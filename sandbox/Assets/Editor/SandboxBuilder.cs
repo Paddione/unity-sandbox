@@ -241,6 +241,25 @@ public static class SandboxBuilder
         Debug.Log("[SandboxBuilder] Verify: OK (NetworkManager + transport + auto-starter + NetworkPlayer prefab).");
     }
 
+    /// <summary>Dedicated-server build (no rendering) for hosts like gpu-metal.</summary>
+    public static void BuildServer()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { ScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/greybox-server/greybox-server",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Server,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] Server build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("Server build failed; see log.");
+    }
+
     public static void BuildPlayer()
     {
         var opts = new BuildPlayerOptions
