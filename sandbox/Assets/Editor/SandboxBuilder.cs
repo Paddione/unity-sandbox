@@ -2,6 +2,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
+using Unity.Netcode.Components;
+using Unity.Netcode.Transports.UTP;
 
 /// <summary>
 /// Headless sandbox construction. Run:
@@ -116,6 +119,8 @@ public static class SandboxBuilder
         var goalToy = goal.AddComponent<ToyTrigger>();
         goalToy.mode = ToyTrigger.Mode.Goal;
 
+        BuildNetworkLayer();
+
         ToyTrigger.ResetRun();
 
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -163,6 +168,77 @@ public static class SandboxBuilder
         }
         foreach (Transform c in t) CountRecursive(c, ref blocks, ref walls,
             ref orbs, ref goals, ref zones, ref player, ref controller);
+    }
+
+    /// <summary>
+    /// Q4 co-op layer: NetworkManager + UnityTransport (127.0.0.1:7777),
+    /// networked player prefab (owner-only controller), ParrelSync-friendly
+    /// auto-starter that hosts in the main editor and connects as client
+    /// in clones. Solo Player stays untouched for single-player verify.
+    /// </summary>
+    public static void BuildNetworkLayer()
+    {
+        // Networked player prefab (saved once, reused on rebuilds).
+        var netPlayer = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        netPlayer.name = "NetworkPlayer";
+        netPlayer.transform.position = new Vector3(0f, 1.1f, 6f);
+        Paint(netPlayer, new Color(0.25f, 0.6f, 0.95f));
+        Object.DestroyImmediate(netPlayer.GetComponent<Collider>());
+        netPlayer.AddComponent<CharacterController>();
+        netPlayer.AddComponent<NetworkObject>();
+        netPlayer.AddComponent<NetworkTransform>();
+        netPlayer.AddComponent<ThirdPersonController>();
+        const string prefabPath = "Assets/Resources/NetworkPlayer.prefab";
+        System.IO.Directory.CreateDirectory("Assets/Resources");
+        PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);
+        Object.DestroyImmediate(netPlayer);
+        var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+        var nmGo = new GameObject("NetworkManager");
+        var nm = nmGo.AddComponent<NetworkManager>();
+        var transport = nmGo.AddComponent<UnityTransport>();
+        transport.SetConnectionData("127.0.0.1", 7777);
+        nm.NetworkConfig.NetworkTransport = transport;
+        nmGo.AddComponent<MultiplayerAutoStarter>();
+        nm.NetworkConfig.PlayerPrefab = playerPrefab;
+        nm.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = playerPrefab });
+        Debug.Log("[SandboxBuilder] Network layer: NetworkManager + UnityTransport 127.0.0.1:7777 + NetworkPlayer prefab.");
+    }
+
+    /// <summary>
+    /// Headless proof for the Q4 co-op layer. Run after BuildScene:
+    ///   Unity -batchmode -nographics -projectPath sandbox
+    ///     -executeMethod SandboxBuilder.VerifyMultiplayer -quit
+    /// </summary>
+    public static void VerifyMultiplayer()
+    {
+        var scene = EditorSceneManager.OpenScene(ScenePath);
+        NetworkManager nm = null;
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            nm = root.GetComponentInChildren<NetworkManager>(true);
+            if (nm != null) break;
+        }
+        if (nm == null)
+            throw new System.Exception("Multiplayer verify failed: no NetworkManager in scene.");
+        if (nm.GetComponent<UnityTransport>() == null)
+            throw new System.Exception("Multiplayer verify failed: no UnityTransport on NetworkManager.");
+        if (nm.GetComponent<MultiplayerAutoStarter>() == null)
+            throw new System.Exception("Multiplayer verify failed: no MultiplayerAutoStarter on NetworkManager.");
+        if (nm.NetworkConfig.NetworkTransport == null)
+            throw new System.Exception("Multiplayer verify failed: NetworkConfig.NetworkTransport not assigned.");
+        if (nm.NetworkConfig.PlayerPrefab == null)
+            throw new System.Exception("Multiplayer verify failed: NetworkManager has no PlayerPrefab.");
+        var prefab = nm.NetworkConfig.PlayerPrefab;
+        if (prefab.GetComponent<NetworkObject>() == null)
+            throw new System.Exception("Multiplayer verify failed: NetworkPlayer prefab has no NetworkObject.");
+        if (prefab.GetComponent<ThirdPersonController>() == null)
+            throw new System.Exception("Multiplayer verify failed: NetworkPlayer prefab has no ThirdPersonController.");
+        if (!MultiplayerAutoStarter.IsClonePath("/proj/sandbox_clone_N/Assets"))
+            throw new System.Exception("Multiplayer verify failed: clone-path detection broken.");
+        if (MultiplayerAutoStarter.IsClonePath("/proj/sandbox/Assets"))
+            throw new System.Exception("Multiplayer verify failed: main path misdetected as clone.");
+        Debug.Log("[SandboxBuilder] Verify: OK (NetworkManager + transport + auto-starter + NetworkPlayer prefab).");
     }
 
     public static void BuildPlayer()

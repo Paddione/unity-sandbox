@@ -5,7 +5,8 @@
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
     "Unity.RenderPipelines.Universal.Runtime",
-    "Sandbox.Runtime"
+    "Sandbox.Runtime",
+    "Unity.Netcode.Runtime"
   ],
   "includePlatforms": [
     "Editor"

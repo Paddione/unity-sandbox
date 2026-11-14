@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 /// <summary>
 /// Minimal hand-rolled third-person controller for the mechanics testbed.
@@ -34,6 +35,11 @@ public sealed class ThirdPersonController : MonoBehaviour
 
     void Update()
     {
+        // Multiplayer: only the owning client drives its player.
+        // Solo scene Player has no NetworkObject -> TryGetComponent is false -> normal control.
+        if (TryGetComponent<NetworkObject>(out var net) && net.IsSpawned && !net.IsOwner)
+            return;
+
         var kb = Keyboard.current;
         var mouse = Mouse.current;
         if (kb == null) return;

@@ -35,3 +35,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Learned: one headless `BuildAll` covers scene + player proof for all
   three questions at once.
 - Next: SFX placeholder (M3, 2026-12-05), share with friends (M4).
+
+## 2026-11-14 — Q4 multiplayer-testable co-op (goal unity-multiplayer-demo)
+
+- Done: NGO 2.5.0 + transport/lobby/relay pinned; `MultiplayerAutoStarter` (path-based clone detect, no ParrelSync dep); `ThirdPersonController` owner gate (solo unaffected); `SandboxBuilder.BuildNetworkLayer` (NetworkManager + transport assignment + NetworkPlayer prefab + prefabs list); `VerifyMultiplayer`; `MultiplayerConfigTests` (3 tests); `BuildAll` green (15.9s, 95MB); EditMode 6/6; host + `--net-client` run logs clean.
+- Faced: keep-alive editor locked the project (stopped service for batch work); services lobby/relay 2.0.0 don't exist (used 1.3.0/1.2.0); `NetworkConfig.NetworkTransport` must be assigned explicitly ("No transport has been selected" + NRE in StartHost until fixed); Sandbox.Runtime needed `Unity.Networking.Transport` asmref.
+- Learned: base manifest already fails Unity resolve when the wrong project is open — always pass `-projectPath`; `NetworkTransform` (not ClientNetworkTransform) ships in NGO 2.5 Components.
+- Next: ParrelSync 2-editor live join, lag pass, silent playtest triage; commit + push + restart editor service.

@@ -18,3 +18,4 @@ Append-only. One line per decision: date, question, verdict
   stays a human-playtest follow-up, not a completion criterion.
 - 2026-11-14, Vertical Slice → **deferred (option only)**. Evidence:
   sandbox proves fun-first per `docs/runbook.md`; no slice work started.
+- 2026-11-14, Q4 netcode stack → **NGO + Relay/Lobby (continue)**. Evidence: `com.unity.netcode.gameobjects@2.5.0` + transport 2.4.0 + lobby 1.3.0 + relay 1.2.0 in manifest, `VerifyMultiplayer` green, host/client startup logs clean, EditMode 6/6. Mirror (self-hosted zero-fee) kept as fallback, Fusion 2 as fastest-cloud alternative per deep-research; no new PUN 2, no Unity-hosted Multiplay dedicated servers.

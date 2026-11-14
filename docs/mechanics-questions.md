@@ -39,3 +39,10 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
   shared counter, build runs with zero errors, decision logged.
 - Headless proof: `VerifyGreybox` inventory + run log; full collect
   playthrough is a human-playtest follow-up (see `docs/playtest-protocol.md`).
+
+## Q4 — Co-op host/join (multiplayer-testable)
+
+- Question: can two players share the greybox loop without builds (host in main editor, client in ParrelSync clone)?
+- Setup: `NetworkManager` + `UnityTransport` (127.0.0.1:7777) + `MultiplayerAutoStarter` (hosts in main, connects as client in `_clone_*` paths or with `--net-client`); `NetworkPlayer` prefab (capsule + CharacterController + NetworkObject + NetworkTransform + owner-only `ThirdPersonController`); solo Player untouched.
+- Exit criterion: `VerifyMultiplayer` green (manager + transport assignment + auto-starter + prefab), Linux build hosts with zero errors, `--net-client` logs client connect path.
+- Headless proof: `docs/q4-run-log.md` (BuildAll + verifies + EditMode 6/6 + host/client run logs).
