@@ -14,9 +14,17 @@ against Editor 6000.0.85f2, relay `unity-ai-relay v1.0.12`, server
 ~/.unity/relay/relay_linux --mcp --project-path /home/patrick/unity-sandbox/sandbox
 ```
 
-- The relay needs a running Editor. Proof run: headless
-  `Editor/Unity -batchmode -nographics -openProject sandbox` → handshake OK,
-  `tools/list` returned 7 tools, `Unity_GetConsoleLogs` call succeeded.
+- The relay needs a running Editor. A headless batchmode Editor is enough —
+  the Assistant package auto-spawns its relay inside the Editor:
+
+```
+/home/patrick/Unity/Hub/Editor/6000.0.85f2/Editor/Unity -batchmode -nographics \
+  -projectPath /home/patrick/unity-sandbox/sandbox -logFile /tmp/unity-sandbox-editor.log
+```
+
+- Proof runs (both against Editor 6000.0.85f2, relay `unity-ai-relay v1.0.12`,
+  server `1.0.0`): handshake OK, `tools/list` returned the 7 tools below,
+  `Unity_GetConsoleLogs` call succeeded — all with no GUI approval step.
 
 ## Tools seen
 
@@ -104,8 +112,9 @@ guidelines otherwise come from `~/AGENTS.md` and the linked skills.
 
 ## Approval
 
-Direct external clients may ask for one manual approval in
-Edit → Project Settings → AI → Unity MCP Server (per project). Read-only
-calls already worked without it; if a mutating call ever reports
-"not approved", approve once in the Hub/Editor GUI (WSLg) and retry.
-AI Gateway connections are auto-approved.
+Verified 2026-11-14 (twice): no approval step needed. Read-only calls
+(`tools/list`, `Unity_GetConsoleLogs`) and the mutating `Unity_RunCommand`
+proof (Greybox cube) all succeeded headless without any GUI approval.
+If a call ever reports "not approved", approve once in
+Edit → Project Settings → AI → Unity MCP Server (Hub/Editor GUI via WSLg)
+and retry. AI Gateway connections are auto-approved.
