@@ -202,6 +202,7 @@ public static class SandboxBuilder
         nmGo.AddComponent<MultiplayerAutoStarter>();
         nm.NetworkConfig.PlayerPrefab = playerPrefab;
         nm.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = playerPrefab });
+        nmGo.AddComponent<ConnectionStatusLogger>();
         Debug.Log("[SandboxBuilder] Network layer: NetworkManager + UnityTransport 127.0.0.1:7777 + NetworkPlayer prefab.");
     }
 
@@ -227,6 +228,8 @@ public static class SandboxBuilder
             throw new System.Exception("Multiplayer verify failed: no MultiplayerAutoStarter on NetworkManager.");
         if (nm.NetworkConfig.NetworkTransport == null)
             throw new System.Exception("Multiplayer verify failed: NetworkConfig.NetworkTransport not assigned.");
+        if (nm.GetComponent<ConnectionStatusLogger>() == null)
+            throw new System.Exception("Multiplayer verify failed: no ConnectionStatusLogger on NetworkManager.");
         if (nm.NetworkConfig.PlayerPrefab == null)
             throw new System.Exception("Multiplayer verify failed: NetworkManager has no PlayerPrefab.");
         var prefab = nm.NetworkConfig.PlayerPrefab;
