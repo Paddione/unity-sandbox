@@ -1,0 +1,24 @@
+[
+  {
+    "name": "ForestNature",
+    "source": "https://kaylousberg.itch.io/kaykit-forest",
+    "archive": "KayKit_Forest_Nature_Pack_1.0_FREE",
+    "sha256": "2ee83e63bb7695f2d884ec27ddf6fce020789a452e7d5c5b0bbdfc4f6ea1fc8c",
+    "models": 105,
+    "textures": [
+      "forest_texture.png"
+    ],
+    "license": "CC0-1.0"
+  },
+  {
+    "name": "Dungeon",
+    "source": "https://kaylousberg.itch.io/kaykit-dungeon-pack",
+    "archive": "KayKit_Dungeon_Pack_1.1_FREE",
+    "sha256": "6acb859d1aefae074f937d1e6f13656a7312b2bdb6d9f1232ebdade8d93d6a1c",
+    "models": 211,
+    "textures": [
+      "dungeon_texture.png"
+    ],
+    "license": "CC0-1.0"
+  }
+]
