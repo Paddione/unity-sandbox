@@ -1,0 +1,46 @@
+name: Unity Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unity Test Runner (EditMode + PlayMode)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with Git LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: sandbox/Library
+          key: Library-test-${{ hashFiles('sandbox/Packages/manifest.json', 'sandbox/Packages/packages-lock.json', 'sandbox/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: |
+            Library-test-
+
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: sandbox
+          unityVersion: 6000.0.85f2
+          testMode: all
+          artifactsPath: artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Test results
+          path: artifacts
+          retention-days: 14
