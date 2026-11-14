@@ -30,15 +30,22 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         if (portArg != null && ushort.TryParse(portArg, out ushort parsedPort))
             targetPort = parsedPort;
 
+        bool isClient = IsClone() || HasArg("--net-client");
+
         var transport = manager.GetComponent<UnityTransport>();
         if (transport != null)
         {
-            transport.SetConnectionData(targetAddress, targetPort);
+            // Host/server must listen on all interfaces (0.0.0.0), otherwise only
+            // loopback clients can connect. Clients ignore the listen address.
+            if (isClient)
+                transport.SetConnectionData(targetAddress, targetPort);
+            else
+                transport.SetConnectionData(targetAddress, targetPort, "0.0.0.0");
             if (manager.NetworkConfig.NetworkTransport == null)
                 manager.NetworkConfig.NetworkTransport = transport;
         }
 
-        if (IsClone() || HasArg("--net-client"))
+        if (isClient)
         {
             Debug.Log($"[Net] Starting client -> {targetAddress}:{targetPort} (clone={IsClone()}).");
             manager.StartClient();
