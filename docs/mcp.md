@@ -27,7 +27,51 @@ against Editor 6000.0.85f2, relay `unity-ai-relay v1.0.12`, server
 
 ## Client entries
 
-Claude Code (`~/.claude.json` / project `.mcp.json`):
+Managed by the dotfiles MCP registry: `unity-sandbox` lives in
+`agentic-resources/runtimes/mcp-servers.json` (all six `harnesses` lists) and is
+rendered by `scripts/render-mcp-configs.py` (pin in `mcp.yaml`). Never hand-edit
+the stanzas below — change the manifest, re-render, update the pin.
+
+| Harness | Config file | Entry |
+|---|---|---|
+| opencode | `.config/opencode/opencode.jsonc` | `mcp.servers.unity-sandbox`, local |
+| codex | `.codex/config.toml` | `[mcp_servers.unity-sandbox]`, 60s/180s timeouts |
+| claude | `.claude/settings.json` | `mcpServers.unity-sandbox` |
+| claude-global | `~/.claude.json` | `mcpServers.unity-sandbox` |
+| gemini | `.gemini/config/mcp_config.json` | `mcpServers.unity-sandbox` |
+| qwen | `.qwen/settings.json` | `mcpServers.unity-sandbox` |
+| muse | `.config/muse/settings.json` | `mcpServers.unity-sandbox`, stdio |
+
+Opencode (`.config/opencode/opencode.jsonc`, inside `mcp.servers`):
+
+```json
+"unity-sandbox": {
+  "type": "local",
+  "command": [
+    "/home/patrick/.unity/relay/relay_linux",
+    "--mcp",
+    "--project-path",
+    "/home/patrick/unity-sandbox/sandbox"
+  ]
+}
+```
+
+Codex (`~/.codex/config.toml`, inside the managed block):
+
+```toml
+[mcp_servers.unity-sandbox]
+command = "/home/patrick/.unity/relay/relay_linux"
+args = [
+    "--mcp",
+    "--project-path",
+    "/home/patrick/unity-sandbox/sandbox",
+]
+startup_timeout_sec = 60.0
+tool_timeout_sec = 180.0
+```
+
+Claude Code (`.claude/settings.json`, project `.mcp.json`, `~/.claude.json`,
+`.gemini/config/mcp_config.json`, `.qwen/settings.json` — same shape):
 
 ```json
 {
@@ -40,15 +84,23 @@ Claude Code (`~/.claude.json` / project `.mcp.json`):
 }
 ```
 
-Codex (`~/.codex/config.toml`):
+Muse (`.config/muse/settings.json` — same, plus transport):
 
-```toml
-[mcp_servers.unity-sandbox]
-command = "/home/patrick/.unity/relay/relay_linux"
-args = ["--mcp", "--project-path", "/home/patrick/unity-sandbox/sandbox"]
-startup_timeout_sec = 60.0
-tool_timeout_sec = 180.0
+```json
+{
+  "mcpServers": {
+    "unity-sandbox": {
+      "command": "/home/patrick/.unity/relay/relay_linux",
+      "args": ["--mcp", "--project-path", "/home/patrick/unity-sandbox/sandbox"],
+      "transport": "stdio"
+    }
+  }
+}
 ```
+
+Harnesses without a render target (`pi`, `openclaw`, `zcode` — skills only via
+`skills.yaml`) reuse the Claude-shape stanza in their own MCP config; their
+guidelines otherwise come from `~/AGENTS.md` and the linked skills.
 
 ## Approval
 
