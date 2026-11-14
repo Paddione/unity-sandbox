@@ -37,3 +37,6 @@ builds/
 sysinfo.txt
 *.stackdump
 crashlytics-build.properties
+
+# Per-machine editor state
+UserSettings/
