@@ -5,7 +5,9 @@ using Unity.Netcode.Transports.UTP;
 /// <summary>
 /// Q4 co-op entry point: player-hosted session without builds.
 /// Main editor hosts; ParrelSync clones (dataPath contains "_clone")
-/// or `--net-client` auto-connect to 127.0.0.1:7777.
+/// or `--net-client` auto-connect. Default 127.0.0.1:7777; override with
+/// `--net-address <host> [--net-port <port>]` for cross-machine play
+/// (e.g. gpu-metal over tailnet).
 /// No hard ParrelSync dependency — clone detection is path-based.
 /// </summary>
 public sealed class MultiplayerAutoStarter : MonoBehaviour
@@ -22,17 +24,23 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
             return;
         }
 
+        string targetAddress = ArgValue("--net-address") ?? address;
+        ushort targetPort = port;
+        string portArg = ArgValue("--net-port");
+        if (portArg != null && ushort.TryParse(portArg, out ushort parsedPort))
+            targetPort = parsedPort;
+
         var transport = manager.GetComponent<UnityTransport>();
         if (transport != null)
         {
-            transport.SetConnectionData(address, port);
+            transport.SetConnectionData(targetAddress, targetPort);
             if (manager.NetworkConfig.NetworkTransport == null)
                 manager.NetworkConfig.NetworkTransport = transport;
         }
 
         if (IsClone() || HasArg("--net-client"))
         {
-            Debug.Log($"[Net] Starting client -> {address}:{port} (clone={IsClone()}).");
+            Debug.Log($"[Net] Starting client -> {targetAddress}:{targetPort} (clone={IsClone()}).");
             manager.StartClient();
         }
         else if (HasArg("--net-server"))
@@ -42,7 +50,7 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[Net] Starting host on {address}:{port}.");
+            Debug.Log($"[Net] Starting host on {targetAddress}:{targetPort}.");
             manager.StartHost();
         }
     }
@@ -59,5 +67,13 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         foreach (var a in System.Environment.GetCommandLineArgs())
             if (a == flag) return true;
         return false;
+    }
+
+    static string ArgValue(string flag)
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i + 1 < args.Length; i++)
+            if (args[i] == flag) return args[i + 1];
+        return null;
     }
 }
