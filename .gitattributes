@@ -1,0 +1,22 @@
+# Git LFS for asset-heavy Unity project (run `git lfs install` once per machine)
+*.png filter=lfs diff=lfs merge=mine -text
+*.jpg filter=lfs diff=lfs merge=mine -text
+*.jpeg filter=lfs diff=lfs merge=mine -text
+*.psd filter=lfs diff=lfs merge=mine -text
+*.tga filter=lfs diff=lfs merge=mine -text
+*.fbx filter=lfs diff=lfs merge=mine -text
+*.fbm filter=lfs diff=lfs merge=mine -text
+*.obj filter=lfs diff=lfs merge=mine -text
+*.blend filter=lfs diff=lfs merge=mine -text
+*.mp3 filter=lfs diff=lfs merge=mine -text
+*.wav filter=lfs diff=lfs merge=mine -text
+*.ogg filter=lfs diff=lfs merge=mine -text
+*.mp4 filter=lfs diff=lfs merge=mine -text
+*.mov filter=lfs diff=lfs merge=mine -text
+*.unity filter=lfs diff=lfs merge=mine -text
+*.prefab filter=lfs diff=lfs merge=mine -text
+*.asset filter=lfs diff=lfs merge=mine -text
+*.controller filter=lfs diff=lfs merge=mine -text
+*.anim filter=lfs diff=lfs merge=mine -text
+*.ttf filter=lfs diff=lfs merge=mine -text
+*.otf filter=lfs diff=lfs merge=mine -text
