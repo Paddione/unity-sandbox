@@ -685,6 +685,7 @@ public static class SandboxBuilder
         hero.AddComponent<DiabloClickController>();
         hero.AddComponent<DiabloMelee>();
         hero.AddComponent<Equipment>();
+        hero.AddComponent<FpsReporter>();
 
         // 6 husks across hall + corridor.
         var huskModels = new[]
@@ -826,6 +827,7 @@ public static class SandboxBuilder
         netPlayer.AddComponent<DiabloMelee>();
         netPlayer.AddComponent<DiabloNetworkPlayer>();
         netPlayer.AddComponent<Equipment>();
+        netPlayer.AddComponent<FpsReporter>();
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);

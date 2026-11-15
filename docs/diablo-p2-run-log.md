@@ -56,3 +56,13 @@ Branch: `feature/unity-diablo-p2-multiplayer-loot-zone` (from `main` @ `ae40013`
 - Proof: EditMode 14/14 + PlayMode 10/10, `VerifyDiabloZone` OK, server +
   player rebuilt, redeployed to `~/diablo-server`, join vs 7778 → connect +
   clean disconnect, no errors.
+
+## Client perf on software rendering (2026-11-15)
+
+- Symptom "laggy" traced to FPS, not network: client ran on Mesa llvmpipe
+  (RDP, no GPU) at fullscreen 5120x1440. No game errors anywhere.
+- Measured with new `FpsReporter` (5 s avg, `[Perf]` in log), Xvfb llvmpipe:
+  5120x1440 fullscreen ~2 fps, 1280x720 windowed ~11 fps,
+  960x540 windowed ~18 fps.
+- Workaround for weak GPUs: `-screen-fullscreen 0 -screen-width 960
+  -screen-height 540`. Kept default resolution untouched.

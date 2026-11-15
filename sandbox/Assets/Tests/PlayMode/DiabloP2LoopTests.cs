@@ -133,6 +133,14 @@ public class DiabloP2LoopTests
     }
 
     [Test]
+    public void FpsReporter_ComputesAverage()
+    {
+        Assert.AreEqual(60f, FpsReporter.ComputeFps(300, 5f), 0.01f);
+        Assert.AreEqual(0f, FpsReporter.ComputeFps(0, 0f), 0.01f);
+        Assert.AreEqual(8f, FpsReporter.ComputeFps(40, 5f), 0.01f);
+    }
+
+    [Test]
     public void Equip_RecalculatesDerivedStats()
     {
         Assert.AreEqual(1f, equipment.GetDamage());
