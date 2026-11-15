@@ -50,6 +50,18 @@ public static class ItemDatabase
         }
     }
 
+    /// <summary>Fixed starter sword, auto-equipped at spawn (Blood Moor).</summary>
+    public static ItemInstance CreateStarterSword()
+    {
+        return new ItemInstance
+        {
+            slot = ItemSlot.Weapon,
+            rarity = ItemRarity.Magic,
+            baseType = "Worn Short Sword",
+            affixes = new List<Affix> { new Affix("Damage", 2f) },
+        };
+    }
+
     public static List<ItemInstance> GetUniques()
     {
         return new List<ItemInstance>

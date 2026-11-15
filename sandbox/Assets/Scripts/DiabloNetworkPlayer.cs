@@ -14,7 +14,7 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         if (target == null || attacker == null) return;
         var health = target.GetComponent<EnemyHealth>();
         if (health == null) return;
-        int damage = melee != null ? melee.damage : 1;
+        int damage = melee != null ? melee.CurrentDamage(attacker) : 1;
 
         var nm = NetworkManager.Singleton;
         var netObj = target.GetComponent<NetworkObject>();

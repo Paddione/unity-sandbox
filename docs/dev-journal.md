@@ -77,3 +77,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: KayKit hero ships with an auto-Animator (Humanoid import) — legacy Animation would double-drive; Mecanim retargeting is the intended path. `AddCondition` does not create the parameter; rebuilding the controller orphans earlier refs (per-build cache).
 - Learned: silent misses are the worst feedback — a whiff must always be visible. Aim rays must ignore the shooter.
 - Next: rebuild Windows + server, redeploy, user retest (whiff swing, close-range aim); husk idle anims as follow-up.
+
+## 2026-11-15 — Blood Moor + Rogue Encampment (inventory, starter sword)
+
+- Done: zone reworked in place (encampment, 10 husks, brute, campfire heal, starter auto-equip); `Inventory` + `DiabloInventoryUI` (I panel, click-equip, `ShouldBlockClicks` guard); `PlayerHealth` + `CampfireHeal`; pickup routing (`CollectInto`) with full-bag equip-overflow so `ToyTrigger` pickup counts stay consistent. Tests: new EditMode `DiabloBloodMoorTests` + PlayMode `DiabloBloodMoorLoopTests` (kill → bag → panel-equip → campfire heal).
+- Faced: `edit_file` near-miss on `Equipment.Equip` (log-line wording) — rewrote the file cleanly instead of stacking edits; `ItemInstance` needed `[Serializable]` or the builder-equipped starter would vanish on scene save; palisade log count depends on the angle skip (20 logs → 15 built, verify pins ≥ 12).
+- Learned: bag-full must never strand loot — overflow-equip keeps the old pickup-count contract intact.
+- Next: run suites + VerifyDiabloZone, rebuild Linux/Windows/server, redeploy, user retest (I-panel, campfire heal, moor clear).
+
+## 2026-11-15 — Blood Moor test failures (gear damage + trigger sync)
+
+- Faced: PlayMode kill test failed — `DiabloMelee.damage` (flat 1) ignored `Equipment` entirely (zero gameplay consumers of `GetDamage`); fixed in product via `DiabloMelee.CurrentDamage` (weapon stats, fallback flat), also used by `DiabloNetworkPlayer.Attack`. No existing test changed meaning: bare heroes still swing 1.
+- Faced: PlayMode campfire test healed 0 — project sets `m_AutoSyncTransforms: 0`, so test teleports (`transform.position`) never reach the physics world; fixed in test via `Physics.SyncTransforms()` after teleports (product untouched — the game walks via `CharacterController.Move`, always synced).
+- Learned: no trigger callback in this project was ever observed firing before; headless trigger tests must sync transforms after any teleport.

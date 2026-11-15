@@ -89,3 +89,10 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
   cross-machine Relay join + 5-person human playtest stay follow-ups
   (Q1–Q5 precedent).
 - Headless proof: `VerifyDiabloZone` inventory + `docs/diablo-p2-run-log.md`.
+
+## Q7 — Does the Blood Moor camp loop with inventory carry the prototype?
+
+- Rogue Encampment (spawn, campfire heal, palisade) → clear 10 moor husks + brute → loot to bag (I to browse/equip) → extract at the Moor Gate. Starter sword (+2) one-shots normal husks (3 dmg vs 3 HP); elites need sustained strikes.
+- Exit criterion: `VerifyDiabloZone` green, Linux/Windows/server builds run with zero errors, EditMode + PlayMode blood-moor tests green, decision logged as Q7 continue/pivot/kill.
+- Husks stay passive and HP/inventory stay local in this cut; retaliation + coop inventory sync are the Q8 candidates.
+- Headless proof: `VerifyDiabloZone` inventory + run log (this session).

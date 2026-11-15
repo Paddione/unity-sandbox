@@ -5,6 +5,7 @@ public enum ItemSlot { Armor, Weapon, Helmet }
 public enum ItemRarity { Magic, Rare, Unique }
 
 /// <summary>Single stat modifier, e.g. Damage +3 or Crit +8%.</summary>
+[System.Serializable]
 public sealed class Affix
 {
     public string key;
@@ -17,7 +18,11 @@ public sealed class Affix
     }
 }
 
-/// <summary>Runtime item instance (P2: local data, no network sync yet).</summary>
+/// <summary>
+/// Runtime item instance (P2: local data, no network sync yet).
+/// Serializable so builder-equipped gear (starter sword) survives in scenes.
+/// </summary>
+[System.Serializable]
 public sealed class ItemInstance
 {
     public ItemSlot slot;

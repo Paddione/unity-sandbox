@@ -31,11 +31,10 @@ public sealed class LootNetRelay : NetworkBehaviour
         {
             var nb = kv.Value;
             if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
-            var equip = nb.GetComponent<Equipment>();
-            if (loot != null && !loot.collected && equip != null && loot.item != null)
+            if (loot != null && !loot.collected && loot.item != null)
             {
                 loot.collected = true;
-                equip.Equip(loot.item);
+                LootDrop.CollectInto(nb.gameObject, loot.item);
             }
         }
         var no = GetComponent<NetworkObject>();

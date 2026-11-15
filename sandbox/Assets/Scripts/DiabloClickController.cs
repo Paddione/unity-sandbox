@@ -59,6 +59,13 @@ public sealed class DiabloClickController : MonoBehaviour
     bool IsRemoteMirror =>
         netPlayer != null && netPlayer.IsSpawned && !netPlayer.IsOwner;
 
+    /// <summary>
+    /// Clicks go to the open inventory panel, never to strikes (pure rule so
+    /// EditMode tests can pin it without spawning UI).
+    /// </summary>
+    public static bool ShouldBlockClicks(DiabloInventoryUI ui) =>
+        ui != null && ui.IsOpen;
+
     /// <summary>Order movement to a ground point (clears attack target).</summary>
     public void SetDestination(Vector3 point)
     {
@@ -141,7 +148,8 @@ public sealed class DiabloClickController : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out var aimHit, 200f))
                 SetAimPoint(aimHit.point);
-            if (mouse.leftButton.wasPressedThisFrame)
+            if (mouse.leftButton.wasPressedThisFrame
+                && !ShouldBlockClicks(GetComponent<DiabloInventoryUI>()))
                 HandleClick(aimHit);
         }
 

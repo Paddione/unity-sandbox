@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -586,9 +587,10 @@ public static class SandboxBuilder
     const string DiabloZoneScenePath = "Assets/Scenes/DiabloZone.unity";
 
     /// <summary>
-    /// P2 Zone 1 "Ember Crypt Approach": south stairs, crypt hall (Diablo
-    /// room kit), west elite alcove with chest, east rubble (blocked), north
-    /// crypt-gate extraction. 6 husks + 1 elite, 4 co-op spawns, netcode.
+    /// Blood Moor (reworked DiabloZone): Rogue Encampment (palisade ring,
+    /// campfire, spawns) in the south, open moor with 10 husks + 1 brute,
+    /// west alcove elite + chest, east rubble, north Moor Gate extraction.
+    /// 4 co-op spawns, netcode, starter sword, inventory, campfire heal.
     /// </summary>
     public static void BuildDiabloZone()
     {
@@ -599,9 +601,9 @@ public static class SandboxBuilder
         var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
         ground.name = "Ground";
         ground.transform.localScale = new Vector3(4f, 1f, 4f);
-        Paint(ground, new Color(0.16f, 0.14f, 0.16f));
+        Paint(ground, new Color(0.20f, 0.28f, 0.17f));
 
-        BuildZoneHall();
+        BuildMoorField();
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)
@@ -696,10 +698,14 @@ public static class SandboxBuilder
         hero.AddComponent<DiabloClickController>();
         hero.AddComponent<DiabloMelee>();
         hero.AddComponent<Equipment>();
+        hero.AddComponent<Inventory>();
+        hero.AddComponent<PlayerHealth>();
+        hero.AddComponent<DiabloInventoryUI>();
+        hero.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         hero.AddComponent<FpsReporter>();
         WireLocomotion(hero, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
 
-        // 6 husks across hall + corridor.
+        // 10 husks scattered across the moor (3 m+ apart, off the camp).
         var huskModels = new[]
         {
             "Skeletons/Characters/Skeleton_Warrior.fbx",
@@ -708,9 +714,11 @@ public static class SandboxBuilder
         };
         var huskSpots = new[]
         {
-            new Vector3(-3f, 0.05f, -2f), new Vector3(3f, 0.05f, -2f),
-            new Vector3(0f, 0.05f, 2f), new Vector3(-4f, 0.05f, 4f),
-            new Vector3(4f, 0.05f, 4f), new Vector3(0f, 0.05f, -3.5f),
+            new Vector3(-5f, 0.05f, 2f), new Vector3(5f, 0.05f, 2f),
+            new Vector3(-2f, 0.05f, -1f), new Vector3(3f, 0.05f, -2f),
+            new Vector3(0f, 0.05f, 5f), new Vector3(-7f, 0.05f, -3f),
+            new Vector3(7f, 0.05f, -3f), new Vector3(-4f, 0.05f, -6f),
+            new Vector3(4f, 0.05f, -6f), new Vector3(0f, 0.05f, -8f),
         };
         for (int i = 0; i < huskSpots.Length; i++)
             SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{i}",
@@ -720,6 +728,19 @@ public static class SandboxBuilder
         SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Husk_Elite",
             new Vector3(-12f, 0.05f, 3f), 15, LootTier.Elite, 1.3f,
             new Color(1f, 0.3f, 0.3f));
+
+        // Brute (northeast moor, second elite).
+        SpawnZoneHusk("Skeletons/Characters/Skeleton_Warrior.fbx", "Husk_Brute",
+            new Vector3(9f, 0.05f, -6f), 12, LootTier.Elite, 1.25f,
+            new Color(0.8f, 0.2f, 0.2f));
+
+        // UI input for the code-built inventory panel.
+        if (Object.FindFirstObjectByType<EventSystem>() == null)
+        {
+            var eventSys = new GameObject("EventSystem");
+            eventSys.AddComponent<EventSystem>();
+            eventSys.AddComponent<StandaloneInputModule>();
+        }
 
         // 4 co-op spawn markers (south stairs, circle formation).
         for (int i = 0; i < 4; i++)
@@ -796,6 +817,124 @@ public static class SandboxBuilder
         wall.name = name;
         wall.transform.position = pos;
         wall.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+    }
+
+    /// <summary>
+    /// Blood Moor field: earthwork bounds, Rogue Encampment palisade ring +
+    /// campfire in the south, scattered rocks and bloodstains across the moor.
+    /// Camp torches keep the ZTorch_* names (verify counts them).
+    /// </summary>
+    static void BuildMoorField()
+    {
+        // Earthwork bounds (keeps the hero on the 40 m plane).
+        var bounds = new[]
+        {
+            ("MoorEdge_N", new Vector3(0f, 1f, -18f), new Vector3(40f, 2f, 1f)),
+            ("MoorEdge_S", new Vector3(0f, 1f, 18f), new Vector3(40f, 2f, 1f)),
+            ("MoorEdge_E", new Vector3(18f, 1f, 0f), new Vector3(1f, 2f, 40f)),
+            ("MoorEdge_W", new Vector3(-18f, 1f, 0f), new Vector3(1f, 2f, 40f)),
+        };
+        foreach (var (name, pos, scale) in bounds)
+        {
+            var edge = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            edge.name = name;
+            edge.transform.position = pos;
+            edge.transform.localScale = scale;
+            Paint(edge, new Color(0.25f, 0.22f, 0.15f));
+        }
+
+        // Palisade ring around the camp (center 0,11, radius 6, gap north).
+        var wood = new Color(0.35f, 0.24f, 0.13f);
+        int logs = 0;
+        for (int i = 0; i < 20; i++)
+        {
+            float a = i * Mathf.PI * 2f / 20f;
+            float sx = Mathf.Cos(a), sz = Mathf.Sin(a);
+            if (sz < -0.7f) continue; // north gate toward the moor
+            var log = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            log.name = $"Palisade_{logs}";
+            log.transform.position = new Vector3(sx * 6f, 1.25f, 11f + sz * 6f);
+            log.transform.localScale = new Vector3(0.5f, 2.5f, 0.5f);
+            Paint(log, wood);
+            logs++;
+        }
+
+        // Campfire: stone base, ember cube, logs + heal trigger.
+        var firePos = new Vector3(3.5f, 0f, 11f);
+        var stone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        stone.name = "CampfireBase";
+        stone.transform.position = firePos + Vector3.up * 0.1f;
+        stone.transform.localScale = new Vector3(1.6f, 0.2f, 1.6f);
+        Paint(stone, new Color(0.4f, 0.38f, 0.38f));
+        var ember = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        ember.name = "Campfire";
+        ember.transform.position = firePos + Vector3.up * 0.5f;
+        ember.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+        Paint(ember, new Color(1f, 0.45f, 0.1f));
+        for (int i = 0; i < 4; i++)
+        {
+            var fuel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            fuel.name = $"CampfireLog_{i}";
+            float a = i * Mathf.PI / 2f + Mathf.PI / 4f;
+            fuel.transform.position = firePos + new Vector3(Mathf.Cos(a) * 0.6f, 0.25f, Mathf.Sin(a) * 0.6f);
+            fuel.transform.rotation = Quaternion.Euler(0f, -a * Mathf.Rad2Deg, 80f);
+            fuel.transform.localScale = new Vector3(0.25f, 1.2f, 0.25f);
+            Paint(fuel, wood);
+        }
+        var trigger = new GameObject("CampfireHeal");
+        trigger.transform.position = firePos + Vector3.up;
+        var triggerCol = trigger.AddComponent<BoxCollider>();
+        triggerCol.isTrigger = true;
+        triggerCol.size = new Vector3(CampfireHeal.Radius * 2f, 3f, CampfireHeal.Radius * 2f);
+        trigger.AddComponent<CampfireHeal>();
+
+        // Camp torches (verify counts ZTorch_*).
+        var torchPrefab = LoadModel("Dungeon/Models/torch_lit.fbx");
+        var torchSpots = new[]
+        {
+            new Vector3(-5f, 0f, 6f), new Vector3(5f, 0f, 6f),
+            new Vector3(-5f, 0f, 15f), new Vector3(5f, 0f, 15f),
+        };
+        for (int i = 0; i < torchSpots.Length; i++)
+        {
+            var torch = (GameObject)PrefabUtility.InstantiatePrefab(torchPrefab);
+            torch.name = $"ZTorch_{i}";
+            torch.transform.position = torchSpots[i];
+        }
+
+        // Scattered moor rocks.
+        var rockSpots = new[]
+        {
+            new Vector3(-3f, 0.3f, 0f), new Vector3(6f, 0.4f, -1f),
+            new Vector3(-8f, 0.25f, 1f), new Vector3(2f, 0.35f, -4f),
+            new Vector3(-5f, 0.3f, -8f), new Vector3(7f, 0.4f, 3f),
+            new Vector3(-1f, 0.25f, 7f), new Vector3(-9f, 0.35f, -6f),
+        };
+        for (int i = 0; i < rockSpots.Length; i++)
+        {
+            var rock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            rock.name = $"MoorRock_{i}";
+            rock.transform.position = rockSpots[i];
+            rock.transform.localScale = new Vector3(1.1f, 0.7f, 1f);
+            rock.transform.rotation = Quaternion.Euler(0f, i * 25f, 5f);
+            Paint(rock, new Color(0.38f, 0.36f, 0.36f));
+        }
+
+        // Bloodstains where the moor earned its name.
+        var stainSpots = new[]
+        {
+            new Vector3(-4.5f, 0f, 1.5f), new Vector3(4.5f, 0f, 1f),
+            new Vector3(0f, 0f, -3f), new Vector3(-6.5f, 0f, -3.5f),
+            new Vector3(3.5f, 0f, -6.5f), new Vector3(8.5f, 0f, -5.5f),
+        };
+        for (int i = 0; i < stainSpots.Length; i++)
+        {
+            var stain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            stain.name = $"BloodPatch_{i}";
+            stain.transform.position = stainSpots[i] + Vector3.up * 0.02f;
+            stain.transform.localScale = new Vector3(1.8f, 0.02f, 1.8f);
+            Paint(stain, new Color(0.45f, 0.08f, 0.08f));
+        }
     }
 
     /// <summary>
@@ -923,6 +1062,10 @@ public static class SandboxBuilder
         SetLayerRecursive(netPlayer, LayerMask.NameToLayer("Ignore Raycast"));
         netPlayer.AddComponent<DiabloNetworkPlayer>();
         netPlayer.AddComponent<Equipment>();
+        netPlayer.AddComponent<Inventory>();
+        netPlayer.AddComponent<PlayerHealth>();
+        netPlayer.AddComponent<DiabloInventoryUI>();
+        netPlayer.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         netPlayer.AddComponent<FpsReporter>();
         WireLocomotion(netPlayer, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
@@ -932,54 +1075,71 @@ public static class SandboxBuilder
         Debug.Log("[SandboxBuilder] NetworkPlayerDiablo prefab saved to Resources.");
     }
 
-    /// <summary>Headless proof for the P2 zone: spawns, husks + elite, goal, netcode.</summary>
+    /// <summary>Headless proof for the Blood Moor: camp, husks + elites, loot, netcode.</summary>
     public static void VerifyDiabloZone()
     {
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
-        bool player = false, clicker = false, melee = false, equip = false, goal = false;
-        bool light = false, camera = false, elite = false, chest = false;
-        bool net = false, transport = false, starter = false, prefab = false;
-        int husks = 0, tiles = 0, walls = 0, torches = 0, spawns = 0;
+        bool player = false, clicker = false, melee = false, equip = false;
+        bool inv = false, health = false, ui = false, starterSword = false;
+        bool goal = false, campfire = false;
+        bool light = false, camera = false, elite = false, brute = false, chest = false;
+        bool net = false, transport = false, autostart = false, prefab = false;
+        int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
         foreach (var root in scene.GetRootGameObjects())
             CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
-                ref equip, ref goal, ref light, ref camera, ref elite, ref chest,
-                ref net, ref transport, ref starter, ref prefab,
-                ref husks, ref tiles, ref walls, ref torches, ref spawns);
+                ref equip, ref inv, ref health, ref ui, ref starterSword,
+                ref goal, ref campfire, ref light, ref camera, ref elite,
+                ref brute, ref chest, ref net, ref transport, ref autostart,
+                ref prefab, ref husks, ref palisade, ref torches, ref spawns,
+                ref edges, ref patches);
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: " +
-                  $"player={player} husks={husks} elite={elite} chest={chest} goal={goal} " +
-                  $"spawns={spawns} tiles={tiles} walls={walls} torches={torches} net={net}");
-        if (!player || !clicker || !melee || !equip || !goal || !elite || !chest
-            || husks < 6 || spawns != 4 || tiles < 25 || walls < 4 || torches < 4
-            || !light || !camera || !net || !transport || !starter || !prefab)
+                  $"player={player} husks={husks} elite={elite} brute={brute} " +
+                  $"chest={chest} goal={goal} campfire={campfire} starterSword={starterSword} " +
+                  $"spawns={spawns} palisade={palisade} torches={torches} edges={edges} " +
+                  $"patches={patches} net={net}");
+        if (!player || !clicker || !melee || !equip || !inv || !health || !ui
+            || !starterSword || !goal || !campfire || !elite || !brute || !chest
+            || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
+            || edges != 4 || patches < 4
+            || !light || !camera || !net || !transport || !autostart || !prefab)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
-        Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (zone + loot + netcode present).");
+        Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (blood moor + loot + netcode present).");
     }
 
     static void CountZoneRecursive(Transform t, ref bool player, ref bool clicker,
-        ref bool melee, ref bool equip, ref bool goal, ref bool light, ref bool camera,
-        ref bool elite, ref bool chest, ref bool net, ref bool transport, ref bool starter,
-        ref bool prefab, ref int husks, ref int tiles, ref int walls, ref int torches, ref int spawns)
+        ref bool melee, ref bool equip, ref bool inv, ref bool health, ref bool ui,
+        ref bool starterSword, ref bool goal, ref bool campfire, ref bool light,
+        ref bool camera, ref bool elite, ref bool brute, ref bool chest, ref bool net,
+        ref bool transport, ref bool autostart, ref bool prefab, ref int husks,
+        ref int palisade, ref int torches, ref int spawns, ref int edges, ref int patches)
     {
         string n = t.gameObject.name;
-        if (n.StartsWith("ZTile_")) tiles++;
-        if (n.StartsWith("ZWall_")) walls++;
+        if (n.StartsWith("Palisade_")) palisade++;
+        if (n.StartsWith("MoorEdge_")) edges++;
+        if (n.StartsWith("BloodPatch_")) patches++;
         if (n.StartsWith("ZTorch_")) torches++;
         if (n.StartsWith("CoopSpawn_")) spawns++;
         if (n == "GoalPad" && t.gameObject.GetComponent<ToyTrigger>() != null
             && t.gameObject.GetComponent<ToyTrigger>().mode == ToyTrigger.Mode.Goal) goal = true;
+        if (n == "CampfireHeal" && t.gameObject.GetComponent<CampfireHeal>() != null) campfire = true;
         if (n == "Player")
         {
             player = true;
             clicker = t.gameObject.GetComponent<DiabloClickController>() != null;
             melee = t.gameObject.GetComponent<DiabloMelee>() != null;
             equip = t.gameObject.GetComponent<Equipment>() != null;
+            inv = t.gameObject.GetComponent<Inventory>() != null;
+            health = t.gameObject.GetComponent<PlayerHealth>() != null;
+            ui = t.gameObject.GetComponent<DiabloInventoryUI>() != null;
             player = player && t.gameObject.GetComponent<CharacterController>() != null;
+            var eq = t.gameObject.GetComponent<Equipment>();
+            starterSword = eq != null && eq.weapon != null
+                && eq.GetDamage() >= Equipment.BaseDamage + 2f;
         }
         if (n == "Husk_Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
-        {
             elite = true;
-            husks++;
-        }
+        else if (n == "Husk_Brute" && t.gameObject.GetComponent<EnemyHealth>() != null)
+            brute = true;
         else if (t.gameObject.CompareTag("Husk")
             && t.gameObject.GetComponent<EnemyHealth>() != null) husks++;
         if (n == "DChestZone" && t.gameObject.GetComponent<LootDrop>() != null) chest = true;
@@ -991,19 +1151,24 @@ public static class SandboxBuilder
                 net = true;
                 transport = nm.GetComponent<UnityTransport>() != null
                     && nm.NetworkConfig.NetworkTransport != null;
-                starter = nm.GetComponent<MultiplayerAutoStarter>() != null;
+                autostart = nm.GetComponent<MultiplayerAutoStarter>() != null;
                 var pp = nm.NetworkConfig.PlayerPrefab;
                 prefab = pp != null && pp.GetComponent<NetworkObject>() != null
                     && pp.GetComponent<DiabloNetworkPlayer>() != null
-                    && pp.GetComponent<Equipment>() != null;
+                    && pp.GetComponent<Equipment>() != null
+                    && pp.GetComponent<Inventory>() != null
+                    && pp.GetComponent<PlayerHealth>() != null
+                    && pp.GetComponent<DiabloInventoryUI>() != null;
             }
         }
         if (t.gameObject.GetComponent<Light>() != null) light = true;
         if (t.gameObject.GetComponent<Camera>() != null) camera = true;
         foreach (Transform c in t) CountZoneRecursive(c, ref player, ref clicker,
-            ref melee, ref equip, ref goal, ref light, ref camera, ref elite,
-            ref chest, ref net, ref transport, ref starter, ref prefab,
-            ref husks, ref tiles, ref walls, ref torches, ref spawns);
+            ref melee, ref equip, ref inv, ref health, ref ui, ref starterSword,
+            ref goal, ref campfire, ref light, ref camera, ref elite,
+            ref brute, ref chest, ref net, ref transport, ref autostart,
+            ref prefab, ref husks, ref palisade, ref torches, ref spawns,
+            ref edges, ref patches);
     }
 
     /// <summary>

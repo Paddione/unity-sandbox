@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// One-shot onboarding hint at the zone entry stairs (Zone 1).
+/// One-shot onboarding hint at the Rogue Encampment gate (Blood Moor).
 /// Fires for the first hero or network player walking in.
 /// </summary>
 public sealed class ZoneEntryHint : MonoBehaviour
@@ -14,8 +14,9 @@ public sealed class ZoneEntryHint : MonoBehaviour
         var go = other.gameObject;
         if (go.name != "Player" && !go.CompareTag("Player")) return;
         shown = true;
-        Debug.Log("[Diablo] Entered Ember Crypt Approach — WASD/arrows to move, aim with the mouse, " +
+        Debug.Log("[Diablo] Entered the Rogue Encampment — WASD/arrows to move, aim with the mouse, " +
                   "click to strike (click a husk to chase it). " +
-                  "Clear the hall, loot the west elite, extract at the north crypt gate.");
+                  "Clear the Blood Moor, loot the west elite, open the chest, " +
+                  "extract at the north Moor Gate. I opens your inventory.");
     }
 }

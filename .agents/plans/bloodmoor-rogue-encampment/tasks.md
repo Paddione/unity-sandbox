@@ -33,7 +33,7 @@ request: Blood-Moor-Area mit Rogue Encampment als Startstadt, Enemies über das 
 
 | Partial | Inhalt | target_files (exklusiv) |
 |---|---|---|
-| P1 data | Bag-Daten + Starter-Schwert | `sandbox/Assets/Scripts/Items/Inventory.cs` (neu), `sandbox/Assets/Scripts/Items/ItemDatabase.cs`, `sandbox/Assets/Scripts/Items/Equipment.cs` |
+| P1 data | Bag-Daten + Starter-Schwert + Pickup-Routing | `sandbox/Assets/Scripts/Items/Inventory.cs` (neu), `sandbox/Assets/Scripts/Items/ItemDatabase.cs` (Starter), `sandbox/Assets/Scripts/Items/ItemDefinition.cs` (`[Serializable]` für Szenen-Persistenz), `sandbox/Assets/Scripts/Items/Equipment.cs` (Swap-API), `sandbox/Assets/Scripts/Loot/LootDrop.cs` (`CollectInto`: Bag mit Equip-Overflow), `sandbox/Assets/Scripts/Loot/LootNetRelay.cs` (Server-Pickup in den Bag) |
 | P2 ui | Inventar-UI + Klick-Guard | `sandbox/Assets/Scripts/DiabloInventoryUI.cs` (neu), `sandbox/Assets/Scripts/DiabloClickController.cs` |
 | P3 zone | Blood-Moor-Umbau + Wiring | `sandbox/Assets/Editor/SandboxBuilder.cs`, `sandbox/Assets/Scenes/DiabloZone.unity`, `sandbox/Assets/Scenes/DiabloZone.unity.meta`, `sandbox/Assets/Scripts/ZoneEntryHint.cs` |
 | P4 camp | HP + Lagerfeuer | `sandbox/Assets/Scripts/PlayerHealth.cs` (neu), `sandbox/Assets/Scripts/CampfireHeal.cs` (neu) |

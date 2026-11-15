@@ -69,6 +69,20 @@ public sealed class LootDrop : MonoBehaviour
         return loot;
     }
 
+    /// <summary>
+    /// Pickup routing (Blood Moor): into the hero's bag when present, else
+    /// straight onto the body (legacy solo behavior without an Inventory).
+    /// A full bag overflows onto the body so no loot is ever lost or stuck.
+    /// </summary>
+    public static void CollectInto(GameObject hero, ItemInstance item)
+    {
+        if (hero == null || item == null) return;
+        var inv = hero.GetComponent<Inventory>();
+        if (inv != null && inv.Add(item)) return;
+        var eq = hero.GetComponent<Equipment>();
+        if (eq != null) eq.Equip(item);
+    }
+
     public static Color ColorFor(ItemRarity rarity)
     {
         switch (rarity)
@@ -114,12 +128,10 @@ public sealed class LootDrop : MonoBehaviour
         if (net && !nm.IsServer)
         {
             var relay = GetComponent<LootNetRelay>();
-            var equip = go.GetComponent<Equipment>();
-            if (equip != null) equip.Equip(item); // client prediction
+            CollectInto(go, item); // client prediction
             if (relay != null) relay.RequestPickupServerRpc();
             return;
         }
-        var eq = go.GetComponent<Equipment>();
-        if (eq != null) eq.Equip(item);
+        CollectInto(go, item);
     }
 }

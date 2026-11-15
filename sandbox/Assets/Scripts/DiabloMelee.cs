@@ -15,6 +15,17 @@ public sealed class DiabloMelee : MonoBehaviour
 
     float lastSwing = float.NegativeInfinity;
 
+    /// <summary>
+    /// Damage for one swing: equipped weapon stats when the attacker gears
+    /// through <see cref="Equipment"/>, else the flat <see cref="damage"/>.
+    /// </summary>
+    public int CurrentDamage(Transform attacker)
+    {
+        var eq = attacker != null ? attacker.GetComponent<Equipment>() : null;
+        if (eq == null) return damage;
+        return Mathf.Max(1, Mathf.RoundToInt(eq.GetDamage()));
+    }
+
     /// <summary>Attempt one swing at target. Returns true on a landed hit.</summary>
     public bool TryAttack(GameObject target, Transform attacker)
     {
@@ -29,8 +40,9 @@ public sealed class DiabloMelee : MonoBehaviour
         Swings++;
         if (toTarget.sqrMagnitude > 0.0001f)
             attacker.rotation = Quaternion.LookRotation(toTarget);
-        health.TakeDamage(damage);
-        Debug.Log($"[Diablo] Melee swing #{Swings} hit {target.name}.");
+        int blow = CurrentDamage(attacker);
+        health.TakeDamage(blow);
+        Debug.Log($"[Diablo] Melee swing #{Swings} hit {target.name} ({blow} dmg).");
         return true;
     }
 
