@@ -502,12 +502,29 @@ public static class SandboxBuilder
             throw new System.Exception("Diablo server build failed; see log.");
     }
 
-    /// <summary>Dedicated-server build (no rendering) for hosts like gpu-metal.</summary>
+    /// <summary>
+    /// Scene for the dedicated-server build: `-serverScene diablo` selects
+    /// the Diablo room, anything else (or no argument) the Greybox.
+    /// </summary>
+    public static string ServerScenePath(string[] args)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == "-serverScene")
+                return args[i + 1] == "diablo" ? DiabloScenePath : ScenePath;
+        return ScenePath;
+    }
+
+    /// <summary>
+    /// Dedicated-server build (no rendering) for hosts like gpu-metal. Run:
+    ///   Unity -batchmode -nographics -quit -projectPath sandbox
+    ///     -executeMethod SandboxBuilder.BuildServer [-serverScene greybox|diablo]
+    /// </summary>
     public static void BuildServer()
     {
+        string scenePath = ServerScenePath(System.Environment.GetCommandLineArgs());
         var opts = new BuildPlayerOptions
         {
-            scenes = new[] { ScenePath },
+            scenes = new[] { scenePath },
             locationPathName = "/home/patrick/unity-sandbox/builds/greybox-server/greybox-server",
             target = BuildTarget.StandaloneLinux64,
             subtarget = (int)StandaloneBuildSubtarget.Server,
@@ -515,6 +532,7 @@ public static class SandboxBuilder
         };
         var report = BuildPipeline.BuildPlayer(opts);
         Debug.Log($"[SandboxBuilder] Server build result: {report.summary.result} " +
+                  $"(scene {System.IO.Path.GetFileName(scenePath)}) " +
                   $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
                   $"{report.summary.totalSize / 1048576} MB");
         if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
