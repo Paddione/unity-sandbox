@@ -42,3 +42,17 @@ Branch: `feature/unity-diablo-p2-multiplayer-loot-zone` (from `main` @ `ae40013`
 - E2E proof: local zone client `--net-client --net-address 100.74.227.118
   --net-port 7778` → server log `[Net] Client connected: 1 (total=1)`,
   then clean disconnect. Join command below.
+
+## Lagfix (2026-11-15, commit `8fb61ac`)
+
+- Symptom: client movement rubber-banded on the gpu-metal session despite a
+  1 ms direct tailnet path (DERP ruled out via `tailscale ping`).
+- Root cause: player prefab `NetworkTransform` in default `Server` authority —
+  the dedicated server replicated its stale copy back to the owner 30x/s.
+  Fixed to `Owner` (zone + greybox prefabs; greybox takes effect on next rebuild).
+- Same pass: husks/chest carry `NetworkObject` now (server-authoritative
+  kills, no more per-client divergence); loot `Spawn()` server-gated plus
+  chest relay for dedicated-server sessions.
+- Proof: EditMode 14/14 + PlayMode 10/10, `VerifyDiabloZone` OK, server +
+  player rebuilt, redeployed to `~/diablo-server`, join vs 7778 → connect +
+  clean disconnect, no errors.
