@@ -557,6 +557,342 @@ public static class SandboxBuilder
             throw new System.Exception("Player build failed; see log.");
     }
 
+    const string DiabloZoneScenePath = "Assets/Scenes/DiabloZone.unity";
+
+    /// <summary>
+    /// P2 Zone 1 "Ember Crypt Approach": south stairs, crypt hall (Diablo
+    /// room kit), west elite alcove with chest, east rubble (blocked), north
+    /// crypt-gate extraction. 6 husks + 1 elite, 4 co-op spawns, netcode.
+    /// </summary>
+    public static void BuildDiabloZone()
+    {
+        var scene = EditorSceneManager.NewScene(
+            NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        scene.name = "DiabloZone";
+
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        ground.name = "Ground";
+        ground.transform.localScale = new Vector3(4f, 1f, 4f);
+        Paint(ground, new Color(0.16f, 0.14f, 0.16f));
+
+        BuildZoneHall();
+
+        // South stairs (entry).
+        for (int i = 0; i < 3; i++)
+        {
+            var step = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            step.name = $"ZStep_{i}";
+            step.transform.position = new Vector3(0f, 0.15f * (2 - i), 10f + i * 1.2f);
+            step.transform.localScale = new Vector3(4f, 0.3f, 1.2f);
+            Paint(step, new Color(0.35f, 0.33f, 0.36f));
+        }
+
+        // West alcove: elite arena + chest.
+        var alcoveTiles = LoadModel("Dungeon/Models/floor_tile_large.fbx");
+        float tile = Footprint(alcoveTiles);
+        for (int ix = -2; ix <= 2; ix++)
+            for (int iz = -2; iz <= 2; iz++)
+            {
+                var t = (GameObject)PrefabUtility.InstantiatePrefab(alcoveTiles);
+                t.name = $"ZTile_Alcove_{ix}_{iz}";
+                t.transform.position = new Vector3(-12f + ix * tile, 0.02f, iz * tile);
+            }
+        var chestPrefab = LoadModel("Dungeon/Models/chest.fbx");
+        var chest = (GameObject)PrefabUtility.InstantiatePrefab(chestPrefab);
+        chest.name = "DChestZone";
+        chest.transform.position = new Vector3(-12f, 0f, 0f);
+        var chestCol = chest.AddComponent<BoxCollider>();
+        chestCol.isTrigger = true;
+        chestCol.size = new Vector3(2f, 2f, 2f);
+        var chestLoot = chest.AddComponent<LootDrop>();
+        chestLoot.isChest = true;
+
+        // East rubble (collapsed passage, decoration only).
+        for (int i = 0; i < 4; i++)
+        {
+            var rock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            rock.name = $"ZRubble_{i}";
+            rock.transform.position = new Vector3(10f + (i % 2), 0.4f, -1f + i);
+            rock.transform.localScale = new Vector3(1.2f, 0.8f, 1.2f);
+            rock.transform.rotation = Quaternion.Euler(0f, i * 20f, 8f);
+            Paint(rock, new Color(0.4f, 0.38f, 0.4f));
+        }
+
+        // North crypt gate (extraction, Q3 semantics).
+        var goal = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        goal.name = "GoalPad";
+        goal.transform.position = new Vector3(0f, 0.1f, -6f);
+        goal.transform.localScale = new Vector3(3f, 0.2f, 3f);
+        Paint(goal, new Color(0.8f, 0.25f, 0.25f));
+        goal.GetComponent<BoxCollider>().isTrigger = true;
+        goal.AddComponent<ToyTrigger>().mode = ToyTrigger.Mode.Goal;
+        for (int i = 0; i < 2; i++)
+        {
+            var pillar = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            pillar.name = $"ZGatePillar_{i}";
+            pillar.transform.position = new Vector3(i == 0 ? -2.2f : 2.2f, 1.5f, -6f);
+            pillar.transform.localScale = new Vector3(0.8f, 3f, 0.8f);
+            Paint(pillar, new Color(0.45f, 0.42f, 0.48f));
+        }
+
+        // Light + camera.
+        var light = new GameObject("Directional Light");
+        var dl = light.AddComponent<Light>();
+        dl.type = LightType.Directional;
+        dl.intensity = 1.1f;
+        light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        var cam = new GameObject("Main Camera");
+        cam.AddComponent<Camera>();
+        cam.tag = "MainCamera";
+        cam.transform.position = new Vector3(0f, 12f, -4f);
+
+        // Solo hero (verify + single-player), with Equipment for loot.
+        var heroPrefab = LoadModel("Adventurers/Characters/Knight.fbx");
+        var hero = (GameObject)PrefabUtility.InstantiatePrefab(heroPrefab);
+        hero.name = "Player";
+        hero.transform.position = new Vector3(0f, 0.05f, 11f);
+        var cc = hero.AddComponent<CharacterController>();
+        cc.height = 1.8f;
+        cc.radius = 0.35f;
+        cc.center = new Vector3(0f, 0.9f, 0f);
+        hero.AddComponent<DiabloClickController>();
+        hero.AddComponent<DiabloMelee>();
+        hero.AddComponent<Equipment>();
+
+        // 6 husks across hall + corridor.
+        var huskModels = new[]
+        {
+            "Skeletons/Characters/Skeleton_Warrior.fbx",
+            "Skeletons/Characters/Skeleton_Minion.fbx",
+            "Skeletons/Characters/Skeleton_Rogue.fbx",
+        };
+        var huskSpots = new[]
+        {
+            new Vector3(-3f, 0.05f, -2f), new Vector3(3f, 0.05f, -2f),
+            new Vector3(0f, 0.05f, 2f), new Vector3(-4f, 0.05f, 4f),
+            new Vector3(4f, 0.05f, 4f), new Vector3(0f, 0.05f, -3.5f),
+        };
+        for (int i = 0; i < huskSpots.Length; i++)
+            SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{i}",
+                huskSpots[i], 3, LootTier.Normal, 1f, null);
+
+        // Elite (west alcove).
+        SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Husk_Elite",
+            new Vector3(-12f, 0.05f, 3f), 15, LootTier.Elite, 1.3f,
+            new Color(1f, 0.3f, 0.3f));
+
+        // 4 co-op spawn markers (south stairs, circle formation).
+        for (int i = 0; i < 4; i++)
+        {
+            float a = i * Mathf.PI / 2f;
+            var spawn = new GameObject($"CoopSpawn_{i}");
+            spawn.transform.position = new Vector3(Mathf.Cos(a) * 1.5f, 0.1f, 11f + Mathf.Sin(a) * 1.5f);
+        }
+
+        BuildDiabloZonePlayerPrefab();
+        AssetDatabase.Refresh();
+        DiabloNetworkBootstrap.EnsureZoneNetcode();
+
+        ToyTrigger.ResetRun();
+        EnemyHealth.ResetRun();
+        DiabloMelee.ResetRun();
+
+        EditorBuildSettings.scenes = new[]
+        {
+            new EditorBuildSettingsScene(ScenePath, true),
+            new EditorBuildSettingsScene(DiabloScenePath, true),
+            new EditorBuildSettingsScene(DiabloZoneScenePath, true),
+        };
+        EditorSceneManager.SaveScene(scene, DiabloZoneScenePath);
+        Debug.Log($"[SandboxBuilder] Saved {DiabloZoneScenePath}");
+    }
+
+    static void BuildZoneHall()
+    {
+        var tilePrefab = LoadModel("Dungeon/Models/floor_tile_large.fbx");
+        float tile = Footprint(tilePrefab);
+        int half = Mathf.CeilToInt(8f / tile);
+        for (int ix = -half; ix <= half; ix++)
+            for (int iz = -half; iz <= half; iz++)
+            {
+                var t = (GameObject)PrefabUtility.InstantiatePrefab(tilePrefab);
+                t.name = $"ZTile_{ix}_{iz}";
+                t.transform.position = new Vector3(ix * tile, 0.02f, iz * tile);
+            }
+        var wallPrefab = LoadModel("Dungeon/Models/wall.fbx");
+        var cornerPrefab = LoadModel("Dungeon/Models/wall_corner.fbx");
+        float w = Footprint(wallPrefab);
+        int n = Mathf.CeilToInt(16f / w);
+        float edge = 8f;
+        for (int i = 0; i <= n; i++)
+        {
+            float p = -edge + i * w;
+            PlaceZoneWall(wallPrefab, $"ZWall_N_{i}", new Vector3(p, 0f, -edge), 0f);
+            PlaceZoneWall(wallPrefab, $"ZWall_S_{i}", new Vector3(p, 0f, edge), 180f);
+            PlaceZoneWall(wallPrefab, $"ZWall_W_{i}", new Vector3(-edge, 0f, p), 90f);
+            PlaceZoneWall(wallPrefab, $"ZWall_E_{i}", new Vector3(edge, 0f, p), 270f);
+        }
+        PlaceZoneWall(cornerPrefab, "ZWall_Corner_NE", new Vector3(edge, 0f, -edge), 0f);
+        PlaceZoneWall(cornerPrefab, "ZWall_Corner_NW", new Vector3(-edge, 0f, -edge), 90f);
+        PlaceZoneWall(cornerPrefab, "ZWall_Corner_SE", new Vector3(edge, 0f, edge), 270f);
+        PlaceZoneWall(cornerPrefab, "ZWall_Corner_SW", new Vector3(edge, 0f, edge), 180f);
+        var torchPrefab = LoadModel("Dungeon/Models/torch_lit.fbx");
+        var torchSpots = new[]
+        {
+            new Vector3(-6f, 0f, -6f), new Vector3(6f, 0f, -6f),
+            new Vector3(-6f, 0f, 6f), new Vector3(6f, 0f, 6f),
+        };
+        for (int i = 0; i < torchSpots.Length; i++)
+        {
+            var torch = (GameObject)PrefabUtility.InstantiatePrefab(torchPrefab);
+            torch.name = $"ZTorch_{i}";
+            torch.transform.position = torchSpots[i];
+        }
+    }
+
+    static void PlaceZoneWall(GameObject prefab, string name, Vector3 pos, float yaw)
+    {
+        var wall = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        wall.name = name;
+        wall.transform.position = pos;
+        wall.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+    }
+
+    static void SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)
+    {
+        var prefab = LoadModel(model);
+        var husk = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        husk.name = name;
+        husk.tag = "Husk";
+        husk.transform.position = pos;
+        husk.transform.localScale = Vector3.one * scale;
+        var col = husk.AddComponent<CapsuleCollider>();
+        col.height = 1.7f;
+        col.radius = 0.35f;
+        col.center = new Vector3(0f, 0.85f, 0f);
+        husk.AddComponent<EnemyHealth>().SetTier(hp, tier);
+        if (tint.HasValue)
+        {
+            var rend = husk.GetComponentInChildren<Renderer>();
+            if (rend != null) rend.material.color = tint.Value;
+        }
+    }
+
+    static void BuildDiabloZonePlayerPrefab()
+    {
+        var heroPrefab = LoadModel("Adventurers/Characters/Knight.fbx");
+        var netPlayer = (GameObject)PrefabUtility.InstantiatePrefab(heroPrefab);
+        netPlayer.name = "NetworkPlayerDiablo";
+        netPlayer.transform.position = Vector3.zero;
+        var cc = netPlayer.AddComponent<CharacterController>();
+        cc.height = 1.8f;
+        cc.radius = 0.35f;
+        cc.center = new Vector3(0f, 0.9f, 0f);
+        netPlayer.AddComponent<NetworkObject>();
+        netPlayer.AddComponent<NetworkTransform>();
+        netPlayer.AddComponent<DiabloClickController>();
+        netPlayer.AddComponent<DiabloMelee>();
+        netPlayer.AddComponent<DiabloNetworkPlayer>();
+        netPlayer.AddComponent<Equipment>();
+        const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
+        System.IO.Directory.CreateDirectory("Assets/Resources");
+        PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);
+        Object.DestroyImmediate(netPlayer);
+        Debug.Log("[SandboxBuilder] NetworkPlayerDiablo prefab saved to Resources.");
+    }
+
+    /// <summary>Headless proof for the P2 zone: spawns, husks + elite, goal, netcode.</summary>
+    public static void VerifyDiabloZone()
+    {
+        var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
+        bool player = false, clicker = false, melee = false, equip = false, goal = false;
+        bool light = false, camera = false, elite = false, chest = false;
+        bool net = false, transport = false, starter = false, prefab = false;
+        int husks = 0, tiles = 0, walls = 0, torches = 0, spawns = 0;
+        foreach (var root in scene.GetRootGameObjects())
+            CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
+                ref equip, ref goal, ref light, ref camera, ref elite, ref chest,
+                ref net, ref transport, ref starter, ref prefab,
+                ref husks, ref tiles, ref walls, ref torches, ref spawns);
+        Debug.Log("[SandboxBuilder] VerifyDiabloZone: " +
+                  $"player={player} husks={husks} elite={elite} chest={chest} goal={goal} " +
+                  $"spawns={spawns} tiles={tiles} walls={walls} torches={torches} net={net}");
+        if (!player || !clicker || !melee || !equip || !goal || !elite || !chest
+            || husks < 6 || spawns != 4 || tiles < 25 || walls < 4 || torches < 4
+            || !light || !camera || !net || !transport || !starter || !prefab)
+            throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
+        Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (zone + loot + netcode present).");
+    }
+
+    static void CountZoneRecursive(Transform t, ref bool player, ref bool clicker,
+        ref bool melee, ref bool equip, ref bool goal, ref bool light, ref bool camera,
+        ref bool elite, ref bool chest, ref bool net, ref bool transport, ref bool starter,
+        ref bool prefab, ref int husks, ref int tiles, ref int walls, ref int torches, ref int spawns)
+    {
+        string n = t.gameObject.name;
+        if (n.StartsWith("ZTile_")) tiles++;
+        if (n.StartsWith("ZWall_")) walls++;
+        if (n.StartsWith("ZTorch_")) torches++;
+        if (n.StartsWith("CoopSpawn_")) spawns++;
+        if (n == "GoalPad" && t.gameObject.GetComponent<ToyTrigger>() != null
+            && t.gameObject.GetComponent<ToyTrigger>().mode == ToyTrigger.Mode.Goal) goal = true;
+        if (n == "Player")
+        {
+            player = true;
+            clicker = t.gameObject.GetComponent<DiabloClickController>() != null;
+            melee = t.gameObject.GetComponent<DiabloMelee>() != null;
+            equip = t.gameObject.GetComponent<Equipment>() != null;
+            player = player && t.gameObject.GetComponent<CharacterController>() != null;
+        }
+        if (n == "Husk_Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
+        {
+            elite = true;
+            husks++;
+        }
+        else if (t.gameObject.CompareTag("Husk")
+            && t.gameObject.GetComponent<EnemyHealth>() != null) husks++;
+        if (n == "DChestZone" && t.gameObject.GetComponent<LootDrop>() != null) chest = true;
+        if (n == "NetworkManager")
+        {
+            var nm = t.gameObject.GetComponent<NetworkManager>();
+            if (nm != null)
+            {
+                net = true;
+                transport = nm.GetComponent<UnityTransport>() != null
+                    && nm.NetworkConfig.NetworkTransport != null;
+                starter = nm.GetComponent<MultiplayerAutoStarter>() != null;
+                var pp = nm.NetworkConfig.PlayerPrefab;
+                prefab = pp != null && pp.GetComponent<NetworkObject>() != null
+                    && pp.GetComponent<DiabloNetworkPlayer>() != null
+                    && pp.GetComponent<Equipment>() != null;
+            }
+        }
+        if (t.gameObject.GetComponent<Light>() != null) light = true;
+        if (t.gameObject.GetComponent<Camera>() != null) camera = true;
+        foreach (Transform c in t) CountZoneRecursive(c, ref player, ref clicker,
+            ref melee, ref equip, ref goal, ref light, ref camera, ref elite,
+            ref chest, ref net, ref transport, ref starter, ref prefab,
+            ref husks, ref tiles, ref walls, ref torches, ref spawns);
+    }
+
+    public static void BuildDiabloZoneBuild()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloZoneScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-zone/diablo-zone",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Player,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] DiabloZone build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("DiabloZone build failed; see log.");
+    }
+
     static void AddWall(string name, Vector3 pos, Vector3 scale)
     {
         var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);

@@ -65,3 +65,25 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Setup: `NetworkManager` + `UnityTransport` (127.0.0.1:7777) + `MultiplayerAutoStarter` (hosts in main, connects as client in `_clone_*` paths or with `--net-client`); `NetworkPlayer` prefab (capsule + CharacterController + NetworkObject + NetworkTransform + owner-only `ThirdPersonController`); solo Player untouched.
 - Exit criterion: `VerifyMultiplayer` green (manager + transport assignment + auto-starter + prefab), Linux build hosts with zero errors, `--net-client` logs client connect path.
 - Headless proof: `docs/q4-run-log.md` (BuildAll + verifies + EditMode 6/6 + host/client run logs).
+
+## Q6 — Co-op kill-loot-extract with rarity chase (P2 zone)
+
+- Question: is the co-op kill-loot-extract loop with a Magic/Rare/Unique
+  rarity chase fun in a first explorable crypt zone?
+- Setup: new `DiabloZone.unity` scene ("Ember Crypt Approach"): south stairs
+  entry → crypt hall (Diablo room kit) → west elite alcove (`Husk_Elite`,
+  15 HP, chest with guaranteed Rare+) → east rubble (blocked) → north
+  crypt-gate extraction (`GoalPad`, Q3 semantics, `Needed = 3` unchanged).
+  6 husks (`Normal`, 3 HP) + 4 `CoopSpawn` markers; hero + `NetworkPlayerDiablo`
+  prefab carry `Equipment` (Armor/Weapon/Helmet). Host-authoritative NGO
+  (owner-only click input, `DiabloNetworkPlayer.SubmitAttackServerRpc` with
+  4 m range check, server-side equip + despawn, client prediction).
+  Kills roll `LootTable` (Normal 70 % drop: 80/18/2; Elite 100 %:
+  50/40/10; Chest 100 %: 0/80/20); no-drop rolls keep the legacy orb.
+- Exit criterion: `VerifyDiabloZone` green, Linux player build
+  `builds/diablo-zone/diablo-zone` runs with zero errors, PlayMode loot
+  tests green, decision logged as Q6 continue/pivot/kill.
+- Client pickup without server is prediction-only (server despawn wins);
+  cross-machine Relay join + 5-person human playtest stay follow-ups
+  (Q1–Q5 precedent).
+- Headless proof: `VerifyDiabloZone` inventory + `docs/diablo-p2-run-log.md`.

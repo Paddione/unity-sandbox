@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 /// <summary>
 /// Isometric click-to-move controller for the Diablo prototype (Q5).
@@ -26,6 +27,7 @@ public sealed class DiabloClickController : MonoBehaviour
 
     CharacterController controller;
     DiabloMelee melee;
+    DiabloNetworkPlayer netPlayer;
     float verticalVelocity;
     Vector3 destination;
     bool hasDestination;
@@ -35,7 +37,12 @@ public sealed class DiabloClickController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         melee = GetComponent<DiabloMelee>();
+        netPlayer = GetComponent<DiabloNetworkPlayer>();
     }
+
+    /// <summary>True for a replicated mirror owned by another client.</summary>
+    bool IsRemoteMirror =>
+        netPlayer != null && netPlayer.IsSpawned && !netPlayer.IsOwner;
 
     /// <summary>Order movement to a ground point (clears attack target).</summary>
     public void SetDestination(Vector3 point)
@@ -57,6 +64,8 @@ public sealed class DiabloClickController : MonoBehaviour
 
     void Update()
     {
+        // P2 co-op: remote mirrors are driven by NetworkTransform, not input.
+        if (IsRemoteMirror) return;
         var mouse = Mouse.current;
         if (mouse != null && Camera.main != null && mouse.leftButton.wasPressedThisFrame)
             HandleClick(mouse);
@@ -72,7 +81,11 @@ public sealed class DiabloClickController : MonoBehaviour
                 Face(toTarget);
                 // Lazy: Awake order vs. sibling AddComponent is not guaranteed.
                 if (melee == null) melee = GetComponent<DiabloMelee>();
-                if (melee != null) melee.TryAttack(attackTarget, transform);
+                if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+                var nm = NetworkManager.Singleton;
+                if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
+                    netPlayer.Attack(attackTarget, melee, transform);
+                else if (melee != null) melee.TryAttack(attackTarget, transform);
                 if (attackTarget == null) attackTarget = null;
             }
             else

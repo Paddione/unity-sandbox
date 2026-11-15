@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// Hit points for Diablo husks (Q5). Death drops a pickup orb (Q3 semantics:
@@ -11,9 +12,11 @@ using UnityEngine;
 public sealed class EnemyHealth : MonoBehaviour
 {
     public int maxHP = 3;
+    public LootTier tier = LootTier.Normal;
 
     public static int HusksKilled;
     public static int OrbsDropped;
+    public static int ItemsDropped;
 
     int hp;
     bool dead;
@@ -21,6 +24,32 @@ public sealed class EnemyHealth : MonoBehaviour
     void Awake()
     {
         hp = maxHP;
+    }
+
+    /// <summary>Set tier HP after AddComponent (builder: elites, chests).</summary>
+    public void SetTier(int tierMaxHP, LootTier lootTier)
+    {
+        maxHP = tierMaxHP;
+        hp = tierMaxHP;
+        tier = lootTier;
+    }
+
+    /// <summary>Damage entry point: local solo/host, server relay as client.</summary>
+    public void RequestDamage(int amount, ulong attackerClientId)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm != null && nm.IsListening && !nm.IsServer)
+        {
+            var player = nm.SpawnManager.GetLocalPlayerObject();
+            var relay = player != null ? player.GetComponent<DiabloNetworkPlayer>() : null;
+            var netObj = GetComponent<NetworkObject>();
+            if (relay != null && netObj != null && netObj.IsSpawned)
+            {
+                relay.SubmitAttackServerRpc(netObj.NetworkObjectId, amount);
+                return;
+            }
+        }
+        TakeDamage(amount);
     }
 
     /// <summary>Apply damage; kills at zero and drops a loot orb.</summary>
@@ -42,8 +71,21 @@ public sealed class EnemyHealth : MonoBehaviour
         dead = true;
         HusksKilled++;
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
-        DropOrb();
-        Destroy(gameObject);
+        DropLoot();
+        var netObj = GetComponent<NetworkObject>();
+        var nm = NetworkManager.Singleton;
+        if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer)
+            netObj.Despawn();
+        else
+            Destroy(gameObject);
+    }
+
+    void DropLoot()
+    {
+        var rng = new System.Random();
+        bool networked = NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
+        var loot = LootDrop.SpawnLoot(transform.position + Vector3.up * 0.8f, tier, rng, networked);
+        if (loot == null) DropOrb(); // no-drop roll: legacy orb keeps the Q3 loop alive
     }
 
     void DropOrb()
@@ -78,5 +120,6 @@ public sealed class EnemyHealth : MonoBehaviour
     {
         HusksKilled = 0;
         OrbsDropped = 0;
+        ItemsDropped = 0;
     }
 }

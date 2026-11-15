@@ -1,0 +1,157 @@
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+/// <summary>P2 loot loop logic (deterministic, no network needed).</summary>
+public class DiabloP2LoopTests
+{
+    GameObject player;
+    Equipment equipment;
+
+    [SetUp]
+    public void Setup()
+    {
+        ToyTrigger.ResetRun();
+        EnemyHealth.ResetRun();
+        DiabloMelee.ResetRun();
+
+        player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        player.name = "Player";
+        player.transform.position = new Vector3(0f, 1.05f, 0f);
+        player.AddComponent<CharacterController>();
+        equipment = player.AddComponent<Equipment>();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        foreach (var loot in GameObject.FindObjectsOfType<LootDrop>())
+            Object.DestroyImmediate(loot.gameObject);
+        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+            Object.DestroyImmediate(husk);
+        if (player != null) Object.DestroyImmediate(player);
+        ToyTrigger.ResetRun();
+        EnemyHealth.ResetRun();
+        DiabloMelee.ResetRun();
+    }
+
+    static GameObject SpawnHusk(Vector3 pos)
+    {
+        var husk = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        husk.name = "TestHusk";
+        husk.tag = "Husk";
+        husk.transform.position = pos;
+        husk.AddComponent<EnemyHealth>();
+        return husk;
+    }
+
+    [UnityTest]
+    public System.Collections.IEnumerator Kill_DropsExactlyOneLootOrbPerHusk()
+    {
+        const int kills = 5;
+        for (int i = 0; i < kills; i++)
+            SpawnHusk(new Vector3(i * 2f, 1f, 0f)).GetComponent<EnemyHealth>().TakeDamage(3);
+        yield return null; // Destroy applies at frame end
+        Assert.AreEqual(0, GameObject.FindGameObjectsWithTag("Husk").Length,
+            "All 5 husks must be gone after 3 damage each.");
+        Assert.AreEqual(kills, EnemyHealth.HusksKilled);
+        Assert.AreEqual(kills, EnemyHealth.OrbsDropped);
+        var orbs = GameObject.FindObjectsOfType<ToyTrigger>();
+        int lootCount = 0;
+        foreach (var o in orbs)
+            if (o.gameObject.name.StartsWith("DiabloOrb_")) lootCount++;
+        Assert.AreEqual(kills, lootCount, "Each kill must drop exactly one loot orb.");
+    }
+
+    [Test]
+    public void SeededSpawn_BuildsItemWithMatchingSlot()
+    {
+        var rng = new System.Random(1234);
+        GameObject spawned = null;
+        for (int i = 0; i < 50 && spawned == null; i++)
+            spawned = LootDrop.SpawnLoot(Vector3.zero, LootTier.Normal, rng, false);
+        Assert.IsNotNull(spawned, "Seeded rolls must drop loot within 50 tries.");
+        var drop = spawned.GetComponent<LootDrop>();
+        Assert.IsNotNull(drop);
+        Assert.IsNotNull(drop.item);
+        var pool = AffixLibrary.PoolFor(drop.item.slot);
+        foreach (var affix in drop.item.affixes)
+            Assert.Contains(affix.key, pool, $"Affix {affix.key} must fit slot {drop.item.slot}.");
+        var label = LootDrop.ItemLabel(drop.item);
+        Assert.IsFalse(string.IsNullOrEmpty(label), "Loot must have a display label.");
+        if (drop.item.rarity == ItemRarity.Unique)
+            Assert.IsFalse(string.IsNullOrEmpty(drop.item.uniqueId), "Unique needs its fixed id.");
+        else
+            Assert.GreaterOrEqual(drop.item.affixes.Count, 1, "Magic/Rare needs affixes.");
+    }
+
+    [Test]
+    public void LootRoll_DistributionMatchesWeights()
+    {
+        var rng = new System.Random(42);
+        int magic = 0, rare = 0, unique = 0, drops = 0;
+        const int rolls = 2000;
+        for (int i = 0; i < rolls; i++)
+        {
+            var r = LootTable.Roll(LootTier.Normal, rng);
+            if (!r.drops) continue;
+            drops++;
+            if (r.rarity == ItemRarity.Magic) magic++;
+            else if (r.rarity == ItemRarity.Rare) rare++;
+            else unique++;
+        }
+        Assert.Greater(drops, 1000, "Normal tier must drop often enough to measure.");
+        float m = (float)magic / drops, r2 = (float)rare / drops, u = (float)unique / drops;
+        Assert.That(m, Is.InRange(0.70f, 0.90f), $"Magic share {m} off 0.80.");
+        Assert.That(r2, Is.InRange(0.10f, 0.26f), $"Rare share {r2} off 0.18.");
+        Assert.That(u, Is.InRange(0.0f, 0.06f), $"Unique share {u} off 0.02.");
+    }
+
+    [Test]
+    public void ChestRoll_AlwaysRarePlus()
+    {
+        var rng = new System.Random(7);
+        for (int i = 0; i < 100; i++)
+        {
+            var r = LootTable.Roll(LootTier.Chest, rng);
+            Assert.IsTrue(r.drops, "Chest must always drop.");
+            Assert.AreNotEqual(ItemRarity.Magic, r.rarity, "Chest must never roll Magic.");
+        }
+    }
+
+    [UnityTest]
+    public System.Collections.IEnumerator Elite_SurvivesNormalBurst()
+    {
+        var husk = SpawnHusk(Vector3.zero);
+        var health = husk.GetComponent<EnemyHealth>();
+        health.SetTier(15, LootTier.Elite);
+        for (int i = 0; i < 14; i++) health.TakeDamage(1);
+        Assert.IsTrue(husk != null, "Elite (15 HP) must survive 14 damage.");
+        health.TakeDamage(1);
+        yield return null; // Destroy applies at frame end
+        Assert.IsTrue(husk == null, "Elite must die at 15 damage.");
+    }
+
+    [Test]
+    public void Equip_RecalculatesDerivedStats()
+    {
+        Assert.AreEqual(1f, equipment.GetDamage());
+        Assert.AreEqual(3f, equipment.GetMaxHP());
+
+        var weapon = new ItemInstance
+        {
+            slot = ItemSlot.Weapon, rarity = ItemRarity.Magic, baseType = "ShortSword",
+        };
+        weapon.affixes.Add(new Affix("Damage", 3f));
+        equipment.Equip(weapon);
+        Assert.AreEqual(4f, equipment.GetDamage());
+
+        var armor = new ItemInstance
+        {
+            slot = ItemSlot.Armor, rarity = ItemRarity.Rare, baseType = "Breastplate",
+        };
+        armor.affixes.Add(new Affix("MaxHP", 12f));
+        equipment.Equip(armor);
+        Assert.AreEqual(15f, equipment.GetMaxHP());
+    }
+}

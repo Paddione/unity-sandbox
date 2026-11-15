@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 
@@ -45,6 +46,7 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
                 manager.NetworkConfig.NetworkTransport = transport;
         }
 
+        Debug.Log($"[Net] Scene: {SceneManager.GetActiveScene().name} (P2: Greybox + DiabloZone share this starter).");
         if (isClient)
         {
             Debug.Log($"[Net] Starting client -> {targetAddress}:{targetPort} (clone={IsClone()}).");
