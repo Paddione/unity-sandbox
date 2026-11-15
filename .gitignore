@@ -43,3 +43,4 @@ UserSettings/
 
 # CI test XML and editor logs
 /artifacts/
+sandbox/artifacts/
