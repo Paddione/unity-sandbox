@@ -734,12 +734,15 @@ public static class SandboxBuilder
             new Vector3(9f, 0.05f, -6f), 12, LootTier.Elite, 1.25f,
             new Color(0.8f, 0.2f, 0.2f));
 
-        // UI input for the code-built inventory panel.
+        // UI input for the code-built inventory panel. InputSystem module:
+        // StandaloneInputModule reads the legacy Input API and throws every
+        // frame (project uses Input System only) — it also spammed the
+        // dedicated server log at ~2 MB/s.
         if (Object.FindFirstObjectByType<EventSystem>() == null)
         {
             var eventSys = new GameObject("EventSystem");
             eventSys.AddComponent<EventSystem>();
-            eventSys.AddComponent<StandaloneInputModule>();
+            eventSys.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
 
         // 4 co-op spawn markers (south stairs, circle formation).

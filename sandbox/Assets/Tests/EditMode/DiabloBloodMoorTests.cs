@@ -202,6 +202,14 @@ public class DiabloBloodMoorTests
         Assert.IsNotNull(heal, "Encampment needs the campfire heal trigger.");
         Assert.IsNotNull(heal.GetComponent<CampfireHeal>());
 
+        var eventSys = GameObject.Find("EventSystem");
+        Assert.IsNotNull(eventSys, "Zone needs an EventSystem for the inventory panel.");
+        Assert.IsNotNull(eventSys.GetComponent<UnityEngine.EventSystems.EventSystem>());
+        Assert.IsNotNull(eventSys.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>(),
+            "EventSystem must use the Input System module (Standalone reads the legacy API and throws).");
+        Assert.IsNull(eventSys.GetComponent<UnityEngine.EventSystems.StandaloneInputModule>(),
+            "StandaloneInputModule must be gone (legacy-Input exceptions + server log spam).");
+
         var player = GameObject.Find("Player");
         Assert.IsNotNull(player.GetComponent<Inventory>(), "Zone hero needs a bag.");
         Assert.IsNotNull(player.GetComponent<PlayerHealth>(), "Zone hero needs HP for the campfire.");

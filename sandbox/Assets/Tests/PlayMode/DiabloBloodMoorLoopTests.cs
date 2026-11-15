@@ -49,6 +49,8 @@ public class DiabloBloodMoorLoopTests
             Object.DestroyImmediate(husk);
         foreach (var left in GameObject.FindObjectsOfType<CampfireHeal>())
             Object.DestroyImmediate(left.gameObject);
+        var eventSys = GameObject.Find("EventSystem");
+        if (eventSys != null) Object.DestroyImmediate(eventSys);
         if (player != null) Object.DestroyImmediate(player);
         ToyTrigger.ResetRun();
         EnemyHealth.ResetRun();
@@ -113,6 +115,32 @@ public class DiabloBloodMoorLoopTests
         if (looted.slot == ItemSlot.Weapon)
             Assert.AreEqual("Worn Short Sword", inventory.Get(inventory.Count - 1).baseType,
                 "Starter sword must swap back into the bag.");
+    }
+
+    [UnityTest]
+    public IEnumerator PanelButton_SubmitsThroughEventSystem()
+    {
+        var eventSysGo = new GameObject("EventSystem");
+        eventSysGo.AddComponent<UnityEngine.EventSystems.EventSystem>();
+        eventSysGo.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+        var axe = new ItemInstance
+        {
+            slot = ItemSlot.Weapon, rarity = ItemRarity.Rare, baseType = "HeavyAxe",
+            affixes = new System.Collections.Generic.List<Affix> { new Affix("Damage", 5f) },
+        };
+        LogAssert.Expect(LogType.Log, "[Loot] Bagged Rare Weapon (HeavyAxe). (1/20).");
+        inventory.Add(axe);
+        ui.SetOpen(true);
+        var button = GameObject.FindFirstObjectByType<UnityEngine.UI.Button>();
+        Assert.IsNotNull(button, "Open panel must build a bag button.");
+        LogAssert.Expect(LogType.Log, "[Loot] Equipped Rare Weapon: HeavyAxe (dmg=6, hp=3).");
+        LogAssert.Expect(LogType.Log, "[Loot] Equipped Rare Weapon from bag (swapped).");
+        UnityEngine.EventSystems.ExecuteEvents.Execute(button.gameObject,
+            new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current),
+            UnityEngine.EventSystems.ExecuteEvents.submitHandler);
+        Assert.AreSame(axe, equipment.weapon, "Submit must wield the bag weapon.");
+        LogAssert.NoUnexpectedReceived();
+        yield return null;
     }
 
     [UnityTest]
