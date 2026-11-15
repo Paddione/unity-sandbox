@@ -483,6 +483,25 @@ public static class SandboxBuilder
             throw new System.Exception("Diablo build failed; see log.");
     }
 
+    /// <summary>Dedicated-server build for DiabloZone (no rendering) for hosts like gpu-metal.</summary>
+    public static void BuildDiabloZoneServer()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloZoneScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-server/diablo-server",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Server,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] DiabloZone server build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("DiabloZone server build failed; see log.");
+    }
+
     /// <summary>Dedicated-server build for Diablo scene (no rendering) for hosts like gpu-metal.</summary>
     public static void BuildDiabloServer()
     {
@@ -504,20 +523,25 @@ public static class SandboxBuilder
 
     /// <summary>
     /// Scene for the dedicated-server build: `-serverScene diablo` selects
-    /// the Diablo room, anything else (or no argument) the Greybox.
+    /// the Diablo room, `diablo-zone` the P2 zone, anything else (or no
+    /// argument) the Greybox.
     /// </summary>
     public static string ServerScenePath(string[] args)
     {
         for (int i = 0; i < args.Length - 1; i++)
             if (args[i] == "-serverScene")
-                return args[i + 1] == "diablo" ? DiabloScenePath : ScenePath;
+            {
+                if (args[i + 1] == "diablo") return DiabloScenePath;
+                if (args[i + 1] == "diablo-zone") return DiabloZoneScenePath;
+                return ScenePath;
+            }
         return ScenePath;
     }
 
     /// <summary>
     /// Dedicated-server build (no rendering) for hosts like gpu-metal. Run:
     ///   Unity -batchmode -nographics -quit -projectPath sandbox
-    ///     -executeMethod SandboxBuilder.BuildServer [-serverScene greybox|diablo]
+    ///     -executeMethod SandboxBuilder.BuildServer [-serverScene greybox|diablo|diablo-zone]
     /// </summary>
     public static void BuildServer()
     {
