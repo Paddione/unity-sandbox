@@ -86,6 +86,7 @@ public static class KayKitAssets
             }
             Debug.Log($"KayKit verified: {Packs[i]}, {paths.Length} models, URP Lit + atlas on every renderer.");
         }
+        KayKitCharacters.Verify();
     }
 
     static string[] ModelPaths(string folder) => Directory.GetFiles(folder + "/Models", "*.fbx")

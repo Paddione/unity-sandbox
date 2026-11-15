@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Adventurers",
+    "source": "https://kaylousberg.itch.io/kaykit-adventurers",
+    "archive": "KayKit_Adventurers_2.0_FREE",
+    "sha256": "abe48f4763fba0896bab486ee9e6d08ca6b5b3884b9601f235c8847ae94dc479",
+    "license": "CC0-1.0",
+    "fbx_files": 37
+  },
+  {
+    "name": "Skeletons",
+    "source": "https://kaylousberg.itch.io/kaykit-skeletons",
+    "archive": "KayKit_Skeletons_1.1_FREE",
+    "sha256": "21fbad59ee6cc1d7bed12d0e425acab8ebe564b8620bbc1d017aedb29dd8a3d2",
+    "license": "CC0-1.0",
+    "fbx_files": 17
+  },
+  {
+    "name": "CharacterAnimations",
+    "source": "https://kaylousberg.itch.io/kaykit-character-animations",
+    "archive": "KayKit_Character_Animations_1.1",
+    "sha256": "65882f31f905ad2e953819648a59287cdeab8f623908d5ef701971d3758be20f",
+    "license": "CC0-1.0",
+    "fbx_files": 8
+  }
+]
