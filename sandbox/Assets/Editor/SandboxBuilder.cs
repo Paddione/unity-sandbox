@@ -909,6 +909,28 @@ public static class SandboxBuilder
             ref husks, ref tiles, ref walls, ref torches, ref spawns);
     }
 
+    /// <summary>
+    /// Windows player build of DiabloZone for GPU playtests (run the .exe
+    /// on Windows; same scene + netcode as the Linux build).
+    /// </summary>
+    public static void BuildDiabloZoneWindows()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloZoneScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-zone-windows/diablo-zone.exe",
+            target = BuildTarget.StandaloneWindows64,
+            subtarget = (int)StandaloneBuildSubtarget.Player,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] DiabloZone Windows build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("DiabloZone Windows build failed; see log.");
+    }
+
     public static void BuildDiabloZoneBuild()
     {
         var opts = new BuildPlayerOptions
