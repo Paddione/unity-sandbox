@@ -42,3 +42,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: keep-alive editor locked the project (stopped service for batch work); services lobby/relay 2.0.0 don't exist (used 1.3.0/1.2.0); `NetworkConfig.NetworkTransport` must be assigned explicitly ("No transport has been selected" + NRE in StartHost until fixed); Sandbox.Runtime needed `Unity.Networking.Transport` asmref.
 - Learned: base manifest already fails Unity resolve when the wrong project is open — always pass `-projectPath`; `NetworkTransform` (not ClientNetworkTransform) ships in NGO 2.5 Components.
 - Next: ParrelSync 2-editor live join, lag pass, silent playtest triage; commit + push + restart editor service.
+
+## 2026-11-15 — Q5 Diablo click-to-move kill-loot (goal unity-diablo-prototype)
+
+- Done: Q5 mechanics question; `DiabloClickController` (iso click + attack-move) + `DiabloMelee` (range/cooldown) + `EnemyHealth` (HP/flash/death orb-drop); `ToyTrigger` activator widened to tag fallback; `Husk` tag; `SandboxBuilder.BuildDiabloScene/VerifyDiablo/BuildDiablo` (Knight hero, 3 Skeleton husks, tile floor 25, wall ring 24, torches, chest GoalPad); `KayKitAssets` extended to 5 packs (Adventurers 6, Skeletons 4, Rig_Medium 8 anim rigs); EditMode 9/9 + PlayMode 4/4; diablo player build Succeeded (36.6s, 98MB), 45s run clean (0 exceptions).
+- Faced: `-quit` kills `-runTests` before execution (omit `-quit`; runner exits itself); controller cached sibling `DiabloMelee` in `Awake` before it existed (lazy resolve fix, test-found); KayKit figure packs use `Characters/` not `Models/` + need URP check without atlas remap; type is `EditorBuildSettingsScene`.
+- Learned: PlayMode `InputTestFixture` virtual devices work headless; `VerifyDiablo` inventory pattern scales; owner GUI import mapped URP materials correctly (Verify green first try).
+- Next: visual-fit check in editor, hero accessories, Rig_Medium animation wiring, one human feel session (follow-ups, not criteria).

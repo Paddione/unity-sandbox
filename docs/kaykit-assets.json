@@ -20,5 +20,37 @@
       "dungeon_texture.png"
     ],
     "license": "CC0-1.0"
+  },
+  {
+    "name": "Adventurers",
+    "source": "in-editor import by owner 2026-11-15 (archive hash n/a)",
+    "models": 6,
+    "models_dir": "Characters",
+    "textures": [
+      "barbarian_texture.png",
+      "knight_texture.png",
+      "mage_texture.png",
+      "ranger_texture.png",
+      "rogue_texture.png"
+    ],
+    "license": "CC0-1.0"
+  },
+  {
+    "name": "Skeletons",
+    "source": "in-editor import by owner 2026-11-15 (archive hash n/a)",
+    "models": 4,
+    "models_dir": "Characters",
+    "textures": [
+      "skeleton_texture.png"
+    ],
+    "license": "CC0-1.0"
+  },
+  {
+    "name": "CharacterAnimations",
+    "source": "in-editor import by owner 2026-11-15 (archive hash n/a)",
+    "models": 8,
+    "models_dir": "Rig_Medium",
+    "kind": "animation-rigs (clips, no meshes)",
+    "license": "CC0-1.0"
   }
 ]

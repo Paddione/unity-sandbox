@@ -40,6 +40,25 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Headless proof: `VerifyGreybox` inventory + run log; full collect
   playthrough is a human-playtest follow-up (see `docs/playtest-protocol.md`).
 
+## Q5 — Click-to-move kill-loot (with KayKit figures)
+
+- Question: is the solo click-to-move kill-loot loop fun? (move → melee
+  3 skeleton husks → orbs drop → extraction arms → loop complete).
+- Setup: new `Diablo.unity` scene (Greybox unchanged): isometric fixed-angle
+  camera + `DiabloClickController` (ground-plane click-to-move, click-husk =
+  attack-move), `DiabloMelee` (range arc, cooldown), 3 `Skeletons`-pack husks
+  with `EnemyHealth` (HP, death drops pickup orb), Adventurers hero named
+  `Player`, orb loot + extraction pad reusing Q3 `ToyTrigger` semantics
+  (`Needed = 3`).
+- Exit criterion: Linux player build `builds/diablo/diablo` runs the scene
+  with zero errors; `VerifyDiablo` inventory green; PlayMode combat test
+  green; decision logged as Q5 continue/pivot/kill.
+- Solo only: `NetworkManager` layer stays in Greybox, untouched; no NGO
+  work in P1. Human feel session is follow-up, not a criterion (Q1–Q3
+  precedent).
+- Headless proof: `VerifyDiablo` inventory + `docs/diablo-run-log.md`;
+  full loop playthrough is a human-playtest follow-up.
+
 ## Q4 — Co-op host/join (multiplayer-testable)
 
 - Question: can two players share the greybox loop without builds (host in main editor, client in ParrelSync clone)?

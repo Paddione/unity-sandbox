@@ -23,7 +23,9 @@ public sealed class ToyTrigger : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (other == null || other.gameObject == null) return;
-        if (other.gameObject.name != "Player") return;
+        // Q5: Diablo hero keeps the name "Player" (or the tag as fallback).
+        var go = other.gameObject;
+        if (go.name != "Player" && !go.CompareTag("Player")) return;
 
         switch (mode)
         {

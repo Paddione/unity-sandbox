@@ -244,6 +244,245 @@ public static class SandboxBuilder
         Debug.Log("[SandboxBuilder] Verify: OK (NetworkManager + transport + auto-starter + NetworkPlayer prefab).");
     }
 
+    const string DiabloScenePath = "Assets/Scenes/Diablo.unity";
+
+    static GameObject LoadModel(string relativePath)
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/ThirdParty/KayKit/" + relativePath);
+        if (prefab == null)
+            throw new System.Exception($"Diablo build: model missing: {relativePath}");
+        return prefab;
+    }
+
+    static float Footprint(GameObject prefab)
+    {
+        var mf = prefab.GetComponentInChildren<MeshFilter>();
+        if (mf != null && mf.sharedMesh != null)
+        {
+            var s = mf.sharedMesh.bounds.size;
+            return Mathf.Max(s.x, s.z);
+        }
+        var skinned = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
+        if (skinned != null && skinned.sharedMesh != null)
+        {
+            var s = skinned.sharedMesh.bounds.size;
+            return Mathf.Max(s.x, s.z);
+        }
+        return 2f;
+    }
+
+    /// <summary>
+    /// Q5 Diablo room (Greybox untouched): KayKit tile floor + wall ring,
+    /// torches, chest-dressed extraction pad, Adventurers hero + 3 husks.
+    /// </summary>
+    public static void BuildDiabloScene()
+    {
+        var scene = EditorSceneManager.NewScene(
+            NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        scene.name = "Diablo";
+
+        // Click plane (gameplay ground; tile dressing sits just above it).
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        ground.name = "Ground";
+        ground.transform.localScale = new Vector3(3f, 1f, 3f);
+        Paint(ground, new Color(0.16f, 0.14f, 0.16f));
+
+        // Tile floor, self-calibrated to the model footprint.
+        var tilePrefab = LoadModel("Dungeon/Models/floor_tile_large.fbx");
+        float tile = Footprint(tilePrefab);
+        int half = Mathf.CeilToInt(8f / tile);
+        for (int ix = -half; ix <= half; ix++)
+            for (int iz = -half; iz <= half; iz++)
+            {
+                var t = (GameObject)PrefabUtility.InstantiatePrefab(tilePrefab);
+                t.name = $"DTile_{ix}_{iz}";
+                t.transform.position = new Vector3(ix * tile, 0.02f, iz * tile);
+            }
+
+        // Wall ring with corners (origins assumed at base; visual fit is a
+        // human follow-up, not a headless criterion).
+        var wallPrefab = LoadModel("Dungeon/Models/wall.fbx");
+        var cornerPrefab = LoadModel("Dungeon/Models/wall_corner.fbx");
+        float w = Footprint(wallPrefab);
+        int n = Mathf.CeilToInt(16f / w);
+        float edge = 8f;
+        for (int i = 0; i <= n; i++)
+        {
+            float p = -edge + i * w;
+            PlaceWall(wallPrefab, $"DWall_N_{i}", new Vector3(p, 0f, -edge), 0f);
+            PlaceWall(wallPrefab, $"DWall_S_{i}", new Vector3(p, 0f, edge), 180f);
+            PlaceWall(wallPrefab, $"DWall_W_{i}", new Vector3(-edge, 0f, p), 90f);
+            PlaceWall(wallPrefab, $"DWall_E_{i}", new Vector3(edge, 0f, p), 270f);
+        }
+        PlaceWall(cornerPrefab, "DWall_Corner_NE", new Vector3(edge, 0f, -edge), 0f);
+        PlaceWall(cornerPrefab, "DWall_Corner_NW", new Vector3(-edge, 0f, -edge), 90f);
+        PlaceWall(cornerPrefab, "DWall_Corner_SE", new Vector3(edge, 0f, edge), 270f);
+        PlaceWall(cornerPrefab, "DWall_Corner_SW", new Vector3(-edge, 0f, edge), 180f);
+
+        // Torch dressing near the corners.
+        var torchPrefab = LoadModel("Dungeon/Models/torch_lit.fbx");
+        var torchSpots = new[]
+        {
+            new Vector3(-6f, 0f, -6f), new Vector3(6f, 0f, -6f),
+            new Vector3(-6f, 0f, 6f), new Vector3(6f, 0f, 6f),
+        };
+        for (int i = 0; i < torchSpots.Length; i++)
+        {
+            var torch = (GameObject)PrefabUtility.InstantiatePrefab(torchPrefab);
+            torch.name = $"DTorch_{i}";
+            torch.transform.position = torchSpots[i];
+        }
+
+        // Light + camera (controller drives it at runtime).
+        var light = new GameObject("Directional Light");
+        var dl = light.AddComponent<Light>();
+        dl.type = LightType.Directional;
+        dl.intensity = 1.1f;
+        light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        var cam = new GameObject("Main Camera");
+        cam.AddComponent<Camera>();
+        cam.tag = "MainCamera";
+        cam.transform.position = new Vector3(0f, 12f, -4f);
+
+        // Hero: Adventurers Knight, keeps the "Player" name for ToyTrigger.
+        var heroPrefab = LoadModel("Adventurers/Characters/Knight.fbx");
+        var hero = (GameObject)PrefabUtility.InstantiatePrefab(heroPrefab);
+        hero.name = "Player";
+        hero.transform.position = new Vector3(0f, 0.05f, 4f);
+        var cc = hero.AddComponent<CharacterController>();
+        cc.height = 1.8f;
+        cc.radius = 0.35f;
+        cc.center = new Vector3(0f, 0.9f, 0f);
+        hero.AddComponent<DiabloClickController>();
+        hero.AddComponent<DiabloMelee>();
+
+        // Husks: 3 Skeletons with builder colliders + HP.
+        var huskPrefabs = new[]
+        {
+            LoadModel("Skeletons/Characters/Skeleton_Warrior.fbx"),
+            LoadModel("Skeletons/Characters/Skeleton_Minion.fbx"),
+            LoadModel("Skeletons/Characters/Skeleton_Rogue.fbx"),
+        };
+        var huskSpots = new[]
+        {
+            new Vector3(-3f, 0.05f, -2f),
+            new Vector3(3f, 0.05f, -2f),
+            new Vector3(0f, 0.05f, -3.5f),
+        };
+        for (int i = 0; i < huskPrefabs.Length; i++)
+        {
+            var husk = (GameObject)PrefabUtility.InstantiatePrefab(huskPrefabs[i]);
+            husk.name = $"Husk_{i}";
+            husk.tag = "Husk";
+            husk.transform.position = huskSpots[i];
+            var col = husk.AddComponent<CapsuleCollider>();
+            col.height = 1.7f;
+            col.radius = 0.35f;
+            col.center = new Vector3(0f, 0.85f, 0f);
+            husk.AddComponent<EnemyHealth>();
+        }
+
+        // Extraction: GoalPad (Q3 semantics) + chest dressing.
+        var goal = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        goal.name = "GoalPad";
+        goal.transform.position = new Vector3(0f, 0.1f, 6f);
+        goal.transform.localScale = new Vector3(3f, 0.2f, 3f);
+        Paint(goal, new Color(0.8f, 0.25f, 0.25f));
+        goal.GetComponent<BoxCollider>().isTrigger = true;
+        goal.AddComponent<ToyTrigger>().mode = ToyTrigger.Mode.Goal;
+        var chestPrefab = LoadModel("Dungeon/Models/chest.fbx");
+        var chest = (GameObject)PrefabUtility.InstantiatePrefab(chestPrefab);
+        chest.name = "DChest";
+        chest.transform.position = new Vector3(2.4f, 0f, 6f);
+
+        ToyTrigger.ResetRun();
+        EnemyHealth.ResetRun();
+        DiabloMelee.ResetRun();
+
+        // Greybox stays first (UrpPipelineTests pins scenes[0]); Diablo appended.
+        EditorBuildSettings.scenes = new[]
+        {
+            new EditorBuildSettingsScene(ScenePath, true),
+            new EditorBuildSettingsScene(DiabloScenePath, true),
+        };
+        EditorSceneManager.SaveScene(scene, DiabloScenePath);
+        Debug.Log($"[SandboxBuilder] Saved {DiabloScenePath}");
+    }
+
+    static void PlaceWall(GameObject prefab, string name, Vector3 pos, float yaw)
+    {
+        var wall = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        wall.name = name;
+        wall.transform.position = pos;
+        wall.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+    }
+
+    /// <summary>
+    /// Headless proof for the Q5 Diablo scene: hero rig, 3 tagged husks
+    /// with HP, goal pad, tile floor and wall ring.
+    /// </summary>
+    public static void VerifyDiablo()
+    {
+        var scene = EditorSceneManager.OpenScene(DiabloScenePath);
+        bool player = false, clicker = false, melee = false, goal = false;
+        bool light = false, camera = false;
+        int husks = 0, tiles = 0, walls = 0;
+        foreach (var root in scene.GetRootGameObjects())
+            CountDiabloRecursive(root.transform, ref player, ref clicker, ref melee,
+                ref goal, ref light, ref camera, ref husks, ref tiles, ref walls);
+        Debug.Log("[SandboxBuilder] VerifyDiablo: " +
+                  $"player={player} clicker={clicker} melee={melee} goal={goal} " +
+                  $"husks={husks} tiles={tiles} walls={walls} light={light} camera={camera}");
+        if (!player || !clicker || !melee || !goal || husks < 3
+            || tiles < 25 || walls < 4 || !light || !camera)
+            throw new System.Exception("Diablo verify failed: mechanics inventory incomplete.");
+        Debug.Log("[SandboxBuilder] VerifyDiablo: OK (hero rig + 3 husks + goal + room present).");
+    }
+
+    static void CountDiabloRecursive(Transform t, ref bool player, ref bool clicker,
+        ref bool melee, ref bool goal, ref bool light, ref bool camera,
+        ref int husks, ref int tiles, ref int walls)
+    {
+        string n = t.gameObject.name;
+        if (n.StartsWith("DTile_")) tiles++;
+        if (n.StartsWith("DWall_")) walls++;
+        if (n == "GoalPad" && t.gameObject.GetComponent<ToyTrigger>() != null
+            && t.gameObject.GetComponent<ToyTrigger>().mode == ToyTrigger.Mode.Goal) goal = true;
+        if (n == "Player")
+        {
+            player = true;
+            clicker = t.gameObject.GetComponent<DiabloClickController>() != null;
+            melee = t.gameObject.GetComponent<DiabloMelee>() != null;
+            player = player && t.gameObject.GetComponent<CharacterController>() != null;
+        }
+        if (t.gameObject.CompareTag("Husk")
+            && t.gameObject.GetComponent<EnemyHealth>() != null) husks++;
+        if (t.gameObject.GetComponent<Light>() != null) light = true;
+        if (t.gameObject.GetComponent<Camera>() != null) camera = true;
+        foreach (Transform c in t) CountDiabloRecursive(c, ref player,
+            ref clicker, ref melee, ref goal, ref light, ref camera,
+            ref husks, ref tiles, ref walls);
+    }
+
+    public static void BuildDiablo()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/diablo/diablo",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Player,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] Diablo build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("Diablo build failed; see log.");
+    }
+
     /// <summary>Dedicated-server build (no rendering) for hosts like gpu-metal.</summary>
     public static void BuildServer()
     {
