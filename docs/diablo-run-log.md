@@ -42,6 +42,16 @@
 - No per-frame game logs by design (as Q1): entry/kill/loop counting executes
   on live trigger contact (human playtest follow-up, not headless).
 
+## gpu-metal (2026-11-15)
+
+- Player build does **not** run there: segfault after ~2 s (RC=139, SIGSEGV at
+  graphics init), same signature as the Q4 greybox player build. Local
+  `-batchmode -nographics` proof (45 s, 0 exceptions) stands.
+- No `xvfb` on the box; installing display/software-GL there is out of scope.
+- Follow-ups (not criteria): `BuildDiabloServer` (Server subtarget, no
+  rendering — proven pattern: greybox-server runs clean on gpu-metal) for
+  remote logic/co-op tests, or a local GPU machine for visual runs.
+
 ## Open follow-ups (not criteria)
 
 - Visual fit of walls/tiles/figures (blind placement) — one in-editor look.
