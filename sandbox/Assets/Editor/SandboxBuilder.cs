@@ -186,7 +186,8 @@ public static class SandboxBuilder
         Object.DestroyImmediate(netPlayer.GetComponent<Collider>());
         netPlayer.AddComponent<CharacterController>();
         netPlayer.AddComponent<NetworkObject>();
-        netPlayer.AddComponent<NetworkTransform>();
+        // Same owner-authority fix as the DiabloZone prefab (no snap-back).
+        netPlayer.AddComponent<NetworkTransform>().AuthorityMode = NetworkTransform.AuthorityModes.Owner;
         netPlayer.AddComponent<ThirdPersonController>();
         const string prefabPath = "Assets/Resources/NetworkPlayer.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
@@ -630,6 +631,8 @@ public static class SandboxBuilder
         chestCol.size = new Vector3(2f, 2f, 2f);
         var chestLoot = chest.AddComponent<LootDrop>();
         chestLoot.isChest = true;
+        chest.AddComponent<NetworkObject>();
+        chest.AddComponent<LootNetRelay>();
 
         // East rubble (collapsed passage, decoration only).
         for (int i = 0; i < 4; i++)
@@ -794,6 +797,9 @@ public static class SandboxBuilder
         col.height = 1.7f;
         col.radius = 0.35f;
         col.center = new Vector3(0f, 0.85f, 0f);
+        // Networked scene object: the dedicated server auto-spawns it, damage
+        // and death replicate instead of diverging per client.
+        husk.AddComponent<NetworkObject>();
         husk.AddComponent<EnemyHealth>().SetTier(hp, tier);
         if (tint.HasValue)
         {
@@ -813,7 +819,9 @@ public static class SandboxBuilder
         cc.radius = 0.35f;
         cc.center = new Vector3(0f, 0.9f, 0f);
         netPlayer.AddComponent<NetworkObject>();
-        netPlayer.AddComponent<NetworkTransform>();
+        // Owner authority: the owning client pushes movement; server authority
+        // would replicate the server's stale copy back and rubber-band the owner.
+        netPlayer.AddComponent<NetworkTransform>().AuthorityMode = NetworkTransform.AuthorityModes.Owner;
         netPlayer.AddComponent<DiabloClickController>();
         netPlayer.AddComponent<DiabloMelee>();
         netPlayer.AddComponent<DiabloNetworkPlayer>();

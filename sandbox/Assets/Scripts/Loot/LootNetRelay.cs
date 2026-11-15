@@ -8,6 +8,19 @@ using Unity.Netcode;
 public sealed class LootNetRelay : NetworkBehaviour
 {
     [ServerRpc(RequireOwnership = false)]
+    public void RequestChestServerRpc(ServerRpcParams rpcParams = default)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsServer) return;
+        var loot = GetComponent<LootDrop>();
+        if (loot == null || !loot.isChest || loot.collected) return;
+        loot.collected = true;
+        LootDrop.SpawnLoot(transform.position + Vector3.up * 1f,
+            LootTier.Chest, new System.Random(), true);
+        Debug.Log("[Loot] Chest opened (guaranteed Rare+).");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void RequestPickupServerRpc(ServerRpcParams rpcParams = default)
     {
         var nm = NetworkManager.Singleton;

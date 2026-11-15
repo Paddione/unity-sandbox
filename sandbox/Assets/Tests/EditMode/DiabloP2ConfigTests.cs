@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 /// <summary>P2 zone/loot/netcode config (headless gate, deterministic).</summary>
 public class DiabloP2ConfigTests
@@ -51,6 +52,19 @@ public class DiabloP2ConfigTests
         var chest = GameObject.Find("DChestZone");
         Assert.IsNotNull(chest, "DiabloZone must contain the DChestZone.");
         Assert.IsTrue(chest.GetComponent<LootDrop>().isChest, "DChestZone must run in chest mode.");
+
+        var huskObjs = GameObject.FindGameObjectsWithTag("Husk");
+        foreach (var husk in huskObjs)
+            Assert.IsNotNull(husk.GetComponent<NetworkObject>(),
+                $"Husk '{husk.name}' needs a NetworkObject (server-authoritative kills).");
+
+        var diabloPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Resources/NetworkPlayerDiablo.prefab");
+        Assert.IsNotNull(diabloPrefab, "NetworkPlayerDiablo prefab must exist in Resources.");
+        var prefabTransform = diabloPrefab.GetComponent<NetworkTransform>();
+        Assert.IsNotNull(prefabTransform, "Player prefab needs NetworkTransform.");
+        Assert.AreEqual(NetworkTransform.AuthorityModes.Owner, prefabTransform.AuthorityMode,
+            "Player prefab must use owner authority (server authority rubber-bands the owner).");
 
         NetworkManager nm = null;
         foreach (var root in scene.GetRootGameObjects())

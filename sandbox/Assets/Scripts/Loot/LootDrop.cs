@@ -57,7 +57,10 @@ public sealed class LootDrop : MonoBehaviour
         var drop = loot.AddComponent<LootDrop>();
         drop.item = item;
         Debug.Log($"[Loot] Dropped {item.rarity} {item.slot} ({ItemLabel(item)}).");
-        if (networked)
+        var nm = NetworkManager.Singleton;
+        // Only the server spawns networked loot; clients receive the replica.
+        // (Spawn() on a client only logs an error and spawns nothing.)
+        if (networked && nm != null && nm.IsServer)
         {
             loot.AddComponent<NetworkObject>();
             loot.AddComponent<LootNetRelay>();
@@ -88,10 +91,19 @@ public sealed class LootDrop : MonoBehaviour
         if (go.name != "Player" && !go.CompareTag("Player")) return;
         if (isChest)
         {
+            var nmChest = NetworkManager.Singleton;
+            bool netChest = nmChest != null && nmChest.IsListening;
+            if (netChest && !nmChest.IsServer)
+            {
+                // Dedicated server owns the drop: forward, server replicates it.
+                collected = true;
+                var chestRelay = GetComponent<LootNetRelay>();
+                if (chestRelay != null) chestRelay.RequestChestServerRpc();
+                return;
+            }
             collected = true;
             var rng = new System.Random();
-            bool networked = NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
-            SpawnLoot(transform.position + Vector3.up * 1f, LootTier.Chest, rng, networked);
+            SpawnLoot(transform.position + Vector3.up * 1f, LootTier.Chest, rng, netChest);
             Debug.Log("[Loot] Chest opened (guaranteed Rare+).");
             return;
         }
