@@ -483,6 +483,25 @@ public static class SandboxBuilder
             throw new System.Exception("Diablo build failed; see log.");
     }
 
+    /// <summary>Dedicated-server build for Diablo scene (no rendering) for hosts like gpu-metal.</summary>
+    public static void BuildDiabloServer()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloScenePath },
+            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-server/diablo-server",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Server,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] Diablo server build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
+                  $"{report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("Diablo server build failed; see log.");
+    }
+
     /// <summary>Dedicated-server build (no rendering) for hosts like gpu-metal.</summary>
     public static void BuildServer()
     {
