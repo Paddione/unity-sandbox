@@ -218,6 +218,12 @@ public class DiabloBloodMoorTests
         Assert.IsNotNull(eq.weapon, "Zone hero must spawn with the starter sword.");
         Assert.AreEqual(3f, eq.GetDamage(), "Starter sword (+2) must raise spawn damage to 3.");
 
+        Transform sword = player.transform.Find("StarterSword");
+        if (sword == null)
+            foreach (var tr in player.GetComponentsInChildren<Transform>(true))
+                if (tr.gameObject.name == "StarterSword") sword = tr;
+        Assert.IsNotNull(sword, "Starter sword must be visible in the hero's hand.");
+
         var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
             "Assets/Resources/NetworkPlayerDiablo.prefab");
         Assert.IsNotNull(prefab.GetComponent<Inventory>(), "Net prefab needs a bag.");
@@ -225,5 +231,9 @@ public class DiabloBloodMoorTests
         Assert.IsNotNull(prefab.GetComponent<DiabloInventoryUI>(), "Net prefab needs the UI.");
         Assert.AreEqual(3f, prefab.GetComponent<Equipment>().GetDamage(),
             "Net prefab must carry the starter sword damage.");
+        bool prefabSword = false;
+        foreach (var tr in prefab.GetComponentsInChildren<Transform>(true))
+            if (tr.gameObject.name == "StarterSword") prefabSword = true;
+        Assert.IsTrue(prefabSword, "Net prefab needs the visible sword prop.");
     }
 }

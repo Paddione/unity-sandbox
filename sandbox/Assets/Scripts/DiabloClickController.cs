@@ -29,6 +29,7 @@ public sealed class DiabloClickController : MonoBehaviour
     DiabloMelee melee;
     DiabloNetworkPlayer netPlayer;
     float verticalVelocity;
+    float lastNetSwing = float.NegativeInfinity;
     Vector3 destination;
     bool hasDestination;
     GameObject attackTarget;
@@ -170,10 +171,25 @@ public sealed class DiabloClickController : MonoBehaviour
                 // Lazy: Awake order vs. sibling AddComponent is not guaranteed.
                 if (melee == null) melee = GetComponent<DiabloMelee>();
                 if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+                var driver = GetComponent<DiabloAnimator>();
                 var nm = NetworkManager.Singleton;
                 if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
-                    netPlayer.Attack(attackTarget, melee, transform);
-                else if (melee != null) melee.TryAttack(attackTarget, transform);
+                {
+                    // Same cooldown as local swings: the server does not gate
+                    // client attack rate, so gate it here (also stops anim spam).
+                    float cd = melee != null ? melee.cooldown : 0.5f;
+                    if (Time.time - lastNetSwing >= cd)
+                    {
+                        lastNetSwing = Time.time;
+                        if (driver != null) driver.OnStrike();
+                        netPlayer.Attack(attackTarget, melee, transform);
+                    }
+                }
+                else if (melee != null && melee.TryAttack(attackTarget, transform))
+                {
+                    // Visible swing: chase-kills used to die silently ("despawn").
+                    if (driver != null) driver.OnStrike();
+                }
                 if (attackTarget == null) attackTarget = null;
             }
             else

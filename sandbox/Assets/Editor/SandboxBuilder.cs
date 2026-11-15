@@ -704,6 +704,8 @@ public static class SandboxBuilder
         hero.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         hero.AddComponent<FpsReporter>();
         WireLocomotion(hero, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
+        AttachStarterSword(hero);
+        SetLayerRecursive(hero, LayerMask.NameToLayer("Ignore Raycast"));
 
         // 10 husks scattered across the moor (3 m+ apart, off the camp).
         var huskModels = new[]
@@ -1022,6 +1024,37 @@ public static class SandboxBuilder
         return null;
     }
 
+    /// <summary>
+    /// Visible starter sword (KayKit 1-handed) on the hero's right hand.
+    /// Falls back to a hip offset when the rig has no hand bone.
+    /// </summary>
+    static void AttachStarterSword(GameObject hero)
+    {
+        var prefab = LoadModel("Adventurers/Accessories/sword_1handed.fbx");
+        var sword = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        sword.name = "StarterSword";
+        var animator = hero.GetComponent<Animator>();
+        Transform hand = null;
+        try
+        {
+            // Throws (not null) when the avatar is not humanoid.
+            hand = animator != null ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
+        }
+        catch (System.InvalidOperationException) { hand = null; }
+        if (hand != null)
+        {
+            sword.transform.SetParent(hand, false);
+            sword.transform.localPosition = Vector3.zero;
+            sword.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            sword.transform.SetParent(hero.transform, false);
+            sword.transform.localPosition = new Vector3(0.35f, 0.9f, 0.1f);
+            sword.transform.localRotation = Quaternion.Euler(0f, 0f, -20f);
+        }
+    }
+
     static void SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)
     {
         var prefab = LoadModel(model);
@@ -1071,6 +1104,8 @@ public static class SandboxBuilder
         netPlayer.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         netPlayer.AddComponent<FpsReporter>();
         WireLocomotion(netPlayer, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
+        AttachStarterSword(netPlayer);
+        SetLayerRecursive(netPlayer, LayerMask.NameToLayer("Ignore Raycast"));
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);

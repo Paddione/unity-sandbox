@@ -144,6 +144,22 @@ public class DiabloBloodMoorLoopTests
     }
 
     [UnityTest]
+    public IEnumerator AttackMove_KillPlaysSwing()
+    {
+        var driver = player.AddComponent<DiabloAnimator>(); // no controller: counts only
+        var husk = SpawnHusk(new Vector3(0f, 1f, 6f));
+        controller.AttackTarget(husk);
+        float waited = 0f;
+        while (husk != null && waited < 8f)
+        {
+            yield return null;
+            waited += Time.deltaTime;
+        }
+        Assert.IsTrue(husk == null, "Chase must reach and kill the husk.");
+        Assert.Greater(driver.strikeCount, 0, "Chase-kill must play a swing (no silent despawn).");
+    }
+
+    [UnityTest]
     public IEnumerator Campfire_HealsHeroStandingInRadius()
     {
         var fire = new GameObject("CampfireHeal");
