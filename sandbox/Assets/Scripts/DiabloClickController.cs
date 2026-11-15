@@ -38,7 +38,19 @@ public sealed class DiabloClickController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
+        // P2 zone scenes run netcode: the solo hero would double-drive clicks
+        // and fight the network player over the camera. Yield in that case.
+        if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))
+            enabled = false;
     }
+
+    /// <summary>
+    /// True when a scene-local click controller must stand down: the scene
+    /// runs netcode and this object is not the network player.
+    /// Pure rule so EditMode tests can pin it.
+    /// </summary>
+    public static bool ShouldYieldToNetcode(bool hasNetworkPlayer, bool netcodeInScene) =>
+        !hasNetworkPlayer && netcodeInScene;
 
     /// <summary>True for a replicated mirror owned by another client.</summary>
     bool IsRemoteMirror =>

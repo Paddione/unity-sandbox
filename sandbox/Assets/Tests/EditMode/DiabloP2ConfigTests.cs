@@ -88,6 +88,67 @@ public class DiabloP2ConfigTests
     }
 
     [Test]
+    public void ZoneHero_HasRunAnimation()
+    {
+        var scene = EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
+        Assert.IsTrue(scene.IsValid(), "DiabloZone.unity must open cleanly.");
+        var player = GameObject.Find("Player");
+        Assert.IsNotNull(player, "DiabloZone must contain the solo hero.");
+        Assert.IsNull(player.GetComponent<Animation>(),
+            "Hero must not carry a legacy Animation next to Mecanim.");
+        var animator = player.GetComponent<Animator>();
+        Assert.IsNotNull(animator, "Hero needs a Mecanim Animator (KayKit rig).");
+        var ctrl = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+        Assert.IsNotNull(ctrl, "Hero Animator needs the locomotion controller.");
+        var states = new System.Collections.Generic.List<string>();
+        foreach (var s in ctrl.layers[0].stateMachine.states) states.Add(s.state.name);
+        Assert.Contains("Idle", states, "Locomotion controller needs an Idle state.");
+        Assert.Contains("Run", states, "Locomotion controller needs a Run state.");
+        bool hasMoving = false;
+        foreach (var p in ctrl.parameters)
+            if (p.name == "Moving" && p.type == AnimatorControllerParameterType.Bool) hasMoving = true;
+        Assert.IsTrue(hasMoving, "Locomotion controller needs a bool param 'Moving'.");
+        var driver = player.GetComponent<DiabloAnimator>();
+        Assert.IsNotNull(driver, "Hero needs a DiabloAnimator driver.");
+        Assert.AreEqual("Moving", driver.moveParam, "Driver must write the 'Moving' param.");
+    }
+
+    [Test]
+    public void ZoneEntry_HintExistsAtStairs()
+    {
+        var scene = EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
+        Assert.IsTrue(scene.IsValid(), "DiabloZone.unity must open cleanly.");
+        var entry = GameObject.Find("ZoneEntry");
+        Assert.IsNotNull(entry, "DiabloZone must contain the ZoneEntry trigger at the stairs.");
+        var col = entry.GetComponent<Collider>();
+        Assert.IsNotNull(col, "ZoneEntry needs a Collider.");
+        Assert.IsTrue(col.isTrigger, "ZoneEntry collider must be a trigger.");
+        Assert.IsNotNull(entry.GetComponent<ZoneEntryHint>(), "ZoneEntry needs the hint component.");
+        Assert.That(entry.transform.position.z, Is.InRange(9f, 13f), "ZoneEntry must sit at the south stairs.");
+    }
+
+    [Test]
+    public void NetworkPrefab_SpawnsAtStairs()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Resources/NetworkPlayerDiablo.prefab");
+        Assert.IsNotNull(prefab, "NetworkPlayerDiablo prefab must exist in Resources.");
+        Assert.That(prefab.transform.position.z, Is.InRange(9f, 13f),
+            "Network players must spawn at the south stairs, facing the zone.");
+    }
+
+    [Test]
+    public void SoloHero_YieldsToNetcode()
+    {
+        Assert.IsTrue(DiabloClickController.ShouldYieldToNetcode(false, true),
+            "Scene hero must yield when the scene runs netcode.");
+        Assert.IsFalse(DiabloClickController.ShouldYieldToNetcode(true, true),
+            "Network player must never yield to itself.");
+        Assert.IsFalse(DiabloClickController.ShouldYieldToNetcode(false, false),
+            "Solo hero stays active without netcode (Diablo scene).");
+    }
+
+    [Test]
     public void DroptableWeights_SumTo100()
     {
         foreach (LootTier tier in System.Enum.GetValues(typeof(LootTier)))

@@ -133,6 +133,21 @@ public class DiabloP2LoopTests
     }
 
     [Test]
+    public void DiabloAnimator_MovesWhileOrdered()
+    {
+        var go = new GameObject("TestDriver");
+        go.AddComponent<CharacterController>();
+        var controller = go.AddComponent<DiabloClickController>();
+        Assert.IsFalse(DiabloAnimator.IsMoving(controller), "Fresh hero is idle.");
+        controller.SetDestination(new Vector3(0f, 1f, 5f));
+        Assert.IsTrue(DiabloAnimator.IsMoving(controller), "Hero with a destination runs.");
+        var husk = SpawnHusk(new Vector3(0f, 1f, 1f));
+        controller.AttackTarget(husk);
+        Assert.IsTrue(DiabloAnimator.IsMoving(controller), "Hero with an attack target runs.");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
     public void FpsReporter_ComputesAverage()
     {
         Assert.AreEqual(60f, FpsReporter.ComputeFps(300, 5f), 0.01f);

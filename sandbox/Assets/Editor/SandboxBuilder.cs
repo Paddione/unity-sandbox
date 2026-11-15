@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -612,6 +613,14 @@ public static class SandboxBuilder
             Paint(step, new Color(0.35f, 0.33f, 0.36f));
         }
 
+        // Entry hint trigger (onboarding: where to go, what to do).
+        var entry = new GameObject("ZoneEntry");
+        entry.transform.position = new Vector3(0f, 1f, 11f);
+        var entryCol = entry.AddComponent<BoxCollider>();
+        entryCol.isTrigger = true;
+        entryCol.size = new Vector3(5f, 2f, 4f);
+        entry.AddComponent<ZoneEntryHint>();
+
         // West alcove: elite arena + chest.
         var alcoveTiles = LoadModel("Dungeon/Models/floor_tile_large.fbx");
         float tile = Footprint(alcoveTiles);
@@ -686,6 +695,7 @@ public static class SandboxBuilder
         hero.AddComponent<DiabloMelee>();
         hero.AddComponent<Equipment>();
         hero.AddComponent<FpsReporter>();
+        WireLocomotion(hero, "Idle_A", "Running_A");
 
         // 6 husks across hall + corridor.
         var huskModels = new[]
@@ -786,6 +796,70 @@ public static class SandboxBuilder
         wall.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
+    /// <summary>
+    /// Wire KayKit Rig_Medium take clips onto a hero via a shared Mecanim
+    /// controller (retargeted): Idle_A default, Running_A on "Moving".
+    /// Warns instead of throwing when a take is missing (pack drift).
+    /// </summary>
+    static void WireLocomotion(GameObject go, string idleTake, string runTake)
+    {
+        var idle = FindTakeClip(
+            "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx", idleTake);
+        var run = FindTakeClip(
+            "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_MovementBasic.fbx", runTake);
+        if (idle == null || run == null)
+        {
+            Debug.LogWarning($"[SandboxBuilder] Locomotion clips missing (idle={idleTake}, run={runTake}); hero stays static.");
+            return;
+        }
+        var animator = go.GetComponent<Animator>();
+        if (animator == null) animator = go.AddComponent<Animator>();
+        animator.runtimeAnimatorController = LocomotionController(idle, run);
+        go.AddComponent<DiabloAnimator>();
+    }
+
+    static RuntimeAnimatorController sharedLocomotion;
+
+    /// <summary>Build once per session: rebuilding would orphan earlier refs.</summary>
+    static RuntimeAnimatorController LocomotionController(AnimationClip idle, AnimationClip run)
+    {
+        if (sharedLocomotion == null) sharedLocomotion = BuildLocomotionController(idle, run);
+        return sharedLocomotion;
+    }
+
+    static RuntimeAnimatorController BuildLocomotionController(AnimationClip idle, AnimationClip run)
+    {
+        const string path = "Assets/Resources/DiabloLocomotion.controller";
+        AssetDatabase.DeleteAsset(path);
+        var controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
+        controller.AddParameter("Moving", AnimatorControllerParameterType.Bool);
+        var sm = controller.layers[0].stateMachine;
+        foreach (var s in sm.states) sm.RemoveState(s.state);
+        var idleState = sm.AddState("Idle");
+        idleState.motion = idle;
+        var runState = sm.AddState("Run");
+        runState.motion = run;
+        sm.defaultState = idleState;
+        var toRun = idleState.AddTransition(runState);
+        toRun.hasExitTime = false;
+        toRun.duration = 0.15f;
+        toRun.AddCondition(AnimatorConditionMode.If, 0, "Moving");
+        var toIdle = runState.AddTransition(idleState);
+        toIdle.hasExitTime = false;
+        toIdle.duration = 0.15f;
+        toIdle.AddCondition(AnimatorConditionMode.IfNot, 0, "Moving");
+        AssetDatabase.SaveAssets();
+        return controller;
+    }
+
+    static AnimationClip FindTakeClip(string fbxPath, string takeName)
+    {
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(fbxPath))
+            if (obj is AnimationClip clip && clip.name == takeName)
+                return clip;
+        return null;
+    }
+
     static void SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)
     {
         var prefab = LoadModel(model);
@@ -814,7 +888,8 @@ public static class SandboxBuilder
         var heroPrefab = LoadModel("Adventurers/Characters/Knight.fbx");
         var netPlayer = (GameObject)PrefabUtility.InstantiatePrefab(heroPrefab);
         netPlayer.name = "NetworkPlayerDiablo";
-        netPlayer.transform.position = Vector3.zero;
+        // Spawn at the entry stairs so players walk INTO the zone.
+        netPlayer.transform.position = new Vector3(0f, 0.05f, 11f);
         var cc = netPlayer.AddComponent<CharacterController>();
         cc.height = 1.8f;
         cc.radius = 0.35f;
@@ -828,6 +903,7 @@ public static class SandboxBuilder
         netPlayer.AddComponent<DiabloNetworkPlayer>();
         netPlayer.AddComponent<Equipment>();
         netPlayer.AddComponent<FpsReporter>();
+        WireLocomotion(netPlayer, "Idle_A", "Running_A");
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);

@@ -56,3 +56,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: `NetworkPrefabs` not enumerable (dedup via PlayerPrefab-compare); `StandaloneBuildSubtotal` typo (fixed to `Subtarget`); `Destroy` applies at frame end — kill asserts need one yielded frame (Q5 waited 6s; mine checked immediately).
 - Learned: `NetworkManager.Singleton` safe-guards (`null`/`IsListening`/`IsServer`) keep solo path exact; `.meta` files generate on import and must be committed; `DefaultNetworkPrefabs.asset` dirties on Prefabs.Add (same as Q4 commit).
 - Next: land via `agent-workspace.py land` (ff); follow-ups (not criteria): Relay cross-machine join, server cooldown on relay swings, client-pickup convergence pass, 5-person playtest.
+
+## 2026-11-15 — Q6 entry + run animation (goal unity-diablo-prototype follow-up)
+
+- Done: ghost-hero yield (`DiabloClickController.ShouldYieldToNetcode` + Awake gate — scene hero stands down when netcode runs, pure rule is EditMode-pinned); prefab spawn moved to the entry stairs; `ZoneEntry` trigger with one-shot onboarding log; Mecanim locomotion (`DiabloLocomotion.controller`: Idle_A/Running_A retargeted, "Moving" bool) via `DiabloAnimator` on hero + network prefab; `FpsReporter` already landed for perf proof.
+- Faced: KayKit Knight ships with an auto-Animator (Humanoid import) — legacy Animation plan caught by the new config test (double-drive), switched to Mecanim; `AddCondition` does NOT create the controller param (explicit `AddParameter`); building the controller twice orphans the first ref (per-session cache).
+- Learned: EditMode tests can assert AnimatorController states/params; PlayMode `IsMoving` pins driver input without frames; take names live in the FBX (`Idle_A`, `Running_A`), not in the .meta.
+- Next: Windows + server rebuilds with this branch, retest with the user (run anim + entry hint), husk idle as follow-up.
