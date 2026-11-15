@@ -70,3 +70,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: `Keyboard.current` exists but idle in headless runners — `SetMoveInput` got wiped each frame; programmatic `SetMoveInput` only survives without a keyboard, so the movement test uses synthetic key presses instead. Same-frame `== null` after `Destroy` bit again in the strike test (yield one frame). `WaitSeconds` helper lives only in the Q5 file.
 - Learned: no existing test clicked through the real mouse path — repurposing left-click broke nothing; Q5 APIs untouched and green.
 - Next: rebuild Windows + server builds, redeploy, user retest (WASD feel, strike arc); gamepad stick as follow-up.
+
+## 2026-11-15 — Strike feedback + self-raycast fix (click felt dead)
+
+- Done: every click swings (`Strike` → `DiabloAnimator.OnStrike`, `strikeCount`; `Melee_1H_Attack_Chop` on a "Strike" trigger, Any-State in/out); hero + prefab on Ignore Raycast (recursive — layer is per-object, meshes live on children); whiff deals no damage but animates. Tests: config pins layer recursion + controller states/params, PlayMode pins whiff (swing, no kill) vs arc hit.
+- Faced: KayKit hero ships with an auto-Animator (Humanoid import) — legacy Animation would double-drive; Mecanim retargeting is the intended path. `AddCondition` does not create the parameter; rebuilding the controller orphans earlier refs (per-build cache).
+- Learned: silent misses are the worst feedback — a whiff must always be visible. Aim rays must ignore the shooter.
+- Next: rebuild Windows + server, redeploy, user retest (whiff swing, close-range aim); husk idle anims as follow-up.

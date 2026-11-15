@@ -113,6 +113,8 @@ public sealed class DiabloClickController : MonoBehaviour
     {
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var driver = GetComponent<DiabloAnimator>();
+        if (driver != null) driver.OnStrike();
         var target = melee != null
             ? DiabloMelee.FindArcTarget(transform, AimDirection, melee.attackRange)
             : null;

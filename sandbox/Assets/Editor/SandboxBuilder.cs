@@ -691,11 +691,13 @@ public static class SandboxBuilder
         cc.height = 1.8f;
         cc.radius = 0.35f;
         cc.center = new Vector3(0f, 0.9f, 0f);
+        // Ignore Raycast is per-object: hero meshes live on children.
+        SetLayerRecursive(hero, LayerMask.NameToLayer("Ignore Raycast"));
         hero.AddComponent<DiabloClickController>();
         hero.AddComponent<DiabloMelee>();
         hero.AddComponent<Equipment>();
         hero.AddComponent<FpsReporter>();
-        WireLocomotion(hero, "Idle_A", "Running_A");
+        WireLocomotion(hero, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
 
         // 6 husks across hall + corridor.
         var huskModels = new[]
@@ -801,38 +803,41 @@ public static class SandboxBuilder
     /// controller (retargeted): Idle_A default, Running_A on "Moving".
     /// Warns instead of throwing when a take is missing (pack drift).
     /// </summary>
-    static void WireLocomotion(GameObject go, string idleTake, string runTake)
+    static void WireLocomotion(GameObject go, string idleTake, string runTake, string strikeTake)
     {
         var idle = FindTakeClip(
             "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx", idleTake);
         var run = FindTakeClip(
             "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_MovementBasic.fbx", runTake);
-        if (idle == null || run == null)
+        var strike = FindTakeClip(
+            "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatMelee.fbx", strikeTake);
+        if (idle == null || run == null || strike == null)
         {
-            Debug.LogWarning($"[SandboxBuilder] Locomotion clips missing (idle={idleTake}, run={runTake}); hero stays static.");
+            Debug.LogWarning($"[SandboxBuilder] Locomotion clips missing (idle={idleTake}, run={runTake}, strike={strikeTake}); hero stays static.");
             return;
         }
         var animator = go.GetComponent<Animator>();
         if (animator == null) animator = go.AddComponent<Animator>();
-        animator.runtimeAnimatorController = LocomotionController(idle, run);
+        animator.runtimeAnimatorController = LocomotionController(idle, run, strike);
         go.AddComponent<DiabloAnimator>();
     }
 
     static RuntimeAnimatorController sharedLocomotion;
 
     /// <summary>Build once per session: rebuilding would orphan earlier refs.</summary>
-    static RuntimeAnimatorController LocomotionController(AnimationClip idle, AnimationClip run)
+    static RuntimeAnimatorController LocomotionController(AnimationClip idle, AnimationClip run, AnimationClip strike)
     {
-        if (sharedLocomotion == null) sharedLocomotion = BuildLocomotionController(idle, run);
+        if (sharedLocomotion == null) sharedLocomotion = BuildLocomotionController(idle, run, strike);
         return sharedLocomotion;
     }
 
-    static RuntimeAnimatorController BuildLocomotionController(AnimationClip idle, AnimationClip run)
+    static RuntimeAnimatorController BuildLocomotionController(AnimationClip idle, AnimationClip run, AnimationClip strike)
     {
         const string path = "Assets/Resources/DiabloLocomotion.controller";
         AssetDatabase.DeleteAsset(path);
         var controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
         controller.AddParameter("Moving", AnimatorControllerParameterType.Bool);
+        controller.AddParameter("Strike", AnimatorControllerParameterType.Trigger);
         var sm = controller.layers[0].stateMachine;
         foreach (var s in sm.states) sm.RemoveState(s.state);
         var idleState = sm.AddState("Idle");
@@ -840,6 +845,15 @@ public static class SandboxBuilder
         var runState = sm.AddState("Run");
         runState.motion = run;
         sm.defaultState = idleState;
+        var strikeState = sm.AddState("Strike");
+        strikeState.motion = strike;
+        var anyToStrike = sm.AddAnyStateTransition(strikeState);
+        anyToStrike.hasExitTime = false;
+        anyToStrike.duration = 0.1f;
+        anyToStrike.AddCondition(AnimatorConditionMode.If, 0, "Strike");
+        var strikeToIdle = strikeState.AddTransition(idleState);
+        strikeToIdle.hasExitTime = true;
+        strikeToIdle.duration = 0.15f;
         var toRun = idleState.AddTransition(runState);
         toRun.hasExitTime = false;
         toRun.duration = 0.15f;
@@ -850,6 +864,12 @@ public static class SandboxBuilder
         toIdle.AddCondition(AnimatorConditionMode.IfNot, 0, "Moving");
         AssetDatabase.SaveAssets();
         return controller;
+    }
+
+    static void SetLayerRecursive(GameObject go, int layer)
+    {
+        foreach (var tr in go.GetComponentsInChildren<Transform>(true))
+            tr.gameObject.layer = layer;
     }
 
     static AnimationClip FindTakeClip(string fbxPath, string takeName)
@@ -900,10 +920,11 @@ public static class SandboxBuilder
         netPlayer.AddComponent<NetworkTransform>().AuthorityMode = NetworkTransform.AuthorityModes.Owner;
         netPlayer.AddComponent<DiabloClickController>();
         netPlayer.AddComponent<DiabloMelee>();
+        SetLayerRecursive(netPlayer, LayerMask.NameToLayer("Ignore Raycast"));
         netPlayer.AddComponent<DiabloNetworkPlayer>();
         netPlayer.AddComponent<Equipment>();
         netPlayer.AddComponent<FpsReporter>();
-        WireLocomotion(netPlayer, "Idle_A", "Running_A");
+        WireLocomotion(netPlayer, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);

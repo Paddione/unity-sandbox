@@ -9,6 +9,10 @@ using UnityEngine;
 public sealed class DiabloAnimator : MonoBehaviour
 {
     public string moveParam = "Moving";
+    public string strikeParam = "Strike";
+
+    /// <summary>Swings triggered (hits + whiffs) — the visible feedback counter.</summary>
+    public int strikeCount;
 
     Animator animator;
     DiabloClickController controller;
@@ -28,5 +32,13 @@ public sealed class DiabloAnimator : MonoBehaviour
     {
         if (animator == null || controller == null) return;
         animator.SetBool(moveParam, IsMoving(controller));
+    }
+
+    /// <summary>Swing once (hit or whiff) — called by every Strike.</summary>
+    public void OnStrike()
+    {
+        strikeCount++;
+        if (animator != null && animator.runtimeAnimatorController != null)
+            animator.SetTrigger(strikeParam);
     }
 }

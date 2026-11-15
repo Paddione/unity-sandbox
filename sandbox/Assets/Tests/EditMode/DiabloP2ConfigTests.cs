@@ -75,6 +75,11 @@ public class DiabloP2ConfigTests
         Assert.IsNotNull(nm, "DiabloZone must contain a NetworkManager.");
         Assert.IsNotNull(nm.NetworkConfig.PlayerPrefab, "NetworkManager needs the Diablo player prefab.");
         var pp = nm.NetworkConfig.PlayerPrefab;
+        int ignoreLayer = UnityEngine.LayerMask.NameToLayer("Ignore Raycast");
+        Assert.AreEqual(ignoreLayer, pp.gameObject.layer, "Network player prefab must ignore aim raycasts.");
+        foreach (var tr in pp.GetComponentsInChildren<Transform>(true))
+            Assert.AreEqual(ignoreLayer, tr.gameObject.layer,
+                $"Prefab child '{tr.gameObject.name}' must ignore aim raycasts.");
         Assert.IsNotNull(pp.GetComponent<DiabloNetworkPlayer>(), "Player prefab needs DiabloNetworkPlayer.");
         Assert.IsNotNull(pp.GetComponent<Equipment>(), "Player prefab needs Equipment.");
     }
@@ -111,6 +116,19 @@ public class DiabloP2ConfigTests
         var driver = player.GetComponent<DiabloAnimator>();
         Assert.IsNotNull(driver, "Hero needs a DiabloAnimator driver.");
         Assert.AreEqual("Moving", driver.moveParam, "Driver must write the 'Moving' param.");
+        Assert.AreEqual("Strike", driver.strikeParam, "Driver must write the 'Strike' trigger.");
+        bool hasStrike = false;
+        foreach (var p in ctrl.parameters)
+            if (p.name == "Strike" && p.type == AnimatorControllerParameterType.Trigger) hasStrike = true;
+        Assert.IsTrue(hasStrike, "Locomotion controller needs a 'Strike' trigger for whiffs.");
+        var states2 = new System.Collections.Generic.List<string>();
+        foreach (var s in ctrl.layers[0].stateMachine.states) states2.Add(s.state.name);
+        Assert.Contains("Strike", states2, "Locomotion controller needs a Strike state.");
+        int ignoreRaycast = UnityEngine.LayerMask.NameToLayer("Ignore Raycast");
+        Assert.AreEqual(ignoreRaycast, player.layer, "Hero must sit on the Ignore Raycast layer (self must not block aim).");
+        foreach (var tr in player.GetComponentsInChildren<Transform>(true))
+            Assert.AreEqual(ignoreRaycast, tr.gameObject.layer,
+                $"Hero child '{tr.gameObject.name}' must ignore aim raycasts (layer is per-object).");
     }
 
     [Test]

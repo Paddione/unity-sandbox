@@ -173,6 +173,21 @@ public class DiabloP2LoopTests
     }
 
     [Test]
+    public void Strike_WhiffsLoudlyWithEmptyArc()
+    {
+        var go = new GameObject("TestStriker");
+        go.AddComponent<CharacterController>();
+        var clicker = go.AddComponent<DiabloClickController>();
+        go.AddComponent<DiabloMelee>();
+        var driver = go.AddComponent<DiabloAnimator>(); // RequireComponent pulls in Animator
+        clicker.SetAimPoint(new Vector3(0f, 0f, 10f));
+        Assert.IsFalse(clicker.Strike(), "Strike into an empty arc must miss.");
+        Assert.AreEqual(0, EnemyHealth.HusksKilled, "Whiff must deal no damage.");
+        Assert.AreEqual(1, driver.strikeCount, "Whiff must still swing (visible feedback).");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
     public void DiabloAnimator_MovesWhileOrdered()
     {
         var go = new GameObject("TestDriver");
