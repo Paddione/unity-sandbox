@@ -75,8 +75,10 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
   15 HP, chest with guaranteed Rare+) → east rubble (blocked) → north
   crypt-gate extraction (`GoalPad`, Q3 semantics, `Needed = 3` unchanged).
   6 husks (`Normal`, 3 HP) + 4 `CoopSpawn` markers; hero + `NetworkPlayerDiablo`
-  prefab carry `Equipment` (Armor/Weapon/Helmet). Host-authoritative NGO
-  (owner-only click input, `DiabloNetworkPlayer.SubmitAttackServerRpc` with
+  prefab carry `Equipment` (Armor/Weapon/Helmet). Twin-stick hybrid controls:
+  WASD/arrows move camera-relative, hero faces the cursor, click strikes in
+  an arc (clicked husk keeps the Q5 attack-move chase). Host-authoritative NGO
+  (owner-only input, `DiabloNetworkPlayer.SubmitAttackServerRpc` with
   4 m range check, server-side equip + despawn, client prediction).
   Kills roll `LootTable` (Normal 70 % drop: 80/18/2; Elite 100 %:
   50/40/10; Chest 100 %: 0/80/20); no-drop rolls keep the legacy orb.

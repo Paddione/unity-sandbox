@@ -13,9 +13,10 @@ public sealed class DiabloAnimator : MonoBehaviour
     Animator animator;
     DiabloClickController controller;
 
-    /// <summary>True while the hero works an order (move or attack-move).</summary>
+    /// <summary>True while the hero works an order (click or WASD).</summary>
     public static bool IsMoving(DiabloClickController c) =>
-        c != null && (c.HasDestination || c.CurrentTarget != null);
+        c != null && (c.HasDestination || c.CurrentTarget != null
+            || c.MoveInput.sqrMagnitude > 0.0001f);
 
     void Awake()
     {

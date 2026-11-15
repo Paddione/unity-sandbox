@@ -3,11 +3,11 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 
 /// <summary>
-/// Isometric click-to-move controller for the Diablo prototype (Q5).
-/// Fixed-angle follow camera, left-click raycasts against the ground for
-/// movement and against tagged husks for attack-move. Bindings are
+/// Isometric hero controller for the Diablo prototype (Q5 click-to-move,
+/// P2+ hybrid): WASD/arrows move camera-relative with priority, the hero
+/// always faces the mouse cursor, left-click strikes toward the cursor
+/// (a clicked husk keeps the Q5 attack-move chase). Bindings are
 /// code-defined (Input System package, no .inputactions asset), like Q1.
-/// Solo P1: no NetworkObject gate (Diablo scene carries no netcode).
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public sealed class DiabloClickController : MonoBehaviour
@@ -38,6 +38,9 @@ public sealed class DiabloClickController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var fwd = transform.forward;
+        fwd.y = 0f;
+        AimDirection = fwd.sqrMagnitude > 0.0001f ? fwd.normalized : Vector3.forward;
         // P2 zone scenes run netcode: the solo hero would double-drive clicks
         // and fight the network player over the camera. Yield in that case.
         if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))
@@ -74,17 +77,80 @@ public sealed class DiabloClickController : MonoBehaviour
     public bool HasDestination => hasDestination;
     public GameObject CurrentTarget => attackTarget;
 
+    /// <summary>Active WASD/arrows world-space intent (zero when idle).</summary>
+    public Vector3 MoveInput { get; private set; }
+
+    /// <summary>Flattened facing direction (mouse aim).</summary>
+    public Vector3 AimDirection { get; private set; }
+
+    /// <summary>Camera-relative WASD mapping (pure, fixed iso yaw).</summary>
+    public static Vector3 MapInput(Vector2 xy, float yaw)
+    {
+        if (xy.sqrMagnitude > 1f) xy.Normalize();
+        var dir = Quaternion.Euler(0f, yaw, 0f) * new Vector3(xy.x, 0f, xy.y);
+        dir.y = 0f;
+        return dir;
+    }
+
+    /// <summary>Drive movement directly (tests + external drivers).</summary>
+    public void SetMoveInput(Vector3 worldDir)
+    {
+        MoveInput = worldDir;
+    }
+
+    /// <summary>Face a ground point (mouse aim); snaps for tight tracking.</summary>
+    public void SetAimPoint(Vector3 groundPoint)
+    {
+        var d = groundPoint - transform.position;
+        d.y = 0f;
+        if (d.sqrMagnitude < 0.0001f) return;
+        AimDirection = d.normalized;
+        transform.rotation = Quaternion.LookRotation(AimDirection);
+    }
+
+    /// <summary>Swing toward the cursor; relays via netcode when spawned.</summary>
+    public bool Strike()
+    {
+        if (melee == null) melee = GetComponent<DiabloMelee>();
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var target = melee != null
+            ? DiabloMelee.FindArcTarget(transform, AimDirection, melee.attackRange)
+            : null;
+        if (target == null) return false;
+        var nm = NetworkManager.Singleton;
+        if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
+        {
+            netPlayer.Attack(target, melee, transform);
+            return true;
+        }
+        return melee != null && melee.TryAttack(target, transform);
+    }
+
     void Update()
     {
         // P2 co-op: remote mirrors are driven by NetworkTransform, not input.
         if (IsRemoteMirror) return;
-        var mouse = Mouse.current;
-        if (mouse != null && Camera.main != null && mouse.leftButton.wasPressedThisFrame)
-            HandleClick(mouse);
+        PollKeyboard();
 
+        var mouse = Mouse.current;
+        if (mouse != null && Camera.main != null)
+        {
+            // Aim tracks the cursor every frame (twin-stick feel).
+            var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+            if (Physics.Raycast(ray, out var aimHit, 200f))
+                SetAimPoint(aimHit.point);
+            if (mouse.leftButton.wasPressedThisFrame)
+                HandleClick(aimHit);
+        }
+
+        // WASD/arrows win over click orders; facing stays on the cursor.
+        if (MoveInput.sqrMagnitude > 0.0001f)
+        {
+            Move(MoveInput * walkSpeed);
+        }
         // Attack-move: approach until in range, then swing (cooldown gates repeats).
         // Unity fake-null: a destroyed husk reads as null here and clears the order.
-        if (attackTarget != null)
+        else if (attackTarget != null)
         {
             var toTarget = attackTarget.transform.position - transform.position;
             toTarget.y = 0f;
@@ -135,14 +201,28 @@ public sealed class DiabloClickController : MonoBehaviour
         UpdateCamera();
     }
 
-    void HandleClick(Mouse mouse)
+    /// <summary>WASD/arrows drive MoveInput; held keys cancel click orders.</summary>
+    public void PollKeyboard()
     {
-        var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
-        if (!Physics.Raycast(ray, out var hit, 200f)) return;
-        if (hit.collider.CompareTag("Husk"))
+        var kb = Keyboard.current;
+        if (kb == null) return; // headless/tests: keep programmatic input
+        MoveInput = Vector3.zero;
+        float ix = (kb.dKey.isPressed || kb.rightArrowKey.isPressed ? 1f : 0f)
+                 - (kb.aKey.isPressed || kb.leftArrowKey.isPressed ? 1f : 0f);
+        float iy = (kb.wKey.isPressed || kb.upArrowKey.isPressed ? 1f : 0f)
+                 - (kb.sKey.isPressed || kb.downArrowKey.isPressed ? 1f : 0f);
+        if (ix == 0f && iy == 0f) return;
+        MoveInput = MapInput(new Vector2(ix, iy), yaw);
+        hasDestination = false;
+        attackTarget = null;
+    }
+
+    void HandleClick(RaycastHit hit)
+    {
+        if (hit.collider != null && hit.collider.CompareTag("Husk"))
             AttackTarget(hit.collider.gameObject);
         else
-            SetDestination(hit.point);
+            Strike();
     }
 
     void Move(Vector3 planar)

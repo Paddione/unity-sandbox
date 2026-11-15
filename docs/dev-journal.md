@@ -63,3 +63,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: KayKit Knight ships with an auto-Animator (Humanoid import) — legacy Animation plan caught by the new config test (double-drive), switched to Mecanim; `AddCondition` does NOT create the controller param (explicit `AddParameter`); building the controller twice orphans the first ref (per-session cache).
 - Learned: EditMode tests can assert AnimatorController states/params; PlayMode `IsMoving` pins driver input without frames; take names live in the FBX (`Idle_A`, `Running_A`), not in the .meta.
 - Next: Windows + server rebuilds with this branch, retest with the user (run anim + entry hint), husk idle as follow-up.
+
+## 2026-11-15 — Twin-stick hybrid controls (WASD + mouse aim/strike)
+
+- Done: WASD/arrows move camera-relative with priority (`PollKeyboard`, `MapInput`), hero faces the cursor every frame (`SetAimPoint`, snap), left-click strikes in a 60° arc (`Strike` → `FindArcTarget`/`TryAttackDirection`; clicked husk keeps Q5 attack-move). Hint text + Q6 setup updated. Tests: WASD via `InputTestFixture` (repo precedent), aim/arc/anim pure + in-scene.
+- Faced: `Keyboard.current` exists but idle in headless runners — `SetMoveInput` got wiped each frame; programmatic `SetMoveInput` only survives without a keyboard, so the movement test uses synthetic key presses instead. Same-frame `== null` after `Destroy` bit again in the strike test (yield one frame). `WaitSeconds` helper lives only in the Q5 file.
+- Learned: no existing test clicked through the real mouse path — repurposing left-click broke nothing; Q5 APIs untouched and green.
+- Next: rebuild Windows + server builds, redeploy, user retest (WASD feel, strike arc); gamepad stick as follow-up.

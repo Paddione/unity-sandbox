@@ -6,6 +6,8 @@ using UnityEngine.TestTools;
 public class DiabloP2LoopTests
 {
     GameObject player;
+    DiabloClickController controller;
+    DiabloMelee melee;
     Equipment equipment;
 
     [SetUp]
@@ -19,6 +21,9 @@ public class DiabloP2LoopTests
         player.name = "Player";
         player.transform.position = new Vector3(0f, 1.05f, 0f);
         player.AddComponent<CharacterController>();
+        controller = player.AddComponent<DiabloClickController>();
+        melee = player.AddComponent<DiabloMelee>();
+        melee.cooldown = 0f;
         equipment = player.AddComponent<Equipment>();
     }
 
@@ -130,6 +135,41 @@ public class DiabloP2LoopTests
         health.TakeDamage(1);
         yield return null; // Destroy applies at frame end
         Assert.IsTrue(husk == null, "Elite must die at 15 damage.");
+    }
+
+    [Test]
+    public void MapInput_IsCameraRelative()
+    {
+        // Yaw 45°: pressing "forward" moves diagonally (sin45, 0, cos45).
+        Vector3 fwd = DiabloClickController.MapInput(new Vector2(0f, 1f), 45f);
+        Assert.AreEqual(Mathf.Sin(45f * Mathf.Deg2Rad), fwd.x, 0.001f);
+        Assert.AreEqual(Mathf.Cos(45f * Mathf.Deg2Rad), fwd.z, 0.001f);
+        Assert.AreEqual(0f, fwd.y, 0.001f);
+        Vector3 strafe = DiabloClickController.MapInput(new Vector2(1f, 0f), 45f);
+        Assert.Greater(strafe.x, 0.5f, "Right key must strafe right.");
+        Assert.Less(Mathf.Abs(strafe.z), 0.75f, "Right key must not move mostly forward.");
+    }
+
+    [Test]
+    public void Aim_FacesCursorPoint()
+    {
+        controller.SetAimPoint(new Vector3(5f, 0f, 0f));
+        Vector3 fwd = player.transform.forward;
+        fwd.y = 0f;
+        Assert.AreEqual(1f, fwd.normalized.x, 0.01f, "Hero must face the cursor point.");
+    }
+
+    [UnityTest]
+    public System.Collections.IEnumerator Strike_HitsHuskInFacingArc()
+    {
+        var front = SpawnHusk(new Vector3(0f, 1f, 1.5f));
+        var behind = SpawnHusk(new Vector3(0f, 1f, -1.5f));
+        controller.SetAimPoint(new Vector3(0f, 0f, 10f));
+        for (int i = 0; i < 3; i++) Assert.IsTrue(controller.Strike(), "Strike into the arc must hit.");
+        yield return null; // Destroy applies at frame end
+        Assert.IsTrue(front == null, "Husk in the facing arc must die from 3 strikes.");
+        Assert.IsTrue(behind != null, "Husk behind the hero must survive.");
+        Assert.AreEqual(1, EnemyHealth.HusksKilled);
     }
 
     [Test]
