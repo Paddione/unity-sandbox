@@ -40,3 +40,6 @@ crashlytics-build.properties
 
 # Per-machine editor state
 UserSettings/
+
+# CI test XML and editor logs
+/artifacts/
