@@ -28,3 +28,17 @@ Branch: `feature/unity-diablo-p2-multiplayer-loot-zone` (from `main` @ `ae40013`
 - Goal arms at 3 pickups (`ToyTrigger.Needed` const unchanged, Q3 semantics);
   plan text said 6 — first 3 pickups arm the crypt gate.
 - Client pickup without server is prediction-only; server despawn wins.
+
+## gpu-metal deploy (2026-11-15, commit `2cb9a69`)
+
+- Server build `BuildDiabloZoneServer`: Succeeded in 36.5 s, 86 MB
+  (`builds/diablo-server/diablo-server`); local smoke: DiabloZone scene,
+  `[Net] Server started, listening for clients`.
+- Deployed per memorized convention (new persistent install, Greybox
+  untouched): `rsync -az --delete builds/diablo-server/ gpu-metal:~/diablo-server/`
+  + `BUILD_INFO.json` (commit `2cb9a69`, scene `diablo-zone`).
+- Unit `diablo-server.service` (enabled, Restart=always): port **7778/udp**
+  (Greybox keeps 7777), UFW `ALLOW 100.64.0.0/10`, log `~/diablo-server/server.log`.
+- E2E proof: local zone client `--net-client --net-address 100.74.227.118
+  --net-port 7778` → server log `[Net] Client connected: 1 (total=1)`,
+  then clean disconnect. Join command below.
