@@ -116,13 +116,18 @@ public sealed class DiabloClickController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(AimDirection);
     }
 
+    /// <summary>Step into every cursor strike (D2 commitment, also on whiffs).</summary>
+    public const float StrikeStep = 0.5f;
+
     /// <summary>Swing toward the cursor; relays via netcode when spawned.</summary>
     public bool Strike()
     {
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        if (controller != null) controller.Move(AimDirection * StrikeStep);
         var driver = GetComponent<DiabloAnimator>();
         if (driver != null) driver.OnStrike();
+        DiabloAudio.PlaySwing();
         var target = melee != null
             ? DiabloMelee.FindArcTarget(transform, AimDirection, melee.attackRange)
             : null;

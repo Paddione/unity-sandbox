@@ -30,7 +30,7 @@ health_goals: none (einmaliger Gameplay-Prototyp wie P2; Verifikation über Edit
 2. **Combat-Feel zuerst**; Loot-Tiefe und Welt-Leben sind Folge-Goals.
 3. **Solo-first**; Coop bleibt kompatibel (Join/Kill/Loot-Beweise), keine neuen Netzsysteme. Retaliation client-lokal (wie `PlayerHealth`).
 4. **Sound voll synthetisiert** (`DiabloAudio`, zur Laufzeit generiert, keine Binär-Assets — P2-Regel „kein .asset-Binary im Repo").
-5. **Knockback klein** (1,2 m normal, 0,4 m Elite/Brute), Positions-Shift ohne Physik (Boden-Clamp y=0).
+5. **Knockback klein** (0,6 m normal, 0,2 m Elite/Brute — D2-Pop statt Punt; 1,2 m hat die Arc-Kill-Verträge gebrochen, weil Combos aus der 2,2-m-Reichweite flogen), Positions-Shift ohne Physik (Boden-Clamp y=0).
 6. **HP-Balken**: ein geteilter Ziel-Balken (D2-Boss-Bar-Stil, oben mittig), gebunden an zuletzt getroffenen Husk, 3 s Fade.
 7. **Schritt in den Strike** (0,5 m Richtung Aim, vor Arc-Auflösung, auch bei Whiff — Commitment). Owner bewegt sich selbst (Owner-Authority ✓).
 8. **Keine Corpses** (Destroy+Orb behält Q3-Loop) — Follow-up. **Keine Vendoren/Tränke/Gold** — Folge-Goal.
@@ -41,7 +41,7 @@ health_goals: none (einmaliger Gameplay-Prototyp wie P2; Verifikation über Edit
 | Partial | Inhalt | target_files (exklusiv) |
 |---|---|---|
 | P1 audio | Synth-Clips + Zähler-API | `sandbox/Assets/Scripts/DiabloAudio.cs` (neu) |
-| P2 strike-feel | Step-in, Knockback-Auslösung, Sound-Hooks, LastStruck | `sandbox/Assets/Scripts/DiabloMelee.cs`, `sandbox/Assets/Scripts/EnemyHealth.cs` |
+| P2 strike-feel | Step-in, Knockback-Auslösung, Sound-Hooks, LastStruck | `sandbox/Assets/Scripts/DiabloMelee.cs`, `sandbox/Assets/Scripts/EnemyHealth.cs`, `sandbox/Assets/Scripts/DiabloClickController.cs` (nur `Strike()`: Step-in + Whoosh, Netz-Gate unangetastet), `sandbox/Assets/Scripts/Loot/LootDrop.cs` (nur `CollectInto`: Loot-Blip) |
 | P3 retaliation | Telegraph/Windup/Cooldown, Tod + Respawn | `sandbox/Assets/Scripts/EnemyAttack.cs` (neu), `sandbox/Assets/Scripts/PlayerHealth.cs` |
 | P4 wiring+bar | Ziel-Balken, Builder-Verdrahtung, Verify-Update, Hinweis-Text, UI-Klick-Sound | `sandbox/Assets/Scripts/DiabloTargetBar.cs` (neu), `sandbox/Assets/Editor/SandboxBuilder.cs`, `sandbox/Assets/Scenes/DiabloZone.unity`, `sandbox/Assets/Scenes/DiabloZone.unity.meta`, `sandbox/Assets/Scripts/ZoneEntryHint.cs`, `sandbox/Assets/Scripts/DiabloInventoryUI.cs` |
 | P5 proof | Tests + Docs | `sandbox/Assets/Tests/EditMode/DiabloD2FeelTests.cs` (neu), `sandbox/Assets/Tests/PlayMode/DiabloD2FeelLoopTests.cs` (neu), `docs/decision-log.md`, `docs/dev-journal.md`, `docs/mechanics-questions.md` |
@@ -77,7 +77,7 @@ Schnittstellen: P1 definiert `DiabloAudio.Play{Swing,Hit,Death,Loot,UIClick,Hurt
 ## P5 — Tests + Docs (Beweis)
 
 - `Tests/EditMode/DiabloD2FeelTests.cs`: Clip-Specs (7× non-null/`samples`/`frequency`), Knockback-Konstanten, Retaliation-Konstanten (Range/Windup/CD/Schaden), Step-in-Konstante, Szene-Pins (EnemyAttack je Husk, Bar-Objekt, `StarterSword` intakt).
-- `Tests/PlayMode/DiabloD2FeelLoopTests.cs` (InputTestFixture-Präzedenz wo Tasten nötig): Kill→Knockback-Versatz; Retaliation senkt HP; Tod→Respawn am Camp voll; Bar-Bruchteil == Husk-HP; Step-in 0,5 m; `sounded*`-Zähler steigen (LogAssert für Sound-Pfade ohne Log-Spam).
+- `Tests/PlayMode/DiabloD2FeelLoopTests.cs` (InputTestFixture-Präzedenz wo Tasten nötig): Kill→Knockback-Versatz; Retaliation senkt HP; Tod→Respawn am Camp voll; Bar-Bruchteil == Husk-HP; Step-in 0,5 m; `sounded*`-Zähler steigen (kein LogAssert auf Audio-Pfaden: Headless-Audio läuft auf nosound und warnt pro Frame — environmental, nicht asserted).
 - Docs: `decision-log.md` (Q8-Entscheid), `dev-journal.md`, `mechanics-questions.md` (Q8: „Fühlt sich der Moor-Kampf wie D2 Act 1 an?").
 - Akzeptanz: EditMode + PlayMode grün, `VerifyDiabloZone` grün.
 

@@ -747,6 +747,13 @@ public static class SandboxBuilder
             eventSys.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
         }
 
+        // D2 target bar (shared, follows the last husk struck).
+        if (GameObject.Find("DTargetBar") == null)
+        {
+            var bar = new GameObject("DTargetBar");
+            bar.AddComponent<DiabloTargetBar>();
+        }
+
         // 4 co-op spawn markers (south stairs, circle formation).
         for (int i = 0; i < 4; i++)
         {
@@ -1071,6 +1078,7 @@ public static class SandboxBuilder
         // and death replicate instead of diverging per client.
         husk.AddComponent<NetworkObject>();
         husk.AddComponent<EnemyHealth>().SetTier(hp, tier);
+        husk.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
         if (tint.HasValue)
         {
             var rend = husk.GetComponentInChildren<Renderer>();
@@ -1119,24 +1127,26 @@ public static class SandboxBuilder
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, health = false, ui = false, starterSword = false;
-        bool goal = false, campfire = false;
+        bool goal = false, campfire = false, targetBar = false;
         bool light = false, camera = false, elite = false, brute = false, chest = false;
+        bool allHusksArmed = true;
         bool net = false, transport = false, autostart = false, prefab = false;
         int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
         foreach (var root in scene.GetRootGameObjects())
             CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
                 ref equip, ref inv, ref health, ref ui, ref starterSword,
-                ref goal, ref campfire, ref light, ref camera, ref elite,
+                ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
                 ref brute, ref chest, ref net, ref transport, ref autostart,
-                ref prefab, ref husks, ref palisade, ref torches, ref spawns,
-                ref edges, ref patches);
+                ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
+                ref spawns, ref edges, ref patches);
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: " +
-                  $"player={player} husks={husks} elite={elite} brute={brute} " +
-                  $"chest={chest} goal={goal} campfire={campfire} starterSword={starterSword} " +
-                  $"spawns={spawns} palisade={palisade} torches={torches} edges={edges} " +
-                  $"patches={patches} net={net}");
+                  $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
+                  $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
+                  $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
+                  $"torches={torches} edges={edges} patches={patches} net={net}");
         if (!player || !clicker || !melee || !equip || !inv || !health || !ui
-            || !starterSword || !goal || !campfire || !elite || !brute || !chest
+            || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
+            || !elite || !brute || !chest
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
             || edges != 4 || patches < 4
             || !light || !camera || !net || !transport || !autostart || !prefab)
@@ -1146,9 +1156,10 @@ public static class SandboxBuilder
 
     static void CountZoneRecursive(Transform t, ref bool player, ref bool clicker,
         ref bool melee, ref bool equip, ref bool inv, ref bool health, ref bool ui,
-        ref bool starterSword, ref bool goal, ref bool campfire, ref bool light,
-        ref bool camera, ref bool elite, ref bool brute, ref bool chest, ref bool net,
-        ref bool transport, ref bool autostart, ref bool prefab, ref int husks,
+        ref bool starterSword, ref bool goal, ref bool campfire, ref bool targetBar,
+        ref bool light, ref bool camera, ref bool elite, ref bool brute, ref bool chest,
+        ref bool net, ref bool transport, ref bool autostart, ref bool prefab,
+        ref bool allHusksArmed, ref int husks,
         ref int palisade, ref int torches, ref int spawns, ref int edges, ref int patches)
     {
         string n = t.gameObject.name;
@@ -1160,6 +1171,7 @@ public static class SandboxBuilder
         if (n == "GoalPad" && t.gameObject.GetComponent<ToyTrigger>() != null
             && t.gameObject.GetComponent<ToyTrigger>().mode == ToyTrigger.Mode.Goal) goal = true;
         if (n == "CampfireHeal" && t.gameObject.GetComponent<CampfireHeal>() != null) campfire = true;
+        if (n == "DTargetBar" && t.gameObject.GetComponent<DiabloTargetBar>() != null) targetBar = true;
         if (n == "Player")
         {
             player = true;
@@ -1175,11 +1187,21 @@ public static class SandboxBuilder
                 && eq.GetDamage() >= Equipment.BaseDamage + 2f;
         }
         if (n == "Husk_Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
+        {
             elite = true;
+            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+        }
         else if (n == "Husk_Brute" && t.gameObject.GetComponent<EnemyHealth>() != null)
+        {
             brute = true;
+            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+        }
         else if (t.gameObject.CompareTag("Husk")
-            && t.gameObject.GetComponent<EnemyHealth>() != null) husks++;
+            && t.gameObject.GetComponent<EnemyHealth>() != null)
+        {
+            husks++;
+            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+        }
         if (n == "DChestZone" && t.gameObject.GetComponent<LootDrop>() != null) chest = true;
         if (n == "NetworkManager")
         {
@@ -1203,10 +1225,10 @@ public static class SandboxBuilder
         if (t.gameObject.GetComponent<Camera>() != null) camera = true;
         foreach (Transform c in t) CountZoneRecursive(c, ref player, ref clicker,
             ref melee, ref equip, ref inv, ref health, ref ui, ref starterSword,
-            ref goal, ref campfire, ref light, ref camera, ref elite,
+            ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
             ref brute, ref chest, ref net, ref transport, ref autostart,
-            ref prefab, ref husks, ref palisade, ref torches, ref spawns,
-            ref edges, ref patches);
+            ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
+            ref spawns, ref edges, ref patches);
     }
 
     /// <summary>

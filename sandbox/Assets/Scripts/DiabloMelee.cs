@@ -26,6 +26,17 @@ public sealed class DiabloMelee : MonoBehaviour
         return Mathf.Max(1, Mathf.RoundToInt(eq.GetDamage()));
     }
 
+    /// <summary>
+    /// Knockback distance by tier (D2 pop, not punt: combos must stay in the
+    /// 2.2 m arc — 1.2 m broke the arc-kill contract, see Strike_HitsHuskInFacingArc).
+    /// </summary>
+    public const float KnockbackNormal = 0.6f;
+    public const float KnockbackElite = 0.2f;
+
+    /// <summary>Last husk actually hit (target bar follows it; null when none).</summary>
+    public static GameObject LastStruck;
+    public static float LastStruckTime;
+
     /// <summary>Attempt one swing at target. Returns true on a landed hit.</summary>
     public bool TryAttack(GameObject target, Transform attacker)
     {
@@ -42,6 +53,11 @@ public sealed class DiabloMelee : MonoBehaviour
             attacker.rotation = Quaternion.LookRotation(toTarget);
         int blow = CurrentDamage(attacker);
         health.TakeDamage(blow);
+        health.ApplyKnockback(attacker.position,
+            health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);
+        DiabloAudio.PlayHit();
+        LastStruck = target;
+        LastStruckTime = Time.time;
         Debug.Log($"[Diablo] Melee swing #{Swings} hit {target.name} ({blow} dmg).");
         return true;
     }
@@ -86,5 +102,7 @@ public sealed class DiabloMelee : MonoBehaviour
     public static void ResetRun()
     {
         Swings = 0;
+        LastStruck = null;
+        LastStruckTime = 0f;
     }
 }

@@ -52,6 +52,25 @@ public sealed class EnemyHealth : MonoBehaviour
         TakeDamage(amount);
     }
 
+    /// <summary>Fraction of max HP left (target bar), clamped.</summary>
+    public float HPFraction() => Mathf.Clamp01((float)hp / maxHP);
+
+    /// <summary>
+    /// Shove away from the attacker (D2 pop, no physics: render transform
+    /// follows immediately, queries use distance math, never triggers).
+    /// </summary>
+    public void ApplyKnockback(Vector3 fromPos, float distance)
+    {
+        if (dead || distance <= 0f) return;
+        var push = transform.position - fromPos;
+        push.y = 0f;
+        if (push.sqrMagnitude < 0.0001f) push = Vector3.forward;
+        push.Normalize();
+        var p = transform.position + push * distance;
+        p.y = transform.position.y;
+        transform.position = p;
+    }
+
     /// <summary>Apply damage; kills at zero and drops a loot orb.</summary>
     public void TakeDamage(int amount)
     {
@@ -70,6 +89,7 @@ public sealed class EnemyHealth : MonoBehaviour
     {
         dead = true;
         HusksKilled++;
+        DiabloAudio.PlayDeath();
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();
         var netObj = GetComponent<NetworkObject>();

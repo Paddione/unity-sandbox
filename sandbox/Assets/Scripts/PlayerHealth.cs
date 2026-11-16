@@ -46,4 +46,21 @@ public sealed class PlayerHealth : MonoBehaviour
     {
         currentHP = Mathf.Clamp(CurrentHP, 0f, MaxHP);
     }
+
+    /// <summary>
+    /// Death: respawn at the Rogue Encampment with full HP (D2 corpse run
+    /// is out of scope). CC-safe teleport (disable/move/enable + sync).
+    /// </summary>
+    public void DieAndRespawn()
+    {
+        var spawn = GameObject.Find("CoopSpawn_0");
+        Vector3 pos = spawn != null ? spawn.transform.position : new Vector3(0f, 0.1f, 11f);
+        var cc = GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        transform.position = pos;
+        if (cc != null) cc.enabled = true;
+        Physics.SyncTransforms();
+        currentHP = MaxHP;
+        Debug.Log("[Diablo] Hero died — respawned at the Rogue Encampment.");
+    }
 }

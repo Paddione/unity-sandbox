@@ -53,6 +53,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     public void SetOpen(bool open)
     {
         EnsureBuilt();
+        if (IsOpen != open) DiabloAudio.PlayUIClick();
         IsOpen = open;
         if (canvas != null) canvas.enabled = open;
         if (open) Refresh();
@@ -66,6 +67,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (inventory.EquipFromBag(index, equipment))
         {
             if (health != null) health.Refresh();
+            DiabloAudio.PlayUIClick();
             Refresh();
         }
     }

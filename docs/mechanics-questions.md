@@ -96,3 +96,10 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Exit criterion: `VerifyDiabloZone` green, Linux/Windows/server builds run with zero errors, EditMode + PlayMode blood-moor tests green, decision logged as Q7 continue/pivot/kill.
 - Husks stay passive and HP/inventory stay local in this cut; retaliation + coop inventory sync are the Q8 candidates.
 - Headless proof: `VerifyDiabloZone` inventory + run log (this session).
+
+## Q8 — Fühlt sich der Moor-Kampf wie D2 Act 1 an?
+
+- Jeder Treffer: Schwung-Sound, Treffer-Thump, Hit-Flash, Knockback-Pop (0,6/0,2 m), HP-Balken am getroffenen Husk (3 s Fade); Kills: Death-Rattle + Loot-Blip. Whiffs: Schritt-in-den-Strike (0,5 m) + Whoosh.
+- Husks schlagen zurück (0,4-s-Telegraph per Ducken, 1/2 Schaden, 1,5 s Cooldown); Tod → Respawn am Camp mit vollem HP. Kein Corpse-Run, keine Damage-Numbers, kein Screenshake (nicht D2).
+- Exit criterion: `VerifyDiabloZone` grün, EditMode + PlayMode grün, Windows-GPU-Playtest mit Ein-Satz-Verdikt.
+- Headless proof: `VerifyDiabloZone` inventory + Suiten grün (dieser Branch).

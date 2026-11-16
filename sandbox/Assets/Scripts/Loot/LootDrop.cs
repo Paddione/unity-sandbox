@@ -78,7 +78,11 @@ public sealed class LootDrop : MonoBehaviour
     {
         if (hero == null || item == null) return;
         var inv = hero.GetComponent<Inventory>();
-        if (inv != null && inv.Add(item)) return;
+        if (inv != null && inv.Add(item))
+        {
+            DiabloAudio.PlayLoot();
+            return;
+        }
         var eq = hero.GetComponent<Equipment>();
         if (eq != null) eq.Equip(item);
     }
