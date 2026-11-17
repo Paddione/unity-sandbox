@@ -37,8 +37,8 @@ public class DiabloP2ConfigTests
         foreach (var husk in husks)
             Assert.IsNotNull(husk.GetComponent<EnemyHealth>(), $"Husk '{husk.name}' needs EnemyHealth.");
 
-        var elite = GameObject.Find("Husk_Elite");
-        Assert.IsNotNull(elite, "DiabloZone must contain the Husk_Elite.");
+        var elite = GameObject.Find("Ash Elite");
+        Assert.IsNotNull(elite, "DiabloZone must contain the Ash Elite.");
         Assert.AreEqual(15, elite.GetComponent<EnemyHealth>().maxHP, "Elite must have 15 HP.");
 
         var player = GameObject.Find("Player");

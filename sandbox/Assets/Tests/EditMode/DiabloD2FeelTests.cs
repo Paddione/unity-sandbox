@@ -87,13 +87,13 @@ public class DiabloD2FeelTests
     }
 
     [Test]
-    public void BloodMoorScene_ArmsHusksAndBar()
+    public void AshenFenScene_ArmsHusksAndBar()
     {
         var scene = EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         Assert.IsTrue(scene.IsValid(), "DiabloZone.unity must open cleanly.");
 
         var husks = GameObject.FindGameObjectsWithTag("Husk");
-        Assert.GreaterOrEqual(husks.Length, 10, "Blood Moor must spread 10+ husks.");
+        Assert.GreaterOrEqual(husks.Length, 10, "Ashen Fen must spread 10+ husks.");
         foreach (var husk in husks)
         {
             var atk = husk.GetComponent<EnemyAttack>();

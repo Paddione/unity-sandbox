@@ -128,3 +128,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 
 - Befund: `C:\Users\PatrickKorczewski\Games` hatte drei Kopien desselben Spiels (`diablo-zone.exe`): `diablo-zone-strike` (15.11., Strike-Meilenstein), `diablo-bloodmoor` (17.11. früh, Stage-Ziel aus dem combat-feel-Plan) und `diablo-zone`. Jede Phase hat von Hand in einen neuen Ordner kopiert, ein Skript gab es nicht.
 - Fix: `scripts/stage-windows.sh` spiegelt `builds/diablo-zone-windows` per `rsync --delete` nach `Games\diablo-zone` und schreibt `BUILD_INFO.json`; Plan-Verweis auf `diablo-bloodmoor` ersetzt; die zwei Altordner gelöscht (nur Build-Dateien, keine Spielstände, keine Verknüpfungen).
+
+## 2026-11-17 — S1 identity (Cinderreach / Ashen Fen)
+
+- Done: alle spielersichtbaren Strings + Kommentare + `WorldArtBuilder`-Objektnamen auf die Identitäts-Tabelle umgestellt (Ashen Fen, Lantern Hold, Fen Gate, Fen Brute, Ash Elite); `productName: Cinderreach`; `BuildDiabloZoneWindows()` → `builds/cinderreach-windows/cinderreach.exe`; `stage-windows.sh`/`shotcheck-windows.sh` → `Games\cinderreach` (Altordner `Games\diablo-zone` bleibt unangetastet, nur als Kommentar vermerkt); Art-Bible in `STARTERPACK.md`, `build_props.py`, `DiabloPalette.cs` auf Ashen Fen (`BloodBanner` bleibt); neue `EditMode/IdentityTests.cs` (Szenen-Namenskatalog + Hint-Quellen, Regex-Gate); Test-IDs `DiabloBloodMoor*` → `DiabloAshenFen*`; Setting-Absatz in `docs/one-page-gdd.md`.
+- Faced: `grep`-Regex trifft auch Historie (Journal, decision-log, mechanics-questions), Asset-Pfade (`Assets/Art/BloodMoor`, `bake_moor_ground.py`) und die Regex-Definition in `IdentityTests.cs` selbst — bewusst ausgenommen (GUIDs/Verlauf bleiben), im PROGRESS dokumentiert.
+- Learned: `Husk_Elite`/`Husk_Brute` sind Szenen-Objektnamen (Target-Bar-sichtbar) → mit `VerifyDiabloZone` und `DiabloP2ConfigTests` zusammen umbenennen, sonst bricht Verify.
+- Belegt: EditMode 58/58, PlayMode 59/59, `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `check-meta.py` OK.
+- Extra-Fix: `DiabloAudio.EnsureBuilt` (latent): Szenen-Ladungen zerstörten die statisch gecachten Synth-Clips
+  (`built` blieb true) → `AudioClips_AreValidMono22050` war reihenfolgeabhängig rot. Jetzt Rebuild bei totem Clip.
+- Next: dotfiles-Anteile (`diablo_unity.py`-Probe) laufen NICHT hier (eigener Worktree, Orchestrator); S2 nach S1-land.

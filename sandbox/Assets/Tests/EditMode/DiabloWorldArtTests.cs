@@ -2,18 +2,18 @@ using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Blood Moor dressing: Blender props replace the greybox look.</summary>
+/// <summary>Ashen Fen dressing: Blender props replace the greybox look.</summary>
 public class DiabloWorldArtTests
 {
     const string ZonePath = "Assets/Scenes/DiabloZone.unity";
 
     [Test]
-    public void BloodMoor_IsDressedWithBlenderProps()
+    public void AshenFen_IsDressedWithBlenderProps()
     {
         EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         var root = GameObject.Find("WorldDressing");
         Assert.IsNotNull(root, "Zone needs the WorldDressing root.");
-        Assert.GreaterOrEqual(root.transform.childCount, 150, "Moor needs its props and plant scatter.");
+        Assert.GreaterOrEqual(root.transform.childCount, 150, "Fen needs its props and plant scatter.");
         Assert.IsNotNull(GameObject.Find("CampfireModel"), "Campfire must use the Blender model.");
         Assert.IsNotNull(GameObject.Find("GateBrazier_0"));
         Assert.IsNotNull(GameObject.Find("DeadTree_0"));
@@ -27,7 +27,7 @@ public class DiabloWorldArtTests
     }
 
     [Test]
-    public void BloodMoor_NoGreyboxLeftVisible()
+    public void AshenFen_NoGreyboxLeftVisible()
     {
         EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         foreach (var prefix in new[] { "MoorEdge_", "ZStep_", "BloodPatch_" })
@@ -42,7 +42,7 @@ public class DiabloWorldArtTests
             }
             Assert.Greater(holders, 0, $"Zone must still contain {prefix} holders.");
         }
-        Assert.IsNotNull(GameObject.Find("MoorWall_N_0"), "Moor edge needs drystone wall segments.");
+        Assert.IsNotNull(GameObject.Find("MoorWall_N_0"), "Fen edge needs drystone wall segments.");
         Assert.IsNotNull(GameObject.Find("Art_ZStep_0"), "Entry steps need the stone step model.");
         Assert.IsNotNull(GameObject.Find("Art_BloodPatch_0"), "Blood patches need the splat model.");
 
@@ -53,7 +53,7 @@ public class DiabloWorldArtTests
     }
 
     [Test]
-    public void BloodMoor_FiresAreLit()
+    public void AshenFen_FiresAreLit()
     {
         EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         var fires = Object.FindObjectsByType<DiabloFire>(FindObjectsSortMode.None);
@@ -64,7 +64,7 @@ public class DiabloWorldArtTests
             Assert.AreEqual(LightType.Point, l.type);
             Assert.AreEqual(LightShadows.None, l.shadows, "Fire lights stay shadowless (cost).");
         }
-        Assert.IsTrue(RenderSettings.fog, "Moor haze must be on.");
+        Assert.IsTrue(RenderSettings.fog, "Fen haze must be on.");
         var cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         Assert.AreEqual(CameraClearFlags.SolidColor, cam.clearFlags, "Sky beyond the wall must be night haze.");
         Assert.AreEqual(RenderSettings.fogColor, cam.backgroundColor);

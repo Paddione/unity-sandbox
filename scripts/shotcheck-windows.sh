@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # shotcheck-windows.sh — visual self-check of the staged Windows player.
 #
-# Launches Games\diablo-zone\diablo-zone.exe with -shotcheck (DiabloShotCheck):
+# Launches Games\cinderreach\cinderreach.exe with -shotcheck (DiabloShotCheck):
 # the game drives the hero through the skill poses, saves screenshots into
 # <game folder>\shotcheck and quits. The PNGs are copied to artifacts/shotcheck
 # so agents can view them. A game window opens briefly on the Windows desktop.
 #
 # Usage (repo root, after stage-windows.sh): bash scripts/shotcheck-windows.sh
-# Env: SHOTCHECK_GAME (default /mnt/c/Users/PatrickKorczewski/Games/diablo-zone),
+# Env: SHOTCHECK_GAME (default /mnt/c/Users/PatrickKorczewski/Games/cinderreach),
 #      SHOTCHECK_TIMEOUT_S (default 120), SHOTCHECK_SIZE (default 1600x900).
 # Exit: 0 shots taken, 1 missing game/shots, 2 timeout, 3 game already running.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-GAME="${SHOTCHECK_GAME:-/mnt/c/Users/PatrickKorczewski/Games/diablo-zone}"
-EXE="diablo-zone.exe"
+GAME="${SHOTCHECK_GAME:-/mnt/c/Users/PatrickKorczewski/Games/cinderreach}"
+EXE="cinderreach.exe"
 TIMEOUT="${SHOTCHECK_TIMEOUT_S:-120}"
 SIZE="${SHOTCHECK_SIZE:-1600x900}"
 OUT="$PWD/artifacts/shotcheck"

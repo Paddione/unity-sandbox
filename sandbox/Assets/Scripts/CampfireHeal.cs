@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Rogue Encampment campfire: standing in the trigger radius slowly heals
+/// Lantern Hold campfire: standing in the trigger radius slowly heals
 /// <see cref="PlayerHealth"/> (solo hero and co-op mirrors alike, locally).
 /// The builder sizes the trigger from <see cref="Radius"/>.
 /// </summary>

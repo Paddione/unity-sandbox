@@ -205,7 +205,7 @@ serialisieren sich über den Projekt-Lock (Exit 3). Alle anderen Stufen laufen s
 
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
-| S1 identity | Vorbedingung | 10 % | offen |
+| S1 identity | Vorbedingung | 10 % | landed 2026-11-17 |
 | S2 economy+save | S1 | 15 % | offen |
 | S3 town+vendor | S2 | 15 % | offen |
 | S4 progression | S2 | 15 % | offen |

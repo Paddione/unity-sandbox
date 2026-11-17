@@ -588,9 +588,9 @@ public static class SandboxBuilder
     const string DiabloZoneScenePath = "Assets/Scenes/DiabloZone.unity";
 
     /// <summary>
-    /// Blood Moor (reworked DiabloZone): Rogue Encampment (palisade ring,
-    /// campfire, spawns) in the south, open moor with 10 husks + 1 brute,
-    /// west alcove elite + chest, east rubble, north Moor Gate extraction.
+    /// Ashen Fen (reworked DiabloZone): Lantern Hold (palisade ring,
+    /// campfire, spawns) in the south, open fen with 10 husks + 1 brute,
+    /// west alcove elite + chest, east rubble, north Fen Gate extraction.
     /// 4 co-op spawns, netcode, starter sword, inventory, campfire heal.
     /// </summary>
     public static void BuildDiabloZone()
@@ -708,7 +708,7 @@ public static class SandboxBuilder
         AttachStarterSword(hero);
         SetLayerRecursive(hero, LayerMask.NameToLayer("Ignore Raycast"));
 
-        // 10 husks scattered across the moor (3 m+ apart, off the camp).
+        // 10 husks scattered across the fen (3 m+ apart, off the camp).
         var huskModels = new[]
         {
             "Skeletons/Characters/Skeleton_Warrior.fbx",
@@ -730,12 +730,12 @@ public static class SandboxBuilder
                 huskSpots[i], 5, LootTier.Normal, 1f, null);
 
         // Elite (west alcove).
-        SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Husk_Elite",
+        SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Ash Elite",
             new Vector3(-12f, 0.05f, 3f), 15, LootTier.Elite, 1.3f,
             new Color(1f, 0.3f, 0.3f));
 
-        // Brute (northeast moor, second elite).
-        SpawnZoneHusk("Skeletons/Characters/Skeleton_Warrior.fbx", "Husk_Brute",
+        // Brute (northeast fen, second elite).
+        SpawnZoneHusk("Skeletons/Characters/Skeleton_Warrior.fbx", "Fen Brute",
             new Vector3(9f, 0.05f, -6f), 12, LootTier.Elite, 1.25f,
             new Color(0.8f, 0.2f, 0.2f));
 
@@ -765,7 +765,7 @@ public static class SandboxBuilder
             spawn.transform.position = new Vector3(Mathf.Cos(a) * 1.5f, 0.1f, 11f + Mathf.Sin(a) * 1.5f);
         }
 
-        // Blender-built Blood Moor props replace the greybox look (names kept).
+        // Blender-built Ashen Fen props replace the greybox look (names kept).
         WorldArtBuilder.DressDiabloZone();
 
         BuildDiabloZonePlayerPrefab();
@@ -838,8 +838,8 @@ public static class SandboxBuilder
     }
 
     /// <summary>
-    /// Blood Moor field: earthwork bounds, Rogue Encampment palisade ring +
-    /// campfire in the south, scattered rocks and bloodstains across the moor.
+    /// Ashen Fen field: earthwork bounds, Lantern Hold palisade ring +
+    /// campfire in the south, scattered rocks and bloodstains across the fen.
     /// Camp torches keep the ZTorch_* names (verify counts them).
     /// </summary>
     static void BuildMoorField()
@@ -938,7 +938,7 @@ public static class SandboxBuilder
             Paint(rock, new Color(0.38f, 0.36f, 0.36f));
         }
 
-        // Bloodstains where the moor earned its name.
+        // Bloodstains where the fen earned its name.
         var stainSpots = new[]
         {
             new Vector3(-4.5f, 0f, 1.5f), new Vector3(4.5f, 0f, 1f),
@@ -1217,7 +1217,7 @@ public static class SandboxBuilder
         Debug.Log("[SandboxBuilder] NetworkPlayerDiablo prefab saved to Resources.");
     }
 
-    /// <summary>Headless proof for the Blood Moor: camp, husks + elites, loot, netcode.</summary>
+    /// <summary>Headless proof for the Ashen Fen: camp, husks + elites, loot, netcode.</summary>
     public static void VerifyDiabloZone()
     {
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
@@ -1247,7 +1247,7 @@ public static class SandboxBuilder
             || edges != 4 || patches < 4
             || !light || !camera || !net || !transport || !autostart || !prefab)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
-        Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (blood moor + loot + netcode present).");
+        Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (ashen fen + loot + netcode present).");
     }
 
     /// <summary>Husk can fight back and is animated (attack + husk rig + controller).</summary>
@@ -1290,12 +1290,12 @@ public static class SandboxBuilder
             starterSword = eq != null && eq.weapon != null
                 && eq.GetDamage() >= Equipment.BaseDamage + 2f;
         }
-        if (n == "Husk_Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
+        if (n == "Ash Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
         {
             elite = true;
             if (!HuskArmed(t.gameObject)) allHusksArmed = false;
         }
-        else if (n == "Husk_Brute" && t.gameObject.GetComponent<EnemyHealth>() != null)
+        else if (n == "Fen Brute" && t.gameObject.GetComponent<EnemyHealth>() != null)
         {
             brute = true;
             if (!HuskArmed(t.gameObject)) allHusksArmed = false;
@@ -1344,7 +1344,7 @@ public static class SandboxBuilder
         var opts = new BuildPlayerOptions
         {
             scenes = new[] { DiabloZoneScenePath },
-            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-zone-windows/diablo-zone.exe",
+            locationPathName = "/home/patrick/unity-sandbox/builds/cinderreach-windows/cinderreach.exe",
             target = BuildTarget.StandaloneWindows64,
             subtarget = (int)StandaloneBuildSubtarget.Player,
             options = BuildOptions.None,

@@ -1,10 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Blood-moor art bible, single source for every menu color.
-/// Style: gothic blood-moor dark fantasy — charred stone panels, ember-gold
+/// Ashen-fen art bible, single source for every menu color.
+/// Style: gothic ashen-fen dark fantasy — charred stone panels, ember-gold
 /// trim, parchment text, blood-red life. Mood: torchlight ember key with a
-/// cool moor-night shadow bounce.
+/// cool fen-night shadow bounce.
 /// Every menu script reads these; no literal <c>Color.*</c> outside this file
 /// and <see cref="LootDrop"/> rarity colors (gameplay, kept in sync).
 /// </summary>

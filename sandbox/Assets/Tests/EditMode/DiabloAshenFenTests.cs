@@ -2,8 +2,8 @@ using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Blood Moor data contracts: starter sword, bag, swap, pickup routing.</summary>
-public class DiabloBloodMoorTests
+/// <summary>Ashen Fen data contracts: starter sword, bag, swap, pickup routing.</summary>
+public class DiabloAshenFenTests
 {
     const string ZonePath = "Assets/Scenes/DiabloZone.unity";
 
@@ -155,7 +155,7 @@ public class DiabloBloodMoorTests
     }
 
     [Test]
-    public void LootWeights_UnchangedByBloodMoor()
+    public void LootWeights_UnchangedByAshenFen()
     {
         LootTable.WeightsFor(LootTier.Normal, out int magic, out int rare, out int unique);
         Assert.AreEqual(80, magic);
@@ -182,15 +182,15 @@ public class DiabloBloodMoorTests
     }
 
     [Test]
-    public void BloodMoorScene_HasCampHusksBruteAndStarter()
+    public void AshenFenScene_HasCampHusksBruteAndStarter()
     {
         var scene = EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         Assert.IsTrue(scene.IsValid(), "DiabloZone.unity must open cleanly.");
 
         var husks = GameObject.FindGameObjectsWithTag("Husk");
-        Assert.GreaterOrEqual(husks.Length, 10, "Blood Moor must spread 10+ husks.");
-        var brute = GameObject.Find("Husk_Brute");
-        Assert.IsNotNull(brute, "Blood Moor needs the Husk_Brute elite.");
+        Assert.GreaterOrEqual(husks.Length, 10, "Ashen Fen must spread 10+ husks.");
+        var brute = GameObject.Find("Fen Brute");
+        Assert.IsNotNull(brute, "Ashen Fen needs the Fen Brute elite.");
         Assert.AreEqual(12, brute.GetComponent<EnemyHealth>().maxHP);
 
         int logs = 0;

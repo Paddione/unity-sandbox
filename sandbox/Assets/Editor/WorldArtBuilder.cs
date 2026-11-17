@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Dresses the Blood Moor with the Blender-built props from
+/// Dresses the Ashen Fen with the Blender-built props from
 /// docs/world-art/build_world_props.py (FBX under Assets/Art/BloodMoor/Models).
 /// Imports map the FBX material names onto URP/Lit materials in the art bible
 /// palette; the greybox primitives keep their names, positions and colliders
@@ -47,7 +47,7 @@ public static class WorldArtBuilder
         "StoneWall_0", "StoneWall_1", "StoneStep", "CryptSeal", "BloodSplat_0", "BloodSplat_1",
     };
 
-    [MenuItem("Sandbox/World Art/Import Blood Moor Props")]
+    [MenuItem("Sandbox/World Art/Import Ashen Fen Props")]
     public static void EnsureAssets()
     {
         Directory.CreateDirectory(Materials);
@@ -158,7 +158,7 @@ public static class WorldArtBuilder
         var root = new GameObject("WorldDressing").transform;
         var rng = new System.Random(1337);
 
-        // Ground: textured moor instead of a flat paint.
+        // Ground: textured fen instead of a flat paint.
         var ground = GameObject.Find("Ground");
         if (ground != null)
             ground.GetComponent<Renderer>().sharedMaterial =
@@ -320,7 +320,7 @@ public static class WorldArtBuilder
             l.intensity = 0.95f;
             l.shadows = LightShadows.Soft;
         }
-        // Beyond the moor wall: night haze instead of the unfogged default skybox.
+        // Beyond the fen wall: night haze instead of the unfogged default skybox.
         var cam = GameObject.Find("Main Camera");
         if (cam != null)
         {
@@ -389,7 +389,7 @@ public static class WorldArtBuilder
         c.center = new Vector3(0f, c.size.y / 2f, 0f);
     }
 
-    /// <summary>A moor spot outside the camp ring, gate pad, alcove and arena paths.</summary>
+    /// <summary>A fen spot outside the camp ring, gate pad, alcove and arena paths.</summary>
     static Vector3 RandomMoorSpot(System.Random rng)
     {
         for (int tries = 0; tries < 40; tries++)

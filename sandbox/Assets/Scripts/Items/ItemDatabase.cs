@@ -50,7 +50,7 @@ public static class ItemDatabase
         }
     }
 
-    /// <summary>Fixed starter sword, auto-equipped at spawn (Blood Moor).</summary>
+    /// <summary>Fixed starter sword, auto-equipped at spawn (Ashen Fen).</summary>
     public static ItemInstance CreateStarterSword()
     {
         return new ItemInstance

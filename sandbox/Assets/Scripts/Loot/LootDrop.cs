@@ -70,7 +70,7 @@ public sealed class LootDrop : MonoBehaviour
     }
 
     /// <summary>
-    /// Pickup routing (Blood Moor): into the hero's bag when present, else
+    /// Pickup routing (Ashen Fen): into the hero's bag when present, else
     /// straight onto the body (legacy solo behavior without an Inventory).
     /// A full bag overflows onto the body so no loot is ever lost or stuck.
     /// </summary>

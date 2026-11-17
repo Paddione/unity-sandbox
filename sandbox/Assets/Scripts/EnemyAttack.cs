@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Husk counterattack (Blood Moor retaliation, D2 Fallen Ones). Distance-based
+/// Husk counterattack (Ashen Fen retaliation, D2 Fallen Ones). Distance-based
 /// (never triggers — autosync-safe): in melee range the husk crouches
 /// (telegraph), then strikes after the windup. Dodging out of range whiffs.
 /// Damage goes to local <see cref="PlayerHealth"/> (solo-first, like HP).

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Hero hit points for the Blood Moor (campfire heal target). Max tracks
+/// Hero hit points for the Ashen Fen (campfire heal target). Max tracks
 /// <see cref="Equipment"/> so armor still matters. Husk strikes
 /// (<see cref="EnemyAttack"/>) drain it; at 0 the hero respawns at camp.
 /// Local-only per client, like <see cref="Equipment"/>. Shown by
@@ -53,7 +53,7 @@ public sealed class PlayerHealth : MonoBehaviour
     }
 
     /// <summary>
-    /// Death: respawn at the Rogue Encampment with full HP (D2 corpse run
+    /// Death: respawn at Lantern Hold with full HP (D2 corpse run
     /// is out of scope). CC-safe teleport (disable/move/enable + sync).
     /// </summary>
     public void DieAndRespawn()
@@ -67,6 +67,6 @@ public sealed class PlayerHealth : MonoBehaviour
         Physics.SyncTransforms();
         currentHP = MaxHP;
         LastDeathTime = Time.time;
-        Debug.Log("[Diablo] Hero died — respawned at the Rogue Encampment.");
+        Debug.Log("[Diablo] Hero died — respawned at Lantern Hold.");
     }
 }

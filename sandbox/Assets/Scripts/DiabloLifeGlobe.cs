@@ -89,7 +89,7 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         Center(label.rectTransform, Size);
 
         deathNotice = MakeText(canvasGo.transform, "DeathNotice", 30);
-        deathNotice.text = "You died - back at the Rogue Encampment";
+        deathNotice.text = "You died - back at Lantern Hold";
         deathNotice.color = new Color(0.95f, 0.25f, 0.2f, 1f);
         var r = deathNotice.rectTransform;
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0.5f);

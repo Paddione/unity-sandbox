@@ -4,6 +4,15 @@ Template: Unity's official One-Page plan (MoSCoW + done-means + milestones).
 Status: scoped. Q1–Q3 defined in `docs/mechanics-questions.md`, decisions in
 `docs/decision-log.md`, headless proof in `docs/q1-run-log.md`.
 
+## Identity (S1, landed 2026-11-17)
+
+Working title **Cinderreach** (`productName`, `cinderreach.exe`,
+`builds/cinderreach-windows`, `Games\cinderreach`). Zone 1 is the
+**Ashen Fen**, its hub **Lantern Hold**, its extraction the **Fen Gate**;
+elites are the **Fen Brute** and the **Ash Elite** (plain husks stay
+generic). Setting: gothic ashen-fen dark fantasy — torchlit camp and
+crypt seal against a cold fen-night haze.
+
 ## Must-haves
 
 - Playable greybox scene with code-owned Third-Person controller (Q1)

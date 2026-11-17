@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// D2 combat sounds, fully synthesized at runtime (Blood Moor has no audio
+/// D2 combat sounds, fully synthesized at runtime (Ashen Fen has no audio
 /// pipeline and the repo bans binary assets). 22050 Hz mono clips built once
 /// from decaying sine/noise shapes; playback is a silent no-op headless.
 /// Static counters (strikeCount precedent) prove sounds fired in tests.
@@ -87,7 +87,9 @@ public static class DiabloAudio
 
     static void EnsureBuilt()
     {
-        if (built) return;
+        // Scene opens destroy the synth objects (no DontDestroyOnLoad outside
+        // play mode); rebuild instead of handing out dead clips.
+        if (built && source != null && swingClip != null) return;
         built = true;
         var go = new GameObject("DiabloAudio");
         if (Application.isPlaying) UnityEngine.Object.DontDestroyOnLoad(go);

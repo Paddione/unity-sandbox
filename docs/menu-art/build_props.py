@@ -1,4 +1,4 @@
-"""Blood-moor dungeon props: TorchSconce, LootChest, BloodBanner.
+"""Ashen-fen dungeon props: TorchSconce, LootChest, BloodBanner.
 Rebuildable Blender script in the style of docs/menu-art/build_icons.py.
 Usage: blender -b --factory-startup --python-exit-code 1 -P build_props.py [--final]
 Preview: 128px/16sp; final: 256px/64sp EEVEE, transparent film.
@@ -18,7 +18,7 @@ SAMPLES = 64 if FINAL else 16
 
 H.reset_scene()
 
-# Blood-moor palette (DiabloPalette.cs)
+# Ashen-fen palette (DiabloPalette.cs)
 bronze = H.material("Bronze", "#8A6238", roughness=0.45, metallic=0.65)
 gold = H.material("EmberGold", "#F2B134", roughness=0.3, metallic=1.0)
 stone = H.material("CryptStone", "#232028", roughness=0.9)

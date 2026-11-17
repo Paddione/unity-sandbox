@@ -1,8 +1,8 @@
-# Blood-moor starter art pack (free-local, 2026-11-17)
+# Ashen-fen starter art pack (free-local, 2026-11-17)
 
-Art bible (from `DiabloPalette.cs`): gothic blood-moor dark fantasy —
+Art bible (from `DiabloPalette.cs`): gothic ashen-fen dark fantasy —
 charred stone panels, ember-gold trim, parchment text, blood-red life.
-Mood: torchlight ember key with cool moor-night shadow bounce.
+Mood: torchlight ember key with cool fen-night shadow bounce.
 Palette: `#14101A` crypt · `#3A2E22` bronze · `#F2B134` ember ·
 `#E8D9BE` parchment · `#0B0910` abyss · `#B31217` blood.
 
@@ -21,7 +21,7 @@ Rebuilt from one script each; rerun to reproduce exactly.
 ## Reference concepts (`docs/menu-art/refs/`, NOT shipped)
 
 Per visual-coding rules AI images are look targets only, never Unity
-assets: `blood-moor-keyart.jpg` (crypt mouth on the moor),
+assets: `blood-moor-keyart.jpg` (crypt mouth on the fen; filename kept),
 `hero-knight-portrait.jpg`, `husk-warrior-portrait.jpg`.
 
 ## Agentic resources used

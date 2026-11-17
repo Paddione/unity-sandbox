@@ -3,8 +3,8 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>Blood Moor end-to-end (headless): kill, loot to bag, equip, heal.</summary>
-public class DiabloBloodMoorLoopTests
+/// <summary>Ashen Fen end-to-end (headless): kill, loot to bag, equip, heal.</summary>
+public class DiabloAshenFenLoopTests
 {
     GameObject player;
     Equipment equipment;

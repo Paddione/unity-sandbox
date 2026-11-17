@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run-unity-build.sh — hardened Unity batchmode build wrapper.
 #
-# Why this exists (2026-11-15, Blood Moor builds): raw
+# Why this exists (2026-11-15, Ashen Fen builds): raw
 # `Unity -batchmode ... -executeMethod` runs failed three ways in one day:
 #  1. a second editor (the unity-sandbox-editor.service warm instance) holds
 #     the project and the build aborts with a core dump;

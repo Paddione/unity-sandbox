@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Bag inventory for the Diablo hero (Blood Moor). Pickups land here via
+/// Bag inventory for the Diablo hero (Ashen Fen). Pickups land here via
 /// <see cref="LootDrop"/>; <see cref="DiabloInventoryUI"/> equips out of the
 /// bag with a swap-back. Local-only per client (P2 pattern); the server only
 /// relays drops, never inventories.
