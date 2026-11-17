@@ -72,17 +72,34 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         var nm = NetworkManager.Singleton;
         if (nm == null || !nm.IsServer) return;
         if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
+        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId, 4f);
+    }
+
+    /// <summary>Server re-check radius for fireball/arrow hits (max skill range + slack).</summary>
+    public const float RangedValidateRange = 24f;
+
+    /// <summary>Client projectile hit request: validated on the server, then applied.</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitRangedHitServerRpc(ulong targetNetId, int damage, ServerRpcParams rpcParams = default)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsServer) return;
+        if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
+        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId, RangedValidateRange);
+    }
+
+    static void ApplyValidated(NetworkManager nm, NetworkObject targetNb, int damage, ulong sender, float maxRange)
+    {
         var health = targetNb.GetComponent<EnemyHealth>();
         if (health == null) return;
         // Range validation against the sender's player object (anti-teleportkill).
-        var sender = rpcParams.Receive.SenderClientId;
         foreach (var kv in nm.SpawnManager.SpawnedObjects)
         {
             var nb = kv.Value;
             if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
             var delta = targetNb.transform.position - nb.transform.position;
             delta.y = 0f;
-            if (delta.magnitude > 4f) return;
+            if (delta.magnitude > maxRange) return;
             health.TakeDamage(damage);
             return;
         }

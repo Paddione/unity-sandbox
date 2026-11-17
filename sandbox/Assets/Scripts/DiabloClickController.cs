@@ -42,6 +42,8 @@ public sealed class DiabloClickController : MonoBehaviour
         var fwd = transform.forward;
         fwd.y = 0f;
         AimDirection = fwd.sqrMagnitude > 0.0001f ? fwd.normalized : Vector3.forward;
+        // Ranged skills (Q fireball, E bow) ride on every hero, scene or prefab.
+        if (GetComponent<DiabloSkills>() == null) gameObject.AddComponent<DiabloSkills>();
         // P2 zone scenes run netcode: the solo hero would double-drive clicks
         // and fight the network player over the camera. Yield in that case.
         if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))
