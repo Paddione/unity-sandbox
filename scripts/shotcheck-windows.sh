@@ -19,6 +19,9 @@ TIMEOUT="${SHOTCHECK_TIMEOUT_S:-120}"
 SIZE="${SHOTCHECK_SIZE:-1600x900}"
 OUT="$PWD/artifacts/shotcheck"
 
+# SIZE is spliced into a cmd.exe command string: accept digits only.
+[[ "$SIZE" =~ ^[0-9]{3,5}x[0-9]{3,5}$ ]] || { echo "shotcheck: bad SHOTCHECK_SIZE '$SIZE' (want WxH)" >&2; exit 1; }
+
 [[ -f "$GAME/$EXE" ]] || { echo "shotcheck: no game at $GAME/$EXE (run stage-windows.sh)" >&2; exit 1; }
 if tasklist.exe /FI "IMAGENAME eq $EXE" 2>/dev/null | grep -qi "$EXE"; then
   echo "shotcheck: $EXE is already running — close it first." >&2
