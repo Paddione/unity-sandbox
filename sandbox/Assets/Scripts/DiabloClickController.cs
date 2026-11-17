@@ -87,6 +87,12 @@ public sealed class DiabloClickController : MonoBehaviour
     public bool HasDestination => hasDestination;
     public GameObject CurrentTarget => attackTarget;
 
+    /// <summary>
+    /// Scripted driver owns the hero (shotcheck): keyboard and mouse are
+    /// ignored so aim and facing stay where the script put them.
+    /// </summary>
+    public static bool ExternalDrive;
+
     /// <summary>Active WASD/arrows world-space intent (zero when idle).</summary>
     public Vector3 MoveInput { get; private set; }
 
@@ -148,9 +154,9 @@ public sealed class DiabloClickController : MonoBehaviour
     {
         // P2 co-op: remote mirrors are driven by NetworkTransform, not input.
         if (IsRemoteMirror) return;
-        PollKeyboard();
+        if (!ExternalDrive) PollKeyboard();
 
-        var mouse = Mouse.current;
+        var mouse = ExternalDrive ? null : Mouse.current;
         if (mouse != null && Camera.main != null)
         {
             // Aim tracks the cursor every frame (twin-stick feel).

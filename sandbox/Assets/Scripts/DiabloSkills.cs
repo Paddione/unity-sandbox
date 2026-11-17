@@ -228,6 +228,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (BowDrawn && Time.time > bowUntil) ExitBowStance();
         if (IsRemoteMirror) return;
         if (controller == null || !controller.isActiveAndEnabled) return;
+        if (DiabloClickController.ExternalDrive) { UpdateHud(); return; }
         var kb = Keyboard.current;
         var mouse = Mouse.current;
         if (kb == null && mouse == null) return; // headless/tests: API only
