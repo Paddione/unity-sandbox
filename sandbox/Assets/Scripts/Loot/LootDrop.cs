@@ -16,6 +16,9 @@ public sealed class LootDrop : MonoBehaviour
     /// <summary>Roll the tier table and spawn loot; null when nothing drops.</summary>
     public static GameObject SpawnLoot(Vector3 pos, LootTier tier, System.Random rng, bool networked)
     {
+        // S2 economy: independent gold roll beside the item orb (local-only
+        // pickup, own counters — item-orb counts stay exact for the Q5 loop).
+        GoldDrop.SpawnGold(pos, tier, rng);
         var roll = LootTable.Roll(tier, rng);
         if (!roll.drops) return null;
         return SpawnItem(pos, BuildItem(roll, rng), networked);

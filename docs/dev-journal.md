@@ -138,3 +138,22 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Extra-Fix: `DiabloAudio.EnsureBuilt` (latent): Szenen-Ladungen zerstörten die statisch gecachten Synth-Clips
   (`built` blieb true) → `AudioClips_AreValidMono22050` war reihenfolgeabhängig rot. Jetzt Rebuild bei totem Clip.
 - Next: dotfiles-Anteile (`diablo_unity.py`-Probe) laufen NICHT hier (eigener Worktree, Orchestrator); S2 nach S1-land.
+
+## 2026-11-18 — S2 economy+save (Cinderreach-Session, Stufe S2)
+
+- Done: `Wallet` (pur, `Add`/`TrySpend`/`SetGold`, `EnsureWallet`) am Helden + Netz-Prefab wie `Inventory`
+  (Builder + `VerifyDiabloZone`- + Prefab-Check); `GoldDrop`-Pickup (Normal 70 % 3–8, Elite 100 % 15–30,
+  Chest 40–60, Konstanten + `GetGoldTable` in `DroptableDatabase`), unabhängiger Roll in
+  `LootDrop.SpawnLoot` neben der Item-Kugel (Q5-Orb-Zähler unberührt); `SaveGame` (v=1, S4-Punktfelder
+  forward-kompatibel) + `SaveService` (`cinderreach-save.json`, tmp+rename, Autosave Level-Up + Quit,
+  `SaveNow(hero, zoneReached)`-Hooks für S5-Gate/S3-Vendor als Kommentar, korrupt → `*.corrupt` + Warnung);
+  `DiabloProgression.GetState/SetState` (Level-Up-Autosave); Tests `SaveGameTests` (7, Roundtrip/Version/
+  Korrupt/Wallet/Tabellen) + `EconomyLoopTests` (3, Pickup-Bilanz/Drop-Bilanz/Reload).
+- Faced: Worktree enthielt uncommittete S2-Vorarbeit (alle Produkt-/Test-Dateien bereits angelegt);
+  übernommen und vervollständigt (Builder-Wallet-Verdrahtung + Verify-Pflicht + Szenen-Rebuild fehlten).
+  Kein Menü-Szenen-Code im Repo (`DiabloMenuTests` = In-Game-Tab-Menü) → Continue/New-Game als TODO
+  dokumentiert statt erfunden (`HasSave`/`TryLoad`/`DeleteSave` sind die Menü-Seams).
+- Learned: `VerifyDiabloZone` als Pflicht-Gate fängt fehlende Builder-Verdrahtung sofort (Wallet-Test);
+  Szene nach Builder-Änderung immer per `BuildDiabloZone` regenerieren, nie von Hand.
+- Belegt: EditMode 65/65, PlayMode 62/62, `VerifyDiabloZone` OK (Wallet an Bord), `KayKitAssets.Verify`
+  grün, `check-meta.py` OK. Nächste: S3 (Vendor gegen Gold, `SaveNow` am Vendor-Schluss).

@@ -1,6 +1,6 @@
 # Progress: arpg-session-loop
 
-Prozent: 10 %
+Prozent: 25 %
 
 ## Erledigt
 
@@ -23,9 +23,24 @@ Prozent: 10 %
   Fix nebenbei: `DiabloAudio.EnsureBuilt` baut Clips neu, wenn Szenen-Ladungen sie zerstört haben
   (latenter Bug, machte `AudioClips_AreValidMono22050` reihenfolgeabhängig rot).
 
+- 2026-11-18: S2 economy+save gelandet.
+  Belege: EditMode 65/65 (neu `SaveGameTests`: Roundtrip aller Felder, Version/Korrupt-Pfade,
+  Wallet-Add/TrySpend, Goldtabellen-Konstanten + -Rolls), PlayMode 62/62 (neu `EconomyLoopTests`:
+  Gold-Pickup-Bilanz, Kill-Drop-Bilanz, Reload setzt Level/Gold fort), `VerifyDiabloZone` grün
+  (Held + Netz-Prefab tragen `Wallet`), `KayKitAssets.Verify` grün, `check-meta.py` ohne Befund.
+  Gold: `Wallet` (pur) am Helden wie `Inventory` (Builder + Verify), `GoldDrop`-Pickup
+  (Normal 70 % 3–8, Elite 100 % 15–30, Chest 40–60, Konstanten in `DroptableDatabase`),
+  unabhängiger Roll neben der Item-Kugel in `LootDrop.SpawnLoot`.
+  Save: `SaveGame` (v=1: Level, XP, S4-Punktfelder, Skill-Ränge, Equipment, Bag, Gold, zoneReached),
+  `SaveService` (`cinderreach-save.json`, JsonUtility, tmp+rename, Autosave bei Level-Up + Quit,
+  `SaveNow`-Hooks für Zonen-Übergang S5 / Vendor-Schluss S3 als TODO-Kommentar, korrupt →
+  `*.corrupt` + Neustart + Warnung). `DiabloProgression` mit GetState/SetState (Level-Up-Autosave).
+  Menü: kein Menü-Szenen-Code vorhanden — Continue (nur bei Save) / New Game (mit Bestätigung) als
+  TODO ans Menü übergeben (Verdrahtung über `HasSave`/`TryLoad`/`DeleteSave` dokumentiert).
+
 ## Nächste Schritte
 
-1. S2 Gold + Save nach Session-Protokoll umsetzen. dotfiles-Probe (`diablo_unity.py` auf `cinderreach`) separat landen.
+1. S3 town+vendor nach S2 (braucht Gold). dotfiles-Probe (`diablo_unity.py` auf `cinderreach`) separat landen.
 
 ## Offene Punkte
 

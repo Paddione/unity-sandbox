@@ -700,6 +700,7 @@ public static class SandboxBuilder
         hero.AddComponent<DiabloMelee>();
         hero.AddComponent<Equipment>();
         hero.AddComponent<Inventory>();
+        hero.AddComponent<Wallet>();
         hero.AddComponent<PlayerHealth>();
         hero.AddComponent<DiabloInventoryUI>();
         hero.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
@@ -1203,6 +1204,7 @@ public static class SandboxBuilder
         netPlayer.AddComponent<DiabloNetworkPlayer>();
         netPlayer.AddComponent<Equipment>();
         netPlayer.AddComponent<Inventory>();
+        netPlayer.AddComponent<Wallet>();
         netPlayer.AddComponent<PlayerHealth>();
         netPlayer.AddComponent<DiabloInventoryUI>();
         netPlayer.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
@@ -1222,7 +1224,7 @@ public static class SandboxBuilder
     {
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
         bool player = false, clicker = false, melee = false, equip = false;
-        bool inv = false, health = false, ui = false, starterSword = false;
+        bool inv = false, wallet = false, health = false, ui = false, starterSword = false;
         bool goal = false, campfire = false, targetBar = false;
         bool light = false, camera = false, elite = false, brute = false, chest = false;
         bool allHusksArmed = true;
@@ -1230,7 +1232,7 @@ public static class SandboxBuilder
         int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
         foreach (var root in scene.GetRootGameObjects())
             CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
-                ref equip, ref inv, ref health, ref ui, ref starterSword,
+                ref equip, ref inv, ref wallet, ref health, ref ui, ref starterSword,
                 ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
                 ref brute, ref chest, ref net, ref transport, ref autostart,
                 ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
@@ -1240,7 +1242,7 @@ public static class SandboxBuilder
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
                   $"torches={torches} edges={edges} patches={patches} net={net}");
-        if (!player || !clicker || !melee || !equip || !inv || !health || !ui
+        if (!player || !clicker || !melee || !equip || !inv || !wallet || !health || !ui
             || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
             || !elite || !brute || !chest
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
@@ -1259,7 +1261,7 @@ public static class SandboxBuilder
     }
 
     static void CountZoneRecursive(Transform t, ref bool player, ref bool clicker,
-        ref bool melee, ref bool equip, ref bool inv, ref bool health, ref bool ui,
+        ref bool melee, ref bool equip, ref bool inv, ref bool wallet, ref bool health, ref bool ui,
         ref bool starterSword, ref bool goal, ref bool campfire, ref bool targetBar,
         ref bool light, ref bool camera, ref bool elite, ref bool brute, ref bool chest,
         ref bool net, ref bool transport, ref bool autostart, ref bool prefab,
@@ -1283,6 +1285,7 @@ public static class SandboxBuilder
             melee = t.gameObject.GetComponent<DiabloMelee>() != null;
             equip = t.gameObject.GetComponent<Equipment>() != null;
             inv = t.gameObject.GetComponent<Inventory>() != null;
+            wallet = t.gameObject.GetComponent<Wallet>() != null;
             health = t.gameObject.GetComponent<PlayerHealth>() != null;
             ui = t.gameObject.GetComponent<DiabloInventoryUI>() != null;
             player = player && t.gameObject.GetComponent<CharacterController>() != null;
@@ -1321,6 +1324,7 @@ public static class SandboxBuilder
                     && pp.GetComponent<DiabloNetworkPlayer>() != null
                     && pp.GetComponent<Equipment>() != null
                     && pp.GetComponent<Inventory>() != null
+                    && pp.GetComponent<Wallet>() != null
                     && pp.GetComponent<PlayerHealth>() != null
                     && pp.GetComponent<DiabloInventoryUI>() != null;
             }
@@ -1328,7 +1332,7 @@ public static class SandboxBuilder
         if (t.gameObject.GetComponent<Light>() != null) light = true;
         if (t.gameObject.GetComponent<Camera>() != null) camera = true;
         foreach (Transform c in t) CountZoneRecursive(c, ref player, ref clicker,
-            ref melee, ref equip, ref inv, ref health, ref ui, ref starterSword,
+            ref melee, ref equip, ref inv, ref wallet, ref health, ref ui, ref starterSword,
             ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
             ref brute, ref chest, ref net, ref transport, ref autostart,
             ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,

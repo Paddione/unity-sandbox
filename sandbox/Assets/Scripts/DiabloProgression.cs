@@ -10,7 +10,8 @@ using Unity.Netcode;
 /// every client (party XP, D2 style) through <see cref="DiabloNetworkPlayer"/>.
 /// The level-up is a moment, not text: gold flash, sting, banner pop,
 /// ember pillar, bar refill — all unscaled, input never locked.
-/// Local-only per client, like <see cref="Equipment"/>; not saved between runs.
+/// Local-only per client, like <see cref="Equipment"/>; persisted through
+/// <see cref="SaveService"/> (S2) instead of living only for the run.
 /// </summary>
 public sealed class DiabloProgression : MonoBehaviour
 {
@@ -45,6 +46,24 @@ public sealed class DiabloProgression : MonoBehaviour
             case LootTier.Chest: return XpChest;
             default: return XpNormal;
         }
+    }
+
+    /// <summary>
+    /// State export for <see cref="SaveService"/> (S2 persist; S4 adds the
+    /// point/allocation fields on top of this level/XP pair).
+    /// </summary>
+    public void GetState(out int level, out int xp)
+    {
+        level = Level;
+        xp = Xp;
+    }
+
+    /// <summary>State import for <see cref="SaveService"/> (Continue path).</summary>
+    public void SetState(int level, int xp)
+    {
+        Level = Mathf.Clamp(level, 1, MaxLevel);
+        Xp = Level >= MaxLevel ? 0 : Mathf.Max(0, xp);
+        TweenFill(Fill);
     }
 
     /// <summary>Bonus max life from levels (read by <see cref="Equipment.GetMaxHP"/>).</summary>
@@ -119,6 +138,7 @@ public sealed class DiabloProgression : MonoBehaviour
     void OnLevelUp()
     {
         LevelUps++;
+        SaveService.SaveNow(gameObject); // S2 autosave: level-up
         var hp = GetComponent<PlayerHealth>();
         if (hp != null) hp.Heal(hp.MaxHP);
         Debug.Log($"[Diablo] Level up: {Level} (max life {(hp != null ? hp.MaxHP : 0f):0}).");
