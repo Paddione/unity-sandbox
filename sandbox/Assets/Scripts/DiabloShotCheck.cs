@@ -101,6 +101,32 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.06f);
         yield return Shot("fireball_blast");
 
+        // 5) Combat juice at gameplay framing: numbers, crit, blood, embers.
+        hero.distance = baseDist;
+        hero.pitch = basePitch;
+        yield return Wait(1.2f);
+        var hitAt = hero.transform.position - camRight * 2.5f;
+        DiabloJuice.OnEnemyHit(hitAt, 2, false);
+        yield return Wait(0.12f);
+        DiabloJuice.OnEnemyHit(hitAt + camFwd * 0.6f, 6, true);
+        yield return Wait(0.1f);
+        yield return Shot("damage_numbers_crit");
+        DiabloJuice.OnEnemyDeath(hitAt);
+        DiabloProgression.GrantLocal(DiabloProgression.XpNormal, hitAt);
+        yield return Wait(0.15f);
+        yield return Shot("death_burst_xp");
+
+        // 6) Level-up moment (banner at its overshoot, pillar rising).
+        var prog = hero.GetComponent<DiabloProgression>();
+        if (prog != null)
+        {
+            prog.AddXp(DiabloProgression.XpToNext(prog.Level) - prog.Xp);
+            yield return Wait(0.3f);
+            yield return Shot("level_up");
+            yield return Wait(1.0f);
+            yield return Shot("level_up_settled");
+        }
+
         hero.distance = baseDist;
         hero.pitch = basePitch;
         DiabloClickController.ExternalDrive = false;

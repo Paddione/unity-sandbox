@@ -19,6 +19,7 @@ public class DiabloCombatTests
     [SetUp]
     public void Setup()
     {
+        DiabloJuice.ForceCrit = false; // exact-damage asserts: no random crits
         ToyTrigger.ResetRun();
         EnemyHealth.ResetRun();
         DiabloMelee.ResetRun();

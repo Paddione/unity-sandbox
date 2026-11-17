@@ -116,6 +116,7 @@ public sealed class EnemyAttack : MonoBehaviour
         if (hp == null) return;
         hp.TakeDamage(damage);
         DiabloAudio.PlayHurt();
+        DiabloJuice.OnPlayerHurt(hero.position, damage);
         if (hp.CurrentHP <= 0f)
         {
             hp.DieAndRespawn();

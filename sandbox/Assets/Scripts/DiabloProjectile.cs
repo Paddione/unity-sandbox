@@ -174,14 +174,14 @@ public sealed class DiabloProjectile : MonoBehaviour
                     if (husk == null) continue;
                     var d = Flat(husk.transform.position) - Flat(point);
                     if (d.magnitude > blastRadius) continue;
-                    DiabloSkills.ApplyHit(husk, damage, point, knockback);
+                    DiabloSkills.ApplyHit(husk, damage, point, knockback, owner);
                 }
             }
             SpawnBlast(point, blastRadius);
         }
         else if (directHit != null && !cosmetic)
         {
-            DiabloSkills.ApplyHit(directHit, damage, origin, knockback);
+            DiabloSkills.ApplyHit(directHit, damage, origin, knockback, owner);
         }
 
         // A wall-struck arrow stays stuck for a moment; everything else goes now.
@@ -219,6 +219,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     /// <summary>Blast art: Resources prefab, procedural sphere when missing.</summary>
     public static GameObject SpawnBlast(Vector3 at, float radius)
     {
+        DiabloJuice.OnBlast(at);
         var prefab = Resources.Load<GameObject>("SkillArt/FireballBlast");
         if (prefab == null) return Explosion.Spawn(at, radius);
         var go = Object.Instantiate(prefab, at, Quaternion.identity);

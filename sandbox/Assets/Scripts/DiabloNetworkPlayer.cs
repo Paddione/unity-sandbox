@@ -61,8 +61,23 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         }
         else
         {
-            health.RequestDamage(damage, nm.LocalClientId);
+            damage = DiabloJuice.RollCrit(attacker, damage, out bool crit);
+            health.RequestDamage(damage, nm.LocalClientId, crit);
         }
+    }
+
+    /// <summary>Server: share one kill's XP with every client (party XP).</summary>
+    public void ShareKillXP(int xp, Vector3 at)
+    {
+        if (!IsServer || !IsSpawned) return;
+        ShareKillXPClientRpc(xp, at);
+    }
+
+    [ClientRpc]
+    void ShareKillXPClientRpc(int xp, Vector3 at)
+    {
+        if (xp <= 0 || xp > DiabloProgression.XpElite) return;
+        DiabloProgression.GrantLocal(xp, at);
     }
 
     /// <summary>Client attack request: validated on the server, then applied.</summary>

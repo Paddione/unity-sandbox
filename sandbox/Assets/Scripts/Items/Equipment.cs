@@ -56,7 +56,13 @@ public sealed class Equipment : MonoBehaviour
     }
 
     public float GetDamage() => BaseDamage + (weapon != null ? weapon.GetAffix("Damage") : 0f);
-    public float GetMaxHP() => BaseMaxHP + (armor != null ? armor.GetAffix("MaxHP") : 0f) + (helmet != null ? helmet.GetAffix("MaxHP") : 0f);
+    public float GetMaxHP() => BaseMaxHP + LevelLife() + (armor != null ? armor.GetAffix("MaxHP") : 0f) + (helmet != null ? helmet.GetAffix("MaxHP") : 0f);
+    float LevelLife()
+    {
+        var prog = GetComponent<DiabloProgression>();
+        return prog != null ? prog.BonusLife : 0f;
+    }
+
     public float GetMoveSpeed() => BaseMoveSpeed + (armor != null ? armor.GetAffix("MoveSpeed") : 0f);
     public float GetCrit() => 5f + (weapon != null ? weapon.GetAffix("Crit") : 0f) + (helmet != null ? helmet.GetAffix("Crit") : 0f);
     public float GetXPMul() => 100f + (helmet != null ? helmet.GetAffix("XPMul") : 0f);

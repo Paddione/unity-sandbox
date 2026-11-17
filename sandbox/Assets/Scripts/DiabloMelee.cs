@@ -51,12 +51,12 @@ public sealed class DiabloMelee : MonoBehaviour
         Swings++;
         if (toTarget.sqrMagnitude > 0.0001f)
             attacker.rotation = Quaternion.LookRotation(toTarget);
-        int blow = CurrentDamage(attacker);
-        health.TakeDamage(blow);
+        int blow = DiabloJuice.RollCrit(attacker, CurrentDamage(attacker), out bool crit);
+        health.TakeDamage(blow, crit);
         health.ApplyKnockback(attacker.position,
             health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);
         DiabloAudio.PlayHit();
-        HitStop.Trigger();
+        HitStop.Trigger(crit ? HitStop.Duration * 1.6f : HitStop.Duration);
         LastStruck = target;
         LastStruckTime = Time.time;
         Debug.Log($"[Diablo] Melee swing #{Swings} hit {target.name} ({blow} dmg).");

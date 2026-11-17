@@ -185,7 +185,8 @@ public sealed class DiabloSkills : MonoBehaviour
             if (driver != null) driver.OnBowShot();
         }
         else if (driver != null) driver.OnStrike();
-        DiabloAudio.PlaySwing();
+        if (s == Skill.Arrow) DiabloAudio.PlayTwang();
+        else DiabloAudio.PlayWhoosh();
         return p;
     }
 
@@ -200,11 +201,13 @@ public sealed class DiabloSkills : MonoBehaviour
     /// Apply one projectile hit: direct damage solo/host, ServerRpc relay as a
     /// netcode client (the server re-validates range).
     /// </summary>
-    public static void ApplyHit(GameObject target, int damage, Vector3 from, float knockback)
+    public static void ApplyHit(GameObject target, int damage, Vector3 from, float knockback,
+        Transform attacker = null)
     {
         if (target == null) return;
         var health = target.GetComponent<EnemyHealth>();
         if (health == null) return;
+        damage = DiabloJuice.RollCrit(attacker, damage, out bool crit);
         var nm = NetworkManager.Singleton;
         var netObj = target.GetComponent<NetworkObject>();
         if (nm != null && nm.IsListening && !nm.IsServer && netObj != null && netObj.IsSpawned)
@@ -212,9 +215,10 @@ public sealed class DiabloSkills : MonoBehaviour
             var player = nm.SpawnManager.GetLocalPlayerObject();
             var relay = player != null ? player.GetComponent<DiabloNetworkPlayer>() : null;
             if (relay != null) relay.SubmitRangedHitServerRpc(netObj.NetworkObjectId, damage);
+            DiabloJuice.OnEnemyHit(target.transform.position, damage, crit);
             return;
         }
-        health.TakeDamage(damage);
+        health.TakeDamage(damage, crit);
         if (health != null)
             health.ApplyKnockback(from, health.tier == LootTier.Normal ? knockback : knockback * 0.3f);
         DiabloAudio.PlayHit();

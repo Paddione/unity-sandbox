@@ -14,6 +14,7 @@ public class DiabloWASDTests : InputTestFixture
     [SetUp]
     public override void Setup()
     {
+        DiabloJuice.ForceCrit = false; // exact-damage asserts: no random crits
         base.Setup();
         keyboard = InputSystem.AddDevice<Keyboard>();
         player = GameObject.CreatePrimitive(PrimitiveType.Capsule);

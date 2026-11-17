@@ -37,7 +37,7 @@ public sealed class EnemyHealth : MonoBehaviour
     }
 
     /// <summary>Damage entry point: local solo/host, server relay as client.</summary>
-    public void RequestDamage(int amount, ulong attackerClientId)
+    public void RequestDamage(int amount, ulong attackerClientId, bool crit = false)
     {
         var nm = NetworkManager.Singleton;
         if (nm != null && nm.IsListening && !nm.IsServer)
@@ -48,10 +48,11 @@ public sealed class EnemyHealth : MonoBehaviour
             if (relay != null && netObj != null && netObj.IsSpawned)
             {
                 relay.SubmitAttackServerRpc(netObj.NetworkObjectId, amount);
+                DiabloJuice.OnEnemyHit(transform.position, amount, crit); // attacker sees own numbers
                 return;
             }
         }
-        TakeDamage(amount);
+        TakeDamage(amount, crit);
     }
 
     /// <summary>Fraction of max HP left (target bar), clamped.</summary>
@@ -74,10 +75,11 @@ public sealed class EnemyHealth : MonoBehaviour
     }
 
     /// <summary>Apply damage; kills at zero and drops a loot orb.</summary>
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, bool crit = false)
     {
         if (dead) return;
         hp -= amount;
+        DiabloJuice.OnEnemyHit(transform.position, amount, crit);
         Debug.Log($"[Diablo] {gameObject.name} took {amount} dmg ({Mathf.Max(hp, 0)}/{maxHP}).");
         if (hp <= 0)
         {
@@ -94,6 +96,8 @@ public sealed class EnemyHealth : MonoBehaviour
         dead = true;
         HusksKilled++;
         DiabloAudio.PlayDeath();
+        DiabloJuice.OnEnemyDeath(transform.position);
+        DiabloProgression.AwardKill(tier, transform.position);
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();
         DiabloCorpse.SpawnFrom(gameObject);
