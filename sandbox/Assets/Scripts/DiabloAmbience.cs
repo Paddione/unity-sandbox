@@ -9,7 +9,7 @@ using UnityEngine;
 public sealed class DiabloAmbience : MonoBehaviour
 {
     public const float BedVolume = 0.22f;
-    public const int MotesPerSecond = 7;
+    public const int MotesPerSecond = 12;
 
     static DiabloAmbience instance;
 
@@ -49,7 +49,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         main.loop = true;
         main.startLifetime = new ParticleSystem.MinMaxCurve(4f, 7f);
         main.startSpeed = 0f;
-        main.startSize = new ParticleSystem.MinMaxCurve(0.04f, 0.09f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.1f, 0.2f);
         main.startColor = new ParticleSystem.MinMaxGradient(
             DiabloPalette.TrimGold, new Color(1f, 0.42f, 0.12f, 1f));
         var emission = motes.emission;
@@ -58,7 +58,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         var shape = motes.shape;
         shape.enabled = true;
         shape.shapeType = ParticleSystemShapeType.Box;
-        shape.scale = new Vector3(26f, 0.5f, 26f);
+        shape.scale = new Vector3(22f, 0.5f, 22f);
         // All three axes in the same curve mode (mixed modes flood the console).
         var vel = motes.velocityOverLifetime;
         vel.enabled = true;
@@ -124,7 +124,7 @@ public sealed class DiabloAmbience : MonoBehaviour
             ep.position = at + new Vector3(ring.x, Random.Range(0f, 0.4f), ring.y);
             ep.velocity = new Vector3(ring.x * 0.4f, Random.Range(2.5f, 5f), ring.y * 0.4f);
             ep.startLifetime = Random.Range(0.9f, 1.3f);
-            ep.startSize = Random.Range(0.08f, 0.2f);
+            ep.startSize = Random.Range(0.14f, 0.3f);
             ep.startColor = Color.Lerp(DiabloPalette.TrimGold, new Color(1f, 0.95f, 0.75f, 1f), Random.value);
             instance.pillar.Emit(ep, 1);
         }

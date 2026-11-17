@@ -58,10 +58,10 @@ public static class DiabloJuice
         var head = at + Vector3.up * 1.6f;
         ShowNumber(head, crit ? $"{amount}!" : amount.ToString(),
             crit ? DiabloPalette.TrimGold : DiabloPalette.Parchment, crit ? 1.5f : 1f);
-        Burst(at + Vector3.up * 1.0f, crit ? 18 : 10, BloodSpray, 3.2f, 0.45f);
+        Burst(at + Vector3.up * 1.0f, crit ? 30 : 18, BloodSpray, 3.4f, 0.65f);
         if (crit)
         {
-            Burst(at + Vector3.up * 1.0f, 12, CritSparks, 5f, 0.35f);
+            Burst(at + Vector3.up * 1.0f, 16, CritSparks, 5f, 0.45f);
             DiabloAudio.PlayCrit();
         }
         AddTrauma(at, crit ? 0.4f : 0.22f);
@@ -70,8 +70,8 @@ public static class DiabloJuice
     /// <summary>A husk died: bone dust and a heavier kick.</summary>
     public static void OnEnemyDeath(Vector3 at)
     {
-        Burst(at + Vector3.up * 0.8f, 26, BoneDust, 2.6f, 0.8f);
-        Burst(at + Vector3.up * 1.0f, 14, BloodSpray, 3.8f, 0.5f);
+        Burst(at + Vector3.up * 0.8f, 30, BoneDust, 2.6f, 0.9f);
+        Burst(at + Vector3.up * 1.0f, 24, BloodSpray, 3.8f, 0.7f);
         AddTrauma(at, 0.3f);
     }
 
@@ -79,7 +79,7 @@ public static class DiabloJuice
     public static void OnPlayerHurt(Vector3 at, float amount)
     {
         ShowNumber(at + Vector3.up * 2f, $"-{amount:0}", DiabloPalette.Blood, 1.1f);
-        Burst(at + Vector3.up * 1.0f, 10, BloodSpray, 3f, 0.45f);
+        Burst(at + Vector3.up * 1.0f, 16, BloodSpray, 3f, 0.6f);
         AddTrauma(at, 0.35f);
     }
 
@@ -153,17 +153,17 @@ public static class DiabloJuice
     static readonly Look BloodSpray = new Look
     {
         material = "SkillArt/FireSmoke", a = DiabloPalette.Blood,
-        b = new Color(0.35f, 0.03f, 0.05f, 1f), size = 0.16f, gravity = 1.6f
+        b = new Color(0.45f, 0.02f, 0.04f, 1f), size = 0.32f, gravity = 1.4f
     };
     static readonly Look CritSparks = new Look
     {
         material = "SkillArt/FireAdditive", a = DiabloPalette.TrimGold,
-        b = new Color(1f, 0.95f, 0.7f, 1f), size = 0.1f, gravity = 0.6f
+        b = new Color(1f, 0.95f, 0.7f, 1f), size = 0.18f, gravity = 0.6f
     };
     static readonly Look BoneDust = new Look
     {
         material = "SkillArt/FireSmoke", a = DiabloPalette.ParchmentDim,
-        b = new Color(0.32f, 0.29f, 0.26f, 1f), size = 0.32f, gravity = -0.15f
+        b = new Color(0.32f, 0.29f, 0.26f, 1f), size = 0.5f, gravity = -0.15f
     };
 
     static readonly Dictionary<string, ParticleSystem> systems = new Dictionary<string, ParticleSystem>();

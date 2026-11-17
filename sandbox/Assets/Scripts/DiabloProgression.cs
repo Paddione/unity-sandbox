@@ -30,6 +30,7 @@ public sealed class DiabloProgression : MonoBehaviour
     Text levelLabel;
     Image flash;
     Text banner;
+    Text bannerSub;
     float shownFill;
     Coroutine fillTween;
 
@@ -131,8 +132,10 @@ public sealed class DiabloProgression : MonoBehaviour
         EnsureHud();
         StartCoroutine(Tween(0.1f, t => SetAlpha(flash, 0.6f * (1f - OutCubic(t)))));
         yield return new WaitForSecondsRealtime(0.05f);
-        banner.text = $"LEVEL {Level}\n<size=22>+{LifePerLevel:0} Life</size>";
+        banner.text = $"LEVEL {Level}";
+        bannerSub.text = $"+{LifePerLevel:0} Life";
         banner.enabled = true;
+        bannerSub.enabled = true;
         DiabloAmbience.LevelPillar(transform.position);
         StartCoroutine(Tween(0.35f, t => banner.rectTransform.localScale = Vector3.one * OutBack(t)));
         yield return new WaitForSecondsRealtime(0.35f);
@@ -141,6 +144,7 @@ public sealed class DiabloProgression : MonoBehaviour
         yield return new WaitForSecondsRealtime(1.1f);
         yield return Tween(0.2f, t => banner.rectTransform.localScale = Vector3.one * (1f - OutCubic(t)));
         banner.enabled = false;
+        bannerSub.enabled = false;
     }
 
     // ---------------------------------------------------------------- HUD
@@ -206,10 +210,13 @@ public sealed class DiabloProgression : MonoBehaviour
         SetAlpha(flash, 0f);
 
         banner = NewText(canvasGo.transform, "LevelBanner", 64, DiabloPalette.TrimGold);
-        banner.supportRichText = true;
-        Place(banner.rectTransform, new Vector2(0.5f, 0.68f), new Vector2(600f, 160f), Vector2.zero);
+        Place(banner.rectTransform, new Vector2(0.5f, 0.68f), new Vector2(600f, 80f), Vector2.zero);
         banner.gameObject.AddComponent<Outline>().effectColor = new Color(0.25f, 0.05f, 0.02f, 0.9f);
+        // Subline is a child: it scales with the banner pop and sits right under it.
+        bannerSub = NewText(banner.transform, "LevelBannerSub", 24, DiabloPalette.Parchment);
+        Place(bannerSub.rectTransform, new Vector2(0.5f, 0f), new Vector2(300f, 30f), new Vector2(0f, -22f));
         banner.enabled = false;
+        bannerSub.enabled = false;
     }
 
     static Sprite whiteSprite;
