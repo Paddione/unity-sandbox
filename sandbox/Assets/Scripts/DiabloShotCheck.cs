@@ -63,6 +63,13 @@ public sealed class DiabloShotCheck : MonoBehaviour
         // 1) Gameplay framing, idle with sword.
         yield return Shot("gameplay_idle");
 
+        // 1b) Wide look over the moor: props, fires, fog.
+        hero.distance = 24f;
+        yield return Wait(0.5f);
+        yield return Shot("world_overview");
+        hero.distance = baseDist;
+        yield return Wait(0.3f);
+
         // 2) Close side view (left side, bow hand, toward the camera).
         hero.distance = 5.5f;
         hero.pitch = 30f;

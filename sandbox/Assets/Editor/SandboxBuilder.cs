@@ -765,6 +765,9 @@ public static class SandboxBuilder
             spawn.transform.position = new Vector3(Mathf.Cos(a) * 1.5f, 0.1f, 11f + Mathf.Sin(a) * 1.5f);
         }
 
+        // Blender-built Blood Moor props replace the greybox look (names kept).
+        WorldArtBuilder.DressDiabloZone();
+
         BuildDiabloZonePlayerPrefab();
         AssetDatabase.Refresh();
         DiabloNetworkBootstrap.EnsureZoneNetcode();
