@@ -1016,6 +1016,7 @@ public static class SandboxBuilder
         toIdle.hasExitTime = false;
         toIdle.duration = 0.15f;
         toIdle.AddCondition(AnimatorConditionMode.IfNot, 0, "Moving");
+        SkillArtBuilder.AddBowStates(controller);
         AssetDatabase.SaveAssets();
         return controller;
     }

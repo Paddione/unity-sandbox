@@ -27,9 +27,127 @@ public static class SkillArtBuilder
         BuildFireball(additive, smoke);
         BuildBlast(additive, smoke);
         BuildHeroBow();
+        UpgradeHeroController();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("[SkillArt] Built ArrowProjectile, FireballProjectile, FireballBlast, HeroBow.");
+    }
+
+    // ---------- bow animation states ----------
+
+    const string HeroControllerPath = "Assets/Resources/DiabloLocomotion.controller";
+    const string RangedFbx = "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx";
+    public const string BowAimState = "BowAim";
+    public const string BowShootState = "BowShoot";
+
+    /// <summary>Add the bow states to the existing hero controller in place (keeps its GUID).</summary>
+    [MenuItem("Sandbox/Diablo/Upgrade Hero Controller (Bow)")]
+    public static void UpgradeHeroController()
+    {
+        var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(HeroControllerPath);
+        if (controller == null)
+        {
+            Debug.LogWarning($"[SkillArt] {HeroControllerPath} missing; build the Diablo scenes first.");
+            return;
+        }
+        AddBowStates(controller);
+        EditorUtility.SetDirty(controller);
+        AssetDatabase.SaveAssets();
+    }
+
+    /// <summary>
+    /// Bow layer of the hero state machine (idempotent): "BowShoot" trigger
+    /// plays Ranged_Bow_Release from any state; while "Bow" is set and the
+    /// hero stands still it holds Ranged_Bow_Aiming_Idle instead of Idle.
+    /// </summary>
+    public static void AddBowStates(UnityEditor.Animations.AnimatorController controller)
+    {
+        var aimClip = FindTake(RangedFbx, "Ranged_Bow_Aiming_Idle");
+        var releaseClip = FindTake(RangedFbx, "Ranged_Bow_Release");
+        if (aimClip == null || releaseClip == null)
+        {
+            Debug.LogWarning("[SkillArt] Ranged_Bow takes missing; hero keeps the sword chop for arrows.");
+            return;
+        }
+        EnsureParam(controller, "Bow", AnimatorControllerParameterType.Bool);
+        EnsureParam(controller, "BowShoot", AnimatorControllerParameterType.Trigger);
+
+        var sm = controller.layers[0].stateMachine;
+        foreach (var t in sm.anyStateTransitions)
+            if (t.destinationState != null && (t.destinationState.name == BowAimState || t.destinationState.name == BowShootState))
+                sm.RemoveAnyStateTransition(t);
+        UnityEditor.Animations.AnimatorState idle = null, run = null;
+        foreach (var cs in sm.states)
+        {
+            if (cs.state.name == BowAimState || cs.state.name == BowShootState) sm.RemoveState(cs.state);
+        }
+        foreach (var cs in sm.states)
+        {
+            if (cs.state.name == "Idle") idle = cs.state;
+            if (cs.state.name == "Run") run = cs.state;
+        }
+        if (idle == null || run == null)
+        {
+            Debug.LogWarning("[SkillArt] Hero controller lacks Idle/Run; bow states skipped.");
+            return;
+        }
+        foreach (var t in idle.transitions)
+            if (t.destinationState == null || t.destinationState.name == BowAimState) idle.RemoveTransition(t);
+
+        var aim = sm.AddState(BowAimState);
+        aim.motion = aimClip;
+        var shoot = sm.AddState(BowShootState);
+        shoot.motion = releaseClip;
+        shoot.speed = 1.6f;
+
+        // Any state -> release (rapid fire may re-enter it).
+        var toShoot = sm.AddAnyStateTransition(shoot);
+        toShoot.hasExitTime = false;
+        toShoot.duration = 0.05f;
+        toShoot.canTransitionToSelf = true;
+        toShoot.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "BowShoot");
+
+        // Release -> hold the aim (bow still drawn) or back to idle.
+        var shootToAim = shoot.AddTransition(aim);
+        shootToAim.hasExitTime = true;
+        shootToAim.exitTime = 0.85f;
+        shootToAim.duration = 0.1f;
+        shootToAim.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Bow");
+        var shootToIdle = shoot.AddTransition(idle);
+        shootToIdle.hasExitTime = true;
+        shootToIdle.exitTime = 0.85f;
+        shootToIdle.duration = 0.15f;
+
+        // Idle <-> aim on the Bow flag; moving always wins.
+        var idleToAim = idle.AddTransition(aim);
+        idleToAim.hasExitTime = false;
+        idleToAim.duration = 0.15f;
+        idleToAim.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Bow");
+        idleToAim.AddCondition(UnityEditor.Animations.AnimatorConditionMode.IfNot, 0, "Moving");
+        var aimToIdle = aim.AddTransition(idle);
+        aimToIdle.hasExitTime = false;
+        aimToIdle.duration = 0.2f;
+        aimToIdle.AddCondition(UnityEditor.Animations.AnimatorConditionMode.IfNot, 0, "Bow");
+        var aimToRun = aim.AddTransition(run);
+        aimToRun.hasExitTime = false;
+        aimToRun.duration = 0.15f;
+        aimToRun.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Moving");
+        Debug.Log("[SkillArt] Hero controller: BowAim + BowShoot states wired.");
+    }
+
+    static void EnsureParam(UnityEditor.Animations.AnimatorController c, string name, AnimatorControllerParameterType type)
+    {
+        foreach (var p in c.parameters)
+            if (p.name == name) return;
+        c.AddParameter(name, type);
+    }
+
+    static AnimationClip FindTake(string fbxPath, string takeName)
+    {
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(fbxPath))
+            if (obj is AnimationClip clip && clip.name == takeName)
+                return clip;
+        return null;
     }
 
     // ---------- held bow ----------

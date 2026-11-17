@@ -178,9 +178,13 @@ public sealed class DiabloSkills : MonoBehaviour
                 fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
             : DiabloProjectile.Spawn(s, origin, dir, transform, arrowDamage + WeaponBonus(),
                 arrowSpeed, arrowRange, 0f, cosmetic);
-        if (s == Skill.Arrow) EnterBowStance();
         var driver = GetComponent<DiabloAnimator>();
-        if (driver != null) driver.OnStrike();
+        if (s == Skill.Arrow)
+        {
+            EnterBowStance();
+            if (driver != null) driver.OnBowShot();
+        }
+        else if (driver != null) driver.OnStrike();
         DiabloAudio.PlaySwing();
         return p;
     }

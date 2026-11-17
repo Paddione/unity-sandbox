@@ -182,6 +182,36 @@ public class DiabloSkillsTests
     }
 
     [UnityTest]
+    public IEnumerator Arrow_PlaysBowReleasePose_ThenAims()
+    {
+        var ctrl = Resources.Load<RuntimeAnimatorController>("DiabloLocomotion");
+        Assert.IsNotNull(ctrl, "Hero controller ships in Resources.");
+        var animator = player.AddComponent<Animator>();
+        animator.runtimeAnimatorController = ctrl;
+        var driver = player.AddComponent<DiabloAnimator>();
+        bool hasBowShoot = false;
+        foreach (var p in animator.parameters) if (p.name == driver.bowShootParam) hasBowShoot = true;
+        Assert.IsTrue(hasBowShoot, "Run SkillArtBuilder.UpgradeHeroController.");
+        yield return null;
+
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Arrow, Vector3.forward));
+        Assert.AreEqual(1, driver.bowShotCount);
+        yield return null;
+        yield return null;
+        var info = animator.GetCurrentAnimatorStateInfo(0);
+        var next = animator.GetNextAnimatorStateInfo(0);
+        Assert.IsTrue(info.IsName("BowShoot") || next.IsName("BowShoot"), "Arrow plays the bow release, not the sword chop.");
+
+        yield return DiabloTestFixture.WaitSeconds(1.2f);
+        info = animator.GetCurrentAnimatorStateInfo(0);
+        Assert.IsTrue(info.IsName("BowAim"), "Standing with the bow drawn holds the aiming pose.");
+
+        yield return DiabloTestFixture.WaitSeconds(DiabloSkills.BowStanceSeconds);
+        info = animator.GetCurrentAnimatorStateInfo(0);
+        Assert.IsTrue(info.IsName("Idle"), "Bow put away returns to idle.");
+    }
+
+    [UnityTest]
     public IEnumerator MeleeStrike_PutsBowAway()
     {
         var sword = AttachTestSword(player);
