@@ -90,7 +90,7 @@ public sealed class DiabloSkills : MonoBehaviour
         {
             bow.transform.SetParent(hand, false);
             bow.transform.localPosition = Vector3.zero;
-            bow.transform.localRotation = Quaternion.identity;
+            bow.transform.localRotation = HandMountRotation(bow);
         }
         else
         {
@@ -99,6 +99,45 @@ public sealed class DiabloSkills : MonoBehaviour
             bow.transform.localRotation = Quaternion.identity;
         }
         return bow;
+    }
+
+    /// <summary>
+    /// KayKit's bow on handslot.l faces its string toward the target and its
+    /// arc toward the archer (seen in the shotcheck). Turn it 180° about its
+    /// own long axis so the arc leads and the string sits on the archer's side.
+    /// </summary>
+    public static Quaternion HandMountRotation(GameObject bow) =>
+        Quaternion.AngleAxis(180f, LongAxis(bow));
+
+    /// <summary>Longest mesh-bounds axis in the bow root's local space (limb to limb).</summary>
+    public static Vector3 LongAxis(GameObject bow)
+    {
+        var min = Vector3.positiveInfinity;
+        var max = Vector3.negativeInfinity;
+        foreach (var r in bow.GetComponentsInChildren<Renderer>(true))
+        {
+            Mesh mesh = null;
+            if (r is SkinnedMeshRenderer smr) mesh = smr.sharedMesh;
+            else
+            {
+                var mf = r.GetComponent<MeshFilter>();
+                if (mf != null) mesh = mf.sharedMesh;
+            }
+            if (mesh == null) continue;
+            var mb = mesh.bounds;
+            for (int i = 0; i < 8; i++)
+            {
+                var corner = mb.center + Vector3.Scale(mb.extents, new Vector3(
+                    (i & 1) == 0 ? -1f : 1f, (i & 2) == 0 ? -1f : 1f, (i & 4) == 0 ? -1f : 1f));
+                var local = bow.transform.InverseTransformPoint(r.transform.TransformPoint(corner));
+                min = Vector3.Min(min, local);
+                max = Vector3.Max(max, local);
+            }
+        }
+        if (float.IsInfinity(min.x)) return Vector3.up;
+        var size = max - min;
+        if (size.x >= size.y && size.x >= size.z) return Vector3.right;
+        return size.y >= size.z ? Vector3.up : Vector3.forward;
     }
 
     void SetSwordVisible(bool visible)

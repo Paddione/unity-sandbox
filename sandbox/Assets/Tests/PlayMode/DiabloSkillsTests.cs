@@ -52,6 +52,20 @@ public class DiabloSkillsTests
     }
 
     [Test]
+    public void HeldBow_TurnsAboutItsLongAxis()
+    {
+        var hand = new GameObject("handslot.l");
+        hand.transform.SetParent(player.transform, false);
+        skills.EnterBowStance();
+        var bow = hand.transform.Find("HeldBow");
+        Assert.IsNotNull(bow, "Bow must mount on handslot.l.");
+        var axis = DiabloSkills.LongAxis(bow.gameObject);
+        Assert.AreEqual(Vector3.up, axis, "KayKit bow runs limb to limb along local Y.");
+        Assert.AreEqual(0f, Quaternion.Angle(Quaternion.AngleAxis(180f, axis), bow.localRotation), 0.01f,
+            "Bow must be flipped so the arc faces the target and the string the archer.");
+    }
+
+    [Test]
     public void ClickController_AddsSkills()
     {
         Assert.IsNotNull(skills, "DiabloClickController must attach DiabloSkills.");
