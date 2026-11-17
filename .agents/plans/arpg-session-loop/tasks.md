@@ -54,9 +54,9 @@ Abschluss `land`) und lässt Suiten, Verify und Host-Start grün. Reihenfolge is
 
 ## Vorbedingung: Fremd-Änderungen „HD-UI + MenuArt-Pack“
 
-Stand 2026-11-17 liegen im Hauptcheckout ungestagte Änderungen einer anderen Session, die diese gerade
-auf `main` übernimmt. Keine Stufe startet, bevor sie auf `origin/main` liegen. Die Prüfung steht in
-Protokollschritt 1.
+**Erfüllt 2026-11-17** durch Commit `feat(ui): HD UI scaling and MenuArt starter pack` (nachgeholt aus dem
+Hauptcheckout, da die Ursprungs-Session sie nicht gelandet hatte). Die Prüfung in Protokollschritt 1 bleibt
+als Absicherung.
 
 - Inhalt: CanvasScaler aller Laufzeit-UIs auf `ScaleWithScreenSize`, 1920×1080, `MatchWidthOrHeight`
   0.5 (`DiabloInventoryUI`, `DiabloJuice`, `DiabloLifeGlobe`, `DiabloProgression`, `DiabloSkills`,

@@ -182,7 +182,9 @@ public sealed class DiabloProgression : MonoBehaviour
         canvas.sortingOrder = 6;
         var scaler = canvasGo.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1600f, 900f);
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
         var white = WhiteSprite();
 
         var back = NewImage(canvasGo.transform, "XpBack", white, DiabloPalette.Abyss);
