@@ -28,8 +28,9 @@ fi
 rm -rf "$GAME/shotcheck"
 echo "shotcheck: launching $EXE -shotcheck (${SIZE}, timeout ${TIMEOUT}s)"
 rc=0
-(cd "$GAME" && timeout "$TIMEOUT" "./$EXE" -shotcheck -screen-fullscreen 0 \
-   -screen-width "${SIZE%x*}" -screen-height "${SIZE#*x}" -logFile shotcheck.log) || rc=$?
+# drvfs copies carry no exec bit: start through cmd.exe, which inherits the
+# game folder as its working directory from this (cd).
+(cd "$GAME" && timeout "$TIMEOUT" cmd.exe /c "$EXE -shotcheck -screen-fullscreen 0 -screen-width ${SIZE%x*} -screen-height ${SIZE#*x} -logFile shotcheck.log" >/dev/null 2>&1) || rc=$?
 if [ "$rc" -eq 124 ]; then
   taskkill.exe /IM "$EXE" /F >/dev/null 2>&1 || true
   echo "shotcheck: timed out after ${TIMEOUT}s" >&2
