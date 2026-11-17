@@ -1,6 +1,6 @@
 # Progress: arpg-session-loop
 
-Prozent: 40 %
+Prozent: 55 %
 
 ## Erledigt
 
@@ -48,9 +48,21 @@ Prozent: 40 %
   Menü: kein Menü-Szenen-Code vorhanden — Continue (nur bei Save) / New Game (mit Bestätigung) als
   TODO ans Menü übergeben (Verdrahtung über `HasSave`/`TryLoad`/`DeleteSave` dokumentiert).
 
+
+- 2026-11-18: S3 town+vendor gelandet (Rebase über S4, HdTests vereint).
+  Belege nach Merge: EditMode 83/83 (VendorTests 10 + CharacterSheetTests 6), PlayMode 69/69
+  (VendorLoopTests 3 + SkillRankTests 4), `VerifyDiabloZone` grün
+  (`palisade=15 torches=4`, neu `vendor` + `vui` + Netz-Prefab-`DiabloVendorUI`-Check),
+  `KayKitAssets.Verify` grün, `check-meta.py` ohne Befund.
+  Town: Camp (Palisade/Campfire/ZTorch) aus `BuildMoorField` nach `Editor/TownBuilder` verschoben
+  (gleiches Ergebnis), Vendor-NPC (KayKit Adventurer `Rogue_Hooded`, Idle `Idle_A`,
+  Klick/Radius 3.5 m). `VendorStock` (6 seeded Offers, Preise Magic 25 / Rare 90 / Unique 300,
+  Verkauf 25 %, Heiltrank-Stack `Consumable` Taste 1). `DiabloVendorUI` (zwei Spalten Vendor/Bag,
+  Gold-Anzeige, HD-Scaler, Klick-Sperre, Schluss → `SaveService.SaveNow`).
+
 ## Nächste Schritte
 
-1. S3 town+vendor nach S2 (braucht Gold). dotfiles-Probe (`diablo_unity.py` auf `cinderreach`) separat landen.
+1. S5 zone2+boss nach S3+S4 (S3+S4 gelandet 2026-11-18). Danach S6 proof.
 
 ## Offene Punkte
 

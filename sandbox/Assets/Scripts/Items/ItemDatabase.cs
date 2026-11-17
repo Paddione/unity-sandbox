@@ -50,6 +50,24 @@ public static class ItemDatabase
         }
     }
 
+    /// <summary>Healing potion (S3 vendor consumable, slot Consumable, drunk with key 1).</summary>
+    public const int PotionPrice = 10;
+
+    /// <summary>HP restored by one healing potion.</summary>
+    public const float PotionHeal = 10f;
+
+    /// <summary>Stackable vendor potion: bagged like loot, never equipped.</summary>
+    public static ItemInstance CreateHealingPotion()
+    {
+        return new ItemInstance
+        {
+            slot = ItemSlot.Consumable,
+            rarity = ItemRarity.Magic,
+            baseType = "Healing Potion",
+            affixes = new List<Affix>(),
+        };
+    }
+
     /// <summary>Fixed starter sword, auto-equipped at spawn (Ashen Fen).</summary>
     public static ItemInstance CreateStarterSword()
     {

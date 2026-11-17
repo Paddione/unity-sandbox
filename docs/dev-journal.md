@@ -176,3 +176,27 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   („player=True husks=10 … net=True“, „OK (ashen fen + loot + netcode present)“),
   `KayKitAssets.Verify` grün (Exit 0, alle Kits verified), `check-meta.py` OK.
   Nächste: S5 (Ossuary + Boss, Balancing gegen Level 5–8).
+## 2026-11-18 — S3 town+vendor (Cinderreach-Session, Stufe S3)
+
+- Done: Camp-Block (Palisade 15, Campfire + Heal-Trigger, 4 ZTorch) aus `BuildMoorField` nach
+  `Editor/TownBuilder.BuildCamp()` verschoben (verbatim, gleiche Namen/Reihenfolge) + `SpawnVendor()`
+  (KayKit `Adventurers/Characters/Rogue_Hooded.fbx`, CapsuleCollider, `Vendor.zoneSeed = 7`,
+  Idle-Take `Idle_A` aus `Rig_Medium_General.fbx` auf geteiltem `Resources/VendorIdle.controller`);
+  `SandboxBuilder` ruft `BuildCamp()` + `SpawnVendor()` und hängt `DiabloVendorUI` an Held + Netz-Prefab
+  (Verify: `vendor` + `vui` + Prefab-Check). `Vendor` (Klick nur in `InteractRadius` 3.5 m, Taste V/Esc,
+  Trank mit Taste 1 via `DrinkPotion`), `VendorStock` (6 seeded Offers 3×Magic/2×Rare/1×Unique,
+  Preise 25/90/300, Verkauf 25 %, `BuyPotion`), `DiabloVendorUI` (UGUI Runtime wie InventoryUI,
+  Spalten Vendor/Bag, Gold-Label, HD-Scaler 1920×1080/0.5, `ExternalDrive`-Lock, Schluss → `SaveNow`).
+  Consumable-Seam: `ItemSlot.Consumable`, `ItemDatabase.CreateHealingPotion` (10 g, +10 HP),
+  `Inventory.RemoveAt`. Tests `VendorTests` (10: Preise, 6er-Seed-Stock, Kauf-ohne-Gold, Kauf/Verkauf-Bilanz,
+  Bag-voll-Block, Trank-Heilung/Konsum, Radius) + `VendorLoopTests` (3: UI frisst Klicks/Schluss speichert,
+  UI-Kauf/Verkauf/Trank, Radius-Gate) + `DiabloHdTests.Vendor_UsesHdScaler`.
+- Faced: Worktree enthielt uncommittete S3-Vorarbeit (Town/Scripts/Tests bereits angelegt);
+  übernommen und vervollständigt (Verify-Verdrahtung vendor/vui + Prefab-Check, HD-Test, Szenen-Rebuild).
+  Editor-Lauf berührte `DiabloLocomotion/HuskLocomotion.controller` (LFS-Pointer-Drift, 3–6 B) →
+  revertiert; `NetworkPlayerDiablo.prefab` + `DiabloZone.unity` sind echte Builder-Änderungen (bleiben).
+- Learned: Refactor-Beleg per Verify-Counts: vorher per Code (20-Log-Ring minus 5 Nord-Lücke = 15,
+  4 Fackel-Spots) = nachher Verify-Log `palisade=15 torches=4` (Pflicht-Gates `palisade<12`, `torches<4` grün).
+- Belegt: EditMode 76/76, PlayMode 65/65, `VerifyDiabloZone` OK
+  (`player=True husks=10 ... palisade=15 torches=4 net=True`), `KayKitAssets.Verify` grün
+  (Dungeon 211, Adventurers 6 Modelle), `check-meta.py` OK. Nächste: S5 (Ossuary + Boss).

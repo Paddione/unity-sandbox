@@ -77,6 +77,19 @@ public class DiabloHdTests
     }
 
     [Test]
+    public void Vendor_UsesHdScaler()
+    {
+        var go = new GameObject("Player");
+        go.AddComponent<Equipment>();
+        go.AddComponent<Inventory>();
+        go.AddComponent<Wallet>();
+        var ui = go.AddComponent<DiabloVendorUI>();
+        ui.SetOpen(true);
+        AssertHd(go.GetComponentInChildren<CanvasScaler>(true), "Vendor");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
     public void TargetBar_UsesHdScaler()
     {
         var go = new GameObject("DTargetBar");

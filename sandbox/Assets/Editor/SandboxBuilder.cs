@@ -605,6 +605,7 @@ public static class SandboxBuilder
         Paint(ground, new Color(0.20f, 0.28f, 0.17f));
 
         BuildMoorField();
+        TownBuilder.SpawnVendor();
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)
@@ -703,6 +704,7 @@ public static class SandboxBuilder
         hero.AddComponent<Wallet>();
         hero.AddComponent<PlayerHealth>();
         hero.AddComponent<DiabloInventoryUI>();
+        hero.AddComponent<DiabloVendorUI>();
         hero.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         hero.AddComponent<FpsReporter>();
         WireLocomotion(hero, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
@@ -862,64 +864,9 @@ public static class SandboxBuilder
             Paint(edge, new Color(0.25f, 0.22f, 0.15f));
         }
 
-        // Palisade ring around the camp (center 0,11, radius 6, gap north).
-        var wood = new Color(0.35f, 0.24f, 0.13f);
-        int logs = 0;
-        for (int i = 0; i < 20; i++)
-        {
-            float a = i * Mathf.PI * 2f / 20f;
-            float sx = Mathf.Cos(a), sz = Mathf.Sin(a);
-            if (sz < -0.7f) continue; // north gate toward the moor
-            var log = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            log.name = $"Palisade_{logs}";
-            log.transform.position = new Vector3(sx * 6f, 1.25f, 11f + sz * 6f);
-            log.transform.localScale = new Vector3(0.5f, 2.5f, 0.5f);
-            Paint(log, wood);
-            logs++;
-        }
-
-        // Campfire: stone base, ember cube, logs + heal trigger.
-        var firePos = new Vector3(3.5f, 0f, 11f);
-        var stone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        stone.name = "CampfireBase";
-        stone.transform.position = firePos + Vector3.up * 0.1f;
-        stone.transform.localScale = new Vector3(1.6f, 0.2f, 1.6f);
-        Paint(stone, new Color(0.4f, 0.38f, 0.38f));
-        var ember = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        ember.name = "Campfire";
-        ember.transform.position = firePos + Vector3.up * 0.5f;
-        ember.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-        Paint(ember, new Color(1f, 0.45f, 0.1f));
-        for (int i = 0; i < 4; i++)
-        {
-            var fuel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            fuel.name = $"CampfireLog_{i}";
-            float a = i * Mathf.PI / 2f + Mathf.PI / 4f;
-            fuel.transform.position = firePos + new Vector3(Mathf.Cos(a) * 0.6f, 0.25f, Mathf.Sin(a) * 0.6f);
-            fuel.transform.rotation = Quaternion.Euler(0f, -a * Mathf.Rad2Deg, 80f);
-            fuel.transform.localScale = new Vector3(0.25f, 1.2f, 0.25f);
-            Paint(fuel, wood);
-        }
-        var trigger = new GameObject("CampfireHeal");
-        trigger.transform.position = firePos + Vector3.up;
-        var triggerCol = trigger.AddComponent<BoxCollider>();
-        triggerCol.isTrigger = true;
-        triggerCol.size = new Vector3(CampfireHeal.Radius * 2f, 3f, CampfireHeal.Radius * 2f);
-        trigger.AddComponent<CampfireHeal>();
-
-        // Camp torches (verify counts ZTorch_*).
-        var torchPrefab = LoadModel("Dungeon/Models/torch_lit.fbx");
-        var torchSpots = new[]
-        {
-            new Vector3(-5f, 0f, 6f), new Vector3(5f, 0f, 6f),
-            new Vector3(-5f, 0f, 15f), new Vector3(5f, 0f, 15f),
-        };
-        for (int i = 0; i < torchSpots.Length; i++)
-        {
-            var torch = (GameObject)PrefabUtility.InstantiatePrefab(torchPrefab);
-            torch.name = $"ZTorch_{i}";
-            torch.transform.position = torchSpots[i];
-        }
+        // Lantern Hold camp (S3: TownBuilder owns the palisade +
+        // campfire + torches; VerifyDiabloZone counts unchanged).
+        TownBuilder.BuildCamp();
 
         // Scattered moor rocks.
         var rockSpots = new[]
@@ -1207,6 +1154,7 @@ public static class SandboxBuilder
         netPlayer.AddComponent<Wallet>();
         netPlayer.AddComponent<PlayerHealth>();
         netPlayer.AddComponent<DiabloInventoryUI>();
+        netPlayer.AddComponent<DiabloVendorUI>();
         netPlayer.GetComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
         netPlayer.AddComponent<FpsReporter>();
         WireLocomotion(netPlayer, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
@@ -1225,6 +1173,7 @@ public static class SandboxBuilder
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, wallet = false, health = false, ui = false, starterSword = false;
+        bool vendor = false, vui = false;
         bool goal = false, campfire = false, targetBar = false;
         bool light = false, camera = false, elite = false, brute = false, chest = false;
         bool allHusksArmed = true;
@@ -1236,13 +1185,14 @@ public static class SandboxBuilder
                 ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
                 ref brute, ref chest, ref net, ref transport, ref autostart,
                 ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
-                ref spawns, ref edges, ref patches);
+                ref spawns, ref edges, ref patches, ref vendor, ref vui);
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: " +
                   $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
                   $"torches={torches} edges={edges} patches={patches} net={net}");
         if (!player || !clicker || !melee || !equip || !inv || !wallet || !health || !ui
+            || !vui || !vendor
             || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
             || !elite || !brute || !chest
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
@@ -1266,7 +1216,8 @@ public static class SandboxBuilder
         ref bool light, ref bool camera, ref bool elite, ref bool brute, ref bool chest,
         ref bool net, ref bool transport, ref bool autostart, ref bool prefab,
         ref bool allHusksArmed, ref int husks,
-        ref int palisade, ref int torches, ref int spawns, ref int edges, ref int patches)
+        ref int palisade, ref int torches, ref int spawns, ref int edges, ref int patches,
+        ref bool vendor, ref bool vui)
     {
         string n = t.gameObject.name;
         if (n.StartsWith("Palisade_")) palisade++;
@@ -1288,6 +1239,7 @@ public static class SandboxBuilder
             wallet = t.gameObject.GetComponent<Wallet>() != null;
             health = t.gameObject.GetComponent<PlayerHealth>() != null;
             ui = t.gameObject.GetComponent<DiabloInventoryUI>() != null;
+            vui = t.gameObject.GetComponent<DiabloVendorUI>() != null;
             player = player && t.gameObject.GetComponent<CharacterController>() != null;
             var eq = t.gameObject.GetComponent<Equipment>();
             starterSword = eq != null && eq.weapon != null
@@ -1310,6 +1262,8 @@ public static class SandboxBuilder
             if (!HuskArmed(t.gameObject)) allHusksArmed = false;
         }
         if (n == "DChestZone" && t.gameObject.GetComponent<LootDrop>() != null) chest = true;
+        if (n == Vendor.VendorObjectName && t.gameObject.GetComponent<Vendor>() != null)
+            vendor = true;
         if (n == "NetworkManager")
         {
             var nm = t.gameObject.GetComponent<NetworkManager>();
@@ -1326,6 +1280,7 @@ public static class SandboxBuilder
                     && pp.GetComponent<Inventory>() != null
                     && pp.GetComponent<Wallet>() != null
                     && pp.GetComponent<PlayerHealth>() != null
+                    && pp.GetComponent<DiabloVendorUI>() != null
                     && pp.GetComponent<DiabloInventoryUI>() != null;
             }
         }
@@ -1336,7 +1291,7 @@ public static class SandboxBuilder
             ref goal, ref campfire, ref targetBar, ref light, ref camera, ref elite,
             ref brute, ref chest, ref net, ref transport, ref autostart,
             ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
-            ref spawns, ref edges, ref patches);
+            ref spawns, ref edges, ref patches, ref vendor, ref vui);
     }
 
     /// <summary>

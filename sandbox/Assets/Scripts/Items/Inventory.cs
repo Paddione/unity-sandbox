@@ -22,6 +22,14 @@ public sealed class Inventory : MonoBehaviour
         return bag[index];
     }
 
+    /// <summary>Remove bag[index] (vendor resale, potion drinking). False when empty.</summary>
+    public bool RemoveAt(int index)
+    {
+        if (index < 0 || index >= bag.Count) return false;
+        bag.RemoveAt(index);
+        return true;
+    }
+
     /// <summary>Add loot to the bag. False when full (caller keeps the loot).</summary>
     public bool Add(ItemInstance item)
     {

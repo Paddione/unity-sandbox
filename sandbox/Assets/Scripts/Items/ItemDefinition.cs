@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public enum ItemSlot { Armor, Weapon, Helmet }
+public enum ItemSlot { Armor, Weapon, Helmet, Consumable }
 
 public enum ItemRarity { Magic, Rare, Unique }
 
