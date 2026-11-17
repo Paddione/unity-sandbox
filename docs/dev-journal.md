@@ -110,3 +110,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: Hit-Flash suchte den Renderer am Root — KayKit-Meshes hängen an Kindern, der Flash lief seit Q5 ins Leere. Solo-DiabloZone läuft als NGO-Host, ein „nur ohne Netcode"-Gate hätte Leichen und Hit-Stop im echten Spiel abgeschaltet → Leiche aus `EnemyHealth.corpseModel` (FBX-Referenz) statt Klon. `BuildDiabloScene` wirft DiabloZone aus den Build-Settings (vorbestehend; Datei auf HEAD zurückgesetzt).
 - Learned: Testhusks aus Primitiven verdecken Rig-Annahmen — neue Tests nutzen einen leeren Root mit Mesh-Kind.
 - Next: Windows-GPU-Playtest (deckt auch das offene Kriterium 5 von `unity-diablo-d2-combat-feel` ab).
+
+## 2026-11-17 — Doppelter Held im Host-Modus
+
+- Befund: DiabloZone enthält einen Solo-Helden `Player` am selben Spawn (0, 0.05, 11) wie `NetworkPlayerDiablo`. Solo läuft als NGO-Host, der Solo-Held schaltete nur seinen Click-Controller ab und blieb sichtbar stehen. Folgefehler: Husks, Target-Bar und Pickups suchen den Helden per Namen `Player` und trafen den stehenden Doppelgänger.
+- Fix: `DiabloNetworkPlayer.OnNetworkSpawn` (nur Owner) deaktiviert den Solo-Helden und übernimmt lokal den Namen `Player` (Namen werden nicht repliziert, Remote-Mirrors behalten ihren Clone-Namen).
+- Belegt: EditMode 41/41 (`DiabloHeroTakeoverTests`), PlayMode 33/33, Linux-Zonen-Build Host-Lauf: `[Net] Owned hero took over 'Player' (solo hero stood down=True)`, 0 Exceptions.
+- Faced: aus dem laufenden Warm-Editor kopierte Library band Szenen-MonoBehaviours nicht (9 Szenentests rot bei korrekten GUIDs) — frische Library behebt es. Worktree-Library nie bei laufendem Editor kopieren.

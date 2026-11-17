@@ -8,6 +8,37 @@ using Unity.Netcode;
 [RequireComponent(typeof(Equipment))]
 public sealed class DiabloNetworkPlayer : NetworkBehaviour
 {
+    /// <summary>Scene-local name every solo lookup uses (husks, target bar, pickups).</summary>
+    public const string HeroName = "Player";
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner) TakeOverSoloHero(gameObject);
+    }
+
+    /// <summary>
+    /// Zone scenes ship a solo hero named "Player" at the same spawn as the
+    /// network player. Once this process owns a network hero, the solo one
+    /// must vanish (it only stood its controller down and stayed visible as a
+    /// double) and the owned hero takes over the name locally — names are not
+    /// replicated, so remote mirrors keep their clone names.
+    /// Returns the deactivated solo hero (null when there was none).
+    /// </summary>
+    public static GameObject TakeOverSoloHero(GameObject ownedHero)
+    {
+        if (ownedHero == null) return null;
+        var solo = GameObject.Find(HeroName);
+        GameObject stoodDown = null;
+        if (solo != null && solo != ownedHero && solo.GetComponent<DiabloNetworkPlayer>() == null)
+        {
+            solo.SetActive(false);
+            stoodDown = solo;
+        }
+        ownedHero.name = HeroName;
+        Debug.Log($"[Net] Owned hero took over '{HeroName}' (solo hero stood down={stoodDown != null}).");
+        return stoodDown;
+    }
+
     /// <summary>Attack a husk: local melee solo/host, ServerRpc as client.</summary>
     public void Attack(GameObject target, DiabloMelee melee, Transform attacker)
     {
