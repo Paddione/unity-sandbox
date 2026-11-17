@@ -86,7 +86,7 @@ Schnittstellen: P1 definiert `DiabloAudio.Play{Swing,Hit,Death,Loot,UIClick,Hurt
 1. `bash scripts/run-unity-tests.sh` (EditMode + PlayMode, XML `Passed`).
 2. `run-unity-build.sh SandboxBuilder.BuildDiabloZone "Saved Assets/Scenes/DiabloZone.unity"` + `-executeMethod SandboxBuilder.VerifyDiabloZone` (OK-Zeile) — Wrapper-Pflicht (Service-Stop, Heartbeat, Timeout).
 3. `python3 ~/scripts/agent-workspace.py check` im Worktree-Root (still = ok).
-4. Builds via Wrapper: Server + Windows + Linux (`DiabloZone* build result: Succeeded`); Deploy Server (rsync + restart, Join-Smoke); Windows-Stage nach `/mnt/c/.../diablo-bloodmoor/`.
+4. Builds via Wrapper: Server + Windows + Linux (`DiabloZone* build result: Succeeded`); Deploy Server (rsync + restart, Join-Smoke); Windows-Stage per `scripts/stage-windows.sh` (SSOT `C:\Users\PatrickKorczewski\Games\diablo-zone`).
 5. Commit `feat(diablo): d2 combat feel` (gezielte Pfade, kein `-A`), `land` (ff) + Push (Dauerfreigabe), `.agents/goals/unity-diablo-d2-combat-feel/PROGRESS.md` belegte Prozente (NICHT 100 % — Umsetzung folgt; `Offene Punkte` aktualisieren).
 6. Goal-Datei-Änderung (PROGRESS.md) läuft über denselben Land mit (gehört zum Plan), GOAL.md bleibt unverändert.
 

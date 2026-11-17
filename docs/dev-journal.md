@@ -123,3 +123,8 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Befund: kein Teleport-Bug, sondern Tod. `Equipment.BaseMaxHP` war 3, Husks treffen mit 1 (Elite 2) — 2–3 Treffer → `PlayerHealth.DieAndRespawn` an `CoopSpawn_0`, ohne HP-Anzeige oder Meldung. Vorher unsichtbar, weil die Husks den Doppelgänger-Helden angriffen (Fix 24eb42e).
 - Fix: `BaseMaxHP` 20, `CampfireHeal.HealPerSecond` 5; neue `DiabloLifeGlobe` (Kugel unten links, `cur / max`, Todesmeldung 3 s), vom ersten `PlayerHealth` selbst erzeugt — kein Szenen-Rebuild.
 - Belegt: EditMode 41/41, PlayMode 35/35 (`LifeGlobe_DrainsAndAnnouncesDeath`, `HeroSurvivesSeveralHuskStrikes`).
+
+## 2026-11-17 — Ein Windows-Spielordner (SSOT)
+
+- Befund: `C:\Users\PatrickKorczewski\Games` hatte drei Kopien desselben Spiels (`diablo-zone.exe`): `diablo-zone-strike` (15.11., Strike-Meilenstein), `diablo-bloodmoor` (17.11. früh, Stage-Ziel aus dem combat-feel-Plan) und `diablo-zone`. Jede Phase hat von Hand in einen neuen Ordner kopiert, ein Skript gab es nicht.
+- Fix: `scripts/stage-windows.sh` spiegelt `builds/diablo-zone-windows` per `rsync --delete` nach `Games\diablo-zone` und schreibt `BUILD_INFO.json`; Plan-Verweis auf `diablo-bloodmoor` ersetzt; die zwei Altordner gelöscht (nur Build-Dateien, keine Spielstände, keine Verknüpfungen).
