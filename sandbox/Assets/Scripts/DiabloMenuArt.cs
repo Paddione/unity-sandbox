@@ -122,12 +122,22 @@ public static class DiabloMenuArt
         });
     }
 
-    /// <summary>Simple item glyph per base type, tinted by rarity edge.</summary>
+    /// <summary>
+    /// Blender-rendered icon when a baked sprite exists
+    /// (Assets/Resources/MenuArt), else the procedural glyph. Rarity tints
+    /// the slot frame, never the icon, so one bake serves all rarities.
+    /// </summary>
     public static Sprite ItemIcon(string baseType, ItemRarity rarity, int size = 64)
     {
         string key = $"icon_{baseType}_{rarity}_{size}";
         return Get(key, () =>
         {
+            string iconName = ResolveIconName(baseType);
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                var baked = Resources.Load<Sprite>("MenuArt/" + iconName);
+                if (baked != null) return baked;
+            }
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             Color ink = DiabloPalette.Parchment;
             Color glow = DiabloPalette.Rarity(rarity);
@@ -147,6 +157,30 @@ public static class DiabloMenuArt
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
         });
+    }
+
+    /// <summary>
+    /// Map a base type (or display name like "Worn Short Sword") to a baked
+    /// icon file. Exact match first, then keyword fallback per slot family.
+    /// Empty when nothing baked: caller falls back to the procedural glyph.
+    /// </summary>
+    public static string ResolveIconName(string baseType)
+    {
+        if (string.IsNullOrEmpty(baseType)) return "";
+        string[] baked = { "ShortSword", "HeavyAxe", "Dagger", "ClothTunic", "LeatherVest", "Breastplate", "Hood", "Helm", "Circlet" };
+        foreach (var b in baked)
+            if (string.Equals(baseType, b, System.StringComparison.OrdinalIgnoreCase)) return b;
+        string lower = baseType.ToLowerInvariant();
+        if (lower.Contains("sword") || lower.Contains("blade")) return "ShortSword";
+        if (lower.Contains("axe")) return "HeavyAxe";
+        if (lower.Contains("dagger") || lower.Contains("knife")) return "Dagger";
+        if (lower.Contains("tunic")) return "ClothTunic";
+        if (lower.Contains("vest")) return "LeatherVest";
+        if (lower.Contains("breast") || lower.Contains("plate") || lower.Contains("armor") || lower.Contains("armour")) return "Breastplate";
+        if (lower.Contains("hood")) return "Hood";
+        if (lower.Contains("helm") || lower.Contains("helmet")) return "Helm";
+        if (lower.Contains("circlet") || lower.Contains("crown")) return "Circlet";
+        return "";
     }
 
     static bool GlyphHit(string baseType, float dx, float dy)

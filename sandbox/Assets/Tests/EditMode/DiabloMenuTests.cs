@@ -38,6 +38,26 @@ public class DiabloMenuTests
     }
 
     [Test]
+    public void IconResolver_MapsDisplayNamesToBakes()
+    {
+        Assert.AreEqual("ShortSword", DiabloMenuArt.ResolveIconName("ShortSword"));
+        Assert.AreEqual("ShortSword", DiabloMenuArt.ResolveIconName("Worn Short Sword"));
+        Assert.AreEqual("HeavyAxe", DiabloMenuArt.ResolveIconName("HeavyAxe"));
+        Assert.AreEqual("Breastplate", DiabloMenuArt.ResolveIconName("Breastplate"));
+        Assert.AreEqual("Circlet", DiabloMenuArt.ResolveIconName("Circlet"));
+        Assert.AreEqual("", DiabloMenuArt.ResolveIconName("Mystery Orb"));
+        Assert.AreEqual("", DiabloMenuArt.ResolveIconName(null));
+    }
+
+    [Test]
+    public void BakedIcons_LoadAsSprites()
+    {
+        foreach (var b in new[] { "ShortSword", "HeavyAxe", "Dagger", "ClothTunic", "LeatherVest", "Breastplate", "Hood", "Helm", "Circlet" })
+            Assert.IsNotNull(Resources.Load<Sprite>("MenuArt/" + b), b);
+        Assert.IsNotNull(DiabloMenuArt.ItemIcon("Worn Short Sword", ItemRarity.Magic));
+    }
+
+    [Test]
     public void Settings_ClampsAndNames()
     {
         DiabloSettings.MasterVol = 2f;
