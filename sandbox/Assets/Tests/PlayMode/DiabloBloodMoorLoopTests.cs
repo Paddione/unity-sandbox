@@ -126,7 +126,10 @@ public class DiabloBloodMoorLoopTests
         };
         inventory.Add(axe);
         ui.SetOpen(true);
-        var button = GameObject.FindFirstObjectByType<UnityEngine.UI.Button>();
+        ui.ShowTab(DiabloInventoryUI.MenuTab.Bag); // bag buttons live on the Bag tab
+        UnityEngine.UI.Button button = null;
+        foreach (var b in GameObject.FindObjectsOfType<UnityEngine.UI.Button>(true))
+            if (b.gameObject.name.StartsWith("BagButton")) { button = b; break; }
         Assert.IsNotNull(button, "Open panel must build a bag button.");
         UnityEngine.EventSystems.ExecuteEvents.Execute(button.gameObject,
             new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current),
