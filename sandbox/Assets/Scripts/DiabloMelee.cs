@@ -21,9 +21,11 @@ public sealed class DiabloMelee : MonoBehaviour
     /// </summary>
     public int CurrentDamage(Transform attacker)
     {
+        var sheet = attacker != null ? CharacterSheet.For(attacker.gameObject) : null;
+        int strBonus = sheet != null ? sheet.MeleeBonus() : 0;
         var eq = attacker != null ? attacker.GetComponent<Equipment>() : null;
-        if (eq == null) return damage;
-        return Mathf.Max(1, Mathf.RoundToInt(eq.GetDamage()));
+        if (eq == null) return damage + strBonus;
+        return Mathf.Max(1, Mathf.RoundToInt(eq.GetDamage()) + strBonus);
     }
 
     /// <summary>

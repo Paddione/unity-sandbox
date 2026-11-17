@@ -45,6 +45,8 @@ public sealed class DiabloClickController : MonoBehaviour
         // Ranged skills (Q fireball, E bow) ride on every hero, scene or prefab.
         if (GetComponent<DiabloSkills>() == null) gameObject.AddComponent<DiabloSkills>();
         if (GetComponent<DiabloProgression>() == null) gameObject.AddComponent<DiabloProgression>();
+        // S4 character sheet rides along too (runtime-built UI, C to open).
+        if (GetComponent<DiabloCharacterUI>() == null) gameObject.AddComponent<DiabloCharacterUI>();
         // P2 zone scenes run netcode: the solo hero would double-drive clicks
         // and fight the network player over the camera. Yield in that case.
         if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))

@@ -65,6 +65,18 @@ public class DiabloHdTests
     }
 
     [Test]
+    public void Character_UsesHdScaler()
+    {
+        var go = new GameObject("Player");
+        go.AddComponent<DiabloProgression>();
+        go.AddComponent<DiabloSkills>();
+        var ui = go.AddComponent<DiabloCharacterUI>();
+        ui.SetOpen(true);
+        AssertHd(go.GetComponentInChildren<CanvasScaler>(true), "Character");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
     public void TargetBar_UsesHdScaler()
     {
         var go = new GameObject("DTargetBar");

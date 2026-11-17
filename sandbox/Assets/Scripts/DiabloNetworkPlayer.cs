@@ -104,7 +104,7 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     [ServerRpc]
     void SubmitCastServerRpc(int skill, Vector3 origin, Vector3 dir)
     {
-        if (skill < 0 || skill > (int)DiabloSkills.Skill.Arrow) return;
+        if (skill < 0 || skill > (int)DiabloSkills.Skill.Cleave) return;
         // Anchor the visual to the caster: reject origins far from the player.
         var delta = origin - transform.position;
         delta.y = 0f;

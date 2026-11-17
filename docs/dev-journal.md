@@ -157,3 +157,22 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Szene nach Builder-Änderung immer per `BuildDiabloZone` regenerieren, nie von Hand.
 - Belegt: EditMode 65/65, PlayMode 62/62, `VerifyDiabloZone` OK (Wallet an Bord), `KayKitAssets.Verify`
   grün, `check-meta.py` OK. Nächste: S3 (Vendor gegen Gold, `SaveNow` am Vendor-Schluss).
+
+## 2026-11-18 — S4 progression (Charakterfortschritt mit Wahl)
+
+- Done: `CharacterSheet` (pur: 1 Attribut- + 1 Skillpunkt/Level, Ränge 1–5 je Skill +20 % Schaden/Rang,
+  Strength +1 Nahkampf/Punkt, Vitality +5 Life/Punkt auf +3 Life/Level-Basis, Focus +8 % Skillschaden
+  und −3 % Cooldown/Punkt mit Floor 50 %); `DiabloProgression` mit Sheet, erweitertem GetState/SetState
+  (Save-Roundtrip via `SaveService`, Level-Up-Banner „+1 Attribut, +1 Skill“); `DiabloSkills.Cleave`
+  (R, 360°, 6 s Cooldown, Rang erweitert Radius +0,4 m/Rang) + `SkillArtBuilder.BuildCleaveArc`;
+  `DiabloCharacterUI` (Taste `C`, HD-Scaler 1920×1080, ungespendete Punkte pulsieren); `DiabloMelee`
+  liest Strength-Bonus, `SaveGame`/`SaveService` persistieren alle Punktfelder; Tests
+  `CharacterSheetTests` (6) + `SkillRankTests` (4).
+- Faced: Worktree enthielt uncommittete S4-Vorarbeit (Produkt-, UI-, Test- und Prefab-Dateien bereits
+  angelegt); übernommen und vervollständigt (Statustabelle, Journal, PROGRESS fehlten).
+  `DiabloLocomotion.controller` (LFS-Pointer) war versehentlich modifiziert → revertiert (außerhalb Scope).
+- Learned: Save-Roundtrip-Test deckt neue Felder sofort ab (`freeSkillPoints` fehlte zuerst in `SaveGame`).
+- Belegt: EditMode 72/72, PlayMode 66/66, `VerifyDiabloZone` OK
+  („player=True husks=10 … net=True“, „OK (ashen fen + loot + netcode present)“),
+  `KayKitAssets.Verify` grün (Exit 0, alle Kits verified), `check-meta.py` OK.
+  Nächste: S5 (Ossuary + Boss, Balancing gegen Level 5–8).

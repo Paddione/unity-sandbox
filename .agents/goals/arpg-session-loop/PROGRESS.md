@@ -1,6 +1,6 @@
 # Progress: arpg-session-loop
 
-Prozent: 25 %
+Prozent: 40 %
 
 ## Erledigt
 
@@ -22,6 +22,16 @@ Prozent: 25 %
   Regex-Definition in `IdentityTests.cs` selbst. Laufzeit-Strings/Builder/Tests sind leer.
   Fix nebenbei: `DiabloAudio.EnsureBuilt` baut Clips neu, wenn Szenen-Ladungen sie zerstört haben
   (latenter Bug, machte `AudioClips_AreValidMono22050` reihenfolgeabhängig rot).
+
+- 2026-11-18: S4 progression gelandet.
+  Belege: EditMode 72/72 (neu `CharacterSheetTests`: Punktezählung über Level-Sprünge,
+  Vitality-Life, Rank-Cap 5 + Schadensskala, Focus-Schaden/Cooldown, Cleave-Radius,
+  Save-Roundtrip), PlayMode 66/66 (neu `SkillRankTests`: Cleave trifft alle Husks im
+  Radius, Rang erhöht `ApplyHit`-Schaden, Cleave-Cooldown 6 s, `CleaveArc`-Prefab),
+  `VerifyDiabloZone` grün, `KayKitAssets.Verify` grün, `check-meta.py` ohne Befund.
+  Punkte: 1 Attribut (Strength/Vitality/Focus) + 1 Skillpunkt (Rang 1–5, +20 %/Rang)
+  pro Level, +3 Life/Level bleibt; dritter Skill Cleave (R, 360°, 6 s, Rang erweitert
+  Radius); `DiabloCharacterUI` (C, HD-Scaler, Puls bei ungespendeten Punkten).
 
 - 2026-11-18: S2 economy+save gelandet.
   Belege: EditMode 65/65 (neu `SaveGameTests`: Roundtrip aller Felder, Version/Korrupt-Pfade,

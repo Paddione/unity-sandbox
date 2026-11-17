@@ -15,8 +15,9 @@ public sealed class SaveGame
     public int level = 1;
     public int xp;
 
-    // S4 forward-compat: unspent points + allocations. S2 writes defaults.
+    // S4 points: unspent pools + allocations (filled by CharacterSheet stage).
     public int freeAttributePoints;
+    public int freeSkillPoints;
     public int strength;
     public int vitality;
     public int focus;

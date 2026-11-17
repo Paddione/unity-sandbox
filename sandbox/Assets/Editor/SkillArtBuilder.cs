@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 /// <summary>
-/// Builds the ranged-skill art into Resources/SkillArt (runtime loads it via
+/// Builds the skill art into Resources/SkillArt (runtime loads it via
 /// Resources.Load, so materials and shaders ship with every build):
 /// ArrowProjectile (KayKit arrow_bow mesh, tip on +Z), FireballProjectile
-/// (particle core, flame trail, embers, light) and FireballBlast (burst).
+/// (particle core, flame trail, embers, light), FireballBlast (burst) and
+/// CleaveArc (S4 360° sweep ring, scaled to the ranked radius at spawn).
 /// Batchmode: -executeMethod SkillArtBuilder.Build
 /// </summary>
 public static class SkillArtBuilder
@@ -26,11 +27,12 @@ public static class SkillArtBuilder
         BuildArrow();
         BuildFireball(additive, smoke);
         BuildBlast(additive, smoke);
+        BuildCleaveArc(additive);
         BuildHeroBow();
         UpgradeHeroController();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("[SkillArt] Built ArrowProjectile, FireballProjectile, FireballBlast, HeroBow.");
+        Debug.Log("[SkillArt] Built ArrowProjectile, FireballProjectile, FireballBlast, CleaveArc, HeroBow.");
     }
 
     // ---------- bow animation states ----------
@@ -400,6 +402,45 @@ public static class SkillArtBuilder
         light.shadows = LightShadows.None;
 
         Save(root, "FireballBlast");
+    }
+
+    // ---------- cleave arc (S4) ----------
+
+    /// <summary>
+    /// Flat expanding ring shown by <c>DiabloSkills.DoCleave</c>: a torus-like
+    /// sweep built from a particle ring plus a point light. Spawned at the
+    /// hero's feet and scaled to the ranked radius, auto-removed after 0.6 s.
+    /// </summary>
+    static void BuildCleaveArc(Material additive)
+    {
+        var root = new GameObject("CleaveArc");
+
+        var ring = Particles(root.transform, "Ring", additive);
+        var m = ring.main;
+        m.loop = false;
+        m.duration = 0.45f;
+        m.startLifetime = 0.45f;
+        m.startSpeed = 6f;
+        m.startSize = new ParticleSystem.MinMaxCurve(0.35f, 0.6f);
+        m.startColor = new ParticleSystem.MinMaxGradient(
+            new Color(1f, 0.85f, 0.45f), new Color(1f, 0.45f, 0.1f));
+        m.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+        var e = ring.emission; e.rateOverTime = 0f;
+        e.SetBursts(new[] { new ParticleSystem.Burst(0f, 60) });
+        var sh = ring.shape; sh.shapeType = ParticleSystemShapeType.Circle; sh.radius = 1.0f;
+        var vel = ring.velocityOverLifetime; vel.enabled = true;
+        vel.radial = new ParticleSystem.MinMaxCurve(3f);
+        SizeFade(ring, 1f, 0.2f);
+        ColorFade(ring, new Color(1f, 0.8f, 0.4f), new Color(0.6f, 0.1f, 0.02f));
+
+        var light = root.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(1f, 0.6f, 0.2f);
+        light.range = 6f;
+        light.intensity = 4f;
+        light.shadows = LightShadows.None;
+
+        Save(root, "CleaveArc");
     }
 
     // ---------- helpers ----------

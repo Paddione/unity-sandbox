@@ -91,9 +91,16 @@ public static class SaveService
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog != null)
         {
-            prog.GetState(out int level, out int xp);
+            prog.GetState(out int level, out int xp, out int freeAttr, out int freeSkill,
+                out int str, out int vit, out int foc, out var ranks);
             save.level = level;
             save.xp = xp;
+            save.freeAttributePoints = freeAttr;
+            save.skillRanks = ranks;
+            save.strength = str;
+            save.vitality = vit;
+            save.focus = foc;
+            save.freeSkillPoints = freeSkill;
         }
         var wallet = hero.GetComponent<Wallet>();
         if (wallet != null) save.gold = wallet.Gold;
@@ -128,7 +135,8 @@ public static class SaveService
         if (hero == null || save == null) return;
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog == null) prog = hero.AddComponent<DiabloProgression>();
-        prog.SetState(save.level, save.xp);
+        prog.SetState(save.level, save.xp, save.freeAttributePoints, save.freeSkillPoints,
+            save.strength, save.vitality, save.focus, save.skillRanks);
         var wallet = Wallet.EnsureWallet(hero);
         if (wallet != null) wallet.SetGold(save.gold);
         var eq = hero.GetComponent<Equipment>();

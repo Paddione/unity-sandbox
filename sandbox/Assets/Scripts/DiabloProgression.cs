@@ -24,6 +24,9 @@ public sealed class DiabloProgression : MonoBehaviour
     public int Level { get; private set; } = 1;
     public int Xp { get; private set; }
 
+    /// <summary>S4 point-spend sheet (solo-local; persisted via SaveGame).</summary>
+    public CharacterSheet Sheet { get; private set; } = new CharacterSheet();
+
     public static int LevelUps;
     public static int XpGranted;
 
@@ -66,8 +69,66 @@ public sealed class DiabloProgression : MonoBehaviour
         TweenFill(Fill);
     }
 
-    /// <summary>Bonus max life from levels (read by <see cref="Equipment.GetMaxHP"/>).</summary>
-    public float BonusLife => (Level - 1) * LifePerLevel;
+    /// <summary>
+    /// Full state export for <see cref="SaveService"/> (S4 points included).
+    /// The 2-arg <see cref="GetState"/> stays as the level/XP seam (S2 tests).
+    /// </summary>
+    public void GetState(out int level, out int xp, out int freeAttr, out int freeSkill,
+        out int strength, out int vitality, out int focus,
+        out System.Collections.Generic.List<SkillRankEntry> ranks)
+    {
+        GetState(out level, out xp);
+        var sheet = Sheet ?? (Sheet = new CharacterSheet());
+        freeAttr = sheet.freeAttributePoints;
+        freeSkill = sheet.freeSkillPoints;
+        strength = sheet.strength;
+        vitality = sheet.vitality;
+        focus = sheet.focus;
+        ranks = sheet.ToEntries();
+    }
+
+    /// <summary>Full state import for <see cref="SaveService"/> (S4 points included).</summary>
+    public void SetState(int level, int xp, int freeAttr, int freeSkill,
+        int strength, int vitality, int focus,
+        System.Collections.Generic.List<SkillRankEntry> ranks)
+    {
+        SetState(level, xp);
+        var sheet = Sheet ?? (Sheet = new CharacterSheet());
+        sheet.freeAttributePoints = Mathf.Max(0, freeAttr);
+        sheet.freeSkillPoints = Mathf.Max(0, freeSkill);
+        sheet.strength = Mathf.Max(0, strength);
+        sheet.vitality = Mathf.Max(0, vitality);
+        sheet.focus = Mathf.Max(0, focus);
+        sheet.FromEntries(ranks);
+        var hp = GetComponent<PlayerHealth>();
+        if (hp != null) hp.Refresh();
+    }
+
+    /// <summary>Spend one attribute point (persists immediately).</summary>
+    public bool SpendAttributePoint(CharacterSheet.Attribute attribute)
+    {
+        var sheet = Sheet ?? (Sheet = new CharacterSheet());
+        if (!sheet.SpendAttribute(attribute)) return false;
+        var hp = GetComponent<PlayerHealth>();
+        if (hp != null) hp.Refresh();
+        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        return true;
+    }
+
+    /// <summary>Spend one skill point on a rank (persists immediately).</summary>
+    public bool SpendSkillPoint(DiabloSkills.Skill skill)
+    {
+        var sheet = Sheet ?? (Sheet = new CharacterSheet());
+        if (!sheet.SpendSkill(skill)) return false;
+        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        return true;
+    }
+
+    /// <summary>
+    /// Bonus max life: flat +3/level base plus vitality (+5/point, S4).
+    /// Read by <see cref="Equipment.GetMaxHP"/>.
+    /// </summary>
+    public float BonusLife => (Level - 1) * LifePerLevel + (Sheet != null ? Sheet.VitalityLife() : 0f);
 
     /// <summary>Fraction of the way to the next level.</summary>
     public float Fill => Level >= MaxLevel ? 1f : Mathf.Clamp01((float)Xp / XpToNext(Level));
@@ -131,6 +192,8 @@ public sealed class DiabloProgression : MonoBehaviour
             gained++;
         }
         if (Level >= MaxLevel) Xp = 0;
+        if (Sheet == null) Sheet = new CharacterSheet();
+        for (int i = 0; i < gained; i++) Sheet.AwardLevel();
         if (gained > 0) OnLevelUp();
         else TweenFill(Fill);
     }
@@ -153,7 +216,7 @@ public sealed class DiabloProgression : MonoBehaviour
         StartCoroutine(Tween(0.1f, t => SetAlpha(flash, 0.6f * (1f - OutCubic(t)))));
         yield return new WaitForSecondsRealtime(0.05f);
         banner.text = $"LEVEL {Level}";
-        bannerSub.text = $"+{LifePerLevel:0} Life";
+        bannerSub.text = $"+{LifePerLevel:0} Life  +1 Attribut, +1 Skill";
         banner.enabled = true;
         bannerSub.enabled = true;
         DiabloAmbience.LevelPillar(transform.position);

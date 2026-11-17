@@ -4,14 +4,17 @@ using UnityEngine.UI;
 using Unity.Netcode;
 
 /// <summary>
-/// Ranged hero skills: Fireball (Q, blast damage) and Bow (E, fast single
-/// target arrow). Right-click repeats the last used skill. Both fire toward
-/// the cursor aim of <see cref="DiabloClickController"/>. Damage runs locally
-/// solo/host and through a range-validated ServerRpc as a netcode client.
+/// Hero skills: Fireball (Q, blast damage), Bow (E, fast single target
+/// arrow) and Cleave (R, 360° melee arc, S4). Right-click repeats the last
+/// used skill. Ranged shots fire toward the cursor aim of
+/// <see cref="DiabloClickController"/>; Cleave hits every husk in radius.
+/// Damage runs locally solo/host and through a range-validated ServerRpc as
+/// a netcode client. Skill ranks (+20 % damage/rank) and focus live on the
+/// <see cref="CharacterSheet"/> and scale every cast.
 /// </summary>
 public sealed class DiabloSkills : MonoBehaviour
 {
-    public enum Skill { Fireball, Arrow }
+    public enum Skill { Fireball, Arrow, Cleave }
 
     [Header("Fireball (Q)")]
     public int fireballDamage = 3;
@@ -26,6 +29,13 @@ public sealed class DiabloSkills : MonoBehaviour
     public float arrowRange = 20f;
     public float arrowCooldown = 0.35f;
 
+    [Header("Cleave (R)")]
+    public int cleaveDamage = 4;
+    public float cleaveBaseRadius = 2.6f;
+    public float cleaveRadiusPerRank = 0.4f;
+    public float cleaveCooldown = 6f;
+    public float cleaveKnockback = 1.2f;
+
     /// <summary>Launch height above the hero pivot (chest).</summary>
     public const float LaunchHeight = 1.0f;
     /// <summary>Launch offset in front of the hero (clears its own collider).</summary>
@@ -35,6 +45,7 @@ public sealed class DiabloSkills : MonoBehaviour
 
     float lastFireball = float.NegativeInfinity;
     float lastArrow = float.NegativeInfinity;
+    float lastCleave = float.NegativeInfinity;
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     Text hud;
@@ -162,12 +173,56 @@ public sealed class DiabloSkills : MonoBehaviour
         return null;
     }
 
+    /// <summary>Base cooldown of a skill (before focus reduction).</summary>
+    public float BaseCooldown(Skill s)
+    {
+        switch (s)
+        {
+            case Skill.Fireball: return fireballCooldown;
+            case Skill.Arrow: return arrowCooldown;
+            default: return cleaveCooldown;
+        }
+    }
+
+    /// <summary>Effective cooldown: base × focus factor (S4, floored at half).</summary>
+    public float EffectiveCooldown(Skill s)
+    {
+        var sheet = CharacterSheet.For(gameObject);
+        float factor = sheet != null ? sheet.CooldownMultiplier() : 1f;
+        return BaseCooldown(s) * factor;
+    }
+
     /// <summary>Seconds until the skill is ready again (0 when ready).</summary>
     public float CooldownLeft(Skill s)
     {
-        float last = s == Skill.Fireball ? lastFireball : lastArrow;
-        float cd = s == Skill.Fireball ? fireballCooldown : arrowCooldown;
-        return Mathf.Max(0f, cd - (Time.time - last));
+        float last = s == Skill.Fireball ? lastFireball : (s == Skill.Arrow ? lastArrow : lastCleave);
+        return Mathf.Max(0f, EffectiveCooldown(s) - (Time.time - last));
+    }
+
+    /// <summary>Current cleave radius: base + per-rank bonus (S4).</summary>
+    public float CleaveRadius
+    {
+        get
+        {
+            var sheet = CharacterSheet.For(gameObject);
+            return sheet != null
+                ? sheet.CleaveRadius(cleaveBaseRadius, cleaveRadiusPerRank)
+                : cleaveBaseRadius;
+        }
+    }
+
+    /// <summary>
+    /// Damage of one cast: base (+ weapon bonus for Bow/Cleave) × rank × focus.
+    /// Pure entry point for tests (uses the live sheet, no cooldown gate).
+    /// </summary>
+    public int EffectiveDamage(Skill s)
+    {
+        int baseDmg = s == Skill.Fireball ? fireballDamage
+            : s == Skill.Arrow ? arrowDamage + WeaponBonus()
+            : cleaveDamage + WeaponBonus();
+        var sheet = CharacterSheet.For(gameObject);
+        float mul = sheet != null ? sheet.SkillMultiplier(s) : 1f;
+        return Mathf.Max(1, Mathf.RoundToInt(baseDmg * mul));
     }
 
     /// <summary>Cast toward the current aim. False while on cooldown.</summary>
@@ -185,26 +240,87 @@ public sealed class DiabloSkills : MonoBehaviour
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
-        if (s == Skill.Fireball) lastFireball = Time.time; else lastArrow = Time.time;
+        if (s == Skill.Fireball) lastFireball = Time.time;
+        else if (s == Skill.Arrow) lastArrow = Time.time;
+        else lastCleave = Time.time;
         lastUsed = s;
 
-        var origin = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
-        Launch(s, origin, dir, cosmetic: false);
+        if (s == Skill.Cleave)
+        {
+            DoCleave(dir, cosmetic: false);
+            var origin = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
+            // Co-op: mirrors render the arc visual (no damage there).
+            if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+            var relay = NetworkManager.Singleton;
+            if (netPlayer != null && netPlayer.IsSpawned && relay != null && relay.IsListening)
+                netPlayer.BroadcastCast((int)s, origin, dir);
+            return true;
+        }
+
+        var origin2 = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
+        Launch(s, origin2, dir, cosmetic: false);
 
         // Co-op: every other client renders a visual-only copy of this cast.
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
         var nm = NetworkManager.Singleton;
         if (netPlayer != null && netPlayer.IsSpawned && nm != null && nm.IsListening)
-            netPlayer.BroadcastCast((int)s, origin, dir);
+            netPlayer.BroadcastCast((int)s, origin2, dir);
         return true;
+    }
+
+    /// <summary>
+    /// Cleave (R, S4): instant 360° melee arc — every husk inside
+    /// <see cref="CleaveRadius"/> takes the ranked blow with knockback.
+    /// Cosmetic mirrors only spawn the arc visual, never damage.
+    /// </summary>
+    public void DoCleave(Vector3 dir, bool cosmetic)
+    {
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+        dir.Normalize();
+        transform.rotation = Quaternion.LookRotation(dir);
+        float radius = CleaveRadius;
+        if (!cosmetic)
+        {
+            ExitBowStance();
+            var driver = GetComponent<DiabloAnimator>();
+            if (driver != null) driver.OnStrike();
+            int blow = EffectiveDamage(Skill.Cleave);
+            foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+            {
+                if (husk == null) continue;
+                var to = husk.transform.position - transform.position;
+                to.y = 0f;
+                if (to.magnitude > radius) continue;
+                ApplyHit(husk, blow, transform.position, cleaveKnockback, transform);
+            }
+            DiabloAudio.PlayWhoosh();
+        }
+        SpawnCleaveVisual(radius);
+    }
+
+    void SpawnCleaveVisual(float radius)
+    {
+        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        if (prefab == null) return;
+        var arc = Instantiate(prefab, transform.position, Quaternion.identity);
+        arc.transform.localScale = Vector3.one * (radius / cleaveBaseRadius);
+        Destroy(arc, 0.6f);
     }
 
     /// <summary>
     /// Render another player's cast on this client: same flight and impact
     /// art, no damage (the caster's own client applies it). No cooldown gate.
     /// </summary>
-    public DiabloProjectile ShowRemoteCast(Skill s, Vector3 origin, Vector3 dir) =>
-        Launch(s, origin, dir, cosmetic: true);
+    public DiabloProjectile ShowRemoteCast(Skill s, Vector3 origin, Vector3 dir)
+    {
+        if (s == Skill.Cleave)
+        {
+            SpawnCleaveVisual(CleaveRadius);
+            return null;
+        }
+        return Launch(s, origin, dir, cosmetic: true);
+    }
 
     DiabloProjectile Launch(Skill s, Vector3 origin, Vector3 dir, bool cosmetic)
     {
@@ -213,9 +329,9 @@ public sealed class DiabloSkills : MonoBehaviour
         dir.Normalize();
         transform.rotation = Quaternion.LookRotation(dir);
         var p = s == Skill.Fireball
-            ? DiabloProjectile.Spawn(s, origin, dir, transform, fireballDamage,
+            ? DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
                 fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
-            : DiabloProjectile.Spawn(s, origin, dir, transform, arrowDamage + WeaponBonus(),
+            : DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
                 arrowSpeed, arrowRange, 0f, cosmetic);
         var driver = GetComponent<DiabloAnimator>();
         if (s == Skill.Arrow)
@@ -277,9 +393,12 @@ public sealed class DiabloSkills : MonoBehaviour
         if (kb == null && mouse == null) return; // headless/tests: API only
         if (DiabloClickController.ShouldBlockClicks(GetComponent<DiabloInventoryUI>()))
             return;
+        var charUI = GetComponent<DiabloCharacterUI>();
+        if (charUI != null && charUI.IsOpen) return;
 
         if (kb != null && kb.qKey.wasPressedThisFrame) Cast(Skill.Fireball);
         else if (kb != null && kb.eKey.wasPressedThisFrame) Cast(Skill.Arrow);
+        else if (kb != null && kb.rKey.wasPressedThisFrame) Cast(Skill.Cleave);
         else if (mouse != null && mouse.rightButton.wasPressedThisFrame) Cast(lastUsed);
 
         UpdateHud();
@@ -288,7 +407,8 @@ public sealed class DiabloSkills : MonoBehaviour
     void UpdateHud()
     {
         if (hud == null) BuildHud();
-        hud.text = $"{Slot("Q", "Fireball", Skill.Fireball)}     {Slot("E", "Bow", Skill.Arrow)}     RMB: {(lastUsed == Skill.Fireball ? "Fireball" : "Bow")}";
+        string lastName = lastUsed == Skill.Fireball ? "Fireball" : lastUsed == Skill.Arrow ? "Bow" : "Cleave";
+        hud.text = $"{Slot("Q", "Fireball", Skill.Fireball)}     {Slot("E", "Bow", Skill.Arrow)}     {Slot("R", "Cleave", Skill.Cleave)}     RMB: {lastName}";
     }
 
     string Slot(string key, string name, Skill s)
