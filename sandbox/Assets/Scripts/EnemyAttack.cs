@@ -13,6 +13,11 @@ public sealed class EnemyAttack : MonoBehaviour
     public const float Cooldown = 1.5f;
     public const float DodgeLeeway = 0.5f;
 
+    /// <summary>Shuffle toward the hero when near but out of reach (D2 roam).</summary>
+    public const float AggroRange = 8f;
+    public const float ApproachSpeed = 1.5f;
+    public const float StopDistance = 1.8f;
+
     /// <summary>Set by the builder per tier (1 normal, 2 elite/brute).</summary>
     public int damage = 1;
 
@@ -35,6 +40,17 @@ public sealed class EnemyAttack : MonoBehaviour
             return;
         }
         float dist = PlanarDistance(hero);
+        FaceHero(hero);
+        if (dist > Range && dist <= AggroRange && windupStart < 0f
+            && Time.time - lastStrike >= Cooldown)
+        {
+            var step = hero.position - transform.position;
+            step.y = 0f;
+            step.Normalize();
+            float move = Mathf.Min(ApproachSpeed * Time.deltaTime, dist - StopDistance);
+            if (move > 0f) transform.position += step * move;
+            return;
+        }
         if (windupStart >= 0f)
         {
             if (dist > Range + DodgeLeeway + 1.5f)
@@ -88,6 +104,15 @@ public sealed class EnemyAttack : MonoBehaviour
         var d = hero.position - transform.position;
         d.y = 0f;
         return d.magnitude;
+    }
+
+    void FaceHero(Transform hero)
+    {
+        var d = hero.position - transform.position;
+        d.y = 0f;
+        if (d.sqrMagnitude < 0.0001f) return;
+        transform.rotation = Quaternion.Slerp(transform.rotation,
+            Quaternion.LookRotation(d), 10f * Time.deltaTime);
     }
 
     Transform AcquireHero()

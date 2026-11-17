@@ -97,3 +97,9 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: 1,2-m-Knockback hat `Strike_HitsHuskInFacingArc` gebrochen (Normals flogen aus der 2,2-m-Arc) — kein Test-Fix, sondern Produkt-Tuning auf 0,6/0,2 m (Combos müssen connecten, D2-Pop statt Punt). Zweitens: `GetComponent<InputSystemUIInputModule>` nach `AddComponent` war null, weil ich die Add-Zeile beim Umschreiben verloren hatte — der Test hat es gefangen.
 - Learned: EditMode-`AddComponent` + `DontDestroyOnLoad` = sofortiger Throw; `Physics.SyncTransforms` allein teleportiert keinen aktiven CharacterController (disable/move/enable nötig — aus Blood-Moor-Tests bestätigt); `LogAssert.Expect(string)` matcht exakt, nicht per Regex, und die Reihenfolge zählt.
 - Next: committen, landen, 3 Targets via Wrapper bauen, Server deployen + Join-Smoke, Windows-Build stagen; dann Goal-PROGRESS fortschreiben (< 100 %, Playtest offen).
+
+## 2026-11-16 — Handschwert + Husk-Anmarsch (Playtest-Follow-up)
+
+- Befund: Schwert hing an der Hüfte (Avatar nicht humanoid → GetBoneTransform wirft); Normals starben im ersten Hit vor dem 0,4-s-Windup; Husks standen statisch herum.
+- Fix: Schwert an `handslot.r` (KayKit-Waffenhalterung, per-Namen-Suche, Hip nur Fallback + Test pinnt Hand-Mount); Normal-HP 3→5 (zwei Starter-Hits, Rache trifft einmal); Husks laufen im 8-m-Radius an (1,5 m/s, Stopp 1,8 m) und wenden sich zu.
+- Belegt: EditMode 36/36 (Hand-Mount, Aggro-Konstanten), PlayMode 28/28 (Anmarsch-Test), VerifyDiabloZone OK.

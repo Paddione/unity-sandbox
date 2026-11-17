@@ -107,6 +107,36 @@ public class DiabloD2FeelLoopTests
     }
 
     [UnityTest]
+    public IEnumerator Approach_ClosesDistanceAndStops()
+    {
+        var huskObj = SpawnHusk(new Vector3(0f, 1f, 6f));
+        huskObj.AddComponent<EnemyAttack>();
+        float waited = 0f;
+        while (Planar(player.transform.position, huskObj.transform.position) > 5f && waited < 8f)
+        {
+            yield return null;
+            waited += Time.deltaTime;
+        }
+        float closed = Planar(player.transform.position, huskObj.transform.position);
+        Assert.Less(closed, 5f, "Husk must shuffle toward the hero.");
+        waited = 0f;
+        while (waited < 4f)
+        {
+            yield return null;
+            waited += Time.deltaTime;
+        }
+        float held = Planar(player.transform.position, huskObj.transform.position);
+        Assert.GreaterOrEqual(held, 1f, "Husk must stop at striking distance, not overlap the hero.");
+    }
+
+    static float Planar(Vector3 a, Vector3 b)
+    {
+        var d = a - b;
+        d.y = 0f;
+        return d.magnitude;
+    }
+
+    [UnityTest]
     public IEnumerator Death_RespawnsAtCamp()
     {
         var husk = SpawnHusk(new Vector3(0f, 1f, 1.2f), 15, LootTier.Elite);

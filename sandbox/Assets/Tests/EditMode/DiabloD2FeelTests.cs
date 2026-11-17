@@ -49,6 +49,9 @@ public class DiabloD2FeelTests
         Assert.AreEqual(2.0f, EnemyAttack.Range);
         Assert.AreEqual(0.4f, EnemyAttack.Windup);
         Assert.AreEqual(1.5f, EnemyAttack.Cooldown);
+        Assert.AreEqual(8f, EnemyAttack.AggroRange);
+        Assert.AreEqual(1.5f, EnemyAttack.ApproachSpeed);
+        Assert.AreEqual(1.8f, EnemyAttack.StopDistance);
         Assert.AreEqual(12f, DiabloTargetBar.MaxRange);
         Assert.AreEqual(3f, DiabloTargetBar.FadeSeconds);
     }

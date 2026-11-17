@@ -722,9 +722,11 @@ public static class SandboxBuilder
             new Vector3(7f, 0.05f, -3f), new Vector3(-4f, 0.05f, -6f),
             new Vector3(4f, 0.05f, -6f), new Vector3(0f, 0.05f, -8f),
         };
+        // Normal husks take two starter hits (5 HP): the first survives long
+        // enough to telegraph retaliation instead of dying on contact.
         for (int i = 0; i < huskSpots.Length; i++)
             SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{i}",
-                huskSpots[i], 3, LootTier.Normal, 1f, null);
+                huskSpots[i], 5, LootTier.Normal, 1f, null);
 
         // Elite (west alcove).
         SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Husk_Elite",
@@ -1032,22 +1034,18 @@ public static class SandboxBuilder
     }
 
     /// <summary>
-    /// Visible starter sword (KayKit 1-handed) on the hero's right hand.
-    /// Falls back to a hip offset when the rig has no hand bone.
+    /// Visible starter sword (KayKit 1-handed) in the hero's right hand.
+    /// The rig is generic (no Humanoid avatar), so the hand bone is found by
+    /// name: KayKit ships a weapon mount ("handslot.r"). Hip fallback only
+    /// when the rig has neither (pinned by scene tests — never silent).
     /// </summary>
     static void AttachStarterSword(GameObject hero)
     {
         var prefab = LoadModel("Adventurers/Accessories/sword_1handed.fbx");
         var sword = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         sword.name = "StarterSword";
-        var animator = hero.GetComponent<Animator>();
-        Transform hand = null;
-        try
-        {
-            // Throws (not null) when the avatar is not humanoid.
-            hand = animator != null ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
-        }
-        catch (System.InvalidOperationException) { hand = null; }
+        Transform hand = FindDeep(hero.transform, "handslot.r")
+            ?? FindDeep(hero.transform, "hand.r");
         if (hand != null)
         {
             sword.transform.SetParent(hand, false);
@@ -1060,6 +1058,19 @@ public static class SandboxBuilder
             sword.transform.localPosition = new Vector3(0.35f, 0.9f, 0.1f);
             sword.transform.localRotation = Quaternion.Euler(0f, 0f, -20f);
         }
+    }
+
+    /// <summary>Recursive case-insensitive descendant search (rig bone lookup).</summary>
+    static Transform FindDeep(Transform root, string name)
+    {
+        foreach (Transform child in root)
+        {
+            if (string.Equals(child.name, name, System.StringComparison.OrdinalIgnoreCase))
+                return child;
+            var found = FindDeep(child, name);
+            if (found != null) return found;
+        }
+        return null;
     }
 
     static void SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)

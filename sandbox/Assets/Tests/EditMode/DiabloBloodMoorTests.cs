@@ -222,7 +222,9 @@ public class DiabloBloodMoorTests
         if (sword == null)
             foreach (var tr in player.GetComponentsInChildren<Transform>(true))
                 if (tr.gameObject.name == "StarterSword") sword = tr;
-        Assert.IsNotNull(sword, "Starter sword must be visible in the hero's hand.");
+        Assert.IsNotNull(sword, "Starter sword must be visible for the hero.");
+        Assert.That(sword.parent.name.ToLowerInvariant(), Does.Contain("hand"),
+            $"Sword must sit in the hand, not at '{sword.parent.name}' (hip fallback is silent and wrong).");
 
         var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
             "Assets/Resources/NetworkPlayerDiablo.prefab");
@@ -231,9 +233,11 @@ public class DiabloBloodMoorTests
         Assert.IsNotNull(prefab.GetComponent<DiabloInventoryUI>(), "Net prefab needs the UI.");
         Assert.AreEqual(3f, prefab.GetComponent<Equipment>().GetDamage(),
             "Net prefab must carry the starter sword damage.");
-        bool prefabSword = false;
+        Transform prefabSword = null;
         foreach (var tr in prefab.GetComponentsInChildren<Transform>(true))
-            if (tr.gameObject.name == "StarterSword") prefabSword = true;
-        Assert.IsTrue(prefabSword, "Net prefab needs the visible sword prop.");
+            if (tr.gameObject.name == "StarterSword") prefabSword = tr;
+        Assert.IsNotNull(prefabSword, "Net prefab needs the visible sword prop.");
+        Assert.That(prefabSword.parent.name.ToLowerInvariant(), Does.Contain("hand"),
+            "Prefab sword must sit in the hand, not at the hip.");
     }
 }
