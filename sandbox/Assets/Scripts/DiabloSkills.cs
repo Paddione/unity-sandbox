@@ -47,6 +47,82 @@ public sealed class DiabloSkills : MonoBehaviour
 
     bool IsRemoteMirror => netPlayer != null && netPlayer.IsSpawned && !netPlayer.IsOwner;
 
+    // ---------- held weapon swap (bow while shooting, sword otherwise) ----------
+
+    /// <summary>Seconds the bow stays drawn after the last arrow.</summary>
+    public const float BowStanceSeconds = 2.0f;
+    /// <summary>Scene/prefab name of the builder-attached melee weapon.</summary>
+    public const string SwordName = "StarterSword";
+
+    float bowUntil = float.NegativeInfinity;
+    GameObject heldBow;
+    Renderer[] swordRenderers;
+
+    /// <summary>True while the hero holds the bow instead of the sword.</summary>
+    public bool BowDrawn => heldBow != null && heldBow.activeSelf;
+
+    /// <summary>Draw the bow (hide the sword) for BowStanceSeconds.</summary>
+    public void EnterBowStance()
+    {
+        bowUntil = Time.time + BowStanceSeconds;
+        if (heldBow == null) heldBow = CreateHeldBow();
+        if (heldBow != null) heldBow.SetActive(true);
+        SetSwordVisible(false);
+    }
+
+    /// <summary>Put the bow away and show the sword again (melee strike or timeout).</summary>
+    public void ExitBowStance()
+    {
+        bowUntil = float.NegativeInfinity;
+        if (heldBow != null) heldBow.SetActive(false);
+        SetSwordVisible(true);
+    }
+
+    GameObject CreateHeldBow()
+    {
+        var prefab = Resources.Load<GameObject>("SkillArt/HeroBow");
+        if (prefab == null) return null;
+        // Bows sit in the off hand; KayKit rigs expose a "handslot.l" mount.
+        var hand = FindDeep(transform, "handslot.l") ?? FindDeep(transform, "hand.l");
+        var bow = Instantiate(prefab);
+        bow.name = "HeldBow";
+        if (hand != null)
+        {
+            bow.transform.SetParent(hand, false);
+            bow.transform.localPosition = Vector3.zero;
+            bow.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            bow.transform.SetParent(transform, false);
+            bow.transform.localPosition = new Vector3(-0.35f, 1.0f, 0.25f);
+            bow.transform.localRotation = Quaternion.identity;
+        }
+        return bow;
+    }
+
+    void SetSwordVisible(bool visible)
+    {
+        if (swordRenderers == null)
+        {
+            var sword = FindDeep(transform, SwordName);
+            swordRenderers = sword != null ? sword.GetComponentsInChildren<Renderer>(true) : new Renderer[0];
+        }
+        foreach (var r in swordRenderers)
+            if (r != null) r.enabled = visible;
+    }
+
+    static Transform FindDeep(Transform t, string name)
+    {
+        if (t.name == name) return t;
+        for (int i = 0; i < t.childCount; i++)
+        {
+            var hit = FindDeep(t.GetChild(i), name);
+            if (hit != null) return hit;
+        }
+        return null;
+    }
+
     /// <summary>Seconds until the skill is ready again (0 when ready).</summary>
     public float CooldownLeft(Skill s)
     {
@@ -102,6 +178,7 @@ public sealed class DiabloSkills : MonoBehaviour
                 fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
             : DiabloProjectile.Spawn(s, origin, dir, transform, arrowDamage + WeaponBonus(),
                 arrowSpeed, arrowRange, 0f, cosmetic);
+        if (s == Skill.Arrow) EnterBowStance();
         var driver = GetComponent<DiabloAnimator>();
         if (driver != null) driver.OnStrike();
         DiabloAudio.PlaySwing();
@@ -143,6 +220,8 @@ public sealed class DiabloSkills : MonoBehaviour
 
     void Update()
     {
+        // Runs on mirrors too: remote casts draw the bow there as well.
+        if (BowDrawn && Time.time > bowUntil) ExitBowStance();
         if (IsRemoteMirror) return;
         if (controller == null || !controller.isActiveAndEnabled) return;
         var kb = Keyboard.current;

@@ -129,6 +129,7 @@ public sealed class DiabloClickController : MonoBehaviour
         if (controller != null) controller.Move(AimDirection * StrikeStep);
         var driver = GetComponent<DiabloAnimator>();
         if (driver != null) driver.OnStrike();
+        SheatheBow();
         DiabloAudio.PlaySwing();
         var target = melee != null
             ? DiabloMelee.FindArcTarget(transform, AimDirection, melee.attackRange)
@@ -189,6 +190,7 @@ public sealed class DiabloClickController : MonoBehaviour
                     {
                         lastNetSwing = Time.time;
                         if (driver != null) driver.OnStrike();
+                        SheatheBow();
                         netPlayer.Attack(attackTarget, melee, transform);
                     }
                 }
@@ -196,6 +198,7 @@ public sealed class DiabloClickController : MonoBehaviour
                 {
                     // Visible swing: chase-kills used to die silently ("despawn").
                     if (driver != null) driver.OnStrike();
+                    SheatheBow();
                 }
                 if (attackTarget == null) attackTarget = null;
             }
@@ -256,6 +259,13 @@ public sealed class DiabloClickController : MonoBehaviour
             AttackTarget(hit.collider.gameObject);
         else
             Strike();
+    }
+
+    /// <summary>Melee swings put the bow away so the sword shows again.</summary>
+    void SheatheBow()
+    {
+        var skills = GetComponent<DiabloSkills>();
+        if (skills != null && skills.BowDrawn) skills.ExitBowStance();
     }
 
     void Move(Vector3 planar)

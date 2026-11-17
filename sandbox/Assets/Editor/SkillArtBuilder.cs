@@ -26,9 +26,28 @@ public static class SkillArtBuilder
         BuildArrow();
         BuildFireball(additive, smoke);
         BuildBlast(additive, smoke);
+        BuildHeroBow();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("[SkillArt] Built ArrowProjectile, FireballProjectile, FireballBlast.");
+        Debug.Log("[SkillArt] Built ArrowProjectile, FireballProjectile, FireballBlast, HeroBow.");
+    }
+
+    // ---------- held bow ----------
+
+    const string BowFbx = "Assets/ThirdParty/KayKit/Adventurers/Accessories/bow_withString.fbx";
+
+    /// <summary>
+    /// Bow the hero holds while shooting. KayKit accessories are authored for
+    /// the rig's handslot bones, so the mesh keeps its native transform.
+    /// </summary>
+    static void BuildHeroBow()
+    {
+        var model = AssetDatabase.LoadAssetAtPath<GameObject>(BowFbx);
+        var root = new GameObject("HeroBow");
+        var inst = (GameObject)Object.Instantiate(model, root.transform);
+        inst.name = "bow_withString";
+        foreach (var col in inst.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(col);
+        Save(root, "HeroBow");
     }
 
     // ---------- textures & materials ----------

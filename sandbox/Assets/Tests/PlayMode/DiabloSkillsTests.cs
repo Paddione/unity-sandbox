@@ -152,6 +152,57 @@ public class DiabloSkillsTests
         }
     }
 
+    static GameObject AttachTestSword(GameObject hero)
+    {
+        var hand = new GameObject("handslot.r");
+        hand.transform.SetParent(hero.transform, false);
+        new GameObject("handslot.l").transform.SetParent(hero.transform, false);
+        var sword = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        sword.name = DiabloSkills.SwordName;
+        Object.DestroyImmediate(sword.GetComponent<Collider>());
+        sword.transform.SetParent(hand.transform, false);
+        return sword;
+    }
+
+    [UnityTest]
+    public IEnumerator Arrow_SwapsSwordForBow_ThenBack()
+    {
+        var sword = AttachTestSword(player);
+        yield return null;
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Arrow, Vector3.forward));
+        Assert.IsTrue(skills.BowDrawn, "Shooting must draw the bow.");
+        var bow = player.transform.Find("handslot.l/HeldBow");
+        Assert.IsNotNull(bow, "Bow sits in the left handslot.");
+        Assert.IsNotNull(bow.GetComponentInChildren<Renderer>(), "Bow uses the KayKit mesh.");
+        Assert.IsFalse(sword.GetComponent<Renderer>().enabled, "Sword hides while the bow is out.");
+
+        yield return DiabloTestFixture.WaitSeconds(DiabloSkills.BowStanceSeconds + 0.2f);
+        Assert.IsFalse(skills.BowDrawn, "Bow is put away after the stance timeout.");
+        Assert.IsTrue(sword.GetComponent<Renderer>().enabled, "Sword returns.");
+    }
+
+    [UnityTest]
+    public IEnumerator MeleeStrike_PutsBowAway()
+    {
+        var sword = AttachTestSword(player);
+        yield return null;
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Arrow, Vector3.forward));
+        Assert.IsTrue(skills.BowDrawn);
+        player.GetComponent<DiabloClickController>().Strike();
+        Assert.IsFalse(skills.BowDrawn, "A melee swing switches back to the sword.");
+        Assert.IsTrue(sword.GetComponent<Renderer>().enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator Fireball_KeepsSword()
+    {
+        var sword = AttachTestSword(player);
+        yield return null;
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Fireball, Vector3.forward));
+        Assert.IsFalse(skills.BowDrawn);
+        Assert.IsTrue(sword.GetComponent<Renderer>().enabled);
+    }
+
     [UnityTest]
     public IEnumerator Cooldown_BlocksImmediateRecast()
     {
