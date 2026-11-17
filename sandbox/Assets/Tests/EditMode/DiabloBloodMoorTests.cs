@@ -168,14 +168,14 @@ public class DiabloBloodMoorTests
     public void Campfire_HealsOnePerSecond()
     {
         Assert.AreEqual(4f, CampfireHeal.Radius);
-        Assert.AreEqual(1f, CampfireHeal.HealPerSecond);
+        Assert.AreEqual(5f, CampfireHeal.HealPerSecond);
         var go = new GameObject("Player");
         go.AddComponent<Equipment>();
         var hp = go.AddComponent<PlayerHealth>();
-        hp.TakeDamage(2f);
-        Assert.AreEqual(1f, hp.CurrentHP);
+        hp.TakeDamage(10f);
+        Assert.AreEqual(hp.MaxHP - 10f, hp.CurrentHP);
         hp.Heal(CampfireHeal.HealPerSecond * 2f);
-        Assert.AreEqual(3f, hp.CurrentHP, "Two campfire-seconds must fully heal base HP.");
+        Assert.AreEqual(hp.MaxHP, hp.CurrentHP, "Two campfire-seconds must heal 10 HP.");
         hp.Heal(99f);
         Assert.AreEqual(hp.MaxHP, hp.CurrentHP, "Heal must clamp at max.");
         Object.DestroyImmediate(go);

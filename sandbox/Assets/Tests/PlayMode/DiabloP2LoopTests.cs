@@ -214,7 +214,7 @@ public class DiabloP2LoopTests
     public void Equip_RecalculatesDerivedStats()
     {
         Assert.AreEqual(1f, equipment.GetDamage());
-        Assert.AreEqual(3f, equipment.GetMaxHP());
+        Assert.AreEqual(Equipment.BaseMaxHP, equipment.GetMaxHP());
 
         var weapon = new ItemInstance
         {
@@ -230,6 +230,6 @@ public class DiabloP2LoopTests
         };
         armor.affixes.Add(new Affix("MaxHP", 12f));
         equipment.Equip(armor);
-        Assert.AreEqual(15f, equipment.GetMaxHP());
+        Assert.AreEqual(Equipment.BaseMaxHP + 12f, equipment.GetMaxHP());
     }
 }

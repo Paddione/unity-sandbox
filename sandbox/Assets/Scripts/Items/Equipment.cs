@@ -11,7 +11,8 @@ public sealed class Equipment : MonoBehaviour
     public ItemInstance helmet;
 
     public const float BaseDamage = 1f;
-    public const float BaseMaxHP = 3f;
+    /// <summary>Survives ~10 normal husk strikes (1 dmg / 1.5 s each).</summary>
+    public const float BaseMaxHP = 20f;
     public const float BaseMoveSpeed = 5f;
 
     public void Equip(ItemInstance item)

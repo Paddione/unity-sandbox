@@ -8,7 +8,8 @@ using UnityEngine;
 public sealed class CampfireHeal : MonoBehaviour
 {
     public const float Radius = 4f;
-    public const float HealPerSecond = 1f;
+    /// <summary>Full base HP (20) in ~4 s at the fire.</summary>
+    public const float HealPerSecond = 5f;
 
     void OnTriggerStay(Collider other)
     {

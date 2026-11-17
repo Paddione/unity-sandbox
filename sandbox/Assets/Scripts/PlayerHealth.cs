@@ -2,9 +2,10 @@ using UnityEngine;
 
 /// <summary>
 /// Hero hit points for the Blood Moor (campfire heal target). Max tracks
-/// <see cref="Equipment"/> so armor still matters; no enemy damage calls this
-/// yet (husks stay passive), so there is no death handling in this cut.
-/// Local-only per client, like <see cref="Equipment"/>.
+/// <see cref="Equipment"/> so armor still matters. Husk strikes
+/// (<see cref="EnemyAttack"/>) drain it; at 0 the hero respawns at camp.
+/// Local-only per client, like <see cref="Equipment"/>. Shown by
+/// <see cref="DiabloLifeGlobe"/>, which the first hero brings up.
 /// </summary>
 public sealed class PlayerHealth : MonoBehaviour
 {
@@ -12,10 +13,14 @@ public sealed class PlayerHealth : MonoBehaviour
 
     Equipment equipment;
 
+    /// <summary>Time.time of the last death, -inf before any (HUD message seam).</summary>
+    public static float LastDeathTime = float.NegativeInfinity;
+
     void Awake()
     {
         equipment = GetComponent<Equipment>();
         Refresh();
+        if (Application.isPlaying) DiabloLifeGlobe.Ensure();
     }
 
     public float MaxHP => equipment != null ? equipment.GetMaxHP() : Equipment.BaseMaxHP;
@@ -61,6 +66,7 @@ public sealed class PlayerHealth : MonoBehaviour
         if (cc != null) cc.enabled = true;
         Physics.SyncTransforms();
         currentHP = MaxHP;
+        LastDeathTime = Time.time;
         Debug.Log("[Diablo] Hero died — respawned at the Rogue Encampment.");
     }
 }

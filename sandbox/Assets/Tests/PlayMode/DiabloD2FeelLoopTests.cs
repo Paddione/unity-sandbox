@@ -46,6 +46,9 @@ public class DiabloD2FeelLoopTests
         var bar = GameObject.Find("DTargetBar");
         if (bar != null) Object.DestroyImmediate(bar);
         if (player != null) Object.DestroyImmediate(player);
+        var globeGo = GameObject.Find("DLifeGlobe");
+        if (globeGo != null) Object.DestroyImmediate(globeGo);
+        PlayerHealth.LastDeathTime = float.NegativeInfinity;
         ToyTrigger.ResetRun();
         EnemyHealth.ResetRun();
         DiabloMelee.ResetRun();
@@ -142,6 +145,7 @@ public class DiabloD2FeelLoopTests
         var husk = SpawnHusk(new Vector3(0f, 1f, 1.2f), 15, LootTier.Elite);
         var atk = husk.AddComponent<EnemyAttack>();
         atk.damage = 2;
+        health.TakeDamage(health.MaxHP - 2f); // one strike from death
         float waited = 0f;
         bool respawned = false;
         while (waited < 12f && !respawned)
@@ -152,6 +156,30 @@ public class DiabloD2FeelLoopTests
                 && Vector3.Distance(player.transform.position, new Vector3(0f, 0.1f, 11f)) < 0.6f;
         }
         Assert.IsTrue(respawned, "Death must respawn the hero at the camp with full HP.");
+    }
+
+    [UnityTest]
+    public IEnumerator LifeGlobe_DrainsAndAnnouncesDeath()
+    {
+        yield return null;
+        var globe = DiabloLifeGlobe.Instance;
+        Assert.IsNotNull(globe, "First hero must bring up the life globe.");
+        Assert.AreEqual(1f, globe.TestFillAmount, 0.001f, "Full HP fills the globe.");
+        health.TakeDamage(health.MaxHP * 0.5f);
+        yield return null;
+        Assert.AreEqual(0.5f, globe.TestFillAmount, 0.001f, "Globe drains with HP.");
+        Assert.IsFalse(globe.TestDeathNoticeShown);
+        health.DieAndRespawn();
+        yield return null;
+        Assert.IsTrue(globe.TestDeathNoticeShown, "Respawn must say the hero died.");
+        Assert.AreEqual(1f, globe.TestFillAmount, 0.001f, "Respawn refills the globe.");
+    }
+
+    [Test]
+    public void HeroSurvivesSeveralHuskStrikes()
+    {
+        Assert.GreaterOrEqual(health.MaxHP / 2f, 5f,
+            "Base hero must take at least 5 elite strikes (was 3 HP: died in 2-3 hits).");
     }
 
     [UnityTest]

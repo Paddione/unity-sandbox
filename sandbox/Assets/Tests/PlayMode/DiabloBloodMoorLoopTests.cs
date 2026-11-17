@@ -161,7 +161,7 @@ public class DiabloBloodMoorLoopTests
         col.size = new Vector3(CampfireHeal.Radius * 2f, 3f, CampfireHeal.Radius * 2f);
         fire.AddComponent<CampfireHeal>();
 
-        health.TakeDamage(2f);
+        health.TakeDamage(health.MaxHP - 1f);
         Assert.AreEqual(1f, health.CurrentHP);
         DiabloTestFixture.TeleportHero(player, new Vector3(10f, 1.05f, 10f));
         float waited = 0f;

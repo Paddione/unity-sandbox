@@ -117,3 +117,9 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Fix: `DiabloNetworkPlayer.OnNetworkSpawn` (nur Owner) deaktiviert den Solo-Helden und übernimmt lokal den Namen `Player` (Namen werden nicht repliziert, Remote-Mirrors behalten ihren Clone-Namen).
 - Belegt: EditMode 41/41 (`DiabloHeroTakeoverTests`), PlayMode 33/33, Linux-Zonen-Build Host-Lauf: `[Net] Owned hero took over 'Player' (solo hero stood down=True)`, 0 Exceptions.
 - Faced: aus dem laufenden Warm-Editor kopierte Library band Szenen-MonoBehaviours nicht (9 Szenentests rot bei korrekten GUIDs) — frische Library behebt es. Worktree-Library nie bei laufendem Editor kopieren.
+
+## 2026-11-17 — „Reset zum Spawn" nach wenigen Treffern
+
+- Befund: kein Teleport-Bug, sondern Tod. `Equipment.BaseMaxHP` war 3, Husks treffen mit 1 (Elite 2) — 2–3 Treffer → `PlayerHealth.DieAndRespawn` an `CoopSpawn_0`, ohne HP-Anzeige oder Meldung. Vorher unsichtbar, weil die Husks den Doppelgänger-Helden angriffen (Fix 24eb42e).
+- Fix: `BaseMaxHP` 20, `CampfireHeal.HealPerSecond` 5; neue `DiabloLifeGlobe` (Kugel unten links, `cur / max`, Todesmeldung 3 s), vom ersten `PlayerHealth` selbst erzeugt — kein Szenen-Rebuild.
+- Belegt: EditMode 41/41, PlayMode 35/35 (`LifeGlobe_DrainsAndAnnouncesDeath`, `HeroSurvivesSeveralHuskStrikes`).
