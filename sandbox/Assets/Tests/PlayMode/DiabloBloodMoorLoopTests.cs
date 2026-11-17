@@ -70,19 +70,7 @@ public class DiabloBloodMoorLoopTests
         return husk;
     }
 
-    /// <summary>
-    /// Teleport the hero so physics (and triggers) actually sees it: an
-    /// enabled CharacterController does not rebase its internal position on
-    /// a raw transform set (plus this project disables autoSyncTransforms).
-    /// </summary>
-    static void TeleportHero(GameObject hero, Vector3 pos)
-    {
-        var cc = hero.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-        hero.transform.position = pos;
-        if (cc != null) cc.enabled = true;
-        Physics.SyncTransforms();
-    }
+    // (Teleport helper lives in DiabloTestFixture; no local copy.)
 
     [UnityTest]
     public IEnumerator Kill_LootLandsInBag_EquipFromPanel()
@@ -99,7 +87,7 @@ public class DiabloBloodMoorLoopTests
         var drop = GameObject.FindFirstObjectByType<LootDrop>();
         Assert.IsNotNull(drop, "Kill must drop loot.");
         var looted = drop.item;
-        TeleportHero(player, drop.transform.position);
+        DiabloTestFixture.TeleportHero(player, drop.transform.position);
         int bagBefore = inventory.Count;
         float pickupWait = 0f;
         while (inventory.Count == bagBefore && pickupWait < 2f)
@@ -175,7 +163,7 @@ public class DiabloBloodMoorLoopTests
 
         health.TakeDamage(2f);
         Assert.AreEqual(1f, health.CurrentHP);
-        TeleportHero(player, new Vector3(10f, 1.05f, 10f));
+        DiabloTestFixture.TeleportHero(player, new Vector3(10f, 1.05f, 10f));
         float waited = 0f;
         while (waited < 1.5f)
         {

@@ -195,7 +195,18 @@ public class DiabloBloodMoorTests
 
         int logs = 0;
         foreach (var go in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
-            if (go.name.StartsWith("Palisade_")) logs++;
+        {
+            if (!go.name.StartsWith("Palisade_")) continue;
+            logs++;
+            // Position tolerance mirrors the builder (ring center 0,11 radius 6,
+            // north gate): blind placement drifts show up here, not just in counts.
+            var p = go.transform.position;
+            float ringDist = Mathf.Sqrt(p.x * p.x + (p.z - 11f) * (p.z - 11f));
+            Assert.GreaterOrEqual(ringDist, 5.5f, $"{go.name} must sit on the ring (r>=5.5).");
+            Assert.LessOrEqual(ringDist, 6.5f, $"{go.name} must sit on the ring (r<=6.5).");
+            Assert.GreaterOrEqual(p.y, 0.75f, $"{go.name} must stand upright (y>=0.75).");
+            Assert.LessOrEqual(p.y, 1.75f, $"{go.name} must stand upright (y<=1.75).");
+        }
         Assert.GreaterOrEqual(logs, 12, "Encampment needs a 12+ log palisade ring.");
 
         var heal = GameObject.Find("CampfireHeal");

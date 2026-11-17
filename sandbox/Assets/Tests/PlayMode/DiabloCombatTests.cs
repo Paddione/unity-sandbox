@@ -64,11 +64,7 @@ public class DiabloCombatTests
         return husk;
     }
 
-    static IEnumerator WaitSeconds(float seconds)
-    {
-        float end = Time.time + seconds;
-        while (Time.time < end) yield return null;
-    }
+    // (Wait helper lives in DiabloTestFixture; no local copy.)
 
     [UnityTest]
     public IEnumerator SetDestination_MovesPlayerTowardPoint()
@@ -79,7 +75,7 @@ public class DiabloCombatTests
         controller.SetDestination(new Vector3(0f, 1.05f, 4f));
         Assert.IsTrue(controller.HasDestination);
 
-        yield return WaitSeconds(1.0f);
+        yield return DiabloTestFixture.WaitSeconds(1.0f);
 
         Vector3 after = player.transform.position;
         Assert.Greater(after.z, start.z + 1f,
@@ -95,7 +91,7 @@ public class DiabloCombatTests
         controller.AttackTarget(husk);
         Assert.AreSame(husk, controller.CurrentTarget);
 
-        yield return WaitSeconds(6.0f);
+        yield return DiabloTestFixture.WaitSeconds(6.0f);
 
         Assert.IsTrue(husk == null,
             "Expected attack-move to kill the husk within 6s.");
