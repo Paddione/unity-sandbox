@@ -2,7 +2,7 @@
 goal: cinderreach-presentation
 slug: cinderreach-presentation
 health_goals: [G-DIABLO02, G-DIABLO05, G-DIABLO06]
-plan_refs: none yet (Plan nach Muster `.agents/plans/arpg-session-loop/tasks.md` schreiben, sobald die Startbedingung erfüllt ist)
+plan_refs: [.agents/plans/cinderreach-presentation/tasks.md]
 ---
 
 # Goal: cinderreach-presentation — Präsentation: Licht, Audio, VFX, Menü, Performance

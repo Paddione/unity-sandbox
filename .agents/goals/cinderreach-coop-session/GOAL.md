@@ -2,7 +2,7 @@
 goal: cinderreach-coop-session
 slug: cinderreach-coop-session
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-plan_refs: none yet (Plan nach Muster `.agents/plans/arpg-session-loop/tasks.md` schreiben, sobald die Startbedingung erfüllt ist)
+plan_refs: [.agents/plans/cinderreach-coop-session/tasks.md]
 ---
 
 # Goal: cinderreach-coop-session — Co-op-Parität der Session-Schleife
@@ -27,8 +27,9 @@ auf Clients. Dazu kommt ein belegter Relay-Join zwischen zwei Maschinen.
 4. `DiabloCorpse` auch auf Clients (heute bewusst nur Host).
 5. Save: jeder Client speichert seinen eigenen Charakter. Join mit vorhandenem Save übernimmt Level und Gear.
    Beleg: Roundtrip-Test im Client-Pfad.
-6. Relay-Join zwischen WSL-Host und Windows-Client (`Games\cinderreach`): Join-Code-Fluss, beide sehen
-   Kampf und Loot. Beleg: Logs beider Seiten + Shotcheck-PNG vom Client.
+6. Join zwischen WSL-Host und Windows-Client (`Games\cinderreach`) per direktem UTP (IP/Port, WSL
+   `mirrored`): beide sehen Kampf und Loot. Beleg: Logs beider Seiten + Shotcheck-PNG vom Client.
+   Relay-Join-Code ist optional und nur mit Eigner-verknüpftem UGS-Projekt (`cloudProjectId` heute leer).
 7. Solo-Pfad und `G-DIABLO06`-Autoplay bleiben grün.
 
 ## Nicht-Ziele

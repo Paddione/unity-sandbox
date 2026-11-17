@@ -2,7 +2,7 @@
 goal: cinderreach-loop-guard
 slug: cinderreach-loop-guard
 health_goals: [G-DIABLO06]
-plan_refs: none yet (Plan nach Muster `.agents/plans/arpg-session-loop/tasks.md` schreiben, sobald die Startbedingung erfüllt ist)
+plan_refs: [.agents/plans/cinderreach-loop-guard/tasks.md]
 ---
 
 # Goal: cinderreach-loop-guard — Session-Schleife dauerhaft gegen Regression bewachen

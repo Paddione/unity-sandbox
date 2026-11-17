@@ -5,12 +5,12 @@ Prozent: 0 %
 ## Erledigt
 
 - 2026-11-17: Goal angelegt (Folge-Goal nach `arpg-session-loop`).
+- 2026-11-17: Plan `.agents/plans/cinderreach-coop-session/tasks.md` geschrieben (Stufen, Statustabelle, Verify).
 
 ## Nächste Schritte
 
 1. Startbedingung aus `GOAL.md` (Abhängigkeiten) prüfen.
-2. Plan `.agents/plans/cinderreach-coop-session/tasks.md` nach Muster `arpg-session-loop` schreiben (Ausgangslage mit Belegen,
-   Stufen, disjunkte `target_files`, Session-Protokoll, Statustabelle, DoD), `plan_refs` setzen, landen.
+2. Erste offene Stufe aus `.agents/plans/cinderreach-coop-session/tasks.md` nach Session-Protokoll ausführen.
 
 ## Offene Punkte
 
