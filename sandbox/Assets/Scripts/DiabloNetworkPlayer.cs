@@ -75,6 +75,37 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId, 4f);
     }
 
+    /// <summary>
+    /// Share a local skill cast so every other client renders it (visual only;
+    /// damage stays on the caster's hit path). Host: straight to clients.
+    /// </summary>
+    public void BroadcastCast(int skill, Vector3 origin, Vector3 dir)
+    {
+        if (!IsSpawned) return;
+        if (IsServer) ShowCastClientRpc(skill, origin, dir);
+        else SubmitCastServerRpc(skill, origin, dir);
+    }
+
+    [ServerRpc]
+    void SubmitCastServerRpc(int skill, Vector3 origin, Vector3 dir)
+    {
+        if (skill < 0 || skill > (int)DiabloSkills.Skill.Arrow) return;
+        // Anchor the visual to the caster: reject origins far from the player.
+        var delta = origin - transform.position;
+        delta.y = 0f;
+        if (delta.magnitude > 3f) return;
+        ShowCastClientRpc(skill, origin, dir);
+    }
+
+    [ClientRpc]
+    void ShowCastClientRpc(int skill, Vector3 origin, Vector3 dir)
+    {
+        if (IsOwner) return; // the caster already spawned the real projectile
+        var skills = GetComponent<DiabloSkills>();
+        if (skills == null) skills = gameObject.AddComponent<DiabloSkills>();
+        skills.ShowRemoteCast((DiabloSkills.Skill)skill, origin, dir);
+    }
+
     /// <summary>Server re-check radius for fireball/arrow hits (max skill range + slack).</summary>
     public const float RangedValidateRange = 24f;
 

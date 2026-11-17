@@ -73,19 +73,39 @@ public sealed class DiabloSkills : MonoBehaviour
         if (s == Skill.Fireball) lastFireball = Time.time; else lastArrow = Time.time;
         lastUsed = s;
 
-        transform.rotation = Quaternion.LookRotation(dir);
         var origin = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
-        if (s == Skill.Fireball)
-            DiabloProjectile.Spawn(s, origin, dir, transform, fireballDamage,
-                fireballSpeed, fireballRange, fireballBlastRadius);
-        else
-            DiabloProjectile.Spawn(s, origin, dir, transform, arrowDamage + WeaponBonus(),
-                arrowSpeed, arrowRange, 0f);
+        Launch(s, origin, dir, cosmetic: false);
 
+        // Co-op: every other client renders a visual-only copy of this cast.
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var nm = NetworkManager.Singleton;
+        if (netPlayer != null && netPlayer.IsSpawned && nm != null && nm.IsListening)
+            netPlayer.BroadcastCast((int)s, origin, dir);
+        return true;
+    }
+
+    /// <summary>
+    /// Render another player's cast on this client: same flight and impact
+    /// art, no damage (the caster's own client applies it). No cooldown gate.
+    /// </summary>
+    public DiabloProjectile ShowRemoteCast(Skill s, Vector3 origin, Vector3 dir) =>
+        Launch(s, origin, dir, cosmetic: true);
+
+    DiabloProjectile Launch(Skill s, Vector3 origin, Vector3 dir, bool cosmetic)
+    {
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+        dir.Normalize();
+        transform.rotation = Quaternion.LookRotation(dir);
+        var p = s == Skill.Fireball
+            ? DiabloProjectile.Spawn(s, origin, dir, transform, fireballDamage,
+                fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
+            : DiabloProjectile.Spawn(s, origin, dir, transform, arrowDamage + WeaponBonus(),
+                arrowSpeed, arrowRange, 0f, cosmetic);
         var driver = GetComponent<DiabloAnimator>();
         if (driver != null) driver.OnStrike();
         DiabloAudio.PlaySwing();
-        return true;
+        return p;
     }
 
     /// <summary>Weapon Damage affix scales arrows like melee swings.</summary>

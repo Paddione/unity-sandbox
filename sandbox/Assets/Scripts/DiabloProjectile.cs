@@ -27,18 +27,57 @@ public sealed class DiabloProjectile : MonoBehaviour
     float travelled;
     bool done;
 
-    /// <summary>Spawn a projectile with a procedural greybox look.</summary>
+    /// <summary>Visual-only copy (co-op mirror of another player's cast): never deals damage.</summary>
+    public bool cosmetic;
+
+    /// <summary>Seconds an arrow stays stuck in a wall after impact.</summary>
+    public const float StuckArrowSeconds = 3f;
+
+    /// <summary>
+    /// Spawn a projectile. Art comes from Resources/SkillArt (built by
+    /// SkillArtBuilder); a primitive stands in when the asset is missing.
+    /// </summary>
     public static DiabloProjectile Spawn(DiabloSkills.Skill kind, Vector3 origin, Vector3 dir,
-        Transform owner, int damage, float speed, float range, float blastRadius)
+        Transform owner, int damage, float speed, float range, float blastRadius, bool cosmetic = false)
     {
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = Vector3.forward;
         dir.Normalize();
 
+        bool fire = kind == DiabloSkills.Skill.Fireball;
+        var prefab = Resources.Load<GameObject>(fire ? "SkillArt/FireballProjectile" : "SkillArt/ArrowProjectile");
         GameObject go;
-        if (kind == DiabloSkills.Skill.Fireball)
+        if (prefab != null)
         {
-            go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            go = Object.Instantiate(prefab, origin, Quaternion.LookRotation(dir));
+        }
+        else
+        {
+            go = FallbackShape(fire);
+            go.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(dir));
+        }
+        go.name = fire ? "Fireball" : "Arrow";
+
+        var p = go.AddComponent<DiabloProjectile>();
+        p.kind = kind;
+        p.direction = dir;
+        p.owner = owner;
+        p.damage = damage;
+        p.speed = speed;
+        p.maxRange = range;
+        p.blastRadius = blastRadius;
+        p.knockback = fire ? 0.9f : 0.3f;
+        p.cosmetic = cosmetic;
+        Launched++;
+        return p;
+    }
+
+    static GameObject FallbackShape(bool fire)
+    {
+        var go = GameObject.CreatePrimitive(fire ? PrimitiveType.Sphere : PrimitiveType.Cube);
+        Object.Destroy(go.GetComponent<Collider>());
+        if (fire)
+        {
             go.transform.localScale = Vector3.one * 0.45f;
             Tint(go, new Color(1f, 0.45f, 0.08f));
             var light = go.AddComponent<Light>();
@@ -49,26 +88,10 @@ public sealed class DiabloProjectile : MonoBehaviour
         }
         else
         {
-            go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.transform.localScale = new Vector3(0.06f, 0.06f, 0.8f);
             Tint(go, new Color(0.55f, 0.4f, 0.25f));
         }
-        Object.Destroy(go.GetComponent<Collider>());
-        go.name = kind == DiabloSkills.Skill.Fireball ? "Fireball" : "Arrow";
-        go.transform.position = origin;
-        go.transform.rotation = Quaternion.LookRotation(dir);
-
-        var p = go.AddComponent<DiabloProjectile>();
-        p.kind = kind;
-        p.direction = dir;
-        p.owner = owner;
-        p.damage = damage;
-        p.speed = speed;
-        p.maxRange = range;
-        p.blastRadius = blastRadius;
-        p.knockback = kind == DiabloSkills.Skill.Fireball ? 0.9f : 0.3f;
-        Launched++;
-        return p;
+        return go;
     }
 
     void Update()
@@ -144,26 +167,65 @@ public sealed class DiabloProjectile : MonoBehaviour
         Vector3 origin = owner != null ? owner.position : point - direction;
         if (blastRadius > 0f)
         {
-            foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+            if (!cosmetic)
             {
-                if (husk == null) continue;
-                var d = Flat(husk.transform.position) - Flat(point);
-                if (d.magnitude > blastRadius) continue;
-                DiabloSkills.ApplyHit(husk, damage, point, knockback);
+                foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+                {
+                    if (husk == null) continue;
+                    var d = Flat(husk.transform.position) - Flat(point);
+                    if (d.magnitude > blastRadius) continue;
+                    DiabloSkills.ApplyHit(husk, damage, point, knockback);
+                }
             }
-            Explosion.Spawn(point, blastRadius);
+            SpawnBlast(point, blastRadius);
         }
-        else if (directHit != null)
+        else if (directHit != null && !cosmetic)
         {
             DiabloSkills.ApplyHit(directHit, damage, origin, knockback);
         }
+
+        // A wall-struck arrow stays stuck for a moment; everything else goes now.
+        if (kind == DiabloSkills.Skill.Arrow && directHit == null)
+        {
+            transform.position = point - direction * 0.3f;
+            var trail = GetComponent<TrailRenderer>();
+            if (trail != null) trail.emitting = false;
+            Destroy(gameObject, StuckArrowSeconds);
+            return;
+        }
+        ReleaseParticles();
         Destroy(gameObject);
     }
 
     void Fizzle()
     {
         done = true;
+        ReleaseParticles();
         Destroy(gameObject);
+    }
+
+    /// <summary>Detach trail particles so they fade out instead of popping.</summary>
+    void ReleaseParticles()
+    {
+        foreach (var ps in GetComponentsInChildren<ParticleSystem>())
+        {
+            if (ps.main.simulationSpace != ParticleSystemSimulationSpace.World) continue;
+            ps.transform.SetParent(null, true);
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            Destroy(ps.gameObject, ps.main.startLifetime.constantMax + 0.1f);
+        }
+    }
+
+    /// <summary>Blast art: Resources prefab, procedural sphere when missing.</summary>
+    public static GameObject SpawnBlast(Vector3 at, float radius)
+    {
+        var prefab = Resources.Load<GameObject>("SkillArt/FireballBlast");
+        if (prefab == null) return Explosion.Spawn(at, radius);
+        var go = Object.Instantiate(prefab, at, Quaternion.identity);
+        go.name = "FireballBlast";
+        go.AddComponent<BlastLight>();
+        Destroy(go, 2f);
+        return go;
     }
 
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
@@ -190,7 +252,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         float radius;
         Light flash;
 
-        public static void Spawn(Vector3 at, float radius)
+        public static GameObject Spawn(Vector3 at, float radius)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             Object.Destroy(go.GetComponent<Collider>());
@@ -205,6 +267,7 @@ public sealed class DiabloProjectile : MonoBehaviour
             e.flash.color = new Color(1f, 0.5f, 0.15f);
             e.flash.range = radius * 3f;
             e.flash.intensity = 6f;
+            return go;
         }
 
         void Update()
@@ -214,6 +277,26 @@ public sealed class DiabloProjectile : MonoBehaviour
             transform.localScale = Vector3.one * Mathf.Lerp(0.3f, radius * 2f, k);
             if (flash != null) flash.intensity = Mathf.Lerp(6f, 0f, k);
             if (k >= 1f) Destroy(gameObject);
+        }
+    }
+
+    /// <summary>Fades the blast prefab's light over its first 0.3 s.</summary>
+    sealed class BlastLight : MonoBehaviour
+    {
+        Light flash;
+        float start;
+        float age;
+
+        void Start()
+        {
+            flash = GetComponent<Light>();
+            if (flash != null) start = flash.intensity;
+        }
+
+        void Update()
+        {
+            age += Time.deltaTime;
+            if (flash != null) flash.intensity = Mathf.Lerp(start, 0f, Mathf.Clamp01(age / 0.3f));
         }
     }
 }
