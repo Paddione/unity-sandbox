@@ -27,8 +27,14 @@ PALETTE = {
     "Bark": "#4A3220", "DarkWood": "#5A3A22", "Stone": "#55505A", "Moss": "#3E4F2A",
     "Bone": "#D8CCB0", "Iron": "#3A3A40", "Flame": "#E84E00", "Coal": "#8A1A00",
     "BloodCloth": "#8E1620", "Gold": "#F2B134", "Heather": "#4F5A33",
-    "HeatherBloom": "#7A3F6E", "Grass": "#5E6B34",
+    "HeatherBloom": "#7A3F6E", "Grass": "#5E6B34", "Rune": "#FF2A1A", "Blood": "#4A0608",
 }
+
+# Optional subset: WORLD_ART_ONLY = ["StoneWall_0", ...] or --only a,b exports just
+# those props, so adding a prop does not rewrite (and re-diff) the others.
+ONLY = globals().get("WORLD_ART_ONLY")
+if ONLY is None and "--only" in sys.argv:
+    ONLY = sys.argv[sys.argv.index("--only") + 1].split(",")
 
 
 def reset():
@@ -51,7 +57,7 @@ def mat(name):
         bsdf = m.node_tree.nodes.get("Principled BSDF")
         if bsdf:
             bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
-            if name in ("Flame", "Coal"):
+            if name in ("Flame", "Coal", "Rune"):
                 key = "Emission Color" if "Emission Color" in bsdf.inputs else "Emission"
                 bsdf.inputs[key].default_value = (*rgb, 1.0)
                 bsdf.inputs["Emission Strength"].default_value = 3.0
@@ -297,17 +303,156 @@ def tuft(name, blades, height, base_mat, tip_mat, seed):
     return join(parts, name)
 
 
+def chamfer(o, width=0.04):
+    """One-segment bevel, applied: chamfered edges catch the moon rim light."""
+    bev = o.modifiers.new("Chamfer", "BEVEL")
+    bev.width = width
+    bev.segments = 1
+    bev.limit_method = "ANGLE"
+    bpy.context.view_layer.objects.active = o
+    bpy.ops.object.select_all(action="DESELECT")
+    o.select_set(True)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    bpy.ops.object.modifier_apply(modifier="Chamfer")
+    return o
+
+
+def moss_top(o, threshold=0.8):
+    """Second material slot: Moss on up-facing faces (rain-side growth)."""
+    o.data.materials.append(mat("Moss"))
+    for poly in o.data.polygons:
+        if poly.normal.z > threshold:
+            poly.material_index = 1
+    return o
+
+
+def stone_wall(i):
+    """Drystone boundary wall, 4 m long (X), ~0.9 m deep, ~1.5 m high."""
+    rng = random.Random(900 + i)
+    parts = []
+    rows = [(0.0, 0.5), (0.5, 0.45), (0.95, 0.4)]
+    for r, (z0, h) in enumerate(rows):
+        x = -2.0 + (0.25 if r % 2 else 0.0) * rng.uniform(0.6, 1.4)
+        while x < 2.0:
+            w = min(rng.uniform(0.55, 1.15), 2.0 - x)
+            if w < 0.2:
+                break
+            d = 0.9 - r * 0.08 + rng.uniform(-0.05, 0.05)
+            hh = h * rng.uniform(0.88, 1.02)
+            b = box((w - 0.04, d, hh), (x + w / 2, rng.uniform(-0.04, 0.04), z0 + hh / 2),
+                    rot=(rng.uniform(-0.04, 0.04), rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05)))
+            parts.append(chamfer(b, 0.05))
+            x += w
+    # cap stones, some missing, mossy on top
+    x = -2.0
+    while x < 1.9:
+        w = rng.uniform(0.35, 0.6)
+        if rng.random() > 0.18:
+            b = box((w - 0.03, 0.5, 0.16), (x + w / 2, rng.uniform(-0.06, 0.06), 1.43),
+                    rot=(rng.uniform(-0.12, 0.12), rng.uniform(-0.1, 0.1), rng.uniform(-0.2, 0.2)))
+            parts.append(moss_top(chamfer(b, 0.03), 0.6))
+        x += w
+    # fallen stones at the foot
+    for k in range(2 + i):
+        side = rng.choice((-1, 1))
+        parts.append(rock_blob(0.22, (rng.uniform(-1.7, 1.7), side * rng.uniform(0.55, 0.75), 0.06),
+                               rng, squash=0.55, moss=False, subdiv=1))
+    return join(parts, f"StoneWall_{i}")
+
+
+def stone_step():
+    """Unit-height step block 4 m x 1.2 m; Unity scales Y to the step top."""
+    rng = random.Random(950)
+    parts = []
+    x = -2.0
+    while x < 2.0:
+        w = min(rng.uniform(0.9, 1.5), 2.0 - x)
+        if w < 0.3:
+            break
+        b = box((w - 0.05, 1.2 - rng.uniform(0.0, 0.06), 1.0 + rng.uniform(-0.03, 0.0)),
+                (x + w / 2, 0, 0.5), rot=(0, 0, rng.uniform(-0.02, 0.02)))
+        parts.append(chamfer(b, 0.06))  # no moss: whole step tops read as bright green tiles
+        x += w
+    return join(parts, "StoneStep")
+
+
+def crypt_seal():
+    """Round crypt seal slab, 3 m: stone disc, carved glowing rune ring, centre sigil."""
+    rng = random.Random(970)
+    parts = []
+    bpy.ops.mesh.primitive_cylinder_add(vertices=24, radius=1.5, depth=0.2, location=(0, 0, 0.1))
+    parts.append(chamfer(finish(bpy.context.active_object, "Stone"), 0.06))
+    # rune ring: 12 short glowing bars sunk into the face
+    for k in range(12):
+        a = k * 2 * math.pi / 12
+        parts.append(box((0.26, 0.07, 0.04), (math.cos(a) * 1.15, math.sin(a) * 1.15, 0.2),
+                         rot=(0, 0, a + math.pi / 2 + rng.uniform(-0.2, 0.2)), material="Rune"))
+        if k % 3 == 0:  # tick marks
+            parts.append(box((0.06, 0.18, 0.04), (math.cos(a) * 0.9, math.sin(a) * 0.9, 0.2),
+                             rot=(0, 0, a + math.pi / 2), material="Rune"))
+    # inner iron ring and sigil (pentagon star of bars)
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.62, minor_radius=0.05, major_segments=20,
+                                     minor_segments=4, location=(0, 0, 0.2))
+    parts.append(finish(bpy.context.active_object, "Iron"))
+    pts = [Vector((math.cos(math.pi / 2 + k * 2 * math.pi / 5) * 0.55,
+                   math.sin(math.pi / 2 + k * 2 * math.pi / 5) * 0.55, 0.21)) for k in range(5)]
+    for k in range(5):
+        a, b = pts[k], pts[(k + 2) % 5]
+        mid, d = (a + b) / 2, (b - a)
+        parts.append(box((d.length, 0.06, 0.04), mid, rot=(0, 0, math.atan2(d.y, d.x)), material="Rune"))
+    # cracked rim chips
+    for k in range(5):
+        a = rng.uniform(0, 6.28)
+        parts.append(rock_blob(0.16, (math.cos(a) * 1.55, math.sin(a) * 1.55, 0.05), rng,
+                               squash=0.5, moss=True, subdiv=1))
+    return join(parts, "CryptSeal")
+
+
+def blood_splat(i):
+    """Flat irregular blood pool with satellite drops, 1.8 m across, 1 cm thick."""
+    rng = random.Random(990 + i)
+    parts = []
+    n = 18
+    bpy.ops.mesh.primitive_circle_add(vertices=n, radius=0.6, fill_type="NGON", location=(0, 0, 0.006))
+    pool = finish(bpy.context.active_object, "Blood")
+    for v in pool.data.vertices:
+        if v.co.length > 0.01:
+            v.co.xy *= rng.uniform(0.7, 1.35)
+    pool.scale = (1.0 + 0.3 * i, 1.0, 1.0)
+    parts.append(pool)
+    for k in range(7 + i * 3):
+        a = rng.uniform(0, 6.28)
+        r = rng.uniform(0.75, 0.95 + 0.2 * i)
+        bpy.ops.mesh.primitive_circle_add(vertices=6, radius=rng.uniform(0.04, 0.11), fill_type="NGON",
+                                          location=(math.cos(a) * r, math.sin(a) * r, 0.006))
+        parts.append(finish(bpy.context.active_object, "Blood"))
+    o = join(parts, f"BloodSplat_{i}")
+    bpy.ops.object.mode_set(mode="EDIT")  # 1 cm slab so the decal never z-fights the ground
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.extrude_region_move(TRANSFORM_OT_translate={"value": (0, 0, 0.01)})
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for p in o.data.polygons:
+        p.use_smooth = False
+    return o
+
+
 BUILDERS = [campfire] + [lambda i=i: stake(i) for i in range(3)] + \
     [lambda i=i: rock(i) for i in range(3)] + [lambda i=i: dead_tree(i) for i in range(2)] + \
     [lambda i=i: gravestone(i) for i in range(2)] + [bone_pile, broken_pillar, brazier, banner] + \
     [lambda: tuft("Heather_0", 14, 0.45, "Heather", "HeatherBloom", 801),
      lambda: tuft("Heather_1", 10, 0.35, "Heather", "HeatherBloom", 802),
-     lambda: tuft("Grass_0", 16, 0.5, "Grass", None, 803)]
+     lambda: tuft("Grass_0", 16, 0.5, "Grass", None, 803)] + \
+    [lambda i=i: stone_wall(i) for i in range(2)] + [stone_step, crypt_seal] + \
+    [lambda i=i: blood_splat(i) for i in range(2)]
 
 reset()
 exported = []
 for build in BUILDERS:
     obj = build()
+    if ONLY and obj.name not in ONLY:
+        bpy.data.objects.remove(obj, do_unlink=True)
+        continue
     exported.append(export(obj))
     obj.hide_set(True)  # out of the next selection; unhidden for the preview below
 

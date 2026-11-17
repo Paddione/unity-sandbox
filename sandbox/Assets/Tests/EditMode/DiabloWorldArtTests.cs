@@ -27,6 +27,32 @@ public class DiabloWorldArtTests
     }
 
     [Test]
+    public void BloodMoor_NoGreyboxLeftVisible()
+    {
+        EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
+        foreach (var prefix in new[] { "MoorEdge_", "ZStep_", "BloodPatch_" })
+        {
+            int holders = 0;
+            foreach (var go in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
+            {
+                if (!go.name.StartsWith(prefix)) continue;
+                holders++;
+                Assert.IsFalse(go.GetComponent<Renderer>().enabled, $"{go.name} must hide its greybox cube.");
+                Assert.IsNotNull(go.GetComponent<Collider>(), $"{go.name} keeps its collider.");
+            }
+            Assert.Greater(holders, 0, $"Zone must still contain {prefix} holders.");
+        }
+        Assert.IsNotNull(GameObject.Find("MoorWall_N_0"), "Moor edge needs drystone wall segments.");
+        Assert.IsNotNull(GameObject.Find("Art_ZStep_0"), "Entry steps need the stone step model.");
+        Assert.IsNotNull(GameObject.Find("Art_BloodPatch_0"), "Blood patches need the splat model.");
+
+        var goal = GameObject.Find("GoalPad");
+        Assert.IsFalse(goal.GetComponent<Renderer>().enabled, "GoalPad hands its look to the crypt seal.");
+        Assert.IsTrue(goal.GetComponent<Collider>().isTrigger, "GoalPad stays the extraction trigger.");
+        Assert.IsNotNull(GameObject.Find("CryptSeal"), "Crypt gate needs the rune seal.");
+    }
+
+    [Test]
     public void BloodMoor_FiresAreLit()
     {
         EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
@@ -39,5 +65,8 @@ public class DiabloWorldArtTests
             Assert.AreEqual(LightShadows.None, l.shadows, "Fire lights stay shadowless (cost).");
         }
         Assert.IsTrue(RenderSettings.fog, "Moor haze must be on.");
+        var cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        Assert.AreEqual(CameraClearFlags.SolidColor, cam.clearFlags, "Sky beyond the wall must be night haze.");
+        Assert.AreEqual(RenderSettings.fogColor, cam.backgroundColor);
     }
 }

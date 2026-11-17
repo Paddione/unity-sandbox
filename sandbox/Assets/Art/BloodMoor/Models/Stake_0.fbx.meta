@@ -12,6 +12,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Blood
+    second: {fileID: 2100000, guid: 560b2c1a06f0e155583a09642e39d22b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: BloodCloth
     second: {fileID: 2100000, guid: 8a863738811976888bd31ade5651c24a, type: 2}
   - first:
@@ -64,6 +69,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Moss
     second: {fileID: 2100000, guid: 656b3465484b9b3c483d7bb805398470, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Rune
+    second: {fileID: 2100000, guid: e4fe6898f6795bcbb8b64d2fa5e8a4ad, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

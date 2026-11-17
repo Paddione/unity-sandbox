@@ -35,6 +35,8 @@ public static class WorldArtBuilder
             { "Heather", (Hex("#55603A"), 0.05f, Color.black) },
             { "HeatherBloom", (Hex("#8A4A7E"), 0.1f, Color.black) },
             { "Grass", (Hex("#66733A"), 0.05f, Color.black) },
+            { "Rune", (Hex("#C0180F"), 0.2f, Hex("#FF2A1A") * 2.2f) },
+            { "Blood", (Hex("#3E0507"), 0.78f, Color.black) },
         };
 
     public static readonly string[] Props =
@@ -42,6 +44,7 @@ public static class WorldArtBuilder
         "Campfire", "Stake_0", "Stake_1", "Stake_2", "Rock_0", "Rock_1", "Rock_2",
         "DeadTree_0", "DeadTree_1", "Gravestone_0", "Gravestone_1", "BonePile",
         "BrokenPillar", "Brazier", "Banner", "Heather_0", "Heather_1", "Grass_0",
+        "StoneWall_0", "StoneWall_1", "StoneStep", "CryptSeal", "BloodSplat_0", "BloodSplat_1",
     };
 
     [MenuItem("Sandbox/World Art/Import Blood Moor Props")]
@@ -173,6 +176,59 @@ public static class WorldArtBuilder
         foreach (var go in FindByPrefix("ZGatePillar_"))
             Dress(go, "BrokenPillar", go.transform.position.x < 0 ? 15f : 200f, 1.15f, root);
 
+        var edgeRng = new System.Random(4242); // own seed: the decor scatter below stays put
+
+        // Moor edge: 4 m drystone segments replace the 40 m boundary cubes (colliders stay).
+        foreach (var edge in FindByPrefix("MoorEdge_"))
+        {
+            Hide(edge);
+            var t = edge.transform;
+            bool alongX = t.localScale.x > t.localScale.z;
+            float length = alongX ? t.localScale.x : t.localScale.z;
+            int segments = Mathf.RoundToInt(length / 4f);
+            string side = edge.name.Substring("MoorEdge_".Length);
+            for (int s = 0; s < segments; s++)
+            {
+                float along = -length / 2f + 2f + s * 4f;
+                var at = Flat(t.position) + (alongX ? new Vector3(along, 0f, 0f) : new Vector3(0f, 0f, along));
+                Place($"StoneWall_{(s + side.Length) % 2}", at, (alongX ? 0f : 90f) + Jitter(edgeRng, 2.5f),
+                    1f, root, $"MoorWall_{side}_{s}");
+            }
+        }
+
+        // Entry steps: stone blocks scaled to each step's top (holders keep the walkable boxes).
+        foreach (var step in FindByPrefix("ZStep_"))
+        {
+            Hide(step);
+            var t = step.transform;
+            float top = t.position.y + t.localScale.y / 2f;
+            var model = Place("StoneStep", Flat(t.position), step.name == "ZStep_1" ? 180f : 0f, 1f, root,
+                "Art_" + step.name);
+            model.transform.localScale = new Vector3(t.localScale.x / 4f, top, t.localScale.z / 1.2f);
+        }
+
+        // Crypt gate: rune seal on the extraction pad, lit blood-red from within.
+        var pad = GameObject.Find("GoalPad");
+        if (pad != null)
+        {
+            Hide(pad);
+            var seal = Place("CryptSeal", Flat(pad.transform.position), 0f, 1f, root, "CryptSeal");
+            var glow = new GameObject("SealGlow");
+            glow.transform.SetParent(seal.transform, false);
+            glow.transform.localPosition = new Vector3(0f, 0.6f, 0f);
+            var l = glow.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.color = new Color(1f, 0.16f, 0.1f);
+            l.range = 4.5f;
+            l.intensity = 1.6f;
+            l.shadows = LightShadows.None;
+        }
+
+        // Blood patches: wet splat meshes instead of flat red cubes.
+        i = 0;
+        foreach (var stain in FindByPrefix("BloodPatch_"))
+            Dress(stain, $"BloodSplat_{i++ % 2}", Jitter(edgeRng, 180f), 1f, root);
+
         // Campfire: one Blender model replaces base, ember cube and logs.
         var fire = GameObject.Find("Campfire");
         if (fire != null)
@@ -263,6 +319,14 @@ public static class WorldArtBuilder
             l.color = new Color(0.82f, 0.86f, 1f);
             l.intensity = 0.95f;
             l.shadows = LightShadows.Soft;
+        }
+        // Beyond the moor wall: night haze instead of the unfogged default skybox.
+        var cam = GameObject.Find("Main Camera");
+        if (cam != null)
+        {
+            var c = cam.GetComponent<Camera>();
+            c.clearFlags = CameraClearFlags.SolidColor;
+            c.backgroundColor = RenderSettings.fogColor;
         }
     }
 
