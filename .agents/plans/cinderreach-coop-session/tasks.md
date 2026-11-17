@@ -10,7 +10,7 @@ start_condition: arpg-session-loop 100 % (cinderreach-loop-guard 100 % empfohlen
 
 # Plan: cinderreach-coop-session — Co-op-Parität der Session-Schleife
 
-Pfad: feature, 6 Stufen (S6 optional). Ausführung nach dem **Session-Protokoll** aus
+Pfad: feature, 6 Stufen. Ausführung nach dem **Session-Protokoll** aus
 `.agents/plans/arpg-session-loop/tasks.md` (Schritte 1–9), Lock-Name `task cinderreach-coop-session-sN`.
 Protokollschritt 1 prüft zusätzlich: `.agents/goals/arpg-session-loop/PROGRESS.md` zeigt `Prozent: 100 %`.
 
@@ -18,8 +18,13 @@ Protokollschritt 1 prüft zusätzlich: `.agents/goals/arpg-session-loop/PROGRESS
 
 - NGO 2.5 + UTP 2.4 + Lobby 1.3 + Relay 1.2 im Manifest (decision-log Q4). Im Code gibt es **keine**
   Relay- oder Lobby-Nutzung. `MultiplayerAutoStarter.cs:63` ruft `StartHost()` direkt (UTP direkt).
-- `cloudProjectId`/`organizationId` in `ProjectSettings.asset` leer: kein UGS-Projekt verknüpft, Relay
-  ist ohne Eigner-Login nicht nutzbar.
+- UGS verknüpft seit 2026-11-17: Cloud-Projekt „Cinderreach“ (`cloudProjectId`
+  `02e05e98-286a-46d9-a3f9-495cca6be886`, Org `9072486650803`), Umgebung `production`.
+  `scripts/ugs-relay-probe.sh` belegt anonyme Anmeldung + Relay-Allocation + Join-Code (Exit 0).
+- `com.unity.services.relay` 1.2.0 und `com.unity.services.lobby` 1.3.0 sind laut Package Manager
+  deprecated, Nachfolger ist `com.unity.services.multiplayer` (Sessions-API).
+- UGS-Init geht nur im Play Mode (`ServicesInitializationException` im Batchmode-Editor). Tests dafür
+  laufen als PlayMode-Test oder im Player.
 - WSL läuft mit `networkingMode = Mirrored` (`.wslconfig`): Windows-Client erreicht den WSL-Host direkt
   über `127.0.0.1`/LAN-IP.
 - RPC-Bestand (25 Stellen): `DiabloNetworkPlayer` 8, `LootNetRelay` 4, `DiabloSkills` 3, `LootDrop` 2,
@@ -30,9 +35,9 @@ Protokollschritt 1 prüft zusätzlich: `.agents/goals/arpg-session-loop/PROGRESS
 
 ## Entscheide
 
-1. Transport: **direkter UTP-Join** (IP + Port, Default 7777) ist Pflichtumfang. Relay ist Stufe S6 und
-   nur dann, wenn der Eigner das UGS-Projekt verknüpft. Sonst bleibt S6 `blocked: UGS-Projekt fehlt`, und
-   das Goal-Kriterium 6 gilt mit direktem Join als erfüllt. Goal-Text entsprechend angepasst.
+1. Transport: **direkter UTP-Join** (IP + Port, Default 7777) für LAN/WSL, **Relay-Join-Code** (S6) für
+   Internet-Co-op. Beide Wege bleiben. Relay läuft über `com.unity.services.multiplayer` (Migration von den
+   deprecated Relay/Lobby-Paketen in S6).
 2. Autorität: Gegner (Husks, Wardens, Boss) werden **host-autoritativ** (heute Retaliation client-seitig).
    Clients senden nur Treffer-Absichten per ServerRpc, der Host validiert Reichweite und Cooldown.
 3. Pro-Spieler-Zustand (Inventar, Gold, Punkte, Save) bleibt beim Client. Der Host validiert nur
@@ -50,9 +55,9 @@ Protokollschritt 1 prüft zusätzlich: `.agents/goals/arpg-session-loop/PROGRESS
 | S3 world | Zonen-Gate für alle, Client-Leichen | `Scripts/Zones/ZoneGate.cs`, `Scripts/DiabloCorpse.cs`, `Scripts/Net/ZoneTravelRelay.cs` (neu), `Tests/PlayMode/CoopGateTests.cs` |
 | S4 economy | Gold/Pickup/Vendor per validiertem ServerRpc | `Scripts/Loot/LootNetRelay.cs`, `Scripts/Loot/GoldDrop.cs`, `Scripts/Town/Vendor.cs`, `Scripts/Net/TradeValidator.cs` (neu), `Tests/EditMode/TradeValidatorTests.cs` |
 | S5 save | Client-Save beim Join, Level/Gear übernehmen | `Scripts/DiabloNetworkPlayer.cs`, `Scripts/Save/SaveService.cs`, `Tests/PlayMode/CoopSaveJoinTests.cs`, `docs/coop-run-log.md` (neu) |
-| S6 relay (optional) | Relay-Join-Code | `Scripts/Net/RelayJoin.cs` (neu), `Scripts/Net/JoinPanel.cs`, `sandbox/ProjectSettings/ProjectSettings.asset` |
+| S6 relay | Relay-Join-Code über Multiplayer Services | `Packages/manifest.json` (relay/lobby → `com.unity.services.multiplayer`), `Scripts/Net/RelayJoin.cs` (neu), `Scripts/Net/JoinPanel.cs`, `Tests/PlayMode/RelayJoinTests.cs` (neu), `scripts/ugs-relay-probe.sh` |
 
-Seriell S1 → S2 → S3 → S4 → S5. S6 nur nach Eigner-Freigabe (UGS-Login), dann unabhängig.
+Seriell S1 → S2 → S3 → S4 → S5 → S6.
 
 ## S1 — Direkt-Join + 2-Prozess-Harness
 
@@ -100,11 +105,17 @@ Seriell S1 → S2 → S3 → S4 → S5. S6 nur nach Eigner-Freigabe (UGS-Login),
   Client. Belegt Goal-Kriterium 6 (direkter Join).
 - Akzeptanz: alle 7 Goal-Kriterien belegt (6 mit direktem Join), Solo-Autoplay `G-DIABLO06` grün.
 
-## S6 — Relay (optional)
+## S6 — Relay-Join-Code
 
-- Voraussetzung: Eigner verknüpft das UGS-Projekt (Editor-Login, `cloudProjectId` gesetzt). Ohne das
-  Status `blocked: UGS-Projekt fehlt` und nicht weiter verfolgen.
-- `RelayJoin`: anonyme Auth, Allocation (max. 3 Clients), Join-Code im `JoinPanel`.
+- Vorab `bash scripts/ugs-relay-probe.sh` (Exit 0 = Projekt + Relay erreichbar).
+- Paketmigration: `com.unity.services.relay`/`lobby` raus, `com.unity.services.multiplayer` rein (Version
+  per Package Manager/Docs prüfen, Doku vor dem Code lesen). Kompilierfehler aus alten Namespaces beheben.
+- `RelayJoin`: `UnityServices.InitializeAsync` → `SignInAnonymouslyAsync` → Session als Host mit Relay
+  (max. 4 Spieler), Join-Code im `JoinPanel`, Client tritt per Code bei. Fallback auf Direkt-Join, wenn
+  UGS nicht erreichbar (Log-Warnung, kein stiller Wechsel).
+- Tests: PlayMode `RelayJoinTests` (Host erzeugt Code, Client im selben Prozess bzw. 2-Prozess-Lauf mit
+  `-join-code`), Fehlerpfad ohne Netz.
+- Beleg: Windows-Client tritt per Join-Code dem WSL-Host bei, Logs beider Seiten im `docs/coop-run-log.md`.
 
 ### Statustabelle
 
@@ -114,8 +125,8 @@ Seriell S1 → S2 → S3 → S4 → S5. S6 nur nach Eigner-Freigabe (UGS-Login),
 | S2 enemies | S1 | 25 % | offen |
 | S3 world | S2 | 15 % | offen |
 | S4 economy | S3 | 20 % | offen |
-| S5 save | S4 | 25 % | offen |
-| S6 relay | Eigner-Freigabe | 0 % (optional) | blocked: UGS-Projekt fehlt |
+| S5 save | S4 | 15 % | offen |
+| S6 relay | S5 | 10 % | offen |
 
 ## Verify (je Stufe)
 

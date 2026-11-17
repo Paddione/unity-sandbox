@@ -29,7 +29,7 @@ auf Clients. Dazu kommt ein belegter Relay-Join zwischen zwei Maschinen.
    Beleg: Roundtrip-Test im Client-Pfad.
 6. Join zwischen WSL-Host und Windows-Client (`Games\cinderreach`) per direktem UTP (IP/Port, WSL
    `mirrored`): beide sehen Kampf und Loot. Beleg: Logs beider Seiten + Shotcheck-PNG vom Client.
-   Relay-Join-Code ist optional und nur mit Eigner-verknüpftem UGS-Projekt (`cloudProjectId` heute leer).
+   Zusätzlich Relay-Join per Code über das verknüpfte UGS-Projekt „Cinderreach“ (Multiplayer-Services-Paket).
 7. Solo-Pfad und `G-DIABLO06`-Autoplay bleiben grün.
 
 ## Nicht-Ziele
