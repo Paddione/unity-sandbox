@@ -103,3 +103,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Befund: Schwert hing an der Hüfte (Avatar nicht humanoid → GetBoneTransform wirft); Normals starben im ersten Hit vor dem 0,4-s-Windup; Husks standen statisch herum.
 - Fix: Schwert an `handslot.r` (KayKit-Waffenhalterung, per-Namen-Suche, Hip nur Fallback + Test pinnt Hand-Mount); Normal-HP 3→5 (zwei Starter-Hits, Rache trifft einmal); Husks laufen im 8-m-Radius an (1,5 m/s, Stopp 1,8 m) und wenden sich zu.
 - Belegt: EditMode 36/36 (Hand-Mount, Aggro-Konstanten), PlayMode 28/28 (Anmarsch-Test), VerifyDiabloZone OK.
+
+## 2026-11-17 — Feel-Polish (Husk-Rig, Leichen, Umweg, Hit-Stop)
+
+- Done: `HuskAnimator` + Builder-`WireHuskAnimator` (Skeletons teilen Rig_Medium, gleiche Takes wie der Held); `DiabloCorpse`; Steering in `EnemyAttack` (Fächer 0/±35/±70/±105°, Husks und Helden blockieren nie, Separation per Distanz); `HitStop`; `Diablo`-Prädikate (`IsLocalAuthority`, `IsSolo`). Tests: EditMode `DiabloFeelPolishTests`, PlayMode `DiabloFeelPolishLoopTests` (Flash am Kind-Renderer, Leiche inert + versinkt, Umweg um Wand, Attack-Take, Hit-Stop stellt timeScale wieder her).
+- Faced: Hit-Flash suchte den Renderer am Root — KayKit-Meshes hängen an Kindern, der Flash lief seit Q5 ins Leere. Solo-DiabloZone läuft als NGO-Host, ein „nur ohne Netcode"-Gate hätte Leichen und Hit-Stop im echten Spiel abgeschaltet → Leiche aus `EnemyHealth.corpseModel` (FBX-Referenz) statt Klon. `BuildDiabloScene` wirft DiabloZone aus den Build-Settings (vorbestehend; Datei auf HEAD zurückgesetzt).
+- Learned: Testhusks aus Primitiven verdecken Rig-Annahmen — neue Tests nutzen einen leeren Root mit Mesh-Kind.
+- Next: Windows-GPU-Playtest (deckt auch das offene Kriterium 5 von `unity-diablo-d2-combat-feel` ab).

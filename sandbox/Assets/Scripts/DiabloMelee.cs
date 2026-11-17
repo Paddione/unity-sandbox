@@ -56,6 +56,7 @@ public sealed class DiabloMelee : MonoBehaviour
         health.ApplyKnockback(attacker.position,
             health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);
         DiabloAudio.PlayHit();
+        HitStop.Trigger();
         LastStruck = target;
         LastStruckTime = Time.time;
         Debug.Log($"[Diablo] Melee swing #{Swings} hit {target.name} ({blow} dmg).");

@@ -383,7 +383,8 @@ public static class SandboxBuilder
             col.height = 1.7f;
             col.radius = 0.35f;
             col.center = new Vector3(0f, 0.85f, 0f);
-            husk.AddComponent<EnemyHealth>();
+            husk.AddComponent<EnemyHealth>().corpseModel = huskPrefabs[i];
+            WireHuskAnimator(husk);
         }
 
         // Extraction: GoalPad (Q3 semantics) + chest dressing.
@@ -1019,6 +1020,83 @@ public static class SandboxBuilder
         return controller;
     }
 
+    const string RigPath = "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/";
+
+    /// <summary>
+    /// Husk Mecanim rig (Skeletons share Rig_Medium with the hero): Idle_A,
+    /// Walking_A on "Moving", Melee_1H_Attack_Chop on "Attack", Hit_A on
+    /// "Hit", Death_A (no exits; corpses Play it). Warns, never throws, when
+    /// a take is missing — the husk then stays static but fully playable.
+    /// </summary>
+    public static void WireHuskAnimator(GameObject husk)
+    {
+        var controller = HuskController();
+        if (controller == null) return;
+        var animator = husk.GetComponent<Animator>();
+        if (animator == null) animator = husk.AddComponent<Animator>();
+        animator.runtimeAnimatorController = controller;
+        animator.applyRootMotion = false;
+        if (husk.GetComponent<HuskAnimator>() == null) husk.AddComponent<HuskAnimator>();
+    }
+
+    static RuntimeAnimatorController sharedHusk;
+
+    static RuntimeAnimatorController HuskController()
+    {
+        if (sharedHusk != null) return sharedHusk;
+        var idle = FindTakeClip(RigPath + "Rig_Medium_General.fbx", "Idle_A");
+        var walk = FindTakeClip(RigPath + "Rig_Medium_MovementBasic.fbx", "Walking_A");
+        var attack = FindTakeClip(RigPath + "Rig_Medium_CombatMelee.fbx", "Melee_1H_Attack_Chop");
+        var hit = FindTakeClip(RigPath + "Rig_Medium_General.fbx", "Hit_A");
+        var death = FindTakeClip(RigPath + "Rig_Medium_General.fbx", "Death_A");
+        if (idle == null || walk == null || attack == null || hit == null || death == null)
+        {
+            Debug.LogWarning("[SandboxBuilder] Husk takes missing; husks stay static.");
+            return null;
+        }
+        const string path = "Assets/Resources/HuskLocomotion.controller";
+        AssetDatabase.DeleteAsset(path);
+        var c = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
+        c.AddParameter(HuskAnimator.MoveParam, AnimatorControllerParameterType.Bool);
+        c.AddParameter(HuskAnimator.AttackParam, AnimatorControllerParameterType.Trigger);
+        c.AddParameter(HuskAnimator.HitParam, AnimatorControllerParameterType.Trigger);
+        var sm = c.layers[0].stateMachine;
+        foreach (var st in sm.states) sm.RemoveState(st.state);
+        var idleS = sm.AddState("Idle");
+        idleS.motion = idle;
+        var walkS = sm.AddState("Walk");
+        walkS.motion = walk;
+        var attackS = sm.AddState("Attack");
+        attackS.motion = attack;
+        var hitS = sm.AddState("Hit");
+        hitS.motion = hit;
+        var deathS = sm.AddState(HuskAnimator.DeathState);
+        deathS.motion = death;
+        sm.defaultState = idleS;
+        var toWalk = idleS.AddTransition(walkS);
+        toWalk.hasExitTime = false;
+        toWalk.duration = 0.15f;
+        toWalk.AddCondition(AnimatorConditionMode.If, 0, HuskAnimator.MoveParam);
+        var toIdle = walkS.AddTransition(idleS);
+        toIdle.hasExitTime = false;
+        toIdle.duration = 0.15f;
+        toIdle.AddCondition(AnimatorConditionMode.IfNot, 0, HuskAnimator.MoveParam);
+        foreach (var (state, param) in new[] { (attackS, HuskAnimator.AttackParam), (hitS, HuskAnimator.HitParam) })
+        {
+            var enter = sm.AddAnyStateTransition(state);
+            enter.hasExitTime = false;
+            enter.duration = 0.08f;
+            enter.canTransitionToSelf = true;
+            enter.AddCondition(AnimatorConditionMode.If, 0, param);
+            var exit = state.AddTransition(idleS);
+            exit.hasExitTime = true;
+            exit.duration = 0.15f;
+        }
+        AssetDatabase.SaveAssets();
+        sharedHusk = c;
+        return c;
+    }
+
     static void SetLayerRecursive(GameObject go, int layer)
     {
         foreach (var tr in go.GetComponentsInChildren<Transform>(true))
@@ -1088,8 +1166,11 @@ public static class SandboxBuilder
         // Networked scene object: the dedicated server auto-spawns it, damage
         // and death replicate instead of diverging per client.
         husk.AddComponent<NetworkObject>();
-        husk.AddComponent<EnemyHealth>().SetTier(hp, tier);
+        var health = husk.AddComponent<EnemyHealth>();
+        health.SetTier(hp, tier);
+        health.corpseModel = prefab;
         husk.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
+        WireHuskAnimator(husk);
         if (tint.HasValue)
         {
             var rend = husk.GetComponentInChildren<Renderer>();
@@ -1165,6 +1246,14 @@ public static class SandboxBuilder
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (blood moor + loot + netcode present).");
     }
 
+    /// <summary>Husk can fight back and is animated (attack + husk rig + controller).</summary>
+    static bool HuskArmed(GameObject g)
+    {
+        var a = g.GetComponent<Animator>();
+        return g.GetComponent<EnemyAttack>() != null && g.GetComponent<HuskAnimator>() != null
+            && a != null && a.runtimeAnimatorController != null;
+    }
+
     static void CountZoneRecursive(Transform t, ref bool player, ref bool clicker,
         ref bool melee, ref bool equip, ref bool inv, ref bool health, ref bool ui,
         ref bool starterSword, ref bool goal, ref bool campfire, ref bool targetBar,
@@ -1200,18 +1289,18 @@ public static class SandboxBuilder
         if (n == "Husk_Elite" && t.gameObject.GetComponent<EnemyHealth>() != null)
         {
             elite = true;
-            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+            if (!HuskArmed(t.gameObject)) allHusksArmed = false;
         }
         else if (n == "Husk_Brute" && t.gameObject.GetComponent<EnemyHealth>() != null)
         {
             brute = true;
-            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+            if (!HuskArmed(t.gameObject)) allHusksArmed = false;
         }
         else if (t.gameObject.CompareTag("Husk")
             && t.gameObject.GetComponent<EnemyHealth>() != null)
         {
             husks++;
-            if (t.gameObject.GetComponent<EnemyAttack>() == null) allHusksArmed = false;
+            if (!HuskArmed(t.gameObject)) allHusksArmed = false;
         }
         if (n == "DChestZone" && t.gameObject.GetComponent<LootDrop>() != null) chest = true;
         if (n == "NetworkManager")

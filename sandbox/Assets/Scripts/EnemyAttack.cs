@@ -21,7 +21,21 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>Set by the builder per tier (1 normal, 2 elite/brute).</summary>
     public int damage = 1;
 
+    /// <summary>Husks closer than this push apart while approaching (no stacking).</summary>
+    public const float SeparationRadius = 1.1f;
+    /// <summary>Probe radius/height for the dressing check (capsule waist).</summary>
+    public const float ProbeRadius = 0.35f;
+    public const float ProbeHeight = 0.6f;
+    static readonly float[] DetourAngles = { 0f, 35f, -35f, 70f, -70f, 105f, -105f };
+
+    static readonly System.Collections.Generic.List<EnemyAttack> live =
+        new System.Collections.Generic.List<EnemyAttack>();
+
+    /// <summary>Times the approach had to turn off the straight line (test seam).</summary>
+    public int detours;
+
     Transform victim;
+    HuskAnimator anim;
     float windupStart = -1f;
     float lastStrike = float.NegativeInfinity;
     Vector3 baseScale;
@@ -29,7 +43,12 @@ public sealed class EnemyAttack : MonoBehaviour
     void Awake()
     {
         baseScale = transform.localScale;
+        anim = GetComponent<HuskAnimator>();
+        if (anim == null) anim = gameObject.AddComponent<HuskAnimator>();
     }
+
+    void OnEnable() => live.Add(this);
+    void OnDisable() => live.Remove(this);
 
     void Update()
     {
@@ -37,6 +56,7 @@ public sealed class EnemyAttack : MonoBehaviour
         if (hero == null)
         {
             CancelWindup();
+            anim.SetMoving(false);
             return;
         }
         float dist = PlanarDistance(hero);
@@ -48,9 +68,20 @@ public sealed class EnemyAttack : MonoBehaviour
             step.y = 0f;
             step.Normalize();
             float move = Mathf.Min(ApproachSpeed * Time.deltaTime, dist - StopDistance);
-            if (move > 0f) transform.position += step * move;
+            bool walked = false;
+            if (move > 0f)
+            {
+                var dir = Steer(step, move);
+                if (dir.sqrMagnitude > 0f)
+                {
+                    transform.position += dir * move;
+                    walked = true;
+                }
+            }
+            anim.SetMoving(walked);
             return;
         }
+        anim.SetMoving(false);
         if (windupStart >= 0f)
         {
             if (dist > Range + DodgeLeeway + 1.5f)
@@ -69,6 +100,7 @@ public sealed class EnemyAttack : MonoBehaviour
         {
             victim = hero;
             windupStart = Time.time;
+            anim.OnAttack();
             transform.localScale = new Vector3(
                 baseScale.x * 1.1f, baseScale.y * 0.85f, baseScale.z * 1.1f);
         }
@@ -89,6 +121,63 @@ public sealed class EnemyAttack : MonoBehaviour
             hp.DieAndRespawn();
             DiabloAudio.PlayPlayerDeath();
         }
+    }
+
+    /// <summary>
+    /// Walk direction around static dressing plus husk separation. Probes the
+    /// straight line first, then fans out; heroes (Ignore Raycast), triggers
+    /// and other husks never block (husks separate by distance math, since
+    /// their transform-moved colliders are not synced). Zero = boxed in.
+    /// </summary>
+    Vector3 Steer(Vector3 toHero, float move)
+    {
+        var desired = toHero + Separation();
+        desired.y = 0f;
+        if (desired.sqrMagnitude < 0.0001f) desired = toHero;
+        desired.Normalize();
+        var origin = transform.position + Vector3.up * ProbeHeight;
+        float probe = move + ProbeRadius + 0.25f;
+        int mask = ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
+        for (int i = 0; i < DetourAngles.Length; i++)
+        {
+            var dir = Quaternion.Euler(0f, DetourAngles[i], 0f) * desired;
+            if (!Blocked(origin, dir, probe, mask))
+            {
+                if (i > 0) detours++;
+                return dir;
+            }
+        }
+        return Vector3.zero;
+    }
+
+    bool Blocked(Vector3 origin, Vector3 dir, float probe, int mask)
+    {
+        var hits = Physics.SphereCastAll(origin, ProbeRadius, dir, probe, mask,
+            QueryTriggerInteraction.Ignore);
+        foreach (var h in hits)
+        {
+            if (h.collider.transform.IsChildOf(transform)) continue;
+            if (h.collider.GetComponentInParent<EnemyHealth>() != null) continue;
+            if (h.collider.GetComponentInParent<PlayerHealth>() != null) continue;
+            if (h.distance <= 0f) continue; // started inside (ground seam): not ahead
+            return true;
+        }
+        return false;
+    }
+
+    Vector3 Separation()
+    {
+        var push = Vector3.zero;
+        foreach (var other in live)
+        {
+            if (other == this) continue;
+            var d = transform.position - other.transform.position;
+            d.y = 0f;
+            float m = d.magnitude;
+            if (m >= SeparationRadius || m < 0.0001f) continue;
+            push += d / m * (1f - m / SeparationRadius);
+        }
+        return push;
     }
 
     void CancelWindup()

@@ -13,6 +13,8 @@ public sealed class EnemyHealth : MonoBehaviour
 {
     public int maxHP = 3;
     public LootTier tier = LootTier.Normal;
+    /// <summary>Source model for the corpse (builder sets the KayKit FBX; null = clone fallback).</summary>
+    public GameObject corpseModel;
 
     public static int HusksKilled;
     public static int OrbsDropped;
@@ -82,6 +84,8 @@ public sealed class EnemyHealth : MonoBehaviour
             Die();
             return;
         }
+        var anim = GetComponent<HuskAnimator>();
+        if (anim != null) anim.OnHit();
         StartCoroutine(Flash());
     }
 
@@ -92,6 +96,7 @@ public sealed class EnemyHealth : MonoBehaviour
         DiabloAudio.PlayDeath();
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();
+        DiabloCorpse.SpawnFrom(gameObject);
         var netObj = GetComponent<NetworkObject>();
         var nm = NetworkManager.Singleton;
         if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer)
@@ -124,15 +129,26 @@ public sealed class EnemyHealth : MonoBehaviour
         orb.AddComponent<ToyTrigger>().mode = ToyTrigger.Mode.Pickup;
     }
 
+    /// <summary>Flashes counted (test seam: proves the flash reached a renderer).</summary>
+    public int flashCount;
+
     IEnumerator Flash()
     {
-        var rend = GetComponent<Renderer>();
-        if (rend == null) yield break;
-        var mat = rend.material;
-        var baseColor = mat.color;
-        mat.color = new Color(1f, 0.25f, 0.25f);
+        // KayKit husks carry their meshes on children; the root has no renderer.
+        var rends = GetComponentsInChildren<Renderer>();
+        if (rends.Length == 0) yield break;
+        flashCount++;
+        var mats = new Material[rends.Length];
+        var colors = new Color[rends.Length];
+        for (int i = 0; i < rends.Length; i++)
+        {
+            mats[i] = rends[i].material;
+            colors[i] = mats[i].color;
+            mats[i].color = new Color(1f, 0.25f, 0.25f);
+        }
         yield return new WaitForSeconds(0.08f);
-        if (mat != null) mat.color = baseColor;
+        for (int i = 0; i < mats.Length; i++)
+            if (mats[i] != null) mats[i].color = colors[i];
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
