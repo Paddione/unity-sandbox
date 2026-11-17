@@ -118,3 +118,41 @@ proof (Greybox cube) all succeeded headless without any GUI approval.
 If a call ever reports "not approved", approve once in
 Edit → Project Settings → AI → Unity MCP Server (Hub/Editor GUI via WSLg)
 and retry. AI Gateway connections are auto-approved.
+
+## Track P3 notes (2026-11-17)
+
+- `unity mcp configure` evaluated and deliberately NOT applied: every harness
+  config already carries the `unity-sandbox` relay entry (e.g. codex
+  `[mcp_servers.unity-sandbox]` → `relay_linux --mcp --project-path …`),
+  verified live again 2026-11-17 (7-tool groups via `unity command`, console
+  read with 0 errors). Re-running configure would duplicate working entries
+  and shell out to client CLIs (`claude mcp add`) for no gain.
+- `--caller plugin --skill` convention dropped: CLI 1.0.1 has no `--caller`
+  flag on `unity command` (verified via `unity command --help`). The live
+  convention is skill-guided discovery (`unity commands --grep <term>`) plus
+  direct `unity command <group> <name>` invocation.
+- Official plugin skill mirror: `unity skills` already inventories the local
+  `.claude/skills` set for `claude-code` (incl. `unity-cli`, `new-unity-project`).
+  `unity skill install <client>` stays available per client on explicit request;
+  no client was force-migrated in this track.
+
+## Stale-socket cleanup
+
+Symptom: `tools/list` hangs in all harnesses after the editor PID died
+(observed 2026-11-14, PID 568443). The relay socket outlives its editor and
+never recovers on its own.
+
+Recovery (headless, no GUI):
+
+```bash
+systemctl --user stop unity-sandbox-editor.service
+# if stop hangs (Unity shutdown spin): it is SIGKILLed after the unit timeout;
+# then: systemctl --user reset-failed unity-sandbox-editor.service
+systemctl --user start unity-sandbox-editor.service
+unity status --until-ready --project-path ~/unity-sandbox/sandbox --format json
+```
+
+`unity status` success with `state: ready` is the validity proof (7-tool
+`unity command` listing answers again). Keep-alive vs build-lock stays a
+standing conflict: batch builds/tests stop the service first (trap-guarded,
+see `scripts/run-unity-build.sh` and `scripts/run-unity-tests.sh`).
