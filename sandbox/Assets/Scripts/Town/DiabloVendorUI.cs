@@ -36,7 +36,6 @@ public sealed class DiabloVendorUI : MonoBehaviour
     void Awake()
     {
         EnsureBuilt();
-        SetOpen(false);
     }
 
     /// <summary>
@@ -103,7 +102,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (open) DiabloAudio.PlayUIClick();
         IsOpen = open;
         if (open) openedFrame = Time.frameCount;
-        if (canvas != null) canvas.enabled = open;
+        canvas.gameObject.SetActive(open);
         // Same effect as the inventory click guard: while the window is open
         // no click reaches movement or strikes (ExternalDrive ignores mouse
         // + WASD; the camera keeps tracking the hero).
@@ -218,6 +217,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
     {
         building = true;
         var canvasGo = new GameObject("VendorCanvas");
+        canvasGo.SetActive(false);
         canvasGo.transform.SetParent(transform, false);
         canvas = canvasGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;

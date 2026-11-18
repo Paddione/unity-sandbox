@@ -1,6 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 
 /// <summary>
@@ -60,14 +61,21 @@ public class VendorLoopTests
     [UnityTest]
     public IEnumerator OpenUi_EatsClicks_CloseRestoresAndSaves()
     {
+        var canvas = player.transform.Find("VendorCanvas").gameObject;
         Assert.IsFalse(ui.IsOpen);
+        Assert.IsFalse(canvas.activeInHierarchy, "A closed vendor must neither render nor intercept UI clicks.");
         Assert.IsFalse(DiabloClickController.ExternalDrive);
         ui.SetOpen(true);
         Assert.IsTrue(ui.IsOpen);
         Assert.IsTrue(DiabloClickController.ExternalDrive,
             "Open vendor window must lock click-movement like the inventory guard.");
         yield return null;
-        ui.SetOpen(false);
+        Assert.IsTrue(canvas.activeInHierarchy);
+        var closeButton = canvas.transform.Find("Panel/SmallButton").gameObject;
+        var click = new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left };
+        Assert.IsTrue(ExecuteEvents.Execute(closeButton, click, ExecuteEvents.pointerClickHandler));
+        Assert.IsFalse(ui.IsOpen);
+        Assert.IsFalse(canvas.activeInHierarchy);
         Assert.IsFalse(DiabloClickController.ExternalDrive);
         Assert.IsTrue(SaveService.HasSave(), "Vendor close must autosave (S2 seam).");
     }
