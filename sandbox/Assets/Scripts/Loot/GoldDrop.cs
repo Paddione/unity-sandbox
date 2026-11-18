@@ -1,10 +1,14 @@
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// Gold pickup (S2 economy). Spawned beside the item orb by
 /// <see cref="LootDrop.SpawnLoot"/> on an independent per-tier roll
 /// (constants in <see cref="DroptableDatabase"/>). Local-only like the
-/// legacy pickup orbs: no NetworkObject, each client collects its own.
+/// legacy pickup orbs. S4 co-op: the host owns every pile (spawned with a
+/// <see cref="LootNetRelay"/>, like item loot); clients request pickup per
+/// ServerRpc and are credited per ClientRpc, so a shared pile pays exactly
+/// once. Solo/offline keeps the direct local path.
 /// </summary>
 public sealed class GoldDrop : MonoBehaviour
 {
@@ -52,6 +56,13 @@ public sealed class GoldDrop : MonoBehaviour
         var drop = pile.AddComponent<GoldDrop>();
         drop.amount = Mathf.Max(0, amount);
         Debug.Log($"[Gold] Dropped {drop.amount} gold.");
+        var nmSpawn = NetworkManager.Singleton;
+        if (nmSpawn != null && nmSpawn.IsListening && nmSpawn.IsServer)
+        {
+            pile.AddComponent<NetworkObject>();
+            pile.AddComponent<LootNetRelay>();
+            pile.GetComponent<NetworkObject>().Spawn();
+        }
         return pile;
     }
 
@@ -60,12 +71,31 @@ public sealed class GoldDrop : MonoBehaviour
         if (collected || other == null || other.gameObject == null) return;
         var go = other.gameObject;
         if (go.name != "Player" && !go.CompareTag("Player")) return;
+        var nm = NetworkManager.Singleton;
+        bool net = nm != null && nm.IsListening;
+        if (net && !nm.IsServer)
+        {
+            // Client: the host validates reach + once-only and credits the owner.
+            var relay = GetComponent<LootNetRelay>();
+            if (relay != null) relay.RequestGoldServerRpc();
+            return;
+        }
+        CollectLocal(go);
+    }
+
+    /// <summary>Host/solo apply: purse credit on this process, then converge.</summary>
+    public void CollectLocal(GameObject go)
+    {
+        if (collected || go == null) return;
         collected = true;
         var wallet = Wallet.EnsureWallet(go);
         var eq = go.GetComponent<Equipment>();
         if (wallet != null) wallet.Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
         DiabloAudio.PlayLoot();
-        Destroy(gameObject);
+        var netObj = GetComponent<NetworkObject>();
+        var nm = NetworkManager.Singleton;
+        if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer) netObj.Despawn();
+        else Destroy(gameObject);
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>

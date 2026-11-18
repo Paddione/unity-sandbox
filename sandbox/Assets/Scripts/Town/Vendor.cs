@@ -32,6 +32,18 @@ public sealed class Vendor : MonoBehaviour
         stock = VendorStock.Roll(seed);
     }
 
+    /// <summary>
+    /// Per-player stock seed (S4 co-op): the host (id 0) keeps the plain zone
+    /// seed, every joined client derives its own assortment from it. Same
+    /// input, same stock — the host recomputes this formula when it validates
+    /// a purchase, so no stock ever replicates.
+    /// </summary>
+    public static int StockSeed(int zoneSeed, ulong clientId) =>
+        zoneSeed ^ (int)(clientId & 0xffffffff);
+
+    /// <summary>This visit's assortment for one player (host or client).</summary>
+    public VendorStock StockFor(ulong clientId) => VendorStock.Roll(StockSeed(zoneSeed, clientId));
+
     /// <summary>Pure trade-reach rule (EditMode-pinnable, no scene).</summary>
     public static bool CanInteract(Vector3 heroPos, Vector3 vendorPos, float radius = InteractRadius)
     {

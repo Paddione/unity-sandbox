@@ -24,6 +24,8 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         {
             TakeOverSoloHero(gameObject);
             PublishClass();
+            var ui = GetComponent<DiabloVendorUI>();
+            if (ui != null) ui.RestockForOwner(); // per-player stock (S4, seed + id)
         }
         else
         {
@@ -155,6 +157,165 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     {
         if (IsServer) return; // the host already spawned its corpse in Die
         ZoneTravelRelay.ApplyRemoteCorpse(huskNetId);
+    }
+
+    /// <summary>
+    /// Remaining per-player vendor rows (S4): base-roll indices still for sale.
+    /// The host owns one list per client (seed + id); the client mirrors it by
+    /// removing rows only through approved buys, so both sides map row numbers
+    /// to the same base offers.
+    /// </summary>
+    static readonly System.Collections.Generic.Dictionary<ulong, System.Collections.Generic.List<int>>
+        vendorRemaining = new System.Collections.Generic.Dictionary<ulong, System.Collections.Generic.List<int>>();
+
+    /// <summary>Clear per-player vendor state (tests / new session).</summary>
+    public static void ResetCoopEconomy() => vendorRemaining.Clear();
+
+    static System.Collections.Generic.List<int> RemainingFor(ulong sender, int baseCount)
+    {
+        if (!vendorRemaining.TryGetValue(sender, out var list) || list == null)
+        {
+            list = new System.Collections.Generic.List<int>(baseCount);
+            for (int i = 0; i < baseCount; i++) list.Add(i);
+            vendorRemaining[sender] = list;
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// Vendor UI entry (S4): solo/offline buys straight from the purse; a host
+    /// with clients validates and applies directly; a client sends a ServerRpc
+    /// and applies on approval. Funds and bag space are enforced at apply time
+    /// by <see cref="VendorStock.TryBuy"/>; the host owns range, existence and
+    /// once-only over the per-player row lists.
+    /// </summary>
+    public void RequestVendorBuy(int offerIndex, DiabloVendorUI ui)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || !IsSpawned
+            || (nm.IsServer && !ZoneGate.HasClientMirrors()))
+        {
+            ui?.ApplyApprovedBuy(offerIndex);
+            return;
+        }
+        if (nm.IsServer)
+        {
+            if (TryServerBuy(nm.LocalClientId, offerIndex)) ui?.ApplyApprovedBuy(offerIndex);
+            return;
+        }
+        SubmitVendorBuyServerRpc(offerIndex);
+    }
+
+    /// <summary>Vendor UI sell entry (S4): same routing as buys.</summary>
+    public void RequestVendorSell(int bagIndex, DiabloVendorUI ui)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || !IsSpawned
+            || (nm.IsServer && !ZoneGate.HasClientMirrors()))
+        {
+            ui?.ApplyApprovedSell(bagIndex);
+            return;
+        }
+        var inv = GetComponent<Inventory>();
+        int price = 0;
+        if (inv != null)
+        {
+            var item = bagIndex >= 0 && bagIndex < inv.Count ? inv.Get(bagIndex) : null;
+            if (item != null) price = VendorStock.SellPrice(item);
+        }
+        if (nm.IsServer)
+        {
+            if (TryServerSell(nm.LocalClientId, bagIndex, price)) ui?.ApplyApprovedSell(bagIndex);
+            return;
+        }
+        SubmitVendorSellServerRpc(bagIndex, price);
+    }
+
+    /// <summary>Server buy validation: range, row exists, row not sold yet.</summary>
+    public static bool TryServerBuy(ulong sender, int offerIndex)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || !nm.IsServer || nm.SpawnManager == null) return false;
+        var vendorGo = GameObject.Find(Vendor.VendorObjectName);
+        var vendor = vendorGo != null ? vendorGo.GetComponent<Vendor>() : null;
+        if (vendor == null) return false;
+        var heroT = SenderHeroTransform(nm, sender);
+        if (heroT == null) return false;
+        var delta = heroT.position - vendor.transform.position;
+        delta.y = 0f;
+        if (TradeValidator.CanBuyRange(delta.magnitude) != null) return false;
+        var baseOffers = VendorStock.Roll(Vendor.StockSeed(vendor.zoneSeed, sender)).offers;
+        var remaining = RemainingFor(sender, baseOffers.Count);
+        if (offerIndex < 0 || offerIndex >= remaining.Count) return false;
+        remaining.RemoveAt(offerIndex);
+        return true;
+    }
+
+    /// <summary>Server sell validation: range and a sane resale price.</summary>
+    public static bool TryServerSell(ulong sender, int bagIndex, int price)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || !nm.IsServer || nm.SpawnManager == null) return false;
+        if (bagIndex < 0) return false;
+        var vendorGo = GameObject.Find(Vendor.VendorObjectName);
+        var vendor = vendorGo != null ? vendorGo.GetComponent<Vendor>() : null;
+        if (vendor == null) return false;
+        var heroT = SenderHeroTransform(nm, sender);
+        if (heroT == null) return false;
+        var delta = heroT.position - vendor.transform.position;
+        delta.y = 0f;
+        return TradeValidator.CanSell(delta.magnitude, price) == null;
+    }
+
+    static Transform SenderHeroTransform(NetworkManager nm, ulong sender)
+    {
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
+            return nb.transform;
+        }
+        return null;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SubmitVendorBuyServerRpc(int offerIndex, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer || !IsSpawned) return;
+        ulong sender = rpcParams.Receive.SenderClientId;
+        if (TryServerBuy(sender, offerIndex)) ApproveBuyClientRpc(offerIndex, sender);
+        else Debug.Log($"[Vendor] rejected buy {offerIndex} from {sender}.");
+    }
+
+    [ClientRpc]
+    void ApproveBuyClientRpc(int offerIndex, ulong buyer)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || nm.LocalClientId != buyer) return;
+        var local = nm.SpawnManager != null ? nm.SpawnManager.GetLocalPlayerObject() : null;
+        var ui = local != null ? local.GetComponent<DiabloVendorUI>()
+            : GameObject.Find(DiabloNetworkPlayer.HeroName)?.GetComponent<DiabloVendorUI>();
+        if (ui != null) ui.ApplyApprovedBuy(offerIndex);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SubmitVendorSellServerRpc(int bagIndex, int price, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer || !IsSpawned) return;
+        ulong sender = rpcParams.Receive.SenderClientId;
+        if (TryServerSell(sender, bagIndex, price)) ApproveSellClientRpc(bagIndex, sender);
+        else Debug.Log($"[Vendor] rejected sell {bagIndex} from {sender}.");
+    }
+
+    [ClientRpc]
+    void ApproveSellClientRpc(int bagIndex, ulong seller)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || nm.LocalClientId != seller) return;
+        var local = nm.SpawnManager != null ? nm.SpawnManager.GetLocalPlayerObject() : null;
+        var ui = local != null ? local.GetComponent<DiabloVendorUI>()
+            : GameObject.Find(DiabloNetworkPlayer.HeroName)?.GetComponent<DiabloVendorUI>();
+        if (ui != null) ui.ApplyApprovedSell(bagIndex);
     }
 
     /// <summary>Melee skill range for validation (attack arc + tolerance in ApplyValidated).</summary>

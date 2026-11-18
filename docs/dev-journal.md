@@ -621,3 +621,30 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   S3-target_files-Liste, tragen aber die Treffer-/Harness-Seite (ServerRpc-Hub, Gate-Fallback,
   Client-Grace) — wie S2 dokumentiert.
 - Next: S4 economy (Gold/Pickup/Vendor validiert).
+
+## 2026-11-18 — coop-session S4: validierte Wirtschaft
+
+- Done: `Net/TradeValidator.cs` (neu, pure C#, keine Szene): `CanBuy` (Gold/Bag/4 m),
+  `CanPickup` (2,5 m + Once), `CanSell` (4 m + Deckel 75). `Tests/EditMode/TradeValidatorTests.cs`
+  (8 Tests: Fälschungen abgelehnt, Seed-Determinismus Host/Client).
+- Gold: `GoldDrop` spawnt auf dem Host mit `NetworkObject` + `LootNetRelay` (wie S1-Loot);
+  Clients fragen per `RequestGoldServerRpc` an (Range + Once), Gutschrift per `GrantGoldClientRpc`
+  nur an den Owner (GoldFind lokal) — kein Predict, keine Doppelzahlung. Host/Solo direkt
+  (`CollectLocal`, Despawn). Item-Loot und Truhen prüfen im ServerRpc zusätzlich die Reichweite
+  (`SenderHero`-Lookup, planar) — Teleport-Pickup wird abgewiesen.
+- Vendor: `Vendor.StockSeed`/`StockFor` (Host id 0 → Zone-Seed; Client → abgeleitet; UI rollt
+  beim Spawn nach, `RestockForOwner`). Kauf/Verkauf laufen im Coop über das Player-Relay
+  (`RequestVendorBuy/Sell`, `TryServerBuy/TryServerSell`, `Approve*ClientRpc`, Restlisten pro
+  Sender, `ResetCoopEconomy`); `TryBuy`/`TrySell` setzen Gold/Bag lokal durch. UI routet im
+  Coop-Fall mit Gold/Bag-Precheck (keine Divergenz), sonst direkt wie bisher. Trank bleibt lokal
+  (Fixpreis, unendlicher Bestand, kein Shared State).
+- Belegt: EditMode 297/297, PlayMode 154/154, `VerifyDiabloZone` OK, `KayKitAssets.Verify` grün,
+  `check-meta` OK; Paarlauf Exit 0 (Host 8/8, Client town,zone1 + Zone-2-Pull, 179 verworfene
+  Client-Treffer als Validator-Wirkungsnachweis, je 0 Exc); Solo-Autoplay Exit 0, FPS-Pass 34,2.
+- Learned: Worktree ohne Commits wurde von fremder Session gereapt — nach `create` sofort claimen
+  und zügig committen. `LayoutSeedTests`-Rot war vorbestehend auf Main (inzwischen dort gefixt).
+- Faced: `DiabloNetworkPlayer.cs`/`DiabloVendorUI.cs`/`SessionAutoplay`-Umfeld stehen nicht in der
+  S4-target_files-Liste, tragen aber Relay-Hub, UI-Routing und Harness (wie S2/S3 dokumentiert).
+  Verkauf serverseitig nur Range + Preisdeckel prüfbar (kein Shadow-Inventar — bewusst, kein
+  Cheat-Schutz über Validierung hinaus).
+- Next: S5 save (Client-Save, Level/Gear-Meldung, Windows-Client, coop-run-log).

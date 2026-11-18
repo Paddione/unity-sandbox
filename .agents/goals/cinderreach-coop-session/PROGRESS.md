@@ -1,6 +1,6 @@
 # Progress: cinderreach-coop-session
 
-Prozent: 55 %
+Prozent: 75 %
 
 ## Erledigt
 
@@ -40,9 +40,26 @@ Prozent: 55 %
   Paarlauf Exit 0: Host `host broadcasts FenGate → zone 2`, Client `phase zone2: pulled to the Ossuary`
   + Offsets (0,0,0)/(1,5,0,0), 12 Remote-Corpses, je 0 Exceptions; Solo-Autoplay Exit 0, FPS-Pass 31,2.
 
+- 2026-11-18: S4 economy landed. `Net/TradeValidator.cs` (neu, pure C#: `CanBuy` Gold/Bag/Range,
+  `CanPickup` Range + Once, `CanSell` Range + Preisdeckel 75) als gemeinsame Regel für Host und Solo.
+  Gold: Host spawnt Haufen mit `NetworkObject` + Relay (S1-Loot-Muster), Clients per
+  `RequestGoldServerRpc` (Reichweite + Once) mit `GrantGoldClientRpc`-Gutschrift an den Owner
+  (keine Client-Prediction, keine Doppelzahlung); Host/Solo direkt via `CollectLocal`.
+  Item-Loot/Chest: Reichweitenprüfung im ServerRpc (Teleport-Pickup abgelehnt).
+  Vendor: Bestand pro Spieler (`Vendor.StockSeed(zoneSeed, clientId)` — Host behält Zone-Seed, Clients
+  leiten ab; UI rollt beim Spawn nach, `RestockForOwner`), Kauf/Verkauf per ServerRpc auf dem
+  Player-Relay: Host prüft Range + Zeile + Once (pro-Spieler-Restlisten), bewilligt per ClientRpc,
+  `TryBuy`/`TrySell` setzen Gold/Bag lokal durch (Aufgabenteilung wie S2-Treffer: geteilte Welt auf
+  dem Host, pro-Spieler-Zustand lokal). UI routet im Coop-Fall über das Relay (mit Gold/Bag-Precheck
+  gegen Divergenz), sonst direkt.
+  Belege: EditMode 297/297 (neu `TradeValidatorTests` 8 Tests: Fälschungen abgelehnt, Seed-Determinismus),
+  PlayMode 154/154, `VerifyDiabloZone` OK, `check-meta` OK; Paarlauf Exit 0 (Host 8/8, Client
+  `town,zone1` + Zone-2-Pull, 179 Client-Hit-Rejections als Wirkungsnachweis, je 0 Exceptions);
+  Solo-Autoplay Exit 0, FPS-Pass 34,2.
+
 ## Nächste Schritte
 
-1. S4 economy: Gold/Pickup/Vendor per validiertem ServerRpc.
+1. S5 save: Client-Save beim Join, Level/Gear übernehmen.
 
 ## Offene Punkte
 

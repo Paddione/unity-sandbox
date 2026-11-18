@@ -47,8 +47,40 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (canvas != null) return;
         wallet = GetComponent<Wallet>();
         inventory = GetComponent<Inventory>();
-        stock = VendorStock.Roll(7);
+        stock = VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
         BuildUI();
+    }
+
+    /// <summary>Current assortment (relay-approved buys apply here).</summary>
+    public VendorStock CurrentStock
+    {
+        get { EnsureBuilt(); return stock; }
+    }
+
+    /// <summary>Zone seed of the scene vendor (7 when none is placed).</summary>
+    static int VendorZoneSeed()
+    {
+        var go = GameObject.Find(Vendor.VendorObjectName);
+        var vendor = go != null ? go.GetComponent<Vendor>() : null;
+        return vendor != null ? vendor.zoneSeed : 7;
+    }
+
+    /// <summary>Owning client id (0 offline/host — keeps the zone stock).</summary>
+    ulong VendorClientId()
+    {
+        var p = GetComponent<DiabloNetworkPlayer>();
+        return p != null && p.IsSpawned ? p.OwnerClientId : 0;
+    }
+
+    /// <summary>
+    /// Re-roll this hero's assortment after its network spawn (S4 co-op):
+    /// each joined client shops its own seed-derived stock.
+    /// </summary>
+    public void RestockForOwner()
+    {
+        EnsureBuilt();
+        stock = VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
+        if (IsOpen) Refresh();
     }
 
     void Update()
@@ -111,8 +143,29 @@ public sealed class DiabloVendorUI : MonoBehaviour
         else SaveService.SaveNow(gameObject);
     }
 
-    /// <summary>Buy offers[index] (button hook); refreshes gold and lists.</summary>
+    /// <summary>
+    /// Buy offers[index] (button hook). Solo/offline applies instantly; with
+    /// a session running the host validates (range, row, once-only) and the
+    /// purse/bag check runs at apply time — here and on approval alike.
+    /// </summary>
     public void BuyOffer(int index)
+    {
+        EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && CoopSessionRunning())
+        {
+            if (BuyPrecheck(index)) relay.RequestVendorBuy(index, this);
+            return;
+        }
+        if (stock != null && stock.TryBuy(index, wallet, inventory))
+        {
+            DiabloAudio.PlayLoot();
+            Refresh();
+        }
+    }
+
+    /// <summary>Server-approved buy lands here (funds/bag re-checked).</summary>
+    public void ApplyApprovedBuy(int index)
     {
         EnsureBuilt();
         if (stock != null && stock.TryBuy(index, wallet, inventory))
@@ -122,8 +175,37 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
     }
 
-    /// <summary>Sell bag[bagIndex] back (button hook).</summary>
+    /// <summary>Local funds/bag/row pre-check before asking the host.</summary>
+    bool BuyPrecheck(int index)
+    {
+        if (stock == null || wallet == null || inventory == null) return false;
+        if (index < 0 || index >= stock.offers.Count) return false;
+        if (inventory.FreeSlots <= 0) return false;
+        return wallet.Gold >= stock.offers[index].price;
+    }
+
+    /// <summary>
+    /// Sell bag[bagIndex] back (button hook). Same routing as buys; resale
+    /// touches no shared stock, so the host only gates range and price.
+    /// </summary>
     public void SellBagIndex(int index)
+    {
+        EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && CoopSessionRunning())
+        {
+            relay.RequestVendorSell(index, this);
+            return;
+        }
+        if (VendorStock.TrySell(index, wallet, inventory))
+        {
+            DiabloAudio.PlayUIClick();
+            Refresh();
+        }
+    }
+
+    /// <summary>Server-approved sale lands here.</summary>
+    public void ApplyApprovedSell(int index)
     {
         EnsureBuilt();
         if (VendorStock.TrySell(index, wallet, inventory))
@@ -131,6 +213,15 @@ public sealed class DiabloVendorUI : MonoBehaviour
             DiabloAudio.PlayUIClick();
             Refresh();
         }
+    }
+
+    /// <summary>True while a co-op session replicates (host + client alike).</summary>
+    static bool CoopSessionRunning()
+    {
+        var nm = Unity.Netcode.NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening) return false;
+        var local = nm.SpawnManager != null ? nm.SpawnManager.GetLocalPlayerObject() : null;
+        return local != null;
     }
 
     /// <summary>Buy one healing potion (button hook).</summary>
