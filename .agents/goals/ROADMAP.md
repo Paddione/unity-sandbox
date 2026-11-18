@@ -17,5 +17,9 @@ und gilt für alle Pläne.
 | 7 | [`cinderreach-zone-contracts`](cinderreach-zone-contracts/GOAL.md) | #5 100 % | Optionale Jagd- und Bergungsaufträge | G-DIABLO06 |
 | 8 | [`cinderreach-smithing`](cinderreach-smithing/GOAL.md) | nach #7 empfohlen | Beute verwerten und einen Affix gezielt ersetzen | G-DIABLO06 |
 | 9 | [`cinderreach-skill-variants`](cinderreach-skill-variants/GOAL.md) | nach #8 empfohlen | Zwei spielstilprägende Varianten je ausgewähltem Skill | G-DIABLO06 |
+| 10 | [`cinderreach-encounter-roles`](cinderreach-encounter-roles/GOAL.md) | Warden- und Kiln-Einstiegsfixes auf main | Gegnergruppen mit klaren Rollen | G-DIABLO06 |
+| 11 | [`cinderreach-build-uniques`](cinderreach-build-uniques/GOAL.md) | #8, #9 und #10 abgeschlossen | Uniques, die den Build verändern | G-DIABLO06 |
+| 12 | [`cinderreach-risk-shrines`](cinderreach-risk-shrines/GOAL.md) | #7 und #10 abgeschlossen | Entscheidungen an Schreinen | G-DIABLO06 |
+| 13 | [`cinderreach-kindled-finale`](cinderreach-kindled-finale/GOAL.md) | #10 abgeschlossen | Kindled-Finale mit eigener Mechanik | G-DIABLO06 |
 
 Bewusst offen (kein Goal angelegt): Eigner-/5-Personen-Playtest, Steam-Build.
