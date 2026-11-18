@@ -21,5 +21,6 @@ und gilt für alle Pläne.
 | 11 | [`cinderreach-build-uniques`](cinderreach-build-uniques/GOAL.md) | #8, #9 und #10 abgeschlossen | Uniques, die den Build verändern | G-DIABLO06 |
 | 12 | [`cinderreach-risk-shrines`](cinderreach-risk-shrines/GOAL.md) | #7 und #10 abgeschlossen | Entscheidungen an Schreinen | G-DIABLO06 |
 | 13 | [`cinderreach-kindled-finale`](cinderreach-kindled-finale/GOAL.md) | #10 abgeschlossen | Kindled-Finale mit eigener Mechanik | G-DIABLO06 |
+| 14 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | #6 100 % + melee-rework auf main | Tank/Heiler/Rogue, Threat-Aggro, Heal, Solo-KI-Gruppe (max. 3) | G-DIABLO01/02/03/06 |
 
 Bewusst offen (kein Goal angelegt): Eigner-/5-Personen-Playtest, Steam-Build.
