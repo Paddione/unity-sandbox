@@ -53,6 +53,10 @@ zeigen `Prozent: 100 %`.
    auf der echten Szene (Kapsel-Raster + Flutfüllung) statt PlayMode. Co-op-Peers erzwingen Variante 0,
    bis `cinderreach-coop-session` S2 Gegnerpositionen repliziert.
 
+8. Nachtrag S4 (2026-11-18): Kein Hauptmenü vorhanden (`Scripts/Menu/MainMenu.cs` fehlt, presentation S4).
+   Auswahl daher in der Einstellungsseite von `DiabloInventoryUI` als „New run (…)“, nie mitten im Lauf.
+   HP skaliert beim Aufwachen bzw. `SetTier` zur Laufzeit, Schaden beim Treffer (Husk, Boss-Slam).
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -111,7 +115,7 @@ S1 zuerst (Save-Format). Danach S2 und S3 parallel (disjunkt). S4 nach S2 (Affix
 | S1 save-v2 | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 affix | S1 | 25 % | landed 2026-11-18 |
 | S3 layouts | S1 | 25 % | landed 2026-11-18 |
-| S4 kindled | S2 | 20 % | offen |
+| S4 kindled | S2 | 20 % | landed 2026-11-18 |
 | S5 stash+proof | S3, S4 | 15 % | offen |
 
 ## Verify (je Stufe)

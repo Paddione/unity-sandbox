@@ -114,14 +114,15 @@ public sealed class EnemyAttack : MonoBehaviour
         if (hero == null || dist > Range + DodgeLeeway) return; // dodged
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null) return;
-        hp.TakeDamage(damage);
+        int dealt = DifficultyProfile.Current.ScaleDamage(damage);
+        hp.TakeDamage(dealt);
         // replayability S2: Thorns reflect flat damage onto the striker.
         var heroEq = hero.GetComponent<Equipment>();
         int thorns = heroEq != null ? heroEq.ThornsDamage() : 0;
         var self = GetComponent<EnemyHealth>();
         if (thorns > 0 && self != null) self.TakeDamage(thorns);
         DiabloAudio.PlayHurt();
-        DiabloJuice.OnPlayerHurt(hero.position, damage);
+        DiabloJuice.OnPlayerHurt(hero.position, dealt);
         if (hp.CurrentHP <= 0f)
         {
             hp.DieAndRespawn();

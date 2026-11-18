@@ -14,6 +14,9 @@ public sealed class SessionComplete : MonoBehaviour
     public static int Shown;
     /// <summary>Last shown summary lines (test seam).</summary>
     public static string LastSummary = "";
+    /// <summary>The boss kill of this run unlocked Kindled (replayability S4).</summary>
+    public static bool KindledUnlockedThisRun;
+    public const string KindledLine = "KINDLED FREIGESCHALTET: Gegner härter, Beute besser (Einstellungen → Schwierigkeit).";
     /// <summary>Best drop line of the session (set by boss loot, tests).</summary>
     public static string BestDrop = "";
 
@@ -58,6 +61,7 @@ public sealed class SessionComplete : MonoBehaviour
         int gold = hero != null ? hero.GetComponent<Wallet>()?.Gold ?? 0 : 0;
         float secs = PlaySeconds();
         LastSummary = $"Zeit {secs:0}s  Kills {kills}  Gold {gold}  Beute {BestDrop}";
+        if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
         if (body != null) body.text = "SESSION GESCHAFFT\n" + LastSummary;
     }
 
@@ -164,6 +168,7 @@ public sealed class SessionComplete : MonoBehaviour
     {
         Shown = 0;
         LastSummary = "";
+        KindledUnlockedThisRun = false;
         BestDrop = "";
         sessionStart = Time.realtimeSinceStartup;
         startStamped = true;

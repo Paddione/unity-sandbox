@@ -32,7 +32,7 @@ public sealed class GoldDrop : MonoBehaviour
     public static GameObject SpawnGold(Vector3 pos, LootTier tier, System.Random rng)
     {
         if (!RollDrops(tier, rng)) return null;
-        return SpawnPile(pos, RollAmount(tier, rng));
+        return SpawnPile(pos, DifficultyProfile.Current.ScaleGold(RollAmount(tier, rng)));
     }
 
     /// <summary>Spawn a fixed-amount pile (deterministic tests + callers).</summary>

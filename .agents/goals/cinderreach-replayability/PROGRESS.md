@@ -1,6 +1,6 @@
 # Progress: cinderreach-replayability
 
-Prozent: 65 %
+Prozent: 85 %
 
 ## Erledigt
 
@@ -30,10 +30,20 @@ Prozent: 65 %
   12 Gegner-Ankern für alle 81 Kombinationen), PlayMode 71/71, Verifies grün, Autoplay `-seed 1`
   und `-seed 2` je 6/6 Phasen, 0 Exceptions, FPS-Minimum 50,3/50,4.
 
+- 2026-11-18: S4 kindled gelandet. `DifficultyProfile` (Normal ×1; Kindled HP/Schaden ×1,8, Affix-Tier 2,
+  Unique-Gewicht ×2, Gold ×1,5), Freischaltung beim ersten Hollow-Abbot-Kill (sofort gespeichert,
+  Overlay-Zeile „KINDLED FREIGESCHALTET“), Auswahl über „New run (Normal/Kindled)“ in den Einstellungen
+  (lädt die Zone mit frischem Seed neu, nur solo), `-difficulty kindled` für Autoplay. Belege: EditMode 131/131
+  (6 neu `DifficultyTests`), PlayMode 74/74 (3 neu `KindledUnlockTests`), Verifies grün, Autoplay Normal und
+  Kindled je 6/6 Phasen, 0 Exceptions. Kindled-Lauf: Abbot 270 statt 150 HP, Husk 9 statt 5 HP.
+
 ## Nächste Schritte
 
-1. S4 kindled.
+1. S5 stash+proof.
 
 ## Offene Punkte
 
-- S4 und S5 offen.
+- S5 offen.
+- Nebenbefund (nicht dieses Goal): Bone-Warden-Projektile treffen den Helden nie, weil
+  `RangedCaster.Fire` über `DiabloProjectile`/`DiabloSkills.ApplyHit` nur `EnemyHealth` trifft. Kindled
+  skaliert deshalb nur Husk-Nahkampf und Boss-Slam. Kandidat für `cinderreach-coop-session` S2 oder einen Fix.

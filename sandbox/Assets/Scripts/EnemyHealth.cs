@@ -25,14 +25,18 @@ public sealed class EnemyHealth : MonoBehaviour
 
     void Awake()
     {
+        // replayability S4: scene enemies scale by difficulty when they wake
+        // (play mode only, so builder/edit-mode values stay unscaled).
+        if (Application.isPlaying) maxHP = DifficultyProfile.Current.ScaleHP(maxHP);
         hp = maxHP;
     }
 
     /// <summary>Set tier HP after AddComponent (builder: elites, chests).</summary>
     public void SetTier(int tierMaxHP, LootTier lootTier)
     {
-        maxHP = tierMaxHP;
-        hp = tierMaxHP;
+        // Runtime spawns (boss summons) scale here; the builder runs in edit mode.
+        maxHP = Application.isPlaying ? DifficultyProfile.Current.ScaleHP(tierMaxHP) : tierMaxHP;
+        hp = maxHP;
         tier = lootTier;
     }
 

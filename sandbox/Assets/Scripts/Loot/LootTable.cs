@@ -50,12 +50,16 @@ public static class LootTable
         unique = u * (1f + mf / 100f);
     }
 
-    public static LootRoll Roll(LootTier tier, System.Random rng, float magicFind)
+    public static LootRoll Roll(LootTier tier, System.Random rng, float magicFind) =>
+        Roll(tier, rng, magicFind, 1f);
+
+    /// <summary>Full roll: Magic Find plus the difficulty unique multiplier (Kindled ×2).</summary>
+    public static LootRoll Roll(LootTier tier, System.Random rng, float magicFind, float uniqueMul)
     {
         var roll = new LootRoll();
         if (rng.Next(100) >= DropChanceFor(tier)) return roll;
         roll.drops = true;
-        if (magicFind <= 0f)
+        if (magicFind <= 0f && uniqueMul == 1f)
         {
             // Exact P2 path (same RNG draws), so seeded tests and drops stay stable.
             WeightsFor(tier, out int m, out int r, out _);
@@ -65,6 +69,7 @@ public static class LootTable
             return roll;
         }
         WeightsWithMagicFind(tier, magicFind, out float magic, out float rare, out float unique);
+        unique *= uniqueMul > 0f ? uniqueMul : 1f;
         double pick = rng.NextDouble() * (magic + rare + unique);
         roll.rarity = pick < magic ? ItemRarity.Magic
             : pick < magic + rare ? ItemRarity.Rare : ItemRarity.Unique;

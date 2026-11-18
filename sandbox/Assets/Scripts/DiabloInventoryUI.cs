@@ -419,15 +419,50 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         shakeBtn.onClick.AddListener(() => { DiabloSettings.ScreenShake = !DiabloSettings.ScreenShake; DiabloSettings.Save(); RefreshSettingsLabels(); });
         var hitBtn = MakeSmallButton(tRow.transform, "HitStop");
         hitBtn.onClick.AddListener(() => { DiabloSettings.HitStop = !DiabloSettings.HitStop; DiabloSettings.Save(); RefreshSettingsLabels(); });
+        // replayability S4: difficulty for the next run (Kindled after the first Abbot kill).
+        difficultyLabel = MakeLabel(settingsPage.transform, "", 15);
+        var dRow = new GameObject("DifficultyRow");
+        dRow.transform.SetParent(settingsPage.transform, false);
+        var dHz = dRow.AddComponent<HorizontalLayoutGroup>();
+        dHz.spacing = 6f;
+        var normalBtn = MakeSmallButton(dRow.transform, "New run (Normal)");
+        normalBtn.onClick.AddListener(() => StartNewRun(RunProfile.Normal));
+        kindledButton = MakeSmallButton(dRow.transform, "New run (Kindled)");
+        kindledButton.onClick.AddListener(() => StartNewRun(RunProfile.Kindled));
         settingsInfoText = MakeLabel(settingsPage.transform, "", 14);
         var closeBtn = MakeSmallButton(settingsPage.transform, "Close menu (I)");
         closeBtn.onClick.AddListener(() => SetOpen(false));
         RefreshSettingsLabels();
     }
 
+    Text difficultyLabel;
+    Button kindledButton;
+
+    /// <summary>
+    /// Difficulty changes only with a new run: enemy HP scales at wake-up, so a
+    /// mid-run switch would mix profiles. Reloads the zone with a fresh layout seed.
+    /// </summary>
+    void StartNewRun(string difficulty)
+    {
+        if (!Diablo.IsSolo()) return; // co-op: the host scene is shared
+        DiabloAudio.PlayUIClick();
+        DifficultyProfile.Select(difficulty);
+        RunProfile.RunSeed = RunProfile.NewSeed();
+        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    /// <summary>Settings line for the difficulty row (test seam).</summary>
+    public static string DifficultyText() =>
+        $"Difficulty: {DifficultyProfile.Current.name}" +
+        (RunProfile.DifficultyUnlocked ? "" : "  (Kindled locked: defeat the Hollow Abbot)");
+
     void RefreshSettingsLabels()
     {
         if (building) return;
+        if (difficultyLabel != null) difficultyLabel.text = DifficultyText();
+        if (kindledButton != null) kindledButton.interactable = RunProfile.DifficultyUnlocked;
         if (qualityLabel != null) qualityLabel.text = $"Quality: {DiabloSettings.QualityName}  (Low/Med/High)";
         if (settingsInfoText != null)
             settingsInfoText.text =

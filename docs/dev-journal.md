@@ -343,3 +343,15 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   gespalten, daher Variante 0 für Peers.
 - Next: S4 Kindled.
 
+## 2026-11-18 — cinderreach-replayability S4 kindled (Schwierigkeitsstufe + Freischaltung)
+
+- Done: `DifficultyProfile`, Freischaltung beim ersten Boss-Kill mit Sofort-Save, Overlay-Zeile,
+  „New run (Normal/Kindled)“ in den Einstellungen, `-difficulty kindled`, Skalierung von HP, Schaden,
+  Unique-Gewicht, Affix-Tier und Gold.
+- Belegt: EditMode 131/131, PlayMode 74/74, Verifies, Autoplay Normal (Abbot 150 HP) und Kindled
+  (Abbot 270 HP, Husk 9 HP) je exit 0.
+- Faced: Ein Schwierigkeitswechsel mitten im Lauf hätte HP (beim Aufwachen skaliert) und Schaden (beim
+  Treffer skaliert) gemischt; Wechsel daher nur mit neuem Lauf.
+- Learned: Bone-Warden-Projektile treffen den Helden nicht (vorhandener Fehler, als Offener Punkt notiert).
+- Next: S5 Truhe + Kindled-Nachtlauf.
+

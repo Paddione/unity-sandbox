@@ -80,9 +80,10 @@ public sealed class BossController : MonoBehaviour
         if (Planar(hero) <= SlamRadius)
         {
             var hp = hero.GetComponent<PlayerHealth>();
-            if (hp != null) hp.TakeDamage(SlamDamage);
+            int slam = DifficultyProfile.Current.ScaleDamage(SlamDamage);
+            if (hp != null) hp.TakeDamage(slam);
             DiabloAudio.PlayHurt();
-            DiabloJuice.OnPlayerHurt(hero.position, SlamDamage);
+            DiabloJuice.OnPlayerHurt(hero.position, slam);
         }
         DiabloJuice.OnBlast(transform.position);
         if (phaseTwo) FireFan(hero);
@@ -116,6 +117,10 @@ public sealed class BossController : MonoBehaviour
         BossesKilled++;
         if (string.IsNullOrEmpty(LastBossDrop)) LastBossDrop = "Rare+ boss cache";
         Debug.Log($"[Boss] {BossName} slain (kills={BossesKilled}, drop={LastBossDrop}).");
+        // replayability S4: the first kill unlocks Kindled and persists it.
+        bool unlocked = DifficultyProfile.UnlockKindled();
+        SessionComplete.KindledUnlockedThisRun |= unlocked;
+        if (unlocked && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
         SessionComplete.Show(hero, LastBossDrop);
     }
 
