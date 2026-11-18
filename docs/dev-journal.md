@@ -365,3 +365,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Beleg der Rate bleibt der Tabellen-Test.
 - Next: dotfiles G-DIABLO06 je Schwierigkeit landen, Dispatch, Goal 100 %.
 
+## 2026-11-18 — cinderreach-replayability 100 %, G-DIABLO03-Regression behoben
+
+- Done: Live-Dispatch mit Normal + Kindled, `G-DIABLO06` je Schwierigkeit grün. Goal auf 100 %.
+- Faced: `G-DIABLO03` fiel auf Testdaten vom 17.11. zurück. Ursache: Der Autoplay-Job (loop-guard S2)
+  teilt den Runner-Workspace mit `Unity Tests`, und `actions/checkout` löschte `artifacts/*.xml`. Fix:
+  `clean: false` im Autoplay-Checkout. Run-Log-Zeile für Seed 0 korrigiert (Layout 2/2/2/1, aus
+  `System.Random(0)` nachgerechnet; vorher falsch eingetragen).
+- Offen außerhalb dieses Goals: Bone-Warden-Projektile treffen den Helden nie (`RangedCaster.Fire` →
+  `DiabloSkills.ApplyHit` trifft nur `EnemyHealth`). Kindled skaliert deshalb nur Husk-Nahkampf und Slam.
+

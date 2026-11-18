@@ -29,6 +29,10 @@ jobs:
         with:
           lfs: true
           persist-credentials: false
+          # Keep untracked files: the runner workspace is shared with Unity Tests,
+          # and dotfiles G-DIABLO03 reads its artifacts/*.xml. A clean checkout
+          # here wiped them, so G-DIABLO03 fell back to stale results.
+          clean: false
 
       - name: Build and run autoplay (Normal + Kindled)
         id: run

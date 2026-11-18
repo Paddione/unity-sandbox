@@ -1,6 +1,6 @@
 # Progress: cinderreach-replayability
 
-Prozent: 85 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -37,13 +37,22 @@ Prozent: 85 %
   (6 neu `DifficultyTests`), PlayMode 74/74 (3 neu `KindledUnlockTests`), Verifies grün, Autoplay Normal und
   Kindled je 6/6 Phasen, 0 Exceptions. Kindled-Lauf: Abbot 270 statt 150 HP, Husk 9 statt 5 HP.
 
+- 2026-11-18: S5 stash+proof gelandet (`604b879`). `StashChest` + `DiabloStashUI` in Lantern Hold (Verify
+  `stash=True`), Nachtlauf Normal + Kindled, `difficulty` im Ergebnis, `docs/replayability-run-log.md`
+  (6 Läufe, Seeds 0–2 × Normal/Kindled, alle exit 0). dotfiles `14825dfc`: `G-DIABLO06` bewertet den
+  neuesten Lauf je Schwierigkeit. Live: Dispatch 44237280581 grün, `G-DIABLO06 achieved` für Normal und Kindled.
+  Belege: EditMode 137/137, PlayMode 74/74.
+
+Kriterien-Abgleich: 1 Kindled (HP/Schaden ×1,8, Affix-Tier 2, Unique ×2, im Save) S4 + `DifficultyTests`,
+`KindledUnlockTests`. 2 Ashen Fen mit 3 Varianten je Kategorie, Seed pro Lauf, Autoplay mit `-seed`, Erreichbarkeit
+von Gate, Truhe und allen Gegner-Ankern für alle 81 Kombinationen (`LayoutSeedTests`) S3. 3 14 Affixe mit Tier-Spannen,
+Rare 3–6, Vergleichs-Tooltip, Gewichtstests S2. 4 Truhe 40 Plätze, Save-Roundtrip S1 + S5. 5 Kindled-Lauf im Autoplay,
+`G-DIABLO06` grün S5.
+
 ## Nächste Schritte
 
-1. S5 stash+proof.
+- Keine. Folge-Goals laut `.agents/goals/ROADMAP.md`: `cinderreach-second-class`, `cinderreach-act-one`.
 
 ## Offene Punkte
 
-- S5 offen.
-- Nebenbefund (nicht dieses Goal): Bone-Warden-Projektile treffen den Helden nie, weil
-  `RangedCaster.Fire` über `DiabloProjectile`/`DiabloSkills.ApplyHit` nur `EnemyHealth` trifft. Kindled
-  skaliert deshalb nur Husk-Nahkampf und Boss-Slam. Kandidat für `cinderreach-coop-session` S2 oder einen Fix.
+Keine.
