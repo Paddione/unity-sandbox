@@ -40,7 +40,8 @@ public class BuildUniqueLootTests
                 Assert.AreEqual(ItemRarity.Unique, item.rarity);
                 Assert.AreEqual(ItemSlot.Weapon, item.slot);
                 Assert.IsTrue(Equipment.CanEquip(item, cls.id), $"{item.uniqueId} must fit {cls.id}");
-                if (item.uniqueId == ItemDatabase.LancerWardId || item.uniqueId == ItemDatabase.WickOfHaloId)
+                if (item.uniqueId == ItemDatabase.LancerWardId || item.uniqueId == ItemDatabase.WickOfHaloId
+                    || item.uniqueId == ItemDatabase.NightfangId)
                     sawBuild = true;
                 else
                     sawLegacy = true;
@@ -73,17 +74,20 @@ public class BuildUniqueLootTests
             RunProfile.ClassId = cls.id;
             var rng = new System.Random(42);
             bool sawBuild = false;
-            string ownBuild = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.WickOfHaloId : ItemDatabase.LancerWardId;
+            string ownBuild = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.WickOfHaloId
+                : cls.id == ClassCatalog.RogueId ? ItemDatabase.NightfangId : ItemDatabase.LancerWardId;
             for (int i = 0; i < 100; i++)
             {
                 var item = LootDrop.BuildItem(new LootRoll { drops = true, rarity = ItemRarity.Unique, slot = ItemSlot.Weapon }, rng);
                 Assert.AreEqual(ItemRarity.Unique, item.rarity);
                 // Cross-class rolls (30 % other-class share) exist by design and
-                // simply don't fit the finder; both classes' pools must be valid.
+                // simply don't fit the finder; all classes' pools must be valid.
                 Assert.That(item.uniqueId, Is.EqualTo(ItemDatabase.LancerWardId)
                     .Or.EqualTo(ItemDatabase.WickOfHaloId)
+                    .Or.EqualTo(ItemDatabase.NightfangId)
                     .Or.EqualTo("Emberbrand Blade")
-                    .Or.EqualTo("Lantern of the Hold"));
+                    .Or.EqualTo("Lantern of the Hold")
+                    .Or.EqualTo(ItemDatabase.RogueKeepsakeId));
                 if (item.uniqueId == ownBuild)
                     sawBuild = true;
             }

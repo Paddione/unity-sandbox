@@ -112,7 +112,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         var title = MakeLabel(panel.transform, "Choose your hero", 28, new Vector2(0f, 230f), new Vector2(900f, 50f));
         title.color = DiabloPalette.TrimGold;
 
-        float x = -235f;
+        float x = -(ClassCatalog.All.Length - 1) * 470f / 2f;
         foreach (var cls in ClassCatalog.All)
         {
             var card = MakePanel(panel.transform, "Card_" + cls.id, new Vector2(440f, 360f), new Vector2(x, 0f));

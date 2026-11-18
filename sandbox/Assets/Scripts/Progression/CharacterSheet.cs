@@ -121,6 +121,17 @@ public sealed class CharacterSheet
     public float SkillMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0, float classFocusFactor = 1f) =>
         RankMultiplier(skill, gearRankBonus) * FocusSkillMultiplier(classFocusFactor);
 
+    /// <summary>
+    /// Party specialty multiplier (party-roles S1, pure formula, wired into damage in S3):
+    /// rank × focus(class) × specialtyFactor for specialty skills, rank × focus(class) for base skills.
+    /// </summary>
+    public float SpecialtySkillMultiplier(DiabloSkills.Skill skill, ClassDefinition cls, int gearRankBonus = 0)
+    {
+        float baseMul = SkillMultiplier(skill, gearRankBonus, cls != null ? cls.focusSkillFactor : 1f);
+        if (cls != null && cls.IsSpecialty(skill)) baseMul *= cls.specialtyFactor;
+        return baseMul;
+    }
+
     /// <summary>Cooldown factor from focus (floored at half base).</summary>
     public float CooldownMultiplier() =>
         Mathf.Max(MinCooldownFactor, 1f - FocusCooldownPerPoint * focus);

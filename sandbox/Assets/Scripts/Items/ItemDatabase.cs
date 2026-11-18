@@ -6,8 +6,10 @@ public static class ItemDatabase
     // second-class S4: weapon bases per class. Armor and helmets fit every class.
     public static readonly string[] FenwalkerWeapons = { "ShortSword", "HeavyAxe", "Dagger" };
     public static readonly string[] LanternbearerWeapons = { "Lantern", "HoodedLantern", "EmberCenser" };
+    public static readonly string[] RogueWeapons = { "RogueBlade", "ShortBow", "HuntingBow" };
     public const string StarterSwordBase = "Worn Short Sword";
     public const string StarterLanternBase = "Worn Lantern";
+    public const string StarterBowBase = "Worn Short Bow";
 
     /// <summary>
     /// Build uniques (cinderreach-build-uniques S1): class-bound weapons that
@@ -16,6 +18,8 @@ public static class ItemDatabase
     /// </summary>
     public const string LancerWardId = "lancer-ward";
     public const string WickOfHaloId = "wick-of-the-halo";
+    public const string NightfangId = "nightfang-edge";
+    public const string RogueKeepsakeId = "Rogue's Keepsake";
 
     /// <summary>Class that may equip a base type; "" = every class.</summary>
     public static string ClassRestriction(string baseType)
@@ -25,6 +29,8 @@ public static class ItemDatabase
             return ClassCatalog.FenwalkerId;
         if (baseType == StarterLanternBase || System.Array.IndexOf(LanternbearerWeapons, baseType) >= 0)
             return ClassCatalog.LanternbearerId;
+        if (baseType == StarterBowBase || System.Array.IndexOf(RogueWeapons, baseType) >= 0)
+            return ClassCatalog.RogueId;
         return "";
     }
 
@@ -32,7 +38,10 @@ public static class ItemDatabase
     public static List<string> GetBaseTypes(ItemSlot slot, string classId)
     {
         if (slot != ItemSlot.Weapon) return GetBaseTypes(slot);
-        return new List<string>(classId == ClassCatalog.LanternbearerId ? LanternbearerWeapons : FenwalkerWeapons);
+        string id = ClassCatalog.Get(classId).id;
+        if (id == ClassCatalog.LanternbearerId) return new List<string>(LanternbearerWeapons);
+        if (id == ClassCatalog.RogueId) return new List<string>(RogueWeapons);
+        return new List<string>(FenwalkerWeapons);
     }
 
     public static List<string> GetBaseTypes(ItemSlot slot)
@@ -97,6 +106,24 @@ public static class ItemDatabase
                     uniqueId = WickOfHaloId,
                     affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 10f) },
                 };
+            case NightfangId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Unique,
+                    baseType = "ShortBow",
+                    uniqueId = NightfangId,
+                    affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("Crit", 8f) },
+                };
+            case RogueKeepsakeId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Unique,
+                    baseType = "RogueBlade",
+                    uniqueId = RogueKeepsakeId,
+                    affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("Crit", 10f) },
+                };
             default:
                 return new ItemInstance
                 {
@@ -151,11 +178,24 @@ public static class ItemDatabase
         };
     }
 
+    /// <summary>Rogue starter weapon (same +2 Damage as the sword).</summary>
+    public static ItemInstance CreateStarterBow()
+    {
+        return new ItemInstance
+        {
+            slot = ItemSlot.Weapon,
+            rarity = ItemRarity.Magic,
+            baseType = StarterBowBase,
+            affixes = new List<Affix> { new Affix("Damage", 2f) },
+        };
+    }
+
     /// <summary>Kindled-finale reward weapon (S2): class-compatible Rare with Kindled affixes.</summary>
     public static ItemInstance CreateKindledFinaleWeapon(string classId)
     {
         string id = ClassCatalog.Get(classId).id;
-        string baseType = id == ClassCatalog.LanternbearerId ? LanternbearerWeapons[0] : FenwalkerWeapons[0];
+        string baseType = id == ClassCatalog.LanternbearerId ? LanternbearerWeapons[0]
+            : id == ClassCatalog.RogueId ? RogueWeapons[0] : FenwalkerWeapons[0];
         return new ItemInstance
         {
             slot = ItemSlot.Weapon,
@@ -190,8 +230,11 @@ public static class ItemDatabase
     {
         bool build = rng != null && rng.NextDouble() < DroptableDatabase.BuildUniqueWeaponShare;
         string id;
-        if (ClassCatalog.Get(classId).id == ClassCatalog.LanternbearerId)
+        string own = ClassCatalog.Get(classId).id;
+        if (own == ClassCatalog.LanternbearerId)
             id = build ? WickOfHaloId : "Lantern of the Hold";
+        else if (own == ClassCatalog.RogueId)
+            id = build ? NightfangId : RogueKeepsakeId;
         else
             id = build ? LancerWardId : "Emberbrand Blade";
         return CreateUnique(id);

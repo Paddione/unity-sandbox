@@ -127,14 +127,18 @@ public sealed class ClassAppearance : MonoBehaviour
         return go;
     }
 
-    /// <summary>The fixed starter weapon follows the class (sword vs. lantern); found gear stays.</summary>
+    /// <summary>The fixed starter weapon follows the class (sword vs. lantern vs. bow); found gear stays.</summary>
     void SwapStarterWeapon(ClassDefinition cls)
     {
         var eq = GetComponent<Equipment>();
         if (eq == null || eq.weapon == null) return;
-        bool isStarter = eq.weapon.baseType == ItemDatabase.StarterSwordBase || eq.weapon.baseType == ItemDatabase.StarterLanternBase;
+        bool isStarter = eq.weapon.baseType == ItemDatabase.StarterSwordBase
+            || eq.weapon.baseType == ItemDatabase.StarterLanternBase
+            || eq.weapon.baseType == ItemDatabase.StarterBowBase;
         if (!isStarter) return;
-        var want = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.CreateStarterLantern() : ItemDatabase.CreateStarterSword();
+        var want = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.CreateStarterLantern()
+            : cls.id == ClassCatalog.RogueId ? ItemDatabase.CreateStarterBow()
+            : ItemDatabase.CreateStarterSword();
         if (eq.weapon.baseType != want.baseType) eq.weapon = want;
     }
 

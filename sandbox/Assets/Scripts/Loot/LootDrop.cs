@@ -107,12 +107,16 @@ public sealed class LootDrop : MonoBehaviour
     /// <summary>Share of weapon drops that fit the finder's class (second-class S4).</summary>
     public const float OwnClassWeaponShare = 0.7f;
 
-    /// <summary>Class whose weapons a drop rolls: 70 % the hero's class, else the other one.</summary>
+    /// <summary>Class whose weapons a drop rolls: 70 % the hero's class, else one of the other two.</summary>
     public static string WeaponClassFor(string heroClassId, System.Random rng)
     {
         string own = ClassCatalog.Get(heroClassId).id;
         if (rng.NextDouble() < OwnClassWeaponShare) return own;
-        return own == ClassCatalog.FenwalkerId ? ClassCatalog.LanternbearerId : ClassCatalog.FenwalkerId;
+        var others = new System.Collections.Generic.List<string>();
+        foreach (var c in ClassCatalog.All)
+            if (c.id != own) others.Add(c.id);
+        if (others.Count == 0) return own;
+        return others[rng.Next(others.Count)];
     }
 
     public static Color ColorFor(ItemRarity rarity)

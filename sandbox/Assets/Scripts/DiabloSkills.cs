@@ -314,7 +314,7 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>Cast in a world direction (tests + external drivers).</summary>
     public bool CastToward(Skill s, Vector3 dir)
     {
-        if (!ActiveClass.Has(s)) return false; // a class casts only its own skills
+        if (!ActiveClass.CanCast(s)) return false; // base set for all, specialty only for its class (party-roles S1)
         if (CooldownLeft(s) > 0f) return false;
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
