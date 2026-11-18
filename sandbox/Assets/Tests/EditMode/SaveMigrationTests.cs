@@ -63,7 +63,6 @@ public class SaveMigrationTests
         Assert.AreEqual(7, SaveGame.CurrentVersion);
         Assert.AreEqual(7, new SaveGame().v);
     }
-    }
 
     [Test]
     public void V1_MigratesLosslesslyWithV2Defaults()
@@ -298,7 +297,7 @@ public class SaveMigrationTests
         var outcome = SaveMigrations.Migrate(V4Fixture, out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(4, from);
-        Assert.AreEqual(6, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v4 lifts through every step");
         Assert.AreEqual(0, save.smithingMaterial);
         Assert.AreEqual(1, save.equipmentWeapon.affixTier);
         Assert.AreEqual(1, save.bag[0].affixTier);
@@ -316,7 +315,7 @@ public class SaveMigrationTests
         var outcome = SaveMigrations.Migrate(v5, out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(5, from);
-        Assert.AreEqual(6, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v5 lifts through every step");
         Assert.AreEqual(0, save.smithingMaterial);
         Assert.AreEqual(1, save.bag[0].affixTier);
         Assert.AreEqual(9, save.level);
@@ -332,7 +331,7 @@ public class SaveMigrationTests
         sword.reforgeIndexPlusOne = 1;
         Assert.IsTrue(hero.GetComponent<Inventory>().Add(sword));
         SaveService.SaveNow(hero, path: path);
-        Assert.AreEqual(6, SaveMigrations.ReadVersion(path));
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path));
 
         RunProfile.Reset();
         var fresh = Hero();

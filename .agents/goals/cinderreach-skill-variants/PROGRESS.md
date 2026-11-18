@@ -1,6 +1,6 @@
 # Progress: cinderreach-skill-variants
 
-Prozent: 60 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -10,12 +10,17 @@ Prozent: 60 %
 - Neue Tests: `SkillVariantTests` (EditMode, 8 Tests), `SkillVariantCombatTests` (PlayMode: Cleave_BaselineHitsBehindAndConeHitsFarAhead, Halo_MovesOrRemainsAtCastPoint, Variant_ReloadAndDefaults, Kegelrand, Co-op-Basis). `SaveMigrationTests` auf v7 gehoben + V4→V7-, V5→V7- und Roundtrip-Tests.
 - `scripts/check-meta.py` und `agent-workspace check`: Exit 0.
 
+- S3 Integration/Nachweis (Übernahme durch opencode-Session ses_e115042b; Rebase auf v6-main d143229, Kette v4→v5→V6→V7, `V4ToV7`-Direktsprung entfernt, `V56ToV7` zu `V6ToV7` gestrafft, #8-Tests auf versionsagnostisch gehoben):
+  - `bash scripts/run-unity-tests.sh` Exit 0: EditMode 257/257, PlayMode 108/108 (`/tmp/sv-full3.log` + `/tmp/sv-edit.log`; 3 #8-Migrationstests auf `CurrentVersion` gehoben, kein Verhaltensfehler).
+  - `SandboxBuilder.VerifyDiabloZone` Exit 0 (`/tmp/sv-verify.log`).
+  - `bash scripts/run-autoplay.sh "artifacts/autoplay/cinderreach-skill-variants-normal" -seed 0` Exit 0: fps-gate PASS (worst avg 37,6 ≥ 30,0; `/tmp/sv-autoplay.log`).
+  - Variantenvergleich je Klasse: `SkillVariantCombatTests` (PlayMode, grün — Cleave rundum vs. Frontalkegel an Umzingelung/Distanz, Halo mitlaufend vs. ortsfest an beweglichem Kampf/Engstelle, beide Klassen, Reload- und Co-op-Fälle).
+  - `python3 scripts/check-meta.py` Exit 0, `agent-workspace check` still vor Commit.
+
 ## Nächste Schritte
 
-- Unity-Suiten (`scripts/run-unity-tests.sh`) und `VerifyDiabloZone` auswerten; bei Grün `run-autoplay.sh` (8 Phasen, keine Exceptions) fahren.
-- Manueller Lauf-Beleg pro Klasse (beide Varianten, gleiche Ausrüstung, zwei Kampfsituationen) als Notiz festhalten.
-- S3-Integrationsnachweis laut Plan.
+Keine — alle drei Stufen belegt und gelandet.
 
 ## Offene Punkte
 
-- Test-/Autoplay-Ergebnisse stehen aus (Unity-Lauf angestoßen); keine 100 % ohne S3.
+Keine.

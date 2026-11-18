@@ -79,7 +79,6 @@ public sealed class SkillVariantEntry
     public string skill;
     public string variant;
 }
-}
 
 /// <summary>One skill's rank (string key: JsonUtility has no dictionaries).</summary>
 [System.Serializable]
