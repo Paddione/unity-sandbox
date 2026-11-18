@@ -285,3 +285,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   mit der Bildrate (Fen 12 vs. 9 Kills), Phasen bleiben stabil.
 - Next: S2 nightly — Runner-Zugriff auf WSLg-Display prüfen.
 
+## 2026-11-18 — cinderreach-loop-guard S2 nightly (Workflow + Host-Ablage)
+
+- Done: `.github/workflows/autoplay-nightly.yml` (02:30 UTC + Dispatch, `unity-licensed`, 45 min),
+  Ergebnis als Artefakt (14 Tage) und Kopie nach `~/unity-sandbox-autoplay/`, `docs/ci-runner.md`.
+- Belegt: 3 Dispatch-Läufe grün (44219811822, 44220861693, 44222093327), je 131 s, 0 Exceptions,
+  6/6 Phasen, FPS-Minimum 48,0–48,5 auf D3D12 aus dem Runner-Dienst.
+- Learned: `workflow_dispatch` braucht den Workflow auf `main`, daher Workflow zuerst gelandet, Belege im
+  zweiten Commit. Die Concurrency-Gruppe hält nur einen wartenden Lauf, Dispatches daher seriell.
+- Next: S3 `G-DIABLO06` in dotfiles.
+

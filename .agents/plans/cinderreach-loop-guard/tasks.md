@@ -96,7 +96,7 @@ Seriell: S1 → S2 → S3.
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
 | S1 result | Startbedingung | 35 % | landed 2026-11-18 |
-| S2 nightly | S1 | 30 % | in Arbeit (Workflow gelandet, 3 Dispatch-Läufe ausstehend) |
+| S2 nightly | S1 | 30 % | landed 2026-11-18 |
 | S3 probe | S2 | 35 % | offen |
 
 ## Verify (je Stufe)

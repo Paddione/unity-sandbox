@@ -1,6 +1,6 @@
 # Progress: cinderreach-loop-guard
 
-Prozent: 35 %
+Prozent: 65 %
 
 ## Erledigt
 
@@ -13,13 +13,19 @@ Prozent: 35 %
   `bash scripts/run-autoplay.sh` Exit 0: Phasen town..complete, 0 Exceptions, Renderer D3D12 RTX 5070 Ti,
   FPS-Gate PASS (schlechtestes Fenster 47,5 fps @1280×720, 25 Fenster).
 
+- 2026-11-18: S2 nightly gelandet (`4149cee`). `autoplay-nightly.yml` (cron `30 2 * * *`, Dispatch,
+  Runner `unity-licensed`), Host-Ablage `~/unity-sandbox-autoplay/<datum>[-<run_id>]/`, 30 Tage Retention.
+  3 aufeinanderfolgende `workflow_dispatch`-Läufe grün (Erfolgskriterium 1):
+  https://github.com/Paddione/unity-sandbox/actions/runs/44219811822 ,
+  https://github.com/Paddione/unity-sandbox/actions/runs/44220861693 ,
+  https://github.com/Paddione/unity-sandbox/actions/runs/44222093327 .
+  Je Lauf: exit 0, 0 Exceptions, 6/6 Phasen, 131 s, schlechtestes FPS-Fenster 48,0/48,4/48,5 (WSLg-GPU
+  aus dem Runner-Dienst bestätigt).
+
 ## Nächste Schritte
 
-1. S2 nightly: `.github/workflows/autoplay-nightly.yml`, 3 `workflow_dispatch`-Läufe grün.
-2. S3 probe: `G-DIABLO06` in dotfiles.
+1. S3 probe: `G-DIABLO06` in dotfiles.
 
 ## Offene Punkte
 
-- S2: Prüfen, ob der Runner-Dienst (`github-runner-unity.service`) das WSLg-Display (`/tmp/.X11-unix/X0`)
-  und `/dev/dxg` erreicht. Sonst fällt `run-autoplay.sh` auf Xvfb (llvmpipe, ~6 fps) zurück und das
-  FPS-Gate wird rot.
+- S3 (`G-DIABLO06`) und Fehlertest (Erfolgskriterium 5) stehen aus.
