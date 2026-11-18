@@ -62,10 +62,15 @@ live_holders() {
 # All editor-owning runs (builds + tests, any checkout) queue on one flock.
 # Without it, concurrent sessions interleave stop/start of the shared editor
 # service and the last trap leaves it dead for every MCP client.
-exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
-echo "run-unity-build: waiting for the machine-wide editor lock..."
-flock 9
-echo "run-unity-build: editor lock acquired."
+# A caller that already holds the lock (run-unity-tests.sh -> unity-warmup.sh)
+# exports UNITY_EDITOR_LOCK_HELD=1: re-locking from the child would open a new
+# file description and wait on its own parent forever.
+if [ "${UNITY_EDITOR_LOCK_HELD:-0}" != 1 ]; then
+  exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
+  echo "run-unity-build: waiting for the machine-wide editor lock..."
+  flock 9
+  echo "run-unity-build: editor lock acquired."
+fi
 
 # --- 1. Warm-editor service -------------------------------------------------
 # Stop first: the keep-warm editor otherwise trips the lock gate on every run

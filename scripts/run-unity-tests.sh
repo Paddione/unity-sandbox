@@ -51,6 +51,8 @@ exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
 echo "run-unity-tests: waiting for the machine-wide editor lock..."
 flock 9
 echo "run-unity-tests: editor lock acquired."
+# Nested run-unity-build.sh calls (warm-up) must not wait on this lock again.
+export UNITY_EDITOR_LOCK_HELD=1
 
 SERVICE_STOPPED=0
 if [ "$project" = "$HOME/unity-sandbox/sandbox" ] && systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then

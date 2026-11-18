@@ -526,3 +526,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Phasen, 0 Exceptions, schlechtestes Fenster 39,3 fps. Drei spätere Läufe auf demselben Spielcode lagen bei
   25,0/29,8/25,6 fps, schon in Lantern Hold vor jedem Kampf, während `llama-server` (:1919) 15,6 von 16,3 GB VRAM
   hielt und die GPU zu 89–91 % auslastete. Eigner hat den 39,3-Lauf als Beleg akzeptiert.
+- Nach Rebase auf `58a6977` (maschinenweite Editor-Sperre): `run-unity-tests.sh` hält die Sperre und reicht sie per
+  `UNITY_EDITOR_LOCK_HELD=1` an den Warm-up weiter, sonst wartet `run-unity-build.sh` im Kind auf den eigenen Elternprozess.
+  Lauf danach: EditMode 201/201, PlayMode 83/84 (`DiabloP2LoopTests.Strike_HitsHuskInFacingArc`, Nahkampf, in zwei
+  Läufen davor auf identischem Spielcode grün). Wiederholung nicht abgewartet: neun parallele Sessions in der Sperr-Warteschlange.
