@@ -1,6 +1,6 @@
 # Progress: arpg-session-loop
 
-Prozent: 55 %
+Prozent: 80 %
 
 ## Erledigt
 
@@ -63,6 +63,25 @@ Prozent: 55 %
 ## Nächste Schritte
 
 1. S5 zone2+boss nach S3+S4 (S3+S4 gelandet 2026-11-18). Danach S6 proof.
+
+- 2026-11-18: S5 zone2+boss gelandet.
+  Belege: EditMode 89/89 (neu `OssuaryConfigTests`: Boss-Tuning 150 HP/XP 120,
+  Phasenwechsel 50 %, Boss-Loot immer Rare+, Gold 150–250, Caster-Abstand 6–8 m;
+  `DiabloHdTests.SessionComplete_UsesHdScaler`), PlayMode 71/71
+  (neu `BossLoopTests`: Gate teleportiert + speichert Zone 2, Rückweg-Tor nach Town,
+  Boss-Tod öffnet Abschluss mit Kills/Gold), `VerifyDiabloZone` grün
+  (`root=True fen=True ret=True casters=8 elites=2 boss=True`, `husks=21`,
+  `palisade=15 torches=4 net=True`), `KayKitAssets.Verify` grün
+  (Dungeon 211, Adventurers 6, Skeletons 4), `check-meta.py` ohne Befund.
+  Zone: `Editor/OssuaryBuilder` (Annex +200 m X, Sarkophage/Pfeiler/Fackeln,
+  Tor-Paar FenGate↔OssuaryGate, 8 Bone Wardens + 2 Elites, Hollow Abbot 150 HP Boss-Tier).
+  Gates: `ZoneGate` (Trigger → Teleport, `zoneReached`-Autosave via `SaveNow`).
+  Gegner: `RangedCaster` (6–8 m Abstand, 0,6 s Telegraph, `DiabloProjectile`-Feuerball,
+  host-autoritativ), `BossController` (Phase 2 ab 50 %: 3 Husks + Projektilfächer,
+  Tod → `SessionComplete`). `LootTier.Boss` (Rare+ garantiert, 150–250 Gold, 120 XP),
+  `SessionComplete` (Zeit/Kills/Gold/Beste Beute, Buttons Town/Menü, HD-Scaler).
+  Fix nebenbei: Button-Label als Child-Text (AddComponent<Text> auf Button-Objekt
+  warf NRE in EditMode). Controller-LFS-Drift revertiert (Diablo/Husk/VendorIdle).
 
 ## Offene Punkte
 

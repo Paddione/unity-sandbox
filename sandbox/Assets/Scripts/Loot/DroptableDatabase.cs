@@ -19,6 +19,11 @@ public static class DroptableDatabase
     public const int ChestGoldMin = 40;
     public const int ChestGoldMax = 60;
 
+    // Boss purse (guaranteed, S5): 150–250 gold.
+    public const int BossGoldChance = 100;
+    public const int BossGoldMin = 150;
+    public const int BossGoldMax = 250;
+
     public static void GetTable(LootTier tier, out int dropChance, out int magic, out int rare, out int unique)
     {
         dropChance = LootTable.DropChanceFor(tier);
@@ -34,6 +39,8 @@ public static class DroptableDatabase
                 chance = EliteGoldChance; min = EliteGoldMin; max = EliteGoldMax; return;
             case LootTier.Chest:
                 chance = ChestGoldChance; min = ChestGoldMin; max = ChestGoldMax; return;
+            case LootTier.Boss:
+                chance = BossGoldChance; min = BossGoldMin; max = BossGoldMax; return;
             default:
                 chance = NormalGoldChance; min = NormalGoldMin; max = NormalGoldMax; return;
         }

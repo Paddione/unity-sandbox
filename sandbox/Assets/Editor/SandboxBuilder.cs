@@ -606,6 +606,7 @@ public static class SandboxBuilder
 
         BuildMoorField();
         TownBuilder.SpawnVendor();
+        OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)
@@ -1171,6 +1172,7 @@ public static class SandboxBuilder
     public static void VerifyDiabloZone()
     {
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
+        OssuaryBuilder.VerifyOssuary(scene); // S5: annex, gates, casters, boss
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, wallet = false, health = false, ui = false, starterSword = false;
         bool vendor = false, vui = false;

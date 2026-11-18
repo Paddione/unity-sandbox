@@ -90,6 +90,18 @@ public class DiabloHdTests
     }
 
     [Test]
+    public void SessionComplete_UsesHdScaler()
+    {
+        SessionComplete.ResetRun();
+        var go = new GameObject("Player");
+        go.AddComponent<Wallet>();
+        SessionComplete.Show(go, "Rare boss cache");
+        AssertHd(go.GetComponentInChildren<CanvasScaler>(true), "SessionComplete");
+        SessionComplete.ResetRun();
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
     public void TargetBar_UsesHdScaler()
     {
         var go = new GameObject("DTargetBar");

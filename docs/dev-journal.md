@@ -200,3 +200,26 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Belegt: EditMode 76/76, PlayMode 65/65, `VerifyDiabloZone` OK
   (`player=True husks=10 ... palisade=15 torches=4 net=True`), `KayKitAssets.Verify` grün
   (Dungeon 211, Adventurers 6 Modelle), `check-meta.py` OK. Nächste: S5 (Ossuary + Boss).
+- 2026-11-18 (S5 zone2+boss): Sunken Ossuary + The Hollow Abbot + Abschluss.
+  Neu: `Editor/OssuaryBuilder` (Annex bei +200 m X, Bodenplatte/Pfeilerring, 4 Sarkophage,
+  4 Fackeln, KayKit-Torch-Dressing wo vorhanden, Tor-Paar `FenGate`↔`OssuaryGate`, 8 Bone Wardens
+  + 2 Elites, Boss am Nord-Apsis), `Scripts/Zones/ZoneGate` (Trigger → Teleport +
+  `zoneReached`-Autosave), `Scripts/Enemies/RangedCaster` (6–8 m Abstand, 0,6 s Telegraph,
+  `DiabloProjectile`-Wiederverwendung, host-autoritativ), `Scripts/Enemies/BossController`
+  (150 HP, Phase 2 ab 50 % mit 3 Husks + Projektilfächer, Tod via `EnemyHealth` + Poll →
+  `SessionComplete`), `Scripts/SessionComplete` (Zeit/Kills/Gold/bester Drop, Town-/Menü-Buttons,
+  HD-Scaler 1920×1080/0,5), `LootTier.Boss` (Rare+ garantiert, 150–250 Gold, 120 XP).
+  `SandboxBuilder` ruft `BuildOssuary` + `VerifyOssuary` (Root/Gate-Paar/≥8 Caster/Boss).
+  Tests: `OssuaryConfigTests` (5: Tuning, 50-%-Schwelle + Idempotenz, Rare+-Garantie über 50 Rolls,
+  Gold 150–250, Caster-Abstand) + `BossLoopTests` (2: Gate teleportiert + speichert Zone 2/Rückweg,
+  Boss-Tod öffnet Abschluss) + HD-Scaler-Test für SessionComplete.
+- Faced: `SessionComplete_UsesHdScaler` rot (NRE: `AddComponent<Text>` direkt auf dem Button-Objekt);
+  Label als Child-Text angelegt (Standard-Pattern) → grün. Editor-Lauf berührte die drei
+  Locomotion/Idle-Controller (LFS-Drift, je 2 B) → revertiert wie in S3; `DiabloZone.unity` +
+  Szenen-Rebuild sind echte Builder-Änderungen (bleiben).
+- Learned: Boss-Tod gehört `EnemyHealth` (Loot/XP-Seams bleiben konsistent); der Controller pollt
+  nur die Fraktion im selben Frame vor dem Deferred-Destroy und öffnet den Abschluss — kein
+  Doppel-Loot, kein Eingriff in fremde Dateien.
+- Belegt: EditMode 89/89, PlayMode 71/71, `VerifyDiabloZone` OK
+  (`root=True fen=True ret=True casters=8 elites=2 boss=True`, `husks=21`), `KayKitAssets.Verify` grün
+  (Dungeon 211, Adventurers 6, Skeletons 4), `check-meta.py` OK. Nächste: S6 (proof).

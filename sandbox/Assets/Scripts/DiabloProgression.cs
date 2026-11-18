@@ -20,6 +20,7 @@ public sealed class DiabloProgression : MonoBehaviour
     public const int XpNormal = 12;
     public const int XpElite = 40;
     public const int XpChest = 5;
+    public const int XpBoss = 120; // S5: The Hollow Abbot (Level 6 Meile)
 
     public int Level { get; private set; } = 1;
     public int Xp { get; private set; }
@@ -47,6 +48,7 @@ public sealed class DiabloProgression : MonoBehaviour
         {
             case LootTier.Elite: return XpElite;
             case LootTier.Chest: return XpChest;
+            case LootTier.Boss: return XpBoss;
             default: return XpNormal;
         }
     }

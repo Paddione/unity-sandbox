@@ -1,5 +1,5 @@
 /// <summary>Enemy tiers for drop rolls (P2).</summary>
-public enum LootTier { Normal, Elite, Chest }
+public enum LootTier { Normal, Elite, Chest, Boss }
 
 /// <summary>Loot roll result: rarity + slot (drops=false means no loot).</summary>
 public struct LootRoll
@@ -17,6 +17,8 @@ public static class LootTable
     {
         switch (tier)
         {
+            case LootTier.Boss:
+                magic = 0; rare = 70; unique = 30; return;
             case LootTier.Elite:
                 magic = 50; rare = 40; unique = 10; return;
             case LootTier.Chest:
@@ -28,7 +30,7 @@ public static class LootTable
 
     public static int DropChanceFor(LootTier tier)
     {
-        return tier == LootTier.Normal ? 70 : 100;
+        return tier == LootTier.Normal ? 70 : 100; // Boss always drops (Rare+)
     }
 
     public static LootRoll Roll(LootTier tier, System.Random rng)
