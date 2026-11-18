@@ -304,7 +304,10 @@ public sealed class ZoneGate : MonoBehaviour
         ZoneTravel.TeleportHero(hero, dest);
         if (targetZone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
         Teleports++;
-        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: targetZone);
+        // S5: solo/host saves like before; a client saves its own hero too.
+        var net = hero.GetComponent<DiabloNetworkPlayer>();
+        if (Diablo.IsLocalAuthority() || (net != null && net.IsSpawned && net.IsOwner))
+            SaveService.SaveNow(hero, zoneReached: targetZone);
         // presentation S1+S2: cross-fade light grade + ambience bed + music on every gate.
         try { DiabloAmbience.ApplyZone(targetZone); } catch { }
         try { MusicDirector.Ensure().PlayZone(targetZone); } catch { }

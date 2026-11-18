@@ -648,3 +648,27 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Verkauf serverseitig nur Range + Preisdeckel prüfbar (kein Shadow-Inventar — bewusst, kein
   Cheat-Schutz über Validierung hinaus).
 - Next: S5 save (Client-Save, Level/Gear-Meldung, Windows-Client, coop-run-log).
+
+## 2026-11-18 — coop-session S5: Client-Save und Join-Handshake
+
+- Done: Join-Handshake auf `DiabloNetworkPlayer` (S2/S3-Hub): `JoinReport`
+  (JSON über `SubmitJoinStatsServerRpc`), `SanitizeJoinReport` (Level 1..30,
+  Punkte ≥ 0, nur Katalog-Gear/Unique-IDs), `ApplyJoinReport` (Spiegel bekommt
+  Level/Punkte/Gear — Max-HP und Schaden folgen nativ). Owner lädt beim Spawn
+  sein Save und meldet danach. `BossController.OnBossDeath` ruft
+  `BroadcastBossKill` (Clients speichern wie solo); `ZoneGate.ApplyTravel`
+  speichert zusätzlich den eigenen Hero (`IsOwner`), Solo-Pfad unverändert.
+- Belegt: EditMode 305/305, PlayMode 173/173 (neu `CoopSaveJoinTests` 4 Tests:
+  Roundtrip Level/Gear/Zone, JSON-Roundtrip, Clamp-Fakes (99→30, negativ→0,
+  Fake-Gear→null), Spiegel-Power), `VerifyDiabloZone` OK, `KayKitAssets.Verify`
+  grün, `check-meta` OK; Paarlauf Exit 0, Join-Reports beidseitig übernommen
+  (Host L5 + Client L3 auf Spiegeln), Client Zone 2 per Broadcast, Saves
+  Host L6/380 G + Client L3/Zone 2, je 0 Exc; Solo-Autoplay Exit 0, FPS 36,4.
+- `docs/coop-run-log.md` (neu): Volllauf-Nachweis beider Seiten + Windows-Vorlage.
+  Windows-Build Succeeded (120 MB, Builder-Ziel im Hauptcheckout), Stage OK
+  (122 MB nach `Games\cinderreach`). Kein Start vom Headless aus (Desktop des
+  Eigners) — Live-Join + Shotcheck-PNG als Eigner-Lauf dokumentiert.
+- Faced: `BossController.cs` steht nicht in der S5-target_files-Liste (3-Zeilen-Hook,
+  wie S2–S4 dokumentiert). `RunProfile`/`DifficultyProfile` liegen unter
+  `Save/` bzw. `Difficulty/`, nicht wie vermutet direkt unter `Scripts/`.
+- Next: S6 relay (Join-Code, Multiplayer-Services-Migration, Eigner-Läufe).

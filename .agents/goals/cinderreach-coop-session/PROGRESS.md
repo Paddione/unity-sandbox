@@ -1,6 +1,6 @@
 # Progress: cinderreach-coop-session
 
-Prozent: 75 %
+Prozent: 90 %
 
 ## Erledigt
 
@@ -57,9 +57,26 @@ Prozent: 75 %
   `town,zone1` + Zone-2-Pull, 179 Client-Hit-Rejections als Wirkungsnachweis, je 0 Exceptions);
   Solo-Autoplay Exit 0, FPS-Pass 34,2.
 
+- 2026-11-18: S5 save landed. Join-Handshake auf dem Player-Relay: `JoinReport`
+  (Level/XP/Punkte/Ränge/Gear als JSON über ServerRpc), `SanitizeJoinReport`
+  (Level 1..30, Punkte ≥ 0, nur Katalog-Gear — Vertrauensmodell wie S2-Treffer),
+  `ApplyJoinReport` auf den Spiegel (Max-HP/Schaden folgen aus Gear/Level).
+  Owner lädt beim Spawn sein Save (`TryLoad`) und meldet danach; Boss-Kill
+  löst `NotifyBossKillClientRpc` aus (Clients speichern wie solo), Gate-Reise
+  speichert den eigenen Hero (`IsOwner`-Zweig in `ApplyTravel`).
+  Belege: EditMode 305/305, PlayMode 173/173 (neu `CoopSaveJoinTests` 4 Tests:
+  Roundtrip, JSON, Clamp-Fakes, Spiegel-Power), `VerifyDiabloZone` OK,
+  `check-meta` OK; Paarlauf Exit 0 (Join-Reports beidseitig übernommen, Client
+  Zone 2 per Broadcast, 12 Remote-Corpses, je 0 Exc); Saves: Host L6/380 G,
+  Client L3/Zone 2; Solo-Autoplay Exit 0, FPS-Pass 36,4. `docs/coop-run-log.md`
+  (neu): Volllauf beider Seiten + Windows-Vorlage (Build Succeeded 120 MB,
+  Stage OK 122 MB nach `Games\cinderreach`; Live-Join + Shotcheck-PNG als
+  Eigner-Lauf dokumentiert).
+- Windows-Client live: offen (Eigner-Lauf nach Vorlage; Relay-Join folgt in S6).
+
 ## Nächste Schritte
 
-1. S5 save: Client-Save beim Join, Level/Gear übernehmen.
+1. S6 relay: Relay-Join-Code über Multiplayer Services (inkl. Eigner-Läufe).
 
 ## Offene Punkte
 

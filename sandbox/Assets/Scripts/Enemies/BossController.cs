@@ -184,6 +184,9 @@ public sealed class BossController : NetworkBehaviour
         bool kilnOpened = RunProfile.Act.Unlock(ActProgress.Kiln);
         if (kilnOpened) UnityEngine.Debug.Log("[Act] Cinder Kiln unlocked.");
         if ((unlocked || kilnOpened) && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
+        // S5: clients autosave their own hero on the shared boss kill, like solo.
+        var relay = DiabloNetworkPlayer.HostRelay();
+        if (relay != null) relay.BroadcastBossKill();
         SessionComplete.Show(hero, LastBossDrop);
     }
 

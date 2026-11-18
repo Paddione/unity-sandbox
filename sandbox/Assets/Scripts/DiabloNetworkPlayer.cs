@@ -26,6 +26,9 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
             PublishClass();
             var ui = GetComponent<DiabloVendorUI>();
             if (ui != null) ui.RestockForOwner(); // per-player stock (S4, seed + id)
+            if (SaveService.HasSave() && SaveService.TryLoad(gameObject))
+                Debug.Log("[Net] loaded local save for co-op join.");
+            SubmitJoinStatsServerRpc(UnityEngine.JsonUtility.ToJson(CaptureJoinReport(gameObject)));
         }
         else
         {
@@ -157,6 +160,155 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     {
         if (IsServer) return; // the host already spawned its corpse in Die
         ZoneTravelRelay.ApplyRemoteCorpse(huskNetId);
+    }
+
+    /// <summary>
+    /// Join handshake (S5): what a client reports about its hero (level,
+    /// points, gear). Serialized as JSON over the ServerRpc; the host
+    /// sanitizes (clamps) before applying to the mirror.
+    /// </summary>
+    [System.Serializable]
+    public struct JoinReport
+    {
+        public int level;
+        public int xp;
+        public int freeAttr;
+        public int freeSkill;
+        public int strength;
+        public int vitality;
+        public int focus;
+        public System.Collections.Generic.List<SkillRankEntry> ranks;
+        public ItemInstance armor;
+        public ItemInstance weapon;
+        public ItemInstance helmet;
+    }
+
+    /// <summary>Capture this hero's join report (owner side).</summary>
+    public static JoinReport CaptureJoinReport(GameObject hero)
+    {
+        var report = new JoinReport();
+        if (hero == null) return report;
+        var prog = hero.GetComponent<DiabloProgression>();
+        if (prog != null)
+            prog.GetState(out report.level, out report.xp, out report.freeAttr, out report.freeSkill,
+                out report.strength, out report.vitality, out report.focus, out report.ranks);
+        else
+        {
+            report.level = 1;
+            report.ranks = new System.Collections.Generic.List<SkillRankEntry>();
+        }
+        var eq = hero.GetComponent<Equipment>();
+        if (eq != null)
+        {
+            report.armor = eq.armor;
+            report.weapon = eq.weapon;
+            report.helmet = eq.helmet;
+        }
+        return report;
+    }
+
+    /// <summary>
+    /// Clamp a join report to plausible values (S5 trust model: co-op among
+    /// friends — the host enforces bounds, not honesty). Level 1..30, points
+    /// non-negative, gear either known-catalog or dropped.
+    /// </summary>
+    public static JoinReport SanitizeJoinReport(JoinReport raw)
+    {
+        raw.level = UnityEngine.Mathf.Clamp(raw.level, 1, DiabloProgression.MaxLevel);
+        if (raw.level >= DiabloProgression.MaxLevel) raw.xp = 0;
+        else raw.xp = System.Math.Max(0, raw.xp);
+        raw.freeAttr = System.Math.Max(0, raw.freeAttr);
+        raw.freeSkill = System.Math.Max(0, raw.freeSkill);
+        raw.strength = System.Math.Max(0, raw.strength);
+        raw.vitality = System.Math.Max(0, raw.vitality);
+        raw.focus = System.Math.Max(0, raw.focus);
+        raw.armor = SanitizeGearItem(raw.armor, ItemSlot.Armor);
+        raw.weapon = SanitizeGearItem(raw.weapon, ItemSlot.Weapon);
+        raw.helmet = SanitizeGearItem(raw.helmet, ItemSlot.Helmet);
+        return raw;
+    }
+
+    static ItemInstance SanitizeGearItem(ItemInstance item, ItemSlot slot)
+    {
+        if (item == null || item.slot != slot) return null;
+        if (!System.Enum.IsDefined(typeof(ItemRarity), item.rarity)) item.rarity = ItemRarity.Magic;
+        if (item.rarity == ItemRarity.Unique)
+        {
+            foreach (var u in ItemDatabase.GetUniques())
+                if (u != null && u.uniqueId == item.uniqueId) return item;
+            return null;
+        }
+        if (string.IsNullOrEmpty(item.baseType)) return null;
+        foreach (var b in ItemDatabase.GetBaseTypes(slot))
+            if (b == item.baseType) return item;
+        return null;
+    }
+
+    /// <summary>Apply a sanitized report to a hero (mirror on the host).</summary>
+    public static void ApplyJoinReport(GameObject hero, JoinReport report)
+    {
+        if (hero == null) return;
+        var prog = hero.GetComponent<DiabloProgression>();
+        if (prog == null) prog = hero.AddComponent<DiabloProgression>();
+        prog.SetState(report.level, report.xp, report.freeAttr, report.freeSkill,
+            report.strength, report.vitality, report.focus, report.ranks);
+        var eq = hero.GetComponent<Equipment>();
+        if (eq == null) eq = hero.AddComponent<Equipment>();
+        eq.armor = report.armor;
+        eq.weapon = report.weapon;
+        eq.helmet = report.helmet;
+    }
+
+    /// <summary>Client join report, validated and applied to the sender's mirror.</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitJoinStatsServerRpc(string json, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer || !IsSpawned) return;
+        if (string.IsNullOrEmpty(json)) return;
+        JoinReport raw;
+        try
+        {
+            raw = UnityEngine.JsonUtility.FromJson<JoinReport>(json);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Net] rejected join report: unreadable ({e.Message}).");
+            return;
+        }
+        var nm = NetworkManager.Singleton;
+        if (nm == null || nm.SpawnManager == null) return;
+        ulong sender = rpcParams.Receive.SenderClientId;
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
+            var clean = SanitizeJoinReport(raw);
+            ApplyJoinReport(nb.gameObject, clean);
+            Debug.Log($"[Net] join stats from {sender}: level {clean.level} applied to mirror.");
+            return;
+        }
+    }
+
+    /// <summary>Server: tell every client to autosave its own hero (boss kill).</summary>
+    public void BroadcastBossKill()
+    {
+        if (!IsServer || !IsSpawned) return;
+        NotifyBossKillClientRpc();
+    }
+
+    [ClientRpc]
+    void NotifyBossKillClientRpc()
+    {
+        if (IsServer) return; // the host saves through OnBossDeath directly
+        var nm = NetworkManager.Singleton;
+        GameObject hero = null;
+        if (nm != null && nm.IsListening && nm.SpawnManager != null)
+        {
+            var local = nm.SpawnManager.GetLocalPlayerObject();
+            if (local != null) hero = local.gameObject;
+        }
+        if (hero == null) hero = GameObject.Find(HeroName);
+        if (hero != null) SaveService.SaveNow(hero);
     }
 
     /// <summary>
