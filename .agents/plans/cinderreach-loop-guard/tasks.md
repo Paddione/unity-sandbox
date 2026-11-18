@@ -97,7 +97,7 @@ Seriell: S1 → S2 → S3.
 |---|---|---|---|
 | S1 result | Startbedingung | 35 % | landed 2026-11-18 |
 | S2 nightly | S1 | 30 % | landed 2026-11-18 |
-| S3 probe | S2 | 35 % | offen |
+| S3 probe | S2 | 35 % | landed 2026-11-18 |
 
 ## Verify (je Stufe)
 

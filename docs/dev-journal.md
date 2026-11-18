@@ -295,3 +295,15 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   zweiten Commit. Die Concurrency-Gruppe hält nur einen wartenden Lauf, Dispatches daher seriell.
 - Next: S3 `G-DIABLO06` in dotfiles.
 
+## 2026-11-18 — cinderreach-loop-guard S3 probe + Fehlertest, Goal 100 %
+
+- Done: dotfiles `G-DIABLO06` (neuestes `autoplay-result.json` aus `~/unity-sandbox-autoplay`: ≤ 48 h,
+  exit 0, 6 Phasen, 0 Exceptions, Dauer ≤ 1,5× Median der vorigen 5, FPS-Fenster ohne erstes ≥ 30).
+- Belegt: Probe-Tests 20 passed, Live `G-DIABLO06 achieved`. Fehlertest mit unverwundbarem Boss auf
+  Wegwerf-Branch → `critical 3`. Danach Lauf auf `main` → achieved.
+- Faced: `agent-workspace.py finish` verweigert ungemergte Branches, rohes `git push --delete` blockt der
+  Guard. Der Wegwerf-Branch `test/g06-invulnerable-boss` (lokal + remote) und sein Worktree bleiben
+  deshalb stehen, bis der Eigner sie löscht. Der Plan-Satz „verwerfen über `finish --branch`“ trifft
+  nicht zu.
+- Learned: Ein Probe mit `baseline 1` meldet einen Einzelverstoß nur `at_risk`. Für G-DIABLO06 Baseline 0.
+
