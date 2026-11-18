@@ -542,7 +542,6 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: erster Solo-Lauf ohne `-seed` las Seed 1112106611 aus einem vorhandenen Save; in dieser Fen-Variante blieb
   der Held nach 11 Kills ohne Treffer bis Budgetende hängen (Befund in PROGRESS, nicht S1).
 - Next: S2 host-autoritative Gegner.
-## 2026-11-18 — fix: Editor-Sperre überspringt hängende Läufe
 
 ## 2026-11-18 — faire Kämpfe Akt I: Plaza, Wind-up-Orb, PlayMode-Belege
 
@@ -560,6 +559,9 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   (14 rote EditMode-Tests); YAML-Patch nur des Gate-Ziels verworfen, Szene aus Main übernommen, Library per
   `unity-warmup.sh` geheilt (Sitzung 1 gebunden).
 - Offen: zwei manuelle Windows-Läufe laut Protokoll (Eigner).
+
+## 2026-11-18 — fix: Editor-Sperre überspringt hängende Läufe
+
 - Anlass: Ein EditMode-Lauf (`skill-variants-s1`) fror um 14:35 im Startup ein (0 % CPU, kein Log-Byte in 16 min)
   und überlebte seine Session. Er hielt die maschinenweite Editor-Sperre, rund zehn Läufe standen dahinter.
 - Done: `scripts/lib/unity-editor-lock.sh`, von `run-unity-build.sh` und `run-unity-tests.sh` genutzt. Der Halter
