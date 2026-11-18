@@ -1,0 +1,71 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Result contract between <see cref="SessionAutoplay"/> and the dotfiles
+/// health probe G-DIABLO06 (cinderreach-loop-guard, schema 1):
+/// <c>{"schema":1,"commit","started","duration_s","phases":[...],"exceptions","fps_windows":[...],"exit"}</c>.
+/// Pure data + helpers so EditMode tests can pin the format.
+/// </summary>
+[System.Serializable]
+public sealed class AutoplayResult
+{
+    public const int Schema = 1;
+    public const string FileName = "autoplay-result.json";
+
+    public const string PhaseTown = "town";
+    public const string PhaseZone1 = "zone1";
+    public const string PhaseGate = "gate";
+    public const string PhaseZone2 = "zone2";
+    public const string PhaseBoss = "boss";
+    public const string PhaseComplete = "complete";
+
+    /// <summary>Canonical order; a full session reaches all of them.</summary>
+    public static readonly string[] RequiredPhases =
+        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseComplete };
+
+    public int schema = Schema;
+    public string commit = "unknown";
+    public string started = "";
+    public float duration_s;
+    public List<string> phases = new List<string>();
+    public int exceptions;
+    public List<float> fps_windows = new List<float>();
+    public int exit = 1;
+
+    /// <summary>Record a reached phase once, keeping first-reach order.</summary>
+    public void Reach(string phase)
+    {
+        if (!string.IsNullOrEmpty(phase) && !phases.Contains(phase)) phases.Add(phase);
+    }
+
+    /// <summary>True when every canonical phase was reached.</summary>
+    public bool AllPhasesReached()
+    {
+        foreach (var p in RequiredPhases)
+            if (!phases.Contains(p)) return false;
+        return true;
+    }
+
+    /// <summary>Exit code: 0 only with all phases and zero exceptions.</summary>
+    public int ComputeExit() => exceptions == 0 && AllPhasesReached() ? 0 : 1;
+
+    public string ToJson() => JsonUtility.ToJson(this, true);
+
+    public static AutoplayResult FromJson(string json) => JsonUtility.FromJson<AutoplayResult>(json);
+
+    /// <summary>Only real exceptions count (errors/asserts are logged, not counted).</summary>
+    public static bool CountsAsException(LogType type) => type == LogType.Exception;
+
+    /// <summary>Write <see cref="FileName"/> into <paramref name="dir"/> (created if missing).</summary>
+    public string WriteTo(string dir)
+    {
+        System.IO.Directory.CreateDirectory(dir);
+        var path = System.IO.Path.Combine(dir, FileName);
+        var tmp = path + ".tmp";
+        System.IO.File.WriteAllText(tmp, ToJson());
+        if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+        System.IO.File.Move(tmp, path);
+        return path;
+    }
+}

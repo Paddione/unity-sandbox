@@ -266,3 +266,22 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Learned: Retry-Budget diszipliniert einhalten (2 Fehlversuche → Übernahme
   statt drittem Dispatch); Riesen-Logzeilen (`grep -a`, Größen statt `cat`).
 - Nächste: dotfiles G-DIABLO02-Vertrag (Ossuary/Boss-Prefade), dann 100 %.
+
+## 2026-11-18 — cinderreach-loop-guard S1 result (Ergebnis-JSON + run-autoplay.sh)
+
+- Done: `AutoplayResult` (schema 1: commit, started, duration_s, phases, exceptions, fps_windows, exit;
+  Pflichtphasen town/zone1/gate/zone2/boss/complete). `SessionAutoplay` trägt Phasen nur bei Erfolg ein
+  und schreibt das JSON immer, auch bei Fehlschlag (`-autoplay-out`, `-autoplay-commit`).
+  `FpsReporter.Windows` (read-only). `scripts/run-autoplay.sh` baut nach `builds/autoplay-player/`
+  (neu: `-buildOut` in `BuildDiabloZoneBuild`, `UNITY_BUILD_EXTRA_ARGS` in `run-unity-build.sh`),
+  startet den Lauf, Timeout 900 s = Exit 2, danach `fps-gate.py`.
+- Belegt: EditMode 97/97 (8 neu `AutoplayResultTests`), PlayMode 71/71, `VerifyDiabloZone` OK,
+  `KayKitAssets.Verify` OK, `check-meta` OK. `run-autoplay.sh` Exit 0, `result_phases=town,zone1,gate,zone2,boss,complete`,
+  0 Exceptions, 75 s Spielzeit.
+- Faced: Xvfb-Lauf rendert auf llvmpipe, FPS-Gate rot (5,6 fps, R1 aus dem Plan). Library-Kopie brach ab,
+  weil der Warm-Editor gerade startete; Dienst kurz gestoppt, sauber kopiert, wieder gestartet.
+- Learned: WSLg-Display + `GALLIUM_DRIVER=d3d12` gibt dem Linux-Player die echte GPU
+  (`Renderer: D3D12 (NVIDIA GeForce RTX 5070 Ti)`), 47,5 fps schlechtestes Fenster. Kill-Zahl schwankt
+  mit der Bildrate (Fen 12 vs. 9 Kills), Phasen bleiben stabil.
+- Next: S2 nightly — Runner-Zugriff auf WSLg-Display prüfen.
+

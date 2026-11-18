@@ -23,6 +23,7 @@
 #
 # Usage (from the repo root):
 #   bash scripts/run-unity-build.sh <ExecuteMethod> <success-marker> [timeout_s] [logfile]
+#   (env UNITY_BUILD_EXTRA_ARGS appends editor args, see step 3)
 # Example:
 #   bash scripts/run-unity-build.sh SandboxBuilder.BuildDiabloZoneServer \
 #     "DiabloZone server build result: Succeeded" 1200 /tmp/bm-server.log
@@ -88,8 +89,11 @@ fi
 
 # --- 3. Build with heartbeat + hard timeout --------------------------------
 echo "run-unity-build: $METHOD (timeout ${TIMEOUT}s, jobs $JOBS, log $LOG)"
+# UNITY_BUILD_EXTRA_ARGS: optional extra editor args, word-split on purpose
+# (e.g. "-buildOut /path/to/player" for SandboxBuilder.BuildDiabloZoneBuild).
+# shellcheck disable=SC2086
 "$EDITOR" -batchmode -nographics -quit -projectPath "$PROJECT" \
-  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" &
+  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" ${UNITY_BUILD_EXTRA_ARGS:-} &
 UNITY_PID=$!
 
 START=$SECONDS

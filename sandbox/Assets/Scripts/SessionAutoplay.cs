@@ -23,11 +23,18 @@ public sealed class SessionAutoplay : MonoBehaviour
 {
     public const string Flag = "-autoplay";
     public const string GodFlag = "-autoplay-god";
+    /// <summary>Directory for <see cref="AutoplayResult.FileName"/> (default &lt;game&gt;/autoplay).</summary>
+    public const string OutFlag = "-autoplay-out";
+    /// <summary>Commit sha stamped into the result (the player cannot know it).</summary>
+    public const string CommitFlag = "-autoplay-commit";
 
     int phasesDone;
     int exceptionCount;
     bool godMode;
     int startBosses;
+    bool lastPhaseOk;
+    readonly AutoplayResult result = new AutoplayResult();
+    float startedAt;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
@@ -43,12 +50,15 @@ public sealed class SessionAutoplay : MonoBehaviour
 
     void CountExceptions(string condition, string stackTrace, LogType type)
     {
-        if (type == LogType.Exception) exceptionCount++;
+        if (AutoplayResult.CountsAsException(type)) exceptionCount++;
     }
 
     IEnumerator Start()
     {
         godMode = HasArg(GodFlag);
+        startedAt = Time.realtimeSinceStartup;
+        result.started = System.DateTime.UtcNow.ToString("o");
+        result.commit = ArgValue(CommitFlag) ?? "unknown";
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}");
         startBosses = BossController.BossesKilled;
         float deadline = Time.realtimeSinceStartup + 600f;
@@ -68,7 +78,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (hero == null)
         {
             Log("FAIL no controllable hero within 30 s");
-            Quit(1);
+            Finish(1);
             yield break;
         }
         DiabloClickController.ExternalDrive = true;
@@ -84,26 +94,57 @@ public sealed class SessionAutoplay : MonoBehaviour
 
         int startHusks = CountHusks(excludeBoss: false);
         yield return PhaseTownWaypoints(hero, deadline);
+        bool townOk = lastPhaseOk;
         yield return PhaseBuyPotion(hero);
+        if (townOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseTown);
         yield return FightLoop(hero, "fen", excludeBoss: true, maxDist: 40f, budget: 120f, deadline: deadline);
+        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseZone1);
         yield return PhaseGate(hero, ZoneGate.FenGateName, expectZone: 2, deadline);
+        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseGate);
         yield return FightLoop(hero, "ossuary", excludeBoss: true, maxDist: 80f, budget: 150f, deadline: deadline);
+        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseZone2);
         yield return PhaseBoss(hero, deadline);
+        bool bossOk = lastPhaseOk;
+        if (bossOk) result.Reach(AutoplayResult.PhaseBoss);
         yield return PhaseGate(hero, ZoneGate.OssuaryGateName, expectZone: 1, deadline);
+        if (bossOk && lastPhaseOk && SessionComplete.Shown >= 1) result.Reach(AutoplayResult.PhaseComplete);
 
         int huskKills = startHusks - CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
         DiabloClickController.ExternalDrive = false;
         Log($"DONE phases={phasesDone} huskKills={huskKills} bossKills={bossKills} " +
             $"phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} " +
-            $"exceptions={exceptionCount}");
-        Quit(exceptionCount > 0 || bossKills < 1 || SessionComplete.Shown < 1 ? 1 : 0);
+            $"exceptions={exceptionCount} result_phases={string.Join(",", result.phases)}");
+        Finish(exceptionCount > 0 || bossKills < 1 || SessionComplete.Shown < 1 ? 1 : 0);
+    }
+
+    /// <summary>Stamp and write the result JSON, then quit with the worse of
+    /// the legacy verdict and the result contract (all phases, 0 exceptions).</summary>
+    void Finish(int legacyExit)
+    {
+        result.exceptions = exceptionCount;
+        result.duration_s = Time.realtimeSinceStartup - startedAt;
+        result.fps_windows = new System.Collections.Generic.List<float>(FpsReporter.Windows);
+        result.exit = Mathf.Max(legacyExit, result.ComputeExit());
+        string dir = ArgValue(OutFlag)
+            ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");
+        try
+        {
+            Log($"result written: {result.WriteTo(dir)} exit={result.exit}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Autoplay] result write failed ({dir}): {e.Message}");
+            result.exit = 1;
+        }
+        Quit(result.exit);
     }
 
     IEnumerator PhaseTownWaypoints(DiabloClickController hero, float deadline)
     {
         Log("phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)");
         string[] stops = { "Campfire", Vendor.VendorObjectName, "ZGatePillar_0" };
+        int reached = 0;
         foreach (var name in stops)
         {
             var target = GameObject.Find(name);
@@ -120,9 +161,11 @@ public sealed class SessionAutoplay : MonoBehaviour
                 TickGod(hero);
                 yield return null;
             }
+            reached++;
             Log($"phase town_waypoints: reached {name}");
         }
         phasesDone++;
+        lastPhaseOk = reached > 0;
         Log("phase town_waypoints done");
     }
 
@@ -132,6 +175,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         var inv = hero.GetComponent<Inventory>();
         bool bought = VendorStock.BuyPotion(wallet: Wallet.EnsureWallet(hero.gameObject), inv: inv);
         Log($"phase vendor_potion: bought={bought}");
+        lastPhaseOk = bought;
         phasesDone++;
         Log("phase vendor_potion done");
         yield return null;
@@ -153,6 +197,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         float flastT = Time.realtimeSinceStartup;
         int fnudges = 0;
         GameObject curTarget = null;
+        bool cleared = false;
         while (Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
         {
             TickGod(hero);
@@ -161,6 +206,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             if (husk == null)
             {
                 Log($"phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)})");
+                cleared = true;
                 break;
             }
             var toTarget = husk.transform.position - hero.transform.position;
@@ -192,14 +238,16 @@ public sealed class SessionAutoplay : MonoBehaviour
             }
             yield return null;
         }
-        Log($"phase combat_{label} done (kills={start - CountHusks(excludeBoss: excludeBoss)})");
+        Log($"phase combat_{label} done (kills={start - CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})");
         phasesDone++;
+        lastPhaseOk = cleared;
     }
 
     /// <summary>Pass a ZoneGate (explicit Teleport, deterministic) and verify
     /// the zone stamp + autosave in the save file.</summary>
     IEnumerator PhaseGate(DiabloClickController hero, string gateName, int expectZone, float deadline)
     {
+        lastPhaseOk = false;
         Log($"phase gate_{gateName} start (expect zoneReached={expectZone}) hero={Fmt(hero.transform.position)}");
         var gate = GameObject.Find(gateName);
         if (gate == null)
@@ -229,6 +277,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             && System.IO.File.ReadAllText(SaveService.DefaultPath).Contains($"\"zoneReached\": {expectZone}");
         Log($"phase gate_{gateName}: teleports={ZoneGate.Teleports - before} zoneSaved={saved} (expectZone={expectZone})");
         phasesDone++;
+        lastPhaseOk = ZoneGate.Teleports > before && saved;
         Log($"phase gate_{gateName} done");
         yield return null;
     }
@@ -237,6 +286,7 @@ public sealed class SessionAutoplay : MonoBehaviour
     /// then wait for the SessionComplete overlay.</summary>
     IEnumerator PhaseBoss(DiabloClickController hero, float deadline)
     {
+        lastPhaseOk = false;
         Log("phase boss start (The Hollow Abbot, phase 1 + 2)");
         var boss = GameObject.Find(BossController.BossName);
         if (boss == null)
@@ -290,6 +340,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             yield return null;
         Log($"phase boss done (overlay={SessionComplete.Shown} summary='{SessionComplete.LastSummary}')");
         phasesDone++;
+        lastPhaseOk = bossKills >= 1;
     }
 
     void TickGod(DiabloClickController hero)
@@ -363,6 +414,14 @@ public sealed class SessionAutoplay : MonoBehaviour
 #else
         Application.Quit(code);
 #endif
+    }
+
+    static string ArgValue(string flag)
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == flag) return args[i + 1];
+        return null;
     }
 
     static bool HasArg(string flag)

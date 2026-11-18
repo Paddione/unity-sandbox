@@ -39,6 +39,12 @@ Commit.
 3. Ergebnisformat (Vertrag zwischen Spiel und Probe):
    `{"schema":1,"commit":"<sha>","started":"<iso>","duration_s":<f>,"phases":["town","zone1","gate","zone2","boss","complete"],"exceptions":<n>,"fps_windows":[<f>...],"exit":<n>}`.
 
+4. Anzeige des Autoplay-Laufs (Nachtrag S1, 2026-11-18): Unter Xvfb rendert Unity mit llvmpipe
+   (gemessen 5,6 fps schlechtestes Fenster, FPS-Gate rot, R1 eingetreten). Über das WSLg-X-Display mit
+   Mesa d3d12 (`DISPLAY=:0 GALLIUM_DRIVER=d3d12`, `/dev/dxg`) rendert die RTX 5070 Ti: 47,5 fps
+   schlechtestes Fenster, Gate grün. `run-autoplay.sh` wählt per `AUTOPLAY_DISPLAY=auto` WSLg, wenn
+   Socket und `/dev/dxg` existieren, sonst Xvfb. Schwelle 30 bleibt unverändert.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -89,7 +95,7 @@ Seriell: S1 → S2 → S3.
 
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
-| S1 result | Startbedingung | 35 % | offen |
+| S1 result | Startbedingung | 35 % | landed 2026-11-18 |
 | S2 nightly | S1 | 30 % | offen |
 | S3 probe | S2 | 35 % | offen |
 

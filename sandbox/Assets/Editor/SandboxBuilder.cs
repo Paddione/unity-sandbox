@@ -1323,7 +1323,9 @@ public static class SandboxBuilder
         var opts = new BuildPlayerOptions
         {
             scenes = new[] { DiabloZoneScenePath },
-            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-zone/diablo-zone",
+            // -buildOut <path> overrides the default (loop-guard: run-autoplay.sh
+            // builds into its own checkout, e.g. the CI runner workspace).
+            locationPathName = BuildOutArg() ?? "/home/patrick/unity-sandbox/builds/diablo-zone/diablo-zone",
             target = BuildTarget.StandaloneLinux64,
             subtarget = (int)StandaloneBuildSubtarget.Player,
             options = BuildOptions.None,
@@ -1334,6 +1336,14 @@ public static class SandboxBuilder
                   $"{report.summary.totalSize / 1048576} MB");
         if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             throw new System.Exception("DiabloZone build failed; see log.");
+    }
+
+    static string BuildOutArg()
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+            if (args[i] == "-buildOut") return args[i + 1];
+        return null;
     }
 
     static void AddWall(string name, Vector3 pos, Vector3 scale)
