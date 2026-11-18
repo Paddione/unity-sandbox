@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsEight()
+    public void CurrentVersion_IsNine()
     {
-        Assert.AreEqual(8, SaveGame.CurrentVersion);
-        Assert.AreEqual(8, new SaveGame().v);
+        Assert.AreEqual(9, SaveGame.CurrentVersion);
+        Assert.AreEqual(9, new SaveGame().v);
     }
 
     [Test]
@@ -258,6 +258,35 @@ public class SaveMigrationTests
         Assert.IsTrue(SaveService.TryLoad(hero, path));
         Assert.AreEqual(SkillVariantCatalog.CleaveRoundId,
             RunProfile.GetSkillVariant(ClassCatalog.FenwalkerId, DiabloSkills.Skill.Cleave));
+    }
+
+    [Test]
+    public void V4_MigratesToV9WithClaimDefaults()
+    {
+        const string v4 = @"{""v"":4,""level"":9,""actOneComplete"":true,""highestUnlockedZone"":3}";
+        var outcome = SaveMigrations.Migrate(v4, out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(4, from);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v4 lifts through every step");
+        Assert.IsFalse(save.kindledRewardPending, "no retroactive claim");
+        Assert.IsFalse(save.kindledRewardGranted);
+        Assert.AreEqual("", save.kindledRewardClass);
+        Assert.IsTrue(save.actOneComplete);
+    }
+
+    [Test]
+    public void V9Claim_SurvivesSaveRoundtrip()
+    {
+        hero = Hero();
+        RunProfile.KindledRewardPending = true;
+        RunProfile.KindledRewardClass = ClassCatalog.LanternbearerId;
+        SaveService.SaveNow(hero, path: path);
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path));
+        RunProfile.Reset();
+        Assert.IsTrue(SaveService.TryLoad(hero, path));
+        Assert.IsTrue(RunProfile.KindledRewardPending);
+        Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.KindledRewardClass);
+        Assert.IsFalse(RunProfile.KindledRewardGranted);
     }
 
     [Test]

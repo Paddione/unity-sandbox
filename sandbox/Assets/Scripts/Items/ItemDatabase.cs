@@ -125,6 +125,25 @@ public static class ItemDatabase
         };
     }
 
+    /// <summary>Kindled-finale reward weapon (S2): class-compatible Rare with Kindled affixes.</summary>
+    public static ItemInstance CreateKindledFinaleWeapon(string classId)
+    {
+        string id = ClassCatalog.Get(classId).id;
+        string baseType = id == ClassCatalog.LanternbearerId ? LanternbearerWeapons[0] : FenwalkerWeapons[0];
+        return new ItemInstance
+        {
+            slot = ItemSlot.Weapon,
+            rarity = ItemRarity.Rare,
+            baseType = baseType,
+            affixes = new List<Affix>
+            {
+                new Affix("Damage", 6f),
+                new Affix("Crit", 12f),
+                new Affix("MaxHP", 10f),
+            },
+        };
+    }
+
     public static List<ItemInstance> GetUniques()
     {
         return new List<ItemInstance>

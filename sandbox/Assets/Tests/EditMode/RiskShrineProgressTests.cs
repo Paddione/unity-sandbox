@@ -57,8 +57,7 @@ public class RiskShrineProgressTests
         var outcome = SaveMigrations.Migrate(v4, out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(4, from);
-        Assert.AreEqual(8, save.v);
-        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v4 lifts through every step");
         Assert.AreEqual((int)RiskShrineState.Unchosen, save.riskShrineState);
         Assert.IsNull(save.riskReward);
         Assert.IsTrue(SaveService.TryLoad(hero, WriteTemp(v4)));
@@ -77,7 +76,7 @@ public class RiskShrineProgressTests
         const string v1 = @"{""v"":1,""level"":2,""xp"":5,""gold"":7,""zoneReached"":1}";
         var outcome = SaveMigrations.Migrate(v1, out SaveGame save, out _);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
-        Assert.AreEqual(8, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v1 lifts through every step");
         Assert.AreEqual((int)RiskShrineState.Unchosen, save.riskShrineState);
     }
 

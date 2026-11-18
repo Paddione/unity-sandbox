@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 8;
+    public const int CurrentVersion = 9;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -57,6 +57,11 @@ public sealed class SaveGame
     // v8 (risk-shrines S1): one-shot shrine choice; older saves start Unchosen (0).
     public int riskShrineState;
     public ItemInstance riskReward;
+
+    // v9 (kindled-finale S2): first-Kindled-victory claim, no retroactive grants.
+    public bool kindledRewardPending;
+    public string kindledRewardClass = "";
+    public bool kindledRewardGranted;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

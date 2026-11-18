@@ -26,13 +26,23 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
     public static int Kills;
     public static int PhaseTwoEntries;
     public static int WavesFired;
+    /// <summary>S1 kindled finale: sector waves fired (Kindled phase 2 only).</summary>
+    public static int SectorPatternsFired;
 
     public bool PhaseTwo { get; private set; }
     bool dead;
     float lastWave = float.NegativeInfinity;
     float lastField = float.NegativeInfinity;
+    float lastSector = float.NegativeInfinity;
+    int sectorWave;
     readonly System.Random rng = new System.Random(31);
     readonly List<FireWave> waves = new List<FireWave>();
+    readonly List<KilnSectorPattern> sectorPatterns = new List<KilnSectorPattern>();
+
+    /// <summary>S1: Kindled phase 2 uses the sector finale (solo-Kindled), Normal keeps waves+fields.</summary>
+    public static bool KindledFinaleActive => DifficultyProfile.Current == DifficultyProfile.Kindled;
+    /// <summary>Live sector patterns (headless seam).</summary>
+    public int ActiveSectorPatternCount => sectorPatterns.Count;
 
     void Update()
     {
@@ -47,11 +57,20 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
         d.y = 0f;
         if (d.magnitude > AggroRange) return;
         float now = Time.time;
-        if (now - lastWave >= (PhaseTwo ? WaveIntervalPhaseTwo : WaveInterval)) FireWaveNow(now);
-        if (PhaseTwo && now - lastField >= FieldInterval)
+        if (PhaseTwo && KindledFinaleActive)
         {
-            lastField = now;
-            BurningGround.Spawn(hero.position);
+            // S1 finale: sector pattern replaces faster waves + random fields; summons stay.
+            if (now - lastSector >= KilnSectorPattern.PatternInterval) FireSectorPatternNow(now);
+            TickSectorPatterns(now);
+        }
+        else
+        {
+            if (now - lastWave >= (PhaseTwo ? WaveIntervalPhaseTwo : WaveInterval)) FireWaveNow(now);
+            if (PhaseTwo && now - lastField >= FieldInterval)
+            {
+                lastField = now;
+                BurningGround.Spawn(hero.position);
+            }
         }
         foreach (var w in waves.ToArray())
             if (w.Tick(now, hero)) waves.Remove(w);
@@ -101,18 +120,48 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
         if (dead) return;
         dead = true;
         Kills++;
+        ClearSectorPatterns();
         var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         bool completed = RunProfile.Act.CompleteAct();
         Debug.Log($"[Kilnmother] slain (kills={Kills}, act complete={RunProfile.Act.ActOneComplete}).");
-        if (completed && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
+        if (completed && hero != null && Diablo.IsLocalAuthority())
+        {
+            try { KindledFinaleReward.OnKilnmotherKill(hero); }
+            catch (System.Exception e) { Debug.LogWarning($"[Kilnmother] Kindled reward failed: {e.Message}"); }
+            SaveService.SaveNow(hero);
+        }
         SessionComplete.ShowActComplete(hero);
     }
+
+    /// <summary>S1 finale (headless-callable): fire one sector wave from the run seed.</summary>
+    public KilnSectorPattern FireSectorPatternNow(float now)
+    {
+        lastSector = now;
+        SectorPatternsFired++;
+        var pattern = new KilnSectorPattern(transform.position, now,
+            KilnSectorPattern.ActiveSectors(RunProfile.RunSeed, sectorWave++));
+        sectorPatterns.Add(pattern);
+        DiabloJuice.OnBlast(transform.position);
+        return pattern;
+    }
+
+    void TickSectorPatterns(float now)
+    {
+        var hero = Hero();
+        Vector3 heroPos = hero != null ? hero.position : transform.position + Vector3.right * (KilnSectorPattern.Radius + 1f);
+        foreach (var p in sectorPatterns.ToArray())
+            if (p.Tick(now, heroPos, null)) sectorPatterns.Remove(p);
+    }
+
+    /// <summary>S1: death, respawn or retreat removes the effect.</summary>
+    public void ClearSectorPatterns() => sectorPatterns.Clear();
 
     public static void ResetRun()
     {
         Kills = 0;
         PhaseTwoEntries = 0;
         WavesFired = 0;
+        SectorPatternsFired = 0;
     }
 }
 

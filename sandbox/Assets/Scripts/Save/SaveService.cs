@@ -124,6 +124,9 @@ public static class SaveService
             skillVariants = CaptureVariants(),
             riskShrineState = (int)RunProfile.RiskShrine.State,
             riskReward = RunProfile.RiskShrine.PendingReward,
+            kindledRewardPending = RunProfile.KindledRewardPending,
+            kindledRewardClass = RunProfile.KindledRewardClass ?? "",
+            kindledRewardGranted = RunProfile.KindledRewardGranted,
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -233,16 +236,9 @@ public static class SaveService
             if (!SkillVariantCatalog.IsKnownVariant(e.classId, skill, e.variant)) continue;
             RunProfile.SkillVariants[e.classId + ":" + skill] = e.variant;
         }
-        RunProfile.RiskShrine.State = (RiskShrineState)UnityEngine.Mathf.Clamp(save.riskShrineState, 0, 4);
-        RunProfile.RiskShrine.PendingReward = save.riskReward;
-        // A claimed shrine never carries a leftover reward; an interrupted
-        // payout (crash between bag write and save) re-opens the claim.
-        if (RunProfile.RiskShrine.State == RiskShrineState.RewardClaimed)
-            RunProfile.RiskShrine.PendingReward = null;
-        else if (RunProfile.RiskShrine.State == RiskShrineState.RewardAvailable
-                 && RunProfile.RiskShrine.PendingReward == null)
-            RunProfile.RiskShrine.PendingReward =
-                RiskShrineProgress.RollRare(RunProfile.RunSeed);
+        RunProfile.KindledRewardPending = save.kindledRewardPending;
+        RunProfile.KindledRewardClass = save.kindledRewardClass ?? "";
+        RunProfile.KindledRewardGranted = save.kindledRewardGranted;
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

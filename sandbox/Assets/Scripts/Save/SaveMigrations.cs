@@ -50,6 +50,7 @@ public static class SaveMigrations
         if (save.v == 5) V5ToV6(save);
         if (save.v == 6) V6ToV7(save);
         if (save.v == 7) V7ToV8(save);
+        if (save.v == 8) V8ToV9(save);
         return Outcome.Migrated;
     }
 
@@ -142,6 +143,16 @@ public static class SaveMigrations
         save.riskShrineState = (int)RiskShrineState.Unchosen;
         save.riskReward = null;
         save.v = 8;
+    }
+
+    /// <summary>
+    /// v8 → v9: first-Kindled-victory claim defaults to closed; older
+    /// completed runs get no retroactive claim.
+    /// </summary>
+    static void V8ToV9(SaveGame save)
+    {
+        if (save.kindledRewardClass == null) save.kindledRewardClass = "";
+        save.v = 9;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>

@@ -27,6 +27,10 @@ public static class RunProfile
     public static ClassDefinition Class => ClassCatalog.Get(ClassId);
     /// <summary>Act I progression (act-one S1, save v4).</summary>
     public static ActProgress Act = new ActProgress();
+    /// <summary>Kindled-finale claim (S2, save v9): pending class + one-time grant.</summary>
+    public static bool KindledRewardPending;
+    public static string KindledRewardClass = "";
+    public static bool KindledRewardGranted;
 
     /// <summary>Risk-shrine choice (risk-shrines S1, save v8).</summary>
     public static RiskShrineProgress RiskShrine = new RiskShrineProgress();
@@ -45,6 +49,9 @@ public static class RunProfile
         ContractProgress.Reset();
         SmithingMaterial = 0;
         RiskShrine.Reset();
+        KindledRewardPending = false;
+        KindledRewardClass = "";
+        KindledRewardGranted = false;
     }
 
     static string VariantKey(string classId, DiabloSkills.Skill skill) => classId + ":" + skill;

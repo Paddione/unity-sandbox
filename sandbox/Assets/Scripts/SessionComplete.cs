@@ -58,6 +58,8 @@ public sealed class SessionComplete : MonoBehaviour
             host = go.AddComponent<SessionComplete>();
         }
         host.EnsureBuilt();
+        try { KindledFinaleReward.OfferOnSessionScreen(hero); }
+        catch (System.Exception e) { Debug.LogWarning($"[Session] Kindled reward offer failed: {e.Message}"); }
         host.Fill(hero);
         host.canvas.enabled = true;
         Debug.Log($"[Session] Complete shown (shown={Shown}).");
@@ -73,6 +75,7 @@ public sealed class SessionComplete : MonoBehaviour
         float secs = PlaySeconds();
         LastSummary = $"Zeit {secs:0}s  Kills {kills}  Gold {gold}  Beute {BestDrop}";
         if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
+        if (!string.IsNullOrEmpty(KindledFinaleReward.LastOfferLine)) LastSummary += "\n" + KindledFinaleReward.LastOfferLine;
         if (body != null) body.text = (ActOneMode ? ActOneTitle : "SESSION GESCHAFFT") + "\n" + LastSummary;
     }
 
