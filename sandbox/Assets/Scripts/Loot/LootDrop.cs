@@ -44,6 +44,7 @@ public sealed class LootDrop : MonoBehaviour
             rarity = roll.rarity,
             baseType = bases[rng.Next(bases.Count)],
             affixes = AffixLibrary.RollAffixes(roll.slot, roll.rarity, rng, DifficultyProfile.Current.affixTier),
+            affixTier = System.Math.Max(1, roll.affixTier), // smithing S1: Stufe am Drop erfassen
         };
     }
 

@@ -64,12 +64,15 @@ public sealed class VendorStock
             {
                 var slot = slots[rng.Next(slots.Length)];
                 var bases = ItemDatabase.GetBaseTypes(slot);
+                // smithing S1: Händlerware bekommt die aktuelle Run-Stufe (Werte + Label).
+                int tier = System.Math.Max(1, DifficultyProfile.Current.affixTier);
                 item = new ItemInstance
                 {
                     slot = slot,
                     rarity = rarity,
                     baseType = bases[rng.Next(bases.Count)],
-                    affixes = AffixLibrary.RollAffixes(slot, rarity, rng),
+                    affixes = AffixLibrary.RollAffixes(slot, rarity, rng, tier),
+                    affixTier = tier,
                 };
             }
             stock.offers.Add(new Offer { item = item, price = BuyPrice(item) });

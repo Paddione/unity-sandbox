@@ -47,6 +47,7 @@ public static class SaveMigrations
         if (save.v == 2) V2ToV3(save);
         if (save.v == 3) V3ToV4(save);
         if (save.v == 4) V4ToV5(save);
+        if (save.v == 5) V5ToV6(save);
         return Outcome.Migrated;
     }
 
@@ -89,6 +90,36 @@ public static class SaveMigrations
         save.v = 5;
     }
 
+    /// <summary>
+    /// v5 → v6: v5-Felder (Zone-Contracts, unbekannt) bleiben unberührt;
+    /// fehlende v6-Felder erhalten Defaults. Kompatibel, egal ob v5 zuerst landet.
+    /// </summary>
+    static void V5ToV6(SaveGame save)
+    {
+        save.smithingMaterial = System.Math.Max(0, save.smithingMaterial);
+        EnsureSmithingFields(save);
+        save.v = 6;
+    }
+
+    /// <summary>Tier-1-Default für Einträge ohne Stufe (0 = vor-smithing).</summary>
+    static void EnsureSmithingFields(SaveGame save)
+    {
+        foreach (var item in AllEquippedAndStored(save))
+        {
+            if (item == null) continue;
+            if (item.affixTier < 1) item.affixTier = 1;
+            if (item.reforgeIndexPlusOne < 0) item.reforgeIndexPlusOne = 0;
+        }
+    }
+
+    static System.Collections.Generic.IEnumerable<ItemInstance> AllEquippedAndStored(SaveGame save)
+    {
+        if (save.equipmentArmor != null) yield return save.equipmentArmor;
+        if (save.equipmentWeapon != null) yield return save.equipmentWeapon;
+        if (save.equipmentHelmet != null) yield return save.equipmentHelmet;
+        if (save.bag != null) foreach (var i in save.bag) yield return i;
+        if (save.stash != null) foreach (var i in save.stash) yield return i;
+    }
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>
     public static int ReadVersion(string path)
     {

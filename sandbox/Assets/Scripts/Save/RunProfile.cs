@@ -16,6 +16,8 @@ public static class RunProfile
     public static Stash Stash = new Stash();
     /// <summary>Playable class (second-class S1, save v3).</summary>
     public static string ClassId = ClassCatalog.FenwalkerId;
+    /// <summary>Schmiede-Material (smithing S1, save v6).</summary>
+    public static int SmithingMaterial;
 
     public static ClassDefinition Class => ClassCatalog.Get(ClassId);
     /// <summary>Act I progression (act-one S1, save v4).</summary>
@@ -32,6 +34,7 @@ public static class RunProfile
         Act = new ActProgress();
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
         ContractProgress.Reset();
+        SmithingMaterial = 0;
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

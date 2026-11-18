@@ -137,6 +137,22 @@ public static class TownBuilder
         post.AddComponent<ContractBoard>();
     }
 
+    /// <summary>
+    /// smithing S2: forge at the camp's east side, south of the board (dark
+    /// anvil block, box collider as click target, <see cref="SmithStation"/>).
+    /// </summary>
+    public static void SpawnSmithStation()
+    {
+        var post = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        post.name = SmithStation.SmithObjectName;
+        post.transform.position = new Vector3(5.5f, 0.6f, 11f);
+        post.transform.localScale = new Vector3(1.8f, 1.2f, 1.2f);
+        Paint(post, new Color(0.25f, 0.25f, 0.28f));
+        var col = post.GetComponent<BoxCollider>();
+        col.isTrigger = false;
+        post.AddComponent<SmithStation>();
+    }
+
     /// <summary>Idle-only Mecanim rig (shared controller, built once per session).</summary>
     static void WireVendorIdle(GameObject vendor)
     {

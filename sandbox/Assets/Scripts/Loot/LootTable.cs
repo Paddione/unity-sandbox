@@ -7,6 +7,8 @@ public struct LootRoll
     public bool drops;
     public ItemRarity rarity;
     public ItemSlot slot;
+    /// <summary>Affix-Stufe des Funds (1 = Normal, 2 = Kindled).</summary>
+    public int affixTier;
 }
 
 /// <summary>Weighted drop tables per tier, seeded RNG for tests.</summary>
@@ -60,6 +62,8 @@ public static class LootTable
     public static LootRoll Roll(LootTier tier, System.Random rng, float magicFind, float uniqueMul)
     {
         var roll = new LootRoll();
+        // Affix-Stufe am Erzeugungspunkt erfassen (smithing S1).
+        roll.affixTier = DifficultyProfile.Current.affixTier;
         if (rng.Next(100) >= DropChanceFor(tier)) return roll;
         roll.drops = true;
         if (magicFind <= 0f && uniqueMul == 1f)

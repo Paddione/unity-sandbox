@@ -120,6 +120,7 @@ public static class SaveService
             highestUnlockedZone = RunProfile.Act.HighestUnlocked,
             actOneComplete = RunProfile.Act.ActOneComplete,
             waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
+            smithingMaterial = System.Math.Max(0, RunProfile.SmithingMaterial),
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -192,6 +193,7 @@ public static class SaveService
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.waypoints);
         ContractProgress.FromSnapshot(save.contract);
+        RunProfile.SmithingMaterial = System.Math.Max(0, save.smithingMaterial);
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

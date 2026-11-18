@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 5;
+    public const int CurrentVersion = 6;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -47,6 +47,9 @@ public sealed class SaveGame
 
     // v5 (zone-contracts S1): frozen run contract, see ContractProgress.
     public ContractSnapshot contract = new ContractSnapshot();
+
+    // v6 (smithing S1): reforge material.
+    public int smithingMaterial;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

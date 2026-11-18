@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsFive()
+    public void CurrentVersion_IsSix()
     {
-        Assert.AreEqual(5, SaveGame.CurrentVersion);
-        Assert.AreEqual(5, new SaveGame().v);
+        Assert.AreEqual(6, SaveGame.CurrentVersion);
+        Assert.AreEqual(6, new SaveGame().v);
     }
 
     [Test]
@@ -220,5 +220,75 @@ public class SaveMigrationTests
         Assert.IsFalse(RunProfile.DifficultyUnlocked);
         Assert.AreEqual(RunProfile.Normal, RunProfile.Difficulty);
         Assert.AreEqual(0, RunProfile.Stash.Count);
+    }
+
+    // smithing S1: v6 (Material + Tier-Defaults) --------------------------
+
+    // v4 ohne smithing-Felder: Material fehlt (= 0), Einträge ohne Tier (= 0).
+    const string V4Fixture = @"{
+    ""v"": 4,
+    ""level"": 9,
+    ""xp"": 120,
+    ""equipmentWeapon"": { ""slot"": 1, ""rarity"": 0, ""baseType"": ""ShortSword"", ""affixes"": [ { ""key"": ""Damage"", ""value"": 2.0 } ], ""uniqueId"": """", ""affixTier"": 0, ""reforgeIndexPlusOne"": 0 },
+    ""equipmentArmor"": null,
+    ""equipmentHelmet"": null,
+    ""bag"": [ { ""slot"": 0, ""rarity"": 1, ""baseType"": ""LeatherVest"", ""affixes"": [ { ""key"": ""Armor"", ""value"": 3.0 } ], ""uniqueId"": """", ""affixTier"": 0, ""reforgeIndexPlusOne"": 0 } ],
+    ""gold"": 77,
+    ""zoneReached"": 2,
+    ""difficulty"": ""Normal"",
+    ""stash"": []
+}";
+
+    [Test]
+    public void V4_MigratesToV6WithTierOneAndZeroMaterial()
+    {
+        var outcome = SaveMigrations.Migrate(V4Fixture, out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(4, from);
+        Assert.AreEqual(6, save.v);
+        Assert.AreEqual(0, save.smithingMaterial);
+        Assert.AreEqual(1, save.equipmentWeapon.affixTier);
+        Assert.AreEqual(1, save.bag[0].affixTier);
+        Assert.AreEqual(0, save.bag[0].reforgeIndexPlusOne);
+        Assert.AreEqual(2f, save.equipmentWeapon.GetAffix("Damage"), 0.001f);
+        Assert.AreEqual(3f, save.bag[0].GetAffix("Armor"), 0.001f);
+        Assert.AreEqual(77, save.gold);
+    }
+
+    [Test]
+    public void V5_UnknownFieldsMigrateToV6WithDefaults()
+    {
+        // v5 gehört den Zone-Contracts: unbekanntes Feld + fehlende v6-Felder.
+        string v5 = V4Fixture.Replace(@"""v"": 4", @"""v"": 5, ""zoneContract"": ""seal-the-fen-gate""");
+        var outcome = SaveMigrations.Migrate(v5, out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(5, from);
+        Assert.AreEqual(6, save.v);
+        Assert.AreEqual(0, save.smithingMaterial);
+        Assert.AreEqual(1, save.bag[0].affixTier);
+        Assert.AreEqual(9, save.level);
+    }
+
+    [Test]
+    public void Material_SurvivesSaveRoundtrip()
+    {
+        hero = Hero();
+        RunProfile.SmithingMaterial = 7;
+        var sword = ItemDatabase.CreateStarterSword();
+        sword.affixTier = 2;
+        sword.reforgeIndexPlusOne = 1;
+        Assert.IsTrue(hero.GetComponent<Inventory>().Add(sword));
+        SaveService.SaveNow(hero, path: path);
+        Assert.AreEqual(6, SaveMigrations.ReadVersion(path));
+
+        RunProfile.Reset();
+        var fresh = Hero();
+        Object.DestroyImmediate(hero);
+        hero = fresh;
+        Assert.IsTrue(SaveService.TryLoad(fresh, path));
+        Assert.AreEqual(7, RunProfile.SmithingMaterial);
+        var loaded = fresh.GetComponent<Inventory>().Get(0);
+        Assert.AreEqual(2, loaded.affixTier);
+        Assert.AreEqual(1, loaded.reforgeIndexPlusOne);
     }
 }

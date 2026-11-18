@@ -30,6 +30,18 @@ public sealed class ItemInstance
     public string baseType;
     public List<Affix> affixes = new List<Affix>();
     public string uniqueId; // only set for Unique
+    /// <summary>
+    /// Affix-Stufe der ursprünglichen Beute (1 = Normal, 2 = Kindled).
+    /// Wird am Erzeugungspunkt (Drop/Vendor) erfasst; alte Einträge
+    /// migriert die Save-Migration auf 1. Annahme: historische Kindled-Funde
+    /// sind nicht mehr unterscheidbar und zählen als Tier 1.
+    /// </summary>
+    public int affixTier = 1;
+    /// <summary>
+    /// Umschmiedeter Affix-Slot + 1 (0 = ungebunden). Pro Gegenstand ist
+    /// dauerhaft genau ein Slot wählbar, der Rest bleibt erhalten.
+    /// </summary>
+    public int reforgeIndexPlusOne;
 
     public float GetAffix(string key)
     {
