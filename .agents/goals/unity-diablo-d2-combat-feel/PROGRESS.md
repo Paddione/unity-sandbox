@@ -21,6 +21,10 @@ Prozent: 100 %
   D2-Feel-Dateien unberührt), Unity-Tests-Run `44343327121` lief,
   Vor-HEAD `0eccf67` CI-grün.
 
+- Follow-ups außerhalb dieses Goal-Cuts: Corpses, Vendoren/Trank/Gold,
+  Damage-Numbers (explizit nicht-D2), Screenshake, Coop-Sync-Feeling,
+  Idle-Anims, Gamepad.
+
 ## Nächste Schritte
 
 Keine.
@@ -28,6 +32,3 @@ Keine.
 ## Offene Punkte
 
 Keine.
-- Follow-ups (nicht dieser Goal-Cut): Corpses, Vendoren/Trank/Gold,
-  Damage-Numbers (explizit nicht-D2), Screenshake, Coop-Sync-Feeling,
-  Idle-Anims, Gamepad.

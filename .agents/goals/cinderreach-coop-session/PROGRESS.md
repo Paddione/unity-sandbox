@@ -94,6 +94,7 @@ Prozent: 100 %
   Anon-Identität kann sich nicht selbst joinen (→ frische Identität pro
   Prozess); volle Save-Bags brechen den deterministischen Trank-Kauf
   (→ Harness archiviert Stale-Saves).
+- Hinweis außerhalb des Goals (kein Goal-Blocker): Solo-Autoplay ohne `-seed` (Seed aus vorhandenem Save, 1112106611, Fen-Variante `husks=1 elite=0 brute=2 props=2`) blieb nach 11 Kills bis Budgetende ohne Treffer hängen. Der Nightly testet nur Seeds 0–2 und diese Husk-Variante nie.
 
 ## Nächste Schritte
 
@@ -102,6 +103,3 @@ Keine — alle Stufen S1–S6 landed; alle 7 Goal-Kriterien belegt.
 ## Offene Punkte
 
 Keine.
-- Befund außerhalb des Goals (bleibt bestehen, kein Goal-Blocker): Solo-Autoplay ohne `-seed` (Seed aus vorhandenem Save, 1112106611, Fen-Variante
-  `husks=1 elite=0 brute=2 props=2`) blieb nach 11 Kills bis Budgetende ohne Treffer hängen. Der Nightly testet nur
-  Seeds 0–2 und diese Husk-Variante nie.
