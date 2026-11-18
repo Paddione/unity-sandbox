@@ -97,6 +97,7 @@ public static class SaveService
             difficulty = RunProfile.Difficulty,
             runSeed = RunProfile.RunSeed,
             stash = RunProfile.Stash.ToList(),
+            classId = RunProfile.ClassId,
         };
         if (hero == null) return save;
         var prog = hero.GetComponent<DiabloProgression>();
@@ -165,6 +166,7 @@ public static class SaveService
         RunProfile.Difficulty = string.IsNullOrEmpty(save.difficulty) ? RunProfile.Normal : save.difficulty;
         RunProfile.RunSeed = save.runSeed;
         RunProfile.Stash = Stash.FromList(save.stash);
+        RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

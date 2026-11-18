@@ -375,3 +375,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Offen außerhalb dieses Goals: Bone-Warden-Projektile treffen den Helden nie (`RangedCaster.Fire` →
   `DiabloSkills.ApplyHit` trifft nur `EnemyHealth`). Kindled skaliert deshalb nur Husk-Nahkampf und Slam.
 
+## 2026-11-18 — cinderreach-second-class S1 class-data (Katalog + Save v3)
+
+- Done: Klassenkatalog, feste Skill-Enum-Werte, Save v3 `classId`, Migration v2 → v3.
+- Belegt: EditMode 143/143, PlayMode 74/74, Verifies, Autoplay exit 0.
+- Faced: Autoplay-Lauf mit Zufalls-Seed (Husk-Variante 1) meldete den Fen nach einem Kill als clear.
+  Befund betrifft replayability S3, Untersuchung folgt als eigener Fix.
+- Next: S2 Lanternbearer-Skills.
+

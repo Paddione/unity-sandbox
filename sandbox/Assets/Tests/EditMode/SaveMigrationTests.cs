@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsTwo()
+    public void CurrentVersion_IsThree()
     {
-        Assert.AreEqual(2, SaveGame.CurrentVersion);
-        Assert.AreEqual(2, new SaveGame().v);
+        Assert.AreEqual(3, SaveGame.CurrentVersion);
+        Assert.AreEqual(3, new SaveGame().v);
     }
 
     [Test]
@@ -70,7 +70,8 @@ public class SaveMigrationTests
         var outcome = SaveMigrations.Migrate(V1Fixture, out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(1, from);
-        Assert.AreEqual(2, save.v);
+        Assert.AreEqual(3, save.v, "v1 lifts through v2 to v3");
+        Assert.AreEqual(ClassCatalog.FenwalkerId, save.classId);
         Assert.AreEqual(6, save.level);
         Assert.AreEqual(340, save.xp);
         Assert.AreEqual(2, save.freeAttributePoints);
@@ -94,9 +95,9 @@ public class SaveMigrationTests
     public void FutureVersion_Refused()
     {
         Assert.AreEqual(SaveMigrations.Outcome.FutureVersion,
-            SaveMigrations.Migrate("{\"v\":3,\"level\":9}", out SaveGame save, out int from));
+            SaveMigrations.Migrate("{\"v\":4,\"level\":9}", out SaveGame save, out int from));
         Assert.IsNull(save);
-        Assert.AreEqual(3, from);
+        Assert.AreEqual(4, from);
     }
 
     [Test]
@@ -121,7 +122,7 @@ public class SaveMigrationTests
         Assert.AreEqual(RunProfile.Normal, RunProfile.Difficulty);
 
         SaveService.SaveNow(hero, path: path);
-        Assert.AreEqual(2, SaveMigrations.ReadVersion(path), "Next write is v2.");
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path), "Next write is current.");
         Assert.AreEqual(V1Fixture, File.ReadAllText(bak), "Backup is never overwritten.");
     }
 
@@ -132,7 +133,7 @@ public class SaveMigrationTests
         hero = Hero();
         SaveService.WriteSave(SaveService.CaptureState(hero), path);
         Assert.IsTrue(File.Exists(SaveMigrations.BackupPath(path, 1)));
-        Assert.AreEqual(2, SaveMigrations.ReadVersion(path));
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path));
     }
 
     [Test]

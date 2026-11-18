@@ -44,6 +44,7 @@ public static class SaveMigrations
         if (header.v == SaveGame.CurrentVersion) return Outcome.Current;
 
         if (save.v == 1) V1ToV2(save);
+        if (save.v == 2) V2ToV3(save);
         return Outcome.Migrated;
     }
 
@@ -55,6 +56,13 @@ public static class SaveMigrations
         save.runSeed = RunProfile.NewSeed();
         save.stash = new System.Collections.Generic.List<ItemInstance>();
         save.v = 2;
+    }
+
+    /// <summary>v2 → v3: every pre-class hero is a Fenwalker.</summary>
+    static void V2ToV3(SaveGame save)
+    {
+        save.classId = ClassCatalog.FenwalkerId;
+        save.v = 3;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>

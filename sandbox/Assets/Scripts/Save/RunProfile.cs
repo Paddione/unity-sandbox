@@ -14,6 +14,10 @@ public static class RunProfile
     public static bool DifficultyUnlocked;
     public static int RunSeed = NewSeed();
     public static Stash Stash = new Stash();
+    /// <summary>Playable class (second-class S1, save v3).</summary>
+    public static string ClassId = ClassCatalog.FenwalkerId;
+
+    public static ClassDefinition Class => ClassCatalog.Get(ClassId);
 
     /// <summary>Fresh-run defaults (New Game, headless tests).</summary>
     public static void Reset()
@@ -22,6 +26,7 @@ public static class RunProfile
         DifficultyUnlocked = false;
         RunSeed = NewSeed();
         Stash = new Stash();
+        ClassId = ClassCatalog.FenwalkerId;
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

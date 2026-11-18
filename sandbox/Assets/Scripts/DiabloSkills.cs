@@ -14,7 +14,11 @@ using Unity.Netcode;
 /// </summary>
 public sealed class DiabloSkills : MonoBehaviour
 {
-    public enum Skill { Fireball, Arrow, Cleave }
+    /// <summary>
+    /// Explicit values: co-op sends skills as int (DiabloNetworkPlayer), so
+    /// existing values never move; Lanternbearer skills append (second-class S1).
+    /// </summary>
+    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6 }
 
     [Header("Fireball (Q)")]
     public int fireballDamage = 3;

@@ -117,7 +117,7 @@ S1 zuerst. S2 und S3 nach S1 parallel (disjunkt). S4 nach S2 und S3. S5 zuletzt.
 
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
-| S1 class-data | Startbedingung | 15 % | offen |
+| S1 class-data | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 skills | S1 | 30 % | offen |
 | S3 sheet+ui | S1 | 15 % | offen |
 | S4 select+items | S2, S3 | 20 % | offen |
