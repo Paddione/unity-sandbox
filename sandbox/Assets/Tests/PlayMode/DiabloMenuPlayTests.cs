@@ -1,0 +1,238 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.TestTools;
+
+/// <summary>
+/// Runtime PlayMode interaction checks across the upgraded Cinderreach UI panels:
+/// SessionComplete clickable BackToMenu -> ClassSelectUI, PauseMenuUI navigation,
+/// DiabloVendorUI scrollable rows/affordability, DiabloInventoryUI sliders & potion consume,
+/// and DiabloCharacterUI / DiabloStashUI / DiabloWaypointUI lifecycle.
+/// </summary>
+public class DiabloMenuPlayTests
+{
+    GameObject eventSys;
+    readonly List<GameObject> tracked = new List<GameObject>();
+    bool hadSaveBackup;
+    byte[] saveBackup;
+
+    TTrack Track<TTrack>(TTrack go) where TTrack : Object
+    {
+        if (go is GameObject g) tracked.Add(g);
+        return go;
+    }
+
+    [UnitySetUp]
+    public IEnumerator SetUp()
+    {
+        RunProfile.Reset();
+        var path = SaveService.DefaultPath;
+        hadSaveBackup = File.Exists(path);
+        saveBackup = hadSaveBackup ? File.ReadAllBytes(path) : null;
+        if (EventSystem.current == null)
+            eventSys = new GameObject("EventSystem", typeof(EventSystem));
+        yield return null;
+    }
+
+    [UnityTearDown]
+    public IEnumerator TearDown()
+    {
+        for (int i = tracked.Count - 1; i >= 0; i--)
+            if (tracked[i] != null) Object.DestroyImmediate(tracked[i]);
+        tracked.Clear();
+        SessionComplete.ResetRun();
+        DiabloClickController.ExternalDrive = false;
+        RunProfile.Reset();
+        var path = SaveService.DefaultPath;
+        if (hadSaveBackup && saveBackup != null)
+            File.WriteAllBytes(path, saveBackup);
+        else if (File.Exists(path))
+            File.Delete(path);
+        if (eventSys != null) Object.DestroyImmediate(eventSys);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator SessionComplete_MenuButtonOpensClassSelectAndTownButtonMovesHero()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        hero.AddComponent<Wallet>();
+        SessionComplete.Show(hero, "Emberbrand Blade");
+        yield return null;
+
+        var menuBtn = hero.transform.Find("SessionCanvas/SessionPanel/SessionButtons/MenuButton")?.GetComponent<Button>();
+        Assert.IsNotNull(menuBtn, "MenuButton missing on SessionCanvas.");
+        ExecuteEvents.Execute(menuBtn.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.submitHandler);
+        yield return null;
+
+        var cls = Object.FindFirstObjectByType<ClassSelectUI>(FindObjectsInactive.Include);
+        Assert.IsNotNull(cls, "BackToMenu must open or spawn ClassSelectUI.");
+        Track(cls.gameObject);
+        Assert.IsTrue(cls.IsOpen, "ClassSelectUI must be open after clicking MenuButton.");
+
+        cls.SetOpen(false);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator ClassSelectUI_DisplaysCardsAndSwitchesClass()
+    {
+        var clsGo = Track(new GameObject("ClassSelect"));
+        var cls = clsGo.AddComponent<ClassSelectUI>();
+        cls.SetOpen(true);
+        yield return null;
+
+        Assert.IsNotNull(clsGo.transform.Find("ClassSelectCanvas/MainContainer/CardsRow/Card_fenwalker"));
+        Assert.IsNotNull(clsGo.transform.Find("ClassSelectCanvas/MainContainer/CardsRow/Card_lanternbearer"));
+
+        cls.ShowSettings(true);
+        yield return null;
+        var settingsPanel = clsGo.transform.Find("ClassSelectCanvas/StartupSettingsPanel");
+        Assert.IsNotNull(settingsPanel);
+        Assert.IsTrue(settingsPanel.gameObject.activeSelf);
+
+        cls.ChooseNew(ClassCatalog.LanternbearerId);
+        yield return null;
+        Assert.IsFalse(cls.IsOpen);
+        Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator PauseMenu_OpensInventoryAndSettingsCleanly()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        hero.AddComponent<Equipment>();
+        hero.AddComponent<Inventory>();
+        var invUi = hero.AddComponent<DiabloInventoryUI>();
+
+        var pauseGo = Track(new GameObject("PauseMenu"));
+        var pause = pauseGo.AddComponent<PauseMenuUI>();
+        pause.SetOpen(true);
+        yield return null;
+
+        Assert.IsTrue(pause.IsOpen);
+        Assert.IsTrue(DiabloClickController.ExternalDrive);
+
+        pause.OpenInventory();
+        yield return null;
+        Assert.IsFalse(pause.IsOpen);
+        Assert.IsTrue(invUi.IsOpen);
+
+        invUi.SetOpen(false);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator VendorUI_ScrollableRowsAndAffordabilityWork()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        var wallet = hero.AddComponent<Wallet>();
+        hero.AddComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
+        hero.AddComponent<Inventory>();
+        var vendorUi = hero.AddComponent<DiabloVendorUI>();
+        var stock = VendorStock.Roll(1234);
+        vendorUi.BindStock(stock);
+
+        vendorUi.SetOpen(true);
+        yield return null;
+        Assert.IsTrue(vendorUi.IsOpen);
+
+        var rows = hero.transform.Find("VendorCanvas/Panel/Columns/VendorColumn/Scroll/Viewport/VendorRows");
+        Assert.IsNotNull(rows, "VendorRows must live inside Scroll/Viewport.");
+        Assert.GreaterOrEqual(rows.childCount, 4, "Vendor rows must populate with stock items.");
+
+        var inv = hero.GetComponent<Inventory>();
+        var firstBuy = rows.GetChild(0).GetComponentInChildren<Button>();
+        Assert.IsNotNull(firstBuy);
+        var priceText = firstBuy.transform.Find("Price")?.GetComponent<Text>();
+        Assert.IsNotNull(priceText);
+        Assert.AreEqual(DiabloPalette.Blood, priceText.color, "Price text must show Blood red when purse is 0.");
+        vendorUi.BuyOffer(0);
+        Assert.AreEqual(0, inv.Count, "Buying when broke must leave bag empty.");
+
+        wallet.Add(500);
+        vendorUi.Refresh();
+        yield return null;
+        priceText = rows.GetChild(0).GetComponentInChildren<Button>()?.transform.Find("Price")?.GetComponent<Text>();
+        Assert.AreEqual(DiabloPalette.GoldBright, priceText.color, "Price text must show GoldBright once affordable.");
+        vendorUi.BuyOffer(0);
+        Assert.AreEqual(1, inv.Count, "Buying affordable item must move it into bag.");
+
+        vendorUi.SetOpen(false);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator InventoryUI_SettingsSlidersAndPotionConsumeWork()
+    {
+        bool prevDmg = DiabloSettings.ShowDamageNumbers;
+        bool prevFps = DiabloSettings.ShowFPS;
+
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        hero.AddComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
+        var inv = hero.AddComponent<Inventory>();
+        hero.AddComponent<Wallet>();
+        var hp = hero.AddComponent<PlayerHealth>();
+        hp.TakeDamage(10f);
+        float damaged = hp.CurrentHP;
+        inv.Add(ItemDatabase.CreateHealingPotion());
+
+        var invUi = hero.AddComponent<DiabloInventoryUI>();
+        invUi.SetOpen(true);
+        yield return null;
+
+        invUi.EquipIndex(0); // consumes potion cleanly without equipping into helmet
+        yield return null;
+        Assert.Greater(hp.CurrentHP, damaged, "Using a potion from the bag must heal the hero.");
+        Assert.IsNull(hero.GetComponent<Equipment>().helmet, "Potion must never equip into helmet.");
+
+        invUi.ShowTab(DiabloInventoryUI.MenuTab.Settings);
+        yield return null;
+        var sliders = hero.GetComponentsInChildren<Slider>(true);
+        Assert.GreaterOrEqual(sliders.Length, 4, "Settings tab must expose 4 real Slider controls.");
+        foreach (var s in sliders)
+        {
+            Assert.IsNotNull(s.fillRect, "Slider must wire fillRect.");
+            Assert.IsNotNull(s.handleRect, "Slider must wire handleRect.");
+        }
+
+        DiabloSettings.ShowDamageNumbers = prevDmg;
+        DiabloSettings.ShowFPS = prevFps;
+        DiabloSettings.Save();
+        invUi.SetOpen(false);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator Panels_CharacterStashWaypointOpenAndCloseCleanly()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        hero.AddComponent<Equipment>().Equip(ItemDatabase.CreateStarterSword());
+        hero.AddComponent<Inventory>();
+        hero.AddComponent<Wallet>();
+        var charUi = hero.AddComponent<DiabloCharacterUI>();
+        var stashUi = hero.AddComponent<DiabloStashUI>();
+        var wpUi = hero.AddComponent<DiabloWaypointUI>();
+
+        charUi.SetOpen(true);
+        yield return null;
+        Assert.IsNotNull(hero.transform.Find("CharacterCanvas/Panel"));
+        charUi.SetOpen(false);
+
+        stashUi.SetOpen(true);
+        yield return null;
+        Assert.IsNotNull(hero.transform.Find("StashCanvas/Panel"));
+        stashUi.SetOpen(false);
+
+        wpUi.SetOpen(true);
+        yield return null;
+        Assert.IsNotNull(hero.transform.Find("WaypointCanvas/Panel"));
+        wpUi.SetOpen(false);
+        yield return null;
+    }
+}

@@ -20,6 +20,18 @@ public static class DiabloPalette
     public static readonly Color SlotEmpty = new Color(0.10f, 0.09f, 0.12f, 1f);
     public static readonly Color TabActive = new Color(0.28f, 0.21f, 0.13f, 1f);
     public static readonly Color TabInactive = new Color(0.13f, 0.11f, 0.15f, 1f);
+    public static readonly Color ButtonPrimary = new Color(0.46f, 0.10f, 0.10f, 1f);
+    public static readonly Color ButtonSecondary = new Color(0.17f, 0.14f, 0.19f, 1f);
+    public static readonly Color TooltipBg = new Color(0.055f, 0.045f, 0.075f, 0.96f);
+    public static readonly Color GoldBright = new Color(0.98f, 0.80f, 0.28f, 1f);
+    public static readonly Color LanternEmber = new Color(0.96f, 0.56f, 0.18f, 1f);
+    public static readonly Color FenSteel = new Color(0.55f, 0.72f, 0.88f, 1f);
+    public static readonly Color DisabledText = new Color(0.45f, 0.42f, 0.38f, 1f);
+
+    public static Color ClassAccent(string classId)
+    {
+        return classId == ClassCatalog.LanternbearerId ? LanternEmber : FenSteel;
+    }
 
     public static Color Rarity(ItemRarity rarity)
     {

@@ -30,6 +30,7 @@ public sealed class WaypointShrine : MonoBehaviour
         TryDiscover(hero);
         var mouse = UnityEngine.InputSystem.Mouse.current;
         if (mouse == null || Camera.main == null || !mouse.leftButton.wasPressedThisFrame) return;
+        if (DiabloUIFactory.IsWorldInputBlocked(hero)) return;
         var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, 200f) || hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!Vendor.CanInteract(hero.transform.position, transform.position, DiscoverRadius + 1f)) return;

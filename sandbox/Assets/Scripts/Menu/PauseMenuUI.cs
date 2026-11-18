@@ -1,0 +1,197 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
+/// <summary>
+/// Sanctuary Pause / System Menu opened on Escape when no other modal dialog owns the screen.
+/// Provides Resume, Inventory, Character Sheet, full embedded Settings, Return to Start Screen,
+/// and Quit without losing save state.
+/// </summary>
+public sealed class PauseMenuUI : MonoBehaviour
+{
+    public bool IsOpen { get; private set; }
+    public bool SettingsOpen { get; private set; }
+
+    Canvas canvas;
+    GameObject mainCard;
+    GameObject settingsCard;
+    Text statusLabel;
+    readonly List<UnityEngine.Events.UnityAction> settingsRefreshes = new List<UnityEngine.Events.UnityAction>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    static void Boot()
+    {
+        if (Object.FindFirstObjectByType<ClassAppearance>(FindObjectsInactive.Include) == null) return;
+        if (Object.FindFirstObjectByType<PauseMenuUI>(FindObjectsInactive.Include) != null) return;
+        new GameObject("PauseMenu").AddComponent<PauseMenuUI>();
+    }
+
+    void Update()
+    {
+        var kb = Keyboard.current;
+        if (kb == null || !kb.escapeKey.wasPressedThisFrame) return;
+        if (DiabloUIFactory.WasEscConsumedThisFrame) return;
+
+        var cls = Object.FindFirstObjectByType<ClassSelectUI>(FindObjectsInactive.Include);
+        if (cls != null && cls.IsOpen) return;
+        if (SessionComplete.Shown > 0 && IsSessionCanvasVisible()) return;
+
+        if (IsOpen)
+        {
+            if (SettingsOpen) ShowMain();
+            else SetOpen(false);
+            DiabloUIFactory.MarkEscConsumed();
+            return;
+        }
+
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (DiabloUIFactory.IsAnyModalOpen(hero)) return;
+
+        SetOpen(true);
+        DiabloUIFactory.MarkEscConsumed();
+    }
+
+    static bool IsSessionCanvasVisible()
+    {
+        var sc = Object.FindFirstObjectByType<SessionComplete>(FindObjectsInactive.Include);
+        if (sc == null) return false;
+        var c = sc.GetComponentInChildren<Canvas>(true);
+        return c != null && c.enabled;
+    }
+
+    public void SetOpen(bool open)
+    {
+        if (open && canvas == null) Build();
+        if (IsOpen != open) DiabloAudio.PlayUIClick();
+        IsOpen = open;
+        if (canvas != null) canvas.enabled = open;
+        DiabloClickController.ExternalDrive = open;
+        if (open)
+        {
+            SettingsOpen = false;
+            ShowMain();
+            RefreshStatus();
+        }
+    }
+
+    public void ShowMain()
+    {
+        SettingsOpen = false;
+        if (mainCard != null) mainCard.SetActive(true);
+        if (settingsCard != null) settingsCard.SetActive(false);
+        RefreshStatus();
+    }
+
+    public void ShowSettings()
+    {
+        if (canvas == null) Build();
+        SettingsOpen = true;
+        if (mainCard != null) mainCard.SetActive(false);
+        if (settingsCard != null) settingsCard.SetActive(true);
+        foreach (var r in settingsRefreshes) r?.Invoke();
+    }
+
+    public void OpenInventory()
+    {
+        SetOpen(false);
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        hero?.GetComponent<DiabloInventoryUI>()?.SetOpen(true);
+    }
+
+    public void OpenCharacter()
+    {
+        SetOpen(false);
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        hero?.GetComponent<DiabloCharacterUI>()?.SetOpen(true);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (hero != null) SaveService.SaveNow(hero);
+        SetOpen(false);
+        var cls = Object.FindFirstObjectByType<ClassSelectUI>(FindObjectsInactive.Include);
+        if (cls == null) cls = new GameObject("ClassSelect").AddComponent<ClassSelectUI>();
+        cls.SetOpen(true);
+    }
+
+    public void QuitGame()
+    {
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (hero != null) SaveService.SaveNow(hero);
+        Debug.Log("[Menu] Quit requested.");
+#if UNITY_EDITOR
+        if (Application.isPlaying && !Application.isBatchMode)
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+        if (!Application.isBatchMode) Application.Quit();
+#endif
+    }
+
+    void RefreshStatus()
+    {
+        if (statusLabel == null) return;
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        var prog = hero != null ? hero.GetComponent<DiabloProgression>() : null;
+        var wallet = hero != null ? hero.GetComponent<Wallet>() : null;
+        int lv = prog != null ? prog.Level : 1;
+        int gold = wallet != null ? wallet.Gold : 0;
+        statusLabel.text = $"{RunProfile.Class.displayName}  •  Lv {lv}  •  {gold}g  •  {RunProfile.Difficulty}";
+    }
+
+    void Build()
+    {
+        var canvasGo = new GameObject("PauseCanvas");
+        canvasGo.transform.SetParent(transform, false);
+        canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 24);
+
+        var scrim = new GameObject("Scrim", typeof(RectTransform));
+        scrim.transform.SetParent(canvasGo.transform, false);
+        var sImg = scrim.AddComponent<Image>();
+        sImg.color = new Color(0.03f, 0.02f, 0.04f, 0.78f);
+        var sr = scrim.GetComponent<RectTransform>();
+        sr.anchorMin = Vector2.zero;
+        sr.anchorMax = Vector2.one;
+        sr.offsetMin = sr.offsetMax = Vector2.zero;
+
+        // Main pause card
+        mainCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PausePanel", new Vector2(440f, 520f), Vector2.zero);
+        var v = mainCard.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(22, 22, 18, 20);
+        v.spacing = 10f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+
+        DiabloUIFactory.MakeHeader(mainCard.transform, "PAUSED", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
+        statusLabel = DiabloUIFactory.MakeText(mainCard.transform, "HeroStatus", "", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(statusLabel.gameObject, prefH: 24f, flexW: 1f);
+        DiabloUIFactory.MakeDivider(mainCard.transform);
+
+        AddMenuButton(mainCard.transform, "ResumeButton", "Resume Expedition", true, () => SetOpen(false));
+        AddMenuButton(mainCard.transform, "InventoryButton", "Inventory & Gear (I)", false, OpenInventory);
+        AddMenuButton(mainCard.transform, "CharacterButton", "Character & Skills (C)", false, OpenCharacter);
+        AddMenuButton(mainCard.transform, "SettingsButton", "Settings & Audio", false, ShowSettings);
+        DiabloUIFactory.MakeDivider(mainCard.transform);
+        AddMenuButton(mainCard.transform, "SaveMenuButton", "Save & Main Menu", false, ReturnToMainMenu);
+        AddMenuButton(mainCard.transform, "QuitButton", "Save & Quit", false, QuitGame);
+
+        // Embedded settings modal card
+        settingsCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PauseSettingsPanel", new Vector2(560f, 600f), Vector2.zero);
+        var sv = settingsCard.AddComponent<VerticalLayoutGroup>();
+        sv.padding = new RectOffset(22, 22, 18, 20);
+        sv.spacing = 8f;
+        sv.childControlWidth = true;
+        sv.childControlHeight = false;
+        DiabloUIFactory.MakeHeader(settingsCard.transform, "SETTINGS", DiabloMenuArt.MenuArtSprite("SettingsCog"), ShowMain);
+        DiabloUIFactory.BuildSettingsWidgets(settingsCard.transform, settingsRefreshes, onBack: ShowMain);
+        settingsCard.SetActive(false);
+        canvas.enabled = false;
+    }
+
+    static void AddMenuButton(Transform parent, string name, string label, bool primary, UnityEngine.Events.UnityAction onClick)
+    {
+        var btn = DiabloUIFactory.MakeButton(parent, name, label, 17, primary, null, onClick);
+        DiabloUIFactory.SetLayout(btn.gameObject, prefH: 44f, flexW: 1f);
+    }
+}

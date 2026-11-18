@@ -186,6 +186,10 @@ public sealed class DiabloSkills : MonoBehaviour
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     Text hud;
+    Transform slotsContainer;
+    string hudBuiltFor = "";
+    readonly System.Collections.Generic.List<(Skill skill, Image frame, Image veil, Text cdText)> hudSlots =
+        new System.Collections.Generic.List<(Skill, Image, Image, Text)>();
 
     void Awake()
     {
@@ -1130,7 +1134,21 @@ public sealed class DiabloSkills : MonoBehaviour
     void UpdateHud()
     {
         if (hud == null) BuildHud();
+        if (hudBuiltFor != ActiveClass.id) RebuildHudSlots();
         hud.text = HudLine();
+        foreach (var (skill, frame, veil, cdText) in hudSlots)
+        {
+            float left = CooldownLeft(skill);
+            bool onCd = left > 0f;
+            if (veil != null) veil.enabled = onCd;
+            if (cdText != null)
+            {
+                cdText.enabled = onCd;
+                if (onCd) cdText.text = $"{left:0.0}";
+            }
+            if (frame != null)
+                frame.color = skill == lastUsed ? DiabloPalette.GoldBright : Color.white;
+        }
     }
 
     /// <summary>Skill bar text from the class (Fenwalker keeps "Fireball / Bow / Cleave").</summary>
@@ -1172,25 +1190,106 @@ public sealed class DiabloSkills : MonoBehaviour
     {
         var canvasGo = new GameObject("SkillBarCanvas");
         canvasGo.transform.SetParent(transform, false);
-        var canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: false);
+
+        var rowGo = new GameObject("SkillSlotsRow", typeof(RectTransform));
+        rowGo.transform.SetParent(canvasGo.transform, false);
+        var rrt = rowGo.GetComponent<RectTransform>();
+        rrt.anchorMin = rrt.anchorMax = rrt.pivot = new Vector2(0.5f, 0f);
+        rrt.sizeDelta = new Vector2(340f, 52f);
+        rrt.anchoredPosition = new Vector2(0f, 20f);
+        var hz = rowGo.AddComponent<HorizontalLayoutGroup>();
+        hz.spacing = 10f;
+        hz.childAlignment = TextAnchor.MiddleCenter;
+        hz.childControlWidth = false;
+        hz.childControlHeight = false;
+        slotsContainer = rowGo.transform;
+
         var go = new GameObject("SkillBar");
         go.transform.SetParent(canvasGo.transform, false);
         hud = go.AddComponent<Text>();
         hud.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        hud.fontSize = 20;
+        hud.fontSize = 14;
         hud.alignment = TextAnchor.MiddleCenter;
-        hud.color = new Color(1f, 0.85f, 0.55f, 1f);
+        hud.color = DiabloPalette.ParchmentDim;
+        hud.horizontalOverflow = HorizontalWrapMode.Overflow;
         hud.raycastTarget = false;
         go.AddComponent<Shadow>();
         var r = hud.rectTransform;
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0f);
-        r.sizeDelta = new Vector2(700f, 36f);
-        r.anchoredPosition = new Vector2(0f, 24f);
+        r.sizeDelta = new Vector2(920f, 20f);
+        r.anchoredPosition = new Vector2(0f, 2f);
+
+        RebuildHudSlots();
+    }
+
+    void RebuildHudSlots()
+    {
+        if (slotsContainer == null) return;
+        foreach (Transform c in slotsContainer)
+            if (Application.isPlaying) Destroy(c.gameObject);
+            else DestroyImmediate(c.gameObject);
+        hudSlots.Clear();
+
+        var cls = ActiveClass;
+        for (int i = 0; i < cls.skills.Length; i++)
+        {
+            var sk = cls.skills[i];
+            string key = cls.keys[i] == "Space" ? "Spc" : cls.keys[i];
+
+            var slot = new GameObject($"SkillSlot_{sk}", typeof(RectTransform));
+            slot.transform.SetParent(slotsContainer, false);
+            slot.GetComponent<RectTransform>().sizeDelta = new Vector2(50f, 50f);
+            var frame = slot.AddComponent<Image>();
+            frame.sprite = DiabloMenuArt.SlotBackground(sk == lastUsed ? ItemRarity.Rare : (ItemRarity?)null, 64);
+            frame.type = Image.Type.Sliced;
+            frame.raycastTarget = false;
+
+            var spr = DiabloMenuArt.SkillIcon(sk);
+            if (spr != null)
+            {
+                var iGo = new GameObject("Icon", typeof(RectTransform));
+                iGo.transform.SetParent(slot.transform, false);
+                var iImg = iGo.AddComponent<Image>();
+                iImg.sprite = spr;
+                iImg.preserveAspect = true;
+                iImg.raycastTarget = false;
+                var ir = iGo.GetComponent<RectTransform>();
+                ir.anchorMin = Vector2.zero;
+                ir.anchorMax = Vector2.one;
+                ir.offsetMin = new Vector2(4f, 4f);
+                ir.offsetMax = new Vector2(-4f, -4f);
+            }
+
+            var veilGo = new GameObject("CooldownVeil", typeof(RectTransform));
+            veilGo.transform.SetParent(slot.transform, false);
+            var veil = veilGo.AddComponent<Image>();
+            veil.color = new Color(0.02f, 0.02f, 0.04f, 0.72f);
+            veil.raycastTarget = false;
+            var vr = veilGo.GetComponent<RectTransform>();
+            vr.anchorMin = Vector2.zero;
+            vr.anchorMax = Vector2.one;
+            vr.offsetMin = vr.offsetMax = Vector2.zero;
+            veil.enabled = false;
+
+            var cd = DiabloUIFactory.MakeText(slot.transform, "CdText", "", 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+            cd.fontStyle = FontStyle.Bold;
+            var cdr = cd.rectTransform;
+            cdr.anchorMin = Vector2.zero;
+            cdr.anchorMax = Vector2.one;
+            cdr.offsetMin = cdr.offsetMax = Vector2.zero;
+            cd.enabled = false;
+
+            var keyLbl = DiabloUIFactory.MakeText(slot.transform, "KeyBadge", key, 11, DiabloPalette.TrimGold, TextAnchor.LowerRight);
+            keyLbl.fontStyle = FontStyle.Bold;
+            var kr = keyLbl.rectTransform;
+            kr.anchorMin = Vector2.zero;
+            kr.anchorMax = Vector2.one;
+            kr.offsetMin = new Vector2(2f, 2f);
+            kr.offsetMax = new Vector2(-4f, -2f);
+
+            hudSlots.Add((sk, frame, veil, cd));
+        }
+        hudBuiltFor = cls.id;
     }
 }

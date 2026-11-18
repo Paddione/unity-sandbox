@@ -135,7 +135,7 @@ public static class DiabloAudio
     public static void PlayDeath() { EnsureBuilt(); soundedDeaths++; PlayRaw(deathClip); }
     public static void PlayLoot() { EnsureBuilt(); soundedLoot++; PlayRaw(lootClip); }
     /// <summary>Menu tick: deep + quiet (presentation tuning) — routes gain + fallback like all SFX.</summary>
-    public static void PlayUIClick() { EnsureBuilt(); PlaySfx(uiClickClip, "UIClick", UIClickVolume); }
+    public static void PlayUIClick() { EnsureBuilt(); PlaySfx(uiClickClip, "UIClick", UIClickVolume * (SfxGain > 0f ? DiabloSettings.EffectiveUI / SfxGain : 0f)); }
     public static void PlayHurt() { EnsureBuilt(); PlayRaw(hurtClip); }
     public static void PlayPlayerDeath() { EnsureBuilt(); PlayRaw(playerDeathClip); }
     /// <summary>Fireball leaving the hand.</summary>

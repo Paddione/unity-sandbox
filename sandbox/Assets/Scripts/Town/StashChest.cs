@@ -46,6 +46,7 @@ public sealed class StashChest : MonoBehaviour
         if (!mouse.leftButton.wasPressedThisFrame) return;
         var hero = GameObject.Find("Player");
         if (hero == null) return;
+        if (DiabloUIFactory.IsWorldInputBlocked(hero)) return;
         var heroUI = hero.GetComponent<DiabloStashUI>();
         if (heroUI != null && heroUI.IsOpen) return;
         var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());

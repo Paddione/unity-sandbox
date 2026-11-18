@@ -40,6 +40,14 @@ public sealed class DiabloClickController : MonoBehaviour
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        if (controller != null)
+        {
+            // Primitive Capsule test heroes carry a sibling CapsuleCollider alongside CharacterController;
+            // disable it and sync PhysX transforms so CharacterController.Move doesn't self-depenetrate.
+            var cap = GetComponent<CapsuleCollider>();
+            if (cap != null && !cap.isTrigger) cap.enabled = false;
+            Physics.SyncTransforms();
+        }
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
         block = GetComponent<DiabloBlock>();
@@ -220,7 +228,8 @@ public sealed class DiabloClickController : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out var aimHit, 200f))
                 SetAimPoint(aimHit.point);
-            if (!ShouldBlockClicks(GetComponent<DiabloInventoryUI>()))
+            if (!ShouldBlockClicks(GetComponent<DiabloInventoryUI>())
+                && !DiabloUIFactory.IsWorldInputBlocked(gameObject))
             {
                 if (mouse.leftButton.wasPressedThisFrame)
                     Strike();

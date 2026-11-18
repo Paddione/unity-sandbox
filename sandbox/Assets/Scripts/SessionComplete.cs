@@ -2,11 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Session-complete overlay (S5): the Hollow Abbot's death opens a panel
-/// with play time, kills, gold and the best drop, plus "Weiter (Town)"
-/// (teleport back to Lantern Hold) and "Menü" buttons. Built at runtime
-/// like <c>DiabloVendorUI</c>, same HD scaler convention (1920×1080,
-/// MatchWidthOrHeight 0.5).
+/// Sanctuary Act / Session Completion overlay shown after defeating the Boss or Kilnmother.
+/// Built cleanly with DiabloUIFactory dark-fantasy panels, GraphicRaycaster, English KPI totals,
+/// Kindled unlock callout, and functional Return to Town & Main Menu actions.
 /// </summary>
 public sealed class SessionComplete : MonoBehaviour
 {
@@ -16,7 +14,7 @@ public sealed class SessionComplete : MonoBehaviour
     public static string LastSummary = "";
     /// <summary>The boss kill of this run unlocked Kindled (replayability S4).</summary>
     public static bool KindledUnlockedThisRun;
-    public const string KindledLine = "KINDLED FREIGESCHALTET: Gegner härter, Beute besser (Einstellungen → Schwierigkeit).";
+    public const string KindledLine = "KINDLED UNLOCKED: Harder foes & richer loot (Settings -> Difficulty).";
     /// <summary>Best drop line of the session (set by boss loot, tests).</summary>
     public static string BestDrop = "";
 
@@ -24,7 +22,12 @@ public sealed class SessionComplete : MonoBehaviour
     static bool startStamped;
 
     Canvas canvas;
-    Text body;
+    Text headerTitle;
+    Text timeVal;
+    Text killsVal;
+    Text goldVal;
+    Text dropVal;
+    Text kindledBanner;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void StampStart()
@@ -36,7 +39,7 @@ public sealed class SessionComplete : MonoBehaviour
 
     /// <summary>act-one S4: the overlay was opened by the Kilnmother's death.</summary>
     public static bool ActOneMode;
-    public const string ActOneTitle = "AKT I ABGESCHLOSSEN";
+    public const string ActOneTitle = "ACT I COMPLETE";
 
     /// <summary>Act I end screen (Kilnmother): same overlay, act title, all three zones in the totals.</summary>
     public static void ShowActComplete(GameObject hero)
@@ -62,10 +65,11 @@ public sealed class SessionComplete : MonoBehaviour
         catch (System.Exception e) { Debug.LogWarning($"[Session] Kindled reward offer failed: {e.Message}"); }
         host.Fill(hero);
         host.canvas.enabled = true;
+        DiabloClickController.ExternalDrive = true;
         Debug.Log($"[Session] Complete shown (shown={Shown}).");
     }
 
-    /// <summary>Play time in seconds (test seam).</summary>
+    /// <summary>Elapsed seconds this run.</summary>
     public static float PlaySeconds() => Mathf.Max(0f, Time.realtimeSinceStartup - sessionStart);
 
     void Fill(GameObject hero)
@@ -73,10 +77,24 @@ public sealed class SessionComplete : MonoBehaviour
         int kills = EnemyHealth.HusksKilled + BossController.BossesKilled;
         int gold = hero != null ? hero.GetComponent<Wallet>()?.Gold ?? 0 : 0;
         float secs = PlaySeconds();
-        LastSummary = $"Zeit {secs:0}s  Kills {kills}  Gold {gold}  Beute {BestDrop}";
+        string dropText = string.IsNullOrEmpty(BestDrop) ? "None" : BestDrop;
+        LastSummary = $"Time {secs:0}s  •  Kills {kills}  •  Gold {gold}  •  Best Drop: {dropText}";
         if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
         if (!string.IsNullOrEmpty(KindledFinaleReward.LastOfferLine)) LastSummary += "\n" + KindledFinaleReward.LastOfferLine;
-        if (body != null) body.text = (ActOneMode ? ActOneTitle : "SESSION GESCHAFFT") + "\n" + LastSummary;
+
+        if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : "EXPEDITION COMPLETE";
+        if (timeVal != null) timeVal.text = $"{secs:0}s";
+        if (killsVal != null) killsVal.text = kills.ToString();
+        if (goldVal != null) goldVal.text = $"{gold}g";
+        if (dropVal != null) dropVal.text = dropText;
+        if (kindledBanner != null)
+        {
+            string offer = KindledFinaleReward.LastOfferLine;
+            bool hasOffer = !string.IsNullOrEmpty(offer);
+            kindledBanner.text = KindledUnlockedThisRun && hasOffer ? KindledLine + "\n" + offer
+                : hasOffer ? offer : KindledLine;
+            kindledBanner.gameObject.SetActive(KindledUnlockedThisRun || hasOffer);
+        }
     }
 
     void EnsureBuilt()
@@ -84,81 +102,84 @@ public sealed class SessionComplete : MonoBehaviour
         if (canvas != null) return;
         var root = new GameObject("SessionCanvas");
         root.transform.SetParent(transform, false);
-        canvas = root.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 20;
-        var scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        canvas = DiabloUIFactory.ConfigureOverlayCanvas(root, sortingOrder: 22);
 
-        var panel = new GameObject("SessionPanel");
-        panel.transform.SetParent(root.transform, false);
-        var img = panel.AddComponent<Image>();
-        img.color = new Color(0.05f, 0.03f, 0.04f, 0.92f);
-        var rt = panel.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.5f);
-        rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.sizeDelta = new Vector2(700f, 420f);
-        rt.anchoredPosition = Vector2.zero;
+        var scrim = new GameObject("Scrim", typeof(RectTransform));
+        scrim.transform.SetParent(root.transform, false);
+        var sImg = scrim.AddComponent<Image>();
+        sImg.color = new Color(0.02f, 0.015f, 0.03f, 0.78f);
+        var sr = scrim.GetComponent<RectTransform>();
+        sr.anchorMin = Vector2.zero;
+        sr.anchorMax = Vector2.one;
+        sr.offsetMin = sr.offsetMax = Vector2.zero;
 
-        body = NewText(panel.transform, "SessionBody", 28, Color.white);
+        var panel = DiabloUIFactory.MakePanel(root.transform, "SessionPanel", new Vector2(680f, 470f), Vector2.zero);
+        var v = panel.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(24, 24, 20, 20);
+        v.spacing = 12f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
 
-        var townBtn = NewButton(panel.transform, "TownButton", "Weiter (Town)");
-        townBtn.onClick.AddListener(ReturnToTown);
-        var menuBtn = NewButton(panel.transform, "MenuButton", "Menü");
-        menuBtn.onClick.AddListener(BackToMenu);
+        var hdr = DiabloUIFactory.MakeHeader(panel.transform, ActOneTitle, DiabloMenuArt.MenuArtSprite("CrestCinderreach"));
+        headerTitle = hdr.transform.Find("BannerLabel")?.GetComponent<Text>();
+
+        var sub = DiabloUIFactory.MakeText(panel.transform, "SessionSub", "The ash settles over Cinderreach.", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(sub.gameObject, prefH: 24f, flexW: 1f);
+        DiabloUIFactory.MakeDivider(panel.transform);
+
+        var gridGo = new GameObject("StatsGrid", typeof(RectTransform));
+        gridGo.transform.SetParent(panel.transform, false);
+        DiabloUIFactory.SetLayout(gridGo, prefH: 150f, flexW: 1f);
+        var grid = gridGo.AddComponent<GridLayoutGroup>();
+        grid.cellSize = new Vector2(304f, 68f);
+        grid.spacing = new Vector2(12f, 10f);
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = 2;
+
+        timeVal = MakeStatBox(gridGo.transform, "Time Elapsed", "0s", DiabloPalette.Parchment);
+        killsVal = MakeStatBox(gridGo.transform, "Foes Slain (Kills)", "0", DiabloPalette.Blood);
+        goldVal = MakeStatBox(gridGo.transform, "Gold Purse", "0g", DiabloPalette.GoldBright);
+        dropVal = MakeStatBox(gridGo.transform, "Best Relic", "None", DiabloPalette.Rarity(ItemRarity.Rare));
+
+        kindledBanner = DiabloUIFactory.MakeText(panel.transform, "KindledBanner", KindledLine, 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(kindledBanner.gameObject, prefH: 38f, flexW: 1f);
+        kindledBanner.gameObject.SetActive(false);
+
+        DiabloUIFactory.MakeDivider(panel.transform);
+
+        var btnRow = DiabloUIFactory.MakeHorizontalRow(panel.transform, "SessionButtons", 16f, 52f);
+        var townBtn = DiabloUIFactory.MakeButton(btnRow.transform, "TownButton", "Return to Town", 18, true, DiabloPalette.GoldBright, ReturnToTown);
+        DiabloUIFactory.SetLayout(townBtn.gameObject, prefH: 48f, flexW: 1f);
+        var menuBtn = DiabloUIFactory.MakeButton(btnRow.transform, "MenuButton", "Main Menu", 18, false, DiabloPalette.Parchment, BackToMenu);
+        DiabloUIFactory.SetLayout(menuBtn.gameObject, prefH: 48f, flexW: 1f);
+
         canvas.enabled = false;
     }
 
-    Text NewText(Transform parent, string name, int size, Color color)
+    static Text MakeStatBox(Transform parent, string label, string initial, Color valueCol)
     {
-        var go = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var t = go.AddComponent<Text>();
-        t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        t.fontSize = size;
-        t.alignment = TextAnchor.MiddleCenter;
-        t.color = color;
-        var rt = t.rectTransform;
-        rt.anchorMin = new Vector2(0.5f, 0.6f);
-        rt.anchorMax = new Vector2(0.5f, 0.6f);
-        rt.sizeDelta = new Vector2(640f, 200f);
-        rt.anchoredPosition = Vector2.zero;
-        return t;
-    }
+        var box = new GameObject("StatBox_" + label, typeof(RectTransform));
+        box.transform.SetParent(parent, false);
+        var img = box.AddComponent<Image>();
+        img.sprite = DiabloMenuArt.TooltipBackground();
+        img.type = Image.Type.Sliced;
+        var v = box.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(12, 12, 6, 6);
+        v.spacing = 2f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
 
-    Button NewButton(Transform parent, string name, string label)
-    {
-        var go = new GameObject(name);
-        go.transform.SetParent(parent, false);
-        var img = go.AddComponent<Image>();
-        img.color = new Color(0.3f, 0.2f, 0.12f, 1f);
-        var btn = go.AddComponent<Button>();
-        var rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0.5f, 0.2f);
-        rt.anchorMax = new Vector2(0.5f, 0.2f);
-        rt.sizeDelta = new Vector2(260f, 60f);
-        rt.anchoredPosition = new Vector2(name == "TownButton" ? -150f : 150f, 0f);
-        var labelGo = new GameObject("Label");
-        labelGo.transform.SetParent(go.transform, false);
-        var t = labelGo.AddComponent<Text>();
-        t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        t.fontSize = 24;
-        t.alignment = TextAnchor.MiddleCenter;
-        t.color = Color.white;
-        t.text = label;
-        var lr = labelGo.GetComponent<RectTransform>();
-        lr.anchorMin = Vector2.zero;
-        lr.anchorMax = Vector2.one;
-        lr.offsetMin = Vector2.zero;
-        lr.offsetMax = Vector2.zero;
-        return btn;
+        var lbl = DiabloUIFactory.MakeText(box.transform, "StatName", label, 13, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(lbl.gameObject, prefH: 18f, flexW: 1f);
+        var val = DiabloUIFactory.MakeText(box.transform, "StatValue", initial, 20, valueCol);
+        val.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(val.gameObject, prefH: 28f, flexW: 1f);
+        return val;
     }
 
     void ReturnToTown()
     {
+        DiabloAudio.PlayUIClick();
         var hero = gameObject.name == "Player" ? gameObject : GameObject.Find("Player");
         if (hero != null)
         {
@@ -168,13 +189,21 @@ public sealed class SessionComplete : MonoBehaviour
             if (cc != null) cc.enabled = true;
         }
         if (canvas != null) canvas.enabled = false;
+        DiabloClickController.ExternalDrive = false;
         Debug.Log("[Session] Returned to Lantern Hold.");
     }
 
     void BackToMenu()
     {
+        DiabloAudio.PlayUIClick();
+        var hero = gameObject.name == "Player" ? gameObject : GameObject.Find("Player");
+        if (hero != null) SaveService.SaveNow(hero);
         if (canvas != null) canvas.enabled = false;
-        Debug.Log("[Session] Back to menu (no menu scene yet; overlay closed).");
+        DiabloClickController.ExternalDrive = false;
+        var cls = Object.FindFirstObjectByType<ClassSelectUI>(FindObjectsInactive.Include);
+        if (cls == null) cls = new GameObject("ClassSelect").AddComponent<ClassSelectUI>();
+        cls.SetOpen(true);
+        Debug.Log("[Session] Returned to Main Menu.");
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
@@ -185,6 +214,7 @@ public sealed class SessionComplete : MonoBehaviour
         KindledUnlockedThisRun = false;
         ActOneMode = false;
         BestDrop = "";
+        DiabloClickController.ExternalDrive = false;
         sessionStart = Time.realtimeSinceStartup;
         startStamped = true;
     }

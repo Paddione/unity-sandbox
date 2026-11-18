@@ -56,8 +56,9 @@ public static class DiabloJuice
     public static void OnEnemyHit(Vector3 at, int amount, bool crit)
     {
         var head = at + Vector3.up * 1.6f;
-        ShowNumber(head, crit ? $"{amount}!" : amount.ToString(),
-            crit ? DiabloPalette.TrimGold : DiabloPalette.Parchment, crit ? 1.5f : 1f);
+        if (DiabloSettings.ShowDamageNumbers)
+            ShowNumber(head, crit ? $"{amount}!" : amount.ToString(),
+                crit ? DiabloPalette.TrimGold : DiabloPalette.Parchment, crit ? 1.5f : 1f);
         Burst(at + Vector3.up * 1.0f, crit ? 30 : 18, BloodSpray, 3.4f, 0.65f);
         if (crit)
         {
@@ -78,7 +79,8 @@ public static class DiabloJuice
     /// <summary>The local hero was struck.</summary>
     public static void OnPlayerHurt(Vector3 at, float amount)
     {
-        ShowNumber(at + Vector3.up * 2f, $"-{amount:0}", DiabloPalette.Blood, 1.1f);
+        if (DiabloSettings.ShowDamageNumbers)
+            ShowNumber(at + Vector3.up * 2f, $"-{amount:0}", DiabloPalette.Blood, 1.1f);
         Burst(at + Vector3.up * 1.0f, 16, BloodSpray, 3f, 0.6f);
         AddTrauma(at, 0.35f);
     }

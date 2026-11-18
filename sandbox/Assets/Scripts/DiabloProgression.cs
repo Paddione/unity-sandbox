@@ -310,22 +310,22 @@ public sealed class DiabloProgression : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         var white = WhiteSprite();
 
-        var back = NewImage(canvasGo.transform, "XpBack", white, DiabloPalette.Abyss);
-        Place(back.rectTransform, new Vector2(0.5f, 0f), new Vector2(560f, 12f), new Vector2(0f, 66f));
-        var edge = back.gameObject.AddComponent<Outline>();
-        edge.effectColor = DiabloPalette.PanelEdge;
-        xpFill = NewImage(back.transform, "XpFill", white, DiabloPalette.TrimGold);
+        var back = NewImage(canvasGo.transform, "XpBack", DiabloMenuArt.TooltipBackground(), Color.white);
+        back.type = Image.Type.Sliced;
+        Place(back.rectTransform, new Vector2(0.5f, 0f), new Vector2(620f, 14f), new Vector2(0f, 76f));
+        xpFill = NewImage(back.transform, "XpFill", DiabloMenuArt.ProgressFillSprite(), DiabloPalette.TrimGold);
         xpFill.type = Image.Type.Filled; // needs a sprite, or fillAmount no-ops
         xpFill.fillMethod = Image.FillMethod.Horizontal;
         xpFill.fillAmount = shownFill;
         var fr = xpFill.rectTransform;
         fr.anchorMin = Vector2.zero;
         fr.anchorMax = Vector2.one;
-        fr.offsetMin = new Vector2(1f, 1f);
-        fr.offsetMax = new Vector2(-1f, -1f);
+        fr.offsetMin = new Vector2(3f, 3f);
+        fr.offsetMax = new Vector2(-3f, -3f);
 
-        levelLabel = NewText(canvasGo.transform, "LevelLabel", 18, DiabloPalette.TrimGold);
-        Place(levelLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(80f, 24f), new Vector2(-325f, 72f));
+        levelLabel = NewText(canvasGo.transform, "LevelLabel", 17, DiabloPalette.GoldBright);
+        levelLabel.fontStyle = FontStyle.Bold;
+        Place(levelLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(84f, 24f), new Vector2(-358f, 76f));
 
         flash = NewImage(canvasGo.transform, "LevelFlash", white, DiabloPalette.TrimGold);
         var flr = flash.rectTransform;

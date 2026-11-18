@@ -1,19 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Lantern Hold trade window (UGUI, built at runtime like
-/// <see cref="DiabloInventoryUI"/> — no prefab churn). Two columns: vendor
-/// stock (click to buy) and hero bag (click to sell at 25 %), plus a potion
-/// row and the gold purse. `V` toggles, `1` drinks a healing potion,
-/// `Esc`/button/click-outside closes. While open, click-movement is locked through the
-/// existing <see cref="DiabloClickController.ExternalDrive"/> seam (same
-/// effect as the inventory click guard, without touching S4-owned files).
-/// Closing autosaves via <see cref="SaveService.SaveNow"/> (S2 seam).
-/// Public contract for tests: IsOpen, SetOpen, BuyOffer, SellBagIndex,
-/// BuyPotion, Refresh, TryCloseOnOutsideClick.
+/// Lantern Hold trade window (V toggles, 1 drinks a potion, Esc closes and saves).
+/// Fixes column layout, adds 3D item icons + rarity slots + PortraitVendor + live
+/// hover comparison tooltip + affordability state, while preserving every test seam
+/// including reflected private <c>stock</c> and public IsOpen, SetOpen, BuyOffer,
+/// SellBagIndex, BuyPotion, Refresh, TryCloseOnOutsideClick, Notice.
+/// Click outside the panel closes; co-op trades route through the host relay.
 /// </summary>
 public sealed class DiabloVendorUI : MonoBehaviour
 {
@@ -25,27 +22,25 @@ public sealed class DiabloVendorUI : MonoBehaviour
     Text goldText;
     Text vendorDetailText;
     Text bagDetailText;
+    Text inspectText;
     Transform vendorList;
     Transform bagList;
-    bool building;
 
-    VendorStock stock;
+    VendorStock stock; // DO NOT rename: reflected by VendorLoopTests
     Wallet wallet;
     Inventory inventory;
+    Equipment equipment;
 
     void Awake()
     {
         EnsureBuilt();
     }
 
-    /// <summary>
-    /// Headless EditMode `AddComponent` can skip `Awake`-time wiring, so every
-    /// entry point heals itself. No-op once built (runtime `Awake` path).
-    /// </summary>
     void EnsureBuilt()
     {
         wallet = GetComponent<Wallet>();
         inventory = GetComponent<Inventory>();
+        equipment = GetComponent<Equipment>();
         if (canvas != null) return;
         stock = GetComponent<DiabloNetworkPlayer>()?.CurrentNetworkStock
             ?? VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
@@ -73,6 +68,19 @@ public sealed class DiabloVendorUI : MonoBehaviour
         return p != null && p.IsSpawned ? p.OwnerClientId : 0;
     }
 
+    /// <summary>
+    /// Bind the town vendor's stock so Restock() reaches the open window.
+    /// Solo only: co-op peers keep their per-player (host-validated) stock.
+    /// </summary>
+    public void BindStock(VendorStock vendorStock)
+    {
+        EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (vendorStock == null || (relay != null && relay.IsSpawned)) return;
+        stock = vendorStock;
+        if (IsOpen) Refresh();
+    }
+
     public void ApplyServerStock(VendorStock serverStock)
     {
         EnsureBuilt();
@@ -88,11 +96,21 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (IsOpen && mouse != null && mouse.leftButton.wasPressedThisFrame
             && Time.frameCount > openedFrame)
             TryCloseOnOutsideClick(mouse.position.ReadValue());
-        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (DiabloUIFactory.IsRemoteMirror(this)) return;
+        var kb = Keyboard.current;
         if (kb == null) return;
-        if (kb.vKey.wasPressedThisFrame) SetOpen(!IsOpen);
-        if (kb.escapeKey.wasPressedThisFrame && IsOpen) SetOpen(false);
-        if (kb.digit1Key.wasPressedThisFrame)
+        if (kb.vKey.wasPressedThisFrame && (!DiabloUIFactory.IsAnyModalOpen(gameObject) || IsOpen))
+        {
+            SetOpen(!IsOpen);
+            return;
+        }
+        if (kb.escapeKey.wasPressedThisFrame && IsOpen)
+        {
+            SetOpen(false);
+            DiabloUIFactory.MarkEscConsumed();
+            return;
+        }
+        if (kb.digit1Key.wasPressedThisFrame && (!DiabloUIFactory.IsMenuCapturingKeys(gameObject) || IsOpen))
         {
             EnsureBuilt();
             if (Vendor.DrinkPotion(gameObject)) Refresh();
@@ -127,8 +145,13 @@ public sealed class DiabloVendorUI : MonoBehaviour
     public void SetOpen(bool open)
     {
         EnsureBuilt();
+        if (DiabloUIFactory.IsRemoteMirror(this)) open = false;
         if (IsOpen == open) return;
-        if (open) DiabloAudio.PlayUIClick();
+        if (open)
+        {
+            DiabloUIFactory.CloseSecondaryPanels(gameObject, this);
+            DiabloAudio.PlayUIClick();
+        }
         IsOpen = open;
         if (open) openedFrame = Time.frameCount;
         canvas.gameObject.SetActive(open);
@@ -254,12 +277,12 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
     }
 
-    /// <summary>Rebuild gold label and both columns from state.</summary>
+    /// <summary>Rebuild gold label, wares column, bag column and inspect bar.</summary>
     public void Refresh()
     {
         EnsureBuilt();
         if (goldText != null)
-            goldText.text = wallet != null ? $"Gold: {wallet.Gold}" : "Gold: —";
+            goldText.text = wallet != null ? $"Purse: {wallet.Gold}g" : "Purse: —";
         RebuildVendor();
         RebuildBag();
         if (noticeText != null) noticeText.text = Notice;
@@ -278,21 +301,44 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         if (vendorDetailText != null)
             vendorDetailText.text = stock.offers.Count == 0
-                ? "Sold out. Leave Lantern Hold and return for fresh wares."
-                : $"{stock.offers.Count} wares. Click to buy.";
+                ? "Sold out. Leave Lantern Hold for fresh wares."
+                : $"{stock.offers.Count} wares available. Click to buy.";
+        int gold = wallet != null ? wallet.Gold : 0;
         for (int i = 0; i < stock.offers.Count; i++)
         {
-            int index = i; // closure copy
+            int index = i;
             var offer = stock.offers[i];
-            var btn = MakeRowButton(vendorList.transform,
-                $"Buy {LootDrop.ItemLabel(offer.item)} [{offer.item.rarity}] — {offer.price}g",
-                DiabloPalette.Rarity(offer.item.rarity));
-            btn.onClick.AddListener(() => BuyOffer(index));
+            bool afford = gold >= offer.price;
+            bool classFit = Equipment.CanEquip(offer.item, RunProfile.ClassId);
+            string sub = afford
+                ? (classFit ? $"[{offer.item.rarity}]  {offer.item.slot}" : $"<color={DiabloInventoryUI.WorseColor}>Other class</color>")
+                : $"<color={DiabloInventoryUI.WorseColor}>Need {offer.price}g</color>";
+            var btn = MakeItemRow(
+                vendorList,
+                offer.item.baseType,
+                offer.item.rarity,
+                LootDrop.ItemLabel(offer.item),
+                sub,
+                $"{offer.price}g",
+                DiabloPalette.Rarity(offer.item.rarity),
+                afford ? DiabloPalette.GoldBright : DiabloPalette.Blood,
+                () => BuyOffer(index),
+                () => InspectItem(offer.item, $"Buy for {offer.price}g"));
+            btn.interactable = true;
         }
-        var potionBtn = MakeRowButton(vendorList.transform,
-            $"Buy Healing Potion (+{ItemDatabase.PotionHeal} HP, key 1) — {ItemDatabase.PotionPrice}g",
-            DiabloPalette.Parchment);
-        potionBtn.onClick.AddListener(BuyPotion);
+        var potionItem = ItemDatabase.CreateHealingPotion();
+        bool potionAfford = gold >= ItemDatabase.PotionPrice;
+        MakeItemRow(
+            vendorList,
+            potionItem.baseType,
+            potionItem.rarity,
+            "Healing Potion",
+            $"Restores +{ItemDatabase.PotionHeal} HP (Key 1)",
+            $"{ItemDatabase.PotionPrice}g",
+            DiabloPalette.Parchment,
+            potionAfford ? DiabloPalette.GoldBright : DiabloPalette.Blood,
+            BuyPotion,
+            () => InspectItem(potionItem, $"Buy for {ItemDatabase.PotionPrice}g"));
     }
 
     void RebuildBag()
@@ -308,179 +354,237 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         if (bagDetailText != null)
             bagDetailText.text = inventory.Count == 0
-                ? "Bag is empty. Loot the fen, then sell here."
-                : $"Bag {inventory.Count} of {Inventory.Capacity}. Click to sell (25 %).";
+                ? "Your bag is empty. Loot the fen to trade."
+                : $"Bag {inventory.Count}/{Inventory.Capacity}. Click item to sell (25%).";
         for (int i = 0; i < inventory.Count; i++)
         {
-            int index = i; // closure copy
+            int index = i;
             var item = inventory.Get(i);
             int price = VendorStock.SellPrice(item);
-            var btn = MakeRowButton(bagList.transform,
-                $"Sell {LootDrop.ItemLabel(item)} — +{price}g",
-                DiabloPalette.Rarity(item.rarity));
-            btn.onClick.AddListener(() => SellBagIndex(index));
+            MakeItemRow(
+                bagList,
+                item.baseType,
+                item.rarity,
+                LootDrop.ItemLabel(item),
+                $"[{item.rarity}]  {item.slot}",
+                $"+{price}g",
+                DiabloPalette.Rarity(item.rarity),
+                DiabloInventoryUI.BetterColor != null ? DiabloPalette.TrimGold : DiabloPalette.Parchment,
+                () => SellBagIndex(index),
+                () => InspectItem(item, $"Sell for +{price}g"));
         }
-        if (bagDetailText != null && inventory.Count > 0)
+        // S5 details: the newest bag item pre-fills the compare box until the hero hovers a row.
+        if (inspectText != null && inventory.Count > 0)
         {
             var last = inventory.Get(inventory.Count - 1);
-            bagDetailText.text = ItemDetailsView.Render(last, null);
-            bagDetailText.supportRichText = true;
+            inspectText.supportRichText = true;
+            inspectText.text = ItemDetailsView.Render(last, null);
         }
     }
 
-    // ---------- build ----------
+    void InspectItem(ItemInstance item, string tradeTag)
+    {
+        if (inspectText == null || item == null) return;
+        if (item.slot == ItemSlot.Consumable)
+        {
+            inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) — Restores +{ItemDatabase.PotionHeal} HP when consumed (Key 1).";
+            return;
+        }
+        var eq = equipment != null ? equipment.GetEquipped(item.slot) : null;
+        string eqName = eq != null ? LootDrop.ItemLabel(eq) : "empty slot";
+        inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) vs {eqName}:\n{DiabloInventoryUI.CompareSummary(item, eq)}";
+    }
 
     void BuildUI()
     {
-        building = true;
         var canvasGo = new GameObject("VendorCanvas");
         canvasGo.SetActive(false);
         canvasGo.transform.SetParent(transform, false);
-        canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 11;
-        var scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-        canvasGo.AddComponent<GraphicRaycaster>();
+        canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 11);
 
-        var panelGo = new GameObject("Panel");
-        panelGo.transform.SetParent(canvasGo.transform, false);
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(840f, 660f), Vector2.zero);
         panel = panelGo.transform;
-        var panelImg = panelGo.AddComponent<Image>();
-        panelImg.sprite = DiabloMenuArt.PanelBackground();
-        panelImg.type = Image.Type.Sliced;
-        panelImg.color = Color.white;
-        var rect = panelGo.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(760f, 560f);
-        rect.anchoredPosition = Vector2.zero;
-
         var layout = panelGo.AddComponent<VerticalLayoutGroup>();
-        layout.padding = new RectOffset(14, 14, 12, 12);
-        layout.spacing = 6f;
+        layout.padding = new RectOffset(16, 16, 14, 14);
+        layout.spacing = 8f;
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        var headerGo = new GameObject("Header");
-        headerGo.transform.SetParent(panelGo.transform, false);
-        var headerImg = headerGo.AddComponent<Image>();
-        headerImg.sprite = DiabloMenuArt.HeaderBanner();
-        headerImg.type = Image.Type.Sliced;
-        var headerRect = headerGo.GetComponent<RectTransform>();
-        headerRect.sizeDelta = new Vector2(0f, 52f);
-        MakeBannerLabel(headerGo.transform, "Lantern Hold vendor", 20);
-        goldText = MakeLabel(panelGo.transform, "Gold: —", 17);
+        DiabloUIFactory.MakeHeader(panelGo.transform, "LANTERN HOLD MERCHANT", DiabloMenuArt.MenuArtSprite("PortraitVendor"), () => SetOpen(false));
 
-        var colsGo = new GameObject("Columns");
+        // Merchant Purse Bar
+        var purseRow = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "PurseRow", 10f, 34f);
+        purseRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+        var coinSpr = DiabloMenuArt.MenuArtSprite("GoldCoin");
+        if (coinSpr != null)
+        {
+            var cGo = new GameObject("CoinIcon", typeof(RectTransform));
+            cGo.transform.SetParent(purseRow.transform, false);
+            DiabloUIFactory.SetLayout(cGo, prefH: 28f, prefW: 28f);
+            var ci = cGo.AddComponent<Image>();
+            ci.sprite = coinSpr;
+            ci.preserveAspect = true;
+        }
+        goldText = DiabloUIFactory.MakeText(purseRow.transform, "GoldLabel", "Purse: —", 18, DiabloPalette.GoldBright);
+        goldText.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(goldText.gameObject, prefH: 30f, flexW: 1f);
+        var hintLbl = DiabloUIFactory.MakeText(purseRow.transform, "VendorHint", "V toggles  •  1 drinks potion  •  Esc / click outside closes", 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleRight);
+        DiabloUIFactory.SetLayout(hintLbl.gameObject, prefH: 30f, prefW: 340f);
+
+        // Two cleanly aligned columns (Vendor Wares | Your Bag) with VerticalLayoutGroup!
+        var colsGo = new GameObject("Columns", typeof(RectTransform));
         colsGo.transform.SetParent(panelGo.transform, false);
+        DiabloUIFactory.SetLayout(colsGo, prefH: 404f, flexW: 1f);
         var cols = colsGo.AddComponent<HorizontalLayoutGroup>();
-        cols.spacing = 10f;
+        cols.spacing = 12f;
         cols.childControlWidth = true;
         cols.childControlHeight = true;
+        cols.childForceExpandWidth = true;
+        cols.childForceExpandHeight = true;
 
-        var vendorCol = new GameObject("VendorColumn");
-        vendorCol.transform.SetParent(colsGo.transform, false);
-        var vendorLayout = vendorCol.AddComponent<VerticalLayoutGroup>();
-        vendorLayout.spacing = 4f;
-        vendorLayout.childControlWidth = true;
-        vendorLayout.childControlHeight = false;
-        MakeLabel(vendorCol.transform, "Wares", 16);
-        vendorDetailText = MakeLabel(vendorCol.transform, "", 13);
-        var vendorRows = new GameObject("VendorRows");
-        vendorRows.transform.SetParent(vendorCol.transform, false);
-        var vendorRowsLayout = vendorRows.AddComponent<VerticalLayoutGroup>();
-        vendorRowsLayout.spacing = 4f;
-        vendorRowsLayout.childControlWidth = true;
-        vendorRowsLayout.childControlHeight = false;
-        vendorList = vendorRows.transform;
+        vendorList = MakeColumn(colsGo.transform, "VendorColumn", "Wares for Sale", out vendorDetailText);
+        bagList = MakeColumn(colsGo.transform, "BagColumn", "Your Bag (Sell 25%)", out bagDetailText);
 
-        var bagCol = new GameObject("BagColumn");
-        bagCol.transform.SetParent(colsGo.transform, false);
-        var bagLayout = bagCol.AddComponent<VerticalLayoutGroup>();
-        bagLayout.spacing = 4f;
-        bagLayout.childControlWidth = true;
-        bagLayout.childControlHeight = false;
-        MakeLabel(bagCol.transform, "Your bag", 16);
-        bagDetailText = MakeLabel(bagCol.transform, "", 13);
-        var bagRows = new GameObject("BagRows");
-        bagRows.transform.SetParent(bagCol.transform, false);
-        var bagRowsLayout = bagRows.AddComponent<VerticalLayoutGroup>();
-        bagRowsLayout.spacing = 4f;
-        bagRowsLayout.childControlWidth = true;
-        bagRowsLayout.childControlHeight = false;
-        bagList = bagRows.transform;
+        // Inspection comparison box
+        var inspBox = new GameObject("InspectBox", typeof(RectTransform));
+        inspBox.transform.SetParent(panelGo.transform, false);
+        DiabloUIFactory.SetLayout(inspBox, prefH: 96f, flexW: 1f);
+        var ibImg = inspBox.AddComponent<Image>();
+        ibImg.sprite = DiabloMenuArt.TooltipBackground();
+        ibImg.type = Image.Type.Sliced;
+        var iv = inspBox.AddComponent<VerticalLayoutGroup>();
+        iv.padding = new RectOffset(12, 12, 8, 8);
+        iv.childControlWidth = true;
+        iv.childControlHeight = false;
+        inspectText = DiabloUIFactory.MakeText(inspBox.transform, "InspectText",
+            "Hover an item to compare stats against your equipped gear.", 14, DiabloPalette.Parchment);
+        DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 78f, flexW: 1f);
 
-        MakeLabel(panelGo.transform, "V toggles, 1 drinks a potion, Esc or click outside closes (saves).", 13);
-        noticeText = MakeLabel(panelGo.transform, "", 14);
-        var closeBtn = MakeSmallButton(panelGo.transform, "Close (saves)");
-        closeBtn.onClick.AddListener(() => SetOpen(false));
-        building = false;
+        noticeText = DiabloUIFactory.MakeText(panelGo.transform, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);
     }
 
-    Text MakeLabel(Transform parent, string text, int size)
+    Transform MakeColumn(Transform parent, string name, string heading, out Text subtitle)
     {
-        var go = new GameObject("Label");
+        var col = new GameObject(name, typeof(RectTransform));
+        col.transform.SetParent(parent, false);
+        var colBg = col.AddComponent<Image>();
+        colBg.sprite = DiabloMenuArt.TooltipBackground();
+        colBg.type = Image.Type.Sliced;
+
+        var cv = col.AddComponent<VerticalLayoutGroup>();
+        cv.padding = new RectOffset(10, 10, 8, 8);
+        cv.spacing = 6f;
+        cv.childControlWidth = true;
+        cv.childControlHeight = false;
+
+        var head = DiabloUIFactory.MakeText(col.transform, "Heading", heading, 16, DiabloPalette.TrimGold);
+        head.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(head.gameObject, prefH: 22f, flexW: 1f);
+
+        subtitle = DiabloUIFactory.MakeText(col.transform, "Subtitle", "", 12, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(subtitle.gameObject, prefH: 18f, flexW: 1f);
+
+        // Scrollable item container so up to 20 bag items NEVER overflow!
+        var scrollGo = new GameObject("Scroll", typeof(RectTransform));
+        scrollGo.transform.SetParent(col.transform, false);
+        DiabloUIFactory.SetLayout(scrollGo, prefH: 334f, flexW: 1f, flexH: 1f);
+        var sr = scrollGo.AddComponent<ScrollRect>();
+        sr.horizontal = false;
+        sr.vertical = true;
+        sr.scrollSensitivity = 28f;
+
+        var vpGo = new GameObject("Viewport", typeof(RectTransform));
+        vpGo.transform.SetParent(scrollGo.transform, false);
+        vpGo.AddComponent<RectMask2D>();
+        var vpImg = vpGo.AddComponent<Image>();
+        vpImg.color = new Color(0f, 0f, 0f, 0.01f);
+        var vpr = vpGo.GetComponent<RectTransform>();
+        vpr.anchorMin = Vector2.zero;
+        vpr.anchorMax = Vector2.one;
+        vpr.offsetMin = vpr.offsetMax = Vector2.zero;
+        sr.viewport = vpr;
+
+        var rows = new GameObject(name == "VendorColumn" ? "VendorRows" : "BagRows", typeof(RectTransform));
+        rows.transform.SetParent(vpGo.transform, false);
+        var rr = rows.GetComponent<RectTransform>();
+        rr.anchorMin = new Vector2(0f, 1f);
+        rr.anchorMax = new Vector2(1f, 1f);
+        rr.pivot = new Vector2(0.5f, 1f);
+        rr.offsetMin = rr.offsetMax = Vector2.zero;
+        var rv = rows.AddComponent<VerticalLayoutGroup>();
+        rv.spacing = 4f;
+        rv.childControlWidth = true;
+        rv.childControlHeight = false;
+        rv.childForceExpandHeight = false;
+        var csf = rows.AddComponent<ContentSizeFitter>();
+        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        sr.content = rr;
+        return rows.transform;
+    }
+
+    Button MakeItemRow(Transform parent, string baseType, ItemRarity rarity, string title, string sub, string priceStr,
+        Color titleCol, Color priceCol, UnityEngine.Events.UnityAction onClick, UnityEngine.Events.UnityAction onHover)
+    {
+        var go = new GameObject("TradeRow", typeof(RectTransform));
         go.transform.SetParent(parent, false);
-        var label = go.AddComponent<Text>();
-        label.text = text;
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = size;
-        label.color = DiabloPalette.Parchment;
-        return label;
-    }
+        DiabloUIFactory.SetLayout(go, prefH: 48f, flexW: 1f);
+        var bg = go.AddComponent<Image>();
+        bg.sprite = DiabloMenuArt.ButtonBackground(false);
+        bg.type = Image.Type.Sliced;
+        var btn = go.AddComponent<Button>();
+        btn.onClick.AddListener(onClick);
 
-    void MakeBannerLabel(Transform parent, string text, int size)
-    {
-        var label = MakeLabel(parent, text, size);
-        label.alignment = TextAnchor.MiddleCenter;
-        label.color = DiabloPalette.TrimGold;
-        var r = label.GetComponent<RectTransform>();
-        r.anchorMin = Vector2.zero;
-        r.anchorMax = Vector2.one;
-        r.offsetMin = Vector2.zero;
-        r.offsetMax = Vector2.zero;
-    }
+        var hz = go.AddComponent<HorizontalLayoutGroup>();
+        hz.padding = new RectOffset(6, 8, 4, 4);
+        hz.spacing = 8f;
+        hz.childAlignment = TextAnchor.MiddleLeft;
+        hz.childControlWidth = true;
+        hz.childControlHeight = false;
+        hz.childForceExpandWidth = false;
 
-    Button MakeRowButton(Transform parent, string text, Color accent)
-    {
-        var go = new GameObject("RowButton");
-        go.transform.SetParent(parent, false);
-        var button = go.AddComponent<Button>();
-        var image = go.AddComponent<Image>();
-        image.sprite = DiabloMenuArt.TabBackground(false);
-        image.type = Image.Type.Sliced;
-        var label = MakeLabel(go.transform, text, 14);
-        label.color = accent;
-        label.alignment = TextAnchor.MiddleLeft;
-        var lr = label.GetComponent<RectTransform>();
-        lr.anchorMin = Vector2.zero;
-        lr.anchorMax = Vector2.one;
-        lr.offsetMin = new Vector2(8f, 0f);
-        lr.offsetMax = Vector2.zero;
-        return button;
-    }
+        var slot = new GameObject("Slot", typeof(RectTransform));
+        slot.transform.SetParent(go.transform, false);
+        DiabloUIFactory.SetLayout(slot, prefH: 38f, prefW: 38f);
+        var sImg = slot.AddComponent<Image>();
+        sImg.sprite = DiabloMenuArt.SlotBackground(rarity, 64);
+        sImg.type = Image.Type.Sliced;
+        sImg.raycastTarget = false;
 
-    Button MakeSmallButton(Transform parent, string text)
-    {
-        var go = new GameObject("SmallButton");
-        go.transform.SetParent(parent, false);
-        var image = go.AddComponent<Image>();
-        image.sprite = DiabloMenuArt.TabBackground(false);
-        image.type = Image.Type.Sliced;
-        var button = go.AddComponent<Button>();
-        var label = MakeLabel(go.transform, text, 15);
-        label.alignment = TextAnchor.MiddleCenter;
-        var lr = label.GetComponent<RectTransform>();
-        lr.anchorMin = Vector2.zero;
-        lr.anchorMax = Vector2.one;
-        lr.offsetMin = new Vector2(8f, 4f);
-        lr.offsetMax = new Vector2(-8f, -4f);
-        return button;
-    }
+        var iGo = new GameObject("Icon", typeof(RectTransform));
+        iGo.transform.SetParent(slot.transform, false);
+        var iImg = iGo.AddComponent<Image>();
+        iImg.sprite = DiabloMenuArt.ItemIcon(baseType, rarity);
+        iImg.preserveAspect = true;
+        iImg.raycastTarget = false;
+        var ir = iGo.GetComponent<RectTransform>();
+        ir.anchorMin = Vector2.zero;
+        ir.anchorMax = Vector2.one;
+        ir.offsetMin = new Vector2(4f, 4f);
+        ir.offsetMax = new Vector2(-4f, -4f);
 
+        var col = new GameObject("TextCol", typeof(RectTransform));
+        col.transform.SetParent(go.transform, false);
+        DiabloUIFactory.SetLayout(col, prefH: 40f, flexW: 1f);
+        var v = col.AddComponent<VerticalLayoutGroup>();
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+        var tLbl = DiabloUIFactory.MakeText(col.transform, "Title", title, 14, titleCol);
+        DiabloUIFactory.SetLayout(tLbl.gameObject, prefH: 20f, flexW: 1f);
+        var sLbl = DiabloUIFactory.MakeText(col.transform, "Sub", sub, 12, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(sLbl.gameObject, prefH: 16f, flexW: 1f);
+
+        var pLbl = DiabloUIFactory.MakeText(go.transform, "Price", priceStr, 14, priceCol, TextAnchor.MiddleRight);
+        pLbl.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(pLbl.gameObject, prefH: 32f, prefW: 62f);
+
+        if (EventSystem.current != null && onHover != null)
+        {
+            var trig = go.AddComponent<EventTrigger>();
+            var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            entry.callback.AddListener(_ => onHover());
+            trig.triggers.Add(entry);
+        }
+        return btn;
+    }
 }

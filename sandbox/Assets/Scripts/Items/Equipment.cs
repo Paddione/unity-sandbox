@@ -24,10 +24,10 @@ public sealed class Equipment : MonoBehaviour
                   $"(dmg={GetDamage()}, hp={GetMaxHP()}).");
     }
 
-    /// <summary>Class binding (second-class S4): restricted bases only for their class.</summary>
+    /// <summary>Class binding (second-class S4): restricted bases only for their class; consumables cannot equip.</summary>
     public static bool CanEquip(ItemInstance item, string classId)
     {
-        if (item == null) return false;
+        if (item == null || item.slot == ItemSlot.Consumable) return false;
         string only = ItemDatabase.ClassRestriction(item.baseType);
         return only == "" || only == ClassCatalog.Get(classId).id;
     }
@@ -39,7 +39,8 @@ public sealed class Equipment : MonoBehaviour
         {
             case ItemSlot.Armor: return armor;
             case ItemSlot.Weapon: return weapon;
-            default: return helmet;
+            case ItemSlot.Helmet: return helmet;
+            default: return null;
         }
     }
 
@@ -59,7 +60,7 @@ public sealed class Equipment : MonoBehaviour
         {
             case ItemSlot.Armor: armor = item; break;
             case ItemSlot.Weapon: weapon = item; break;
-            default: helmet = item; break;
+            case ItemSlot.Helmet: helmet = item; break;
         }
     }
 

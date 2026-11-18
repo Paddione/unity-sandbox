@@ -59,6 +59,7 @@ public sealed class Vendor : MonoBehaviour
         if (!mouse.leftButton.wasPressedThisFrame) return;
         var hero = GameObject.Find("Player");
         if (hero == null) return;
+        if (DiabloUIFactory.IsWorldInputBlocked(hero)) return;
         var heroUI = hero.GetComponent<DiabloVendorUI>();
         if (heroUI != null && heroUI.IsOpen) return; // UI eats its own clicks
         var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
@@ -66,6 +67,7 @@ public sealed class Vendor : MonoBehaviour
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
         if (heroUI == null) heroUI = hero.AddComponent<DiabloVendorUI>();
+        heroUI.BindStock(stock);
         heroUI.SetOpen(true);
         Debug.Log("[Vendor] Trade window opened.");
     }

@@ -139,23 +139,74 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.5f);
         yield return Shot("town_lantern_hold");
 
-        // 8) Vendor trade window (S3 seam: runtime DiabloVendorUI panel).
+        // 8) Town & Sanctuary UI Gallery (Vendor, Stash, Waypoint, Inventory, Bag, Settings, Character, Pause).
+        var bagComp = hero.GetComponent<Inventory>();
+        var eqComp = hero.GetComponent<Equipment>();
+        var walComp = hero.GetComponent<Wallet>();
+        if (walComp != null && walComp.Gold < 250) walComp.Add(250 - walComp.Gold);
+        if (bagComp != null && bagComp.Count < 4)
+        {
+            bagComp.Add(ItemDatabase.CreateUnique("Emberbrand Blade"));
+            bagComp.Add(ItemDatabase.CreateUnique("Cryptwarden Plate"));
+            bagComp.Add(ItemDatabase.CreateHealingPotion());
+        }
+
         var vendorUI = hero.GetComponent<DiabloVendorUI>();
         if (vendorUI == null) vendorUI = hero.gameObject.AddComponent<DiabloVendorUI>();
         vendorUI.SetOpen(true);
-        yield return Wait(0.5f);
+        yield return Wait(0.4f);
         yield return Shot("vendor_open");
         vendorUI.SetOpen(false);
-        yield return Wait(0.3f);
+        yield return Wait(0.2f);
+
+        var stashUI = hero.GetComponent<DiabloStashUI>();
+        if (stashUI == null) stashUI = hero.gameObject.AddComponent<DiabloStashUI>();
+        stashUI.SetOpen(true);
+        yield return Wait(0.4f);
+        yield return Shot("stash_open");
+        stashUI.SetOpen(false);
+        yield return Wait(0.2f);
+
+        var waypointUI = hero.GetComponent<DiabloWaypointUI>();
+        if (waypointUI == null) waypointUI = hero.gameObject.AddComponent<DiabloWaypointUI>();
+        waypointUI.SetOpen(true);
+        yield return Wait(0.4f);
+        yield return Shot("waypoint_open");
+        waypointUI.SetOpen(false);
+        yield return Wait(0.2f);
+
+        var invUI = hero.GetComponent<DiabloInventoryUI>();
+        if (invUI == null) invUI = hero.gameObject.AddComponent<DiabloInventoryUI>();
+        invUI.SetOpen(true);
+        yield return Wait(0.35f);
+        yield return Shot("inventory_open");
+        invUI.ShowTab(DiabloInventoryUI.MenuTab.Bag);
+        yield return Wait(0.35f);
+        yield return Shot("bag_open");
+        invUI.ShowTab(DiabloInventoryUI.MenuTab.Settings);
+        yield return Wait(0.35f);
+        yield return Shot("settings_open");
+        invUI.SetOpen(false);
+        yield return Wait(0.2f);
 
         // 9) Character sheet (S4 seam: DiabloCharacterUI, C panel).
         var charUI = hero.GetComponent<DiabloCharacterUI>();
         if (charUI == null) charUI = hero.gameObject.AddComponent<DiabloCharacterUI>();
         charUI.SetOpen(true);
-        yield return Wait(0.5f);
+        yield return Wait(0.4f);
         yield return Shot("character_open");
         charUI.SetOpen(false);
-        yield return Wait(0.3f);
+        yield return Wait(0.2f);
+
+        var pauseGo = new GameObject("ShotCheckPause");
+        var pauseUI = pauseGo.AddComponent<PauseMenuUI>();
+        pauseUI.SetOpen(true);
+        yield return Wait(0.35f);
+        yield return Shot("pause_menu");
+        pauseUI.SetOpen(false);
+        Destroy(pauseGo);
+        DiabloClickController.ExternalDrive = true;
+        yield return Wait(0.2f);
 
         // 10) Sunken Ossuary arrival (S5): teleport the hero through the
         // FenGate destination like ZoneGate.Teleport does, wide shot.
@@ -201,12 +252,16 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(1.0f);
         yield return Shot("abbot_phase2");
 
-        // 13a) Class select overlay (second-class S4).
+        // 13a) Class select & Startup settings overlay (second-class S4).
         var selectGo = new GameObject("ClassSelect");
         var select = selectGo.AddComponent<ClassSelectUI>();
         select.SetOpen(true);
         yield return Wait(0.4f);
         yield return Shot("class_select");
+        select.ShowSettings(true);
+        yield return Wait(0.3f);
+        yield return Shot("start_settings");
+        select.ShowSettings(false);
         select.ChooseNew(ClassCatalog.LanternbearerId);
         Destroy(selectGo);
         DiabloClickController.ExternalDrive = true;

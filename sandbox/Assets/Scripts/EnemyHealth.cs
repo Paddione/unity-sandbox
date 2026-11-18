@@ -127,6 +127,9 @@ public sealed class EnemyHealth : NetworkBehaviour
         var p = transform.position + push * distance;
         p.y = transform.position.y;
         transform.position = p;
+        // Keep PhysX colliders synced with transform knockback so immediate follow-up
+        // strikes don't collide with the husk's pre-knockback ghost collider.
+        Physics.SyncTransforms();
     }
 
     /// <summary>

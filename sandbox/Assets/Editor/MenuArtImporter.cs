@@ -28,10 +28,16 @@ public static class MenuArtImporter
                 Debug.LogWarning($"[MenuArt] No TextureImporter for {path}.");
                 continue;
             }
-            if (importer.textureType != TextureImporterType.Sprite)
+            bool dirty = importer.textureType != TextureImporterType.Sprite
+                || importer.spriteImportMode != SpriteImportMode.Single
+                || !importer.alphaIsTransparency
+                || importer.mipmapEnabled;
+            if (dirty)
             {
                 importer.textureType = TextureImporterType.Sprite;
                 importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
                 importer.filterMode = FilterMode.Bilinear;
                 importer.textureCompression = TextureImporterCompression.Uncompressed;
                 importer.SaveAndReimport();

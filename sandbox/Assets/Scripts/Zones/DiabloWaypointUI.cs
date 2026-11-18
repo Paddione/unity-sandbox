@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Waypoint travel window (act-one S5), runtime UGUI with the HD scaler
-/// convention: one button per destination from <see cref="WaypointShrine.Destinations"/>.
+/// Waypoint travel window (act-one S5), upgraded with WaypointSigil artwork,
+/// non-overlapping rows, zone current-location markers, empty-state copy, and close button.
 /// Movement is locked while open; Esc closes.
 /// </summary>
 public sealed class DiabloWaypointUI : MonoBehaviour
@@ -11,17 +12,26 @@ public sealed class DiabloWaypointUI : MonoBehaviour
     public bool IsOpen { get; private set; }
     Canvas canvas;
     Transform list;
+    Text emptyHint;
 
     void Update()
     {
-        var kb = UnityEngine.InputSystem.Keyboard.current;
-        if (kb != null && IsOpen && kb.escapeKey.wasPressedThisFrame) SetOpen(false);
+        if (DiabloUIFactory.IsRemoteMirror(this)) return;
+        var kb = Keyboard.current;
+        if (kb != null && IsOpen && kb.escapeKey.wasPressedThisFrame)
+        {
+            SetOpen(false);
+            DiabloUIFactory.MarkEscConsumed();
+        }
     }
 
     public void SetOpen(bool open)
     {
         if (canvas == null) Build();
+        if (DiabloUIFactory.IsRemoteMirror(this)) open = false;
+        if (IsOpen != open) DiabloAudio.PlayUIClick();
         IsOpen = open;
+        if (open) DiabloUIFactory.CloseSecondaryPanels(gameObject, this);
         canvas.enabled = open;
         DiabloClickController.ExternalDrive = open;
         if (open) Refresh();
@@ -40,27 +50,54 @@ public sealed class DiabloWaypointUI : MonoBehaviour
     {
         if (list == null) return;
         foreach (Transform c in list)
-            if (Application.isPlaying) Destroy(c.gameObject); else DestroyImmediate(c.gameObject);
-        foreach (var s in WaypointShrine.Destinations())
+            if (Application.isPlaying) Destroy(c.gameObject);
+            else DestroyImmediate(c.gameObject);
+
+        var dests = WaypointShrine.Destinations();
+        if (emptyHint != null) emptyHint.gameObject.SetActive(dests.Count == 0);
+        foreach (var s in dests)
         {
             string id = s.shrineId;
+            bool nearby = Vector3.Distance(transform.position, s.transform.position) < 8f;
+            string caption = nearby ? $"{s.displayName}  (Here)" : s.displayName;
+
             var go = new GameObject("Waypoint_" + id, typeof(RectTransform));
             go.transform.SetParent(list, false);
-            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 40f);
+            DiabloUIFactory.SetLayout(go, prefH: 48f, flexW: 1f);
             var img = go.AddComponent<Image>();
-            img.sprite = DiabloMenuArt.TabBackground(false);
+            img.sprite = DiabloMenuArt.ButtonBackground(!nearby);
             img.type = Image.Type.Sliced;
             var b = go.AddComponent<Button>();
             b.onClick.AddListener(() =>
             {
+                DiabloAudio.PlayUIClick();
                 WaypointShrine.Travel(id, gameObject);
                 SetOpen(false);
             });
-            var label = MakeLabel(go.transform, s.displayName, 18);
-            var r = label.rectTransform;
-            r.anchorMin = Vector2.zero;
-            r.anchorMax = Vector2.one;
-            r.offsetMin = r.offsetMax = Vector2.zero;
+
+            var hz = go.AddComponent<HorizontalLayoutGroup>();
+            hz.padding = new RectOffset(12, 12, 4, 4);
+            hz.spacing = 10f;
+            hz.childAlignment = TextAnchor.MiddleLeft;
+            hz.childControlWidth = true;
+            hz.childControlHeight = false;
+            hz.childForceExpandWidth = false;
+
+            var sigil = DiabloMenuArt.MenuArtSprite("WaypointSigil");
+            if (sigil != null)
+            {
+                var iGo = new GameObject("Sigil", typeof(RectTransform));
+                iGo.transform.SetParent(go.transform, false);
+                DiabloUIFactory.SetLayout(iGo, prefH: 32f, prefW: 32f);
+                var iImg = iGo.AddComponent<Image>();
+                iImg.sprite = sigil;
+                iImg.preserveAspect = true;
+                iImg.raycastTarget = false;
+            }
+
+            var label = DiabloUIFactory.MakeText(go.transform, "DestLabel", caption, 17,
+                nearby ? DiabloPalette.ParchmentDim : DiabloPalette.GoldBright);
+            DiabloUIFactory.SetLayout(label.gameObject, prefH: 36f, flexW: 1f);
         }
     }
 
@@ -68,48 +105,34 @@ public sealed class DiabloWaypointUI : MonoBehaviour
     {
         var canvasGo = new GameObject("WaypointCanvas");
         canvasGo.transform.SetParent(transform, false);
-        canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 12;
-        var scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-        canvasGo.AddComponent<GraphicRaycaster>();
-        var panel = new GameObject("Panel", typeof(RectTransform));
-        panel.transform.SetParent(canvasGo.transform, false);
-        var img = panel.AddComponent<Image>();
-        img.sprite = DiabloMenuArt.PanelBackground();
-        img.type = Image.Type.Sliced;
-        panel.GetComponent<RectTransform>().sizeDelta = new Vector2(420f, 360f);
+        canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 12);
+
+        var panel = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(480f, 440f), Vector2.zero);
         var v = panel.AddComponent<VerticalLayoutGroup>();
-        v.padding = new RectOffset(16, 16, 14, 14);
-        v.spacing = 8f;
+        v.padding = new RectOffset(18, 18, 16, 16);
+        v.spacing = 10f;
         v.childControlWidth = true;
         v.childControlHeight = false;
-        var title = MakeLabel(panel.transform, "Waypoints", 22);
-        title.color = DiabloPalette.TrimGold;
+
+        DiabloUIFactory.MakeHeader(panel.transform, "SANCTIFIED WAYPOINTS", DiabloMenuArt.MenuArtSprite("WaypointSigil"), () => SetOpen(false));
+
+        var sub = DiabloUIFactory.MakeText(panel.transform, "WaypointSub", "Choose a discovered shrine to attune & travel:", 14, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(sub.gameObject, prefH: 22f, flexW: 1f);
+
+        emptyHint = DiabloUIFactory.MakeText(panel.transform, "EmptyHint", "Explore the world to discover additional Waypoint Shrines.", 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(emptyHint.gameObject, prefH: 36f, flexW: 1f);
+        emptyHint.gameObject.SetActive(false);
+
         var listGo = new GameObject("List", typeof(RectTransform));
         listGo.transform.SetParent(panel.transform, false);
+        DiabloUIFactory.SetLayout(listGo, prefH: 256f, flexW: 1f);
         var lv = listGo.AddComponent<VerticalLayoutGroup>();
-        lv.spacing = 6f;
+        lv.spacing = 8f;
         lv.childControlWidth = true;
         lv.childControlHeight = false;
         list = listGo.transform;
-        MakeLabel(panel.transform, "Esc closes.", 13);
-    }
 
-    static Text MakeLabel(Transform parent, string text, int size)
-    {
-        var go = new GameObject("Label", typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        var t = go.AddComponent<Text>();
-        t.text = text;
-        t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        t.fontSize = size;
-        t.alignment = TextAnchor.MiddleCenter;
-        t.color = DiabloPalette.Parchment;
-        return t;
+        var hint = DiabloUIFactory.MakeText(panel.transform, "EscHint", "Click shrine to travel  •  Esc closes", 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(hint.gameObject, prefH: 22f, flexW: 1f);
     }
 }

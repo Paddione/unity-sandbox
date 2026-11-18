@@ -1,0 +1,193 @@
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// Verifies all Cinderreach menu art sprites, 9-slice borders, layout groups,
+/// potion safety, settings persistence/wiring, PauseMenuUI, and SessionComplete fixes.
+/// </summary>
+public class DiabloMenuPolishTests
+{
+    static readonly string[] AllBakedMenuSprites =
+    {
+        "ShortSword", "HeavyAxe", "Dagger",
+        "ClothTunic", "LeatherVest", "Breastplate",
+        "Hood", "Helm", "Circlet",
+        "Lantern", "HoodedLantern", "EmberCenser",
+        "HealingPotion", "GoldCoin",
+        "TorchSconce", "LootChest", "BloodBanner",
+        "PortraitFenwalker", "PortraitLanternbearer", "PortraitVendor",
+        "SkillFireball", "SkillArrow", "SkillCleave",
+        "SkillLanternBolt", "SkillWisps", "SkillSearingHalo", "SkillVeilStep",
+        "CrestCinderreach", "WaypointSigil", "StashChestIcon", "SettingsCog",
+        "StartupBackdrop",
+    };
+
+    [Test]
+    public void MenuArt_All32SpritesLoadAsSpriteResources()
+    {
+        foreach (var name in AllBakedMenuSprites)
+            Assert.IsNotNull(Resources.Load<Sprite>("MenuArt/" + name), $"Missing Resources/MenuArt/{name} Sprite");
+    }
+
+    [Test]
+    public void MenuArt_ChromeSpritesHaveNineSliceBorders()
+    {
+        Assert.Greater(DiabloMenuArt.PanelBackground().border.sqrMagnitude, 0f);
+        Assert.Greater(DiabloMenuArt.HeaderBanner().border.sqrMagnitude, 0f);
+        Assert.Greater(DiabloMenuArt.SlotBackground(ItemRarity.Rare).border.sqrMagnitude, 0f);
+        Assert.Greater(DiabloMenuArt.TabBackground(true).border.sqrMagnitude, 0f);
+        Assert.Greater(DiabloMenuArt.ButtonBackground(true).border.sqrMagnitude, 0f);
+    }
+
+    [Test]
+    public void IconResolver_MapsLanternsPotionsGoldWithoutHoodCollision()
+    {
+        Assert.AreEqual("Lantern", DiabloMenuArt.ResolveIconName("Lantern"));
+        Assert.AreEqual("Lantern", DiabloMenuArt.ResolveIconName("Worn Lantern"));
+        Assert.AreEqual("HoodedLantern", DiabloMenuArt.ResolveIconName("HoodedLantern"));
+        Assert.AreEqual("EmberCenser", DiabloMenuArt.ResolveIconName("EmberCenser"));
+        Assert.AreEqual("HealingPotion", DiabloMenuArt.ResolveIconName("Healing Potion"));
+        Assert.AreEqual("GoldCoin", DiabloMenuArt.ResolveIconName("GoldCoin"));
+        Assert.AreEqual("Hood", DiabloMenuArt.ResolveIconName("Hood"));
+    }
+
+    [Test]
+    public void SkillIcons_ResolveAllSevenClassSkills()
+    {
+        foreach (DiabloSkills.Skill sk in System.Enum.GetValues(typeof(DiabloSkills.Skill)))
+            Assert.IsNotNull(DiabloMenuArt.SkillIcon(sk), $"Missing SkillIcon for {sk}");
+    }
+
+    [Test]
+    public void Equipment_PotionCannotEquipToHelmetAndBagDrinksIt()
+    {
+        var go = new GameObject("HeroPotionTest");
+        var eq = go.AddComponent<Equipment>();
+        var inv = go.AddComponent<Inventory>();
+        var hp = go.AddComponent<PlayerHealth>();
+        hp.Refresh();
+        hp.TakeDamage(10f);
+        float before = hp.CurrentHP;
+
+        var potion = ItemDatabase.CreateHealingPotion();
+        Assert.IsFalse(Equipment.CanEquip(potion, ClassCatalog.FenwalkerId));
+        inv.Add(potion);
+
+        var ui = go.AddComponent<DiabloInventoryUI>();
+        ui.SetOpen(true);
+        ui.EquipIndex(0);
+
+        Assert.IsNull(eq.helmet, "Consumable potion must never equip into Helmet slot.");
+        Assert.AreEqual(0, inv.Count, "Clicking potion in bag must consume it.");
+        Assert.Greater(hp.CurrentHP, before, "Consuming potion must heal hero.");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void InventoryUI_HasNoLegacyBloodMoorCopyAndSlidersHaveFillAndHandle()
+    {
+        var go = new GameObject("HeroInvPolish");
+        go.AddComponent<Equipment>();
+        go.AddComponent<Inventory>();
+        var ui = go.AddComponent<DiabloInventoryUI>();
+        ui.SetOpen(true);
+        foreach (var t in go.GetComponentsInChildren<Text>(true))
+            StringAssert.DoesNotContain("blood-moor", t.text.ToLowerInvariant());
+        var sliders = go.GetComponentsInChildren<Slider>(true);
+        Assert.GreaterOrEqual(sliders.Length, 4);
+        foreach (var s in sliders)
+        {
+            Assert.IsNotNull(s.fillRect, s.name + " missing fillRect");
+            Assert.IsNotNull(s.handleRect, s.name + " missing handleRect");
+        }
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void VendorUI_ColumnsAndRowHoldersHaveVerticalLayoutGroups()
+    {
+        var go = new GameObject("HeroVendorLayout");
+        go.AddComponent<Wallet>();
+        go.AddComponent<Inventory>();
+        go.AddComponent<Equipment>();
+        var ui = go.AddComponent<DiabloVendorUI>();
+        ui.SetOpen(true);
+        var vRows = go.transform.Find("VendorCanvas/Panel/Columns/VendorColumn/Scroll/Viewport/VendorRows");
+        var bRows = go.transform.Find("VendorCanvas/Panel/Columns/BagColumn/Scroll/Viewport/BagRows");
+        Assert.IsNotNull(vRows);
+        Assert.IsNotNull(bRows);
+        Assert.IsNotNull(vRows.GetComponent<VerticalLayoutGroup>());
+        Assert.IsNotNull(bRows.GetComponent<VerticalLayoutGroup>());
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void TargetBar_FillHasSpriteSoFillAmountRenders()
+    {
+        var go = new GameObject("TargetBarSpriteTest");
+        var bar = go.AddComponent<DiabloTargetBar>();
+        var m = typeof(DiabloTargetBar).GetMethod("BuildUI", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        m?.Invoke(bar, null);
+        var fillTransform = go.transform.Find("TargetBarCanvas/Panel/BarBg/BarFill");
+        Assert.IsNotNull(fillTransform);
+        var img = fillTransform.GetComponent<Image>();
+        Assert.IsNotNull(img.sprite, "TargetBar fill Image requires a non-null Sprite for Filled mode.");
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void SessionComplete_HasGraphicRaycasterAndEnglishCopy()
+    {
+        var go = new GameObject("SessionCompleteTest");
+        SessionComplete.Show(go, "Emberbrand Blade");
+        var canvas = go.transform.Find("SessionCanvas");
+        Assert.IsNotNull(canvas);
+        Assert.IsNotNull(canvas.GetComponent<GraphicRaycaster>(), "SessionCanvas must have GraphicRaycaster so buttons are clickable.");
+        StringAssert.DoesNotContain("Beute", SessionComplete.LastSummary);
+        StringAssert.Contains("Kills", SessionComplete.LastSummary);
+        StringAssert.Contains("Gold", SessionComplete.LastSummary);
+        SessionComplete.ResetRun();
+        Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void Settings_NewOptionsResetAndCycleCleanly()
+    {
+        DiabloSettings.UIVol = 0.25f;
+        DiabloSettings.MusicVol = 0.5f;
+        DiabloSettings.MasterVol = 0.5f;
+        Assert.AreEqual(0.25f, DiabloSettings.EffectiveMusic, 0.001f);
+        Assert.AreEqual(0.125f, DiabloSettings.EffectiveUI, 0.001f);
+
+        int prevIdx = DiabloSettings.ResolutionIndex;
+        DiabloSettings.CycleResolution();
+        Assert.AreNotEqual(prevIdx, DiabloSettings.ResolutionIndex);
+
+        DiabloSettings.ResetDefaults();
+        Assert.AreEqual(0.8f, DiabloSettings.MasterVol, 0.001f);
+        Assert.AreEqual(0.8f, DiabloSettings.UIVol, 0.001f);
+        Assert.AreEqual(2, DiabloSettings.QualityLevel);
+        Assert.AreEqual(0, DiabloSettings.ResolutionIndex);
+        Assert.IsTrue(DiabloSettings.VSync);
+        Assert.IsTrue(DiabloSettings.ShowDamageNumbers);
+    }
+
+    [Test]
+    public void PauseMenu_OpensTogglesSettingsAndUsesHdScaler()
+    {
+        var go = new GameObject("PauseMenuTest");
+        var pause = go.AddComponent<PauseMenuUI>();
+        pause.SetOpen(true);
+        Assert.IsTrue(pause.IsOpen);
+        var scaler = go.GetComponentInChildren<CanvasScaler>(true);
+        Assert.IsNotNull(scaler);
+        Assert.AreEqual(new Vector2(1920f, 1080f), scaler.referenceResolution);
+        pause.ShowSettings();
+        Assert.IsTrue(pause.SettingsOpen);
+        pause.SetOpen(false);
+        Assert.IsFalse(pause.IsOpen);
+        DiabloClickController.ExternalDrive = false;
+        Object.DestroyImmediate(go);
+    }
+}

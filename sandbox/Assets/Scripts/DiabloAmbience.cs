@@ -51,7 +51,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         bed = gameObject.AddComponent<AudioSource>();
         bed.clip = DiabloAudio.AmbientClip;
         bed.loop = true;
-        bed.volume = BedVolume;
+        bed.volume = BedVolume * DiabloSettings.EffectiveMusic;
         bed.spatialBlend = 0f;
         if (!AmbienceMuted) bed.Play();
 
@@ -172,6 +172,12 @@ public sealed class DiabloAmbience : MonoBehaviour
         }
         if (target != null && motes != null)
             motes.transform.position = target.position + Vector3.up * 0.2f;
+    }
+
+    public static void ApplySettings()
+    {
+        if (instance != null && instance.bed != null)
+            instance.bed.volume = BedVolume * DiabloSettings.EffectiveMusic;
     }
 
     void OnDestroy()

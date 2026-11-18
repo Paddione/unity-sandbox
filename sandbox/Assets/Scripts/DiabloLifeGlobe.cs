@@ -19,6 +19,9 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
     Image fill;
     Text label;
     Text deathNotice;
+    Text hudStatusText;
+    Text fpsText;
+    float fpsSmooth = 60f;
 
     /// <summary>Test seams: shown fill (-1 unbuilt) and notice visibility.</summary>
     public float TestFillAmount => fill != null ? fill.fillAmount : -1f;
@@ -58,6 +61,31 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         fill.fillAmount = max > 0f ? cur / max : 0f;
         label.text = $"{Mathf.CeilToInt(cur)} / {Mathf.CeilToInt(max)}";
         deathNotice.enabled = Time.time - PlayerHealth.LastDeathTime < DeathNoticeSeconds;
+
+        if (hudStatusText != null)
+        {
+            var w = hero.GetComponent<Wallet>();
+            var inv = hero.GetComponent<Inventory>();
+            var prog = hero.GetComponent<DiabloProgression>();
+            int gold = w != null ? w.Gold : 0;
+            int pot = 0;
+            if (inv != null)
+                for (int i = 0; i < inv.Count; i++)
+                    if (inv.Get(i)?.slot == ItemSlot.Consumable) pot++;
+            var sheet = prog != null ? prog.Sheet : null;
+            int pts = sheet != null ? sheet.freeAttributePoints + sheet.freeSkillPoints : 0;
+            string ptsTag = pts > 0 ? $"   <color={DiabloPalette.ToHex(DiabloPalette.GoldBright)}>+{pts} pts [C]</color>" : "";
+            hudStatusText.text = $"<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>{gold}g</color>   •   Potions [1]: {pot}{ptsTag}";
+        }
+        if (fpsText != null)
+        {
+            fpsText.enabled = DiabloSettings.ShowFPS;
+            if (DiabloSettings.ShowFPS && Time.unscaledDeltaTime > 0.0001f)
+            {
+                fpsSmooth = Mathf.Lerp(fpsSmooth, 1f / Time.unscaledDeltaTime, 0.1f);
+                fpsText.text = $"{Mathf.RoundToInt(fpsSmooth)} FPS";
+            }
+        }
     }
 
     void BuildUI()
@@ -73,20 +101,56 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
 
         var disc = CircleSprite();
-        var rim = MakeImage(canvasGo.transform, "GlobeRim", disc, new Color(0.08f, 0.06f, 0.05f, 0.95f));
-        Place(rim.rectTransform, new Vector2(0f, 0f), new Vector2(16f, 16f), Size + 8f);
+        var outerTrim = MakeImage(canvasGo.transform, "GlobeGoldRim", disc, DiabloPalette.PanelEdge);
+        Place(outerTrim.rectTransform, new Vector2(0f, 0f), new Vector2(18f, 16f), Size + 14f);
 
-        var back = MakeImage(rim.transform, "GlobeBack", disc, new Color(0.18f, 0.03f, 0.03f, 1f));
+        var rim = MakeImage(outerTrim.transform, "GlobeRim", disc, new Color(0.06f, 0.04f, 0.05f, 0.98f));
+        Center(rim.rectTransform, Size + 6f);
+
+        var back = MakeImage(rim.transform, "GlobeBack", disc, new Color(0.16f, 0.025f, 0.03f, 1f));
         Center(back.rectTransform, Size);
 
-        fill = MakeImage(rim.transform, "GlobeFill", disc, new Color(0.75f, 0.07f, 0.07f, 1f));
+        fill = MakeImage(rim.transform, "GlobeFill", disc, new Color(0.78f, 0.07f, 0.08f, 1f));
         fill.type = Image.Type.Filled;
         fill.fillMethod = Image.FillMethod.Vertical;
         fill.fillOrigin = (int)Image.OriginVertical.Bottom;
         Center(fill.rectTransform, Size);
 
+        var sheen = MakeImage(rim.transform, "GlobeSheen", disc, new Color(1f, 0.72f, 0.68f, 0.12f));
+        Center(sheen.rectTransform, Size * 0.78f);
+
         label = MakeText(rim.transform, "GlobeLabel", 18);
         Center(label.rectTransform, Size);
+
+        // Compact gold/potion status card next to the life globe
+        var statusCard = new GameObject("HudStatusCard", typeof(RectTransform));
+        statusCard.transform.SetParent(canvasGo.transform, false);
+        var scImg = statusCard.AddComponent<Image>();
+        scImg.sprite = DiabloMenuArt.TooltipBackground();
+        scImg.type = Image.Type.Sliced;
+        scImg.raycastTarget = false;
+        var scr = statusCard.GetComponent<RectTransform>();
+        scr.anchorMin = scr.anchorMax = scr.pivot = new Vector2(0f, 0f);
+        scr.sizeDelta = new Vector2(310f, 34f);
+        scr.anchoredPosition = new Vector2(158f, 22f);
+
+        hudStatusText = MakeText(statusCard.transform, "HudStatusText", 14);
+        hudStatusText.supportRichText = true;
+        hudStatusText.alignment = TextAnchor.MiddleCenter;
+        var hsr = hudStatusText.rectTransform;
+        hsr.anchorMin = Vector2.zero;
+        hsr.anchorMax = Vector2.one;
+        hsr.offsetMin = new Vector2(8f, 2f);
+        hsr.offsetMax = new Vector2(-8f, -2f);
+
+        fpsText = MakeText(canvasGo.transform, "FpsOverlay", 15);
+        fpsText.alignment = TextAnchor.UpperRight;
+        fpsText.color = DiabloPalette.TrimGold;
+        var fr = fpsText.rectTransform;
+        fr.anchorMin = fr.anchorMax = fr.pivot = new Vector2(1f, 1f);
+        fr.sizeDelta = new Vector2(120f, 28f);
+        fr.anchoredPosition = new Vector2(-14f, -10f);
+        fpsText.enabled = DiabloSettings.ShowFPS;
 
         deathNotice = MakeText(canvasGo.transform, "DeathNotice", 30);
         deathNotice.text = "You died - back at Lantern Hold";

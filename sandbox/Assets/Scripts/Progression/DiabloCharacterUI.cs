@@ -1,33 +1,39 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// S4 character sheet panel (UGUI, built at runtime like
-/// <see cref="DiabloInventoryUI"/>): attributes (Strength/Vitality/Focus, one
-/// point each) and skill ranks (1–5, +20 % damage per rank) for the skills of
-/// the hero's class from <see cref="ClassCatalog"/> (second-class S3). <c>C</c> toggles, <c>Esc</c> closes. Unspent points pulse so a fresh
-/// level-up is impossible to miss. Public contract for tests: IsOpen, SetOpen.
-/// Local-only like the sheet itself; mirrors never open it.
+/// Runtime character & skill sheet (C toggles, Esc closes).
+/// Displays hero portrait, attributes (STR/VIT/FOC), and class skill ranks with
+/// Blender-rendered skill icons, crisp non-overlapping rows, disabled states at 0 points
+/// or max rank, and a detailed hover breakdown.
 /// </summary>
 public sealed class DiabloCharacterUI : MonoBehaviour
 {
     public bool IsOpen { get; private set; }
 
     Canvas canvas;
+    Transform panelRoot;
+    Transform skillSection;
+    Text headerSubText;
     Text attrPointsText;
     Text skillPointsText;
     Text strengthText;
     Text vitalityText;
     Text focusText;
-    readonly System.Collections.Generic.List<(DiabloSkills.Skill skill, Text text)> skillRows =
-        new System.Collections.Generic.List<(DiabloSkills.Skill, Text)>();
-    Transform panelRoot;
+    Text detailText;
+    Image portraitImg;
+    Button strPlusBtn;
+    Button vitPlusBtn;
+    Button focPlusBtn;
+    readonly List<(DiabloSkills.Skill skill, Text label, Button plus)> skillRows = new List<(DiabloSkills.Skill, Text, Button)>();
+    string builtFor = "";
     Text variantText;
-    string builtFor;
     bool building;
 
-    /// <summary>Skills shown as rank rows (class order; test seam).</summary>
+    /// <summary>Skills currently displayed on the sheet (class-reactive; test seam).</summary>
     public DiabloSkills.Skill[] RowSkills
     {
         get
@@ -47,10 +53,6 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         SetOpen(false);
     }
 
-    /// <summary>
-    /// Headless EditMode `AddComponent` can skip `Awake`-time wiring, so every
-    /// entry point heals itself (same pattern as DiabloInventoryUI).
-    /// </summary>
     public void EnsureBuilt()
     {
         if (canvas != null) return;
@@ -59,26 +61,26 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         BuildUI();
     }
 
-    bool IsRemoteMirror()
-    {
-        var net = GetComponent<DiabloNetworkPlayer>();
-        return net != null && net.IsSpawned && !net.IsOwner;
-    }
+    bool IsRemoteMirror() => DiabloUIFactory.IsRemoteMirror(this);
 
     void Update()
     {
         var kb = Keyboard.current;
         if (kb != null && !IsRemoteMirror())
         {
-            if (kb.cKey.wasPressedThisFrame) SetOpen(!IsOpen);
-            else if (kb.escapeKey.wasPressedThisFrame && IsOpen) SetOpen(false);
+            if (kb.cKey.wasPressedThisFrame && (!DiabloUIFactory.IsAnyModalOpen(gameObject) || IsOpen))
+                SetOpen(!IsOpen);
+            else if (kb.escapeKey.wasPressedThisFrame && IsOpen)
+            {
+                SetOpen(false);
+                DiabloUIFactory.MarkEscConsumed();
+            }
         }
         if (!IsOpen || building) return;
-        // Unspent points pulse: scale the point labels on a sine.
         var sheet = prog != null ? prog.Sheet : null;
         if (sheet != null && sheet.HasUnspent)
         {
-            float s = 1f + 0.08f * Mathf.Sin(Time.unscaledTime * 5f);
+            float s = 1f + 0.06f * Mathf.Sin(Time.unscaledTime * 5f);
             if (attrPointsText != null && sheet.freeAttributePoints > 0)
                 attrPointsText.rectTransform.localScale = Vector3.one * s;
             if (skillPointsText != null && sheet.freeSkillPoints > 0)
@@ -92,25 +94,44 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         if (IsRemoteMirror()) open = false;
         if (IsOpen != open) DiabloAudio.PlayUIClick();
         IsOpen = open;
+        if (open) DiabloUIFactory.CloseSecondaryPanels(gameObject, this);
         if (canvas != null) canvas.enabled = open;
         if (open) Refresh();
     }
 
-    /// <summary>Rebuild all labels from the sheet (also the HD-test seam).</summary>
+    /// <summary>Rebuild all labels and button states from CharacterSheet (test seam).</summary>
     public void Refresh()
     {
         EnsureBuilt();
         var sheet = prog != null ? prog.Sheet : CharacterSheet.For(gameObject);
         if (sheet == null) return;
         if (builtFor != RunProfile.Class.id) BuildSkillRows();
+
+        if (portraitImg != null) portraitImg.sprite = DiabloMenuArt.ClassPortrait(RunProfile.ClassId);
+        int lv = prog != null ? prog.Level : 1;
+        if (headerSubText != null)
+            headerSubText.text = $"<b>{RunProfile.Class.displayName}</b>  •  Level {lv}\n<size=13>Invest points from leveling up.</size>";
+
         attrPointsText.text = $"Attribute points: {sheet.freeAttributePoints}";
+        attrPointsText.color = sheet.freeAttributePoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
         skillPointsText.text = $"Skill points: {sheet.freeSkillPoints}";
-        strengthText.text = $"Strength {sheet.strength}  (+{sheet.strength * CharacterSheet.StrengthMeleePerPoint} melee)";
-        vitalityText.text = $"Vitality {sheet.vitality}  (+{sheet.VitalityLife():0} life)";
+        skillPointsText.color = sheet.freeSkillPoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
+
+        bool canAttr = sheet.freeAttributePoints > 0;
+        if (strPlusBtn != null) strPlusBtn.interactable = canAttr;
+        if (vitPlusBtn != null) vitPlusBtn.interactable = canAttr;
+        if (focPlusBtn != null) focPlusBtn.interactable = canAttr;
+
+        strengthText.text = $"Strength  <b>{sheet.strength}</b>  (+{sheet.strength * CharacterSheet.StrengthMeleePerPoint} melee dmg)";
+        vitalityText.text = $"Vitality  <b>{sheet.vitality}</b>  (+{sheet.VitalityLife():0} max HP)";
         float factor = RunProfile.Class.focusSkillFactor;
-        focusText.text = $"Focus {sheet.focus}  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
-        foreach (var (skill, text) in skillRows)
+        focusText.text = $"Focus  <b>{sheet.focus}</b>  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
+
+        foreach (var (skill, text, plus) in skillRows)
+        {
             text.text = RowText(sheet, skill);
+            if (plus != null) plus.interactable = sheet.freeSkillPoints > 0 && sheet.GetRank(skill) < CharacterSheet.MaxSkillRank;
+        }
         if (variantText != null) variantText.text = VariantLines();
         if (!sheet.HasUnspent)
         {
@@ -121,7 +142,8 @@ public sealed class DiabloCharacterUI : MonoBehaviour
 
     string RowText(CharacterSheet sheet, DiabloSkills.Skill skill)
     {
-        string line = $"{DiabloSkills.SkillName(skill)} {RankPips(sheet.GetRank(skill))}";
+        int rank = sheet.GetRank(skill);
+        string line = $"{DiabloSkills.SkillName(skill)}  {RankPips(rank)}";
         if (skill == DiabloSkills.Skill.Cleave)
         {
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
@@ -149,8 +171,6 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             sb.Append(i < rank ? '●' : '○');
         return sb.ToString();
     }
-
-    // ---------- spend hooks (button targets) ----------
 
     public void SpendStrength() => Spend(CharacterSheet.Attribute.Strength);
     public void SpendVitality() => Spend(CharacterSheet.Attribute.Vitality);
@@ -229,102 +249,166 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         building = true;
         var canvasGo = new GameObject("CharacterCanvas");
         canvasGo.transform.SetParent(transform, false);
-        canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 10;
-        var scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-        canvasGo.AddComponent<GraphicRaycaster>();
+        canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 10);
 
-        var panelGo = new GameObject("Panel");
-        panelGo.transform.SetParent(canvasGo.transform, false);
-        var panel = panelGo.AddComponent<Image>();
-        panel.sprite = DiabloMenuArt.PanelBackground();
-        panel.type = Image.Type.Sliced;
-        panel.color = Color.white;
-        var rect = panelGo.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(1f, 0.5f);
-        rect.anchorMax = new Vector2(1f, 0.5f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = new Vector2(480f, 560f);
-        rect.anchoredPosition = new Vector2(-16f, 0f);
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(530f, 650f), new Vector2(-18f, 0f));
+        var pr = panelGo.GetComponent<RectTransform>();
+        pr.anchorMin = new Vector2(1f, 0.5f);
+        pr.anchorMax = new Vector2(1f, 0.5f);
+        pr.pivot = new Vector2(1f, 0.5f);
 
         var layout = panelGo.AddComponent<VerticalLayoutGroup>();
-        layout.padding = new RectOffset(14, 14, 12, 12);
-        layout.spacing = 6f;
+        layout.padding = new RectOffset(16, 16, 14, 14);
+        layout.spacing = 7f;
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        MakeLabel(panelGo.transform, "Character (C to close)", 20);
-        attrPointsText = MakeLabel(panelGo.transform, "", 16);
-        AddRow(panelGo.transform, "STR", out strengthText, SpendStrength);
-        AddRow(panelGo.transform, "VIT", out vitalityText, SpendVitality);
-        AddRow(panelGo.transform, "FOC", out focusText, SpendFocus);
-        skillPointsText = MakeLabel(panelGo.transform, "", 16);
+        DiabloUIFactory.MakeHeader(panelGo.transform, "CHARACTER & SKILLS (C)", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
+
+        // Portrait + Hero Class card
+        var topRow = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "HeroIdentityRow", 12f, 68f);
+        topRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+        var pFrame = new GameObject("PortraitSlot", typeof(RectTransform));
+        pFrame.transform.SetParent(topRow.transform, false);
+        DiabloUIFactory.SetLayout(pFrame, prefH: 64f, prefW: 64f);
+        var pfImg = pFrame.AddComponent<Image>();
+        pfImg.sprite = DiabloMenuArt.SlotBackground(ItemRarity.Unique, 64);
+        pfImg.type = Image.Type.Sliced;
+
+        var pGo = new GameObject("Portrait", typeof(RectTransform));
+        pGo.transform.SetParent(pFrame.transform, false);
+        portraitImg = pGo.AddComponent<Image>();
+        portraitImg.sprite = DiabloMenuArt.ClassPortrait(RunProfile.ClassId);
+        portraitImg.preserveAspect = true;
+        var pir = pGo.GetComponent<RectTransform>();
+        pir.anchorMin = Vector2.zero;
+        pir.anchorMax = Vector2.one;
+        pir.offsetMin = new Vector2(4f, 4f);
+        pir.offsetMax = new Vector2(-4f, -4f);
+
+        headerSubText = DiabloUIFactory.MakeText(topRow.transform, "HeroClassSub", "", 16, DiabloPalette.Parchment);
+        DiabloUIFactory.SetLayout(headerSubText.gameObject, prefH: 60f, flexW: 1f);
+
+        DiabloUIFactory.MakeDivider(panelGo.transform);
+
+        attrPointsText = DiabloUIFactory.MakeText(panelGo.transform, "AttrPoints", "Attribute points: 0", 16, DiabloPalette.GoldBright);
+        attrPointsText.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(attrPointsText.gameObject, prefH: 24f, flexW: 1f);
+
+        AddRow(panelGo.transform, "STR", null, out strengthText, out strPlusBtn, SpendStrength,
+            "Strength increases basic melee cleave & sword strike damage.");
+        AddRow(panelGo.transform, "VIT", null, out vitalityText, out vitPlusBtn, SpendVitality,
+            "Vitality increases maximum health by +5 per point.");
+        AddRow(panelGo.transform, "FOC", null, out focusText, out focPlusBtn, SpendFocus,
+            "Focus amplifies skill damage and shortens all cooldowns.");
+
+        DiabloUIFactory.MakeDivider(panelGo.transform);
+
+        skillPointsText = DiabloUIFactory.MakeText(panelGo.transform, "SkillPoints", "Skill points: 0", 16, DiabloPalette.GoldBright);
+        skillPointsText.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(skillPointsText.gameObject, prefH: 24f, flexW: 1f);
+
+        var skillsGo = new GameObject("SkillRowsContainer", typeof(RectTransform));
+        skillsGo.transform.SetParent(panelGo.transform, false);
+        DiabloUIFactory.SetLayout(skillsGo, prefH: 214f, flexW: 1f);
+        var sv = skillsGo.AddComponent<VerticalLayoutGroup>();
+        sv.spacing = 6f;
+        sv.childControlWidth = true;
+        sv.childControlHeight = false;
+        skillSection = skillsGo.transform;
+
         panelRoot = panelGo.transform;
         BuildSkillRows();
-        variantText = MakeLabel(panelGo.transform, "", 14);
+        variantText = DiabloUIFactory.MakeText(panelGo.transform, "VariantLines", "", 13, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(variantText.gameObject, prefH: 54f, flexW: 1f);
+
+        var tipCard = new GameObject("DetailCard", typeof(RectTransform));
+        tipCard.transform.SetParent(panelGo.transform, false);
+        DiabloUIFactory.SetLayout(tipCard, prefH: 52f, flexW: 1f);
+        var tcBg = tipCard.AddComponent<Image>();
+        tcBg.sprite = DiabloMenuArt.TooltipBackground();
+        tcBg.type = Image.Type.Sliced;
+        var tv = tipCard.AddComponent<VerticalLayoutGroup>();
+        tv.padding = new RectOffset(10, 10, 6, 6);
+        detailText = DiabloUIFactory.MakeText(tipCard.transform, "Detail", "Hover an attribute or skill for details. C toggles.", 13, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(detailText.gameObject, prefH: 38f, flexW: 1f);
+
         building = false;
     }
 
-    /// <summary>One rank row per class skill (rebuilt when the class changes).</summary>
+    /// <summary>One rank row per class skill (rebuilt cleanly inside dedicated container above DetailCard).</summary>
     void BuildSkillRows()
     {
-        foreach (var (_, text) in skillRows)
+        foreach (var (_, text, _) in skillRows)
             if (text != null)
             {
                 var row = text.transform.parent.gameObject;
                 if (Application.isPlaying) Destroy(row); else DestroyImmediate(row);
             }
         skillRows.Clear();
+        var parent = skillSection != null ? skillSection : panelRoot;
         var cls = RunProfile.Class;
         for (int i = 0; i < cls.skills.Length; i++)
         {
             var skill = cls.skills[i];
-            AddRow(panelRoot, cls.keys[i], out Text text, () => SpendRank(skill));
-            skillRows.Add((skill, text));
+            var spr = DiabloMenuArt.SkillIcon(skill);
+            AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
+                $"[{cls.keys[i]}] {DiabloSkills.SkillName(skill)} — Gain rank up to {CharacterSheet.MaxSkillRank} to boost potency.", 44f);
+            skillRows.Add((skill, text, plus));
         }
         builtFor = cls.id;
     }
 
-    void AddRow(Transform parent, string key, out Text value, UnityEngine.Events.UnityAction onPlus)
+    void AddRow(Transform parent, string key, Sprite iconSprite, out Text value, out Button plusBtn,
+        UnityEngine.Events.UnityAction onPlus, string tooltip, float height = 38f)
     {
-        var row = new GameObject("Row" + key);
+        var row = new GameObject("Row" + key, typeof(RectTransform));
         row.transform.SetParent(parent, false);
-        var hz = row.AddComponent<HorizontalLayoutGroup>();
-        hz.spacing = 8f;
-        hz.childControlWidth = true;
-        value = MakeLabel(row.transform, "", 16);
-        var btnGo = new GameObject("Plus");
-        btnGo.transform.SetParent(row.transform, false);
-        var image = btnGo.AddComponent<Image>();
-        image.sprite = DiabloMenuArt.TabBackground(false);
-        image.type = Image.Type.Sliced;
-        var button = btnGo.AddComponent<Button>();
-        button.onClick.AddListener(onPlus);
-        var label = MakeLabel(btnGo.transform, "+", 18);
-        label.alignment = TextAnchor.MiddleCenter;
-        var lr = label.GetComponent<RectTransform>();
-        lr.anchorMin = Vector2.zero;
-        lr.anchorMax = Vector2.one;
-        lr.offsetMin = Vector2.zero;
-        lr.offsetMax = Vector2.zero;
-        var br = btnGo.GetComponent<RectTransform>();
-        br.sizeDelta = new Vector2(44f, 30f);
-    }
+        DiabloUIFactory.SetLayout(row, prefH: height, flexW: 1f);
+        var bg = row.AddComponent<Image>();
+        bg.sprite = DiabloMenuArt.TooltipBackground();
+        bg.type = Image.Type.Sliced;
 
-    static Text MakeLabel(Transform parent, string text, int size)
-    {
-        var go = new GameObject("Label");
-        go.transform.SetParent(parent, false);
-        var label = go.AddComponent<Text>();
-        label.text = text;
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = size;
-        label.color = DiabloPalette.Parchment;
-        return label;
+        var hz = row.AddComponent<HorizontalLayoutGroup>();
+        hz.padding = new RectOffset(8, 8, 4, 4);
+        hz.spacing = 8f;
+        hz.childAlignment = TextAnchor.MiddleLeft;
+        hz.childControlWidth = true;
+        hz.childControlHeight = false;
+        hz.childForceExpandWidth = false;
+
+        if (iconSprite != null)
+        {
+            var slotGo = new GameObject("SkillSlot", typeof(RectTransform));
+            slotGo.transform.SetParent(row.transform, false);
+            DiabloUIFactory.SetLayout(slotGo, prefH: 34f, prefW: 34f);
+            var sImg = slotGo.AddComponent<Image>();
+            sImg.sprite = DiabloMenuArt.SlotBackground(null, 64);
+            sImg.type = Image.Type.Sliced;
+            var iGo = new GameObject("Icon", typeof(RectTransform));
+            iGo.transform.SetParent(slotGo.transform, false);
+            var iImg = iGo.AddComponent<Image>();
+            iImg.sprite = iconSprite;
+            iImg.preserveAspect = true;
+            var ir = iGo.GetComponent<RectTransform>();
+            ir.anchorMin = Vector2.zero;
+            ir.anchorMax = Vector2.one;
+            ir.offsetMin = new Vector2(3f, 3f);
+            ir.offsetMax = new Vector2(-3f, -3f);
+        }
+
+        value = DiabloUIFactory.MakeText(row.transform, "ValueLabel", "", 15, DiabloPalette.Parchment);
+        DiabloUIFactory.SetLayout(value.gameObject, prefH: 30f, flexW: 1f);
+
+        plusBtn = DiabloUIFactory.MakeButton(row.transform, "Plus", "+", 18, true, DiabloPalette.GoldBright, onPlus);
+        DiabloUIFactory.SetLayout(plusBtn.gameObject, prefH: 30f, prefW: 38f);
+
+        if (EventSystem.current != null && !string.IsNullOrEmpty(tooltip))
+        {
+            var trig = row.AddComponent<EventTrigger>();
+            var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            entry.callback.AddListener(_ => { if (detailText != null) detailText.text = tooltip; });
+            trig.triggers.Add(entry);
+        }
     }
 }
