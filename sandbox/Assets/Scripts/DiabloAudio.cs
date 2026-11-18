@@ -24,6 +24,7 @@ public static class DiabloAudio
     static AudioSource source;
     static AudioClip swingClip, hitClip, deathClip, lootClip, uiClickClip, hurtClip, playerDeathClip;
     static AudioClip whooshClip, blastClip, twangClip, critClip, levelUpClip, ambientClip;
+    static AudioClip lanternClip, haloClip, veilClip;
     static readonly System.Random pitchRng = new System.Random(77);
     static bool built;
 
@@ -55,6 +56,14 @@ public static class DiabloAudio
     public static void PlayTwang() { EnsureBuilt(); Varied(twangClip, 0.8f); soundedCasts++; }
     public static void PlayBlast() { EnsureBuilt(); Varied(blastClip, 1f); soundedBlasts++; }
     public static void PlayCrit() { EnsureBuilt(); Varied(critClip, 0.9f); soundedCrits++; }
+    // Lanternbearer (second-class S2): bell chime, rising hum, falling shimmer.
+    public static void PlayLantern() { EnsureBuilt(); Varied(lanternClip, 0.7f); soundedCasts++; }
+    public static void PlayHalo() { EnsureBuilt(); Varied(haloClip, 0.8f); soundedCasts++; }
+    public static void PlayVeil() { EnsureBuilt(); Varied(veilClip, 0.6f); soundedCasts++; }
+    public static AudioClip LanternClip { get { EnsureBuilt(); return lanternClip; } }
+    public static AudioClip HaloClip { get { EnsureBuilt(); return haloClip; } }
+    public static AudioClip VeilClip { get { EnsureBuilt(); return veilClip; } }
+
     public static void PlayLevelUp() { EnsureBuilt(); source.PlayOneShot(levelUpClip, 0.9f); soundedLevelUps++; }
 
     /// <summary>
@@ -108,6 +117,9 @@ public static class DiabloAudio
         critClip = Crit("Crit", 0.18f);
         levelUpClip = Sting("LevelUp");
         ambientClip = Ambient("MoorWind", 6f, rng);
+        lanternClip = Chime("LanternBolt", 0.45f, 660f);
+        haloClip = Sweep("SearingHalo", 0.4f, 220f, 880f);
+        veilClip = Sweep("VeilStep", 0.25f, 1400f, 480f);
         pitched = new AudioSource[4];
         for (int i = 0; i < pitched.Length; i++) pitched[i] = go.AddComponent<AudioSource>();
     }
@@ -236,6 +248,22 @@ public static class DiabloAudio
         var clip = AudioClip.Create(name, loop.Length, 1, SampleRate, false);
         clip.SetData(loop, 0);
         return clip;
+    }
+
+    /// <summary>Bell: inharmonic partials (1, 2.76, 5.4) with exponential decay.</summary>
+    static AudioClip Chime(string name, float seconds, float f0)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / SampleRate;
+            float env = Mathf.Exp(-t * 9f);
+            data[i] = env * (0.6f * Mathf.Sin(2f * Mathf.PI * f0 * t)
+                             + 0.25f * Mathf.Sin(2f * Mathf.PI * f0 * 2.76f * t)
+                             + 0.12f * Mathf.Sin(2f * Mathf.PI * f0 * 5.4f * t));
+        }
+        return Bake(name, data);
     }
 
     static int Samples(float seconds) => Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));

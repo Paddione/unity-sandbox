@@ -402,3 +402,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Offener Nebenbefund: Bone Wardens laufen ohne Leine aus dem Ossuary (x 200) bis in den Fen und zählen dort
   zu den Kills. Kandidat für `cinderreach-coop-session` S2 oder `cinderreach-act-one`.
 
+## 2026-11-18 — cinderreach-second-class S2 skills (Lanternbearer)
+
+- Done: vier Lanternbearer-Skills, `Wisp`, Durchdringen im `DiabloProjectile`, Klassen-Gate, HUD/Tasten aus
+  dem Katalog, Chime/Hum/Shimmer-Klänge.
+- Belegt: EditMode 157/157, PlayMode 78/78, Verifies, Autoplay Seed 0 (Fenwalker) grün.
+- Faced: EditMode-Halo traf Husks einer offenen Zonenszene aus anderen Suites (eigene leere Szene im Test);
+  `CleaveArc` trägt schon ein Licht (`AddComponent` lieferte null); Projektiltests müssen Spielzeit statt
+  Frames warten (Test-Frames ≈ 1 ms).
+- Next: S3 Ränge und Charakter-UI je Klasse.
+

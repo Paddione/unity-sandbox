@@ -48,6 +48,10 @@ S5-Teil „Balance-Abnahme Zone 3“ wartet zusätzlich auf `cinderreach-act-one
 6. Lanternbearer-Modell aus dem vorhandenen KayKit-Adventurer-Satz (`Editor/KayKitCharacters.cs`), Laterne
    als Blender-Prop über `WorldArtBuilder`. Keine Fremd-IP.
 
+7. Nachtrag S2 (2026-11-18): Keine Icons über `SkillArtBuilder`, das HUD ist textbasiert. Bolt-, Wisp-, Halo-
+   und Veil-Art entstehen prozedural (Licht + Primitive, Halo als gold getönter `CleaveArc`). Bis S3 liefert
+   `CharacterSheet.GetRank` für Lanternbearer-Skills 0 und `SpendSkill` lehnt sie ab.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -118,7 +122,7 @@ S1 zuerst. S2 und S3 nach S1 parallel (disjunkt). S4 nach S2 und S3. S5 zuletzt.
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
 | S1 class-data | Startbedingung | 15 % | landed 2026-11-18 |
-| S2 skills | S1 | 30 % | offen |
+| S2 skills | S1 | 30 % | landed 2026-11-18 |
 | S3 sheet+ui | S1 | 15 % | offen |
 | S4 select+items | S2, S3 | 20 % | offen |
 | S5 proof | S4 (Zone-3-Abnahme: act-one 100 %) | 20 % | offen |

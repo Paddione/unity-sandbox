@@ -40,6 +40,25 @@ public sealed class DiabloSkills : MonoBehaviour
     public float cleaveCooldown = 6f;
     public float cleaveKnockback = 1.2f;
 
+    [Header("Lanternbearer (second-class S2)")]
+    public int lanternBoltDamage = 4;
+    public float lanternBoltSpeed = 16f;
+    public float lanternBoltRange = 18f;
+    public float lanternBoltCooldown = 1.2f;
+    public int lanternBoltPierce = 1;
+    public int wispBaseCount = 2;
+    public int wispDamage = 1;
+    public float wispDuration = 20f;
+    public float wispCooldown = 14f;
+    public int haloDamage = 3;
+    public float haloRadius = 3.5f;
+    /// <summary>Same pop as the melee contract (d2-combat-feel: 0.6 m on normal husks).</summary>
+    public float haloKnockback = 0.6f;
+    public float haloCooldown = 7f;
+    public float veilDistance = 6f;
+    public float veilCooldown = 5f;
+    public const float VeilHeroRadius = 0.35f;
+
     /// <summary>Launch height above the hero pivot (chest).</summary>
     public const float LaunchHeight = 1.0f;
     /// <summary>Launch offset in front of the hero (clears its own collider).</summary>
@@ -50,6 +69,14 @@ public sealed class DiabloSkills : MonoBehaviour
     float lastFireball = float.NegativeInfinity;
     float lastArrow = float.NegativeInfinity;
     float lastCleave = float.NegativeInfinity;
+    readonly System.Collections.Generic.Dictionary<Skill, float> lastLantern =
+        new System.Collections.Generic.Dictionary<Skill, float>();
+
+    /// <summary>Class of the local hero (run profile); mirrors only render casts.</summary>
+    public ClassDefinition ActiveClass => RunProfile.Class;
+
+    /// <summary>Wisps for a rank: base 2, a third from rank 3.</summary>
+    public int WispCountFor(int rank) => wispBaseCount + (rank >= 3 ? 1 : 0);
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     Text hud;
@@ -184,6 +211,10 @@ public sealed class DiabloSkills : MonoBehaviour
         {
             case Skill.Fireball: return fireballCooldown;
             case Skill.Arrow: return arrowCooldown;
+            case Skill.LanternBolt: return lanternBoltCooldown;
+            case Skill.Wisps: return wispCooldown;
+            case Skill.SearingHalo: return haloCooldown;
+            case Skill.VeilStep: return veilCooldown;
             default: return cleaveCooldown;
         }
     }
@@ -201,7 +232,10 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>Seconds until the skill is ready again (0 when ready).</summary>
     public float CooldownLeft(Skill s)
     {
-        float last = s == Skill.Fireball ? lastFireball : (s == Skill.Arrow ? lastArrow : lastCleave);
+        float last = s == Skill.Fireball ? lastFireball
+            : s == Skill.Arrow ? lastArrow
+            : s == Skill.Cleave ? lastCleave
+            : lastLantern.TryGetValue(s, out float l) ? l : float.NegativeInfinity;
         return Mathf.Max(0f, EffectiveCooldown(s) - (Time.time - last));
     }
 
@@ -223,16 +257,35 @@ public sealed class DiabloSkills : MonoBehaviour
     /// </summary>
     public int EffectiveDamage(Skill s)
     {
-        int baseDmg = s == Skill.Fireball ? fireballDamage
-            : s == Skill.Arrow ? arrowDamage + WeaponBonus()
-            : cleaveDamage + WeaponBonus();
+        int baseDmg = BaseDamage(s);
+        if (baseDmg <= 0) return 0; // Veil Step deals no damage
         var sheet = CharacterSheet.For(gameObject);
         var eq = GetComponent<Equipment>();
         int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
-        float mul = sheet != null
-            ? sheet.SkillMultiplier(s, gearRanks)
-            : 1f + CharacterSheet.RankDamageBonus * gearRanks;
+        float mul;
+        if (sheet != null)
+        {
+            // Class focus factor scales only the Focus bonus (Fenwalker 1 = unchanged).
+            float focusMul = 1f + (sheet.FocusSkillMultiplier() - 1f) * ActiveClass.focusSkillFactor;
+            mul = sheet.RankMultiplier(s, gearRanks) * focusMul;
+        }
+        else mul = 1f + CharacterSheet.RankDamageBonus * gearRanks;
         return Mathf.Max(1, Mathf.RoundToInt(baseDmg * mul));
+    }
+
+    /// <summary>Unscaled damage of a skill (weapon bonus for Bow/Cleave).</summary>
+    public int BaseDamage(Skill s)
+    {
+        switch (s)
+        {
+            case Skill.Fireball: return fireballDamage;
+            case Skill.Arrow: return arrowDamage + WeaponBonus();
+            case Skill.Cleave: return cleaveDamage + WeaponBonus();
+            case Skill.LanternBolt: return lanternBoltDamage;
+            case Skill.Wisps: return wispDamage;
+            case Skill.SearingHalo: return haloDamage;
+            default: return 0;
+        }
     }
 
     /// <summary>Cast toward the current aim. False while on cooldown.</summary>
@@ -246,14 +299,26 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>Cast in a world direction (tests + external drivers).</summary>
     public bool CastToward(Skill s, Vector3 dir)
     {
+        if (!ActiveClass.Has(s)) return false; // a class casts only its own skills
         if (CooldownLeft(s) > 0f) return false;
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
         if (s == Skill.Fireball) lastFireball = Time.time;
         else if (s == Skill.Arrow) lastArrow = Time.time;
-        else lastCleave = Time.time;
+        else if (s == Skill.Cleave) lastCleave = Time.time;
+        else lastLantern[s] = Time.time;
         lastUsed = s;
+
+        if (s == Skill.Wisps || s == Skill.SearingHalo || s == Skill.VeilStep)
+        {
+            var at = transform.position + Vector3.up * LaunchHeight;
+            if (s == Skill.Wisps) SummonWisps(cosmetic: false);
+            else if (s == Skill.SearingHalo) DoHalo(cosmetic: false);
+            else DoVeilStep(dir);
+            BroadcastIfNetworked(s, at, dir);
+            return true;
+        }
 
         if (s == Skill.Cleave)
         {
@@ -276,6 +341,134 @@ public sealed class DiabloSkills : MonoBehaviour
         if (netPlayer != null && netPlayer.IsSpawned && nm != null && nm.IsListening)
             netPlayer.BroadcastCast((int)s, origin2, dir);
         return true;
+    }
+
+    void BroadcastIfNetworked(Skill s, Vector3 origin, Vector3 dir)
+    {
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var nm = NetworkManager.Singleton;
+        if (netPlayer != null && netPlayer.IsSpawned && nm != null && nm.IsListening)
+            netPlayer.BroadcastCast((int)s, origin, dir);
+    }
+
+    // ---------- Lanternbearer (second-class S2) ----------
+
+    /// <summary>Wisps (E): companions for <see cref="wispDuration"/> s; +1 from rank 3. Replaces live wisps.</summary>
+    public System.Collections.Generic.List<Wisp> SummonWisps(bool cosmetic)
+    {
+        foreach (var old in Wisp.Active.ToArray())
+            if (old != null && old.owner == transform)
+            {
+                if (Application.isPlaying) Destroy(old.gameObject); else DestroyImmediate(old.gameObject);
+            }
+        var sheet = CharacterSheet.For(gameObject);
+        int count = WispCountFor(sheet != null ? sheet.GetRank(Skill.Wisps) : 0);
+        int dmg = cosmetic ? 0 : EffectiveDamage(Skill.Wisps);
+        var list = new System.Collections.Generic.List<Wisp>();
+        for (int i = 0; i < count; i++)
+            list.Add(Wisp.Spawn(transform, i, count, dmg, wispDuration, cosmetic));
+        if (!cosmetic) DiabloAudio.PlayLantern();
+        return list;
+    }
+
+    /// <summary>Searing Halo (R): ring around the hero, every husk inside takes the blow and a small pop.</summary>
+    public int DoHalo(bool cosmetic)
+    {
+        int hits = 0;
+        if (!cosmetic)
+        {
+            int blow = EffectiveDamage(Skill.SearingHalo);
+            foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+            {
+                if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
+                var to = husk.transform.position - transform.position;
+                to.y = 0f;
+                if (to.magnitude > haloRadius) continue;
+                ApplyHit(husk, blow, transform.position, haloKnockback, transform);
+                hits++;
+            }
+            DiabloAudio.PlayHalo();
+            var driver = GetComponent<DiabloAnimator>();
+            if (driver != null) driver.OnStrike();
+        }
+        SpawnHaloVisual();
+        return hits;
+    }
+
+    void SpawnHaloVisual()
+    {
+        if (!Application.isPlaying) return;
+        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        GameObject ring;
+        if (prefab != null)
+        {
+            ring = Instantiate(prefab, transform.position, Quaternion.identity);
+            ring.transform.localScale = Vector3.one * (haloRadius / cleaveBaseRadius);
+            foreach (var r in ring.GetComponentsInChildren<Renderer>())
+                r.material.color = new Color(1f, 0.85f, 0.45f, r.material.color.a);
+        }
+        else ring = new GameObject("SearingHalo");
+        ring.name = "SearingHalo";
+        // Explicit check: GetComponent returns a Unity fake-null in the editor, so "??" would not fall back.
+        var light = ring.GetComponent<Light>();
+        if (light == null) light = ring.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(1f, 0.8f, 0.4f);
+        light.range = haloRadius * 2f;
+        light.intensity = 4f;
+        Destroy(ring, 0.6f);
+    }
+
+    /// <summary>
+    /// Veil Step (Space): blink up to <see cref="veilDistance"/> along dir,
+    /// stopping in front of the first solid collider. Returns the distance moved.
+    /// </summary>
+    public float DoVeilStep(Vector3 dir)
+    {
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+        dir.Normalize();
+        float dist = VeilClearDistance(transform.position, dir, veilDistance, transform);
+        var from = transform.position;
+        var cc = GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        transform.position = from + dir * dist;
+        transform.rotation = Quaternion.LookRotation(dir);
+        if (cc != null) cc.enabled = true;
+        SpawnVeilPuff(from);
+        SpawnVeilPuff(transform.position);
+        DiabloAudio.PlayVeil();
+        return dist;
+    }
+
+    /// <summary>Free distance for a hero-sized capsule along dir (husks and triggers ignored).</summary>
+    public static float VeilClearDistance(Vector3 from, Vector3 dir, float max, Transform self)
+    {
+        var p0 = from + Vector3.up * (0.4f + VeilHeroRadius);
+        var p1 = from + Vector3.up * 1.6f;
+        float best = max;
+        foreach (var h in Physics.CapsuleCastAll(p0, p1, VeilHeroRadius, dir, max, ~0, QueryTriggerInteraction.Ignore))
+        {
+            var t = h.collider.transform;
+            if (self != null && (t == self || t.IsChildOf(self))) continue;
+            if (h.collider.CompareTag("Husk") || h.collider.GetComponentInParent<EnemyHealth>() != null) continue;
+            if (h.distance <= 0f) continue; // already overlapping: ignore (start inside)
+            best = Mathf.Min(best, Mathf.Max(0f, h.distance - 0.1f));
+        }
+        return best;
+    }
+
+    static void SpawnVeilPuff(Vector3 at)
+    {
+        if (!Application.isPlaying) return;
+        var go = new GameObject("VeilPuff");
+        go.transform.position = at + Vector3.up;
+        var light = go.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(0.75f, 0.8f, 1f);
+        light.range = 4f;
+        light.intensity = 3f;
+        Destroy(go, 0.3f);
     }
 
     /// <summary>
@@ -329,6 +522,9 @@ public sealed class DiabloSkills : MonoBehaviour
             SpawnCleaveVisual(CleaveRadius);
             return null;
         }
+        if (s == Skill.SearingHalo) { DoHalo(cosmetic: true); return null; }
+        if (s == Skill.Wisps) { SummonWisps(cosmetic: true); return null; }
+        if (s == Skill.VeilStep) { SpawnVeilPuff(origin); return null; }
         return Launch(s, origin, dir, cosmetic: true);
     }
 
@@ -338,6 +534,16 @@ public sealed class DiabloSkills : MonoBehaviour
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
         transform.rotation = Quaternion.LookRotation(dir);
+        if (s == Skill.LanternBolt)
+        {
+            var bolt = DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
+                lanternBoltSpeed, lanternBoltRange, 0f, cosmetic);
+            bolt.pierce = lanternBoltPierce;
+            var d = GetComponent<DiabloAnimator>();
+            if (d != null) d.OnStrike();
+            DiabloAudio.PlayLantern();
+            return bolt;
+        }
         var p = s == Skill.Fireball
             ? DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
                 fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
@@ -407,9 +613,12 @@ public sealed class DiabloSkills : MonoBehaviour
         var charUI = GetComponent<DiabloCharacterUI>();
         if (charUI != null && charUI.IsOpen) return;
 
-        if (kb != null && kb.qKey.wasPressedThisFrame) Cast(Skill.Fireball);
-        else if (kb != null && kb.eKey.wasPressedThisFrame) Cast(Skill.Arrow);
-        else if (kb != null && kb.rKey.wasPressedThisFrame) Cast(Skill.Cleave);
+        // Keys come from the class: Q/E/R(/Space) map to its skill slots.
+        var skills = ActiveClass.skills;
+        if (kb != null && kb.qKey.wasPressedThisFrame && skills.Length > 0) Cast(skills[0]);
+        else if (kb != null && kb.eKey.wasPressedThisFrame && skills.Length > 1) Cast(skills[1]);
+        else if (kb != null && kb.rKey.wasPressedThisFrame && skills.Length > 2) Cast(skills[2]);
+        else if (kb != null && kb.spaceKey.wasPressedThisFrame && skills.Length > 3) Cast(skills[3]);
         else if (mouse != null && mouse.rightButton.wasPressedThisFrame) Cast(lastUsed);
 
         UpdateHud();
@@ -418,8 +627,31 @@ public sealed class DiabloSkills : MonoBehaviour
     void UpdateHud()
     {
         if (hud == null) BuildHud();
-        string lastName = lastUsed == Skill.Fireball ? "Fireball" : lastUsed == Skill.Arrow ? "Bow" : "Cleave";
-        hud.text = $"{Slot("Q", "Fireball", Skill.Fireball)}     {Slot("E", "Bow", Skill.Arrow)}     {Slot("R", "Cleave", Skill.Cleave)}     RMB: {lastName}";
+        hud.text = HudLine();
+    }
+
+    /// <summary>Skill bar text from the class (Fenwalker keeps "Fireball / Bow / Cleave").</summary>
+    public string HudLine()
+    {
+        var cls = ActiveClass;
+        var parts = new System.Collections.Generic.List<string>();
+        for (int i = 0; i < cls.skills.Length; i++)
+            parts.Add(Slot(cls.keys[i], SkillName(cls.skills[i]), cls.skills[i]));
+        return string.Join("     ", parts.ToArray()) + $"     RMB: {SkillName(lastUsed)}";
+    }
+
+    public static string SkillName(Skill s)
+    {
+        switch (s)
+        {
+            case Skill.Fireball: return "Fireball";
+            case Skill.Arrow: return "Bow";
+            case Skill.Cleave: return "Cleave";
+            case Skill.LanternBolt: return "Lantern Bolt";
+            case Skill.Wisps: return "Wisps";
+            case Skill.SearingHalo: return "Searing Halo";
+            default: return "Veil Step";
+        }
     }
 
     string Slot(string key, string name, Skill s)

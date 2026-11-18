@@ -20,6 +20,9 @@ public sealed class DiabloProjectile : MonoBehaviour
     public float blastRadius;
     public float knockback = 0.6f;
     public Transform owner;
+    /// <summary>Extra husks a direct-hit projectile passes through (Lantern Bolt: 1).</summary>
+    public int pierce;
+    readonly System.Collections.Generic.List<GameObject> struck = new System.Collections.Generic.List<GameObject>();
 
     public static int Launched;
     public static int Impacts;
@@ -45,9 +48,16 @@ public sealed class DiabloProjectile : MonoBehaviour
         dir.Normalize();
 
         bool fire = kind == DiabloSkills.Skill.Fireball;
-        var prefab = Resources.Load<GameObject>(fire ? "SkillArt/FireballProjectile" : "SkillArt/ArrowProjectile");
+        bool lantern = kind == DiabloSkills.Skill.LanternBolt;
+        var prefab = lantern ? null
+            : Resources.Load<GameObject>(fire ? "SkillArt/FireballProjectile" : "SkillArt/ArrowProjectile");
         GameObject go;
-        if (prefab != null)
+        if (lantern)
+        {
+            go = LanternShape();
+            go.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(dir));
+        }
+        else if (prefab != null)
         {
             go = Object.Instantiate(prefab, origin, Quaternion.LookRotation(dir));
         }
@@ -56,7 +66,7 @@ public sealed class DiabloProjectile : MonoBehaviour
             go = FallbackShape(fire);
             go.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(dir));
         }
-        go.name = fire ? "Fireball" : "Arrow";
+        go.name = lantern ? "LanternBolt" : fire ? "Fireball" : "Arrow";
 
         var p = go.AddComponent<DiabloProjectile>();
         p.kind = kind;
@@ -66,10 +76,25 @@ public sealed class DiabloProjectile : MonoBehaviour
         p.speed = speed;
         p.maxRange = range;
         p.blastRadius = blastRadius;
-        p.knockback = fire ? 0.9f : 0.3f;
+        p.knockback = fire ? 0.9f : lantern ? 0.2f : 0.3f;
         p.cosmetic = cosmetic;
         Launched++;
         return p;
+    }
+
+    /// <summary>Lantern Bolt art (second-class S2): pale-gold glowing orb with a warm light.</summary>
+    static GameObject LanternShape()
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Object.Destroy(go.GetComponent<Collider>());
+        go.transform.localScale = Vector3.one * 0.32f;
+        Tint(go, new Color(1f, 0.92f, 0.6f));
+        var light = go.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(1f, 0.85f, 0.5f);
+        light.range = 5f;
+        light.intensity = 2.5f;
+        return go;
     }
 
     static GameObject FallbackShape(bool fire)
@@ -106,6 +131,17 @@ public sealed class DiabloProjectile : MonoBehaviour
         float wallT = WallDistance(from, step);
         if (husk != null && huskT <= wallT)
         {
+            if (pierce > 0)
+            {
+                // Pass through: hit this husk once, keep flying.
+                pierce--;
+                struck.Add(husk);
+                if (!cosmetic) DiabloSkills.ApplyHit(husk, damage, from, knockback, owner);
+                transform.position = to;
+                travelled += step;
+                if (travelled >= maxRange) Fizzle();
+                return;
+            }
             Impact(husk.transform.position, husk);
             return;
         }
@@ -133,6 +169,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
         {
             if (husk.GetComponent<EnemyHealth>() == null) continue;
+            if (struck.Contains(husk)) continue;
             Vector3 p = Flat(husk.transform.position);
             float t = Mathf.Clamp(Vector3.Dot(p - a, dir), 0f, len);
             if ((a + dir * t - p).magnitude > HitRadius) continue;

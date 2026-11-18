@@ -69,7 +69,8 @@ public sealed class CharacterSheet
         {
             case DiabloSkills.Skill.Fireball: return fireballRank;
             case DiabloSkills.Skill.Arrow: return arrowRank;
-            default: return cleaveRank;
+            case DiabloSkills.Skill.Cleave: return cleaveRank;
+            default: return 0; // Lanternbearer ranks arrive in second-class S3
         }
     }
 
@@ -77,13 +78,14 @@ public sealed class CharacterSheet
     public bool SpendSkill(DiabloSkills.Skill skill)
     {
         if (freeSkillPoints <= 0 || GetRank(skill) >= MaxSkillRank) return false;
-        freeSkillPoints--;
         switch (skill)
         {
             case DiabloSkills.Skill.Fireball: fireballRank++; break;
             case DiabloSkills.Skill.Arrow: arrowRank++; break;
-            default: cleaveRank++; break;
+            case DiabloSkills.Skill.Cleave: cleaveRank++; break;
+            default: return false; // Lanternbearer ranks arrive in second-class S3
         }
+        freeSkillPoints--;
         return true;
     }
 
