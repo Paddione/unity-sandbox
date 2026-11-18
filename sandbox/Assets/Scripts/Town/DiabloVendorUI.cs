@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -6,18 +8,20 @@ using UnityEngine.UI;
 /// <see cref="DiabloInventoryUI"/> — no prefab churn). Two columns: vendor
 /// stock (click to buy) and hero bag (click to sell at 25 %), plus a potion
 /// row and the gold purse. `V` toggles, `1` drinks a healing potion,
-/// `Esc`/button closes. While open, click-movement is locked through the
+/// `Esc`/button/click-outside closes. While open, click-movement is locked through the
 /// existing <see cref="DiabloClickController.ExternalDrive"/> seam (same
 /// effect as the inventory click guard, without touching S4-owned files).
 /// Closing autosaves via <see cref="SaveService.SaveNow"/> (S2 seam).
 /// Public contract for tests: IsOpen, SetOpen, BuyOffer, SellBagIndex,
-/// BuyPotion, Refresh.
+/// BuyPotion, Refresh, TryCloseOnOutsideClick.
 /// </summary>
 public sealed class DiabloVendorUI : MonoBehaviour
 {
     public bool IsOpen { get; private set; }
 
     Canvas canvas;
+    Transform panel;
+    int openedFrame = -1;
     Text goldText;
     Text vendorDetailText;
     Text bagDetailText;
@@ -50,6 +54,12 @@ public sealed class DiabloVendorUI : MonoBehaviour
 
     void Update()
     {
+        var mouse = UnityEngine.InputSystem.Mouse.current;
+        // Click-away closes: a click outside the panel dismisses the window.
+        // (V/Esc/button stay; the opening click must not close it right away.)
+        if (IsOpen && mouse != null && mouse.leftButton.wasPressedThisFrame
+            && Time.frameCount > openedFrame)
+            TryCloseOnOutsideClick(mouse.position.ReadValue());
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (kb == null) return;
         if (kb.vKey.wasPressedThisFrame) SetOpen(!IsOpen);
@@ -61,12 +71,38 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Close when the click lands outside the panel (headless-callable with an
+    /// explicit screen position; the live Update path passes the mouse). True
+    /// when the click closed the window.
+    /// </summary>
+    public bool TryCloseOnOutsideClick(Vector2 screenPos)
+    {
+        // Resolve live: a cached panel Transform can report null while its
+        // GameObject still stands, so fall back to the path lookup (cheap,
+        // runs only on click frames).
+        var root = panel != null ? panel : transform.Find("VendorCanvas/Panel");
+        if (!IsOpen || root == null) return false;
+        var es = EventSystem.current;
+        if (es == null) return false;
+        var hits = new List<RaycastResult>();
+        es.RaycastAll(new PointerEventData(es) { position = screenPos }, hits);
+        foreach (var h in hits)
+        {
+            var t = h.gameObject != null ? h.gameObject.transform : null;
+            if (t == root || (t != null && t.IsChildOf(root))) return false;
+        }
+        SetOpen(false);
+        return true;
+    }
+
     public void SetOpen(bool open)
     {
         EnsureBuilt();
         if (IsOpen == open) return;
         if (open) DiabloAudio.PlayUIClick();
         IsOpen = open;
+        if (open) openedFrame = Time.frameCount;
         if (canvas != null) canvas.enabled = open;
         // Same effect as the inventory click guard: while the window is open
         // no click reaches movement or strikes (ExternalDrive ignores mouse
@@ -195,10 +231,11 @@ public sealed class DiabloVendorUI : MonoBehaviour
 
         var panelGo = new GameObject("Panel");
         panelGo.transform.SetParent(canvasGo.transform, false);
-        var panel = panelGo.AddComponent<Image>();
-        panel.sprite = DiabloMenuArt.PanelBackground();
-        panel.type = Image.Type.Sliced;
-        panel.color = Color.white;
+        panel = panelGo.transform;
+        var panelImg = panelGo.AddComponent<Image>();
+        panelImg.sprite = DiabloMenuArt.PanelBackground();
+        panelImg.type = Image.Type.Sliced;
+        panelImg.color = Color.white;
         var rect = panelGo.GetComponent<RectTransform>();
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -245,7 +282,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         bagRows.transform.SetParent(bagCol.transform, false);
         bagList = bagRows.transform;
 
-        MakeLabel(panelGo.transform, "V toggles, 1 drinks a potion, Esc closes (saves).", 13);
+        MakeLabel(panelGo.transform, "V toggles, 1 drinks a potion, Esc or click outside closes (saves).", 13);
         var closeBtn = MakeSmallButton(panelGo.transform, "Close (saves)");
         closeBtn.onClick.AddListener(() => SetOpen(false));
         building = false;
