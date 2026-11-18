@@ -58,10 +58,11 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsSix()
+    public void CurrentVersion_IsSeven()
     {
-        Assert.AreEqual(6, SaveGame.CurrentVersion);
-        Assert.AreEqual(6, new SaveGame().v);
+        Assert.AreEqual(7, SaveGame.CurrentVersion);
+        Assert.AreEqual(7, new SaveGame().v);
+    }
     }
 
     [Test]
@@ -211,15 +212,67 @@ public class SaveMigrationTests
     }
 
     [Test]
+    public void V4_MigratesToV7WithVariantDefaults()
+    {
+        var outcome = SaveMigrations.Migrate(
+            "{\"v\":4,\"level\":3,\"xp\":5,\"skillRanks\":[],\"bag\":[],\"gold\":0,\"zoneReached\":1," +
+            "\"classId\":\"fenwalker\",\"highestUnlockedZone\":2,\"actOneComplete\":false,\"waypoints\":[]}",
+            out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(4, from);
+        Assert.AreEqual(7, save.v);
+        Assert.IsNotNull(save.skillVariants);
+        Assert.AreEqual(0, save.skillVariants.Count);
+    }
+
+    [Test]
+    public void SiblingV5OrV6_MigratesToV7KeepingFields()
+    {
+        var outcome = SaveMigrations.Migrate(
+            "{\"v\":5,\"level\":3,\"xp\":5,\"skillRanks\":[],\"bag\":[],\"gold\":9,\"zoneReached\":1}",
+            out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(5, from);
+        Assert.AreEqual(7, save.v);
+        Assert.AreEqual(9, save.gold);
+        Assert.IsNotNull(save.skillVariants);
+    }
+
+    [Test]
+    public void VariantPick_SurvivesSaveRoundtrip()
+    {
+        hero = Hero();
+        RunProfile.SkillVariants["fenwalker:Cleave"] = SkillVariantCatalog.CleaveFrontalId;
+        SaveService.SaveNow(hero, path: path);
+        Assert.AreEqual(7, SaveMigrations.ReadVersion(path));
+
+        RunProfile.Reset();
+        Assert.IsTrue(SaveService.TryLoad(hero, path));
+        Assert.AreEqual(SkillVariantCatalog.CleaveFrontalId,
+            RunProfile.GetSkillVariant(ClassCatalog.FenwalkerId, DiabloSkills.Skill.Cleave));
+
+        // Unknown stored ids never load into the profile.
+        RunProfile.Reset();
+        var save = SaveService.CaptureState(hero);
+        save.skillVariants.Add(new SkillVariantEntry { classId = "fenwalker", skill = "Cleave", variant = "bogus" });
+        SaveService.WriteSave(save, path);
+        Assert.IsTrue(SaveService.TryLoad(hero, path));
+        Assert.AreEqual(SkillVariantCatalog.CleaveRoundId,
+            RunProfile.GetSkillVariant(ClassCatalog.FenwalkerId, DiabloSkills.Skill.Cleave));
+    }
+
+    [Test]
     public void DeleteSave_ResetsRunProfile()
     {
         RunProfile.DifficultyUnlocked = true;
         RunProfile.Difficulty = RunProfile.Kindled;
         RunProfile.Stash.Add(ItemDatabase.CreateStarterSword());
+        RunProfile.SkillVariants["fenwalker:Cleave"] = SkillVariantCatalog.CleaveFrontalId;
         SaveService.DeleteSave(path);
         Assert.IsFalse(RunProfile.DifficultyUnlocked);
         Assert.AreEqual(RunProfile.Normal, RunProfile.Difficulty);
         Assert.AreEqual(0, RunProfile.Stash.Count);
+        Assert.AreEqual(0, RunProfile.SkillVariants.Count);
     }
 
     // smithing S1: v6 (Material + Tier-Defaults) --------------------------

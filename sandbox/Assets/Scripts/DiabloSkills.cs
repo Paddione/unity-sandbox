@@ -75,6 +75,19 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>Class of the local hero (run profile); mirrors only render casts.</summary>
     public ClassDefinition ActiveClass => RunProfile.Class;
 
+    /// <summary>
+    /// Active skill variant (skill-variants S2). Unknown picks fall back to
+    /// the legacy default; co-op sessions always run the base skill path.
+    /// </summary>
+    public string ActiveVariantId(Skill s)
+    {
+        string def = SkillVariantCatalog.DefaultVariantId(ActiveClass.id, s);
+        if (def == null) return null;
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        if (netPlayer != null && netPlayer.IsSpawned) return def;
+        return RunProfile.GetSkillVariant(ActiveClass.id, s);
+    }
+
     /// <summary>Wisps for a rank: base 2, a third from rank 3.</summary>
     public int WispCountFor(int rank) => wispBaseCount + (rank >= 3 ? 1 : 0);
     DiabloClickController controller;
@@ -371,6 +384,8 @@ public sealed class DiabloSkills : MonoBehaviour
     public int DoHalo(bool cosmetic)
     {
         int hits = 0;
+        bool ward = !cosmetic && ActiveVariantId(Skill.SearingHalo) == SkillVariantCatalog.HaloWardId;
+        if (!cosmetic) HaloZone.ClearFor(transform); // recasts replace the old ward
         if (!cosmetic)
         {
             int blow = EffectiveDamage(Skill.SearingHalo);
@@ -383,6 +398,9 @@ public sealed class DiabloSkills : MonoBehaviour
                 ApplyHit(husk, blow, transform.position, haloKnockback, transform);
                 hits++;
             }
+            if (ward)
+                HaloZone.Spawn(transform, transform.position, blow, haloRadius,
+                    SkillVariantCatalog.HaloWardDuration, SkillVariantCatalog.HaloTickInterval, haloKnockback);
             DiabloAudio.PlayHalo();
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
@@ -470,6 +488,8 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>
     /// Cleave (R, S4): instant 360° melee arc — every husk inside
     /// <see cref="CleaveRadius"/> takes the ranked blow with knockback.
+    /// The frontal variant (skill-variants S2) trades the back half for a
+    /// 90° cone at 1.5× range; damage and cooldown paths stay the same.
     /// Cosmetic mirrors only spawn the arc visual, never damage.
     /// </summary>
     public void DoCleave(Vector3 dir, bool cosmetic)
@@ -478,7 +498,9 @@ public sealed class DiabloSkills : MonoBehaviour
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
         transform.rotation = Quaternion.LookRotation(dir);
-        float radius = CleaveRadius;
+        string variant = ActiveVariantId(Skill.Cleave);
+        float radius = SkillVariantCatalog.CleaveRadiusFor(this, variant);
+        float arc = SkillVariantCatalog.CleaveArcFor(variant);
         if (!cosmetic)
         {
             ExitBowStance();
@@ -488,9 +510,8 @@ public sealed class DiabloSkills : MonoBehaviour
             foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
             {
                 if (husk == null) continue;
-                var to = husk.transform.position - transform.position;
-                to.y = 0f;
-                if (to.magnitude > radius) continue;
+                if (!SkillVariantTargeting.InCleaveArea(transform.position, dir,
+                    husk.transform.position, radius, arc)) continue;
                 ApplyHit(husk, blow, transform.position, cleaveKnockback, transform);
             }
             DiabloAudio.PlayWhoosh();

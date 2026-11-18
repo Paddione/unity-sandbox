@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 6;
+    public const int CurrentVersion = 7;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -50,6 +50,9 @@ public sealed class SaveGame
 
     // v6 (smithing S1): reforge material.
     public int smithingMaterial;
+
+    // v7 (skill-variants S1): variant picks by class+skill.
+    public List<SkillVariantEntry> skillVariants = new List<SkillVariantEntry>();
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted
@@ -66,6 +69,16 @@ public sealed class ContractSnapshot
     public int gold;
     public string targetName = string.Empty;
     public int status;
+}
+
+/// <summary>One skill variant pick (class + skill key, stable variant id).</summary>
+[System.Serializable]
+public sealed class SkillVariantEntry
+{
+    public string classId;
+    public string skill;
+    public string variant;
+}
 }
 
 /// <summary>One skill's rank (string key: JsonUtility has no dictionaries).</summary>

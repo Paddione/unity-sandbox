@@ -48,6 +48,7 @@ public static class SaveMigrations
         if (save.v == 3) V3ToV4(save);
         if (save.v == 4) V4ToV5(save);
         if (save.v == 5) V5ToV6(save);
+        if (save.v == 6) V6ToV7(save);
         return Outcome.Migrated;
     }
 
@@ -120,6 +121,17 @@ public static class SaveMigrations
         if (save.bag != null) foreach (var i in save.bag) yield return i;
         if (save.stash != null) foreach (var i in save.stash) yield return i;
     }
+    /// <summary>
+    /// v6 → v7: v6 fields (contracts, smithing) stay untouched; default only
+    /// the variant picks we add. v5 always flows through v6 first.
+    /// </summary>
+    static void V6ToV7(SaveGame save)
+    {
+        if (save.skillVariants == null)
+            save.skillVariants = new System.Collections.Generic.List<SkillVariantEntry>();
+        save.v = 7;
+    }
+
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>
     public static int ReadVersion(string path)
     {

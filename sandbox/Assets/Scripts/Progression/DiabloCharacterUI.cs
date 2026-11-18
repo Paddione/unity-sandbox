@@ -23,6 +23,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     readonly System.Collections.Generic.List<(DiabloSkills.Skill skill, Text text)> skillRows =
         new System.Collections.Generic.List<(DiabloSkills.Skill, Text)>();
     Transform panelRoot;
+    Text variantText;
     string builtFor;
     bool building;
 
@@ -110,6 +111,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         focusText.text = $"Focus {sheet.focus}  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
         foreach (var (skill, text) in skillRows)
             text.text = RowText(sheet, skill);
+        if (variantText != null) variantText.text = VariantLines();
         if (!sheet.HasUnspent)
         {
             attrPointsText.rectTransform.localScale = Vector3.one;
@@ -122,10 +124,18 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         string line = $"{DiabloSkills.SkillName(skill)} {RankPips(sheet.GetRank(skill))}";
         if (skill == DiabloSkills.Skill.Cleave)
         {
-            float radius = sheet.CleaveRadius(
-                skills != null ? skills.cleaveBaseRadius : 2.6f,
-                skills != null ? skills.cleaveRadiusPerRank : 0.4f);
-            line += $"  ({radius:0.0} m)";
+            string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
+            float radius = SkillVariantCatalog.CleaveRadiusFor(skills, variant);
+            float arc = SkillVariantCatalog.CleaveArcFor(variant);
+            string shape = arc >= 360f ? "rundum" : $"{arc:0}°-Kegel";
+            line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {shape}, {radius:0.0} m)";
+        }
+        else if (skill == DiabloSkills.Skill.SearingHalo)
+        {
+            string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
+            float dur = SkillVariantCatalog.HaloDurationFor(variant);
+            string mode = dur > 0f ? $"ortsfest, {dur:0} s" : "mitlaufend, sofort";
+            line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {mode})";
         }
         else if (skill == DiabloSkills.Skill.Wisps && skills != null)
             line += $"  ({skills.WispCountFor(sheet.wispsRank)} wisps)";
@@ -160,6 +170,56 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     {
         EnsureBuilt();
         if (prog != null && prog.SpendSkillPoint(skill)) { DiabloAudio.PlayUIClick(); Refresh(); }
+    }
+
+    // ---------- variant selection (skill-variants S1) ----------
+
+    /// <summary>Solo session (mirrors never pick variants).</summary>
+    public bool IsSoloSession()
+    {
+        var net = GetComponent<DiabloNetworkPlayer>();
+        return net == null || !net.IsSpawned;
+    }
+
+    /// <summary>Variant switch allowed only solo inside the Lantern Hold camp.</summary>
+    public bool CanChangeVariant() =>
+        IsSoloSession() && SkillVariantCatalog.IsInLanternHold(transform.position);
+
+    /// <summary>
+    /// Pick a skill variant. True on success; false outside the Hold, in
+    /// co-op, or for unknown ids. Points and ranks stay untouched.
+    /// </summary>
+    public bool TrySelectVariant(DiabloSkills.Skill skill, string variantId)
+    {
+        EnsureBuilt();
+        if (!CanChangeVariant()) return false;
+        bool ok = RunProfile.TrySetSkillVariant(RunProfile.Class.id, skill, variantId,
+            transform.position, solo: true);
+        if (ok) Refresh();
+        return ok;
+    }
+
+    /// <summary>Sheet lines for the variant skills (preview == runtime values).</summary>
+    public string VariantLines()
+    {
+        EnsureBuilt();
+        var cls = RunProfile.Class;
+        var sb = new System.Text.StringBuilder();
+        foreach (var skill in cls.skills)
+        {
+            string current = RunProfile.GetSkillVariant(cls.id, skill);
+            if (current == null) continue;
+            if (sb.Length > 0) sb.AppendLine();
+            sb.Append($"{DiabloSkills.SkillName(skill)}: ");
+            sb.Append(SkillVariantCatalog.Describe(cls.id, skill, current, skills));
+        }
+        if (sb.Length == 0) sb.Append("Keine Varianten für diese Klasse.");
+        else if (!CanChangeVariant())
+        {
+            sb.AppendLine();
+            sb.Append("Wechsel nur solo im Lantern Hold.");
+        }
+        return sb.ToString();
     }
 
     // ---------- build ----------
@@ -206,6 +266,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         skillPointsText = MakeLabel(panelGo.transform, "", 16);
         panelRoot = panelGo.transform;
         BuildSkillRows();
+        variantText = MakeLabel(panelGo.transform, "", 14);
         building = false;
     }
 

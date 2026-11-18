@@ -3,7 +3,9 @@
 /// (replayability S1, save v2): difficulty, its unlock, the layout seed of the
 /// current run and the stash. <see cref="SaveService.CaptureState"/> reads it,
 /// <see cref="SaveService.ApplyState"/> fills it, so autosaves never drop
-/// these fields. Local per client like the rest of the save.
+/// these fields. Local per client like the rest of the save. Skill variant
+/// picks (skill-variants S1, save v7) ride along the same way: switching a
+/// variant never touches points or ranks.
 /// </summary>
 public static class RunProfile
 {
@@ -18,6 +20,9 @@ public static class RunProfile
     public static string ClassId = ClassCatalog.FenwalkerId;
     /// <summary>Schmiede-Material (smithing S1, save v6).</summary>
     public static int SmithingMaterial;
+    /// <summary>Skill variant picks by "classId:Skill" (skill-variants S1, save v7).</summary>
+    public static System.Collections.Generic.Dictionary<string, string> SkillVariants =
+        new System.Collections.Generic.Dictionary<string, string>();
 
     public static ClassDefinition Class => ClassCatalog.Get(ClassId);
     /// <summary>Act I progression (act-one S1, save v4).</summary>
@@ -31,10 +36,33 @@ public static class RunProfile
         RunSeed = NewSeed();
         Stash = new Stash();
         ClassId = ClassCatalog.FenwalkerId;
+        SkillVariants = new System.Collections.Generic.Dictionary<string, string>();
         Act = new ActProgress();
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
         ContractProgress.Reset();
         SmithingMaterial = 0;
+    }
+
+    static string VariantKey(string classId, DiabloSkills.Skill skill) => classId + ":" + skill;
+
+    /// <summary>Active variant: stored pick when known, else the legacy default.</summary>
+    public static string GetSkillVariant(string classId, DiabloSkills.Skill skill)
+    {
+        SkillVariants.TryGetValue(VariantKey(classId, skill), out string stored);
+        return SkillVariantCatalog.Resolve(classId, skill, stored);
+    }
+
+    /// <summary>
+    /// Store a variant pick. True when the id is known and the switch happens
+    /// solo inside the Lantern Hold; points and ranks stay untouched.
+    /// </summary>
+    public static bool TrySetSkillVariant(string classId, DiabloSkills.Skill skill,
+        string variantId, UnityEngine.Vector3 heroPos, bool solo)
+    {
+        if (!SkillVariantCatalog.IsKnownVariant(classId, skill, variantId)) return false;
+        if (!SkillVariantCatalog.CanChangeAt(heroPos, solo)) return false;
+        SkillVariants[VariantKey(classId, skill)] = variantId;
+        return true;
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

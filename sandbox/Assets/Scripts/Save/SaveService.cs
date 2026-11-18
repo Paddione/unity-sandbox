@@ -121,6 +121,7 @@ public static class SaveService
             actOneComplete = RunProfile.Act.ActOneComplete,
             waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
             smithingMaterial = System.Math.Max(0, RunProfile.SmithingMaterial),
+            skillVariants = CaptureVariants(),
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -194,6 +195,32 @@ public static class SaveService
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.waypoints);
         ContractProgress.FromSnapshot(save.contract);
         RunProfile.SmithingMaterial = System.Math.Max(0, save.smithingMaterial);
+        ApplyVariants(save);
+    }
+
+    static System.Collections.Generic.List<SkillVariantEntry> CaptureVariants()
+    {
+        var list = new System.Collections.Generic.List<SkillVariantEntry>();
+        foreach (var kv in RunProfile.SkillVariants)
+        {
+            var parts = kv.Key.Split(':');
+            if (parts.Length != 2) continue;
+            list.Add(new SkillVariantEntry { classId = parts[0], skill = parts[1], variant = kv.Value });
+        }
+        return list;
+    }
+
+    static void ApplyVariants(SaveGame save)
+    {
+        RunProfile.SkillVariants.Clear();
+        if (save.skillVariants == null) return;
+        foreach (var e in save.skillVariants)
+        {
+            if (e == null || string.IsNullOrEmpty(e.classId) || string.IsNullOrEmpty(e.skill)) continue;
+            if (!System.Enum.TryParse<DiabloSkills.Skill>(e.skill, out var skill)) continue;
+            if (!SkillVariantCatalog.IsKnownVariant(e.classId, skill, e.variant)) continue;
+            RunProfile.SkillVariants[e.classId + ":" + skill] = e.variant;
+        }
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>
