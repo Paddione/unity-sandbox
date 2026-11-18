@@ -468,3 +468,12 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Szenenbau brach den URP-Lit-Vertrag → Text zur Laufzeit.
 - Next: S3 Gegner, S4 Kilnmother.
 
+## 2026-11-18 — cinderreach-act-one S3 kiln-enemies + S4 kilnmother
+
+- Done: Cinder Thrall, Ash Lancer, Kiln-Aufstellung in drei Varianten, The Kilnmother mit Feuerwellen, brennendem
+  Boden und Beschwörung, Akt-I-Abschluss mit Save und Overlay, `LootTier.ActBoss`.
+- Belegt: EditMode 186/186, PlayMode 82/82, Verify inkl. Kiln-Inventar, Autoplay 6/6.
+- Faced: `Skeleton_Brute.fbx` fehlt im Pack (Fallback); Lancer verletzten den „armed“-Vertrag; zwei eigene Tests
+  griffen auf den `Player` einer offenen Zonenszene zu bzw. kippten an einer Float-Zeitgrenze.
+- Next: S5 Wegpunkte, Autoplay-Route bis zur Kilnmother, Shotcheck, Probe.
+

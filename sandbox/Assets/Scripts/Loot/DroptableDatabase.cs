@@ -31,6 +31,10 @@ public static class DroptableDatabase
     }
 
     /// <summary>Gold roll for the tier: drop chance plus inclusive amount bounds.</summary>
+    /// <summary>Kilnmother gold (act-one S4): 300–450.</summary>
+    public const int ActBossGoldMin = 300;
+    public const int ActBossGoldMax = 450;
+
     public static void GetGoldTable(LootTier tier, out int chance, out int min, out int max)
     {
         switch (tier)
@@ -41,6 +45,8 @@ public static class DroptableDatabase
                 chance = ChestGoldChance; min = ChestGoldMin; max = ChestGoldMax; return;
             case LootTier.Boss:
                 chance = BossGoldChance; min = BossGoldMin; max = BossGoldMax; return;
+            case LootTier.ActBoss:
+                chance = 100; min = ActBossGoldMin; max = ActBossGoldMax; return;
             default:
                 chance = NormalGoldChance; min = NormalGoldMin; max = NormalGoldMax; return;
         }

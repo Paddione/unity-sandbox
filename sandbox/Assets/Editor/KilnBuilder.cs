@@ -87,11 +87,68 @@ public static class KilnBuilder
 
         TryKayKitDressing(root);
 
+        // S3: Cinder Thralls (packs), Ash Lancers, two Kiln Elites at variant 0 anchors.
+        for (int i = 0; i < KilnLayout.ThrallCount; i++)
+            SpawnEnemy("Skeletons/Characters/Skeleton_Minion.fbx", KilnLayout.ThrallPrefix + i,
+                KilnLayout.ThrallAnchor(0, i), 6, LootTier.Normal, 0.9f, root.transform, thrall: true);
+        for (int i = 0; i < KilnLayout.LancerCount; i++)
+            SpawnEnemy("Skeletons/Characters/Skeleton_Rogue.fbx", KilnLayout.LancerPrefix + i,
+                KilnLayout.LancerAnchor(0, i), 10, LootTier.Normal, 1f, root.transform, thrall: false);
+        for (int i = 0; i < KilnLayout.EliteCount; i++)
+            SpawnEnemy("Skeletons/Characters/Skeleton_Warrior.fbx", KilnLayout.ElitePrefix + i,
+                KilnLayout.EliteAnchor(0, i), 24, LootTier.Elite, 1.25f, root.transform, thrall: true);
+
+        // S4: The Kilnmother at the north end of the ring.
+        SpawnKilnmother(root.transform);
+
         var gate = SpawnGate(ZoneGate.KilnGateName, KilnGatePos, KilnArrival, ActProgress.Kiln, withHint: true);
         var ossuary = GameObject.Find(OssuaryBuilder.RootName);
         if (ossuary != null) gate.transform.SetParent(ossuary.transform, true);
         var ret = SpawnGate(ZoneGate.KilnReturnGateName, KilnReturnPos, OssuaryReturnArrival, ActProgress.Ossuary, withHint: false);
         ret.transform.SetParent(root.transform, true);
+    }
+
+    static GameObject SpawnEnemy(string model, string name, Vector3 pos, int hp, LootTier tier, float scale,
+        Transform parent, bool thrall)
+    {
+        // Skeleton_Brute is not in the pack: fall back to the Warrior like the Abbot does.
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ThirdParty/KayKit/" + model)
+            ?? AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Warrior.fbx");
+        GameObject e = prefab != null ? (GameObject)PrefabUtility.InstantiatePrefab(prefab)
+            : GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        if (e.GetComponent<Collider>() == null)
+        {
+            var col = e.AddComponent<CapsuleCollider>();
+            col.height = 1.7f;
+            col.radius = 0.35f;
+            col.center = new Vector3(0f, 0.85f, 0f);
+        }
+        e.name = name;
+        e.tag = "Husk";
+        e.transform.SetParent(parent, true);
+        e.transform.position = pos;
+        e.transform.localScale = Vector3.one * scale;
+        e.AddComponent<Unity.Netcode.NetworkObject>();
+        var health = e.AddComponent<EnemyHealth>();
+        health.SetTier(hp, tier);
+        health.corpseModel = prefab;
+        if (thrall)
+        {
+            e.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
+            e.AddComponent<CinderThrall>();
+        }
+        else e.AddComponent<AshLancer>();
+        SandboxBuilder.WireHuskAnimator(e);
+        return e;
+    }
+
+    static void SpawnKilnmother(Transform parent)
+    {
+        var boss = SpawnEnemy("Skeletons/Characters/Skeleton_Brute.fbx", KilnLayout.KilnmotherName,
+            KilnLayout.KilnmotherPos, KilnmotherController.MaxHP, LootTier.ActBoss, 2f, parent, thrall: false);
+        Object.DestroyImmediate(boss.GetComponent<AshLancer>());
+        boss.AddComponent<EnemyAttack>().damage = 3;
+        boss.AddComponent<KilnmotherController>();
     }
 
     static GameObject SpawnGate(string name, Vector3 at, Vector3 dest, int zone, bool withHint)
@@ -156,8 +213,8 @@ public static class KilnBuilder
     /// <summary>Headless proof: Kiln root, domes, ember lights, locked gate with hint, return gate.</summary>
     public static void VerifyKiln(UnityEngine.SceneManagement.Scene scene)
     {
-        bool root = false, gate = false, hint = false, ret = false;
-        int domes = 0, embers = 0;
+        bool root = false, gate = false, hint = false, ret = false, mother = false;
+        int domes = 0, embers = 0, thralls = 0, lancers = 0, elites = 0;
         foreach (var r in scene.GetRootGameObjects())
             foreach (var t in r.GetComponentsInChildren<Transform>(true))
             {
@@ -172,9 +229,16 @@ public static class KilnBuilder
                     hint = t.Find(ZoneGate.LockedHintName) != null;
                 }
                 if (n == ZoneGate.KilnReturnGateName && zg != null) ret = true;
+                if (n.StartsWith(KilnLayout.ThrallPrefix) && t.GetComponent<CinderThrall>() != null) thralls++;
+                if (n.StartsWith(KilnLayout.LancerPrefix) && t.GetComponent<AshLancer>() != null) lancers++;
+                if (n.StartsWith(KilnLayout.ElitePrefix) && t.GetComponent<CinderThrall>() != null) elites++;
+                if (n == KilnLayout.KilnmotherName && t.GetComponent<KilnmotherController>() != null) mother = true;
             }
-        Debug.Log($"[KilnBuilder] Verify: root={root} domes={domes} embers={embers} gate={gate} hint={hint} ret={ret}");
-        if (!root || domes < KilnDomes || embers < EmberLights || !gate || !hint || !ret)
+        Debug.Log($"[KilnBuilder] Verify: root={root} domes={domes} embers={embers} gate={gate} hint={hint} ret={ret} " +
+                  $"thralls={thralls} lancers={lancers} elites={elites} kilnmother={mother}");
+        if (!root || domes < KilnDomes || embers < EmberLights || !gate || !hint || !ret
+            || thralls != KilnLayout.ThrallCount || lancers != KilnLayout.LancerCount
+            || elites != KilnLayout.EliteCount || !mother)
             throw new System.Exception("Kiln verify failed: zone 3 inventory incomplete.");
         Debug.Log("[KilnBuilder] Verify: OK (cinder kiln + gates present).");
     }

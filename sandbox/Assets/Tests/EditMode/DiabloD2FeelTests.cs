@@ -96,10 +96,13 @@ public class DiabloD2FeelTests
         Assert.GreaterOrEqual(husks.Length, 10, "Ashen Fen must spread 10+ husks.");
         foreach (var husk in husks)
         {
+            // act-one S3: Ash Lancers are armed with their own charge instead of melee.
+            if (husk.GetComponent<AshLancer>() != null) continue;
             var atk = husk.GetComponent<EnemyAttack>();
             Assert.IsNotNull(atk, $"Husk '{husk.name}' needs EnemyAttack.");
             var tier = husk.GetComponent<EnemyHealth>().tier;
-            int expectedDamage = tier == LootTier.Normal ? 1 : (tier == LootTier.Boss ? 3 : 2);
+            bool boss = tier == LootTier.Boss || tier == LootTier.ActBoss;
+            int expectedDamage = tier == LootTier.Normal ? 1 : (boss ? 3 : 2);
             Assert.AreEqual(expectedDamage, atk.damage,
                 $"Husk '{husk.name}' damage must follow its tier.");
         }

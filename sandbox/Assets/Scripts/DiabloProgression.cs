@@ -49,6 +49,7 @@ public sealed class DiabloProgression : MonoBehaviour
             case LootTier.Elite: return XpElite;
             case LootTier.Chest: return XpChest;
             case LootTier.Boss: return XpBoss;
+            case LootTier.ActBoss: return XpBoss * 2;
             default: return XpNormal;
         }
     }

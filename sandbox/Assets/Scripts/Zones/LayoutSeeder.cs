@@ -38,8 +38,8 @@ public static class LayoutSeeder
     /// <summary>Chosen variant per category.</summary>
     public struct Layout
     {
-        public int husks, elite, brute, props;
-        public override string ToString() => $"husks={husks} elite={elite} brute={brute} props={props}";
+        public int husks, elite, brute, props, kiln;
+        public override string ToString() => $"husks={husks} elite={elite} brute={brute} props={props} kiln={kiln}";
     }
 
     public static Layout ForSeed(int seed)
@@ -51,6 +51,8 @@ public static class LayoutSeeder
             elite = rng.Next(VariantCount),
             brute = rng.Next(VariantCount),
             props = rng.Next(VariantCount),
+            // act-one S3: drawn last so the Ashen Fen picks of a seed stay unchanged.
+            kiln = rng.Next(VariantCount),
         };
     }
 
@@ -108,6 +110,13 @@ public static class LayoutSeeder
             if (Place($"Husk_{i}", husks[i])) moved++;
         if (Place(EliteName, EliteSpots[Clamp(layout.elite)])) moved++;
         if (Place(BruteName, BruteSpots[Clamp(layout.brute)])) moved++;
+        int k = Clamp(layout.kiln);
+        for (int i = 0; i < KilnLayout.ThrallCount; i++)
+            if (Place(KilnLayout.ThrallPrefix + i, KilnLayout.ThrallAnchor(k, i))) moved++;
+        for (int i = 0; i < KilnLayout.LancerCount; i++)
+            if (Place(KilnLayout.LancerPrefix + i, KilnLayout.LancerAnchor(k, i))) moved++;
+        for (int i = 0; i < KilnLayout.EliteCount; i++)
+            if (Place(KilnLayout.ElitePrefix + i, KilnLayout.EliteAnchor(k, i))) moved++;
         for (int v = 0; v < VariantCount; v++)
         {
             var root = FindIncludingInactive(PropRootPrefix + v);

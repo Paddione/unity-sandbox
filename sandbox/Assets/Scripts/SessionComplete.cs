@@ -34,6 +34,17 @@ public sealed class SessionComplete : MonoBehaviour
         sessionStart = Time.realtimeSinceStartup;
     }
 
+    /// <summary>act-one S4: the overlay was opened by the Kilnmother's death.</summary>
+    public static bool ActOneMode;
+    public const string ActOneTitle = "AKT I ABGESCHLOSSEN";
+
+    /// <summary>Act I end screen (Kilnmother): same overlay, act title, all three zones in the totals.</summary>
+    public static void ShowActComplete(GameObject hero)
+    {
+        ActOneMode = true;
+        Show(hero, "Rare+ kiln hoard");
+    }
+
     /// <summary>Open the overlay for the hero (headless-callable).</summary>
     public static void Show(GameObject hero, string bestDrop)
     {
@@ -62,7 +73,7 @@ public sealed class SessionComplete : MonoBehaviour
         float secs = PlaySeconds();
         LastSummary = $"Zeit {secs:0}s  Kills {kills}  Gold {gold}  Beute {BestDrop}";
         if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
-        if (body != null) body.text = "SESSION GESCHAFFT\n" + LastSummary;
+        if (body != null) body.text = (ActOneMode ? ActOneTitle : "SESSION GESCHAFFT") + "\n" + LastSummary;
     }
 
     void EnsureBuilt()
@@ -169,6 +180,7 @@ public sealed class SessionComplete : MonoBehaviour
         Shown = 0;
         LastSummary = "";
         KindledUnlockedThisRun = false;
+        ActOneMode = false;
         BestDrop = "";
         sessionStart = Time.realtimeSinceStartup;
         startStamped = true;

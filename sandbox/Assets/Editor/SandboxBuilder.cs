@@ -1236,7 +1236,9 @@ public static class SandboxBuilder
     static bool HuskArmed(GameObject g)
     {
         var a = g.GetComponent<Animator>();
-        return g.GetComponent<EnemyAttack>() != null && g.GetComponent<HuskAnimator>() != null
+        // act-one S3: Ash Lancers fight with their own charge instead of EnemyAttack.
+        bool attacks = g.GetComponent<EnemyAttack>() != null || g.GetComponent<AshLancer>() != null;
+        return attacks && g.GetComponent<HuskAnimator>() != null
             && a != null && a.runtimeAnimatorController != null;
     }
 

@@ -69,7 +69,8 @@ public class LayoutSeedTests
     {
         EditorSceneManager.OpenScene(ZonePath, OpenSceneMode.Single);
         var layout = new LayoutSeeder.Layout { husks = 2, elite = 1, brute = 2, props = 1 };
-        Assert.AreEqual(LayoutSeeder.HuskCount + 2, LayoutSeeder.Apply(layout));
+        int kilnEnemies = KilnLayout.ThrallCount + KilnLayout.LancerCount + KilnLayout.EliteCount;
+        Assert.AreEqual(LayoutSeeder.HuskCount + 2 + kilnEnemies, LayoutSeeder.Apply(layout));
         Assert.Less(Vector3.Distance(GameObject.Find("Husk_3").transform.position, LayoutSeeder.HuskSets[2][3]), 0.01f);
         Assert.Less(Vector3.Distance(GameObject.Find(LayoutSeeder.EliteName).transform.position, LayoutSeeder.EliteSpots[1]), 0.01f);
         Assert.IsTrue(LayoutSeeder.FindIncludingInactive(LayoutSeeder.PropRootPrefix + "1").activeSelf);

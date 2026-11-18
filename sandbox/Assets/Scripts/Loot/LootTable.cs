@@ -1,5 +1,5 @@
 /// <summary>Enemy tiers for drop rolls (P2).</summary>
-public enum LootTier { Normal, Elite, Chest, Boss }
+public enum LootTier { Normal, Elite, Chest, Boss, ActBoss }
 
 /// <summary>Loot roll result: rarity + slot (drops=false means no loot).</summary>
 public struct LootRoll
@@ -19,6 +19,9 @@ public static class LootTable
         {
             case LootTier.Boss:
                 magic = 0; rare = 70; unique = 30; return;
+            case LootTier.ActBoss:
+                // act-one S4: Kilnmother, Rare+ with a heavier unique roll.
+                magic = 0; rare = 60; unique = 40; return;
             case LootTier.Elite:
                 magic = 50; rare = 40; unique = 10; return;
             case LootTier.Chest:

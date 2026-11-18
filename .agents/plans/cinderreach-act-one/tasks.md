@@ -55,6 +55,11 @@ Protokollschritt 1 prüft zusätzlich: `PROGRESS.md` von `cinderreach-replayabil
    KayKit. Konstanten in `Scripts/Zones/KilnLayout.cs` (Tests sehen keine Editor-Skripte). Der Tor-Hinweis bekommt
    sein `TextMesh` zur Laufzeit (Szenen-Vertrag: nur URP-Lit-Materialien).
 
+9. Nachtrag S3/S4 (2026-11-18): Ein Branch, ein Commit (Builder und Seeder greifen ineinander). Tod-Hook
+   `IEnemyDeathHook` in `EnemyHealth.Die`. Keine eigene Kiln-Droptabelle: Normal/Elite wie im Fen, Boss über
+   `LootTier.ActBoss`. Kein `Skeleton_Brute.fbx` im Pack, Kilnmother nutzt den Warrior-Fallback des Abbots.
+   Vertrag „jeder Husk bewaffnet“ (Builder + `DiabloD2FeelTests`) akzeptiert `AshLancer` als Bewaffnung.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -128,8 +133,8 @@ S1 zuerst (Save-Format und Freischaltkette). S2 nach S1. S3 und S4 nach S2, unte
 |---|---|---|---|
 | S1 act-save | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 kiln-world | S1 | 20 % | landed 2026-11-18 |
-| S3 kiln-enemies | S2 | 20 % | offen |
-| S4 kilnmother | S2 | 25 % | offen |
+| S3 kiln-enemies | S2 | 20 % | landed 2026-11-18 |
+| S4 kilnmother | S2 | 25 % | landed 2026-11-18 |
 | S5 waypoints+proof | S3, S4 | 20 % | offen |
 
 ## Verify (je Stufe)

@@ -108,6 +108,7 @@ public sealed class EnemyHealth : MonoBehaviour
         // deferred Destroy can win the race and skip the overlay forever.
         var boss = GetComponent<BossController>();
         if (boss != null) boss.OnBossDeath(boss.HeroObject());
+        foreach (var hook in GetComponents<IEnemyDeathHook>()) hook.OnEnemyDeath();
         DiabloCorpse.SpawnFrom(gameObject);
         var netObj = GetComponent<NetworkObject>();
         var nm = NetworkManager.Singleton;

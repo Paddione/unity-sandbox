@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-one
 
-Prozent: 35 %
+Prozent: 80 %
 
 ## Erledigt
 
@@ -20,10 +20,20 @@ Prozent: 35 %
   im `VerifyDiabloZone`. `ZoneGate` lehnt gesperrte Zielzonen ab. Belege: EditMode 177/177 (3 neu
   `KilnConfigTests`), PlayMode 80/80, Verify `domes=6 embers=6 gate=True hint=True ret=True`, Autoplay 6/6.
 
+- 2026-11-18: S3 kiln-enemies und S4 kilnmother gelandet. Cinder Thrall (Nahkampf über `EnemyAttack`, beim Tod
+  0,6 s Telegraph + 2-m-Explosion nur gegen den Helden), Ash Lancer (hält 8 m, 0,7 s Telegraph-Linie, Sturm 14 m/s,
+  einmal 4 Schaden, 2 s erschöpft, Aggro 16 m), 18 Thralls in sechs Packs + 6 Lancer + 2 Kiln Elites, drei
+  Anker-Varianten über `LayoutSeeder` (Kiln-Ziehung zuletzt, Fen-Picks bestehender Seeds unverändert). The
+  Kilnmother (320 HP, Feuerwellen mit 60°-Lücke, ab 50 % schnellere Wellen + brennender Boden + 4 Thralls einmalig,
+  Tod → `ActProgress.CompleteAct`, Save, Overlay „AKT I ABGESCHLOSSEN“), `LootTier.ActBoss` (Rare+, 40 % Unique,
+  300–450 Gold). Belege: EditMode 186/186 (10 neu `KilnEnemyConfigTests`, u. a. Erreichbarkeit aller Kiln-Anker in
+  drei Varianten), PlayMode 82/82 (2 neu `KilnmotherLoopTests`), Verify `thralls=18 lancers=6 elites=2
+  kilnmother=True armed=True`, Autoplay 6/6.
+
 ## Nächste Schritte
 
-1. S3 kiln-enemies und S4 kilnmother.
+1. S5 waypoints+proof (Wegpunkte, Autoplay bis zur Kilnmother, Shotcheck, Probe).
 
 ## Offene Punkte
 
-- S3 bis S5 offen.
+- S5 offen.
