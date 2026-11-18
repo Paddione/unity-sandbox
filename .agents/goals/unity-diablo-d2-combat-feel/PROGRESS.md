@@ -27,8 +27,7 @@ Keine.
 
 ## Offene Punkte
 
-Keine (Playtest per Eigner-Entscheid erfolgreich — kein ausstehender Beleg mehr).
-- Sound-Asset-Frage ist entschieden (synth statt Dateien) — kein offener Punkt mehr.
+Keine.
 - Follow-ups (nicht dieser Goal-Cut): Corpses, Vendoren/Trank/Gold,
   Damage-Numbers (explizit nicht-D2), Screenshake, Coop-Sync-Feeling,
   Idle-Anims, Gamepad.
