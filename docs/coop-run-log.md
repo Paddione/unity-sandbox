@@ -44,3 +44,26 @@ der Start gehört auf den Windows-Desktop):
 5. Erwartete Belege: beide Logs ohne Exceptions, Client sieht Kampf und Loot,
    `player.log` (Client) enthält `phase zone2`, Shotcheck-PNG vom Client.
    Der Relay-Join-Code (`-join-code`, UGS-Projekt „Cinderreach“) folgt in S6.
+
+## S6 — Relay (Linux-Linux und WSL ↔ Windows)
+
+Harness: `COOP_RELAY=1 bash scripts/run-coop-pair.sh artifacts/coop-relay/<datum>`
+(Host `-host-relay`, Code aus `RELAY_JOIN_CODE=…`, Client `-join-code CODE`).
+Windows-Läufe zusätzlich über Einmal-Harness `/tmp/coop-win.sh`
+(`MODE=direct|relay`; kein Repo-Bestandteil — Befehle siehe unten).
+
+- Linux-Linux: Host `RELAY_JOIN_CODE=MHP868`, beide Exit 0, Client
+  `phase zone2: pulled to the Ossuary by the host broadcast`, je 0 Exceptions
+  (`artifacts/coop-relay/2026-11-18/`).
+- WSL-Host + Windows-Client, direkt: beide Exit 0, Client
+  `phase zone2: pulled to the Ossuary`, je 0 Exceptions
+  (`artifacts/coop-win-direct/2026-11-18/`).
+- WSL-Host + Windows-Client, per Code: Host `RELAY_JOIN_CODE=6N9BHD`,
+  Client `joined session by code 6N9BHD` + `phase zone2`, beide Exit 0,
+  je 0 Exceptions (`artifacts/coop-win-relay/2026-11-18/`).
+- Shotcheck-PNGs vom Windows-Build (`artifacts/shotcheck/`,
+  z. B. `30_session_complete.png`: Session-Complete-Overlay in Lantern Hold).
+- Windows-Befehle (Staging s. S5, S6-Build 121 MB): Host wie oben; Client
+  direkt `cinderreach.exe -join 127.0.0.1:7790 -coop-autoplay client ...`
+  oder per Code `cinderreach.exe -join-code <CODE> -coop-autoplay client ...`.
+  Shotcheck: `bash scripts/shotcheck-windows.sh` vom Repo-Root.

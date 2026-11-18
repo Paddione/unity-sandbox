@@ -13,6 +13,10 @@ public readonly struct JoinArgs
     public const string HostFlag = "-host";
     public const string JoinFlag = "-join";
     public const string PortFlag = "-port";
+    /// <summary>Join a relay session by code (S6, UGS project "Cinderreach").</summary>
+    public const string JoinCodeFlag = "-join-code";
+    /// <summary>Host via relay instead of direct UTP (S6).</summary>
+    public const string HostRelayFlag = "-host-relay";
     public const string DefaultAddress = "127.0.0.1";
     public const ushort DefaultPort = 7777;
 
@@ -21,13 +25,20 @@ public readonly struct JoinArgs
     public readonly ushort Port;
     /// <summary>Why a value fell back to its default (null when none did).</summary>
     public readonly string Warning;
+    /// <summary>Relay join code from <c>-join-code</c> (null when direct).</summary>
+    public readonly string JoinCode;
+    /// <summary>Host via relay instead of direct UTP (<c>-host-relay</c>).</summary>
+    public readonly bool RelayHost;
 
-    public JoinArgs(NetMode mode, string address, ushort port, string warning = null)
+    public JoinArgs(NetMode mode, string address, ushort port, string warning = null,
+        string joinCode = null, bool relayHost = false)
     {
         Mode = mode;
         Address = string.IsNullOrWhiteSpace(address) ? DefaultAddress : address.Trim();
         Port = port == 0 ? DefaultPort : port;
         Warning = warning;
+        JoinCode = string.IsNullOrWhiteSpace(joinCode) ? null : joinCode.Trim();
+        RelayHost = relayHost;
     }
 
     public bool IsClient => Mode == NetMode.Client;
@@ -73,7 +84,16 @@ public readonly struct JoinArgs
             warning = "-join without address, using " + DefaultAddress;
         }
         if (mode != NetMode.Client && !portGiven) port = DefaultPort;
-        return new JoinArgs(mode, address, port, warning);
+        string joinCode = Value(args, JoinCodeFlag);
+        if (joinCode != null) mode = NetMode.Client;
+        else if (Has(args, JoinCodeFlag))
+        {
+            mode = NetMode.Client;
+            warning = "-join-code without a code, using " + DefaultAddress;
+        }
+        bool relayHost = Has(args, HostRelayFlag);
+        if (relayHost) mode = NetMode.Host;
+        return new JoinArgs(mode, address, port, warning, joinCode, relayHost);
     }
 
     /// <summary>Split "host[:port]" (the JoinPanel field uses the same rule).</summary>

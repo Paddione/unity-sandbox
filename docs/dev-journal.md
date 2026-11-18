@@ -672,3 +672,33 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   wie S2–S4 dokumentiert). `RunProfile`/`DifficultyProfile` liegen unter
   `Save/` bzw. `Difficulty/`, nicht wie vermutet direkt unter `Scripts/`.
 - Next: S6 relay (Join-Code, Multiplayer-Services-Migration, Eigner-Läufe).
+
+## 2026-11-18 — coop-session S6: Relay-Join-Code (FINAL)
+
+- Done: Paketmigration per Client-API (kein Hand-Edit): `relay`/`lobby` raus,
+  `com.unity.services.multiplayer@2.5.0` rein (Transport 2.4.0 → 2.7.4 in einer
+  UPM-Resolution). `Net/RelayJoin.cs` (neu): UGS-Init + anonymer Login, Host
+  erstellt die Session mit Relay (`CreateSessionAsync` + `WithRelayNetwork`,
+  max 4), Join-Code im Log (`RELAY_JOIN_CODE=`) und im JoinPanel; Client joint
+  per `JoinSessionByCodeAsync`. Das Sessions SDK owned Transport + NGO-Start;
+  Fallback direktes UTP mit Warnung (nie still). `JoinArgs -join-code` /
+  `-host-relay`, JoinPanel mit Code-Feld + HostRelay/JoinByCode + Relay-Status,
+  `run-coop-pair.sh` mit `COOP_RELAY=1`.
+- Belegt: EditMode 305/305, PlayMode 180/180 (neu `RelayJoinTests` 7 Tests:
+  Code-Normierung, Flag-Parsing, Offline-Fehlerpfade), `VerifyDiabloZone` OK,
+  `check-meta` OK; Linux-Linux-Relay-Paar Exit 0/0 (Code MHP868, Client
+  Zone-2-Pull, je 0 Exc); WSL-Host + Windows-Client direkt Exit 0/0 (Client
+  Zone-2-Pull, je 0 Exc); WSL-Host + Windows-Client per Code Exit 0/0
+  (Code 6N9BHD, Client Zone-2-Pull, je 0 Exc); Shotcheck-PNGs vom Windows-Build
+  (`30_session_complete.png` u.a.); Solo-Autoplay Exit 0, FPS-Pass;
+  Direkt-Paar nach Transport-Upgrade weiter Exit 0/0.
+- Debug-Funde (alle live belegt, keine Theorie): Sessions-SDK braucht den
+  Unity-Main-Thread (kein `ConfigureAwait` — sonst NRE im Transport-Allocator
+  bei `StartHost`); gleiche Anon-Identität kann sich nicht selbst joinen (pro
+  Prozess frisch via `SignOut(clearCredentials:true)`); volle Save-Bags brechen
+  den deterministischen Trank-Kauf (Harness archiviert Stale-Saves seit S6).
+- Faced: `MultiplayerAutoStarter.cs`/`run-coop-pair.sh`/`Sandbox.Runtime.asmdef`
+  (Assembly-Referenzen) stehen nicht in der S6-target_files-Liste, tragen aber
+  Relay-Boot, Harness und Kompilierbarkeit (wie S2–S5 dokumentiert).
+  `ugs-relay-probe.sh` blieb unverändert (Vorab-Check, Exit 0).
+- Next: Goal-Audit und 100 %.

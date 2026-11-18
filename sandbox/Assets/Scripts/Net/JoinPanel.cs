@@ -14,6 +14,8 @@ public sealed class JoinPanel : MonoBehaviour
     public const string ObjectName = "JoinPanel";
 
     public InputField AddressField { get; private set; }
+    /// <summary>Relay join code field (S6).</summary>
+    public InputField CodeField { get; private set; }
     public Text Status { get; private set; }
     public bool IsOpen => canvas != null && canvas.enabled;
 
@@ -68,6 +70,21 @@ public sealed class JoinPanel : MonoBehaviour
         return MultiplayerAutoStarter.Restart(new JoinArgs(JoinArgs.NetMode.Client, host, port));
     }
 
+    /// <summary>Host a relay session (join code appears in the status line).</summary>
+    public bool HostRelay()
+    {
+        return MultiplayerAutoStarter.Restart(new JoinArgs(JoinArgs.NetMode.Host,
+            JoinArgs.DefaultAddress, JoinArgs.DefaultPort, relayHost: true));
+    }
+
+    /// <summary>Join the relay code typed in the code field.</summary>
+    public bool JoinByCode()
+    {
+        string code = CodeField != null ? CodeField.text : null;
+        return MultiplayerAutoStarter.Restart(new JoinArgs(JoinArgs.NetMode.Client,
+            JoinArgs.DefaultAddress, JoinArgs.DefaultPort, joinCode: code));
+    }
+
     void Update()
     {
         var kb = UnityEngine.InputSystem.Keyboard.current;
@@ -86,15 +103,24 @@ public sealed class JoinPanel : MonoBehaviour
     {
         if (nm == null) return "Offline (no NetworkManager)";
         if (nm.ShutdownInProgress) return "Leaving session…";
-        if (!nm.IsListening) return "Not connected";
+        if (!nm.IsListening)
+            return current.JoinCode != null ? $"Relay code {current.JoinCode}: connecting…"
+                : current.RelayHost ? "Relay: creating session…"
+                : "Not connected";
         if (nm.IsHost)
         {
             int others = Mathf.Max(0, nm.ConnectedClientsIds.Count - 1);
+            if (current.RelayHost && RelayJoin.LastJoinCode != null)
+                return others == 0
+                    ? $"Relay code {RelayJoin.LastJoinCode}, waiting for players"
+                    : $"Relay code {RelayJoin.LastJoinCode}, {others} joined";
             return others == 0
                 ? $"Hosting on port {current.Port}, waiting for players"
                 : $"Hosting on port {current.Port}, {others} joined";
         }
-        if (nm.IsConnectedClient) return $"Joined {current.Address}:{current.Port}";
+        if (nm.IsConnectedClient)
+            return current.JoinCode != null ? $"Joined via relay {current.JoinCode}"
+                : $"Joined {current.Address}:{current.Port}";
         return $"Connecting to {current.Address}:{current.Port}…";
     }
 
@@ -112,14 +138,18 @@ public sealed class JoinPanel : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         canvasGo.AddComponent<GraphicRaycaster>();
 
-        var panel = Panel(canvasGo.transform, "Panel", new Vector2(620f, 360f), Vector2.zero);
-        Label(panel.transform, "Co-op", 28, new Vector2(0f, 140f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
-        Label(panel.transform, "Host on a port, or join ip:port", 16, new Vector2(0f, 95f), new Vector2(560f, 30f));
-        AddressField = Field(panel.transform, $"{JoinArgs.DefaultAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 45f));
-        Button(panel.transform, "Host", new Vector2(-190f, -30f), () => Host());
-        Button(panel.transform, "Join", new Vector2(0f, -30f), () => Join());
-        Button(panel.transform, "Close", new Vector2(190f, -30f), () => SetOpen(false));
-        Status = Label(panel.transform, "", 16, new Vector2(0f, -110f), new Vector2(560f, 40f));
+        var panel = Panel(canvasGo.transform, "Panel", new Vector2(620f, 470f), Vector2.zero);
+        Label(panel.transform, "Co-op", 28, new Vector2(0f, 190f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
+        Label(panel.transform, "Host on a port, join ip:port — or use a relay code", 16, new Vector2(0f, 150f), new Vector2(560f, 30f));
+        AddressField = Field(panel.transform, "AddressField", $"{JoinArgs.DefaultAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 100f));
+        Button(panel.transform, "Host", new Vector2(-190f, 35f), () => Host());
+        Button(panel.transform, "Join", new Vector2(0f, 35f), () => Join());
+        Button(panel.transform, "Close", new Vector2(190f, 35f), () => SetOpen(false));
+        Label(panel.transform, "Relay join code", 16, new Vector2(0f, -25f), new Vector2(560f, 30f));
+        CodeField = Field(panel.transform, "CodeField", "", new Vector2(0f, -70f));
+        Button(panel.transform, "HostRelay", new Vector2(-95f, -135f), () => HostRelay());
+        Button(panel.transform, "JoinByCode", new Vector2(95f, -135f), () => JoinByCode());
+        Status = Label(panel.transform, "", 16, new Vector2(0f, -195f), new Vector2(560f, 40f));
     }
 
     static GameObject Panel(Transform parent, string name, Vector2 size, Vector2 pos)
@@ -151,9 +181,9 @@ public sealed class JoinPanel : MonoBehaviour
         return label;
     }
 
-    static InputField Field(Transform parent, string value, Vector2 pos)
+    static InputField Field(Transform parent, string name, string value, Vector2 pos)
     {
-        var go = new GameObject("AddressField", typeof(RectTransform));
+        var go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var img = go.AddComponent<Image>();
         img.sprite = DiabloMenuArt.TabBackground(false);

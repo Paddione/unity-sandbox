@@ -14,6 +14,10 @@
 #
 # Exit = max(host, client); 2 = hang (COOP_TIMEOUT, default 1200 s).
 # Usage (repo root): bash scripts/run-coop-pair.sh [out_dir]
+#
+# Relay mode (S6): COOP_RELAY=1 hosts via `-host-relay` (Sessions SDK,
+# join code from the host log) and joins the client via `-join-code CODE` —
+# same route, same verdicts, UGS transport instead of direct UTP.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -48,7 +52,39 @@ esac
 
 COMMON=(-screen-width 960 -screen-height 540 -screen-fullscreen 0 -autoplay-god -autoplay-commit "$COMMIT")
 rm -f "$OUT/host/autoplay-result.json" "$OUT/client/autoplay-result.json"
+# Fresh saves per run (S6): loot accumulates in the bag across runs, and a
+# full bag would fail the deterministic town potion buy. Previous saves are
+# archived with a timestamp, never silently deleted.
+SAVEDIR="${XDG_CONFIG_HOME:-$HOME/.config}/unity3d/Unity Technologies/Cinderreach"
+for s in coop-host.json coop-client.json; do
+  if [ -f "$SAVEDIR/$s" ]; then
+    bak="$SAVEDIR/$s.bak-$(date +%F-%H%M%S)"
+    mv "$SAVEDIR/$s" "$bak" && echo "run-coop-pair: archived stale save to $bak"
+  fi
+done
 
+if [ "${COOP_RELAY:-0}" = 1 ]; then
+  echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s)"
+  set +e
+  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
+    -host-relay -autoplay -coop-autoplay host -save-file coop-host.json \
+    -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
+  HOST_PID=$!
+  echo "run-coop-pair: waiting for relay join code..."
+  CODE=""
+  for _ in $(seq 1 120); do
+    sleep 5
+    CODE=$(grep -a -o 'RELAY_JOIN_CODE=[A-Z0-9]*' "$OUT/host/player.log" 2>/dev/null | tail -n 1 | cut -d= -f2)
+    [ -n "$CODE" ] && break
+    kill -0 "$HOST_PID" 2>/dev/null || break
+  done
+  if [ -z "$CODE" ]; then echo "run-coop-pair: no relay join code from host" >&2; fi
+  echo "run-coop-pair: client -> relay code $CODE"
+  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
+    -join-code "$CODE" -coop-autoplay client -save-file coop-client.json \
+    -autoplay-out "$OUT/client" -logFile "$OUT/client/player.log" &
+  CLIENT_PID=$!
+else
 echo "run-coop-pair: host on port $PORT (display $MODE, timeout ${TIMEOUT}s)"
 set +e
 timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
@@ -61,6 +97,7 @@ timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
   -join "127.0.0.1:$PORT" -coop-autoplay client -save-file coop-client.json \
   -autoplay-out "$OUT/client" -logFile "$OUT/client/player.log" &
 CLIENT_PID=$!
+fi
 wait "$CLIENT_PID"; CLIENT_RC=$?
 wait "$HOST_PID"; HOST_RC=$?
 set -e

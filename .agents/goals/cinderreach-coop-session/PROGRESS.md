@@ -1,6 +1,6 @@
 # Progress: cinderreach-coop-session
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -72,15 +72,36 @@ Prozent: 90 %
   (neu): Volllauf beider Seiten + Windows-Vorlage (Build Succeeded 120 MB,
   Stage OK 122 MB nach `Games\cinderreach`; Live-Join + Shotcheck-PNG als
   Eigner-Lauf dokumentiert).
-- Windows-Client live: offen (Eigner-Lauf nach Vorlage; Relay-Join folgt in S6).
+- 2026-11-18: S6 relay landed. Paketmigration per Client-API (kein Hand-Edit):
+  `relay`/`lobby` raus, `com.unity.services.multiplayer@2.5.0` rein (Transport
+  2.4.0 → 2.7.4). `Net/RelayJoin.cs` (neu): UGS-Init + anonymer Login, Host
+  erstellt Session mit Relay (`CreateSessionAsync` + `WithRelayNetwork`),
+  Join-Code im Log/Panel; Client joint per `JoinSessionByCodeAsync`. Sessions
+  SDK owned Transport + NGO-Start (nach Main-Thread-Fix: kein `ConfigureAwait`
+  — Background-Threads brechen den Transport-Allocator); Fallback direktes UTP
+  mit Warnung. `JoinArgs`: `-join-code`/`-host-relay`; `JoinPanel` mit
+  Code-Feld, HostRelay/JoinByCode-Buttons, Relay-Status; `run-coop-pair.sh`
+  mit `COOP_RELAY=1` (Code aus Host-Log, Client per Code).
+  Belege: EditMode 305/305, PlayMode 180/180 (neu `RelayJoinTests` 7 Tests),
+  `VerifyDiabloZone` OK, `check-meta` OK; Linux-Linux-Relay-Paar Exit 0/0
+  (Code MHP868, Client Zone-2-Pull, je 0 Exc); WSL-Host + Windows-Client direkt
+  Exit 0/0 (Client Zone-2-Pull, je 0 Exc); WSL-Host + Windows-Client per Code
+  Exit 0/0 (Code 6N9BHD, Client Zone-2-Pull, je 0 Exc); Shotcheck-PNGs vom
+  Windows-Build (`30_session_complete.png` u.a.); Solo-Autoplay Exit 0,
+  FPS-Pass; Direkt-Paar nach Transport-Upgrade weiter Exit 0/0.
+  Debug-Funde unterwegs: dynamisch gespawnte Relay-Objekte replizieren nicht
+  (Hash-0-Fehler → Broadcasts laufen übers Player-Objekt, S3); gleiche
+  Anon-Identität kann sich nicht selbst joinen (→ frische Identität pro
+  Prozess); volle Save-Bags brechen den deterministischen Trank-Kauf
+  (→ Harness archiviert Stale-Saves).
 
 ## Nächste Schritte
 
-1. S6 relay: Relay-Join-Code über Multiplayer Services (inkl. Eigner-Läufe).
+Keine — alle Stufen S1–S6 landed; alle 7 Goal-Kriterien belegt.
 
 ## Offene Punkte
 
-- Kriterien 1–7 offen bis S2–S6.
-- Befund außerhalb des Goals: Solo-Autoplay ohne `-seed` (Seed aus vorhandenem Save, 1112106611, Fen-Variante
+Keine.
+- Befund außerhalb des Goals (bleibt bestehen, kein Goal-Blocker): Solo-Autoplay ohne `-seed` (Seed aus vorhandenem Save, 1112106611, Fen-Variante
   `husks=1 elite=0 brute=2 props=2`) blieb nach 11 Kills bis Budgetende ohne Treffer hängen. Der Nightly testet nur
   Seeds 0–2 und diese Husk-Variante nie.

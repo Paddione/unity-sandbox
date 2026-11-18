@@ -126,7 +126,7 @@ Seriell S1 → S2 → S3 → S4 → S5 → S6.
 | S3 world | S2 | 15 % | landed 2026-11-18 |
 | S4 economy | S3 | 20 % | landed 2026-11-18 |
 | S5 save | S4 | 15 % | landed 2026-11-18 |
-| S6 relay | S5 | 10 % | offen |
+| S6 relay | S5 | 10 % | landed 2026-11-18 |
 
 ## Verify (je Stufe)
 
