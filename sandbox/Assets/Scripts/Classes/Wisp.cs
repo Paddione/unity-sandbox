@@ -87,14 +87,22 @@ public sealed class Wisp : MonoBehaviour
         var center = owner != null ? owner.position : transform.position;
         GameObject best = null;
         float bestD = reach;
+        var candidates = new System.Collections.Generic.List<GameObject>();
         foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
         {
             if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
             var d = husk.transform.position - center;
             d.y = 0f;
+            if (d.magnitude > reach) continue;
+            candidates.Add(husk);
             if (d.magnitude <= bestD) { bestD = d.magnitude; best = husk; }
         }
         if (best == null) return null;
+        // Build unique (wick-of-the-halo S2): with the lantern equipped and a
+        // burning halo, a valid target inside the halo wins over the nearest.
+        var eq = owner != null ? owner.GetComponent<Equipment>() : null;
+        var haloPick = BuildUniqueEffects.PreferHaloTarget(eq, candidates, now);
+        if (haloPick != null) best = haloPick;
         lastStrike = now;
         Strikes++;
         if (!cosmetic) DiabloSkills.ApplyHit(best, damage, center, 0f, owner);

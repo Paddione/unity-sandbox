@@ -176,7 +176,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         var equipped = equipment != null ? equipment.GetEquipped(item.slot) : null;
         string fit = Equipment.CanEquip(item, RunProfile.ClassId) ? ""
             : $"<color={WorseColor}>{ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName} only</color>\n";
-        return fit + $"{LootDrop.ItemLabel(item)} vs {(equipped != null ? LootDrop.ItemLabel(equipped) : "empty slot")}:\n" +
+        string effect = BuildUniqueEffects.EffectTextFor(item);
+        if (!string.IsNullOrEmpty(effect)) effect = $"<color=#ff7d1a>{effect}</color>\n";
+        return fit + effect + $"{LootDrop.ItemLabel(item)} vs {(equipped != null ? LootDrop.ItemLabel(equipped) : "empty slot")}:\n" +
                CompareSummary(item, equipped);
     }
 

@@ -30,6 +30,13 @@ public static class DroptableDatabase
         LootTable.WeightsFor(tier, out magic, out rare, out unique);
     }
 
+    /// <summary>
+    /// Build-unique share of class weapon Unique drops (cinderreach S1): each
+    /// class weapon Unique rolls 50/50 between its build unique and the legacy
+    /// unique. Regular Unique drop chances are unchanged.
+    /// </summary>
+    public const float BuildUniqueWeaponShare = 0.5f;
+
     /// <summary>Gold roll for the tier: drop chance plus inclusive amount bounds.</summary>
     /// <summary>Kilnmother gold (act-one S4): 300–450.</summary>
     public const int ActBossGoldMin = 300;

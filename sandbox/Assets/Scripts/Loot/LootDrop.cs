@@ -30,9 +30,9 @@ public sealed class LootDrop : MonoBehaviour
         string weaponClass = roll.slot == ItemSlot.Weapon ? WeaponClassFor(RunProfile.ClassId, rng) : "";
         if (roll.rarity == ItemRarity.Unique)
         {
-            string id = roll.slot == ItemSlot.Weapon
-                ? (weaponClass == ClassCatalog.LanternbearerId ? "Lantern of the Hold" : "Emberbrand Blade")
-                : roll.slot == ItemSlot.Armor ? "Cryptwarden Plate" : "Seer's Circlet";
+            if (roll.slot == ItemSlot.Weapon)
+                return ItemDatabase.UniqueWeaponForClass(weaponClass, rng);
+            string id = roll.slot == ItemSlot.Armor ? "Cryptwarden Plate" : "Seer's Circlet";
             return ItemDatabase.CreateUnique(id);
         }
         var bases = roll.slot == ItemSlot.Weapon

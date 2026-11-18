@@ -166,6 +166,19 @@ public sealed class AshLancer : MonoBehaviour
         if (line != null) Destroy(line.gameObject);
     }
 
+    /// <summary>
+    /// Build unique (lancer-ward): a Cleave interrupt drops a charging or
+    /// telegraphing lancer into the existing Exhausted recovery. No-op in any
+    /// other state (Interrupt only valid mid-charge).
+    /// </summary>
+    public void InterruptToExhausted()
+    {
+        if (Current != State.Charge && Current != State.Telegraph) return;
+        Current = State.Exhausted;
+        stateSince = Time.time;
+        ShowLine(false);
+    }
+
     public static void ResetRun()
     {
         Charges = 0;

@@ -9,6 +9,14 @@ public static class ItemDatabase
     public const string StarterSwordBase = "Worn Short Sword";
     public const string StarterLanternBase = "Worn Lantern";
 
+    /// <summary>
+    /// Build uniques (cinderreach-build-uniques S1): class-bound weapons that
+    /// change skill tactics. Fenwalker sword interrupts a Lancer charge with
+    /// Cleave; Lanternbearer lantern prioritizes Wisp targets inside the halo.
+    /// </summary>
+    public const string LancerWardId = "lancer-ward";
+    public const string WickOfHaloId = "wick-of-the-halo";
+
     /// <summary>Class that may equip a base type; "" = every class.</summary>
     public static string ClassRestriction(string baseType)
     {
@@ -70,6 +78,24 @@ public static class ItemDatabase
                     baseType = "Breastplate",
                     uniqueId = "Cryptwarden Plate",
                     affixes = new List<Affix> { new Affix("MaxHP", 30f), new Affix("Armor", 4f) },
+                };
+            case LancerWardId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Unique,
+                    baseType = "HeavyAxe",
+                    uniqueId = LancerWardId,
+                    affixes = new List<Affix> { new Affix("Damage", 5f) },
+                };
+            case WickOfHaloId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Unique,
+                    baseType = "EmberCenser",
+                    uniqueId = WickOfHaloId,
+                    affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 10f) },
                 };
             default:
                 return new ItemInstance
@@ -152,5 +178,22 @@ public static class ItemDatabase
             CreateUnique("Cryptwarden Plate"),
             CreateUnique("Seer's Circlet"),
         };
+    }
+
+    /// <summary>
+    /// Build-unique weapon for a class (cinderreach-build-uniques S1): picks
+    /// between the tactial build unique and the legacy class weapon unique so
+    /// both stay regularly obtainable through the existing class-bound Unique
+    /// selection. Drop chances are unchanged (regular Unique weight applies).
+    /// </summary>
+    public static ItemInstance UniqueWeaponForClass(string classId, System.Random rng)
+    {
+        bool build = rng != null && rng.NextDouble() < DroptableDatabase.BuildUniqueWeaponShare;
+        string id;
+        if (ClassCatalog.Get(classId).id == ClassCatalog.LanternbearerId)
+            id = build ? WickOfHaloId : "Lantern of the Hold";
+        else
+            id = build ? LancerWardId : "Emberbrand Blade";
+        return CreateUnique(id);
     }
 }

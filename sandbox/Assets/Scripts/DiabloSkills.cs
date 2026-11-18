@@ -59,6 +59,12 @@ public sealed class DiabloSkills : MonoBehaviour
     public float veilCooldown = 5f;
     public const float VeilHeroRadius = 0.35f;
 
+    /// <summary>
+    /// Burning-halo window for the wick-of-the-halo Wisp priority
+    /// (cinderreach-build-uniques S2): matches the halo visual lifetime.
+    /// </summary>
+    public const float HaloVisualSeconds = 0.6f;
+
     /// <summary>Launch height above the hero pivot (chest).</summary>
     public const float LaunchHeight = 1.0f;
     /// <summary>Launch offset in front of the hero (clears its own collider).</summary>
@@ -401,6 +407,7 @@ public sealed class DiabloSkills : MonoBehaviour
             if (ward)
                 HaloZone.Spawn(transform, transform.position, blow, haloRadius,
                     SkillVariantCatalog.HaloWardDuration, SkillVariantCatalog.HaloTickInterval, haloKnockback);
+            BuildUniqueEffects.NotifyHalo(transform.position, haloRadius, HaloVisualSeconds);
             DiabloAudio.PlayHalo();
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
@@ -514,6 +521,8 @@ public sealed class DiabloSkills : MonoBehaviour
                     husk.transform.position, radius, arc)) continue;
                 ApplyHit(husk, blow, transform.position, cleaveKnockback, transform);
             }
+            // Build unique (lancer-ward S2): at most one interrupt per cast, variant-independent.
+            BuildUniqueEffects.TryInterruptCharge(transform, GetComponent<Equipment>(), radius);
             DiabloAudio.PlayWhoosh();
         }
         SpawnCleaveVisual(radius);
