@@ -543,3 +543,19 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   der Held nach 11 Kills ohne Treffer bis Budgetende hängen (Befund in PROGRESS, nicht S1).
 - Next: S2 host-autoritative Gegner.
 
+## 2026-11-18 — faire Kämpfe Akt I: Plaza, Wind-up-Orb, PlayMode-Belege
+
+- Done: Auf `7f455b0` aufgesetzt (Leine, hostile Projektile, NO-Ankunft bleiben). Dazu: Ankunfts-Plaza
+  (Tor- und Wegpunkt-Scheibe je r=5, gelatcht, Tor/Wegpunkt/Reset re-armen), sichtbarer Warden-Wind-up
+  (wachsende Kugel + Licht, `Telegraphing`-Seam), Plaza-Guards in `EnemyAttack`/`AshLancer`/`Kilnmother`,
+  PlayMode-Suiten (`WardenRetreatTests`, `WardenShotTests`, `KilnArrivalTests` alle 3 Layouts) plus
+  `KilnPlazaTests` (EditMode) und `docs/fair-fights-playtest.md` (Fenwalker/Lanternbearer, Windows, offen).
+- Belegt: EditMode 206/206, PlayMode 91/91, Akt-I-Autoplay 9/9 Phasen, 49 Husks, Kilnmother tot,
+  0 Exceptions, FPS-Tor 33,6 (Schwelle 30).
+- Learned: Nahkampf- und Caster-Komponente auf einem Warden-Körper pattieren sich an der inneren Bandkante
+  (6 m − 0,025 m pro Frame, Wind-up startet nie); der Retreat-Test löst den Wind-up deshalb deterministisch
+  an der äußeren Bandkante (8 m) aus. Reine Sim in Python hat den Patt vor dem Re-Run bewiesen.
+- Faced: Erster eigener Szenen-Rebuild schrieb 32 eingebettete MonoScripts mit nackten `fileID`-Refs
+  (14 rote EditMode-Tests); YAML-Patch nur des Gate-Ziels verworfen, Szene aus Main übernommen, Library per
+  `unity-warmup.sh` geheilt (Sitzung 1 gebunden).
+- Offen: zwei manuelle Windows-Läufe laut Protokoll (Eigner).

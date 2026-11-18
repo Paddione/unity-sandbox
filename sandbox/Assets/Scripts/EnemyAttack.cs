@@ -59,6 +59,13 @@ public sealed class EnemyAttack : MonoBehaviour
             anim.SetMoving(false);
             return;
         }
+        if (KilnLayout.PlazaSafe(hero.position))
+        {
+            // Fair-fights arrival plaza: hold while the hero orients.
+            CancelWindup();
+            anim.SetMoving(false);
+            return;
+        }
         float dist = PlanarDistance(hero);
         FaceHero(hero);
         if (dist > Range && dist <= AggroRange && windupStart < 0f

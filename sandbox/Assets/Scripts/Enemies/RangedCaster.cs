@@ -29,10 +29,15 @@ public sealed class RangedCaster : MonoBehaviour
     /// <summary>Telegraphed shots fired this run (test seam).</summary>
     public static int ShotsFired;
 
+    /// <summary>True while the windup runs (test seam, drives the orb).</summary>
+    public bool Telegraphing => telegraphStart >= 0f;
+
     float telegraphStart = -1f;
     float lastShot = float.NegativeInfinity;
     Vector3 home;
     bool homeSet;
+    Transform orb;
+    Light glow;
 
     /// <summary>Walking back to the spawn point, hero ignored.</summary>
     public bool Returning { get; private set; }
@@ -64,7 +69,7 @@ public sealed class RangedCaster : MonoBehaviour
         float dist = flat.magnitude;
         if (hero == null || dist > AggroRange || fromHome > LeashRadius + LeashSlack)
         {
-            telegraphStart = -1f;
+            CancelTelegraph();
             if (fromHome > 0.3f) Returning = true;
             return;
         }
@@ -75,10 +80,12 @@ public sealed class RangedCaster : MonoBehaviour
 
         if (telegraphStart >= 0f)
         {
+            GrowTelegraph(now);
             if (now - telegraphStart >= Telegraph)
             {
                 telegraphStart = -1f;
                 lastShot = now;
+                HideTelegraph();
                 Fire(hero);
             }
             return;
@@ -91,7 +98,65 @@ public sealed class RangedCaster : MonoBehaviour
         if (dist < HoldMin) pinned = !Step(-flat.normalized, HoldMin - dist, dt);
         else if (dist > HoldMax) pinned = !Step(flat.normalized, dist - HoldMax, dt);
         if ((inBand || pinned) && now - lastShot >= Cooldown)
+        {
             telegraphStart = now;
+            ShowTelegraph();
+        }
+    }
+
+    void CancelTelegraph()
+    {
+        telegraphStart = -1f;
+        HideTelegraph();
+    }
+
+    /// <summary>Glowing charge orb above the warden: the readable windup (like the lancer line).</summary>
+    void ShowTelegraph()
+    {
+        if (!Application.isPlaying) return;
+        if (orb == null)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            go.name = "WardenTelegraph";
+            Destroy(go.GetComponent<Collider>());
+            go.transform.SetParent(transform, false);
+            go.transform.localPosition = new Vector3(0f, 2f, 0f);
+            var r = go.GetComponent<Renderer>();
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (r != null && shader != null)
+            {
+                var m = new Material(shader) { color = new Color(1f, 0.45f, 0.1f) };
+                m.EnableKeyword("_EMISSION");
+                m.SetColor("_EmissionColor", new Color(1f, 0.4f, 0.08f) * 2f);
+                r.sharedMaterial = m;
+            }
+            glow = go.AddComponent<Light>();
+            glow.type = LightType.Point;
+            glow.color = new Color(1f, 0.5f, 0.15f);
+            glow.range = 6f;
+            glow.intensity = 0f;
+            orb = go.transform;
+        }
+        orb.gameObject.SetActive(true);
+    }
+
+    void GrowTelegraph(float now)
+    {
+        if (orb == null || !orb.gameObject.activeSelf) return;
+        float t = Mathf.Clamp01((now - telegraphStart) / Telegraph);
+        orb.localScale = Vector3.one * Mathf.Lerp(0.25f, 1.1f, t);
+        if (glow != null) glow.intensity = Mathf.Lerp(0f, 3f, t);
+    }
+
+    void HideTelegraph()
+    {
+        if (orb != null) orb.gameObject.SetActive(false);
+        if (glow != null) glow.intensity = 0f;
+    }
+
+    void OnDestroy()
+    {
+        if (orb != null) Destroy(orb.gameObject);
     }
 
     /// <summary>Move toward <paramref name="dir"/>; false when the leash blocks the step.</summary>

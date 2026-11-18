@@ -158,6 +158,7 @@ public sealed class ZoneGate : MonoBehaviour
             return;
         }
         ZoneTravel.TeleportHero(hero, destination);
+        if (targetZone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
         Teleports++;
         if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: targetZone);
         Debug.Log($"[Zone] Gate {gameObject.name} → zone {targetZone} (teleports={Teleports}).");

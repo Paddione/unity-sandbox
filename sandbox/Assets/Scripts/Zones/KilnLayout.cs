@@ -64,4 +64,52 @@ public static class KilnLayout
     // ---- S4 boss ----
     public const string KilnmotherName = "The Kilnmother";
     public static readonly Vector3 KilnmotherPos = KilnOffset + new Vector3(0f, 0.05f, -7.5f);
+
+    // ---- Fair-fights arrival plaza: stand, orient, advance to trigger ----
+    /// <summary>Safe radius around each entry point. The gate arrival and the
+    /// waypoint arrival sit 9 m apart, so the two discs overlap into one
+    /// entrance strip: standing anywhere inside is safe until the hero leaves
+    /// the union, which breaches the latch for this entry (no re-arming
+    /// mid-fight by retreating).</summary>
+    public const float ArrivalPlazaRadius = 5f;
+    /// <summary>Planar distance from the Kiln center beyond which the hero
+    /// counts as gone (no latch change out there).</summary>
+    public const float KilnExtent = 25f;
+
+    static bool plazaBreached;
+
+    /// <summary>Waypoint arrival point (shrine + forward offset, like <see cref="WaypointShrine.Arrival"/>).</summary>
+    public static Vector3 WaypointArrival
+    {
+        get
+        {
+            var pos = Shrines[3].pos;
+            return pos + Vector3.up * 0.5f + Vector3.forward * 2f + Vector3.up * 0.05f;
+        }
+    }
+
+    static bool InPlaza(Vector3 heroPos, Vector3 center)
+    {
+        var d = heroPos - center;
+        d.y = 0f;
+        return d.magnitude <= ArrivalPlazaRadius;
+    }
+
+    /// <summary>True while the hero may stand safely (headless-callable; latches on exit).</summary>
+    public static bool PlazaSafe(Vector3 heroPos)
+    {
+        var fromCenter = heroPos - KilnOffset;
+        fromCenter.y = 0f;
+        if (fromCenter.magnitude > KilnExtent) return false;
+        if (InPlaza(heroPos, KilnArrival) || InPlaza(heroPos, WaypointArrival))
+            return !plazaBreached;
+        plazaBreached = true;
+        return false;
+    }
+
+    /// <summary>Re-arm the plaza (Kiln entry, run reset, headless tests).</summary>
+    public static void ResetPlaza() => plazaBreached = false;
+
+    /// <summary>Test seam: was the plaza left this entry.</summary>
+    public static bool PlazaBreached => plazaBreached;
 }

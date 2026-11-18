@@ -42,6 +42,7 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
         if (!PhaseTwo && hp.HPFraction() <= PhaseTwoFraction) EnterPhaseTwo();
         var hero = Hero();
         if (hero == null) return;
+        if (KilnLayout.PlazaSafe(hero.position)) return; // fair-fights arrival plaza
         var d = hero.position - transform.position;
         d.y = 0f;
         if (d.magnitude > AggroRange) return;

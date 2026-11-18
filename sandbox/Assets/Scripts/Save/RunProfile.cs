@@ -30,6 +30,7 @@ public static class RunProfile
         Stash = new Stash();
         ClassId = ClassCatalog.FenwalkerId;
         Act = new ActProgress();
+        KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

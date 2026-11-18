@@ -40,6 +40,13 @@ public sealed class AshLancer : MonoBehaviour
     /// <summary>State machine step (headless-callable with explicit time).</summary>
     public void Tick(float now, float dt, Transform hero)
     {
+        if (hero != null && KilnLayout.PlazaSafe(hero.position))
+        {
+            // Fair-fights arrival plaza: hold while the hero orients.
+            if (Current == State.Telegraph) ShowLine(false);
+            Current = State.Idle;
+            return;
+        }
         Vector3 flat = hero != null ? hero.position - transform.position : Vector3.zero;
         flat.y = 0f;
         float dist = flat.magnitude;
