@@ -91,4 +91,19 @@ public class KilnConfigTests
         Assert.IsFalse(g.Locked);
         Object.DestroyImmediate(go);
     }
+
+    [Test]
+    public void KilnArrival_IsClearOfEveryThrallAndElitePack()
+    {
+        float clear = EnemyAttack.AggroRange + 1f;
+        for (int v = 0; v < KilnLayout.Variants; v++)
+        {
+            for (int i = 0; i < KilnLayout.ThrallCount; i++)
+                Assert.GreaterOrEqual(Flat(KilnLayout.KilnArrival - KilnLayout.ThrallAnchor(v, i)), clear, $"thrall {i} variant {v}");
+            for (int i = 0; i < KilnLayout.EliteCount; i++)
+                Assert.GreaterOrEqual(Flat(KilnLayout.KilnArrival - KilnLayout.EliteAnchor(v, i)), clear, $"elite {i} variant {v}");
+        }
+    }
+
+    static float Flat(Vector3 d) => new Vector2(d.x, d.z).magnitude;
 }

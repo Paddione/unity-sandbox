@@ -40,8 +40,8 @@ COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 if [ "${AUTOPLAY_SKIP_BUILD:-0}" != 1 ]; then
   # Separate compile session first: building in the session that recompiles
   # changed scripts produced a player with every scene script "missing".
-  bash "$ROOT/scripts/run-unity-build.sh" SandboxBuilder.CompileCheck \
-    "[SandboxBuilder] Compile check OK" 900 "$OUT/compile.log"
+  # unity-warmup.sh also rebinds runtime scripts whose MonoScript lost its class.
+  bash "$ROOT/scripts/unity-warmup.sh" "$OUT"
   echo "run-autoplay: building Linux player -> $PLAYER"
   UNITY_BUILD_EXTRA_ARGS="-buildOut $PLAYER" bash "$ROOT/scripts/run-unity-build.sh" \
     SandboxBuilder.BuildDiabloZoneBuild "DiabloZone build result: Succeeded" 1500 \

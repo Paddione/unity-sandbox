@@ -91,6 +91,14 @@ heartbeat() {
   done
 }
 
+# Warm-up (scripts/unity-warmup.sh): compile outside the test session and
+# rebind runtime scripts whose MonoScript lost its class (Editor/LibraryRepair.cs).
+# Without it a worktree with a copied Library ran EditMode with every scene
+# component null (14 scene tests red, 2026-11-18). Skip: UNITY_TESTS_SKIP_WARMUP=1.
+if [ "${UNITY_TESTS_SKIP_WARMUP:-0}" != 1 ]; then
+  bash "$PWD/scripts/unity-warmup.sh" "$artifacts" || exit 1
+fi
+
 failed=0
 # shellcheck disable=SC2206
 platforms=(${PLATFORMS:-EditMode PlayMode})

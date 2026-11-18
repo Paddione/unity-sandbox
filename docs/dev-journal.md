@@ -496,3 +496,33 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Offene Befunde für Folge-Goals (nicht act-one): Bone Wardens ohne Leine (laufen aus dem Ossuary in den Fen),
   Bone-Warden-Projektile treffen den Helden nie, Kiln-Ankunft zwischen zwei Packs (Playtest).
 
+
+## 2026-11-18 — fix: Warden-Leine, feindliche Projektile, Kiln-Ankunft, ungebundene Skripte
+
+- Done: `RangedCaster` mit Aggro-Radius 14 m und Leine 10 m um den Spawnpunkt. Verlässt der Held den Radius
+  oder wirft ein Rückstoß den Warden über 12 m hinaus, geht er heim und ignoriert den Helden bis dahin. Am
+  Leinenrand bleibt er stehen und schießt weiter. `DiabloProjectile` hat einen feindlichen Modus
+  (`hostile`): sucht Helden mit `PlayerHealth` statt `Husk`-Ziele, fliegt durch Husks, Schaden nach
+  `DifficultyProfile.ScaleDamage`. Bone Wardens und der Fächer des Hollow Abbot schießen feindlich. Vorher
+  trafen beide nie den Helden, ein Warden-Feuerball konnte nur andere Wardens treffen.
+  `KilnLayout.KilnArrival` von (0, 2) auf (13, 13): mindestens 9 m zu jedem Thrall- und Elite-Anker in allen
+  drei Varianten (vorher 4–5 m zwischen den Packs bei 60° und 120°). Projektil-`Destroy` läuft im EditMode
+  über `DestroyImmediate`.
+- Ungeklärter Test-Effekt aus second-class aufgeklärt: In einem Worktree mit aus dem Hauptcheckout kopierter
+  `Library` kompiliert die erste Sitzung manchmal alle Assemblies neu (Refresh 63–67 s statt 16 s). Danach
+  haben die `MonoScript`-Artefakte von `Assets/Scripts` keine Klassenbindung (`GetClass()` = null), Szenen
+  und Prefabs laden ihre Komponenten als null, ohne „missing script“-Warnung, und alle Folgesitzungen erben
+  den Cache: 14 Szenen-Tests rot, `VerifyDiabloZone` rot, Autoplay-Player ohne Helden. Belegt mit
+  Diagnose-Methode (Held mit 11 Null-Komponenten, `DiabloClickController.cs` ohne Klasse). Der
+  `DestroyImmediate`-Test war im damaligen Bisect nicht die Ursache. Abhilfe: `Editor/LibraryRepair.cs`
+  erkennt ungebundene Behaviour-Skripte und reimportiert `Assets/Scripts`, wirksam ab der nächsten Sitzung.
+  `scripts/unity-warmup.sh` wiederholt `SandboxBuilder.CompileCheck`, bis eine Sitzung „scripts bound“
+  meldet, und läuft vor jedem Testlauf (`run-unity-tests.sh`) und jedem Autoplay-Build.
+- Faced: Experimente B–E4 (Compile allein, neue Skripte ohne `.meta`, frische `Library`, fehlende
+  `UserSettings`, Prefab-Reimport) widerlegten je eine Hypothese, bevor die Diagnose die Bindung zeigte.
+  Auch der Reimport in derselben Sitzung reicht nicht, erst die Folgesitzung ist gebunden.
+- Belegt: Endprobe aus vergiftetem Ausgangszustand: Warm-up Sitzung 1 meldet 51 ungebundene Skripte, Sitzung 2
+  gebunden, EditMode 201/201, PlayMode 84/84, `VerifyDiabloZone`, `check-meta`, `KayKitAssets.Verify`. Autoplay 8/8
+  Phasen, 0 Exceptions, schlechtestes Fenster 39,3 fps. Drei spätere Läufe auf demselben Spielcode lagen bei
+  25,0/29,8/25,6 fps, schon in Lantern Hold vor jedem Kampf, während `llama-server` (:1919) 15,6 von 16,3 GB VRAM
+  hielt und die GPU zu 89–91 % auslastete. Eigner hat den 39,3-Lauf als Beleg akzeptiert.

@@ -101,7 +101,7 @@ public sealed class BossController : MonoBehaviour
         {
             var dir = Quaternion.Euler(0f, i * 20f, 0f) * baseDir;
             DiabloProjectile.Spawn(DiabloSkills.Skill.Fireball, from, dir, transform,
-                RangedCaster.ShotDamage, 11f, 18f, 0f);
+                RangedCaster.ShotDamage, 11f, 18f, 0f, hostile: true);
         }
     }
 

@@ -14,7 +14,8 @@ public static class KilnLayout
     public const int EmberLights = 6;
     /// <summary>Ossuary-side gate, east of the apse and clear of the pillar ring.</summary>
     public static readonly Vector3 KilnGatePos = OssuaryOffset + new Vector3(6f, 1f, -13f);
-    public static readonly Vector3 KilnArrival = KilnOffset + new Vector3(0f, 1f, 2f);
+    /// <summary>Arrival in the north-east corner, at least 9 m from every thrall and elite anchor in all variants (was between two packs).</summary>
+    public static readonly Vector3 KilnArrival = KilnOffset + new Vector3(13f, 1f, 13f);
     public static readonly Vector3 KilnReturnPos = KilnOffset + new Vector3(0f, 1f, 10f);
     /// <summary>Back in the Ossuary 8 m clear of the Kiln gate (no bounce).</summary>
     public static readonly Vector3 OssuaryReturnArrival = OssuaryOffset + new Vector3(6f, 1f, -5f);

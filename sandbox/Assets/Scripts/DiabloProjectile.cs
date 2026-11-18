@@ -5,7 +5,9 @@ using UnityEngine;
 /// distance math against "Husk"-tagged <see cref="EnemyHealth"/> objects (same
 /// rule as melee, no trigger physics); solid scene colliders stop it. A
 /// fireball explodes on impact and damages every husk in its blast radius,
-/// an arrow damages the first husk it reaches.
+/// an arrow damages the first husk it reaches. A hostile projectile (Bone
+/// Warden, Hollow Abbot) targets heroes with <see cref="PlayerHealth"/>
+/// instead and never damages husks.
 /// </summary>
 public sealed class DiabloProjectile : MonoBehaviour
 {
@@ -33,6 +35,12 @@ public sealed class DiabloProjectile : MonoBehaviour
     /// <summary>Visual-only copy (co-op mirror of another player's cast): never deals damage.</summary>
     public bool cosmetic;
 
+    /// <summary>Enemy-fired: hits heroes (PlayerHealth), passes through husks.</summary>
+    public bool hostile;
+
+    /// <summary>Hostile projectile hits on a hero this run (test seam).</summary>
+    public static int HeroHits;
+
     /// <summary>Seconds an arrow stays stuck in a wall after impact.</summary>
     public const float StuckArrowSeconds = 3f;
 
@@ -41,7 +49,8 @@ public sealed class DiabloProjectile : MonoBehaviour
     /// SkillArtBuilder); a primitive stands in when the asset is missing.
     /// </summary>
     public static DiabloProjectile Spawn(DiabloSkills.Skill kind, Vector3 origin, Vector3 dir,
-        Transform owner, int damage, float speed, float range, float blastRadius, bool cosmetic = false)
+        Transform owner, int damage, float speed, float range, float blastRadius, bool cosmetic = false,
+        bool hostile = false)
     {
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = Vector3.forward;
@@ -78,6 +87,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         p.blastRadius = blastRadius;
         p.knockback = fire ? 0.9f : lantern ? 0.2f : 0.3f;
         p.cosmetic = cosmetic;
+        p.hostile = hostile;
         Launched++;
         return p;
     }
@@ -86,7 +96,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     static GameObject LanternShape()
     {
         var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Object.Destroy(go.GetComponent<Collider>());
+        Despawn(go.GetComponent<Collider>());
         go.transform.localScale = Vector3.one * 0.32f;
         Tint(go, new Color(1f, 0.92f, 0.6f));
         var light = go.AddComponent<Light>();
@@ -100,7 +110,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     static GameObject FallbackShape(bool fire)
     {
         var go = GameObject.CreatePrimitive(fire ? PrimitiveType.Sphere : PrimitiveType.Cube);
-        Object.Destroy(go.GetComponent<Collider>());
+        Despawn(go.GetComponent<Collider>());
         if (fire)
         {
             go.transform.localScale = Vector3.one * 0.45f;
@@ -119,13 +129,28 @@ public sealed class DiabloProjectile : MonoBehaviour
         return go;
     }
 
-    void Update()
+    void Update() => Step(Time.deltaTime);
+
+    /// <summary>Advance one frame (headless-callable with explicit dt).</summary>
+    public void Step(float dt)
     {
         if (done) return;
-        float step = speed * Time.deltaTime;
+        float step = speed * dt;
         if (step <= 0f) return;
         Vector3 from = transform.position;
         Vector3 to = from + direction * step;
+
+        if (hostile)
+        {
+            var hero = FirstHeroOnSegment(from, to, out float heroT);
+            float wall = WallDistance(from, step);
+            if (hero != null && heroT <= wall) { Impact(hero.transform.position, hero.gameObject); return; }
+            if (wall < step) { Impact(from + direction * wall, null); return; }
+            transform.position = to;
+            travelled += step;
+            if (travelled >= maxRange) Fizzle();
+            return;
+        }
 
         var husk = FirstHuskOnSegment(from, to, out float huskT);
         float wallT = WallDistance(from, step);
@@ -182,7 +207,31 @@ public sealed class DiabloProjectile : MonoBehaviour
         return best;
     }
 
-    /// <summary>Distance to the first solid non-husk collider ahead (MaxValue when clear).</summary>
+    /// <summary>Nearest hero (PlayerHealth) whose planar distance to the segment is within HitRadius.</summary>
+    static PlayerHealth FirstHeroOnSegment(Vector3 from, Vector3 to, out float alongDist)
+    {
+        alongDist = float.MaxValue;
+        PlayerHealth best = null;
+        Vector3 a = Flat(from), b = Flat(to);
+        Vector3 ab = b - a;
+        float len = ab.magnitude;
+        if (len < 0.0001f) return null;
+        Vector3 dir = ab / len;
+        foreach (var hero in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            Vector3 p = Flat(hero.transform.position);
+            float t = Mathf.Clamp(Vector3.Dot(p - a, dir), 0f, len);
+            if ((a + dir * t - p).magnitude > HitRadius) continue;
+            if (t < alongDist)
+            {
+                alongDist = t;
+                best = hero;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>Distance to the first solid non-husk, non-hero collider ahead (MaxValue when clear).</summary>
     float WallDistance(Vector3 from, float step)
     {
         var hits = Physics.RaycastAll(from, direction, step, ~0, QueryTriggerInteraction.Ignore);
@@ -192,6 +241,7 @@ public sealed class DiabloProjectile : MonoBehaviour
             var t = h.collider.transform;
             if (owner != null && (t == owner || t.IsChildOf(owner))) continue;
             if (h.collider.CompareTag("Husk") || h.collider.GetComponentInParent<EnemyHealth>() != null) continue;
+            if (h.collider.GetComponentInParent<PlayerHealth>() != null) continue;
             if (h.distance < best) best = h.distance;
         }
         return best;
@@ -202,7 +252,12 @@ public sealed class DiabloProjectile : MonoBehaviour
         done = true;
         Impacts++;
         Vector3 origin = owner != null ? owner.position : point - direction;
-        if (blastRadius > 0f)
+        if (hostile)
+        {
+            if (!cosmetic) HurtHeroes(point, directHit);
+            if (blastRadius > 0f) SpawnBlast(point, blastRadius);
+        }
+        else if (blastRadius > 0f)
         {
             if (!cosmetic)
             {
@@ -227,18 +282,33 @@ public sealed class DiabloProjectile : MonoBehaviour
             transform.position = point - direction * 0.3f;
             var trail = GetComponent<TrailRenderer>();
             if (trail != null) trail.emitting = false;
-            Destroy(gameObject, StuckArrowSeconds);
+            Despawn(gameObject, StuckArrowSeconds);
             return;
         }
         ReleaseParticles();
-        Destroy(gameObject);
+        Despawn(gameObject);
+    }
+
+    /// <summary>Hostile impact: the struck hero, plus every hero in the blast radius.</summary>
+    void HurtHeroes(Vector3 point, GameObject directHit)
+    {
+        int dmg = DifficultyProfile.Current.ScaleDamage(damage);
+        foreach (var hero in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            bool hit = hero.gameObject == directHit
+                || (blastRadius > 0f && (Flat(hero.transform.position) - Flat(point)).magnitude <= blastRadius);
+            if (!hit) continue;
+            hero.TakeDamage(dmg);
+            HeroHits++;
+            if (Application.isPlaying) DiabloJuice.OnPlayerHurt(hero.transform.position, dmg);
+        }
     }
 
     void Fizzle()
     {
         done = true;
         ReleaseParticles();
-        Destroy(gameObject);
+        Despawn(gameObject);
     }
 
     /// <summary>Detach trail particles so they fade out instead of popping.</summary>
@@ -249,7 +319,7 @@ public sealed class DiabloProjectile : MonoBehaviour
             if (ps.main.simulationSpace != ParticleSystemSimulationSpace.World) continue;
             ps.transform.SetParent(null, true);
             ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            Destroy(ps.gameObject, ps.main.startLifetime.constantMax + 0.1f);
+            Despawn(ps.gameObject, ps.main.startLifetime.constantMax + 0.1f);
         }
     }
 
@@ -262,8 +332,16 @@ public sealed class DiabloProjectile : MonoBehaviour
         var go = Object.Instantiate(prefab, at, Quaternion.identity);
         go.name = "FireballBlast";
         go.AddComponent<BlastLight>();
-        Destroy(go, 2f);
+        Despawn(go, 2f);
         return go;
+    }
+
+    /// <summary>Destroy in play mode, DestroyImmediate in edit mode (headless EditMode tests).</summary>
+    static void Despawn(Object o, float delay = 0f)
+    {
+        if (o == null) return;
+        if (Application.isPlaying) Object.Destroy(o, delay);
+        else Object.DestroyImmediate(o);
     }
 
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
@@ -280,6 +358,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     {
         Launched = 0;
         Impacts = 0;
+        HeroHits = 0;
     }
 
     /// <summary>Short-lived expanding fire burst with a light flash.</summary>
@@ -293,7 +372,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         public static GameObject Spawn(Vector3 at, float radius)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Object.Destroy(go.GetComponent<Collider>());
+            Despawn(go.GetComponent<Collider>());
             go.name = "FireballBlast";
             go.transform.position = at;
             go.transform.localScale = Vector3.one * 0.3f;
@@ -314,7 +393,7 @@ public sealed class DiabloProjectile : MonoBehaviour
             float k = Mathf.Clamp01(age / Life);
             transform.localScale = Vector3.one * Mathf.Lerp(0.3f, radius * 2f, k);
             if (flash != null) flash.intensity = Mathf.Lerp(6f, 0f, k);
-            if (k >= 1f) Destroy(gameObject);
+            if (k >= 1f) Despawn(gameObject);
         }
     }
 

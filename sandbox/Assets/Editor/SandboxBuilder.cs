@@ -1373,10 +1373,15 @@ public static class SandboxBuilder
     /// Compile-only pass for scripts/run-autoplay.sh. A player build in the same
     /// batch session that first recompiles changed scripts shipped a scene whose
     /// MonoBehaviours were all "missing" (2026-11-18); compiling in a separate
-    /// session first avoids that.
+    /// session first avoids that. The session also rebinds runtime scripts whose
+    /// MonoScript lost its class (<see cref="LibraryRepair"/>), the cause behind
+    /// those "missing" scripts.
     /// </summary>
-    public static void CompileCheck() =>
+    public static void CompileCheck()
+    {
+        LibraryRepair.EnsureScriptsBound();
         Debug.Log("[SandboxBuilder] Compile check OK");
+    }
 
     static string BuildOutArg()
     {
