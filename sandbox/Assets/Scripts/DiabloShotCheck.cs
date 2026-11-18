@@ -134,6 +134,36 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield return Shot("level_up_settled");
         }
 
+        // 7) Lantern Hold town framing (S3): wide view over camp + vendor.
+        hero.distance = 16f;
+        yield return Wait(0.5f);
+        yield return Shot("town_lantern_hold");
+
+        // 8) Vendor trade window (S3 seam: runtime DiabloVendorUI panel).
+        var vendorUI = hero.GetComponent<DiabloVendorUI>();
+        if (vendorUI == null) vendorUI = hero.gameObject.AddComponent<DiabloVendorUI>();
+        vendorUI.SetOpen(true);
+        yield return Wait(0.5f);
+        yield return Shot("vendor_open");
+        vendorUI.SetOpen(false);
+        yield return Wait(0.3f);
+
+        // 9) Character sheet (S4 seam: DiabloCharacterUI, C panel).
+        var charUI = hero.GetComponent<DiabloCharacterUI>();
+        if (charUI == null) charUI = hero.gameObject.AddComponent<DiabloCharacterUI>();
+        charUI.SetOpen(true);
+        yield return Wait(0.5f);
+        yield return Shot("character_open");
+        charUI.SetOpen(false);
+        yield return Wait(0.3f);
+
+        // S5 TODO (follow-up pass after the rebase, S5 objects do not exist
+        // in this basis): Ossuary root wide shot (OssuaryBuilder area),
+        // Bone Warden at range (RangedCaster), The Hollow Abbot phase 2
+        // (BossController summons + projectile fan), SessionComplete overlay.
+        // Shot names (reserved): ossuary_arrival, bone_warden, abbot_phase2,
+        // session_complete.
+
         hero.distance = baseDist;
         hero.pitch = basePitch;
         DiabloClickController.ExternalDrive = false;

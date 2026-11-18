@@ -210,7 +210,7 @@ serialisieren sich über den Projekt-Lock (Exit 3). Alle anderen Stufen laufen s
 | S3 town+vendor | S2 | 15 % | landed 2026-11-18 |
 | S4 progression | S2 | 15 % | landed 2026-11-18 |
 | S5 zone2+boss | S3, S4 | 25 % | landed 2026-11-18 |
-| S6 proof | S5 | 20 % | offen |
+| S6 proof | S5 | 20 % | in Arbeit (Basis ohne S5, 2026-11-18) |
 
 ### Definition of Done je Stufe
 

@@ -18,11 +18,18 @@ crypt seal against a cold fen-night haze.
 - Playable greybox scene with code-owned Third-Person controller (Q1)
 - One mechanics question answered per prototype (kill/pivot/continue logged)
 - Trigger toy + toy-vs-goal loop in the same greybox scene (Q2/Q3)
+- Cinderreach session loop (S1–S4, Q9-Basis): Lantern Hold hub (campfire
+  heal, vendor trade for gold, potion via key 1) → Ashen Fen clear (10 husks
+  + Fen Brute, Ash Elite + chest) → loot/rarity chase (Magic/Rare/Unique) →
+  attribute + skill-point progression with Cleave (R) → Fen Gate extraction;
+  scripted proof via `-autoplay`, full loop proof after S5 (Ossuary + boss)
 
 ## Should-haves
 
 - Headless verify (`SandboxBuilder.VerifyGreybox`) green on every scene change
 - Linux player build runs the scene with zero errors
+- Save/continue: `cinderreach-save.json` (v=1, atomic tmp+rename, autosave on
+  level-up + vendor close + quit), corrupt → `*.corrupt` backup + restart
 
 ## Could-haves
 

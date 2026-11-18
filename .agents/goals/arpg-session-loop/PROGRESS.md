@@ -60,9 +60,19 @@ Prozent: 80 %
   Verkauf 25 %, Heiltrank-Stack `Consumable` Taste 1). `DiabloVendorUI` (zwei Spalten Vendor/Bag,
   Gold-Anzeige, HD-Scaler, Klick-Sperre, Schluss → `SaveService.SaveNow`).
 
+- 2026-11-18: S6 proof, Basis-Teil ohne S5 (kein Prozent, bleibt 55 %).
+  `Scripts/SessionAutoplay.cs` (neu, `-autoplay` inert ohne Flag, Gott-Cheat nur
+  `-autoplay-god` im Log ausgewiesen): Wegpunkte Lantern Hold, Kampf per Melee + Q/E,
+  Trank-Kauf über S3-Seam `VendorStock.BuyPotion`, Fen Gate als Seam-Name; Ossuary-Root,
+  `ZoneGate`, Bone Warden, The Hollow Abbot, `SessionComplete` als markierte Seams für den
+  S5-Folgepass. `DiabloShotCheck` + Town/Vendor-UI/Character-UI (+ S5-Shot-TODOs).
+  Docs: Q9 in `mechanics-questions.md`, `decision-log.md` (continue Basis),
+  `one-page-gdd.md` (finaler Stand S1–S4), Run-Log `docs/session-loop-run-log.md`.
+
 ## Nächste Schritte
 
-1. S5 zone2+boss nach S3+S4 (S3+S4 gelandet 2026-11-18). Danach S6 proof.
+1. S5 zone2+boss nach S3+S4 (S3+S4 gelandet 2026-11-18). Danach S6-Folgepass
+   (Ossuary-/Boss-Beine + Windows-Shots, dann S6 auf landed setzen).
 
 - 2026-11-18: S5 zone2+boss gelandet.
   Belege: EditMode 89/89 (neu `OssuaryConfigTests`: Boss-Tuning 150 HP/XP 120,

@@ -220,6 +220,29 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Learned: Boss-Tod gehört `EnemyHealth` (Loot/XP-Seams bleiben konsistent); der Controller pollt
   nur die Fraktion im selben Frame vor dem Deferred-Destroy und öffnet den Abschluss — kein
   Doppel-Loot, kein Eingriff in fremde Dateien.
-- Belegt: EditMode 89/89, PlayMode 71/71, `VerifyDiabloZone` OK
-  (`root=True fen=True ret=True casters=8 elites=2 boss=True`, `husks=21`), `KayKitAssets.Verify` grün
-  (Dungeon 211, Adventurers 6, Skeletons 4), `check-meta.py` OK. Nächste: S6 (proof).
+- Next: S6-Folgepass nach S5-Rebase (Ossuary-/Boss-Beine, S5-Shots, Q9 erneut belegen).
+## 2026-11-18 — S6 proof, Basis-Teil ohne S5 (SessionAutoplay + Shotcheck + Docs)
+
+- Done: `Scripts/SessionAutoplay.cs` (neu, `-autoplay` inert ohne Flag; Wegpunkte
+  Campfire/Vendor/Tor-Pfeiler, Kampf per `DiabloMelee` + Q/E-Skills, Trank-Kauf über
+  S3-Seam `VendorStock.BuyPotion`, Fen-Gate-Marsch; Ossuary-Root, `ZoneGate`, Bone
+  Warden, The Hollow Abbot, `SessionComplete` als benannte S5-Seams mit SKIPPED-Log;
+  Cheat nur `-autoplay-god`, im Log ausgewiesen; Phasen- + Exception-Zähler, Exit 0/1).
+  `DiabloShotCheck` + `town_lantern_hold`, `vendor_open`, `character_open`
+  (+ S5-Shot-TODOs); Docs: Q9 (`mechanics-questions.md`), Q9-`continue (Basis)`
+  (`decision-log.md`), `one-page-gdd.md` (S1–S4-Stand), `docs/session-loop-run-log.md`;
+  `tasks.md` → S6 `in Arbeit (Basis ohne S5)`, PROGRESS bei 55 % + Basis-Eintrag.
+- Faced: erster Autoplay-Lauf meldete `kills~0` bei 12 echten Kills — der Zähler las eine
+  bereits zerstörte Husk-Referenz statt Vorher/Nachher zu vergleichen; auf
+  `CountHusks`-Differenz umgestellt, neu gebaut, Neulauf `kills=12`. Windows-Shots
+  zeigten das Vendor-Panel schon im Town-Shot (Öffnungszustand aus dem Shot-Ablauf,
+  kein Produktfehler).
+- Learned: `BuildDiabloZoneBuild` schreibt absolut nach `~/unity-sandbox/builds/` —
+  aus dem Worktree gebaut landet das Artefakt im Hauptcheckout (git-ignored, ok);
+  `xvfb-run` trägt den Linux-Player headless mit 0 Exceptions.
+- Belegt: EditMode 83/83, PlayMode 69/69, `VerifyDiabloZone` OK
+  (`player=True husks=10 … palisade=15 torches=4 net=True`), `KayKitAssets.Verify`
+  grün, `check-meta.py` OK; Linux-`-autoplay`-Lauf Exit 0, 0 Exceptions;
+  Windows stage + shotcheck OK (18 Shots, 3 neue visuell geprüft).
+- Next: Orchestrator rebased S5 → Folgepass (Ossuary-/Boss-Beine, S5-Shots,
+  Q9-Verdikt erneut belegen, S6 auf landed).

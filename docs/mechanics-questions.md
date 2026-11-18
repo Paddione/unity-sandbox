@@ -103,3 +103,24 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Husks schlagen zurück (0,4-s-Telegraph per Ducken, 1/2 Schaden, 1,5 s Cooldown); Tod → Respawn am Camp mit vollem HP. Kein Corpse-Run, keine Damage-Numbers, kein Screenshake (nicht D2).
 - Exit criterion: `VerifyDiabloZone` grün, EditMode + PlayMode grün, Windows-GPU-Playtest mit Ein-Satz-Verdikt.
 - Headless proof: `VerifyDiabloZone` inventory + Suiten grün (dieser Branch).
+
+## Q9 — Trägt die Session-Schleife? (S6, Basis-Teil ohne S5)
+
+- Question: trägt die Cinderreach-Session-Schleife (Lantern Hold → Ashen Fen
+  clearen → Loot/Gold → Vendor → Punkte vergeben → Fen Gate) als beweisbarer
+  Lauf, bevor Ossuary + Boss dazukommen?
+- Setup: `Scripts/SessionAutoplay.cs` (`-autoplay`, inert ohne Flag):
+  geskripteter Held (Wegpunkte Campfire/Vendor/Tor-Pfeiler, Kampf per
+  `DiabloMelee` + Q/E-Skills, Trank-Kauf über S3-Seam `VendorStock.BuyPotion`,
+  Marsch zum Fen-Gate-`GoalPad`); Cheat nur `-autoplay-god` (HP-Refill,
+  im Log ausgewiesen). Ossuary-/Boss-Beine sind klar markierte Seams
+  (Namen aus dem Plan: Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow
+  Abbot, `SessionComplete`-Overlay) und laufen im S5-Folgepass.
+- Exit criterion: Linux-Player-Lauf mit `-autoplay` über
+  `scripts/run-unity-build.sh`, 0 Exceptions (Zähler im Log), Exit-Code 0;
+  `DiabloShotCheck` um Town-, Vendor-UI- und Character-UI-Shots erweitert
+  (Ossuary/Boss/Shots als Seam-TODO); Entscheidung als Q9 continue/pivot/kill.
+- Headless proof: `docs/session-loop-run-log.md` (dieser Branch).
+- Windows: `stage-windows.sh` → `shotcheck-windows.sh`, PNGs prüfen und im
+  Run-Log verlinken — falls Windows-Stage auf Linux nicht möglich, im Journal
+  vermerken (kein Fake-Grün).
