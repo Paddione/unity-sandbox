@@ -488,3 +488,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   jetzt beide Ausgänge gepinnt. Shotcheck starb im Kiln ohne Lebenssicherung.
 - Learned: Ankunft im Kiln mitten zwischen zwei Packs ist ein Balance-Befund für den Playtest.
 
+## 2026-11-18 — cinderreach-act-one 100 %
+
+- Live-Dispatch 44288445907 grün mit drei Läufen durch den Kiln, `G-DIABLO01`–`06` achieved.
+- Faced: `G-DIABLO06` meldete nach der Routenerweiterung „Dauer > 1,5× Median“, weil der Median aus Läufen der
+  alten, kürzeren Route stammte. dotfiles `e6463e03`: Basis nur aus vollständigen Läufen der aktuellen Route.
+- Offene Befunde für Folge-Goals (nicht act-one): Bone Wardens ohne Leine (laufen aus dem Ossuary in den Fen),
+  Bone-Warden-Projektile treffen den Helden nie, Kiln-Ankunft zwischen zwei Packs (Playtest).
+

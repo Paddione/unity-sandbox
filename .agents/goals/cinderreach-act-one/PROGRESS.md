@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-one
 
-Prozent: 95 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -40,10 +40,27 @@ Prozent: 95 %
   FPS-Fenster 36,5/36,9/38,6. Shots `26_kiln_entrance`, `27_thrall_pack`, `28_kilnmother_phase2`,
   `29_act_one_complete`. Run-Log `docs/act-one-run-log.md`.
 
+- 2026-11-18: Live-Beleg. dotfiles `023ac60b` (acht Pflichtphasen, Kiln-Skripte in `G-DIABLO02`) und `e6463e03`
+  (Dauer-Basis nur aus vollständigen Läufen der aktuellen Route; die alte Route ohne Kiln hätte jeden neuen Lauf rot
+  gemacht). Dispatch https://github.com/Paddione/unity-sandbox/actions/runs/44288445907 grün: Normal 170 s,
+  Kindled 350 s, Lanternbearer 175 s, je 8/8 Phasen, `actOneComplete`, FPS-Minimum 37,8/41,2/35,0.
+  Live: `G-DIABLO01`–`06` achieved.
+
+Kriterien-Abgleich:
+1. Cinder Kiln als eigener Szenenbereich mit Cinder Thrall, Ash Lancer und The Kilnmother (zwei Phasen):
+   `VerifyDiabloZone`/`VerifyKiln`, `KilnEnemyConfigTests`, `KilnmotherLoopTests`.
+2. Freischaltkette Abbot → Kiln → Kilnmother → Akt I, Save/Load: `ActProgressTests`, `KilnmotherLoopTests`.
+3. Wegpunkte zwischen Lantern Hold und allen freigeschalteten Zonen: `WaypointTests` (EditMode statt PlayMode),
+   Autoplay reist Kiln → Lantern Hold.
+4. Seeds, Affixe, Kindled im Kiln: drei Anker-Varianten über `LayoutSeeder`, Kindled-Kilnmother 576 statt 320 HP.
+5. Nächtlicher Autoplay bis zum Akt-Boss, FPS-Gate grün: Dispatch oben, `G-DIABLO06` achieved.
+6. Windows-Build gestaged, Shots `26_kiln_entrance`, `27_thrall_pack`, `28_kilnmother_phase2`, `29_act_one_complete`.
+
 ## Nächste Schritte
 
-1. dotfiles `G-DIABLO06` (acht Phasen) landen, Nachtlauf dispatchen, Live-Probe prüfen, dann 100 %.
+- Keine. Offen laut `.agents/goals/ROADMAP.md`: `cinderreach-coop-session`, `cinderreach-presentation`;
+  bewusst offen: Eigner-Playtest, Steam-Build.
 
 ## Offene Punkte
 
-- S5 offen.
+Keine.
