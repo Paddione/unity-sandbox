@@ -42,6 +42,8 @@ public sealed class CharacterSheet
     public int wispsRank;
     public int haloRank;
     public int veilRank;
+    // Tank slam (party-roles S2).
+    public int slamRank;
 
     /// <summary>True while any point is unspent (drives the UI pulse).</summary>
     public bool HasUnspent => freeAttributePoints > 0 || freeSkillPoints > 0;
@@ -79,6 +81,7 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.Wisps: return wispsRank;
             case DiabloSkills.Skill.SearingHalo: return haloRank;
             case DiabloSkills.Skill.VeilStep: return veilRank;
+            case DiabloSkills.Skill.SeismicSlam: return slamRank;
             default: return 0;
         }
     }
@@ -96,6 +99,7 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.Wisps: wispsRank++; break;
             case DiabloSkills.Skill.SearingHalo: haloRank++; break;
             case DiabloSkills.Skill.VeilStep: veilRank++; break;
+            case DiabloSkills.Skill.SeismicSlam: slamRank++; break;
             default: return false;
         }
         freeSkillPoints--;
@@ -156,13 +160,14 @@ public sealed class CharacterSheet
         new SkillRankEntry { skill = DiabloSkills.Skill.Wisps.ToString(), rank = wispsRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.SearingHalo.ToString(), rank = haloRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.VeilStep.ToString(), rank = veilRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.SeismicSlam.ToString(), rank = slamRank },
     };
 
     /// <summary>Import ranks from a save (unknown/missing skills stay 0).</summary>
     public void FromEntries(List<SkillRankEntry> entries)
     {
         fireballRank = arrowRank = cleaveRank = 0;
-        lanternBoltRank = wispsRank = haloRank = veilRank = 0;
+        lanternBoltRank = wispsRank = haloRank = veilRank = slamRank = 0;
         if (entries == null) return;
         foreach (var e in entries)
         {
@@ -177,6 +182,7 @@ public sealed class CharacterSheet
                 case "Wisps": wispsRank = rank; break;
                 case "SearingHalo": haloRank = rank; break;
                 case "VeilStep": veilRank = rank; break;
+                case "SeismicSlam": slamRank = rank; break;
             }
         }
     }

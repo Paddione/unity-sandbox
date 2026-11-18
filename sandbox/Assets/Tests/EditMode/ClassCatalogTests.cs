@@ -38,8 +38,8 @@ public class ClassCatalogTests
     {
         var f = ClassCatalog.Fenwalker;
         CollectionAssert.AreEqual(
-            new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave }, f.skills);
-        CollectionAssert.AreEqual(new[] { "Q", "E", "R" }, f.keys);
+            new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave, DiabloSkills.Skill.SeismicSlam }, f.skills);
+        CollectionAssert.AreEqual(new[] { "Q", "E", "R", "Space" }, f.keys);
         Assert.AreEqual(1f, f.focusSkillFactor);
         Assert.AreEqual(1f, f.strengthMeleeFactor);
         Assert.AreEqual("Adventurers/Characters/Knight.fbx", f.modelPath);

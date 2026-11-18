@@ -51,6 +51,19 @@ public sealed class EnemyAttack : MonoBehaviour
     float lastStrike = float.NegativeInfinity;
     Vector3 baseScale;
 
+    /// <summary>Stun expiry (party-roles S2 tank slam): stunned husks hold still and never strike.</summary>
+    float stunnedUntil = float.NegativeInfinity;
+
+    /// <summary>True while a tank slam stuns this husk.</summary>
+    public bool IsStunned => Time.time < stunnedUntil;
+
+    /// <summary>Stun for seconds (keeps the longest running stun).</summary>
+    public void Stun(float seconds)
+    {
+        if (seconds <= 0f) return;
+        stunnedUntil = Mathf.Max(stunnedUntil, Time.time + seconds);
+    }
+
     void Awake()
     {
         baseScale = transform.localScale;
@@ -74,6 +87,13 @@ public sealed class EnemyAttack : MonoBehaviour
         var hero = AcquireHero();
         if (hero == null)
         {
+            CancelWindup();
+            anim.SetMoving(false);
+            return;
+        }
+        if (IsStunned)
+        {
+            // Tank slam: hold still, cancel any windup, never strike while stunned.
             CancelWindup();
             anim.SetMoving(false);
             return;
@@ -258,11 +278,24 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>
     /// S2 co-op targeting: nearest living hero (replaces name-based "Player"
     /// lookup; the cached victim is kept only while still alive).
+    /// Party-roles S2: the highest-threat living source wins first, so the
+    /// tank slam pulls aggro; an empty table keeps the old nearest logic, so
+    /// solo play without any threat behaves exactly like before.
     /// Runs locally on every peer for movement; the server owns hero-to-enemy
     /// damage via HitValidator, enemy-to-hero stays per-client HP.
     /// </summary>
     public Transform AcquireHero()
     {
+        var table = GetComponent<ThreatTable>();
+        if (table != null)
+        {
+            var top = table.TopSource();
+            if (top != null)
+            {
+                victim = top;
+                return top;
+            }
+        }
         if (victim != null)
         {
             var php = victim.GetComponent<PlayerHealth>();

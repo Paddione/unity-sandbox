@@ -16,9 +16,10 @@ public sealed class DiabloSkills : MonoBehaviour
 {
     /// <summary>
     /// Explicit values: co-op sends skills as int (DiabloNetworkPlayer), so
-    /// existing values never move; Lanternbearer skills append (second-class S1).
+    /// existing values never move; Lanternbearer skills append (second-class S1),
+    /// party-role skills append after them (party-roles S2: SeismicSlam).
     /// </summary>
-    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6 }
+    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6, SeismicSlam = 7 }
 
     [Header("Fireball (Q)")]
     public int fireballDamage = 3;
@@ -58,6 +59,15 @@ public sealed class DiabloSkills : MonoBehaviour
     public float veilDistance = 6f;
     public float veilCooldown = 5f;
     public const float VeilHeroRadius = 0.35f;
+
+    [Header("Tank slam (party-roles S2, Fenwalker)")]
+    public int slamDamage = 3;
+    public float slamRadius = 3.5f;
+    public float slamCooldown = 8f;
+    /// <summary>How long slammed husks hold still (bosses use their own controller, unaffected).</summary>
+    public float slamStunSeconds = 2f;
+    /// <summary>No knockback: the tank holds the line, slammed husks stay in reach.</summary>
+    public float slamKnockback = 0f;
 
     /// <summary>
     /// Burning-halo window for the wick-of-the-halo Wisp priority
@@ -234,6 +244,7 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.Wisps: return wispCooldown;
             case Skill.SearingHalo: return haloCooldown;
             case Skill.VeilStep: return veilCooldown;
+            case Skill.SeismicSlam: return slamCooldown;
             default: return cleaveCooldown;
         }
     }
@@ -299,6 +310,7 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.LanternBolt: return lanternBoltDamage;
             case Skill.Wisps: return wispDamage;
             case Skill.SearingHalo: return haloDamage;
+            case Skill.SeismicSlam: return slamDamage;
             default: return 0;
         }
     }
@@ -344,6 +356,14 @@ public sealed class DiabloSkills : MonoBehaviour
             var relay = NetworkManager.Singleton;
             if (netPlayer != null && netPlayer.IsSpawned && relay != null && relay.IsListening)
                 netPlayer.BroadcastCast((int)s, origin, dir);
+            return true;
+        }
+
+        if (s == Skill.SeismicSlam)
+        {
+            DoSlam(cosmetic: false);
+            var at = transform.position + Vector3.up * LaunchHeight;
+            BroadcastIfNetworked(s, at, dir);
             return true;
         }
 
@@ -439,6 +459,55 @@ public sealed class DiabloSkills : MonoBehaviour
         light.range = haloRadius * 2f;
         light.intensity = 4f;
         Destroy(ring, 0.6f);
+    }
+
+    /// <summary>
+    /// Seismic Slam (tank specialty, party-roles S2): shockwave around the
+    /// tank — every husk inside <see cref="slamRadius"/> takes the blow, holds
+    /// still for <see cref="slamStunSeconds"/> and books
+    /// <see cref="ThreatTable.SlamThreatBonus"/> threat on top of the damage,
+    /// so aggro swings to the tank. No knockback: the tank holds the line.
+    /// Cosmetic mirrors only spawn the visual, never damage, stun or threat.
+    /// </summary>
+    public int DoSlam(bool cosmetic)
+    {
+        int hits = 0;
+        if (!cosmetic)
+        {
+            ExitBowStance();
+            var driver = GetComponent<DiabloAnimator>();
+            if (driver != null) driver.OnStrike();
+            int blow = EffectiveDamage(Skill.SeismicSlam);
+            foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+            {
+                if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
+                var to = husk.transform.position - transform.position;
+                to.y = 0f;
+                if (to.magnitude > slamRadius) continue;
+                ApplyHit(husk, blow, transform.position, slamKnockback, transform);
+                ThreatTable.BookStun(husk, transform);
+                var atk = husk.GetComponent<EnemyAttack>();
+                if (atk != null) atk.Stun(slamStunSeconds);
+                hits++;
+            }
+            DiabloAudio.PlayWhoosh();
+        }
+        SpawnSlamVisual();
+        PresentationVfx.CleaveArc(transform.position, slamRadius);
+        return hits;
+    }
+
+    void SpawnSlamVisual()
+    {
+        if (!Application.isPlaying) return;
+        var go = new GameObject("SeismicSlam");
+        go.transform.position = transform.position + Vector3.up * 0.2f;
+        var light = go.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(0.7f, 0.6f, 0.5f);
+        light.range = slamRadius * 2f;
+        light.intensity = 3f;
+        Destroy(go, 0.4f);
     }
 
     /// <summary>
@@ -552,6 +621,7 @@ public sealed class DiabloSkills : MonoBehaviour
             return null;
         }
         if (s == Skill.SearingHalo) { DoHalo(cosmetic: true); return null; }
+        if (s == Skill.SeismicSlam) { DoSlam(cosmetic: true); return null; }
         if (s == Skill.Wisps) { SummonWisps(cosmetic: true); return null; }
         if (s == Skill.VeilStep) { SpawnVeilPuff(origin); return null; }
         return Launch(s, origin, dir, cosmetic: true);
@@ -612,6 +682,9 @@ public sealed class DiabloSkills : MonoBehaviour
         var health = target.GetComponent<EnemyHealth>();
         if (health == null) return;
         damage = DiabloJuice.RollCrit(attacker, damage, out bool crit);
+        // Party threat (S2): local + client-prediction booking; the server books
+        // authoritative threat when it applies damage (HitValidator, S5 wiring).
+        ThreatTable.BookDamage(target, attacker, damage);
         var nm = NetworkManager.Singleton;
         var netObj = target.GetComponent<NetworkObject>();
         if (nm != null && nm.IsListening && !nm.IsServer && netObj != null && netObj.IsSpawned)
@@ -683,6 +756,7 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.LanternBolt: return "Lantern Bolt";
             case Skill.Wisps: return "Wisps";
             case Skill.SearingHalo: return "Searing Halo";
+            case Skill.SeismicSlam: return "Seismic Slam";
             default: return "Veil Step";
         }
     }

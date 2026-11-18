@@ -29,9 +29,9 @@ public class ClassSheetUiTests
     [Test]
     public void Ranks_SaveAllSevenAndKeepTheOtherClass()
     {
-        var sheet = new CharacterSheet { fireballRank = 2, cleaveRank = 1, lanternBoltRank = 3, wispsRank = 4, haloRank = 1, veilRank = 2 };
+        var sheet = new CharacterSheet { fireballRank = 2, cleaveRank = 1, lanternBoltRank = 3, wispsRank = 4, haloRank = 1, veilRank = 2, slamRank = 3 };
         var entries = sheet.ToEntries();
-        Assert.AreEqual(7, entries.Count);
+        Assert.AreEqual(8, entries.Count);
         var back = new CharacterSheet();
         back.FromEntries(entries);
         Assert.AreEqual(2, back.fireballRank);
@@ -40,6 +40,7 @@ public class ClassSheetUiTests
         Assert.AreEqual(4, back.GetRank(DiabloSkills.Skill.Wisps));
         Assert.AreEqual(1, back.GetRank(DiabloSkills.Skill.SearingHalo));
         Assert.AreEqual(2, back.GetRank(DiabloSkills.Skill.VeilStep));
+        Assert.AreEqual(3, back.GetRank(DiabloSkills.Skill.SeismicSlam));
     }
 
     [Test]

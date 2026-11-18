@@ -14,8 +14,8 @@ public static class ClassCatalog
     public static readonly ClassDefinition Fenwalker = new ClassDefinition(
         FenwalkerId, "Fenwalker",
         "Sword, bow and fire. Cleaves through husk packs, holds the line.",
-        new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave },
-        new[] { "Q", "E", "R" },
+        new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave, DiabloSkills.Skill.SeismicSlam },
+        new[] { "Q", "E", "R", "Space" },
         1f, 1f, "Adventurers/Characters/Knight.fbx",
         ClassDefinition.PartyRole.Tank, 1f);
 
