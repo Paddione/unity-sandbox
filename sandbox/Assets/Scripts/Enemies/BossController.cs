@@ -126,6 +126,13 @@ public sealed class BossController : MonoBehaviour
         return d.magnitude;
     }
 
+    /// <summary>Hero object for the session screen (death-dispatch path).</summary>
+    public GameObject HeroObject()
+    {
+        var h = AcquireHero();
+        return h != null ? h.gameObject : null;
+    }
+
     Transform AcquireHero()
     {
         var solo = GameObject.Find("Player");

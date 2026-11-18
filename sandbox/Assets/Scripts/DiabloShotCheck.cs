@@ -157,18 +157,71 @@ public sealed class DiabloShotCheck : MonoBehaviour
         charUI.SetOpen(false);
         yield return Wait(0.3f);
 
-        // S5 TODO (follow-up pass after the rebase, S5 objects do not exist
-        // in this basis): Ossuary root wide shot (OssuaryBuilder area),
-        // Bone Warden at range (RangedCaster), The Hollow Abbot phase 2
-        // (BossController summons + projectile fan), SessionComplete overlay.
-        // Shot names (reserved): ossuary_arrival, bone_warden, abbot_phase2,
-        // session_complete.
+        // 10) Sunken Ossuary arrival (S5): teleport the hero through the
+        // FenGate destination like ZoneGate.Teleport does, wide shot.
+        var ossuaryGate = GameObject.Find(ZoneGate.FenGateName);
+        if (ossuaryGate == null || ossuaryGate.GetComponent<ZoneGate>() == null)
+        {
+            Log("FAIL no FenGate with ZoneGate for the ossuary leg");
+            Quit(2);
+            yield break;
+        }
+        TeleportHero(hero, ossuaryGate.GetComponent<ZoneGate>().destination);
+        hero.distance = 18f;
+        yield return Wait(1.0f);
+        yield return Shot("ossuary_arrival");
+
+        // 11) Bone Warden at range (S5 RangedCaster, hold band 6-8 m).
+        var warden = GameObject.Find("Bone Warden");
+        if (warden == null)
+        {
+            Log("FAIL no Bone Warden found");
+            Quit(2);
+            yield break;
+        }
+        Face(hero, warden.transform.position - hero.transform.position);
+        hero.distance = 8f;
+        hero.pitch = 40f;
+        yield return Wait(1.2f); // let the 0.6 s telegraph play
+        yield return Shot("bone_warden");
+
+        // 12) The Hollow Abbot phase 2 (S5 BossController: summons + fan).
+        var boss = GameObject.Find(BossController.BossName);
+        if (boss == null)
+        {
+            Log("FAIL no Hollow Abbot found");
+            Quit(2);
+            yield break;
+        }
+        TeleportHero(hero, boss.transform.position + new Vector3(0f, 0f, 5f));
+        Face(hero, boss.transform.position - hero.transform.position);
+        var bossCtl = boss.GetComponent<BossController>();
+        if (bossCtl != null) bossCtl.EnterPhaseTwo();
+        hero.distance = 10f;
+        yield return Wait(1.0f);
+        yield return Shot("abbot_phase2");
+
+        // 13) SessionComplete overlay (S5 end screen, shown on boss death;
+        // here opened directly as the visual proof — the gameplay proof is
+        // the autoplay boss kill in docs/session-loop-run-log.md).
+        SessionComplete.Show(hero.gameObject, BossController.LastBossDrop);
+        yield return Wait(0.5f);
+        yield return Shot("session_complete");
 
         hero.distance = baseDist;
         hero.pitch = basePitch;
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);
+    }
+
+    static void TeleportHero(DiabloClickController hero, Vector3 pos)
+    {
+        var cc = hero.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        hero.transform.position = pos;
+        if (cc != null) cc.enabled = true;
+        hero.SetDestination(pos);
     }
 
     static void Face(DiabloClickController hero, Vector3 dir)

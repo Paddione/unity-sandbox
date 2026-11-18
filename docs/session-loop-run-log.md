@@ -43,7 +43,7 @@ S5-Beine (Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow Abbot,
 - S5-Shots (`ossuary_arrival`, `bone_warden`, `abbot_phase2`,
   `session_complete`) als reservierte Namen + TODO im `DiabloShotCheck`.
 
-## Suiten / Verify (finaler Stand)
+## Suiten / Verify (Basis-Stand vor S5-Rebase)
 
 - `scripts/run-unity-tests.sh`: EditMode **83/83**, PlayMode **69/69**.
 - `SandboxBuilder.VerifyDiabloZone`: OK
@@ -51,3 +51,38 @@ S5-Beine (Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow Abbot,
   „ashen fen + loot + netcode present“).
 - `KayKitAssets.Verify`: grün.
 - `python3 scripts/check-meta.py`: OK.
+
+## Voller Session-Lauf (Linux-Player, `-autoplay -autoplay-god`, S5+S6, 2026-11-18)
+
+- Build: `SandboxBuilder.BuildDiabloZoneBuild` → Succeeded (117 MB).
+- Lauf: `xvfb-run -a ./diablo-zone -autoplay -autoplay-god`, Timeout 590 s.
+- Ergebnis: **Exit-Code 0, 0 Exceptions** (`/tmp/s6-autoplay-full.log`).
+- Phasen (`[Autoplay]`): `town_waypoints` (Campfire → Vendor → ZGatePillar_0) →
+  `vendor_potion` (`bought=True`, Gold 100 → 90) → `combat_fen` clear (kills=12:
+  10 Husks + Fen Brute + Ash Elite) → `gate_FenGate` (teleports=1,
+  zoneSaved=True, expectZone=2) → `combat_ossuary` (kills=0 in der Leash —
+  Wardens außerhalb 80-m-Radius, fallen in der Boss-Phase) → `boss`
+  (bossKills=1, phaseTwo=1, Drop „Rare+ boss cache“) → Overlay
+  (`SessionComplete`, Zeit 73 s, Kills 17, Gold 103) → `gate_OssuaryGate`
+  (teleports=1, zoneSaved=True, expectZone=1).
+- `DONE phases=7 huskKills=13 bossKills=1 phaseTwo=1 overlay=1 exceptions=0`.
+- Ehrliche Grenze: Ossuary-Clear findet in der 80-m-Leash keine Ziele
+  (kills=0 dort); Wardens + Summons sterben im Boss-Kampf. Kein Fake-Grün:
+  Zähler stehen so im Log. Follow-up: Leash/Anmarsch der Wardens.
+
+## Shotcheck Vollpass (Windows-Stage, 2026-11-18)
+
+- Build: `SandboxBuilder.BuildDiabloZoneWindows` → Succeeded (118 MB).
+- Stage: `scripts/stage-windows.sh` → OK (`Games\cinderreach`, 147 MB;
+  `cinderreach_Data` frisch, Launcher-Exe unverändert).
+- Shots: 22 (`15`–`18` Basis + neu `19_ossuary_arrival.png`,
+  `20_bone_warden.png` (Telegraph läuft), `21_abbot_phase2.png`
+  (Summons + Fächer), `22_session_complete.png`), Größen 520–590 KB
+  (echte Renders, keine Leerbilder).
+
+## Suiten / Verify (finaler Stand)
+
+- `scripts/run-unity-tests.sh`: EditMode **89/89**, PlayMode **71/71**.
+- `SandboxBuilder.VerifyDiabloZone`: OK (`root=True fen=True ret=True
+  casters=8 elites=2 boss=True`, `husks=21`).
+- `KayKitAssets.Verify`: grün. `python3 scripts/check-meta.py`: OK.

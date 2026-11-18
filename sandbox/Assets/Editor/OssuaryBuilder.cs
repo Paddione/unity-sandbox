@@ -66,8 +66,10 @@ public static class OssuaryBuilder
         }
 
         // Gates: FenGate in town (GoalPad-Nähe) → Ossuary; return gate back.
+        // Arrival lands 8 m clear of the return gate: identical coordinates
+        // bounced arrivals straight back to town (unreachable ossuary).
         SpawnGate(ZoneGate.FenGateName, new Vector3(0f, 1f, -6f),
-            OssuaryOffset + new Vector3(0f, 1f, 10f), 2);
+            OssuaryOffset + new Vector3(0f, 1f, 2f), 2);
         var ret = SpawnGate(ZoneGate.OssuaryGateName, OssuaryOffset + new Vector3(0f, 1f, 10f),
             new Vector3(0f, 1f, -4f), 1);
         ret.transform.SetParent(root.transform, true);
@@ -127,9 +129,9 @@ public static class OssuaryBuilder
         husk.transform.position = pos;
         husk.transform.localScale = Vector3.one * scale;
         husk.AddComponent<NetworkObject>();
-        var health = husk.AddComponent<EnemyHealth>();
-        health.SetTier(hp, tier);
-        health.corpseModel = prefab;
+        var casterHealth = husk.AddComponent<EnemyHealth>();
+        casterHealth.SetTier(hp, tier);
+        casterHealth.corpseModel = prefab; // host-safe corpse path (feel contract, like fen husks)
         husk.AddComponent<RangedCaster>();
         husk.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
         SandboxBuilder.WireHuskAnimator(husk);
@@ -159,7 +161,7 @@ public static class OssuaryBuilder
         boss.AddComponent<NetworkObject>();
         var health = boss.AddComponent<EnemyHealth>();
         health.SetTier(BossController.BossMaxHP, LootTier.Boss);
-        health.corpseModel = prefab;
+        health.corpseModel = prefab; // host-safe corpse path (feel contract, like fen husks)
         boss.AddComponent<BossController>();
         boss.AddComponent<EnemyAttack>().damage = 3;
         SandboxBuilder.WireHuskAnimator(boss);

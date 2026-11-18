@@ -100,6 +100,10 @@ public sealed class EnemyHealth : MonoBehaviour
         DiabloProgression.AwardKill(tier, transform.position);
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();
+        // Bosses must bookkeep on death, not on the next Update poll: the
+        // deferred Destroy can win the race and skip the overlay forever.
+        var boss = GetComponent<BossController>();
+        if (boss != null) boss.OnBossDeath(boss.HeroObject());
         DiabloCorpse.SpawnFrom(gameObject);
         var netObj = GetComponent<NetworkObject>();
         var nm = NetworkManager.Singleton;

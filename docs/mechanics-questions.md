@@ -104,23 +104,22 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Exit criterion: `VerifyDiabloZone` grün, EditMode + PlayMode grün, Windows-GPU-Playtest mit Ein-Satz-Verdikt.
 - Headless proof: `VerifyDiabloZone` inventory + Suiten grün (dieser Branch).
 
-## Q9 — Trägt die Session-Schleife? (S6, Basis-Teil ohne S5)
+## Q9 — Trägt die Session-Schleife? (S6 Vollpass mit S5: JA → continue)
 
 - Question: trägt die Cinderreach-Session-Schleife (Lantern Hold → Ashen Fen
-  clearen → Loot/Gold → Vendor → Punkte vergeben → Fen Gate) als beweisbarer
-  Lauf, bevor Ossuary + Boss dazukommen?
+  clearen → Loot/Gold → Vendor → Punkte vergeben → Fen Gate → Ossuary →
+  Boss → Abschluss) als beweisbarer Lauf?
 - Setup: `Scripts/SessionAutoplay.cs` (`-autoplay`, inert ohne Flag):
-  geskripteter Held (Wegpunkte Campfire/Vendor/Tor-Pfeiler, Kampf per
-  `DiabloMelee` + Q/E-Skills, Trank-Kauf über S3-Seam `VendorStock.BuyPotion`,
-  Marsch zum Fen-Gate-`GoalPad`); Cheat nur `-autoplay-god` (HP-Refill,
-  im Log ausgewiesen). Ossuary-/Boss-Beine sind klar markierte Seams
-  (Namen aus dem Plan: Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow
-  Abbot, `SessionComplete`-Overlay) und laufen im S5-Folgepass.
-- Exit criterion: Linux-Player-Lauf mit `-autoplay` über
-  `scripts/run-unity-build.sh`, 0 Exceptions (Zähler im Log), Exit-Code 0;
-  `DiabloShotCheck` um Town-, Vendor-UI- und Character-UI-Shots erweitert
-  (Ossuary/Boss/Shots als Seam-TODO); Entscheidung als Q9 continue/pivot/kill.
-- Headless proof: `docs/session-loop-run-log.md` (dieser Branch).
-- Windows: `stage-windows.sh` → `shotcheck-windows.sh`, PNGs prüfen und im
-  Run-Log verlinken — falls Windows-Stage auf Linux nicht möglich, im Journal
-  vermerken (kein Fake-Grün).
+  geskripteter Held (Wegpunkte, Kampf per `DiabloMelee` + Q/E/R-Skills,
+  Trank-Kauf über S3-Seam, FenGate↔OssuaryGate über `ZoneGate`,
+  Bone-Warden-Kampf, Hollow-Abbot-Kampf Phase 1/2, `SessionComplete`-Overlay,
+  Rückweg); Cheat nur `-autoplay-god` (im Log ausgewiesen).
+- Exit criterion: Linux-Player-Lauf `-autoplay` Exit-Code 0, 0 Exceptions,
+  `bossKills=1`, `overlay=1` — erfüllt (`DONE phases=7 huskKills=13
+  bossKills=1 phaseTwo=1 overlay=1 exceptions=0`, `/tmp/s6-autoplay-full.log`);
+  `DiabloShotCheck` mit 22 Shots inkl. Ossuary/Boss/Overlay.
+- Headless proof: `docs/session-loop-run-log.md` (Vollpass-Abschnitt).
+- Windows: `stage-windows.sh` → `shotcheck-windows.sh` OK, PNGs 19–22 geprüft.
+- Grenze: Ossuary-Leash findet keine Ziele (Folgepass Leash/Anmarsch).
+
+- Historie: Basis-Teil ohne S5 (Seams) siehe Git-Historie dieser Datei.

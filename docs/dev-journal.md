@@ -246,3 +246,23 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Windows stage + shotcheck OK (18 Shots, 3 neue visuell geprüft).
 - Next: Orchestrator rebased S5 → Folgepass (Ossuary-/Boss-Beine, S5-Shots,
   Q9-Verdikt erneut belegen, S6 auf landed).
+
+## 2026-11-18 — S6 proof Vollpass (Ossuary/Boss-Beine, Orchestrator-Übernahme)
+
+- Done: S5-Folgepass aus dem S6-Worktree (Muse-Harness verweigerte 2× den
+  Follow-up mit `tool_choice`-Fehler; Übernahme nach Retry-Budget): `SessionAutoplay`
+  spielt die ganze Schleife (Fen → FenGate → Ossuary → Boss → Rückweg),
+  `DiabloShotCheck` mit 4 S5-Shots, Boss-Tod-Race gefixt (`OnBossDeath` im
+  `EnemyHealth`-Tod statt Poll — Deferred-Destroy gewann sonst), Gate-Bounce
+  gefixt (Ankunft 8 m frei vom Rückweg-Tor), `D2FeelTests` Boss-Tier-3-Schaden.
+- Belegt: Linux-`-autoplay`-Vollpass Exit 0, 0 Exceptions,
+  `DONE phases=7 huskKills=13 bossKills=1 phaseTwo=1 overlay=1`;
+  Windows stage OK + 22 Shots (19–22 neu, echte Renders);
+  EditMode 89/89, PlayMode 71/71, beide Verifies grün, `check-meta.py` OK.
+- Faced: Controller-LFS-Drift nach jedem Editor-Lauf (revertiert wie S3/S5);
+  Windows-Exe unverändert (nur `cinderreach_Data` frisch — normal, Launcher stabil);
+  Ossuary-Leash findet keine Ziele (kills=0 dort, Wardens fallen im Boss-Kampf) —
+  ehrlich im Run-Log vermerkt, Follow-up Leash/Anmarsch außerhalb dieses Plans.
+- Learned: Retry-Budget diszipliniert einhalten (2 Fehlversuche → Übernahme
+  statt drittem Dispatch); Riesen-Logzeilen (`grep -a`, Größen statt `cat`).
+- Nächste: dotfiles G-DIABLO02-Vertrag (Ossuary/Boss-Prefade), dann 100 %.

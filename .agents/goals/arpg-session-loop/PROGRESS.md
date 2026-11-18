@@ -1,6 +1,6 @@
 # Progress: arpg-session-loop
 
-Prozent: 80 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -71,8 +71,8 @@ Prozent: 80 %
 
 ## Nächste Schritte
 
-1. S5 zone2+boss nach S3+S4 (S3+S4 gelandet 2026-11-18). Danach S6-Folgepass
-   (Ossuary-/Boss-Beine + Windows-Shots, dann S6 auf landed setzen).
+1. Erledigt: alle Stufen S1–S6 gelandet (S6-Vollpass 2026-11-18). Danach nur
+   dotfiles-Anteile (G-DIABLO02-Vertrag für Ossuary/Boss-Prefabs).
 
 - 2026-11-18: S5 zone2+boss gelandet.
   Belege: EditMode 89/89 (neu `OssuaryConfigTests`: Boss-Tuning 150 HP/XP 120,
@@ -92,6 +92,18 @@ Prozent: 80 %
   `SessionComplete` (Zeit/Kills/Gold/Beste Beute, Buttons Town/Menü, HD-Scaler).
   Fix nebenbei: Button-Label als Child-Text (AddComponent<Text> auf Button-Objekt
   warf NRE in EditMode). Controller-LFS-Drift revertiert (Diablo/Husk/VendorIdle).
+
+- 2026-11-18: S6 proof gelandet (Vollpass mit S5, 20 % → 100 %).
+  Belege: Linux-`-autoplay`-Vollpass Exit 0, 0 Exceptions,
+  `DONE phases=7 huskKills=13 bossKills=1 phaseTwo=1 overlay=1`
+  (`/tmp/s6-autoplay-full.log`); Windows stage OK (`Games\cinderreach`),
+  22 Shots inkl. `ossuary_arrival`/`bone_warden`/`abbot_phase2`/
+  `session_complete`; EditMode 89/89, PlayMode 71/71, `VerifyDiabloZone` grün
+  (`casters=8 elites=2 boss=True`, `husks=21`), `KayKitAssets.Verify` grün,
+  `check-meta.py` ohne Befund. Q9 → **continue** (`decision-log.md`).
+  Fixes: Boss-Tod-Race (`OnBossDeath` im Tod statt Poll), Gate-Bounce
+  (Ankunft 8 m frei), D2Feel Boss-Tier-Schaden 3. Grenze: Ossuary-Leash
+  kills=0 (Wardens fallen im Boss-Kampf) — im Run-Log vermerkt.
 
 ## Offene Punkte
 
