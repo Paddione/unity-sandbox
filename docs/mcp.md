@@ -156,3 +156,32 @@ unity status --until-ready --project-path ~/unity-sandbox/sandbox --format json
 `unity command` listing answers again). Keep-alive vs build-lock stays a
 standing conflict: batch builds/tests stop the service first (trap-guarded,
 see `scripts/run-unity-build.sh` and `scripts/run-unity-tests.sh`).
+
+## Multi-session use (shared editor, 2026-11-18)
+
+One headless Editor (`unity-sandbox-editor.service`, project
+`~/unity-sandbox/sandbox`) serves every session at once. Each harness
+spawns its own `relay_linux --mcp --project-path …` shim; the Editor's
+bridge accepts all of them concurrently (verified: two parallel shims,
+7 tools + `Unity_GetConsoleLogs` each). Tool execution serializes on the
+Unity main thread, so reads are safe in parallel and mutating calls
+effectively queue — coordinate scene edits between sessions.
+
+Rules that keep it alive:
+
+- Never start a second Editor on `sandbox/` and never pin a shim with
+  `--instance-id` (a dead PID hangs `tools/list`); `--project-path`
+  discovery finds the current Editor.
+- Builds/tests in the main checkout pause MCP: the wrappers stop the
+  editor and restart it after. All wrappers serialize on
+  `flock /tmp/unity-sandbox-editor.lock`, so concurrent runs queue
+  instead of interleaving stop/start (196 starts in one day left it dead
+  before this). After a build, open sessions may need an MCP restart to
+  re-discover the new Editor PID.
+- Worktree builds/tests never touch the shared service — they target
+  their own project copy.
+- If `tools/list` hangs after an Editor restart, run
+  `bash scripts/unity-mcp-cleanup.sh` (removes `/tmp/unity-mcp-*`
+  sockets and connection records whose Editor PID is dead; 404 stale
+  entries removed at setup), restart the service, and re-check with
+  `unity status --until-ready`.

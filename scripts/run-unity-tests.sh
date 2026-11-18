@@ -4,7 +4,12 @@
 # Discipline transferred from run-unity-build.sh:
 #  - stops unity-sandbox-editor.service for the run and restarts it after
 #    (trap-guarded); a second editor otherwise trips the project lock and
-#    `unity test` refuses projects that are open in an Editor;
+#    `unity test` refuses projects that are open in an Editor; only a run
+#    in the main checkout manages that shared service — worktree runs
+#    leave it (and every MCP session on it) alone;
+#  - serializes all builds/tests machine-wide via flock on
+#    /tmp/unity-sandbox-editor.lock (shared with run-unity-build.sh), so
+#    concurrent sessions queue instead of leaving the shared editor dead;
 #  - refuses to start when another Unity holds this project (exit 3);
 #    only a stale lockfile (no live holder) is removed;
 #  - hard timeout per platform (default 1500 s): exit 2 on hang (timeout 124),
@@ -41,8 +46,14 @@ live_holders() {
   echo "$holders"
 }
 
+# Machine-wide editor lock: queue behind any build/test (see header).
+exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
+echo "run-unity-tests: waiting for the machine-wide editor lock..."
+flock 9
+echo "run-unity-tests: editor lock acquired."
+
 SERVICE_STOPPED=0
-if systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
+if [ "$project" = "$HOME/unity-sandbox/sandbox" ] && systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
   echo "run-unity-tests: stopping $SERVICE for the run."
   systemctl --user stop "$SERVICE" || true
   SERVICE_STOPPED=1

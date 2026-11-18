@@ -14,7 +14,11 @@
 #    only a stale lockfile (no live holder) is removed;
 #  - stops unity-sandbox-editor.service for the build and restarts it after
 #    (trap-guarded), so the warm editor can neither block nor race the build
-#    over Library/;
+#    over Library/; only a build of the main checkout manages that shared
+#    service — worktree builds leave it (and every MCP session on it) alone;
+#  - serializes all builds/tests machine-wide via flock on
+#    /tmp/unity-sandbox-editor.lock, so concurrent sessions queue instead
+#    of interleaving stop/start and leaving the shared editor dead;
 #  - pins job worker threads (-job-worker-count, default 10 of 12 cores);
 #  - prints a heartbeat line every 60 s (elapsed + last progress line);
 #  - hard timeout (default 1500 s): kills stragglers, clears the lock,
@@ -54,11 +58,22 @@ live_holders() {
   echo "$holders"
 }
 
+# --- 0. Machine-wide build lock ----------------------------------------------
+# All editor-owning runs (builds + tests, any checkout) queue on one flock.
+# Without it, concurrent sessions interleave stop/start of the shared editor
+# service and the last trap leaves it dead for every MCP client.
+exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
+echo "run-unity-build: waiting for the machine-wide editor lock..."
+flock 9
+echo "run-unity-build: editor lock acquired."
+
 # --- 1. Warm-editor service -------------------------------------------------
 # Stop first: the keep-warm editor otherwise trips the lock gate on every run
 # and races the build over Library/ (3 h single-thread spin observed).
+# Only the main checkout owns that service; a worktree build targets its own
+# project copy and must not evict MCP sessions from the shared editor.
 SERVICE_STOPPED=0
-if systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
+if [ "$PROJECT" = "$HOME/unity-sandbox/sandbox" ] && systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
   echo "run-unity-build: stopping $SERVICE for the build."
   systemctl --user stop "$SERVICE"
   SERVICE_STOPPED=1
