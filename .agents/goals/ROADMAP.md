@@ -12,5 +12,7 @@ und gilt für alle Pläne.
 | 3a | `cinderreach-coop-session` | #1 100 %, besser nach #2 | Co-op-Parität, Direkt-Join WSL ↔ Windows (Relay optional) | G-DIABLO02/03/06 |
 | 3b | `cinderreach-presentation` | #1 100 % (parallel zu 3a) | Licht, Audio, VFX, Menü, 60 FPS @1080p Windows | G-DIABLO02/05/06 |
 | 4 | `cinderreach-replayability` | #1 und #2 100 % | Kindled-Stufe, Layout-Seeds, Affixe, Stash | G-DIABLO02/03/06 |
+| 5 | `cinderreach-act-one` | #4 100 % | Zone 3, Akt-Boss, Akt-Freischaltkette, Wegpunkte | G-DIABLO02/03/06 |
+| 6 | `cinderreach-second-class` | #2 100 % (parallel zu #5) | Zweite Klasse, Skill-Baum, Klassenwahl, Save-Migration | G-DIABLO02/03/06 |
 
-Bewusst offen (kein Goal angelegt): Eigner-/5-Personen-Playtest, dritte Zone, zweite Klasse, Steam-Build.
+Bewusst offen (kein Goal angelegt): Eigner-/5-Personen-Playtest, Steam-Build.
