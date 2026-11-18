@@ -1,0 +1,60 @@
+name: Autoplay Nightly
+
+# cinderreach-loop-guard S2: nightly full-session autoplay on the licensed
+# self-hosted runner. Result JSON is kept as artifact (14 days) and copied to
+# ~/unity-sandbox-autoplay/<YYYY-MM-DD>/ on the host, which the dotfiles
+# health probe G-DIABLO06 reads (30-day local retention).
+
+on:
+  schedule:
+    # 03:30 Europe/Berlin in winter (CET = UTC+1).
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-autoplay
+  cancel-in-progress: false
+
+jobs:
+  autoplay:
+    name: Session autoplay (Linux player, WSLg GPU)
+    runs-on: [self-hosted, Linux, X64, unity-licensed]
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository with Git LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          persist-credentials: false
+
+      - name: Build and run autoplay
+        id: run
+        run: |
+          OUT="artifacts/autoplay/$(date +%F)-${GITHUB_RUN_ID}"
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          bash scripts/run-autoplay.sh "$OUT"
+
+      - name: Copy result to host store
+        if: always() && steps.run.outputs.out != ''
+        env:
+          RUN_OUT: ${{ steps.run.outputs.out }}
+        run: |
+          DEST="$HOME/unity-sandbox-autoplay/$(date +%F)"
+          if [ -d "$DEST" ] && [ -f "$DEST/autoplay-result.json" ]; then
+            DEST="$DEST-${GITHUB_RUN_ID}"
+          fi
+          mkdir -p "$DEST"
+          cp -a "$RUN_OUT/." "$DEST/" || true
+          ls -la "$DEST"
+          find "$HOME/unity-sandbox-autoplay" -mindepth 1 -maxdepth 1 -type d -mtime +30 -print -exec rm -rf {} +
+
+      - name: Upload autoplay artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: autoplay-${{ github.run_id }}
+          path: artifacts/autoplay
+          retention-days: 14
