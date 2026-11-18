@@ -1,6 +1,6 @@
 # PROGRESS — unity-diablo-d2-combat-feel
 
-Prozent: 80 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -14,14 +14,20 @@ Prozent: 80 %
 - 3 Targets via Wrapper gebaut, Server deployed (Join-Smoke: connect +
   clean disconnect, 0 Exceptions, Log ruhig), Windows-Build gestaged.
 
+- 2026-11-18: Eigner hat den Playtest als Erfolg abgeschlossen
+  (Anweisung „als Erfolg abschließen") — Erfolgskriterium 5 damit erfüllt,
+  keine erfundenen Feel-Details protokolliert. Stand beim Close: HEAD
+  `6a33815` (zone-contracts S1+S2, Szenen-Regen mit Contract-Board;
+  D2-Feel-Dateien unberührt), Unity-Tests-Run `44343327121` lief,
+  Vor-HEAD `0eccf67` CI-grün.
+
 ## Nächste Schritte
 
-- Windows-GPU-Playtest mit Ein-Satz-Verdikt (Erfolgskriterium 5),
-  dann erst 100 %.
+Keine.
 
 ## Offene Punkte
 
-- Live-Playtest steht aus (Erfolgskriterium 5); ohne ihn kein 100-%-Abschluss.
+Keine (Playtest per Eigner-Entscheid erfolgreich — kein ausstehender Beleg mehr).
 - Sound-Asset-Frage ist entschieden (synth statt Dateien) — kein offener Punkt mehr.
 - Follow-ups (nicht dieser Goal-Cut): Corpses, Vendoren/Trank/Gold,
   Damage-Numbers (explizit nicht-D2), Screenshake, Coop-Sync-Feeling,
