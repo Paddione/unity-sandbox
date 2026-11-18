@@ -50,6 +50,11 @@ Protokollschritt 1 prüft zusätzlich: `PROGRESS.md` von `cinderreach-replayabil
 7. Nachtrag S1 (2026-11-18): Save wurde v4 (v2 replayability, v3 second-class). `ActProgress` lebt in
    `RunProfile.Act`; `zoneReached` bleibt als letzte betretene Zone erhalten.
 
+8. Nachtrag S2 (2026-11-18): Kein Volume-Profil (`LightingBuilder` aus presentation fehlt); Stimmung über
+   sechs Glut-Punktlichter und emissive Ofenöffnungen. Kein `WorldArtBuilder`-Eintrag, Props aus Primitiven und
+   KayKit. Konstanten in `Scripts/Zones/KilnLayout.cs` (Tests sehen keine Editor-Skripte). Der Tor-Hinweis bekommt
+   sein `TextMesh` zur Laufzeit (Szenen-Vertrag: nur URP-Lit-Materialien).
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -122,7 +127,7 @@ S1 zuerst (Save-Format und Freischaltkette). S2 nach S1. S3 und S4 nach S2, unte
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
 | S1 act-save | Startbedingung | 15 % | landed 2026-11-18 |
-| S2 kiln-world | S1 | 20 % | offen |
+| S2 kiln-world | S1 | 20 % | landed 2026-11-18 |
 | S3 kiln-enemies | S2 | 20 % | offen |
 | S4 kilnmother | S2 | 25 % | offen |
 | S5 waypoints+proof | S3, S4 | 20 % | offen |

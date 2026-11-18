@@ -10,6 +10,16 @@ public sealed class ZoneGate : MonoBehaviour
 {
     public const string FenGateName = "FenGate";
     public const string OssuaryGateName = "OssuaryGate";
+    // act-one S2: Ossuary → Cinder Kiln (locked until the Abbot falls) and back.
+    public const string KilnGateName = "KilnGate";
+    public const string KilnReturnGateName = "KilnReturnGate";
+    public const string LockedHintName = "GateHint";
+
+    /// <summary>Gate leads into a zone the act has not opened yet.</summary>
+    public bool Locked => !RunProfile.Act.IsUnlocked(targetZone);
+
+    /// <summary>Gates refused because the target zone was locked (test seam).</summary>
+    public static int Refusals;
 
     /// <summary>Teleport destination (set by the builder).</summary>
     public Vector3 destination;
@@ -113,12 +123,40 @@ public sealed class ZoneGate : MonoBehaviour
         if (other != null) EndDwell(other.gameObject);
     }
 
-    void Update() => TickDwell(Time.time);
+    void Update()
+    {
+        RefreshHint();
+        TickDwell(Time.time);
+    }
+
+    /// <summary>Locked-gate hint follows the act state (headless-callable).</summary>
+    public void RefreshHint()
+    {
+        var hint = transform.Find(LockedHintName);
+        if (hint == null) return;
+        if (Application.isPlaying && hint.GetComponent<TextMesh>() == null)
+        {
+            var tm = hint.gameObject.AddComponent<TextMesh>();
+            tm.text = KilnLayout.LockedHint;
+            tm.anchor = TextAnchor.MiddleCenter;
+            tm.alignment = TextAlignment.Center;
+            tm.characterSize = 0.5f;
+            tm.fontSize = 48;
+            tm.color = new Color(1f, 0.7f, 0.35f);
+        }
+        if (hint.gameObject.activeSelf != Locked) hint.gameObject.SetActive(Locked);
+    }
 
     /// <summary>Move the hero, stamp the zone and autosave (headless-callable).</summary>
     public void Teleport(GameObject hero)
     {
         if (hero == null) return;
+        if (Locked)
+        {
+            Refusals++;
+            Debug.Log($"[Zone] Gate {gameObject.name} is locked (zone {targetZone}).");
+            return;
+        }
         var cc = hero.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
         hero.transform.position = destination;
@@ -130,5 +168,9 @@ public sealed class ZoneGate : MonoBehaviour
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
-    public static void ResetRun() => Teleports = 0;
+    public static void ResetRun()
+    {
+        Teleports = 0;
+        Refusals = 0;
+    }
 }

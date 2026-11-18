@@ -608,6 +608,7 @@ public static class SandboxBuilder
         TownBuilder.SpawnVendor();
         TownBuilder.SpawnStashChest();
         OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
+        KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)
@@ -1185,6 +1186,7 @@ public static class SandboxBuilder
     {
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
         OssuaryBuilder.VerifyOssuary(scene); // S5: annex, gates, casters, boss
+        KilnBuilder.VerifyKiln(scene); // act-one S2: zone 3, locked gate
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, wallet = false, health = false, ui = false, starterSword = false;
         bool vendor = false, vui = false;

@@ -460,3 +460,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Belegt: EditMode 174/174, PlayMode 80/80, Verifies, Autoplay grün mit `[Act] Cinder Kiln unlocked.`
 - Next: S2 Cinder Kiln (Welt).
 
+## 2026-11-18 — cinderreach-act-one S2 kiln-world
+
+- Done: Cinder Kiln als Szenenbereich, gesperrtes Kiln-Tor mit Hinweis, Rücktor, Verify.
+- Belegt: EditMode 177/177, PlayMode 80/80, `VerifyDiabloZone` inkl. Kiln, Autoplay 6/6.
+- Faced: Tests referenzierten `KilnBuilder` (Editor-Assembly) → Konstanten nach `KilnLayout`; `TextMesh` im
+  Szenenbau brach den URP-Lit-Vertrag → Text zur Laufzeit.
+- Next: S3 Gegner, S4 Kilnmother.
+
