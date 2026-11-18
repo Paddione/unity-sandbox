@@ -420,3 +420,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   im eigenen Test (7 statt 8 Punkte).
 - Next: S4 Klassenwahl und Items.
 
+## 2026-11-18 — cinderreach-second-class S4 select+items
+
+- Done: Klassen-Optik per Re-Skin, Co-op-Klassen-Sync, Start-Overlay zur Klassenwahl, klassengebundene Waffen,
+  gewichtete Waffen-Drops, Laternen-Unique.
+- Belegt: EditMode 168/168, PlayMode 80/80, Verify `classLook=True`, Autoplay Fenwalker grün, Lanternbearer
+  ohne Exceptions.
+- Faced: Overlay am Szenen-Helden wäre beim Netzwerk-Takeover verschwunden und hätte die Steuerung gesperrt;
+  das Overlay ist ein eigenes Objekt und löst den Helden beim Klick auf.
+- Next: S5 Beweis.
+

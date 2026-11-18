@@ -11,9 +11,40 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     /// <summary>Scene-local name every solo lookup uses (husks, target bar, pickups).</summary>
     public const string HeroName = "Player";
 
+    /// <summary>
+    /// Owner's class index into <see cref="ClassCatalog.All"/> (second-class S4):
+    /// mirrors render the right body, nothing else depends on it.
+    /// </summary>
+    public readonly NetworkVariable<int> classIndex = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     public override void OnNetworkSpawn()
     {
-        if (IsOwner) TakeOverSoloHero(gameObject);
+        if (IsOwner)
+        {
+            TakeOverSoloHero(gameObject);
+            PublishClass();
+        }
+        else
+        {
+            classIndex.OnValueChanged += (_, now) => ApplyClassIndex(now);
+            ApplyClassIndex(classIndex.Value);
+        }
+    }
+
+    /// <summary>Owner: push the run profile class to all mirrors.</summary>
+    public void PublishClass()
+    {
+        if (!IsSpawned || !IsOwner) return;
+        int idx = System.Array.IndexOf(ClassCatalog.All, RunProfile.Class);
+        classIndex.Value = idx < 0 ? 0 : idx;
+    }
+
+    void ApplyClassIndex(int idx)
+    {
+        var look = GetComponent<ClassAppearance>();
+        if (look == null) return;
+        look.Apply(idx >= 0 && idx < ClassCatalog.All.Length ? ClassCatalog.All[idx] : ClassCatalog.Fenwalker);
     }
 
     /// <summary>

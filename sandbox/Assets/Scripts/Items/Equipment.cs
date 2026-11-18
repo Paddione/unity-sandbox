@@ -24,6 +24,14 @@ public sealed class Equipment : MonoBehaviour
                   $"(dmg={GetDamage()}, hp={GetMaxHP()}).");
     }
 
+    /// <summary>Class binding (second-class S4): restricted bases only for their class.</summary>
+    public static bool CanEquip(ItemInstance item, string classId)
+    {
+        if (item == null) return false;
+        string only = ItemDatabase.ClassRestriction(item.baseType);
+        return only == "" || only == ClassCatalog.Get(classId).id;
+    }
+
     /// <summary>Currently equipped item in a slot (null when empty).</summary>
     public ItemInstance GetEquipped(ItemSlot slot)
     {

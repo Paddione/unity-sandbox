@@ -48,6 +48,11 @@ public sealed class Inventory : MonoBehaviour
     {
         if (eq == null || index < 0 || index >= bag.Count) return false;
         var item = bag[index];
+        if (!Equipment.CanEquip(item, RunProfile.ClassId))
+        {
+            Debug.Log($"[Loot] {item.baseType} is for {ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName} only.");
+            return false;
+        }
         var current = eq.GetEquipped(item.slot);
         bag.RemoveAt(index);
         eq.Equip(item);

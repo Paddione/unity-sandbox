@@ -711,6 +711,7 @@ public static class SandboxBuilder
         hero.AddComponent<FpsReporter>();
         WireLocomotion(hero, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
         AttachStarterSword(hero);
+        AddClassAppearance(hero);
         SetLayerRecursive(hero, LayerMask.NameToLayer("Ignore Raycast"));
 
         // 10 husks scattered across the fen (3 m+ apart, off the camp).
@@ -1073,6 +1074,13 @@ public static class SandboxBuilder
     /// name: KayKit ships a weapon mount ("handslot.r"). Hip fallback only
     /// when the rig has neither (pinned by scene tests — never silent).
     /// </summary>
+    /// <summary>second-class S4: class look (Lanternbearer re-skin onto the Knight rig).</summary>
+    static void AddClassAppearance(GameObject hero)
+    {
+        var look = hero.AddComponent<ClassAppearance>();
+        look.lanternbearerModel = LoadModel(ClassCatalog.Lanternbearer.modelPath);
+    }
+
     static void AttachStarterSword(GameObject hero)
     {
         var prefab = LoadModel("Adventurers/Accessories/sword_1handed.fbx");
@@ -1163,6 +1171,7 @@ public static class SandboxBuilder
         netPlayer.AddComponent<FpsReporter>();
         WireLocomotion(netPlayer, "Idle_A", "Running_A", "Melee_1H_Attack_Chop");
         AttachStarterSword(netPlayer);
+        AddClassAppearance(netPlayer);
         SetLayerRecursive(netPlayer, LayerMask.NameToLayer("Ignore Raycast"));
         const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
         System.IO.Directory.CreateDirectory("Assets/Resources");
@@ -1186,12 +1195,16 @@ public static class SandboxBuilder
         int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
         int layoutRoots = 0;
         bool stash = false;
+        bool classLook = false;
         foreach (var root in scene.GetRootGameObjects())
         {
             if (root.name.StartsWith(LayoutSeeder.PropRootPrefix) && root.transform.childCount > 0)
                 layoutRoots++;
             if (root.name == StashChest.ObjectName && root.GetComponent<StashChest>() != null)
                 stash = true;
+            if (root.name == "Player" && root.GetComponent<ClassAppearance>() != null
+                && root.GetComponent<ClassAppearance>().lanternbearerModel != null)
+                classLook = true;
         }
         foreach (var root in scene.GetRootGameObjects())
             CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
@@ -1204,7 +1217,7 @@ public static class SandboxBuilder
                   $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
-                  $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots} stash={stash}");
+                  $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots} stash={stash} classLook={classLook}");
         if (!player || !clicker || !melee || !equip || !inv || !wallet || !health || !ui
             || !vui || !vendor
             || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
@@ -1212,7 +1225,7 @@ public static class SandboxBuilder
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
             || edges != 4 || patches < 4
             || !light || !camera || !net || !transport || !autostart || !prefab
-            || layoutRoots != LayoutSeeder.VariantCount || !stash)
+            || layoutRoots != LayoutSeeder.VariantCount || !stash || !classLook)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (ashen fen + loot + netcode present).");
     }

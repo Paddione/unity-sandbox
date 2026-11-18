@@ -27,13 +27,17 @@ public sealed class LootDrop : MonoBehaviour
 
     public static ItemInstance BuildItem(LootRoll roll, System.Random rng)
     {
+        string weaponClass = roll.slot == ItemSlot.Weapon ? WeaponClassFor(RunProfile.ClassId, rng) : "";
         if (roll.rarity == ItemRarity.Unique)
         {
-            string id = roll.slot == ItemSlot.Weapon ? "Emberbrand Blade"
+            string id = roll.slot == ItemSlot.Weapon
+                ? (weaponClass == ClassCatalog.LanternbearerId ? "Lantern of the Hold" : "Emberbrand Blade")
                 : roll.slot == ItemSlot.Armor ? "Cryptwarden Plate" : "Seer's Circlet";
             return ItemDatabase.CreateUnique(id);
         }
-        var bases = ItemDatabase.GetBaseTypes(roll.slot);
+        var bases = roll.slot == ItemSlot.Weapon
+            ? ItemDatabase.GetBaseTypes(roll.slot, weaponClass)
+            : ItemDatabase.GetBaseTypes(roll.slot);
         return new ItemInstance
         {
             slot = roll.slot,
@@ -88,7 +92,24 @@ public sealed class LootDrop : MonoBehaviour
             return;
         }
         var eq = hero.GetComponent<Equipment>();
-        if (eq != null) eq.Equip(item);
+        if (eq == null) return;
+        if (!Equipment.CanEquip(item, RunProfile.ClassId))
+        {
+            Debug.Log($"[Loot] Bag full, {item.baseType} does not fit this class: left behind.");
+            return;
+        }
+        eq.Equip(item);
+    }
+
+    /// <summary>Share of weapon drops that fit the finder's class (second-class S4).</summary>
+    public const float OwnClassWeaponShare = 0.7f;
+
+    /// <summary>Class whose weapons a drop rolls: 70 % the hero's class, else the other one.</summary>
+    public static string WeaponClassFor(string heroClassId, System.Random rng)
+    {
+        string own = ClassCatalog.Get(heroClassId).id;
+        if (rng.NextDouble() < OwnClassWeaponShare) return own;
+        return own == ClassCatalog.FenwalkerId ? ClassCatalog.LanternbearerId : ClassCatalog.FenwalkerId;
     }
 
     public static Color ColorFor(ItemRarity rarity)

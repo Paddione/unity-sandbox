@@ -52,6 +52,11 @@ S5-Teil „Balance-Abnahme Zone 3“ wartet zusätzlich auf `cinderreach-act-one
    und Veil-Art entstehen prozedural (Licht + Primitive, Halo als gold getönter `CleaveArc`). Bis S3 liefert
    `CharacterSheet.GetRank` für Lanternbearer-Skills 0 und `SpendSkill` lehnt sie ab.
 
+8. Nachtrag S4 (2026-11-18): Kein zweites Held-Prefab. Die KayKit-Adventurers teilen ein Rig, `ClassAppearance`
+   bindet die Mage-Meshes an die Knochen des vorhandenen Helden; Szene, NGO-Prefabliste und Netzwerk-Prefab
+   bleiben eins. Laterne prozedural (Würfel + Punktlicht) statt Blender-Prop. Kein Hauptmenü: Klassenwahl als
+   Start-Overlay. „Lantern of the Hold“ nicht in `GetUniques` (P2-Vertrag drei Uniques, Vendor-Seeds).
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -124,7 +129,7 @@ S1 zuerst. S2 und S3 nach S1 parallel (disjunkt). S4 nach S2 und S3. S5 zuletzt.
 | S1 class-data | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 skills | S1 | 30 % | landed 2026-11-18 |
 | S3 sheet+ui | S1 | 15 % | landed 2026-11-18 |
-| S4 select+items | S2, S3 | 20 % | offen |
+| S4 select+items | S2, S3 | 20 % | landed 2026-11-18 |
 | S5 proof | S4 (Zone-3-Abnahme: act-one 100 %) | 20 % | offen |
 
 ## Verify (je Stufe)

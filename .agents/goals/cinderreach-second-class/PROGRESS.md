@@ -1,6 +1,6 @@
 # Progress: cinderreach-second-class
 
-Prozent: 60 %
+Prozent: 80 %
 
 ## Erledigt
 
@@ -28,9 +28,18 @@ Prozent: 60 %
   Wisps-Zeile zeigt die Begleiterzahl). Belege: EditMode 163/163 (6 neu `ClassSheetUiTests`), PlayMode 78/78,
   Verifies grün, Autoplay Seed 1 6/6 Phasen.
 
+- 2026-11-18: S4 select+items gelandet. `ClassAppearance` re-skinnt den Mage per Knochennamen auf das Knight-Rig
+  (Knight-Meshes und Schwert aus, prozedurale Laterne mit Licht, Starter-Waffe je Klasse), Co-op-Spiegel über
+  `DiabloNetworkPlayer.classIndex`. `ClassSelectUI` beim Start (zwei Karten, „Continue saved hero“ bei
+  vorhandenem Save, übersprungen für Autoplay/Shotcheck/Co-op-Peers/`-class`). Waffen klassengebunden
+  (`ItemDatabase.ClassRestriction`, `Equipment.CanEquip`, Bag lehnt ab, Tooltip-Hinweis), Unique „Lantern of
+  the Hold“, Waffen-Drops 70 % passend zum Finder. Belege: EditMode 168/168 (5 neu `ClassItemTests`, u. a.
+  Re-Skin am echten Knight/Mage-Rig), PlayMode 80/80 (2 neu `ClassSelectTests`), Verify `classLook=True`,
+  Autoplay Fenwalker 6/6, Lanternbearer-Smoke 0 Exceptions (Fen ohne Kampfprofil nicht geräumt, folgt in S5).
+
 ## Nächste Schritte
 
-1. S4 select+items (Klassenwahl, Held-Prefab je Klasse, Item-Bindung, Drops).
+1. S5 proof (Lanternbearer-Kampfprofil, ±25 %-Abnahme, Co-op gemischt, Shotcheck).
 
 ## Offene Punkte
 
