@@ -441,3 +441,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: relativer `-logFile`-Pfad wird vom Player nicht geschrieben; absolute Pfade nutzen.
 - Next: dotfiles G-DIABLO06 je Klasse landen, Dispatch, Goal 100 %.
 
+## 2026-11-18 — fix: Abbot summons magenta, cinderreach-second-class 100 %
+
+- Done: `BossController.SpawnHusk` gibt den Beschwörungs-Kapseln ein URP-Lit-Material (aschgrau). Vorher Default-
+  Material ohne URP-Shader, im Player magenta (sichtbar in `21_abbot_phase2.png` seit arpg-session-loop S5).
+- Belegt: EditMode 168/168 (Material-Assert in `OssuaryConfigTests.Boss_PhaseTwoAtHalfHp`), PlayMode 80/80,
+  Windows-Shotcheck `21_abbot_phase2.png` zeigt graue Kapseln.
+- Faced: Ein `DestroyImmediate` der Beschwörungen im EditMode-Test ließ in derselben Testsitzung alle später
+  geöffneten Szenen ohne `Sandbox.Runtime`-Komponenten laden (11 Szenen-Tests rot). Per Bisect belegt
+  (ohne Teständerung 168/168, ohne Fix-Änderung im Skript ebenfalls rot nur mit der Teständerung), Mechanismus
+  nicht gefunden. Der Test lässt die Beschwörungen wie früher stehen. Library-Kopien aus Hauptcheckout und
+  Runner waren nicht die Ursache.
+- second-class auf 100 %: alle sechs Kriterien belegt, `G-DIABLO06` live grün inkl. Normal/lanternbearer.
+
