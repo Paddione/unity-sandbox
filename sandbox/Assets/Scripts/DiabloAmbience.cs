@@ -113,6 +113,27 @@ public sealed class DiabloAmbience : MonoBehaviour
         sol.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 1f, 1f, 0.2f));
     }
 
+    /// <summary>S1 light: ambience bed volume per zone (ActProgress id). No API break: <c>Ensure(Transform)</c> untouched.</summary>
+    public static float BedVolumeForZone(int zone)
+    {
+        switch (zone)
+        {
+            case ActProgress.Ossuary: return 0.18f;
+            case ActProgress.Kiln: return 0.15f;
+            default: return BedVolume;
+        }
+    }
+
+    /// <summary>S1 light: retune the bed for a zone and start the atmosphere cross-fade (headless-callable).</summary>
+    public static void ApplyZone(int zone)
+    {
+        if (instance != null && instance.bed != null)
+            instance.bed.volume = BedVolumeForZone(zone);
+        var atmo = ZoneAtmosphere.Instance;
+        if (atmo != null) atmo.ShowZone(zone);
+        else if (Application.isPlaying) ZoneAtmosphere.Ensure().ShowZone(zone);
+    }
+
     /// <summary>Level-up: a column of embers rising around the hero.</summary>
     public static void LevelPillar(Vector3 at)
     {

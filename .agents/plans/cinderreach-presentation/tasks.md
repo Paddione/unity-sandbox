@@ -100,11 +100,11 @@ S5 zuletzt.
 
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
-| S1 light | Startbedingung | 20 % | offen |
-| S2 audio | Startbedingung | 25 % | offen |
-| S3 vfx | Startbedingung | 20 % | offen |
-| S4 menu | S2 | 15 % | offen |
-| S5 perf+proof | S1–S4 | 20 % | offen |
+| S1 light | Startbedingung | 20 % | gelandet 2026-11-18 |
+| S2 audio | Startbedingung | 25 % | gelandet 2026-11-18 |
+| S3 vfx | Startbedingung | 20 % | gelandet 2026-11-18 |
+| S4 menu | S2 | 15 % | gelandet 2026-11-18 |
+| S5 perf+proof | S1–S4 | 20 % | gelandet 2026-11-18 |
 
 ## Verify (je Stufe)
 

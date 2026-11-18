@@ -1,0 +1,258 @@
+{
+ "version": "S2",
+ "license": "All entries are locally synthesized recipes (no third-party assets, license: free). Future studio .ogg renders replace the synth clips 1:1 by cue name.",
+ "budget": "<= 60MB total audio, .ogg quality 0.6 target",
+ "format": {
+  "sampleRate": 22050,
+  "channels": 1,
+  "fadeMs": 5,
+  "oggQuality": 0.6
+ },
+ "sfx": [
+  {
+   "cue": "Swing",
+   "prompt": "short whooshy melee swing, airy noise burst",
+   "seed": 1234,
+   "synth": "NoiseBurst 0.12s",
+   "license": "free"
+  },
+  {
+   "cue": "Hit",
+   "prompt": "meaty thump with fast pitch drop",
+   "seed": 1234,
+   "synth": "Thump 0.15s 180->90Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Death",
+   "prompt": "creature death rattle, tone plus noise",
+   "seed": 1234,
+   "synth": "Rattle 0.4s 300->60Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Loot",
+   "prompt": "bright pickup shimmer, rising sweep",
+   "seed": 1234,
+   "synth": "Sweep 0.09s 880->1320Hz",
+   "license": "free"
+  },
+  {
+   "cue": "UIClick",
+   "prompt": "deep soft UI tick",
+   "seed": 1234,
+   "synth": "Sweep 0.07s 520->380Hz, vol 0.35 via gain layer",
+   "license": "free"
+  },
+  {
+   "cue": "Hurt",
+   "prompt": "player hurt thud",
+   "seed": 1234,
+   "synth": "Thump 0.2s 150->100Hz",
+   "license": "free"
+  },
+  {
+   "cue": "PlayerDeath",
+   "prompt": "low falling death sweep",
+   "seed": 1234,
+   "synth": "Sweep 0.6s 400->70Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Whoosh",
+   "prompt": "fireball launch whoosh, filtered noise swell",
+   "seed": 1234,
+   "synth": "Whoosh 0.38s",
+   "license": "free"
+  },
+  {
+   "cue": "Blast",
+   "prompt": "explosion boom, sub thump plus rumble",
+   "seed": 1234,
+   "synth": "Boom 0.7s",
+   "license": "free"
+  },
+  {
+   "cue": "Twang",
+   "prompt": "bowstring pluck, bright attack",
+   "seed": 1234,
+   "synth": "Pluck 0.28s 196Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Crit",
+   "prompt": "heavy crit thump with metallic ping",
+   "seed": 77,
+   "synth": "Crit 0.18s + 1760Hz ping",
+   "license": "free"
+  },
+  {
+   "cue": "LevelUp",
+   "prompt": "triumphant major-triad sting with octave",
+   "seed": 99,
+   "synth": "Sting C-E-G-C",
+   "license": "free"
+  },
+  {
+   "cue": "Lantern",
+   "prompt": "holy bell chime, inharmonic partials",
+   "seed": 7,
+   "synth": "Chime 0.45s 660Hz (1/2.76/5.4)",
+   "license": "free"
+  },
+  {
+   "cue": "Halo",
+   "prompt": "rising warm halo sweep",
+   "seed": 7,
+   "synth": "Sweep 0.4s 220->880Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Veil",
+   "prompt": "falling shadowstep shimmer",
+   "seed": 7,
+   "synth": "Sweep 0.25s 1400->480Hz",
+   "license": "free"
+  },
+  {
+   "cue": "SwordHit1",
+   "prompt": "sword impact variant 1, bright slash",
+   "seed": 201,
+   "synth": "Crit 0.14s",
+   "license": "free"
+  },
+  {
+   "cue": "SwordHit2",
+   "prompt": "sword impact variant 2, mid slash",
+   "seed": 202,
+   "synth": "Crit 0.16s",
+   "license": "free"
+  },
+  {
+   "cue": "SwordHit3",
+   "prompt": "sword impact variant 3, heavy slash",
+   "seed": 203,
+   "synth": "Crit 0.2s",
+   "license": "free"
+  },
+  {
+   "cue": "Fireball",
+   "prompt": "fireball cast whoosh",
+   "seed": 204,
+   "synth": "Whoosh 0.42s",
+   "license": "free"
+  },
+  {
+   "cue": "Arrow",
+   "prompt": "arrow release zip, fast falling sweep",
+   "seed": 205,
+   "synth": "Sweep 0.12s 2400->900Hz",
+   "license": "free"
+  },
+  {
+   "cue": "Cleave",
+   "prompt": "wide cleave slash, noise burst",
+   "seed": 206,
+   "synth": "NoiseBurst 0.22s",
+   "license": "free"
+  },
+  {
+   "cue": "HuskGrowl",
+   "prompt": "husk growl, low rattle",
+   "seed": 207,
+   "synth": "Rattle 0.5s 140->70Hz",
+   "license": "free"
+  },
+  {
+   "cue": "WardenTaunt",
+   "prompt": "bone warden taunt, rising hollow sweep",
+   "seed": 208,
+   "synth": "Sweep 0.6s 110->330Hz",
+   "license": "free"
+  },
+  {
+   "cue": "BossRoar",
+   "prompt": "boss roar, deep boom",
+   "seed": 209,
+   "synth": "Boom 1.1s",
+   "license": "free"
+  },
+  {
+   "cue": "Gold",
+   "prompt": "coin clink, bright double ping",
+   "seed": 210,
+   "synth": "Sweep 0.12s 1568->2093Hz",
+   "license": "free"
+  },
+  {
+   "cue": "RareDrop",
+   "prompt": "rare drop fanfare sting",
+   "seed": 211,
+   "synth": "Sting C-E-G-C",
+   "license": "free"
+  },
+  {
+   "cue": "VendorBuy",
+   "prompt": "vendor buy chime, low rising fourth",
+   "seed": 212,
+   "synth": "Sweep 0.18s 330->495Hz, vol 0.5 via gain layer",
+   "license": "free"
+  },
+  {
+   "cue": "VendorSell",
+   "prompt": "vendor sell chime, low falling fourth",
+   "seed": 213,
+   "synth": "Sweep 0.18s 495->330Hz, vol 0.5 via gain layer",
+   "license": "free"
+  },
+  {
+   "cue": "Gate",
+   "prompt": "zone gate swell, low riser",
+   "seed": 214,
+   "synth": "Sweep 0.8s 180->720Hz",
+   "license": "free"
+  }
+ ],
+ "music": [
+  {
+   "track": "MenuTheme",
+   "prompt": "dark devotional menu theme, slow minor pads 60s seamless loop",
+   "seed": 101,
+   "synth": "SynthLoop root 220Hz (placeholder)",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "LanternHoldLoop",
+   "prompt": "warm hearth zone loop, soft strings plus fire crackle 60-90s seamless",
+   "seed": 102,
+   "synth": "SynthLoop root 174.6Hz (placeholder)",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "AshenFenLoop",
+   "prompt": "cold moor zone loop, low drone plus wind gusts 60-90s seamless",
+   "seed": 103,
+   "synth": "SynthLoop root 146.8Hz (placeholder)",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "OssuaryLoop",
+   "prompt": "crypt zone loop, deep bells plus whispers 60-90s seamless",
+   "seed": 104,
+   "synth": "SynthLoop root 123.5Hz (placeholder)",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "BossTrack",
+   "prompt": "boss battle track, driving percussion plus choir stabs",
+   "seed": 105,
+   "synth": "SynthLoop root 98Hz (placeholder)",
+   "license": "free",
+   "length": "boss loop"
+  }
+ ]
+}

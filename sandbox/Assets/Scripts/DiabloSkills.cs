@@ -413,6 +413,7 @@ public sealed class DiabloSkills : MonoBehaviour
             if (driver != null) driver.OnStrike();
         }
         SpawnHaloVisual();
+        PresentationVfx.CleaveArc(transform.position, haloRadius);
         return hits;
     }
 
@@ -481,6 +482,7 @@ public sealed class DiabloSkills : MonoBehaviour
 
     static void SpawnVeilPuff(Vector3 at)
     {
+        PresentationVfx.VeilPuff(at);
         if (!Application.isPlaying) return;
         var go = new GameObject("VeilPuff");
         go.transform.position = at + Vector3.up;
@@ -530,6 +532,7 @@ public sealed class DiabloSkills : MonoBehaviour
 
     void SpawnCleaveVisual(float radius)
     {
+        PresentationVfx.CleaveArc(transform.position, radius);
         var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
         if (prefab == null) return;
         var arc = Instantiate(prefab, transform.position, Quaternion.identity);
@@ -560,6 +563,9 @@ public sealed class DiabloSkills : MonoBehaviour
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
         transform.rotation = Quaternion.LookRotation(dir);
+        // S3 VFX hooks only: flight art, no damage or cooldown change.
+        if (s == Skill.Fireball || s == Skill.LanternBolt) PresentationVfx.FireballTrail(origin);
+        else if (s == Skill.Arrow) PresentationVfx.ArrowTrail(origin);
         if (s == Skill.LanternBolt)
         {
             var bolt = DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),

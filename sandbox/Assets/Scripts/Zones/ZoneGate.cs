@@ -305,6 +305,10 @@ public sealed class ZoneGate : MonoBehaviour
         if (targetZone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
         Teleports++;
         if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: targetZone);
+        // presentation S1+S2: cross-fade light grade + ambience bed + music on every gate.
+        try { DiabloAmbience.ApplyZone(targetZone); } catch { }
+        try { MusicDirector.Ensure().PlayZone(targetZone); } catch { }
+        try { DiabloAudio.PlayGate(); } catch { }
         Debug.Log($"[Zone] Gate {gameObject.name} → zone {targetZone} (teleports={Teleports}).");
     }
 

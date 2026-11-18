@@ -10,7 +10,11 @@ Usage:
 import re
 import sys
 
-LINE_RE = re.compile(r"\[Perf\] FPS avg ([0-9.]+) \(([0-9.]+) ms/frame\) over (\d+) frames\.")
+LINE_RE = re.compile(r"\[Perf\] FPS avg ([0-9.,]+) \(([0-9.,]+) ms/frame\) over (\d+) frames\.")
+
+
+def _num(raw: str) -> float:
+    return float(raw.replace(",", "."))
 
 
 def main(argv):
@@ -29,7 +33,7 @@ def main(argv):
     except OSError as exc:
         print(f"fps-gate: cannot read {log}: {exc}", file=sys.stderr)
         return 2
-    windows = [float(m.group(1)) for m in LINE_RE.finditer(text)]
+    windows = [_num(m.group(1)) for m in LINE_RE.finditer(text)]
     if not windows:
         print(f"fps-gate: no [Perf] windows in {log} — FpsReporter absent?", file=sys.stderr)
         return 2

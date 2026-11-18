@@ -66,6 +66,8 @@ public sealed class LootDrop : MonoBehaviour
         var drop = loot.AddComponent<LootDrop>();
         drop.item = item;
         Debug.Log($"[Loot] Dropped {item.rarity} {item.slot} ({ItemLabel(item)}).");
+        // S3 VFX hook only: Rare+ drops earn a light pillar, Magic stays quiet.
+        if (PresentationVfx.ShouldBeamFor(item.rarity)) PresentationVfx.RareBeam(pos, item.rarity);
         var nm = NetworkManager.Singleton;
         // Only the server spawns networked loot; clients receive the replica.
         // (Spawn() on a client only logs an error and spawns nothing.)

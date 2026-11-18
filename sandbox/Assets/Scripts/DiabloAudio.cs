@@ -12,6 +12,18 @@ public static class DiabloAudio
 {
     public const int SampleRate = 22050;
 
+    /// <summary>S2 cue catalogue (>=20 SFX). Each maps to a Play* method.</summary>
+    public enum Cue
+    {
+        Swing, Hit, Death, Loot, UIClick, Hurt, PlayerDeath,
+        Whoosh, Blast, Twang, Crit, LevelUp, Ambient,
+        Lantern, Halo, Veil,
+        SwordHit1, SwordHit2, SwordHit3,
+        Fireball, Arrow, Cleave,
+        HuskGrowl, WardenTaunt, BossRoar,
+        Gold, RareDrop, VendorBuy, VendorSell, Gate,
+    }
+
     public static int soundedSwings;
     public static int soundedHits;
     public static int soundedDeaths;
@@ -20,11 +32,29 @@ public static class DiabloAudio
     public static int soundedBlasts;
     public static int soundedCrits;
     public static int soundedLevelUps;
+    public static int soundedSwordHits;
+    public static int soundedSkillShots;
+    public static int soundedEnemyVox;
+    public static int soundedGold;
+    public static int soundedRare;
+    public static int soundedVendor;
+    public static int soundedGate;
+    /// <summary>Synth-fallback hits: asset override missing, synth clip used.</summary>
+    public static int soundedFallbacks;
+    public static string lastFallbackCue;
+
+    /// <summary>Menu base volumes (presentation tuning): UI sits under combat, vendor under loot.</summary>
+    public const float UIClickVolume = 0.35f;
+    public const float VendorVolume = 0.5f;
 
     static AudioSource source;
     static AudioClip swingClip, hitClip, deathClip, lootClip, uiClickClip, hurtClip, playerDeathClip;
     static AudioClip whooshClip, blastClip, twangClip, critClip, levelUpClip, ambientClip;
     static AudioClip lanternClip, haloClip, veilClip;
+    static AudioClip swordHit1Clip, swordHit2Clip, swordHit3Clip;
+    static AudioClip fireballClip, arrowClip, cleaveClip;
+    static AudioClip huskGrowlClip, wardenTauntClip, bossRoarClip;
+    static AudioClip goldClip, rareDropClip, vendorBuyClip, vendorSellClip, gateClip;
     static readonly System.Random pitchRng = new System.Random(77);
     static bool built;
 
@@ -43,11 +73,46 @@ public static class DiabloAudio
     /// <summary>Seamless 6 s moor wind + low drone loop (ambient bed).</summary>
     public static AudioClip AmbientClip { get { EnsureBuilt(); return ambientClip; } }
 
+    static readonly System.Collections.Generic.Dictionary<string, AudioClip> overrides =
+        new System.Collections.Generic.Dictionary<string, AudioClip>();
+
+    /// <summary>Test seam: prefer a generated .ogg clip when present.</summary>
+    public static void RegisterOverride(string cueName, AudioClip clip)
+    {
+        overrides[cueName] = clip;
+    }
+    public static void ClearOverrides() { overrides.Clear(); }
+
+    /// <summary>Asset clip if registered, else synth + fallback counter.</summary>
+    static AudioClip Resolve(string cueName, AudioClip synth)
+    {
+        AudioClip clip;
+        if (overrides.TryGetValue(cueName, out clip) && clip != null) return clip;
+        soundedFallbacks++;
+        lastFallbackCue = cueName;
+        return synth;
+    }
+
+    /// <summary>SFX gain layer via DiabloSettings (mixer authoring is a TODO
+    /// for the human session: create CinderreachMixer with Master/Music/SFX/UI
+    /// groups per craft-game-floors game-audio headless floor, then route the
+    /// sources below via AudioSource.outputAudioMixerGroup).</summary>
+    public static float SfxGain => DiabloSettings.EffectiveSFX;
+    public static float MusicGain => DiabloSettings.MasterVol * DiabloSettings.MusicVol;
+
+    static void PlaySfx(AudioClip synth, string cueName, float volume)
+    {
+        EnsureBuilt();
+        try { source.PlayOneShot(Resolve(cueName, synth), volume * SfxGain); }
+        catch { soundedFallbacks++; }
+    }
+
     public static void PlaySwing() { EnsureBuilt(); source.PlayOneShot(swingClip); soundedSwings++; }
     public static void PlayHit() { EnsureBuilt(); source.PlayOneShot(hitClip); soundedHits++; }
     public static void PlayDeath() { EnsureBuilt(); source.PlayOneShot(deathClip); soundedDeaths++; }
     public static void PlayLoot() { EnsureBuilt(); source.PlayOneShot(lootClip); soundedLoot++; }
-    public static void PlayUIClick() { EnsureBuilt(); source.PlayOneShot(uiClickClip); }
+    /// <summary>Menu tick: deep + quiet (presentation tuning) — routes gain + fallback like all SFX.</summary>
+    public static void PlayUIClick() { EnsureBuilt(); PlaySfx(uiClickClip, "UIClick", UIClickVolume); }
     public static void PlayHurt() { EnsureBuilt(); source.PlayOneShot(hurtClip); }
     public static void PlayPlayerDeath() { EnsureBuilt(); source.PlayOneShot(playerDeathClip); }
     /// <summary>Fireball leaving the hand.</summary>
@@ -63,6 +128,73 @@ public static class DiabloAudio
     public static AudioClip LanternClip { get { EnsureBuilt(); return lanternClip; } }
     public static AudioClip HaloClip { get { EnsureBuilt(); return haloClip; } }
     public static AudioClip VeilClip { get { EnsureBuilt(); return veilClip; } }
+    public static AudioClip SwordHit1Clip { get { EnsureBuilt(); return swordHit1Clip; } }
+    public static AudioClip SwordHit2Clip { get { EnsureBuilt(); return swordHit2Clip; } }
+    public static AudioClip SwordHit3Clip { get { EnsureBuilt(); return swordHit3Clip; } }
+    public static AudioClip FireballClip { get { EnsureBuilt(); return fireballClip; } }
+    public static AudioClip ArrowClip { get { EnsureBuilt(); return arrowClip; } }
+    public static AudioClip CleaveClip { get { EnsureBuilt(); return cleaveClip; } }
+    public static AudioClip HuskGrowlClip { get { EnsureBuilt(); return huskGrowlClip; } }
+    public static AudioClip WardenTauntClip { get { EnsureBuilt(); return wardenTauntClip; } }
+    public static AudioClip BossRoarClip { get { EnsureBuilt(); return bossRoarClip; } }
+    public static AudioClip GoldClip { get { EnsureBuilt(); return goldClip; } }
+    public static AudioClip RareDropClip { get { EnsureBuilt(); return rareDropClip; } }
+    public static AudioClip VendorBuyClip { get { EnsureBuilt(); return vendorBuyClip; } }
+    public static AudioClip VendorSellClip { get { EnsureBuilt(); return vendorSellClip; } }
+    public static AudioClip GateClip { get { EnsureBuilt(); return gateClip; } }
+
+    /// <summary>Generic cue entry point (counts toward the >=20 catalogue).</summary>
+    public static void PlayCue(Cue cue)
+    {
+        switch (cue)
+        {
+            case Cue.Swing: PlaySwing(); break;
+            case Cue.Hit: PlayHit(); break;
+            case Cue.Death: PlayDeath(); break;
+            case Cue.Loot: PlayLoot(); break;
+            case Cue.UIClick: PlayUIClick(); break;
+            case Cue.Hurt: PlayHurt(); break;
+            case Cue.PlayerDeath: PlayPlayerDeath(); break;
+            case Cue.Whoosh: PlayWhoosh(); break;
+            case Cue.Blast: PlayBlast(); break;
+            case Cue.Twang: PlayTwang(); break;
+            case Cue.Crit: PlayCrit(); break;
+            case Cue.LevelUp: PlayLevelUp(); break;
+            case Cue.Lantern: PlayLantern(); break;
+            case Cue.Halo: PlayHalo(); break;
+            case Cue.Veil: PlayVeil(); break;
+            case Cue.SwordHit1: PlaySwordHit1(); break;
+            case Cue.SwordHit2: PlaySwordHit2(); break;
+            case Cue.SwordHit3: PlaySwordHit3(); break;
+            case Cue.Fireball: PlayFireball(); break;
+            case Cue.Arrow: PlayArrow(); break;
+            case Cue.Cleave: PlayCleave(); break;
+            case Cue.HuskGrowl: PlayHuskGrowl(); break;
+            case Cue.WardenTaunt: PlayWardenTaunt(); break;
+            case Cue.BossRoar: PlayBossRoar(); break;
+            case Cue.Gold: PlayGold(); break;
+            case Cue.RareDrop: PlayRareDrop(); break;
+            case Cue.VendorBuy: PlayVendorBuy(); break;
+            case Cue.VendorSell: PlayVendorSell(); break;
+            case Cue.Gate: PlayGate(); break;
+            default: PlayHit(); break;
+        }
+    }
+
+    public static void PlaySwordHit1() { EnsureBuilt(); Varied(Resolve("SwordHit1", swordHit1Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
+    public static void PlaySwordHit2() { EnsureBuilt(); Varied(Resolve("SwordHit2", swordHit2Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
+    public static void PlaySwordHit3() { EnsureBuilt(); Varied(Resolve("SwordHit3", swordHit3Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
+    public static void PlayFireball() { EnsureBuilt(); Varied(Resolve("Fireball", fireballClip), 0.9f * SfxGain); soundedSkillShots++; soundedCasts++; }
+    public static void PlayArrow() { EnsureBuilt(); Varied(Resolve("Arrow", arrowClip), 0.8f * SfxGain); soundedSkillShots++; soundedCasts++; }
+    public static void PlayCleave() { EnsureBuilt(); Varied(Resolve("Cleave", cleaveClip), 1f * SfxGain); soundedSkillShots++; soundedCasts++; }
+    public static void PlayHuskGrowl() { EnsureBuilt(); Varied(Resolve("HuskGrowl", huskGrowlClip), 0.7f * SfxGain); soundedEnemyVox++; }
+    public static void PlayWardenTaunt() { EnsureBuilt(); Varied(Resolve("WardenTaunt", wardenTauntClip), 0.8f * SfxGain); soundedEnemyVox++; }
+    public static void PlayBossRoar() { EnsureBuilt(); Varied(Resolve("BossRoar", bossRoarClip), 1f * SfxGain); soundedEnemyVox++; }
+    public static void PlayGold() { EnsureBuilt(); PlaySfx(goldClip, "Gold", 0.8f); soundedGold++; soundedLoot++; }
+    public static void PlayRareDrop() { EnsureBuilt(); PlaySfx(rareDropClip, "RareDrop", 0.9f); soundedRare++; soundedLoot++; }
+    public static void PlayVendorBuy() { EnsureBuilt(); PlaySfx(vendorBuyClip, "VendorBuy", VendorVolume); soundedVendor++; }
+    public static void PlayVendorSell() { EnsureBuilt(); PlaySfx(vendorSellClip, "VendorSell", VendorVolume); soundedVendor++; }
+    public static void PlayGate() { EnsureBuilt(); PlaySfx(gateClip, "Gate", 1f); soundedGate++; }
 
     public static void PlayLevelUp() { EnsureBuilt(); source.PlayOneShot(levelUpClip, 0.9f); soundedLevelUps++; }
 
@@ -75,7 +207,7 @@ public static class DiabloAudio
         var s = pitched[pitchedNext];
         pitchedNext = (pitchedNext + 1) % pitched.Length;
         s.pitch = 0.92f + (float)pitchRng.NextDouble() * 0.16f;
-        s.PlayOneShot(clip, volume);
+        try { s.PlayOneShot(clip, volume * SfxGain); } catch { }
     }
 
     static AudioSource[] pitched;
@@ -92,6 +224,15 @@ public static class DiabloAudio
         soundedBlasts = 0;
         soundedCrits = 0;
         soundedLevelUps = 0;
+        soundedSwordHits = 0;
+        soundedSkillShots = 0;
+        soundedEnemyVox = 0;
+        soundedGold = 0;
+        soundedRare = 0;
+        soundedVendor = 0;
+        soundedGate = 0;
+        soundedFallbacks = 0;
+        lastFallbackCue = null;
     }
 
     static void EnsureBuilt()
@@ -108,7 +249,7 @@ public static class DiabloAudio
         hitClip = Thump("Hit", 0.15f, 180f, 90f);
         deathClip = Rattle("Death", 0.4f, 300f, 60f, rng);
         lootClip = Sweep("Loot", 0.09f, 880f, 1320f);
-        uiClickClip = Sweep("UIClick", 0.05f, 1200f, 1200f);
+        uiClickClip = Sweep("UIClick", 0.07f, 520f, 380f);
         hurtClip = Thump("Hurt", 0.2f, 150f, 100f);
         playerDeathClip = Sweep("PlayerDeath", 0.6f, 400f, 70f);
         whooshClip = Whoosh("Whoosh", 0.38f, rng);
@@ -117,6 +258,20 @@ public static class DiabloAudio
         critClip = Crit("Crit", 0.18f);
         levelUpClip = Sting("LevelUp");
         ambientClip = Ambient("MoorWind", 6f, rng);
+        swordHit1Clip = Crit("SwordHit1", 0.14f);
+        swordHit2Clip = Crit("SwordHit2", 0.16f);
+        swordHit3Clip = Crit("SwordHit3", 0.2f);
+        fireballClip = Whoosh("Fireball", 0.42f, rng);
+        arrowClip = Sweep("Arrow", 0.12f, 2400f, 900f);
+        cleaveClip = NoiseBurst("Cleave", 0.22f, rng);
+        huskGrowlClip = Rattle("HuskGrowl", 0.5f, 140f, 70f, rng);
+        wardenTauntClip = Sweep("WardenTaunt", 0.6f, 110f, 330f);
+        bossRoarClip = Boom("BossRoar", 1.1f, rng);
+        goldClip = Sweep("Gold", 0.12f, 1568f, 2093f);
+        rareDropClip = Sting("RareDrop");
+        vendorBuyClip = Sweep("VendorBuy", 0.18f, 330f, 495f);
+        vendorSellClip = Sweep("VendorSell", 0.18f, 495f, 330f);
+        gateClip = Sweep("Gate", 0.8f, 180f, 720f);
         lanternClip = Chime("LanternBolt", 0.45f, 660f);
         haloClip = Sweep("SearingHalo", 0.4f, 220f, 880f);
         veilClip = Sweep("VeilStep", 0.25f, 1400f, 480f);

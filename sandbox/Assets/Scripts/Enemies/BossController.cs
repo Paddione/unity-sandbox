@@ -85,6 +85,7 @@ public sealed class BossController : NetworkBehaviour
             if (hero != null && Planar(hero) <= SlamRadius + 0.5f)
             {
                 slamStart = Time.time; // ground-circle telegraph starts
+                PresentationVfx.BossTelegraph(transform.position, SlamRadius);
                 if (IsSpawned && IsServer) SlamTelegraphClientRpc();
             }
         }
@@ -97,6 +98,7 @@ public sealed class BossController : NetworkBehaviour
         phaseTwo = true;
         PhaseTwoEntries++;
         Debug.Log($"[Boss] {BossName} enters phase 2 (adds={PhaseTwoEntries}).");
+        PresentationVfx.PhaseTwoBurst(transform.position);
         if (IsSpawned)
         {
             if (!IsServer) return;
@@ -120,6 +122,7 @@ public sealed class BossController : NetworkBehaviour
     {
         if (IsServer) return;
         DiabloJuice.OnBlast(transform.position);
+        PresentationVfx.PhaseTwoBurst(transform.position);
     }
 
     [ClientRpc]
@@ -127,6 +130,7 @@ public sealed class BossController : NetworkBehaviour
     {
         if (IsServer) return;
         DiabloJuice.OnBlast(transform.position);
+        PresentationVfx.BossTelegraph(transform.position, SlamRadius);
     }
 
     void ResolveSlam()
