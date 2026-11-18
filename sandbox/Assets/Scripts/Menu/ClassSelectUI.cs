@@ -47,7 +47,8 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         foreach (var a in args)
             if (a == SessionAutoplay.Flag || a == "-shotcheck" || a == ClassFlag
-                || a == "--net-client" || a == "--net-server" || a == "-batchmode")
+                || a == "--net-client" || a == "--net-server" || a == "-batchmode"
+                || a == CoopAutoplay.Flag)
                 return false;
         return !MultiplayerAutoStarter.IsClone();
     }
@@ -126,7 +127,10 @@ public sealed class ClassSelectUI : MonoBehaviour
             x += 470f;
         }
         if (SaveService.HasSave())
-            MakeButton(panel.transform, "Continue saved hero", new Vector2(0f, -240f), () => Continue());
+            MakeButton(panel.transform, "Continue saved hero", new Vector2(-170f, -240f), () => Continue());
+        // coop-session S1: host or join before choosing (the panel keeps this overlay open).
+        MakeButton(panel.transform, "Co-op: host / join", new Vector2(SaveService.HasSave() ? 170f : 0f, -240f),
+            () => JoinPanel.Open());
     }
 
     static GameObject MakePanel(Transform parent, string name, Vector2 size, Vector2 pos)

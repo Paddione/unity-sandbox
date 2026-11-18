@@ -530,3 +530,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   `UNITY_EDITOR_LOCK_HELD=1` an den Warm-up weiter, sonst wartet `run-unity-build.sh` im Kind auf den eigenen Elternprozess.
   Lauf danach: EditMode 201/201, PlayMode 83/84 (`DiabloP2LoopTests.Strike_HitsHuskInFacingArc`, Nahkampf, in zwei
   Läufen davor auf identischem Spielcode grün). Wiederholung nicht abgewartet: neun parallele Sessions in der Sperr-Warteschlange.
+
+## 2026-11-18 — cinderreach-coop-session S1 join
+
+- Done: Startparameter `-host [-port N]`, `-join ip[:port]` (`JoinArgs`, P2-Flags und Klon-Erkennung bleiben),
+  `MultiplayerAutoStarter.Restart` für den Wechsel zur Laufzeit, `JoinPanel` (F7 / Klassenwahl, HD-Scaler),
+  `SaveService -save-file`, `AutoplayResult.role` mit Client-Pflichtphasen `town,zone1`, `CoopAutoplay` (Client),
+  Host-Autoplay wartet bis 90 s auf den Client, `scripts/run-coop-pair.sh` (zwei Player auf WSLg-GPU).
+- Belegt: EditMode 210/210, PlayMode 84/84, Verify, Paarlauf Exit 0 (Client 2/2, Host 8/8, je 0 Exceptions),
+  Solo-Autoplay `-seed 0` 8/8 bei 36,8 fps.
+- Faced: erster Solo-Lauf ohne `-seed` las Seed 1112106611 aus einem vorhandenen Save; in dieser Fen-Variante blieb
+  der Held nach 11 Kills ohne Treffer bis Budgetende hängen (Befund in PROGRESS, nicht S1).
+- Next: S2 host-autoritative Gegner.
+

@@ -22,9 +22,27 @@ using UnityEngine;
 public static class SaveService
 {
     public const string FileName = "cinderreach-save.json";
+    /// <summary>
+    /// <c>-save-file &lt;name&gt;</c> picks another file name in persistentDataPath
+    /// (coop-session S1: host and client on one machine must not share a save).
+    /// </summary>
+    public const string SaveFileFlag = "-save-file";
 
     public static string DefaultPath =>
-        Path.Combine(Application.persistentDataPath, FileName);
+        Path.Combine(Application.persistentDataPath, FileNameFor(Environment.GetCommandLineArgs()));
+
+    /// <summary>Save file name for these arguments: the -save-file value (file name only) or <see cref="FileName"/>.</summary>
+    public static string FileNameFor(string[] args)
+    {
+        if (args != null)
+            for (int i = 0; i + 1 < args.Length; i++)
+                if (args[i] == SaveFileFlag)
+                {
+                    var name = Path.GetFileName(args[i + 1]);
+                    if (!string.IsNullOrWhiteSpace(name) && !name.StartsWith("-")) return name;
+                }
+        return FileName;
+    }
 
     /// <summary>Furthest zone of the last load (S5 gate reads this).</summary>
     public static int LoadedZoneReached { get; private set; } = 1;

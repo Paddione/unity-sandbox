@@ -43,6 +43,22 @@ public sealed class AutoplayResult
     public string classId = "fenwalker";
     /// <summary>Act I finished in this run (act-one S5).</summary>
     public bool actOneComplete;
+    /// <summary>"solo", or "host"/"client" in a co-op pair run (coop-session S1).</summary>
+    public string role = RoleSolo;
+
+    public const string RoleSolo = "solo";
+    public const string RoleHost = "host";
+    public const string RoleClient = "client";
+
+    /// <summary>
+    /// Phases a co-op client must reach: it follows the host through Lantern
+    /// Hold and the Ashen Fen (coop-session S1). Later stages extend the list
+    /// as gates and bosses become co-op.
+    /// </summary>
+    public static readonly string[] ClientPhases = { PhaseTown, PhaseZone1 };
+
+    /// <summary>Required phases for a role (solo and host play the full route).</summary>
+    public static string[] RequiredFor(string role) => role == RoleClient ? ClientPhases : RequiredPhases;
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)
@@ -53,7 +69,7 @@ public sealed class AutoplayResult
     /// <summary>True when every canonical phase was reached.</summary>
     public bool AllPhasesReached()
     {
-        foreach (var p in RequiredPhases)
+        foreach (var p in RequiredFor(role))
             if (!phases.Contains(p)) return false;
         return true;
     }

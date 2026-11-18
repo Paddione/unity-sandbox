@@ -59,6 +59,8 @@ public sealed class SessionAutoplay : MonoBehaviour
         startedAt = Time.realtimeSinceStartup;
         result.started = System.DateTime.UtcNow.ToString("o");
         result.commit = ArgValue(CommitFlag) ?? "unknown";
+        bool coopHost = CoopAutoplay.Role == AutoplayResult.RoleHost;
+        if (coopHost) result.role = AutoplayResult.RoleHost;
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         startBosses = BossController.BossesKilled;
         float deadline = Time.realtimeSinceStartup + 840f; // act-one S5: route runs through the Kiln
@@ -80,6 +82,24 @@ public sealed class SessionAutoplay : MonoBehaviour
             Log("FAIL no controllable hero within 30 s");
             Finish(1);
             yield break;
+        }
+        if (coopHost)
+        {
+            // coop-session S1: the pair run starts the route once the client is in.
+            var nm = Unity.Netcode.NetworkManager.Singleton;
+            float joinBy = Time.realtimeSinceStartup + 90f;
+            while (Time.realtimeSinceStartup < joinBy && (nm == null || nm.ConnectedClientsIds.Count < 2))
+            {
+                yield return null;
+                nm = Unity.Netcode.NetworkManager.Singleton;
+            }
+            if (nm == null || nm.ConnectedClientsIds.Count < 2)
+            {
+                Log("FAIL co-op client did not join within 90 s");
+                Finish(1);
+                yield break;
+            }
+            Log($"co-op host: client joined ({nm.ConnectedClientsIds.Count} connected)");
         }
         DiabloClickController.ExternalDrive = true;
         HitStop.Enabled = false;
