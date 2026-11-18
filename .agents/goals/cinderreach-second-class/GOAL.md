@@ -2,7 +2,7 @@
 goal: cinderreach-second-class
 slug: cinderreach-second-class
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-plan_refs: []
+plan_refs: [.agents/plans/cinderreach-second-class/tasks.md]
 ---
 
 # Goal: cinderreach-second-class — zweite spielbare Klasse
@@ -12,8 +12,8 @@ Folge-Goal #6, Reihenfolge siehe `.agents/goals/ROADMAP.md`.
 
 ## Objective
 
-Eine zweite spielbare Klasse auf Fernkampf- oder Caster-Basis mit eigenem Skill-Baum, über dieselbe
-Attribut- und Skillpunkt-Progression wie die Nahkampfklasse.
+Eine zweite spielbare Klasse, der **Lanternbearer** (Licht-Caster mit Wisp-Begleitern), mit eigenem Skill-Baum, über dieselbe
+Attribut- und Skillpunkt-Progression wie die bestehende Klasse, die als **Fenwalker** unverändert bleibt.
 
 ## Erfolgskriterien
 

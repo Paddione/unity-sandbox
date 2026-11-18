@@ -2,7 +2,7 @@
 goal: cinderreach-act-one
 slug: cinderreach-act-one
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-plan_refs: []
+plan_refs: [.agents/plans/cinderreach-act-one/tasks.md]
 ---
 
 # Goal: cinderreach-act-one — Akt I mit dritter Zone und Akt-Boss
@@ -17,7 +17,7 @@ eigenem Akt-Boss, Lantern Hold bleibt das Hub.
 
 ## Erfolgskriterien
 
-1. Zone 3 als eigene Szene mit eigenem Namen und eigenen Assets, 2 neue Gegnertypen und ein Akt-Boss mit
+1. Zone 3 **Cinder Kiln** als eigener Szenenbereich (eigener Root in `DiabloZone.unity`, wie das Ossuary) mit eigenen Assets, 2 neue Gegnertypen (Cinder Thrall, Ash Lancer) und ein Akt-Boss (The Kilnmother) mit
    ≥ 2 Phasen. Beleg: `VerifyDiabloZone` + PlayMode-Test für Spawn und Boss-Kill.
 2. Akt-Struktur steuert den Fortschritt: Boss Ossuary → Zone 3 frei → Akt-Boss → „Akt I abgeschlossen“ im
    Save. Beleg: EditMode-Test der Freischaltkette + PlayMode-Test für Save/Load über alle 3 Zonen.
