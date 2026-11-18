@@ -430,3 +430,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   das Overlay ist ein eigenes Objekt und löst den Helden beim Klick auf.
 - Next: S5 Beweis.
 
+## 2026-11-18 — cinderreach-second-class S5 proof
+
+- Done: Lanternbearer-Kampfprofil im Autoplay (Fenwalker-Regeln unverändert), `classId` im Ergebnis, dritter
+  Nachtlauf als Lanternbearer, Shotcheck-Aufnahmen Klassenwahl + Wisps/Halo/Bolt, Mirror-Klassen-Log,
+  `docs/second-class-run-log.md`.
+- Belegt: EditMode 168/168, PlayMode 80/80, je drei Seeds Fenwalker 111,1 s und Lanternbearer 122,0 s im Mittel
+  (+9,8 %), alle 6/6 Phasen, 0 Exceptions. Co-op-Smoke gemischt: Mirror zeigt Lanternbearer, Join/Disconnect
+  sauber, 0 Exceptions. Windows-Stage + 26 Shots.
+- Faced: relativer `-logFile`-Pfad wird vom Player nicht geschrieben; absolute Pfade nutzen.
+- Next: dotfiles G-DIABLO06 je Klasse landen, Dispatch, Goal 100 %.
+

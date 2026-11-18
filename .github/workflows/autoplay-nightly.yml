@@ -48,22 +48,25 @@ jobs:
           # replayability S5: second run on Kindled, same build and seed.
           AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/kindled" -seed "$SEED" -difficulty kindled
           RC_KINDLED=$?
+          # second-class S5: third run as the Lanternbearer (Normal, same seed).
+          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/lanternbearer" -seed "$SEED" -class lanternbearer
+          RC_LANTERN=$?
           set -e
-          echo "normal exit $RC_NORMAL, kindled exit $RC_KINDLED"
-          [ "$RC_NORMAL" -eq 0 ] && [ "$RC_KINDLED" -eq 0 ]
+          echo "normal exit $RC_NORMAL, kindled exit $RC_KINDLED, lanternbearer exit $RC_LANTERN"
+          [ "$RC_NORMAL" -eq 0 ] && [ "$RC_KINDLED" -eq 0 ] && [ "$RC_LANTERN" -eq 0 ]
 
       - name: Copy results to host store
         if: always() && steps.run.outputs.out != ''
         env:
           RUN_OUT: ${{ steps.run.outputs.out }}
         run: |
-          # One folder per run and difficulty: <date>[-<run_id>] and <date>[-<run_id>]-kindled.
+          # One folder per run kind: <date>[-<run_id>], ...-kindled, ...-lanternbearer.
           BASE="$HOME/unity-sandbox-autoplay/$(date +%F)"
           if [ -f "$BASE/autoplay-result.json" ]; then BASE="$BASE-${GITHUB_RUN_ID}"; fi
-          for kind in normal kindled; do
+          for kind in normal kindled lanternbearer; do
             [ -d "$RUN_OUT/$kind" ] || continue
             DEST="$BASE"
-            [ "$kind" = kindled ] && DEST="$BASE-kindled"
+            [ "$kind" != normal ] && DEST="$BASE-$kind"
             mkdir -p "$DEST"
             cp -a "$RUN_OUT/$kind/." "$DEST/" || true
             ls -la "$DEST"

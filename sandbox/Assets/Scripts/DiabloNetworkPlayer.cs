@@ -44,7 +44,9 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     {
         var look = GetComponent<ClassAppearance>();
         if (look == null) return;
-        look.Apply(idx >= 0 && idx < ClassCatalog.All.Length ? ClassCatalog.All[idx] : ClassCatalog.Fenwalker);
+        var cls = idx >= 0 && idx < ClassCatalog.All.Length ? ClassCatalog.All[idx] : ClassCatalog.Fenwalker;
+        look.Apply(cls);
+        Debug.Log($"[Class] mirror {gameObject.name} (client {OwnerClientId}) shows {cls.displayName}.");
     }
 
     /// <summary>

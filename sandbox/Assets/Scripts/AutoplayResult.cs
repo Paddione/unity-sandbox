@@ -36,6 +36,8 @@ public sealed class AutoplayResult
     public int seed = -1;
     /// <summary>Difficulty of the run (replayability S5; G-DIABLO06 judges each one).</summary>
     public string difficulty = "Normal";
+    /// <summary>Hero class of the run (second-class S5; G-DIABLO06 judges each class).</summary>
+    public string classId = "fenwalker";
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)

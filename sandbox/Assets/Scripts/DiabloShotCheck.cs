@@ -201,6 +201,33 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(1.0f);
         yield return Shot("abbot_phase2");
 
+        // 13a) Class select overlay (second-class S4).
+        var selectGo = new GameObject("ClassSelect");
+        var select = selectGo.AddComponent<ClassSelectUI>();
+        select.SetOpen(true);
+        yield return Wait(0.4f);
+        yield return Shot("class_select");
+        select.ChooseNew(ClassCatalog.LanternbearerId);
+        Destroy(selectGo);
+        DiabloClickController.ExternalDrive = true;
+
+        // 13b) Lanternbearer in the abbot fight: wisps out, then the searing halo.
+        Face(hero, boss.transform.position - hero.transform.position);
+        hero.distance = 9f;
+        hero.pitch = 45f;
+        skills.CastToward(DiabloSkills.Skill.Wisps, boss.transform.position - hero.transform.position);
+        yield return Wait(0.8f);
+        yield return Shot("lanternbearer_wisps");
+        skills.CastToward(DiabloSkills.Skill.SearingHalo, boss.transform.position - hero.transform.position);
+        yield return Wait(0.12f);
+        yield return Shot("lanternbearer_halo");
+        skills.CastToward(DiabloSkills.Skill.LanternBolt, boss.transform.position - hero.transform.position);
+        yield return Wait(0.15f);
+        yield return Shot("lanternbearer_bolt");
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        var look = hero.GetComponent<ClassAppearance>();
+        if (look != null) look.Apply(ClassCatalog.Fenwalker);
+
         // 13) SessionComplete overlay (S5 end screen, shown on boss death;
         // here opened directly as the visual proof — the gameplay proof is
         // the autoplay boss kill in docs/session-loop-run-log.md).

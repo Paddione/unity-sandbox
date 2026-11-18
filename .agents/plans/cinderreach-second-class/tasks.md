@@ -130,7 +130,7 @@ S1 zuerst. S2 und S3 nach S1 parallel (disjunkt). S4 nach S2 und S3. S5 zuletzt.
 | S2 skills | S1 | 30 % | landed 2026-11-18 |
 | S3 sheet+ui | S1 | 15 % | landed 2026-11-18 |
 | S4 select+items | S2, S3 | 20 % | landed 2026-11-18 |
-| S5 proof | S4 (Zone-3-Abnahme: act-one 100 %) | 20 % | offen |
+| S5 proof | S4 (Zone-3-Abnahme: act-one 100 %) | 20 % | landed 2026-11-18 |
 
 ## Verify (je Stufe)
 

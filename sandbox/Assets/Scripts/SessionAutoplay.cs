@@ -127,6 +127,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.fps_windows = new System.Collections.Generic.List<float>(FpsReporter.Windows);
         result.seed = LayoutSeeder.CurrentSeed;
         result.difficulty = DifficultyProfile.Current.name;
+        result.classId = RunProfile.ClassId;
         result.exit = Mathf.Max(legacyExit, result.ComputeExit());
         string dir = ArgValue(OutFlag)
             ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");
@@ -226,26 +227,14 @@ public sealed class SessionAutoplay : MonoBehaviour
             if (dist > hero.attackRange)
             {
                 hero.AttackTarget(husk);
-                if (skills != null && dist < 18f)
-                {
-                    if (skills.CooldownLeft(DiabloSkills.Skill.Fireball) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-                    else if (skills.CooldownLeft(DiabloSkills.Skill.Arrow) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
-                }
+                if (skills != null && dist < 18f) CastProfile(skills, toTarget, inRange: false);
             }
             else
             {
                 UnstickTick(hero, husk.transform.position, ref flast, ref flastT, ref fnudges);
                 hero.SetAimPoint(husk.transform.position);
                 hero.Strike();
-                if (skills != null)
-                {
-                    if (skills.CooldownLeft(DiabloSkills.Skill.Fireball) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-                    else if (skills.CooldownLeft(DiabloSkills.Skill.Arrow) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
-                }
+                if (skills != null) CastProfile(skills, toTarget, inRange: true);
             }
             yield return null;
         }
@@ -322,25 +311,13 @@ public sealed class SessionAutoplay : MonoBehaviour
             if (toTarget.magnitude > hero.attackRange)
             {
                 hero.AttackTarget(boss);
-                if (skills != null && toTarget.magnitude < 18f)
-                {
-                    if (skills.CooldownLeft(DiabloSkills.Skill.Fireball) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-                    else if (skills.CooldownLeft(DiabloSkills.Skill.Arrow) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
-                }
+                if (skills != null && toTarget.magnitude < 18f) CastProfile(skills, toTarget, inRange: false);
             }
             else
             {
                 hero.SetAimPoint(boss.transform.position);
                 hero.Strike();
-                if (skills != null)
-                {
-                    if (skills.CooldownLeft(DiabloSkills.Skill.Cleave) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Cleave, toTarget);
-                    else if (skills.CooldownLeft(DiabloSkills.Skill.Fireball) <= 0f)
-                        skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-                }
+                if (skills != null) CastProfile(skills, toTarget, inRange: true, boss: true);
             }
             yield return null;
         }
@@ -352,6 +329,45 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log($"phase boss done (overlay={SessionComplete.Shown} summary='{SessionComplete.LastSummary}')");
         phasesDone++;
         lastPhaseOk = bossKills >= 1;
+    }
+
+    /// <summary>
+    /// Class combat profile (second-class S5). Fenwalker: unchanged (Fireball,
+    /// else Arrow; at the boss Cleave first). Lanternbearer: Wisps whenever
+    /// ready, Searing Halo with 3+ husks (or the boss) inside its radius, else
+    /// Lantern Bolt.
+    /// </summary>
+    static void CastProfile(DiabloSkills skills, Vector3 toTarget, bool inRange, bool boss = false)
+    {
+        bool Ready(DiabloSkills.Skill s) => skills.CooldownLeft(s) <= 0f;
+        if (RunProfile.ClassId == ClassCatalog.LanternbearerId)
+        {
+            if (Ready(DiabloSkills.Skill.Wisps)) { skills.CastToward(DiabloSkills.Skill.Wisps, toTarget); return; }
+            int near = 0;
+            foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
+            {
+                if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
+                var d = h.transform.position - skills.transform.position;
+                d.y = 0f;
+                if (d.magnitude <= skills.haloRadius) near++;
+            }
+            if (Ready(DiabloSkills.Skill.SearingHalo) && (near >= 3 || (boss && inRange)))
+            {
+                skills.CastToward(DiabloSkills.Skill.SearingHalo, toTarget);
+                return;
+            }
+            if (Ready(DiabloSkills.Skill.LanternBolt)) skills.CastToward(DiabloSkills.Skill.LanternBolt, toTarget);
+            return;
+        }
+        if (boss && inRange)
+        {
+            // Pre-class boss rule, unchanged: Cleave, else Fireball.
+            if (Ready(DiabloSkills.Skill.Cleave)) skills.CastToward(DiabloSkills.Skill.Cleave, toTarget);
+            else if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
+            return;
+        }
+        if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
+        else if (Ready(DiabloSkills.Skill.Arrow)) skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
     }
 
     void TickGod(DiabloClickController hero)
