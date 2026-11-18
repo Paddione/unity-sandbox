@@ -104,6 +104,23 @@ public static class TownBuilder
         WireVendorIdle(vendor);
     }
 
+    /// <summary>
+    /// replayability S5: stash chest at the camp's north-west corner (KayKit
+    /// gold chest, box collider as click target, <see cref="StashChest"/>).
+    /// </summary>
+    public static void SpawnStashChest()
+    {
+        var prefab = LoadModel("Dungeon/Models/chest_gold.fbx");
+        var chest = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        chest.name = StashChest.ObjectName;
+        chest.transform.position = new Vector3(-3.5f, 0f, 14f);
+        chest.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        var col = chest.AddComponent<BoxCollider>();
+        col.size = new Vector3(1.4f, 1.1f, 1f);
+        col.center = new Vector3(0f, 0.55f, 0f);
+        chest.AddComponent<StashChest>();
+    }
+
     /// <summary>Idle-only Mecanim rig (shared controller, built once per session).</summary>
     static void WireVendorIdle(GameObject vendor)
     {

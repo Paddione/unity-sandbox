@@ -116,7 +116,7 @@ S1 zuerst (Save-Format). Danach S2 und S3 parallel (disjunkt). S4 nach S2 (Affix
 | S2 affix | S1 | 25 % | landed 2026-11-18 |
 | S3 layouts | S1 | 25 % | landed 2026-11-18 |
 | S4 kindled | S2 | 20 % | landed 2026-11-18 |
-| S5 stash+proof | S3, S4 | 15 % | offen |
+| S5 stash+proof | S3, S4 | 15 % | landed 2026-11-18 |
 
 ## Verify (je Stufe)
 

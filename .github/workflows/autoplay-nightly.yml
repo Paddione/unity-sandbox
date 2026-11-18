@@ -30,7 +30,7 @@ jobs:
           lfs: true
           persist-credentials: false
 
-      - name: Build and run autoplay
+      - name: Build and run autoplay (Normal + Kindled)
         id: run
         run: |
           OUT="artifacts/autoplay/$(date +%F)-${GITHUB_RUN_ID}"
@@ -38,20 +38,32 @@ jobs:
           # replayability S3: rotate the Ashen Fen layout seed 0..2 by weekday.
           SEED=$(( $(date +%u) % 3 ))
           echo "layout seed $SEED"
-          bash scripts/run-autoplay.sh "$OUT" -seed "$SEED"
+          set +e
+          bash scripts/run-autoplay.sh "$OUT/normal" -seed "$SEED"
+          RC_NORMAL=$?
+          # replayability S5: second run on Kindled, same build and seed.
+          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/kindled" -seed "$SEED" -difficulty kindled
+          RC_KINDLED=$?
+          set -e
+          echo "normal exit $RC_NORMAL, kindled exit $RC_KINDLED"
+          [ "$RC_NORMAL" -eq 0 ] && [ "$RC_KINDLED" -eq 0 ]
 
-      - name: Copy result to host store
+      - name: Copy results to host store
         if: always() && steps.run.outputs.out != ''
         env:
           RUN_OUT: ${{ steps.run.outputs.out }}
         run: |
-          DEST="$HOME/unity-sandbox-autoplay/$(date +%F)"
-          if [ -d "$DEST" ] && [ -f "$DEST/autoplay-result.json" ]; then
-            DEST="$DEST-${GITHUB_RUN_ID}"
-          fi
-          mkdir -p "$DEST"
-          cp -a "$RUN_OUT/." "$DEST/" || true
-          ls -la "$DEST"
+          # One folder per run and difficulty: <date>[-<run_id>] and <date>[-<run_id>]-kindled.
+          BASE="$HOME/unity-sandbox-autoplay/$(date +%F)"
+          if [ -f "$BASE/autoplay-result.json" ]; then BASE="$BASE-${GITHUB_RUN_ID}"; fi
+          for kind in normal kindled; do
+            [ -d "$RUN_OUT/$kind" ] || continue
+            DEST="$BASE"
+            [ "$kind" = kindled ] && DEST="$BASE-kindled"
+            mkdir -p "$DEST"
+            cp -a "$RUN_OUT/$kind/." "$DEST/" || true
+            ls -la "$DEST"
+          done
           find "$HOME/unity-sandbox-autoplay" -mindepth 1 -maxdepth 1 -type d -mtime +30 -print -exec rm -rf {} +
 
       - name: Upload autoplay artifacts

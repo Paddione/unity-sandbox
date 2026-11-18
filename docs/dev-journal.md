@@ -355,3 +355,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Learned: Bone-Warden-Projektile treffen den Helden nicht (vorhandener Fehler, als Offener Punkt notiert).
 - Next: S5 Truhe + Kindled-Nachtlauf.
 
+## 2026-11-18 — cinderreach-replayability S5 stash + proof
+
+- Done: `StashChest` + `DiabloStashUI` in Lantern Hold (Builder, Verify `stash=True`), `difficulty` im
+  Autoplay-Ergebnis, Nachtlauf Normal + Kindled, Run-Log `docs/replayability-run-log.md`.
+- Belegt: EditMode 137/137 (6 neu `StashChestTests`), PlayMode 74/74, Verifies, sechs Autoplay-Läufe
+  (Seeds 0–2 × Normal/Kindled) exit 0, 0 Exceptions, Abbot 150 bzw. 270 HP.
+- Faced: Drei Läufe je Stufe reichen nicht, um den Unique-Bonus zu zeigen (Kindled 2/32 vs. Normal 5/56).
+  Beleg der Rate bleibt der Tabellen-Test.
+- Next: dotfiles G-DIABLO06 je Schwierigkeit landen, Dispatch, Goal 100 %.
+

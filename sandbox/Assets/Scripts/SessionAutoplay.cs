@@ -126,6 +126,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.duration_s = Time.realtimeSinceStartup - startedAt;
         result.fps_windows = new System.Collections.Generic.List<float>(FpsReporter.Windows);
         result.seed = LayoutSeeder.CurrentSeed;
+        result.difficulty = DifficultyProfile.Current.name;
         result.exit = Mathf.Max(legacyExit, result.ComputeExit());
         string dir = ArgValue(OutFlag)
             ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");

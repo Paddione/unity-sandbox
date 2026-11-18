@@ -34,6 +34,8 @@ public sealed class AutoplayResult
     public int exit = 1;
     /// <summary>Layout seed of the run (replayability S3), -1 when no zone layout ran.</summary>
     public int seed = -1;
+    /// <summary>Difficulty of the run (replayability S5; G-DIABLO06 judges each one).</summary>
+    public string difficulty = "Normal";
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)
