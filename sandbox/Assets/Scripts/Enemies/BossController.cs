@@ -147,10 +147,19 @@ public sealed class BossController : MonoBehaviour
         return null;
     }
 
+    /// <summary>Ash-grey summon colour (URP Lit).</summary>
+    public static readonly Color SummonTint = new Color(0.32f, 0.29f, 0.27f);
+
     static void SpawnHusk(string name, Vector3 pos)
     {
         var husk = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         husk.name = name;
+        // The primitive's default material has no URP shader and renders magenta in
+        // the player (seen in shotcheck 21_abbot_phase2): give it a URP Lit ash tint.
+        var shader = Shader.Find("Universal Render Pipeline/Lit");
+        var rend = husk.GetComponent<Renderer>();
+        if (shader != null && rend != null)
+            rend.sharedMaterial = new Material(shader) { color = SummonTint };
         husk.tag = "Husk";
         husk.transform.position = pos;
         husk.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);

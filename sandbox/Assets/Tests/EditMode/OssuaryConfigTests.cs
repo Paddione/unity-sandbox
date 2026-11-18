@@ -30,6 +30,19 @@ public class OssuaryConfigTests
         Assert.AreEqual(before + 1, BossController.PhaseTwoEntries);
         boss.EnterPhaseTwo(); // idempotent: summons only once
         Assert.AreEqual(before + 1, BossController.PhaseTwoEntries);
+        // Summons render with URP Lit, never the magenta default material.
+        int summons = 0;
+        foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
+        {
+            if (!h.name.StartsWith("Husk_Summon_")) continue;
+            summons++;
+            var mat = h.GetComponent<Renderer>().sharedMaterial;
+            Assert.AreEqual("Universal Render Pipeline/Lit", mat.shader.name, h.name);
+            // Left in place like before: destroying them here broke every later
+            // scene-config test in the run (all Sandbox.Runtime components missing on
+            // load, mechanism not found, 2026-11-18).
+        }
+        Assert.AreEqual(3, summons);
         Object.DestroyImmediate(go);
     }
 
