@@ -75,10 +75,16 @@ public static class EncounterLayout
         return KilnLayout.OssuaryOffset + new Vector3(Mathf.Cos(a) * 7f, 0.05f, Mathf.Sin(a) * 7f);
     }
 
-    /// <summary>Opposite ring wardens; variant 0 is ring spots 0 and 4 (the builder layout).</summary>
+    /// <summary>Opposite ring wardens per variant. Pairs are explicit (not a
+    /// stride): v0 {0,4} is the builder layout, v1 {3,7} rotates the roof,
+    /// v2 {5,1} mirrors v1 — the south slot (index 6, on the boss axis) is
+    /// never used, so cover always blocks the warden and never the boss.
+    /// </summary>
+    static readonly int[,] WardenPairs = { { 0, 4 }, { 3, 7 }, { 5, 1 } };
+
     public static Vector3 OssuaryWardenAnchor(int variant, int pair)
     {
-        int idx = (ClampV(variant) * 3 + (pair == 0 ? 0 : 4)) % 8;
+        int idx = WardenPairs[ClampV(variant), Mathf.Clamp(pair, 0, 1)];
         float a = idx * Mathf.PI * 2f / 8f;
         return KilnLayout.OssuaryOffset + new Vector3(Mathf.Cos(a) * 7f, 0.05f, Mathf.Sin(a) * 7f);
     }

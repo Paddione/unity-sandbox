@@ -74,7 +74,9 @@ public class EncounterRoleTests
         var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
         wall.name = "TestWall";
         wall.transform.position = new Vector3(0f, 1f, -3.5f);
-        wall.transform.localScale = new Vector3(3f, 3f, 0.5f);
+        // Wide enough that sidestepping inside the leash cannot clear it:
+        // the setup tests "blocked until clear", not the strafe itself.
+        wall.transform.localScale = new Vector3(30f, 3f, 0.5f);
         Physics.SyncTransforms();
 
         yield return DiabloTestFixture.WaitSeconds(RangedCaster.Cooldown + RangedCaster.Telegraph + 0.6f);

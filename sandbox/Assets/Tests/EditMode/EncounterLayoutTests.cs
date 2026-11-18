@@ -20,8 +20,9 @@ public class EncounterLayoutTests
     public void Variant0_MatchesBuilderLayout()
     {
         var off = KilnLayout.OssuaryOffset;
-        Assert.AreEqual(off + new Vector3(7f, 0.05f, 0f), EncounterLayout.OssuaryWardenAnchor(0, 0));
-        Assert.AreEqual(off + new Vector3(-7f, 0.05f, 0f), EncounterLayout.OssuaryWardenAnchor(0, 1));
+        // Float dust (cos(pi) != -1 exactly): compare with tolerance, not bitwise.
+        Assert.Less(Vector3.Distance(off + new Vector3(7f, 0.05f, 0f), EncounterLayout.OssuaryWardenAnchor(0, 0)), 0.01f);
+        Assert.Less(Vector3.Distance(off + new Vector3(-7f, 0.05f, 0f), EncounterLayout.OssuaryWardenAnchor(0, 1)), 0.01f);
         for (int i = 0; i < KilnLayout.ThrallCount; i++)
             Assert.AreEqual(KilnLayout.ThrallAnchor(0, i), EncounterLayout.KilnThrallAnchor(0, i));
         for (int i = 0; i < KilnLayout.LancerCount; i++)
