@@ -71,8 +71,8 @@ Prozent: 100 %
 
 ## Nächste Schritte
 
-1. Erledigt: alle Stufen S1–S6 gelandet (S6-Vollpass 2026-11-18). Danach nur
-   dotfiles-Anteile (G-DIABLO02-Vertrag für Ossuary/Boss-Prefabs).
+Keine — alle Stufen S1–S6 gelandet (S6-Vollpass 2026-11-18), dotfiles-Anteile
+(G-DIABLO05-, G-DIABLO02-Verträge) ebenfalls gelandet.
 
 - 2026-11-18: S5 zone2+boss gelandet.
   Belege: EditMode 89/89 (neu `OssuaryConfigTests`: Boss-Tuning 150 HP/XP 120,
