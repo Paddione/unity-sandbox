@@ -383,3 +383,22 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Befund betrifft replayability S3, Untersuchung folgt als eigener Fix.
 - Next: S2 Lanternbearer-Skills.
 
+## 2026-11-18 — fix: Fen Gate fired mid-fight, autoplay hid it, builds lost scripts
+
+- Symptom: Autoplay mit Zufalls-Seed meldete den Fen nach einem Kill als clear (`huskKills=2`).
+- Ursache 1 (gemessen über eine Census-Zeile und Dwell-Logs): Der Held lief im Kampf über bzw. entlang des
+  FenGate-Triggers (0, 1, -6) und wurde sofort ins Ossuary teleportiert. Danach lagen alle Fen-Husks außerhalb
+  der 40-m-Suche, der Kampf galt als geräumt. Trifft echte Spieler genauso.
+- Fix: `ZoneGate` feuert erst, wenn der Held 0,6 s still auf dem Tor steht. Bewegung über 0,3 m oder ein
+  gelandeter Treffer startet die Zeit neu, und das Tor prüft selbst, ob der Held noch in seinen Bounds steht
+  (Unstick-Versätze lösen kein `OnTriggerExit` aus). Entscheid: Tor-Reise braucht jetzt einen bewussten Halt.
+- Ursache 2: `SessionAutoplay` hielt einen Zonenwechsel mitten im Kampf für „clear“. Jetzt FAIL mit Census,
+  die Phase fehlt im Ergebnis und `G-DIABLO06` wird rot.
+- Ursache 3: Ein Build in derselben Batch-Sitzung, die geänderte Skripte erst kompilierte, lieferte eine Szene
+  mit 124 „missing script“-Behaviours (kein Held). `run-autoplay.sh` kompiliert jetzt vorher separat
+  (`SandboxBuilder.CompileCheck`).
+- Belegt: EditMode 149/149 (6 neu `ZoneGateDwellTests`), PlayMode 74/74, Verifies, Autoplay Seeds 1, 769869018,
+  0, 2 je Fen clear mit 22 Kills, 6/6 Phasen, 0 missing scripts, FPS-Minimum 47,3–53,0.
+- Offener Nebenbefund: Bone Wardens laufen ohne Leine aus dem Ossuary (x 200) bis in den Fen und zählen dort
+  zu den Kills. Kandidat für `cinderreach-coop-session` S2 oder `cinderreach-act-one`.
+

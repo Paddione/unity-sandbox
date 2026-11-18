@@ -1351,6 +1351,15 @@ public static class SandboxBuilder
             throw new System.Exception("DiabloZone build failed; see log.");
     }
 
+    /// <summary>
+    /// Compile-only pass for scripts/run-autoplay.sh. A player build in the same
+    /// batch session that first recompiles changed scripts shipped a scene whose
+    /// MonoBehaviours were all "missing" (2026-11-18); compiling in a separate
+    /// session first avoids that.
+    /// </summary>
+    public static void CompileCheck() =>
+        Debug.Log("[SandboxBuilder] Compile check OK");
+
     static string BuildOutArg()
     {
         var args = System.Environment.GetCommandLineArgs();

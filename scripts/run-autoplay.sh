@@ -3,7 +3,8 @@
 # autoplay with result JSON + FPS gate (cinderreach-loop-guard S1).
 #
 # Steps:
-#  1. build via run-unity-build.sh (SandboxBuilder.BuildDiabloZoneBuild) into
+#  1. compile pass (SandboxBuilder.CompileCheck), then build via
+#     run-unity-build.sh (SandboxBuilder.BuildDiabloZoneBuild) into
 #     <repo>/builds/autoplay-player/ of THIS checkout (skip: AUTOPLAY_SKIP_BUILD=1);
 #  2. run the player at 1280x720 windowed with
 #     -autoplay -autoplay-god -autoplay-out <out> -autoplay-commit <sha>
@@ -37,6 +38,10 @@ LOG="$OUT/autoplay-player.log"
 COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 
 if [ "${AUTOPLAY_SKIP_BUILD:-0}" != 1 ]; then
+  # Separate compile session first: building in the session that recompiles
+  # changed scripts produced a player with every scene script "missing".
+  bash "$ROOT/scripts/run-unity-build.sh" SandboxBuilder.CompileCheck \
+    "[SandboxBuilder] Compile check OK" 900 "$OUT/compile.log"
   echo "run-autoplay: building Linux player -> $PLAYER"
   UNITY_BUILD_EXTRA_ARGS="-buildOut $PLAYER" bash "$ROOT/scripts/run-unity-build.sh" \
     SandboxBuilder.BuildDiabloZoneBuild "DiabloZone build result: Succeeded" 1500 \

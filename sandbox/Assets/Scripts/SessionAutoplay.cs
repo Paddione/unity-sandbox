@@ -200,14 +200,23 @@ public sealed class SessionAutoplay : MonoBehaviour
         int fnudges = 0;
         GameObject curTarget = null;
         bool cleared = false;
+        int teleportsAtStart = ZoneGate.Teleports;
         while (Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
         {
             TickGod(hero);
+            if (ZoneGate.Teleports != teleportsAtStart)
+            {
+                // A gate fired mid-fight: the zone is not cleared, it was left.
+                Log($"phase combat_{label}: FAIL hero left the zone mid-fight " +
+                    $"{HuskCensus(hero.transform.position, excludeBoss)}");
+                break;
+            }
             var husk = NearestHusk(hero.transform.position, maxDist, excludeBoss);
             curTarget = husk;
             if (husk == null)
             {
-                Log($"phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)})");
+                Log($"phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)}) " +
+                    $"{HuskCensus(hero.transform.position, excludeBoss)}");
                 cleared = true;
                 break;
             }
@@ -365,6 +374,24 @@ public sealed class SessionAutoplay : MonoBehaviour
             n++;
         }
         return n;
+    }
+
+    /// <summary>Diagnostic: remaining husks, nearest planar/3D distance and its position.</summary>
+    static string HuskCensus(Vector3 from, bool excludeBoss)
+    {
+        int n = 0;
+        float best = float.PositiveInfinity;
+        Vector3 at = Vector3.zero;
+        string name = "-";
+        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+        {
+            if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
+            if (excludeBoss && IsBoss(husk)) continue;
+            n++;
+            float d = Vector3.Distance(from, husk.transform.position);
+            if (d < best) { best = d; at = husk.transform.position; name = husk.name; }
+        }
+        return n == 0 ? "census: none left" : $"census: {n} left, nearest {name} {best:0.0} m at {Fmt(at)}";
     }
 
     static GameObject NearestHusk(Vector3 from, float maxDist, bool excludeBoss)
