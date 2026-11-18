@@ -1,0 +1,34 @@
+name: Unity Scene Captures
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-scene-captures
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Linux, X64, unity-licensed]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          clean: false
+          persist-credentials: false
+      - name: Capture the DiabloZone scene and game camera
+        id: capture
+        run: bash scripts/capture-unity-scene.sh
+      - name: Upload scene captures
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: unity-scene-captures-${{ github.run_id }}
+          path: ${{ steps.capture.outputs.directory }}/*.png
+          if-no-files-found: error
+          retention-days: 14

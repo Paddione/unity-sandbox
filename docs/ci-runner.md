@@ -42,3 +42,17 @@ idempotent and refuses to replace an existing remote runner name.
 - Serialisation with `Unity Tests`: both jobs use the same runner and the same runner
   Library. A single runner executes jobs one after another, which is the protection; the
   `unity-autoplay` concurrency group only prevents two autoplay runs queueing in parallel.
+
+## Unity Scene Captures
+
+Run **Unity Scene Captures** on `main` via workflow dispatch. The licensed
+WSLg runner opens the checked-in `DiabloZone`, frames the Ashen Fen in the
+Scene View and captures the scene and the game camera at 1280 × 720 through
+the Unity command pipeline. Download both PNGs from
+`unity-scene-captures-<run_id>` within 14 days.
+
+For a local run, use a dedicated worktree with its editor closed and run
+`bash scripts/capture-unity-scene.sh`. The script locks that checkout for captures
+and writes into a fresh `artifacts/scene-captures.*` directory. The renderer
+must report a D3D12 GPU through WSLg. The Unity CLI defaults to
+`~/.local/bin/unity` and can be set with `UNITY_CLI`.
