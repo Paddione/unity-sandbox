@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsSeven()
+    public void CurrentVersion_IsEight()
     {
-        Assert.AreEqual(7, SaveGame.CurrentVersion);
-        Assert.AreEqual(7, new SaveGame().v);
+        Assert.AreEqual(8, SaveGame.CurrentVersion);
+        Assert.AreEqual(8, new SaveGame().v);
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class SaveMigrationTests
             out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(4, from);
-        Assert.AreEqual(7, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v4 lifts through every step");
         Assert.IsNotNull(save.skillVariants);
         Assert.AreEqual(0, save.skillVariants.Count);
     }
@@ -232,7 +232,7 @@ public class SaveMigrationTests
             out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(5, from);
-        Assert.AreEqual(7, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v5 lifts through every step");
         Assert.AreEqual(9, save.gold);
         Assert.IsNotNull(save.skillVariants);
     }
@@ -243,7 +243,7 @@ public class SaveMigrationTests
         hero = Hero();
         RunProfile.SkillVariants["fenwalker:Cleave"] = SkillVariantCatalog.CleaveFrontalId;
         SaveService.SaveNow(hero, path: path);
-        Assert.AreEqual(7, SaveMigrations.ReadVersion(path));
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path));
 
         RunProfile.Reset();
         Assert.IsTrue(SaveService.TryLoad(hero, path));

@@ -49,6 +49,7 @@ public static class SaveMigrations
         if (save.v == 4) V4ToV5(save);
         if (save.v == 5) V5ToV6(save);
         if (save.v == 6) V6ToV7(save);
+        if (save.v == 7) V7ToV8(save);
         return Outcome.Migrated;
     }
 
@@ -130,6 +131,17 @@ public static class SaveMigrations
         if (save.skillVariants == null)
             save.skillVariants = new System.Collections.Generic.List<SkillVariantEntry>();
         save.v = 7;
+    }
+
+    /// <summary>
+    /// v7 → v8: the risk shrine starts unchosen (older saves predate it).
+    /// v5–v7 fields stay untouched.
+    /// </summary>
+    static void V7ToV8(SaveGame save)
+    {
+        save.riskShrineState = (int)RiskShrineState.Unchosen;
+        save.riskReward = null;
+        save.v = 8;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>

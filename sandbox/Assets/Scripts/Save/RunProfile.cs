@@ -28,6 +28,9 @@ public static class RunProfile
     /// <summary>Act I progression (act-one S1, save v4).</summary>
     public static ActProgress Act = new ActProgress();
 
+    /// <summary>Risk-shrine choice (risk-shrines S1, save v8).</summary>
+    public static RiskShrineProgress RiskShrine = new RiskShrineProgress();
+
     /// <summary>Fresh-run defaults (New Game, headless tests).</summary>
     public static void Reset()
     {
@@ -41,6 +44,7 @@ public static class RunProfile
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
         ContractProgress.Reset();
         SmithingMaterial = 0;
+        RiskShrine.Reset();
     }
 
     static string VariantKey(string classId, DiabloSkills.Skill skill) => classId + ":" + skill;

@@ -122,6 +122,8 @@ public static class SaveService
             waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
             smithingMaterial = System.Math.Max(0, RunProfile.SmithingMaterial),
             skillVariants = CaptureVariants(),
+            riskShrineState = (int)RunProfile.RiskShrine.State,
+            riskReward = RunProfile.RiskShrine.PendingReward,
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -196,6 +198,16 @@ public static class SaveService
         ContractProgress.FromSnapshot(save.contract);
         RunProfile.SmithingMaterial = System.Math.Max(0, save.smithingMaterial);
         ApplyVariants(save);
+        RunProfile.RiskShrine.State = (RiskShrineState)UnityEngine.Mathf.Clamp(save.riskShrineState, 0, 4);
+        RunProfile.RiskShrine.PendingReward = save.riskReward;
+        // A claimed shrine never carries a leftover reward; an interrupted
+        // payout (crash between bag write and save) re-opens the claim.
+        if (RunProfile.RiskShrine.State == RiskShrineState.RewardClaimed)
+            RunProfile.RiskShrine.PendingReward = null;
+        else if (RunProfile.RiskShrine.State == RiskShrineState.RewardAvailable
+                 && RunProfile.RiskShrine.PendingReward == null)
+            RunProfile.RiskShrine.PendingReward =
+                RiskShrineProgress.RollRare(RunProfile.RunSeed);
     }
 
     static System.Collections.Generic.List<SkillVariantEntry> CaptureVariants()
@@ -221,6 +233,16 @@ public static class SaveService
             if (!SkillVariantCatalog.IsKnownVariant(e.classId, skill, e.variant)) continue;
             RunProfile.SkillVariants[e.classId + ":" + skill] = e.variant;
         }
+        RunProfile.RiskShrine.State = (RiskShrineState)UnityEngine.Mathf.Clamp(save.riskShrineState, 0, 4);
+        RunProfile.RiskShrine.PendingReward = save.riskReward;
+        // A claimed shrine never carries a leftover reward; an interrupted
+        // payout (crash between bag write and save) re-opens the claim.
+        if (RunProfile.RiskShrine.State == RiskShrineState.RewardClaimed)
+            RunProfile.RiskShrine.PendingReward = null;
+        else if (RunProfile.RiskShrine.State == RiskShrineState.RewardAvailable
+                 && RunProfile.RiskShrine.PendingReward == null)
+            RunProfile.RiskShrine.PendingReward =
+                RiskShrineProgress.RollRare(RunProfile.RunSeed);
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

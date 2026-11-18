@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 7;
+    public const int CurrentVersion = 8;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -53,6 +53,10 @@ public sealed class SaveGame
 
     // v7 (skill-variants S1): variant picks by class+skill.
     public List<SkillVariantEntry> skillVariants = new List<SkillVariantEntry>();
+
+    // v8 (risk-shrines S1): one-shot shrine choice; older saves start Unchosen (0).
+    public int riskShrineState;
+    public ItemInstance riskReward;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted
