@@ -171,7 +171,12 @@ public sealed class EnemyHealth : NetworkBehaviour
         var netObj = GetComponent<NetworkObject>();
         var nm = NetworkManager.Singleton;
         if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer)
+        {
+            // S3: let clients rebuild the corpse from their husk copy, then despawn.
+            var relay = DiabloNetworkPlayer.HostRelay();
+            if (relay != null) relay.BroadcastCorpse(netObj.NetworkObjectId);
             netObj.Despawn();
+        }
         else
             Destroy(gameObject);
     }

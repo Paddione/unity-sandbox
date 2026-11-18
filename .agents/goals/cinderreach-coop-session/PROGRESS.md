@@ -1,6 +1,6 @@
 # Progress: cinderreach-coop-session
 
-Prozent: 40 %
+Prozent: 55 %
 
 ## Erledigt
 
@@ -25,9 +25,24 @@ Prozent: 40 %
   grün, `check-meta` OK; Paarlauf Exit 0: Host 8/8 Phasen 0 Exceptions (181 s), Client `town,zone1`
   0 Exceptions hits=232 (108 s); Solo-Autoplay Exit 0, 0 Exceptions, FPS-Pass 34,6 (Schwelle 30).
 
+- 2026-11-18: S3 world landed. Host-gated group travel: `Net/ZoneTravelRelay.cs` (neu, statisch —
+  `GroupReady`, `SpawnOffset`, Fade-Overlay, `ApplyLocalTravel`/`ApplyRemoteCorpse`), Broadcasts auf
+  dem Host-Player-Relay (`DiabloNetworkPlayer.BroadcastTravel/BroadcastCorpse`, Muster wie ShareKillXP —
+  dynamisch gespawnte Relay-Objekte replizieren nicht, Hash-0-Fehler), `ZoneGate.CoopTick` (alle
+  Lebenden auf dem Gate oder 3 s Host-Hold; `HasClientMirrors` statt `IsSolo`; Clients dwellen lokal
+  nicht), `TeleportViaHost` für den Autoplay-Harness (Broadcast + 15 s Wait statt sync), `DiabloCorpse`
+  remote-Overload + Death-Broadcast vor Despawn, `CoopAutoplay`-Client bleibt bis Zone 2 (60 s Grace).
+  Eigner-Funde: `Diablo.IsSolo` zählt den Server nicht mit (conn==1 solo trotz Client — deshalb
+  Mirror-Zählung); Autoplay umgeht Dwell per `zg.Teleport` (SessionAutoplay.cs:309). `HostHero` nutzt
+  das Owned-Player-Objekt (zwei Objekte heißen „Player“).
+  Belege: EditMode 264/265 (1 vorbestehender `LayoutSeedTests`-Bruch, auch auf Main), PlayMode 127/127
+  (neu `CoopGateTests` 8 Tests), `VerifyDiabloZone` OK, `KayKitAssets.Verify` grün, `check-meta` OK;
+  Paarlauf Exit 0: Host `host broadcasts FenGate → zone 2`, Client `phase zone2: pulled to the Ossuary`
+  + Offsets (0,0,0)/(1,5,0,0), 12 Remote-Corpses, je 0 Exceptions; Solo-Autoplay Exit 0, FPS-Pass 31,2.
+
 ## Nächste Schritte
 
-1. S3 world: Zonen-Gate für alle, Client-Leichen.
+1. S4 economy: Gold/Pickup/Vendor per validiertem ServerRpc.
 
 ## Offene Punkte
 

@@ -594,3 +594,30 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: `DiabloNetworkPlayer.cs` steht nicht in der S2-target_files-Liste (dort nur `DiabloSkills.cs`),
   trägt aber beide Treffer-ServerRpcs — Validierung landet dort, `DiabloSkills` delegiert.
 - Next: S3 world (Gate für alle, Client-Leichen).
+
+## 2026-11-18 — coop-session S3: Gate für alle, Client-Leichen
+
+- Done: `Net/ZoneTravelRelay.cs` (neu, statisch): `GroupReady` (alle Lebenden oder 3 s Host-Hold,
+  nie locked), `SpawnOffset` (Index 0 bleibt, Follower fächern ≤ 3 m), Fade-Overlay (0,3 s, non-blocking),
+  `ApplyLocalTravel` (eigenen Hero per Offset teleportieren), `ApplyRemoteCorpse` (visual aus eigener
+  Husk-Kopie). Broadcasts auf dem Host-Player-Relay (`BroadcastTravel/BroadcastCorpse`, ClientRpcs,
+  Muster ShareKillXP): dynamisch gespawnte Relay-Objekte replizieren NICHT (Client-Hash-0-Fehler),
+  deshalb kein separates Relay-Objekt. `ZoneGate`: `HasClientMirrors` (Spiegel zählen statt
+  `IsSolo` — `ConnectedClientsIds` enthält den Server, solo wäre sonst mit Client true),
+  `CoopTick` (nur Host mit Clients; Clients dwellen lokal nicht), `HostHero` (Owned-Player-Objekt —
+  zwei Objekte heißen „Player“), `TeleportViaHost` (Harness: Broadcast + async, solo: lokal),
+  `ApplyTravel` (gemeinsamer Reisekörper). `DiabloCorpse.SpawnFrom(husk, remote)` + Death-Broadcast
+  vor Despawn. `SessionAutoplay`-Gate wartet 15 s auf Broadcast-Reise; `CoopAutoplay`-Client bleibt
+  bis Zone 2 (60 s Grace, Log `phase zone2`).
+- Belegt: EditMode 264/265 (einziger Fail `LayoutSeedTests`, vorbestehend auf Main),
+  PlayMode 127/127 (neu `CoopGateTests` 8 Tests), `VerifyDiabloZone` OK, `KayKitAssets.Verify` grün,
+  `check-meta` OK; Paarlauf Exit 0: Host `host broadcasts FenGate → zone 2`, Host-Offset (0,0,0),
+  Client-Offset (1,5,0,0), Client `phase zone2: pulled to the Ossuary`, 12 Remote-Corpses, je 0 Exc;
+  Solo-Autoplay Exit 0, FPS-Pass 31,2 (≥ 30).
+- Learned: Autoplay umgeht Dwell per direktem `zg.Teleport` (SessionAutoplay.cs:309) — organischer
+  Dwell/Hold greift bei kämpfenden Heroes nie (Hold resettet bei Bewegung), deshalb braucht der
+  Harness-Pfad einen eigenen Broadcast-Einstieg.
+- Faced: `DiabloNetworkPlayer.cs`/`SessionAutoplay.cs`/`CoopAutoplay.cs` stehen nicht in der
+  S3-target_files-Liste, tragen aber die Treffer-/Harness-Seite (ServerRpc-Hub, Gate-Fallback,
+  Client-Grace) — wie S2 dokumentiert.
+- Next: S4 economy (Gold/Pickup/Vendor validiert).

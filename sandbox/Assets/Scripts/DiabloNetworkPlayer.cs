@@ -99,6 +99,16 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         }
     }
 
+    /// <summary>Host's player relay (server broadcast entry), null when unavailable.</summary>
+    public static DiabloNetworkPlayer HostRelay()
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || !nm.IsServer || nm.SpawnManager == null) return null;
+        var hostObj = nm.SpawnManager.GetLocalPlayerObject();
+        var relay = hostObj != null ? hostObj.GetComponent<DiabloNetworkPlayer>() : null;
+        return relay != null && relay.IsSpawned ? relay : null;
+    }
+
     /// <summary>Server: share one kill's XP with every client (party XP).</summary>
     public void ShareKillXP(int xp, Vector3 at)
     {
@@ -111,6 +121,40 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     {
         if (xp <= 0 || xp > DiabloProgression.XpElite) return;
         DiabloProgression.GrantLocal(xp, at);
+    }
+
+    /// <summary>
+    /// Server: broadcast a gate travel to every side (S3). Call on the host's
+    /// player object (like <see cref="ShareKillXP"/>): each process fades and
+    /// teleports its own hero with a spawn offset.
+    /// </summary>
+    public void BroadcastTravel(string gateName, Vector3 baseDest, int targetZone)
+    {
+        if (!IsServer || !IsSpawned) return;
+        TravelClientRpc(gateName, baseDest, targetZone);
+    }
+
+    [ClientRpc]
+    void TravelClientRpc(string gateName, Vector3 baseDest, int targetZone)
+    {
+        StartCoroutine(ZoneTravelRelay.TravelRoutine(gateName, baseDest, targetZone));
+    }
+
+    /// <summary>
+    /// Server: replay a husk death on clients so they rebuild the corpse
+    /// from their own husk copy (S3). The host already spawned its corpse.
+    /// </summary>
+    public void BroadcastCorpse(ulong huskNetId)
+    {
+        if (!IsServer || !IsSpawned) return;
+        CorpseClientRpc(huskNetId);
+    }
+
+    [ClientRpc]
+    void CorpseClientRpc(ulong huskNetId)
+    {
+        if (IsServer) return; // the host already spawned its corpse in Die
+        ZoneTravelRelay.ApplyRemoteCorpse(huskNetId);
     }
 
     /// <summary>Melee skill range for validation (attack arc + tolerance in ApplyValidated).</summary>

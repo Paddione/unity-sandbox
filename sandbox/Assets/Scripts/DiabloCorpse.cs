@@ -6,7 +6,8 @@ using UnityEngine;
 /// components — so arc targeting, aggro and kill asserts never see it. Plays
 /// the Death take (primitives tip over instead), lies for
 /// <see cref="LieSeconds"/>, sinks into the ground and destroys itself.
-/// Local-only: co-op clients keep the existing despawn path.
+/// S3 co-op: the host still spawns its corpse locally; clients rebuild the
+/// same visual from their own husk copy via the relay (remote: true).
 /// </summary>
 public sealed class DiabloCorpse : MonoBehaviour
 {
@@ -39,11 +40,19 @@ public sealed class DiabloCorpse : MonoBehaviour
     /// Leave a body for this husk. Prefers a fresh instance of the husk's
     /// source model (<see cref="EnemyHealth.corpseModel"/>: no netcode
     /// components, safe on a solo host); falls back to an inactive clone for
-    /// model-less husks offline. Null on dedicated servers and clients.
+    /// model-less husks offline. Null on dedicated servers and (unless
+    /// <paramref name="remote"/>) on clients.
     /// </summary>
-    public static GameObject SpawnFrom(GameObject husk)
+    public static GameObject SpawnFrom(GameObject husk) => SpawnFrom(husk, remote: false);
+
+    /// <summary>
+    /// Remote variant for the co-op corpse broadcast (S3): same visual built
+    /// from the client's own husk copy, without the authority gate.
+    /// </summary>
+    public static GameObject SpawnFrom(GameObject husk, bool remote)
     {
-        if (husk == null || !Diablo.IsLocalAuthority()) return null;
+        if (husk == null) return null;
+        if (!remote && !Diablo.IsLocalAuthority()) return null;
         var health = husk.GetComponent<EnemyHealth>();
         GameObject corpse;
         if (health != null && health.corpseModel != null)

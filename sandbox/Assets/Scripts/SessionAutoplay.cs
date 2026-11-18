@@ -306,7 +306,20 @@ public sealed class SessionAutoplay : MonoBehaviour
             yield return null;
             arrived = Vector3.Distance(hero.transform.position, gate.transform.position);
         }
-        if (ZoneGate.Teleports == before) zg.Teleport(hero.gameObject);
+        bool viaBroadcast = false;
+        if (ZoneGate.Teleports == before) viaBroadcast = zg.TeleportViaHost(hero.gameObject);
+        if (viaBroadcast)
+        {
+            // The host's own travel arrives asynchronously (fade + teleport);
+            // wait for it like the arrival loop above instead of failing fast.
+            float waitBy = Time.realtimeSinceStartup + 15f;
+            while (ZoneGate.Teleports == before
+                   && Time.realtimeSinceStartup < waitBy && Time.realtimeSinceStartup < deadline)
+            {
+                TickGod(hero);
+                yield return null;
+            }
+        }
         bool saved = SaveService.HasSave()
             && System.IO.File.ReadAllText(SaveService.DefaultPath).Contains($"\"zoneReached\": {expectZone}");
         Log($"phase gate_{gateName}: teleports={ZoneGate.Teleports - before} zoneSaved={saved} (expectZone={expectZone})");

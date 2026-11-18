@@ -160,6 +160,20 @@ public sealed class CoopAutoplay : MonoBehaviour
         }
         Log($"phase fen: hits={hits} hostLeft={hostLeft} clear={clear} connected={Connected()}");
         if (hits >= MinFenHits && (hostLeft || clear)) result.Reach(AutoplayResult.PhaseZone1);
+        // S3: stay for the host's gate broadcast so both sides reach zone 2.
+        // The broadcast pulls this hero to the Ossuary (own x passes FenLeftX);
+        // fall back to quitting after the grace period (zone1 credit kept).
+        float graceBy = Time.realtimeSinceStartup
+            + (result.phases.Contains(AutoplayResult.PhaseZone1) ? 60f : 0f);
+        while (Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < graceBy && Connected())
+        {
+            if (hero.transform.position.x > FenLeftX)
+            {
+                Log("phase zone2: pulled to the Ossuary by the host broadcast");
+                break;
+            }
+            yield return null;
+        }
         DiabloClickController.ExternalDrive = false;
         Finish();
     }
