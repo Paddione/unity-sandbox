@@ -20,9 +20,14 @@
 #    /tmp/unity-sandbox-editor.lock, so concurrent sessions queue instead
 #    of interleaving stop/start and leaving the shared editor dead;
 #  - pins job worker threads (-job-worker-count, default 10 of 12 cores);
-#  - prints a heartbeat line every 60 s (elapsed + last progress line);
+#  - prints a heartbeat line every 60 s (elapsed, log silence, last line);
+#  - stall watchdog: a log silent for UNITY_STALL_S (default 600 s) ends the
+#    run like a timeout, and waiting runs end a stalled lock holder
+#    (scripts/lib/unity-editor-lock.sh), so one frozen editor cannot block
+#    the queue;
 #  - hard timeout (default 1500 s): kills stragglers, clears the lock,
 #    prints the log tail, exits 2 (distinguishes hang from build failure);
+#    a stall or timeout after the success marker counts as OK (shutdown hang);
 #  - checks the success marker in the log (exit 1 when missing).
 #
 # Usage (from the repo root):
@@ -61,16 +66,11 @@ live_holders() {
 # --- 0. Machine-wide build lock ----------------------------------------------
 # All editor-owning runs (builds + tests, any checkout) queue on one flock.
 # Without it, concurrent sessions interleave stop/start of the shared editor
-# service and the last trap leaves it dead for every MCP client.
-# A caller that already holds the lock (run-unity-tests.sh -> unity-warmup.sh)
-# exports UNITY_EDITOR_LOCK_HELD=1: re-locking from the child would open a new
-# file description and wait on its own parent forever.
-if [ "${UNITY_EDITOR_LOCK_HELD:-0}" != 1 ]; then
-  exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
-  echo "run-unity-build: waiting for the machine-wide editor lock..."
-  flock 9
-  echo "run-unity-build: editor lock acquired."
-fi
+# service and the last trap leaves it dead for every MCP client. Waiters end
+# a holder whose Unity log stalled (scripts/lib/unity-editor-lock.sh).
+# shellcheck source=lib/unity-editor-lock.sh
+source "$ROOT/scripts/lib/unity-editor-lock.sh"
+unity_lock_acquire run-unity-build
 
 # --- 1. Warm-editor service -------------------------------------------------
 # Stop first: the keep-warm editor otherwise trips the lock gate on every run
@@ -107,34 +107,30 @@ if [ -e "$LOCKFILE" ]; then
   rm -f "$LOCKFILE"
 fi
 
-# --- 3. Build with heartbeat + hard timeout --------------------------------
-echo "run-unity-build: $METHOD (timeout ${TIMEOUT}s, jobs $JOBS, log $LOG)"
+# --- 3. Build with heartbeat, stall watchdog + hard timeout ----------------
+echo "run-unity-build: $METHOD (timeout ${TIMEOUT}s, stall ${UNITY_STALL_S}s, jobs $JOBS, log $LOG)"
 # UNITY_BUILD_EXTRA_ARGS: optional extra editor args, word-split on purpose
 # (e.g. "-buildOut /path/to/player" for SandboxBuilder.BuildDiabloZoneBuild).
 # shellcheck disable=SC2086
-"$EDITOR" -batchmode -nographics -quit -projectPath "$PROJECT" \
-  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" ${UNITY_BUILD_EXTRA_ARGS:-} &
-UNITY_PID=$!
-
-START=$SECONDS
-while kill -0 "$UNITY_PID" 2>/dev/null; do
-  sleep 60
-  ELAPSED=$((SECONDS - START))
-  PHASE=$(grep -a -o "DisplayProgressbar: .*" "$LOG" 2>/dev/null | tail -1 || true)
-  echo "run-unity-build: heartbeat ${ELAPSED}s alive ${PHASE:-starting up}"
-  if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-    echo "run-unity-build: TIMEOUT after ${ELAPSED}s — killing build tree." >&2
-    kill -9 "$UNITY_PID" 2>/dev/null || true
-    sleep 2
-    STRAGGLERS=$(live_holders || true)
-    [ -n "$STRAGGLERS" ] && kill -9 $STRAGGLERS 2>/dev/null || true
+unity_run_watched run-unity-build "$LOG" "$TIMEOUT" \
+  "$EDITOR" -batchmode -nographics -quit -projectPath "$PROJECT" \
+  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" ${UNITY_BUILD_EXTRA_ARGS:-}
+RC=$UNITY_RUN_RC
+if [ "$UNITY_RUN_END" != done ]; then
+  STRAGGLERS=$(live_holders || true)
+  # shellcheck disable=SC2086
+  [ -n "$STRAGGLERS" ] && kill -9 $STRAGGLERS 2>/dev/null || true
+  if grep -a -F -q "$MARKER" "$LOG" 2>/dev/null; then
+    # Known failure 2: Unity hangs in shutdown after a finished build.
+    echo "run-unity-build: $UNITY_RUN_END after the success marker, outputs are written; treating as OK."
+    RC=0
+  else
     echo "--- log tail ---" >&2
     tail -20 "$LOG" | cut -c1-160 >&2 || true
+    echo "run-unity-build: $UNITY_RUN_END, exit 2 (safe to retry)." >&2
     exit 2
   fi
-done
-RC=0
-wait "$UNITY_PID" || RC=$?
+fi
 
 # --- 4. Result ---------------------------------------------------------------
 trap - EXIT

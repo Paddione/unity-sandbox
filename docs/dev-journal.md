@@ -542,6 +542,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: erster Solo-Lauf ohne `-seed` las Seed 1112106611 aus einem vorhandenen Save; in dieser Fen-Variante blieb
   der Held nach 11 Kills ohne Treffer bis Budgetende hängen (Befund in PROGRESS, nicht S1).
 - Next: S2 host-autoritative Gegner.
+## 2026-11-18 — fix: Editor-Sperre überspringt hängende Läufe
 
 ## 2026-11-18 — faire Kämpfe Akt I: Plaza, Wind-up-Orb, PlayMode-Belege
 
@@ -559,3 +560,15 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   (14 rote EditMode-Tests); YAML-Patch nur des Gate-Ziels verworfen, Szene aus Main übernommen, Library per
   `unity-warmup.sh` geheilt (Sitzung 1 gebunden).
 - Offen: zwei manuelle Windows-Läufe laut Protokoll (Eigner).
+- Anlass: Ein EditMode-Lauf (`skill-variants-s1`) fror um 14:35 im Startup ein (0 % CPU, kein Log-Byte in 16 min)
+  und überlebte seine Session. Er hielt die maschinenweite Editor-Sperre, rund zehn Läufe standen dahinter.
+- Done: `scripts/lib/unity-editor-lock.sh`, von `run-unity-build.sh` und `run-unity-tests.sh` genutzt. Der Halter
+  trägt seinen Unity-Prozess und sein Log in `<lock>.owner` ein. Ein Lauf, dessen Log `UNITY_STALL_S` (600 s)
+  still ist, endet selbst mit Exit 2 und gibt die Sperre sofort frei (Tests: ohne die nächste Plattform zu
+  starten). Wartende pollen alle 30 s und beenden einen hängenden, auch verwaisten Halter samt Prozessbaum. Eine
+  wiederverwendete PID wird nicht getroffen (die Kommandozeile muss den Log-Pfad tragen). Hängt ein Build erst
+  nach dem Erfolgsmarker (bekannter Shutdown-Hänger), gilt er als OK.
+- Belegt: `scripts/test-unity-editor-lock.sh` 6/6 mit Fake-Editor (34 s). Echter Lauf durch die neuen Wrapper:
+  Warm-up, EditMode 201/201, PlayMode 84/84.
+- Faced: `pkill -f` auf ein Muster aus der eigenen Kommandozeile beendete die eigene Shell. Der Test räumt nur
+  per PID-Baum auf.

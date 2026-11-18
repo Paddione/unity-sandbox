@@ -12,8 +12,10 @@
 #    concurrent sessions queue instead of leaving the shared editor dead;
 #  - refuses to start when another Unity holds this project (exit 3);
 #    only a stale lockfile (no live holder) is removed;
-#  - hard timeout per platform (default 1500 s): exit 2 on hang (timeout 124),
-#    exit 1 on test/process failure — a hang is not a test failure;
+#  - hard timeout per platform (default 1500 s) and a stall watchdog (log
+#    silent for UNITY_STALL_S, default 600 s): exit 2 on either, at once, so
+#    the lock goes to the next queued run; exit 1 on test/process failure;
+#    waiting runs end a stalled lock holder (scripts/lib/unity-editor-lock.sh);
 #  - heartbeat line every 60 s so a stuck run looks different from a slow one.
 #
 # Exit semantics (live CLI table, verified 2026-11-17):
@@ -46,13 +48,13 @@ live_holders() {
   echo "$holders"
 }
 
-# Machine-wide editor lock: queue behind any build/test (see header).
-exec 9>"${TMPDIR:-/tmp}/unity-sandbox-editor.lock"
-echo "run-unity-tests: waiting for the machine-wide editor lock..."
-flock 9
-echo "run-unity-tests: editor lock acquired."
-# Nested run-unity-build.sh calls (warm-up) must not wait on this lock again.
-export UNITY_EDITOR_LOCK_HELD=1
+# Machine-wide editor lock: queue behind any build/test (see header). Waiters
+# end a holder whose Unity log stalled. The lock exports
+# UNITY_EDITOR_LOCK_HELD=1, so nested run-unity-build.sh calls (warm-up) do
+# not wait on it again.
+# shellcheck source=lib/unity-editor-lock.sh
+source "$PWD/scripts/lib/unity-editor-lock.sh"
+unity_lock_acquire run-unity-tests
 
 SERVICE_STOPPED=0
 if [ "$project" = "$HOME/unity-sandbox/sandbox" ] && systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
@@ -85,14 +87,6 @@ if [ -e "$LOCKFILE" ]; then
   rm -f "$LOCKFILE"
 fi
 
-heartbeat() {
-  local log="$1" start="$2"
-  while true; do
-    sleep 60
-    echo "run-unity-tests: still running ($(( $(date +%s) - start ))s): $(tail -n 1 "$log" 2>/dev/null | cut -c1-160)"
-  done
-}
-
 # Warm-up (scripts/unity-warmup.sh): compile outside the test session and
 # rebind runtime scripts whose MonoScript lost its class (Editor/LibraryRepair.cs).
 # Without it a worktree with a copied Library ran EditMode with every scene
@@ -109,19 +103,16 @@ for platform in "${platforms[@]}"; do
   log="$artifacts/$platform.log"
   rm -f "$result"
   echo "Running $platform with Unity $version"
-  start=$(date +%s)
-  heartbeat "$log" "$start" &
-  hb=$!
-  rc=0
   # -quit would kill -runTests (dev-journal Q5): never pass it here.
-  timeout "$TIMEOUT" "$editor" -batchmode -nographics -projectPath "$project" -runTests \
-      -testPlatform "$platform" -testResults "$result" -logFile "$log" || rc=$?
-  kill "$hb" 2>/dev/null || true
-  if [ "$rc" -eq 124 ]; then
-    echo "$platform hung past ${TIMEOUT}s — infra hang (exit 2), safe to retry" >&2
+  unity_run_watched run-unity-tests "$log" "$TIMEOUT" \
+      "$editor" -batchmode -nographics -projectPath "$project" -runTests \
+      -testPlatform "$platform" -testResults "$result" -logFile "$log"
+  rc=$UNITY_RUN_RC
+  if [ "$UNITY_RUN_END" != done ]; then
+    # Stall or timeout: infra hang. Stop here so the lock goes to the next run.
+    echo "$platform $UNITY_RUN_END — infra hang (exit 2), safe to retry" >&2
     tail -n 60 "$log" >&2 || true
-    failed=2
-    continue
+    exit 2
   elif [ "$rc" -ne 0 ]; then
     echo "$platform editor/test process failed (exit $rc)" >&2
     tail -n 60 "$log" >&2 || true
