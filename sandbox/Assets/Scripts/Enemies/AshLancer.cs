@@ -92,7 +92,7 @@ public sealed class AshLancer : MonoBehaviour
                         HeroHits++;
                         int dmg = DifficultyProfile.Current.ScaleDamage(ChargeDamage);
                         var hp = hero.GetComponent<PlayerHealth>();
-                        if (hp != null) hp.TakeDamage(dmg);
+                        if (hp != null) hp.TakeDamage(dmg, transform.position);
                         DiabloJuice.OnPlayerHurt(hero.position, dmg);
                     }
                 }

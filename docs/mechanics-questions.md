@@ -123,3 +123,10 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Grenze: Ossuary-Leash findet keine Ziele (Folgepass Leash/Anmarsch).
 
 - Historie: Basis-Teil ohne S5 (Seams) siehe Git-Historie dieser Datei.
+
+## Q10 — Trägt der stationäre Nahkampf mit Outreach-Stoß und Block?
+
+- Question: bleibt der Kill-Loop spaßig, wenn LMB ortsfest im 120°-Kegel (2,2 m, alle Treffer, kein Step-in, keine Chase) trifft, RMB als schmaler Stoß (25°, 3,2 m, 1,2 s Cooldown) gegnerische Melee-Reichweite (2,0 m) outrangt und Shift frontal blockt (50 % Reduktion Nah/Ferne, feindliche Projektile fliegen zurück)?
+- Setup: `DiabloMelee` (Kegel-Mehrfachtreffer + Stoß), `DiabloBlock` (Shift halten, frontal 60°), `DiabloClickController` (Strike/Thrust, RMB von `DiabloSkills` abgelöst), `PlayerHealth.TakeDamage(amount, fromPos)`, Reflexion in `DiabloProjectile`, `DiabloTargetBar`-Sprite-Fix (fillAmount ohne Sprite rendert nicht).
+- Exit criterion: `VerifyDiabloZone` grün, EditMode + PlayMode grün (inkl. `DiabloMeleeReworkTests`: ortsfester Mehrfachtreffer, Stoß-Reichweite, frontal halbiert/hinten voll, Projektil-Reflexion, Balken-Sprite), decision logged as Q10 continue/pivot/kill.
+- Headless proof: EditMode 305/305 + PlayMode 180/180 (dieser Branch).

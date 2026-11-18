@@ -201,7 +201,7 @@ public sealed class FireWave
             HitHero = true;
             int dmg = DifficultyProfile.Current.ScaleDamage(KilnmotherController.WaveDamage);
             var hp = hero.GetComponent<PlayerHealth>();
-            if (hp != null) hp.TakeDamage(dmg);
+            if (hp != null) hp.TakeDamage(dmg, center);
             DiabloJuice.OnPlayerHurt(hero.position, dmg);
         }
         return RadiusAt(now) > KilnmotherController.WaveMaxRadius;

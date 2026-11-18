@@ -141,7 +141,7 @@ public sealed class BossController : NetworkBehaviour
         {
             var hp = hero.GetComponent<PlayerHealth>();
             int slam = DifficultyProfile.Current.ScaleDamage(SlamDamage);
-            if (hp != null) hp.TakeDamage(slam);
+            if (hp != null) hp.TakeDamage(slam, transform.position);
             DiabloAudio.PlayHurt();
             DiabloJuice.OnPlayerHurt(hero.position, slam);
         }

@@ -163,7 +163,10 @@ public class DiabloP2LoopTests
     [UnityTest]
     public System.Collections.IEnumerator Strike_HitsHuskInFacingArc()
     {
-        var front = SpawnHusk(new Vector3(0f, 1f, 1.5f));
+        // Stationary rework: no step-in glue, so the husk starts at 0.8 m —
+        // two 0.6 m knockbacks still leave the corpse inside the 2.2 m arc
+        // for the third swing (1.5 m would strand it at 2.7 m).
+        var front = SpawnHusk(new Vector3(0f, 1f, 0.8f));
         var behind = SpawnHusk(new Vector3(0f, 1f, -1.5f));
         controller.SetAimPoint(new Vector3(0f, 0f, 10f));
         for (int i = 0; i < 3; i++) Assert.IsTrue(controller.Strike(), "Strike into the arc must hit.");

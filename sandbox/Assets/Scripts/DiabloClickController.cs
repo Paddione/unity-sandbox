@@ -4,10 +4,11 @@ using Unity.Netcode;
 
 /// <summary>
 /// Isometric hero controller for the Diablo prototype (Q5 click-to-move,
-/// P2+ hybrid): WASD/arrows move camera-relative with priority, the hero
-/// always faces the mouse cursor, left-click strikes toward the cursor
-/// (a clicked husk keeps the Q5 attack-move chase). Bindings are
-/// code-defined (Input System package, no .inputactions asset), like Q1.
+/// Cinderreach rework): WASD/arrows move camera-relative with priority, the
+/// hero always faces the mouse cursor, left-click strikes a stationary
+/// frontal cone toward the cursor (no step-in, no chase), right-click thrusts
+/// past husk melee range, Shift blocks frontally. Bindings are code-defined
+/// (Input System package, no .inputactions asset), like Q1.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public sealed class DiabloClickController : MonoBehaviour
@@ -28,8 +29,10 @@ public sealed class DiabloClickController : MonoBehaviour
     CharacterController controller;
     DiabloMelee melee;
     DiabloNetworkPlayer netPlayer;
+    DiabloBlock block;
     float verticalVelocity;
     float lastNetSwing = float.NegativeInfinity;
+    float lastNetThrust = float.NegativeInfinity;
     Vector3 destination;
     bool hasDestination;
     GameObject attackTarget;
@@ -39,6 +42,8 @@ public sealed class DiabloClickController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
+        block = GetComponent<DiabloBlock>();
+        if (block == null) block = gameObject.AddComponent<DiabloBlock>();
         var fwd = transform.forward;
         fwd.y = 0f;
         AimDirection = fwd.sqrMagnitude > 0.0001f ? fwd.normalized : Vector3.forward;
@@ -56,7 +61,7 @@ public sealed class DiabloClickController : MonoBehaviour
     /// <summary>
     /// True when a scene-local click controller must stand down: the scene
     /// runs netcode and this object is not the network player.
-    /// Pure rule so EditMode tests can pin it.
+    /// Pure rule so EditMode tests can pin it without spawning UI.
     /// </summary>
     public static bool ShouldYieldToNetcode(bool hasNetworkPlayer, bool netcodeInScene) =>
         !hasNetworkPlayer && netcodeInScene;
@@ -80,7 +85,11 @@ public sealed class DiabloClickController : MonoBehaviour
         attackTarget = null;
     }
 
-    /// <summary>Order attack-move against a husk (re-paths into melee range).</summary>
+    /// <summary>
+    /// Driver/autoplay seam (bots, scripted runs): approach and swing at a
+    /// husk. Player clicks never set this since the rework (LMB is
+    /// stationary); kept so autoplay and existing driver tests keep working.
+    /// </summary>
     public void AttackTarget(GameObject target)
     {
         attackTarget = target;
@@ -127,30 +136,74 @@ public sealed class DiabloClickController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(AimDirection);
     }
 
-    /// <summary>Step into every cursor strike (D2 commitment, also on whiffs).</summary>
+    /// <summary>
+    /// Legacy step-in distance (pre-rework D2 commitment). Kept as a constant
+    /// so old tuning references compile; strikes no longer move the hero.
+    /// </summary>
     public const float StrikeStep = 0.5f;
 
-    /// <summary>Swing toward the cursor; relays via netcode when spawned.</summary>
+    /// <summary>True while the Shift block is held.</summary>
+    public bool IsBlocking()
+    {
+        if (block == null) block = GetComponent<DiabloBlock>();
+        return block != null && block.Held;
+    }
+
+    /// <summary>
+    /// Stationary LMB cone toward the cursor: damages every husk in the
+    /// frontal arc, never moves the hero. Relays per-target via netcode.
+    /// Blocked while blocking. Returns true when at least one husk is hit.
+    /// </summary>
     public bool Strike()
     {
+        if (IsBlocking()) return false;
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
-        if (controller != null) controller.Move(AimDirection * StrikeStep);
         var driver = GetComponent<DiabloAnimator>();
         if (driver != null) driver.OnStrike();
         SheatheBow();
         DiabloAudio.PlaySwing();
-        var target = melee != null
-            ? DiabloMelee.FindArcTarget(transform, AimDirection, melee.attackRange)
-            : null;
-        if (target == null) return false;
+        var targets = melee != null
+            ? DiabloMelee.FindArcTargets(transform, AimDirection, melee.attackRange, DiabloMelee.ArcHalfAngle)
+            : new System.Collections.Generic.List<GameObject>();
+        if (targets.Count == 0) return false;
         var nm = NetworkManager.Singleton;
         if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
         {
-            netPlayer.Attack(target, melee, transform);
+            float cd = melee != null ? melee.cooldown : 0.5f;
+            if (Time.time - lastNetSwing < cd) return false;
+            lastNetSwing = Time.time;
+            foreach (var t in targets) netPlayer.Attack(t, melee, transform);
             return true;
         }
-        return melee != null && melee.TryAttack(target, transform);
+        return melee != null && melee.TryConeAttack(transform, AimDirection) > 0;
+    }
+
+    /// <summary>
+    /// RMB outreach thrust toward the cursor: narrow cone past husk melee
+    /// range. Blocked while blocking. Returns true on a landed hit.
+    /// </summary>
+    public bool Thrust()
+    {
+        if (IsBlocking()) return false;
+        if (melee == null) melee = GetComponent<DiabloMelee>();
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var driver = GetComponent<DiabloAnimator>();
+        if (driver != null) driver.OnStrike();
+        SheatheBow();
+        DiabloAudio.PlaySwing();
+        var targets = DiabloMelee.FindArcTargets(
+            transform, AimDirection, DiabloMelee.OutreachRange, DiabloMelee.OutreachHalfAngle);
+        if (targets.Count == 0) return false;
+        var nm = NetworkManager.Singleton;
+        if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
+        {
+            if (Time.time - lastNetThrust < DiabloMelee.OutreachCooldown) return false;
+            lastNetThrust = Time.time;
+            foreach (var t in targets) netPlayer.Attack(t, melee, transform);
+            return true;
+        }
+        return melee != null && melee.TryThrust(transform, AimDirection) > 0;
     }
 
     void Update()
@@ -158,6 +211,7 @@ public sealed class DiabloClickController : MonoBehaviour
         // P2 co-op: remote mirrors are driven by NetworkTransform, not input.
         if (IsRemoteMirror) return;
         if (!ExternalDrive) PollKeyboard();
+        UpdateBlock();
 
         var mouse = ExternalDrive ? null : Mouse.current;
         if (mouse != null && Camera.main != null)
@@ -166,18 +220,24 @@ public sealed class DiabloClickController : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out var aimHit, 200f))
                 SetAimPoint(aimHit.point);
-            if (mouse.leftButton.wasPressedThisFrame
-                && !ShouldBlockClicks(GetComponent<DiabloInventoryUI>()))
-                HandleClick(aimHit);
+            if (!ShouldBlockClicks(GetComponent<DiabloInventoryUI>()))
+            {
+                if (mouse.leftButton.wasPressedThisFrame)
+                    Strike();
+                else if (mouse.rightButton.wasPressedThisFrame)
+                    Thrust();
+            }
         }
 
+        float speed = walkSpeed * (IsBlocking() ? DiabloBlock.BlockMoveMultiplier : 1f);
         // WASD/arrows win over click orders; facing stays on the cursor.
         if (MoveInput.sqrMagnitude > 0.0001f)
         {
-            Move(MoveInput * walkSpeed);
+            Move(MoveInput * speed);
         }
-        // Attack-move: approach until in range, then swing (cooldown gates repeats).
-        // Unity fake-null: a destroyed husk reads as null here and clears the order.
+        // Driver/autoplay seam: approach until in range, then swing (cooldown
+        // gates repeats). Unity fake-null: a destroyed husk reads as null
+        // here and clears the order. Player clicks never set this.
         else if (attackTarget != null)
         {
             var toTarget = attackTarget.transform.position - transform.position;
@@ -213,7 +273,7 @@ public sealed class DiabloClickController : MonoBehaviour
             }
             else
             {
-                Move(toTarget.normalized * walkSpeed);
+                Move(toTarget.normalized * speed);
                 Face(toTarget);
             }
         }
@@ -227,7 +287,7 @@ public sealed class DiabloClickController : MonoBehaviour
             }
             else
             {
-                Move(toDest.normalized * walkSpeed);
+                Move(toDest.normalized * speed);
                 Face(toDest);
             }
         }
@@ -262,12 +322,15 @@ public sealed class DiabloClickController : MonoBehaviour
         attackTarget = null;
     }
 
-    void HandleClick(RaycastHit hit)
+    /// <summary>Shift hold drives the block (programmatic Held survives headless).</summary>
+    void UpdateBlock()
     {
-        if (hit.collider != null && hit.collider.CompareTag("Husk"))
-            AttackTarget(hit.collider.gameObject);
-        else
-            Strike();
+        if (block == null) block = GetComponent<DiabloBlock>();
+        if (block == null) return;
+        if (ExternalDrive) return;
+        var kb = Keyboard.current;
+        if (kb == null) return; // headless/tests: API only
+        block.Held = kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
     }
 
     /// <summary>Melee swings put the bow away so the sword shows again.</summary>

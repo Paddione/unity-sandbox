@@ -647,12 +647,12 @@ public sealed class DiabloSkills : MonoBehaviour
         if (charUI != null && charUI.IsOpen) return;
 
         // Keys come from the class: Q/E/R(/Space) map to its skill slots.
+        // RMB is the melee outreach thrust (DiabloClickController), never a skill.
         var skills = ActiveClass.skills;
         if (kb != null && kb.qKey.wasPressedThisFrame && skills.Length > 0) Cast(skills[0]);
         else if (kb != null && kb.eKey.wasPressedThisFrame && skills.Length > 1) Cast(skills[1]);
         else if (kb != null && kb.rKey.wasPressedThisFrame && skills.Length > 2) Cast(skills[2]);
         else if (kb != null && kb.spaceKey.wasPressedThisFrame && skills.Length > 3) Cast(skills[3]);
-        else if (mouse != null && mouse.rightButton.wasPressedThisFrame) Cast(lastUsed);
 
         UpdateHud();
     }
@@ -670,7 +670,7 @@ public sealed class DiabloSkills : MonoBehaviour
         var parts = new System.Collections.Generic.List<string>();
         for (int i = 0; i < cls.skills.Length; i++)
             parts.Add(Slot(cls.keys[i], SkillName(cls.skills[i]), cls.skills[i]));
-        return string.Join("     ", parts.ToArray()) + $"     RMB: {SkillName(lastUsed)}";
+        return string.Join("     ", parts.ToArray()) + "     RMB: Thrust";
     }
 
     public static string SkillName(Skill s)

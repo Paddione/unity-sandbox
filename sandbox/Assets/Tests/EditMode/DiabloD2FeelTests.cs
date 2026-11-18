@@ -45,7 +45,13 @@ public class DiabloD2FeelTests
     {
         Assert.AreEqual(0.6f, DiabloMelee.KnockbackNormal);
         Assert.AreEqual(0.2f, DiabloMelee.KnockbackElite);
-        Assert.AreEqual(0.5f, DiabloClickController.StrikeStep);
+        Assert.AreEqual(0.5f, DiabloClickController.StrikeStep, "Legacy step constant stays; strikes no longer move.");
+        Assert.AreEqual(60f, DiabloMelee.ArcHalfAngle, "LMB cone is 120°.");
+        Assert.AreEqual(3.2f, DiabloMelee.OutreachRange, "RMB outranges husk melee (2.0 m).");
+        Assert.AreEqual(25f, DiabloMelee.OutreachHalfAngle, "Thrust cone is narrow.");
+        Assert.AreEqual(1.2f, DiabloMelee.OutreachCooldown, "Thrust is slower than the swing.");
+        Assert.AreEqual(60f, DiabloBlock.BlockHalfAngle, "Block covers the frontal arc.");
+        Assert.AreEqual(0.5f, DiabloBlock.BlockMultiplier, "Block halves frontal damage.");
         Assert.AreEqual(2.0f, EnemyAttack.Range);
         Assert.AreEqual(0.4f, EnemyAttack.Windup);
         Assert.AreEqual(1.5f, EnemyAttack.Cooldown);

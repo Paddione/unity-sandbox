@@ -69,9 +69,11 @@ public sealed class DiabloTargetBar : MonoBehaviour
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
 
+        var white = WhiteSprite();
         var panelGo = new GameObject("Panel");
         panelGo.transform.SetParent(canvasGo.transform, false);
         var panel = panelGo.AddComponent<Image>();
+        panel.sprite = white;
         panel.color = new Color(0.05f, 0.05f, 0.08f, 0.85f);
         panel.raycastTarget = false;
         var rect = panelGo.GetComponent<RectTransform>();
@@ -86,6 +88,7 @@ public sealed class DiabloTargetBar : MonoBehaviour
         var bgGo = new GameObject("BarBg");
         bgGo.transform.SetParent(panelGo.transform, false);
         var bg = bgGo.AddComponent<Image>();
+        bg.sprite = white;
         bg.color = new Color(0.3f, 0.05f, 0.05f, 1f);
         bg.raycastTarget = false;
         var bgRect = bgGo.GetComponent<RectTransform>();
@@ -97,6 +100,7 @@ public sealed class DiabloTargetBar : MonoBehaviour
         var fillGo = new GameObject("BarFill");
         fillGo.transform.SetParent(bgGo.transform, false);
         fill = fillGo.AddComponent<Image>();
+        fill.sprite = white;
         fill.color = new Color(0.8f, 0.15f, 0.15f, 1f);
         fill.raycastTarget = false;
         fill.type = Image.Type.Filled;
@@ -106,6 +110,21 @@ public sealed class DiabloTargetBar : MonoBehaviour
         fillRect.anchorMax = Vector2.one;
         fillRect.offsetMin = Vector2.zero;
         fillRect.offsetMax = Vector2.zero;
+    }
+
+    static Sprite whiteSprite;
+
+    /// <summary>Plain white sprite: FillMethod needs one or fillAmount no-ops.</summary>
+    static Sprite WhiteSprite()
+    {
+        if (whiteSprite != null) return whiteSprite;
+        var tex = new Texture2D(4, 4, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+        var px = new Color32[16];
+        for (int i = 0; i < px.Length; i++) px[i] = new Color32(255, 255, 255, 255);
+        tex.SetPixels32(px);
+        tex.Apply();
+        whiteSprite = Sprite.Create(tex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f));
+        return whiteSprite;
     }
 
     Text MakeLabel(Transform parent, string text, int size)

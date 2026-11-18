@@ -81,7 +81,7 @@ public sealed class ThrallBlast : MonoBehaviour
             if (hp != null && Hits(transform.position, hero.transform.position))
             {
                 int dmg = DifficultyProfile.Current.ScaleDamage(CinderThrall.BlastDamage);
-                hp.TakeDamage(dmg);
+                hp.TakeDamage(dmg, transform.position);
                 HeroHits++;
                 DiabloJuice.OnPlayerHurt(hero.transform.position, dmg);
             }

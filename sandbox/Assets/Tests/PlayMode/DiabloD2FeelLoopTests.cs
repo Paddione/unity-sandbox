@@ -199,14 +199,18 @@ public class DiabloD2FeelLoopTests
     }
 
     [UnityTest]
-    public IEnumerator Strike_StepsIntoAim()
+    public IEnumerator Strike_StaysInPlace()
     {
         controller.SetAimPoint(new Vector3(0f, 0f, 10f));
         Vector3 before = player.transform.position;
         Assert.IsFalse(controller.Strike(), "Empty arc must whiff.");
-        Assert.AreEqual(DiabloClickController.StrikeStep,
-            Vector3.Distance(before, player.transform.position), 0.05f,
-            "Strike must step into the aim, even on whiffs.");
+        Assert.AreEqual(0f, Vector3.Distance(before, player.transform.position), 0.001f,
+            "Rework: strikes never move the hero, not even on whiffs.");
+        var husk = SpawnHusk(new Vector3(0f, 1f, 1.5f));
+        Assert.IsTrue(controller.Strike(), "Strike into the arc must hit.");
+        Assert.AreEqual(0f, Vector3.Distance(before, player.transform.position), 0.001f,
+            "Rework: landed strikes never move the hero either.");
         yield return null;
+        Object.DestroyImmediate(husk);
     }
 }

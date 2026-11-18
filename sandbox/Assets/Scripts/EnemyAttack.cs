@@ -159,7 +159,7 @@ public sealed class EnemyAttack : MonoBehaviour
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null) return;
         int dealt = DifficultyProfile.Current.ScaleDamage(damage);
-        hp.TakeDamage(dealt);
+        hp.TakeDamage(dealt, transform.position);
         // replayability S2: Thorns reflect flat damage onto the striker.
         var heroEq = hero.GetComponent<Equipment>();
         int thorns = heroEq != null ? heroEq.ThornsDamage() : 0;

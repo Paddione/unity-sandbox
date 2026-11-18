@@ -144,7 +144,17 @@ public sealed class DiabloProjectile : MonoBehaviour
         {
             var hero = FirstHeroOnSegment(from, to, out float heroT);
             float wall = WallDistance(from, step);
-            if (hero != null && heroT <= wall) { Impact(hero.transform.position, hero.gameObject); return; }
+            if (hero != null && heroT <= wall)
+            {
+                var block = hero.GetComponent<DiabloBlock>();
+                if (block != null && block.BlocksFrom(transform.position))
+                {
+                    Reflect(hero);
+                    return;
+                }
+                Impact(hero.transform.position, hero.gameObject);
+                return;
+            }
             if (wall < step) { Impact(from + direction * wall, null); return; }
             transform.position = to;
             travelled += step;
@@ -298,10 +308,27 @@ public sealed class DiabloProjectile : MonoBehaviour
             bool hit = hero.gameObject == directHit
                 || (blastRadius > 0f && (Flat(hero.transform.position) - Flat(point)).magnitude <= blastRadius);
             if (!hit) continue;
-            hero.TakeDamage(dmg);
+            hero.TakeDamage(dmg, point);
             HeroHits++;
             if (Application.isPlaying) DiabloJuice.OnPlayerHurt(hero.transform.position, dmg);
         }
+    }
+
+    /// <summary>
+    /// Frontal block: turn the hostile projectile around. It flies back as a
+    /// hero-owned projectile and damages husks instead of heroes.
+    /// </summary>
+    void Reflect(PlayerHealth hero)
+    {
+        hostile = false;
+        owner = hero.transform;
+        var back = transform.position - hero.transform.position;
+        back.y = 0f;
+        if (back.sqrMagnitude < 0.0001f) back = -direction;
+        back.y = 0f;
+        direction = back.normalized;
+        if (Application.isPlaying) DiabloAudio.PlayHit();
+        Debug.Log($"[Diablo] {hero.name} blocked and reflected a projectile.");
     }
 
     void Fizzle()

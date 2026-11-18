@@ -46,6 +46,20 @@ public sealed class PlayerHealth : MonoBehaviour
         currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
     }
 
+    /// <summary>
+    /// Directional damage: a held frontal <see cref="DiabloBlock"/> halves
+    /// the hit, anything else lands unreduced. Undirected callers keep the
+    /// full-damage path above.
+    /// </summary>
+    public void TakeDamage(float amount, Vector3 fromPos)
+    {
+        if (amount <= 0f) return;
+        var block = GetComponent<DiabloBlock>();
+        if (block != null && block.BlocksFrom(fromPos))
+            amount = DiabloBlock.Reduce(amount);
+        currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
+    }
+
     /// <summary>Clamp current HP after equipment swaps change the max.</summary>
     public void Refresh()
     {
