@@ -255,14 +255,24 @@ public sealed class EnemyAttack : MonoBehaviour
             Quaternion.LookRotation(d), 10f * Time.deltaTime);
     }
 
-    Transform AcquireHero()
+    /// <summary>
+    /// S2 co-op targeting: nearest living hero (replaces name-based "Player"
+    /// lookup; the cached victim is kept only while still alive).
+    /// Runs locally on every peer for movement; the server owns hero-to-enemy
+    /// damage via HitValidator, enemy-to-hero stays per-client HP.
+    /// </summary>
+    public Transform AcquireHero()
     {
         if (victim != null)
         {
-            if (victim.GetComponent<PlayerHealth>() != null) return victim;
+            var php = victim.GetComponent<PlayerHealth>();
+            if (php != null && php.CurrentHP > 0f && victim.gameObject.activeInHierarchy) return victim;
             victim = null;
         }
-        var solo = HeroLocator.Solo(); // one scene search per frame for all enemies
+        // Nearest living among all heroes (solo: the single "Player").
+        var living = HitValidator.NearestLivingPlayer(transform.position);
+        if (living != null) return living;
+        var solo = HeroLocator.Solo(); // fallback: scene search cache (act-one perf)
         if (solo != null) return solo;
         float best = float.MaxValue;
         Transform bestT = null;

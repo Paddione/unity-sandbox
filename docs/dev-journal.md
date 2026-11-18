@@ -574,3 +574,23 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Warm-up, EditMode 201/201, PlayMode 84/84.
 - Faced: `pkill -f` auf ein Muster aus der eigenen Kommandozeile beendete die eigene Shell. Der Test räumt nur
   per PID-Baum auf.
+
+## 2026-11-18 — coop-session S2: host-autoritative Gegner + HitValidator
+
+- Done: `Net/HitValidator.cs` (neu, pure C# + Unity-Math: Reichweite + 0,5 m, Cooldown, Ziel lebt,
+  Schaden 1..50, `NearestLivingPlayer`), `EnemyHealth` → `NetworkBehaviour` mit `NetHP`
+  (Everyone/Server; Server schreibt, Clients spiegeln per OnValueChanged, ungespawnt lokal),
+  `EnemyAttack.AcquireHero` (public, nächste lebende Heldin), `BossController` → `NetworkBehaviour`
+  mit `Phase` (1/2) + `PhaseTwo`/`SlamTelegraph`-ClientRpc + Summons per `NetworkObject.Spawn`
+  (Server; solo lokal), `RangedCaster` → `NetworkBehaviour` mit `TelegraphClientRpc` + nächste
+  lebende Heldin, `DiabloNetworkPlayer`-Validierung (Melee 4 m/0,5 s, Ranged 24 m/0,3 s, je Sender),
+  `DiabloSkills.ApplyHit`-Kommentar (HitValidator), PlayMode `HostEnemyTests` (5 Tests) +
+  `Sandbox.Tests.PlayMode`-Asmdef um `Unity.Netcode.Runtime` ergänzt.
+- Belegt: EditMode 257/257, PlayMode 113/113, `VerifyDiabloZone` OK (husks=48, armed),
+  `KayKitAssets.Verify` grün, `check-meta` OK; Paarlauf Exit 0 (Host 8/8, 0 Exc, 181 s; Client
+  town,zone1, 0 Exc, hits=232, 108 s); Solo-Autoplay Exit 0, 0 Exc, FPS-Pass 34,6 (≥30).
+- Learned: PlayMode-Tests brauchen `Unity.Netcode.Runtime` in der Asmdef, sobald Produktionscode
+  `NetworkBehaviour` als Basis nutzt (CS0012); EditMode hatte die Referenz bereits.
+- Faced: `DiabloNetworkPlayer.cs` steht nicht in der S2-target_files-Liste (dort nur `DiabloSkills.cs`),
+  trägt aber beide Treffer-ServerRpcs — Validierung landet dort, `DiabloSkills` delegiert.
+- Next: S3 world (Gate für alle, Client-Leichen).

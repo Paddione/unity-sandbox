@@ -113,6 +113,13 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         DiabloProgression.GrantLocal(xp, at);
     }
 
+    /// <summary>Melee skill range for validation (attack arc + tolerance in ApplyValidated).</summary>
+    public const float MeleeValidateRange = 4f;
+
+    /// <summary>Last validated melee hit per sender (cooldown gate, S2).</summary>
+    static readonly System.Collections.Generic.Dictionary<ulong, float> lastMeleeHit =
+        new System.Collections.Generic.Dictionary<ulong, float>();
+
     /// <summary>Client attack request: validated on the server, then applied.</summary>
     [ServerRpc(RequireOwnership = false)]
     public void SubmitAttackServerRpc(ulong targetNetId, int damage, ServerRpcParams rpcParams = default)
@@ -120,8 +127,12 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         var nm = NetworkManager.Singleton;
         if (nm == null || !nm.IsServer) return;
         if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
-        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId, 4f);
+        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId,
+            MeleeValidateRange, DiabloMeleeCooldown, lastMeleeHit);
     }
+
+    /// <summary>Melee cooldown for the server gate (matches DiabloMelee).</summary>
+    const float DiabloMeleeCooldown = 0.5f;
 
     /// <summary>
     /// Share a local skill cast so every other client renders it (visual only;
@@ -157,6 +168,13 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
     /// <summary>Server re-check radius for fireball/arrow hits (max skill range + slack).</summary>
     public const float RangedValidateRange = 24f;
 
+    /// <summary>Ranged cooldown floor for the server gate (fastest skill: arrow 0.35 s).</summary>
+    const float RangedCooldownFloor = 0.3f;
+
+    /// <summary>Last validated ranged hit per sender (cooldown gate, S2).</summary>
+    static readonly System.Collections.Generic.Dictionary<ulong, float> lastRangedHit =
+        new System.Collections.Generic.Dictionary<ulong, float>();
+
     /// <summary>Client projectile hit request: validated on the server, then applied.</summary>
     [ServerRpc(RequireOwnership = false)]
     public void SubmitRangedHitServerRpc(ulong targetNetId, int damage, ServerRpcParams rpcParams = default)
@@ -164,10 +182,17 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         var nm = NetworkManager.Singleton;
         if (nm == null || !nm.IsServer) return;
         if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
-        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId, RangedValidateRange);
+        ApplyValidated(nm, targetNb, damage, rpcParams.Receive.SenderClientId,
+            RangedValidateRange, RangedCooldownFloor, lastRangedHit);
     }
 
-    static void ApplyValidated(NetworkManager nm, NetworkObject targetNb, int damage, ulong sender, float maxRange)
+    /// <summary>
+    /// S2 validated hit path: HitValidator (range + cooldown + alive + damage)
+    /// against the sender's player object, then host-authoritative TakeDamage.
+    /// </summary>
+    static void ApplyValidated(NetworkManager nm, NetworkObject targetNb, int damage, ulong sender,
+        float skillRange, float cooldown,
+        System.Collections.Generic.Dictionary<ulong, float> lastHit)
     {
         var health = targetNb.GetComponent<EnemyHealth>();
         if (health == null) return;
@@ -176,9 +201,16 @@ public sealed class DiabloNetworkPlayer : NetworkBehaviour
         {
             var nb = kv.Value;
             if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
-            var delta = targetNb.transform.position - nb.transform.position;
-            delta.y = 0f;
-            if (delta.magnitude > maxRange) return;
+            float last = lastHit.TryGetValue(sender, out float t) ? t : float.NegativeInfinity;
+            float now = UnityEngine.Time.time;
+            string reason = HitValidator.Validate(nb.transform.position, targetNb.transform.position,
+                skillRange, last, cooldown, now, health.IsAlive, damage);
+            if (reason != null)
+            {
+                Debug.Log($"[Net] rejected hit from {sender}: {reason}.");
+                return;
+            }
+            lastHit[sender] = now;
             health.TakeDamage(damage);
             return;
         }

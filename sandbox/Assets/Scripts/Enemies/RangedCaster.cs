@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// Bone Warden ranged caster (S5 Sunken Ossuary). Holds 6–8 m distance from
@@ -11,10 +12,11 @@ using UnityEngine;
 /// back (no march from the Ossuary into the Fen). Before warning and shooting
 /// it checks fixed cover (encounter-roles S2): with the sight axis interrupted
 /// it sidesteps for a clear angle instead of wasting the shot.
-/// Projectiles spawn host-authoritatively (solo/host only, like loot);
-/// clients see the telegraph but never spawn.
+/// S2 co-op: projectiles spawn host-authoritatively (solo/host only, like loot);
+/// the telegraph fans out per ClientRpc so clients see the windup, targeting
+/// picks the nearest living hero.
 /// </summary>
-public sealed class RangedCaster : MonoBehaviour
+public sealed class RangedCaster : NetworkBehaviour
 {
     public const float HoldMin = 6f;
     public const float HoldMax = 8f;
@@ -113,6 +115,7 @@ public sealed class RangedCaster : MonoBehaviour
             }
             telegraphStart = now;
             ShowTelegraph();
+            if (IsSpawned && IsServer) TelegraphClientRpc();
         }
     }
 
@@ -243,9 +246,19 @@ public sealed class RangedCaster : MonoBehaviour
         Debug.Log($"[Caster] {gameObject.name} fired (shots={ShotsFired}).");
     }
 
+    /// <summary>S2 telegraph fan-out (server tells clients to show the orb).</summary>
+    [ClientRpc]
+    public void TelegraphClientRpc()
+    {
+        if (IsServer) return;
+        ShowTelegraph();
+    }
+
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 
-    Transform AcquireHero() => HeroLocator.Hero(); // cached per frame (act-one perf fix)
+    /// <summary>S2 co-op targeting: nearest living hero.</summary>
+    public Transform AcquireHero() =>
+        HitValidator.NearestLivingPlayer(transform.position) ?? HeroLocator.Hero();
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
     public static void ResetRun()

@@ -1,6 +1,6 @@
 # Progress: cinderreach-coop-session
 
-Prozent: 15 %
+Prozent: 40 %
 
 ## Erledigt
 
@@ -12,9 +12,22 @@ Prozent: 15 %
   Belege: EditMode 210/210, PlayMode 84/84, `VerifyDiabloZone`, `check-meta`; Paarlauf Exit 0: Client
   `town,zone1` 0 Exceptions (104 s), Host 8/8 Phasen 0 Exceptions (179 s); Solo-Autoplay `-seed 0` 8/8, 36,8 fps.
 
+- 2026-11-18: S2 enemies landed. Host-autoritative Treffer: `Net/HitValidator.cs` (Reichweite +
+  Toleranz, Cooldown, Ziel lebt, Schaden 1..50; `NearestLivingPlayer`), `EnemyHealth` als
+  `NetworkBehaviour` mit `NetHP` (Server schreibt, Clients spiegeln; ungespawnt lokal wie zuvor),
+  `EnemyAttack`-Zielwahl nächste lebende Heldin, `BossController.Phase` (1/2, Server schreibt) +
+  Summons per `NetworkObject.Spawn` + Slam-/Phase-Telegraph per ClientRpc, `RangedCaster`-Telegraph
+  per ClientRpc + nächste lebende Heldin, `DiabloNetworkPlayer`-ServerRpc mit HitValidator-Gate
+  (Melee 4 m/0,5 s, Ranged 24 m/0,3 s) + PlayMode `HostEnemyTests` (Validator-Ablehnungen, Server-Treffer
+  senkt HP, Boss-Phase summont einmal, Nearest-Living). `Sandbox.Tests.PlayMode` um
+  `Unity.Netcode.Runtime`-Referenz ergänzt (NetworkBehaviour-Basis).
+  Belege: EditMode 257/257, PlayMode 113/113, `VerifyDiabloZone` OK (husks=48), `KayKitAssets.Verify`
+  grün, `check-meta` OK; Paarlauf Exit 0: Host 8/8 Phasen 0 Exceptions (181 s), Client `town,zone1`
+  0 Exceptions hits=232 (108 s); Solo-Autoplay Exit 0, 0 Exceptions, FPS-Pass 34,6 (Schwelle 30).
+
 ## Nächste Schritte
 
-1. S2 enemies: host-autoritative Gegner, Boss-Replikation, `HitValidator`.
+1. S3 world: Zonen-Gate für alle, Client-Leichen.
 
 ## Offene Punkte
 

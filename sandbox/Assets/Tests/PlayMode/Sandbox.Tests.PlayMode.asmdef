@@ -6,7 +6,8 @@
     "UnityEditor.TestRunner",
     "Unity.InputSystem",
     "Unity.InputSystem.TestFramework",
-    "Sandbox.Runtime"
+    "Sandbox.Runtime",
+    "Unity.Netcode.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

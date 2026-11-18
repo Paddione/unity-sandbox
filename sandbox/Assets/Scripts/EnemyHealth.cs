@@ -8,13 +8,21 @@ using Unity.Netcode;
 /// shared kill counter. KayKit shares one material per pack, so the hit
 /// flash uses a material instance (<c>renderer.material</c>), never the
 /// shared asset.
+/// Co-op S2: host-authoritative HP. The server owns <see cref="NetHP"/>
+/// (read everyone, write server); clients mirror it and never apply damage
+/// locally (they send intents via ServerRpc, validated by HitValidator).
+/// Offline / unspawned (EditMode tests): plain local HP, same as before.
 /// </summary>
-public sealed class EnemyHealth : MonoBehaviour
+public sealed class EnemyHealth : NetworkBehaviour
 {
     public int maxHP = 3;
     public LootTier tier = LootTier.Normal;
     /// <summary>Source model for the corpse (builder sets the KayKit FBX; null = clone fallback).</summary>
     public GameObject corpseModel;
+
+    /// <summary>Replicated HP (server writes, everyone reads). 0 = dead.</summary>
+    public readonly NetworkVariable<int> NetHP = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public static int HusksKilled;
     public static int OrbsDropped;
@@ -22,6 +30,12 @@ public sealed class EnemyHealth : MonoBehaviour
 
     int hp;
     bool dead;
+
+    /// <summary>Local HP (mirrors NetHP when spawned).</summary>
+    public int CurrentHP => hp;
+
+    /// <summary>True while alive (validator seam).</summary>
+    public bool IsAlive => !dead;
 
     void Awake()
     {
@@ -31,6 +45,42 @@ public sealed class EnemyHealth : MonoBehaviour
         hp = maxHP;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            NetHP.Value = Mathf.Max(hp, 0);
+        }
+        else if (NetHP.Value > 0)
+        {
+            hp = NetHP.Value;
+        }
+        NetHP.OnValueChanged += OnNetHPChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        NetHP.OnValueChanged -= OnNetHPChanged;
+    }
+
+    void OnNetHPChanged(int oldV, int newV)
+    {
+        if (IsServer) return; // server already applied locally
+        hp = newV;
+        if (newV <= 0)
+        {
+            if (!dead)
+            {
+                dead = true;
+                DiabloJuice.OnEnemyDeath(transform.position);
+            }
+            return;
+        }
+        var anim = GetComponent<HuskAnimator>();
+        if (anim != null) anim.OnHit();
+        StartCoroutine(Flash());
+    }
+
     /// <summary>Set tier HP after AddComponent (builder: elites, chests).</summary>
     public void SetTier(int tierMaxHP, LootTier lootTier)
     {
@@ -38,6 +88,7 @@ public sealed class EnemyHealth : MonoBehaviour
         maxHP = Application.isPlaying ? DifficultyProfile.Current.ScaleHP(tierMaxHP) : tierMaxHP;
         hp = maxHP;
         tier = lootTier;
+        if (IsSpawned && IsServer) NetHP.Value = Mathf.Max(hp, 0);
     }
 
     /// <summary>Damage entry point: local solo/host, server relay as client.</summary>
@@ -78,11 +129,18 @@ public sealed class EnemyHealth : MonoBehaviour
         transform.position = p;
     }
 
-    /// <summary>Apply damage; kills at zero and drops a loot orb.</summary>
+    /// <summary>
+    /// Apply damage; kills at zero and drops a loot orb.
+    /// S2 host-authoritative: spawned clients never apply directly (they mirror
+    /// NetHP); the server applies and replicates. Offline/unspawned stays local.
+    /// </summary>
     public void TakeDamage(int amount, bool crit = false)
     {
         if (dead) return;
+        if (IsSpawned && NetworkManager.Singleton != null
+            && NetworkManager.Singleton.IsListening && !IsServer) return;
         hp -= amount;
+        if (IsSpawned && IsServer) NetHP.Value = Mathf.Max(hp, 0);
         DiabloJuice.OnEnemyHit(transform.position, amount, crit);
         Debug.Log($"[Diablo] {gameObject.name} took {amount} dmg ({Mathf.Max(hp, 0)}/{maxHP}).");
         if (hp <= 0)

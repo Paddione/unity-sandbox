@@ -587,7 +587,8 @@ public sealed class DiabloSkills : MonoBehaviour
 
     /// <summary>
     /// Apply one projectile hit: direct damage solo/host, ServerRpc relay as a
-    /// netcode client (the server re-validates range).
+    /// netcode client (the server re-validates range + cooldown + alive + damage
+    /// via HitValidator, S2 host-authoritative).
     /// </summary>
     public static void ApplyHit(GameObject target, int damage, Vector3 from, float knockback,
         Transform attacker = null)

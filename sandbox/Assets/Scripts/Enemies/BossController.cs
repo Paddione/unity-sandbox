@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// The Hollow Abbot (S5 boss, ~150 HP for a level 5–8 hero with S4 points).
@@ -8,10 +9,12 @@ using UnityEngine;
 /// <see cref="EnemyHealth"/> (Boss tier: guaranteed Rare+, 150–250 gold);
 /// this controller polls the fraction each frame and — on the same frame,
 /// before the deferred destroy — records the kill and opens
-/// <see cref="SessionComplete"/>. Summons spawn host-authoritatively
-/// (solo/host only, like loot).
+/// <see cref="SessionComplete"/>. S2 co-op: phase replicates via
+/// <see cref="Phase"/> (1/2, server writes), summons spawn via
+/// NetworkObject.Spawn on the server, slam/phase telegraphs fan out per
+/// ClientRpc so clients see the windup.
 /// </summary>
-public sealed class BossController : MonoBehaviour
+public sealed class BossController : NetworkBehaviour
 {
     public const string BossName = "Hollow Abbot";
     public const int BossMaxHP = 150;
@@ -19,6 +22,10 @@ public sealed class BossController : MonoBehaviour
     public const float SlamRadius = 3f;
     public const float SlamWindup = 0.8f;
     public const int SlamDamage = 3;
+
+    /// <summary>Replicated phase (1 or 2, server writes).</summary>
+    public readonly NetworkVariable<int> Phase = new NetworkVariable<int>(1,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     /// <summary>Boss kills this run (test seam).</summary>
     public static int BossesKilled;
@@ -30,6 +37,29 @@ public sealed class BossController : MonoBehaviour
     bool phaseTwo;
     bool dead;
     float slamStart = -1f;
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer) Phase.Value = phaseTwo ? 2 : 1;
+        else if (Phase.Value == 2 && !phaseTwo) { phaseTwo = true; }
+        Phase.OnValueChanged += OnPhaseChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        Phase.OnValueChanged -= OnPhaseChanged;
+    }
+
+    void OnPhaseChanged(int oldV, int newV)
+    {
+        if (IsServer) return;
+        if (newV == 2 && !phaseTwo)
+        {
+            phaseTwo = true;
+            PhaseTwoEntries++;
+            Debug.Log($"[Boss] {BossName} mirrors phase 2 (adds={PhaseTwoEntries}).");
+        }
+    }
 
     void Update()
     {
@@ -53,7 +83,10 @@ public sealed class BossController : MonoBehaviour
         {
             var hero = AcquireHero();
             if (hero != null && Planar(hero) <= SlamRadius + 0.5f)
+            {
                 slamStart = Time.time; // ground-circle telegraph starts
+                if (IsSpawned && IsServer) SlamTelegraphClientRpc();
+            }
         }
     }
 
@@ -64,13 +97,36 @@ public sealed class BossController : MonoBehaviour
         phaseTwo = true;
         PhaseTwoEntries++;
         Debug.Log($"[Boss] {BossName} enters phase 2 (adds={PhaseTwoEntries}).");
-        if (!Diablo.IsLocalAuthority() && !Diablo.IsSolo()) return;
+        if (IsSpawned)
+        {
+            if (!IsServer) return;
+            Phase.Value = 2;
+            PhaseTwoClientRpc();
+        }
+        else if (!Diablo.IsLocalAuthority() && !Diablo.IsSolo()) return;
+        // Spawn on the server (replicates to clients when spawned); solo spawns locally.
+        var nm = NetworkManager.Singleton;
+        bool netServer = nm != null && nm.IsListening && nm.IsServer;
         for (int i = 0; i < 3; i++)
         {
             float a = i * Mathf.PI * 2f / 3f;
             var pos = transform.position + new Vector3(Mathf.Cos(a) * 2.5f, 0.05f, Mathf.Sin(a) * 2.5f);
-            SpawnHusk($"Husk_Summon_{i}_{PhaseTwoEntries}", pos);
+            SpawnHusk($"Husk_Summon_{i}_{PhaseTwoEntries}", pos, netServer);
         }
+    }
+
+    [ClientRpc]
+    void PhaseTwoClientRpc()
+    {
+        if (IsServer) return;
+        DiabloJuice.OnBlast(transform.position);
+    }
+
+    [ClientRpc]
+    void SlamTelegraphClientRpc()
+    {
+        if (IsServer) return;
+        DiabloJuice.OnBlast(transform.position);
     }
 
     void ResolveSlam()
@@ -141,12 +197,14 @@ public sealed class BossController : MonoBehaviour
         return h != null ? h.gameObject : null;
     }
 
-    Transform AcquireHero() => HeroLocator.Hero(); // cached per frame (act-one perf fix)
+    /// <summary>S2 co-op targeting: nearest living hero.</summary>
+    public Transform AcquireHero() =>
+        HitValidator.NearestLivingPlayer(transform.position) ?? HeroLocator.Hero();
 
     /// <summary>Ash-grey summon colour (URP Lit).</summary>
     public static readonly Color SummonTint = new Color(0.32f, 0.29f, 0.27f);
 
-    static void SpawnHusk(string name, Vector3 pos)
+    static void SpawnHusk(string name, Vector3 pos, bool netServer)
     {
         var husk = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         husk.name = name;
@@ -160,6 +218,11 @@ public sealed class BossController : MonoBehaviour
         husk.transform.position = pos;
         husk.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);
         husk.AddComponent<EnemyAttack>().damage = 1;
+        // Server spawn replicates to clients; solo stays local.
+        if (netServer)
+        {
+            husk.AddComponent<NetworkObject>().Spawn();
+        }
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
