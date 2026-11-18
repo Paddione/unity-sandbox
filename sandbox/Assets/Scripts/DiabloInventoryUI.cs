@@ -166,8 +166,53 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     {
         if (item == null || item.affixes == null || item.affixes.Count == 0) return "no bonuses";
         var parts = new System.Collections.Generic.List<string>();
-        foreach (var a in item.affixes) parts.Add($"+{a.value:0.#} {a.key}");
+        foreach (var a in item.affixes) parts.Add(AffixLibrary.Describe(a));
         return string.Join(", ", parts.ToArray());
+    }
+
+    /// <summary>Bag detail line: item label plus the comparison to the equipped item.</summary>
+    string DetailFor(ItemInstance item)
+    {
+        var equipped = equipment != null ? equipment.GetEquipped(item.slot) : null;
+        return $"{LootDrop.ItemLabel(item)} vs {(equipped != null ? LootDrop.ItemLabel(equipped) : "empty slot")}:\n" +
+               CompareSummary(item, equipped);
+    }
+
+    public const string BetterColor = "#6fd36f";
+    public const string WorseColor = "#e05a4a";
+
+    /// <summary>
+    /// Replayability S2 tooltip: per affix key the summed value of
+    /// <paramref name="item"/> and its difference to <paramref name="equipped"/>
+    /// in the same slot, green when better and red when worse (rich text).
+    /// Keys only on the equipped item show as losses.
+    /// </summary>
+    public static string CompareSummary(ItemInstance item, ItemInstance equipped)
+    {
+        if (item == null) return "";
+        var keys = new System.Collections.Generic.List<string>();
+        void Collect(ItemInstance it)
+        {
+            if (it?.affixes == null) return;
+            foreach (var a in it.affixes)
+                if (!keys.Contains(a.key)) keys.Add(a.key);
+        }
+        Collect(item);
+        Collect(equipped);
+        if (keys.Count == 0) return "no bonuses";
+        var lines = new System.Collections.Generic.List<string>();
+        foreach (var key in keys)
+        {
+            float mine = item.GetAffix(key);
+            float theirs = equipped != null ? equipped.GetAffix(key) : 0f;
+            float delta = mine - theirs;
+            string text = AffixLibrary.Describe(new Affix(key, mine));
+            if (System.Math.Abs(delta) < 0.0001f)
+                lines.Add(text);
+            else
+                lines.Add($"{text} <color={(delta > 0f ? BetterColor : WorseColor)}>({(delta > 0f ? "+" : "")}{delta:0.##})</color>");
+        }
+        return string.Join("\n", lines.ToArray());
     }
 
     void RebuildBag()
@@ -186,7 +231,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (bagDetailText != null)
             bagDetailText.text = inventory.Count == 0
                 ? "Empty. Husks and the west chest drop loot; walk over it."
-                : $"{LootDrop.ItemLabel(inventory.Get(inventory.Count - 1))}: {AffixSummary(inventory.Get(inventory.Count - 1))}";
+                : DetailFor(inventory.Get(inventory.Count - 1));
         for (int i = 0; i < Inventory.Capacity; i++)
         {
             var item = inventory.Get(i);
@@ -331,6 +376,12 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         grid.spacing = new Vector2(6f, 6f);
         bagList = gridGo.transform;
         bagDetailText = MakeLabel(bagPage.transform, "", 14);
+        // S2 compare tooltip spans several lines.
+        bagDetailText.supportRichText = true;
+        bagDetailText.verticalOverflow = VerticalWrapMode.Overflow;
+        var detailLayout = bagDetailText.gameObject.AddComponent<LayoutElement>();
+        detailLayout.minHeight = 120f;
+        detailLayout.preferredHeight = 120f;
     }
 
     void BuildStatsPage()

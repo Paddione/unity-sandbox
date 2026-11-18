@@ -319,3 +319,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Downgrade keinen Spielstand zerstört.
 - Next: S2 Affixe.
 
+## 2026-11-18 — cinderreach-replayability S2 affix (14 Affixe, Tiers, Effekte, Vergleich)
+
+- Done: Affix-Tabelle mit Tier 1/2, sieben neue Affixe samt Effekt-Hooks, Vergleichs-Tooltip im Bag.
+- Belegt: EditMode 120/120, PlayMode 71/71, `VerifyDiabloZone`, `KayKitAssets.Verify`, `check-meta`,
+  Autoplay exit 0 (6/6 Phasen, 49,0 fps Minimum).
+- Faced: `CharacterSheet` ist reines C# ohne Helden-Bezug; der SkillRank-Bonus kommt daher als Parameter
+  aus `DiabloSkills.EffectiveDamage`.
+- Learned: Ein neuer Gleitkomma-Loot-Pfad hätte geseedete Tests verschoben; bei Magic Find 0 bleibt der
+  alte Ganzzahl-Wurf.
+- Next: S3 Layouts.
+

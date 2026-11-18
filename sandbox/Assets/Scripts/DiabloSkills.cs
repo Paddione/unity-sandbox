@@ -189,6 +189,8 @@ public sealed class DiabloSkills : MonoBehaviour
     {
         var sheet = CharacterSheet.For(gameObject);
         float factor = sheet != null ? sheet.CooldownMultiplier() : 1f;
+        var eq = GetComponent<Equipment>();
+        if (eq != null) factor *= eq.CooldownFactor();
         return BaseCooldown(s) * factor;
     }
 
@@ -221,7 +223,11 @@ public sealed class DiabloSkills : MonoBehaviour
             : s == Skill.Arrow ? arrowDamage + WeaponBonus()
             : cleaveDamage + WeaponBonus();
         var sheet = CharacterSheet.For(gameObject);
-        float mul = sheet != null ? sheet.SkillMultiplier(s) : 1f;
+        var eq = GetComponent<Equipment>();
+        int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
+        float mul = sheet != null
+            ? sheet.SkillMultiplier(s, gearRanks)
+            : 1f + CharacterSheet.RankDamageBonus * gearRanks;
         return Mathf.Max(1, Mathf.RoundToInt(baseDmg * mul));
     }
 
@@ -374,6 +380,7 @@ public sealed class DiabloSkills : MonoBehaviour
             return;
         }
         health.TakeDamage(damage, crit);
+        Equipment.ApplyLifeSteal(attacker, damage);
         if (health != null)
             health.ApplyKnockback(from, health.tier == LootTier.Normal ? knockback : knockback * 0.3f);
         DiabloAudio.PlayHit();

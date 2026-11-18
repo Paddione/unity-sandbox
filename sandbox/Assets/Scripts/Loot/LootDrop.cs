@@ -19,7 +19,7 @@ public sealed class LootDrop : MonoBehaviour
         // S2 economy: independent gold roll beside the item orb (local-only
         // pickup, own counters — item-orb counts stay exact for the Q5 loop).
         GoldDrop.SpawnGold(pos, tier, rng);
-        var roll = LootTable.Roll(tier, rng);
+        var roll = LootTable.Roll(tier, rng, Equipment.LocalMagicFind());
         if (!roll.drops) return null;
         return SpawnItem(pos, BuildItem(roll, rng), networked);
     }

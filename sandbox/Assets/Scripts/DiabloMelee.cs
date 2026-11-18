@@ -55,6 +55,7 @@ public sealed class DiabloMelee : MonoBehaviour
             attacker.rotation = Quaternion.LookRotation(toTarget);
         int blow = DiabloJuice.RollCrit(attacker, CurrentDamage(attacker), out bool crit);
         health.TakeDamage(blow, crit);
+        Equipment.ApplyLifeSteal(attacker, blow);
         health.ApplyKnockback(attacker.position,
             health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);
         DiabloAudio.PlayHit();

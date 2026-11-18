@@ -42,6 +42,12 @@ zeigen `Prozent: 100 %`.
    Laufzeit, `SaveService.CaptureState`/`ApplyState` lesen und füllen es, `DeleteSave` setzt es zurück.
    Dafür war `Scripts/Save/SaveService.cs` zusätzlich zu den S1-`target_files` nötig.
 
+6. Nachtrag S2 (2026-11-18): `SkillRank` gibt +N auf **alle** Skills statt auf einen zufälligen, weil
+   ein Affix nur Schlüssel und Wert trägt. Magic Find liest der Loot-Wurf vom lokalen Helden
+   (`Equipment.LocalMagicFind`), da Drops beim Gegner-Tod ohne Finder entstehen. Effekt-Hooks lagen
+   zusätzlich in `DiabloMelee`, `EnemyAttack`, `Loot/GoldDrop`, `Loot/LootDrop`, `Loot/LootTable`,
+   `Progression/CharacterSheet`.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -98,7 +104,7 @@ S1 zuerst (Save-Format). Danach S2 und S3 parallel (disjunkt). S4 nach S2 (Affix
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
 | S1 save-v2 | Startbedingung | 15 % | landed 2026-11-18 |
-| S2 affix | S1 | 25 % | offen |
+| S2 affix | S1 | 25 % | landed 2026-11-18 |
 | S3 layouts | S1 | 25 % | offen |
 | S4 kindled | S2 | 20 % | offen |
 | S5 stash+proof | S3, S4 | 15 % | offen |

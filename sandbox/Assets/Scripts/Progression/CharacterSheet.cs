@@ -87,16 +87,20 @@ public sealed class CharacterSheet
         return true;
     }
 
-    /// <summary>Rank multiplier for a skill (1 + 20 % per rank).</summary>
-    public float RankMultiplier(DiabloSkills.Skill skill) =>
-        1f + RankDamageBonus * GetRank(skill);
+    /// <summary>Spent rank plus "+N to all Skills" from gear (replayability S2).</summary>
+    public int EffectiveRank(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
+        GetRank(skill) + System.Math.Max(0, gearRankBonus);
+
+    /// <summary>Rank multiplier for a skill (1 + 20 % per effective rank).</summary>
+    public float RankMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
+        1f + RankDamageBonus * EffectiveRank(skill, gearRankBonus);
 
     /// <summary>Focus skill-damage multiplier (1 + 8 % per point).</summary>
     public float FocusSkillMultiplier() => 1f + FocusSkillDamagePerPoint * focus;
 
     /// <summary>Total skill-damage multiplier: rank × focus.</summary>
-    public float SkillMultiplier(DiabloSkills.Skill skill) =>
-        RankMultiplier(skill) * FocusSkillMultiplier();
+    public float SkillMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
+        RankMultiplier(skill, gearRankBonus) * FocusSkillMultiplier();
 
     /// <summary>Cooldown factor from focus (floored at half base).</summary>
     public float CooldownMultiplier() =>

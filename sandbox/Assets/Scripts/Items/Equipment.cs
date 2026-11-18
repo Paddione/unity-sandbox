@@ -55,7 +55,9 @@ public sealed class Equipment : MonoBehaviour
         }
     }
 
-    public float GetDamage() => BaseDamage + (weapon != null ? weapon.GetAffix("Damage") : 0f);
+    public float GetDamage() => BaseDamage + (weapon != null
+        ? weapon.GetAffix(AffixLibrary.Damage) + weapon.GetAffix(AffixLibrary.FireDamage)
+        : 0f);
     public float GetMaxHP() => BaseMaxHP + LevelLife() + (armor != null ? armor.GetAffix("MaxHP") : 0f) + (helmet != null ? helmet.GetAffix("MaxHP") : 0f);
     float LevelLife()
     {
@@ -66,4 +68,55 @@ public sealed class Equipment : MonoBehaviour
     public float GetMoveSpeed() => BaseMoveSpeed + (armor != null ? armor.GetAffix("MoveSpeed") : 0f);
     public float GetCrit() => 5f + (weapon != null ? weapon.GetAffix("Crit") : 0f) + (helmet != null ? helmet.GetAffix("Crit") : 0f);
     public float GetXPMul() => 100f + (helmet != null ? helmet.GetAffix("XPMul") : 0f);
+
+    // --- replayability S2: aggregated affix effects --------------------------
+
+    /// <summary>Hard caps keep stacked rolls sane.</summary>
+    public const float MaxLifeStealPct = 25f;
+    public const float MaxCooldownReductionPct = 40f;
+
+    /// <summary>Sum of one affix over all three equipped slots.</summary>
+    public float Total(string key) =>
+        (armor != null ? armor.GetAffix(key) : 0f)
+        + (weapon != null ? weapon.GetAffix(key) : 0f)
+        + (helmet != null ? helmet.GetAffix(key) : 0f);
+
+    public float LifeStealPct() => UnityEngine.Mathf.Min(MaxLifeStealPct, Total(AffixLibrary.LifeSteal));
+    public float GoldFindPct() => Total(AffixLibrary.GoldFind);
+    public float MagicFindPct() => Total(AffixLibrary.MagicFind);
+    public int SkillRankBonus() => UnityEngine.Mathf.RoundToInt(Total(AffixLibrary.SkillRank));
+    public int ThornsDamage() => UnityEngine.Mathf.RoundToInt(Total(AffixLibrary.Thorns));
+
+    /// <summary>Cooldown factor from CooldownReduction (1 = none, floored by the cap).</summary>
+    public float CooldownFactor() =>
+        1f - UnityEngine.Mathf.Min(MaxCooldownReductionPct, Total(AffixLibrary.CooldownReduction)) / 100f;
+
+    /// <summary>Gold after Gold Find (rounded, never below the base amount).</summary>
+    public static int ApplyGoldFind(int amount, float goldFindPct) =>
+        UnityEngine.Mathf.Max(amount, UnityEngine.Mathf.RoundToInt(amount * (1f + goldFindPct / 100f)));
+
+    /// <summary>
+    /// Heal the attacker by LifeSteal % of the damage dealt. Returns the healed
+    /// amount (0 without gear, health or steal). Fractions accumulate per hero.
+    /// </summary>
+    public static float ApplyLifeSteal(Transform attacker, int damageDealt)
+    {
+        if (attacker == null || damageDealt <= 0) return 0f;
+        var eq = attacker.GetComponent<Equipment>();
+        var hp = attacker.GetComponent<PlayerHealth>();
+        if (eq == null || hp == null) return 0f;
+        float pct = eq.LifeStealPct();
+        if (pct <= 0f) return 0f;
+        float heal = damageDealt * pct / 100f;
+        hp.Heal(heal);
+        return heal;
+    }
+
+    /// <summary>Magic Find of the local hero (loot rolls happen at enemy death).</summary>
+    public static float LocalMagicFind()
+    {
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        var eq = hero != null ? hero.GetComponent<Equipment>() : null;
+        return eq != null ? eq.MagicFindPct() : 0f;
+    }
 }

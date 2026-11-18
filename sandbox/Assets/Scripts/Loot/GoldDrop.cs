@@ -62,7 +62,8 @@ public sealed class GoldDrop : MonoBehaviour
         if (go.name != "Player" && !go.CompareTag("Player")) return;
         collected = true;
         var wallet = Wallet.EnsureWallet(go);
-        if (wallet != null) wallet.Add(amount);
+        var eq = go.GetComponent<Equipment>();
+        if (wallet != null) wallet.Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
         DiabloAudio.PlayLoot();
         Destroy(gameObject);
     }

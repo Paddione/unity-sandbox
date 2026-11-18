@@ -115,6 +115,11 @@ public sealed class EnemyAttack : MonoBehaviour
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null) return;
         hp.TakeDamage(damage);
+        // replayability S2: Thorns reflect flat damage onto the striker.
+        var heroEq = hero.GetComponent<Equipment>();
+        int thorns = heroEq != null ? heroEq.ThornsDamage() : 0;
+        var self = GetComponent<EnemyHealth>();
+        if (thorns > 0 && self != null) self.TakeDamage(thorns);
         DiabloAudio.PlayHurt();
         DiabloJuice.OnPlayerHurt(hero.position, damage);
         if (hp.CurrentHP <= 0f)
