@@ -10,8 +10,11 @@ using UnityEngine;
 /// application quit (hooked below), and — once those stages land —
 /// the zone transition (S5: <c>SaveNow(hero, zoneReached: 2)</c>) and the
 /// vendor window close (S3: <c>SaveNow(hero)</c>).
-/// A corrupt or version-mismatched file is backed up to <c>*.corrupt</c>
-/// with a warning and never silently deleted (fresh start instead).
+/// A corrupt file is backed up to <c>*.corrupt</c> with a warning and never
+/// silently deleted (fresh start instead). Older versions are migrated by
+/// <see cref="SaveMigrations"/> (original kept as <c>*.v1.bak</c> before the
+/// first newer write); an unknown newer version is not loaded and stays
+/// untouched.
 /// There is no main-menu scene yet: Continue/New-Game wire to
 /// <see cref="HasSave"/>, <see cref="TryLoad"/> and <see cref="DeleteSave"/>
 /// (New Game deletes only after the caller's overwrite confirmation).
@@ -70,6 +73,7 @@ public static class SaveService
         string p = path ?? DefaultPath;
         if (File.Exists(p)) File.Delete(p);
         LoadedZoneReached = 1;
+        RunProfile.Reset();
     }
 
     /// <summary>
@@ -86,7 +90,14 @@ public static class SaveService
 
     public static SaveGame CaptureState(GameObject hero, int zoneReached = 1)
     {
-        var save = new SaveGame { zoneReached = Mathf.Max(1, zoneReached) };
+        var save = new SaveGame
+        {
+            zoneReached = Mathf.Max(1, zoneReached),
+            difficultyUnlocked = RunProfile.DifficultyUnlocked,
+            difficulty = RunProfile.Difficulty,
+            runSeed = RunProfile.RunSeed,
+            stash = RunProfile.Stash.ToList(),
+        };
         if (hero == null) return save;
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog != null)
@@ -150,11 +161,16 @@ public static class SaveService
         if (save.bag != null)
             foreach (var item in save.bag)
                 if (item != null) inv.Add(item);
+        RunProfile.DifficultyUnlocked = save.difficultyUnlocked;
+        RunProfile.Difficulty = string.IsNullOrEmpty(save.difficulty) ? RunProfile.Normal : save.difficulty;
+        RunProfile.RunSeed = save.runSeed;
+        RunProfile.Stash = Stash.FromList(save.stash);
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>
     public static void WriteSave(SaveGame save, string path)
     {
+        SaveMigrations.BackupOlderVersion(path);
         string json = JsonUtility.ToJson(save, prettyPrint: true);
         string tmp = path + ".tmp";
         File.WriteAllText(tmp, json);
@@ -175,21 +191,25 @@ public static class SaveService
         {
             return false; // missing/unreadable: clean fresh start, nothing to back up
         }
-        try
+        switch (SaveMigrations.Migrate(json, out save, out int fromVersion))
         {
-            if (string.IsNullOrEmpty(json)) throw new Exception("empty save file");
-            save = JsonUtility.FromJson<SaveGame>(json);
-            if (save == null) throw new Exception("unparseable save file");
-            if (save.v != SaveGame.CurrentVersion)
-                throw new Exception($"unsupported save version v={save.v}");
-            return true;
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[Save] Save unreadable ({e.Message}): backing up to *.corrupt, starting fresh.");
-            MarkCorrupt(path);
-            save = null;
-            return false;
+            case SaveMigrations.Outcome.Current:
+                return true;
+            case SaveMigrations.Outcome.Migrated:
+                SaveMigrations.BackupOlderVersion(path);
+                Debug.Log($"[Save] Migrated save v{fromVersion} -> v{SaveGame.CurrentVersion} " +
+                          $"(backup {SaveMigrations.BackupPath(path, fromVersion)}).");
+                return true;
+            case SaveMigrations.Outcome.FutureVersion:
+                Debug.LogWarning($"[Save] Save version v={fromVersion} is newer than " +
+                                 $"v{SaveGame.CurrentVersion}: not loaded, file left untouched.");
+                save = null;
+                return false;
+            default:
+                Debug.LogWarning("[Save] Save unreadable: backing up to *.corrupt, starting fresh.");
+                MarkCorrupt(path);
+                save = null;
+                return false;
         }
     }
 

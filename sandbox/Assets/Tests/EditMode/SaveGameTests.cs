@@ -90,12 +90,14 @@ public class SaveGameTests
     }
 
     [Test]
-    public void VersionMismatch_TreatedAsCorrupt()
+    public void FutureVersion_NotLoadedAndLeftUntouched()
     {
         hero = HeroWithAll();
-        File.WriteAllText(path, "{\"v\":999,\"level\":9,\"gold\":999}");
+        const string future = "{\"v\":999,\"level\":9,\"gold\":999}";
+        File.WriteAllText(path, future);
         Assert.IsFalse(SaveService.TryLoad(hero, path));
-        Assert.IsTrue(File.Exists(corruptPath));
+        Assert.IsFalse(File.Exists(corruptPath), "Newer save must not be moved aside as corrupt.");
+        Assert.AreEqual(future, File.ReadAllText(path), "Newer save must stay byte-identical.");
         hero.GetComponent<DiabloProgression>().GetState(out int level, out _);
         Assert.AreEqual(1, level, "Future-version save must not apply.");
     }

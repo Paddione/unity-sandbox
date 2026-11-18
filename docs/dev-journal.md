@@ -307,3 +307,15 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   nicht zu.
 - Learned: Ein Probe mit `baseline 1` meldet einen Einzelverstoß nur `at_risk`. Für G-DIABLO06 Baseline 0.
 
+## 2026-11-18 — cinderreach-replayability S1 save-v2 (Migration + Stash-Daten)
+
+- Done: `SaveGame` v2, `SaveMigrations.Migrate` (Outcome Current/Migrated/FutureVersion/Corrupt),
+  `Stash` (40), `RunProfile` (Schwierigkeit, Freischaltung, Seed, Stash), Backup `*.v1.bak` beim Laden
+  und vor jedem Überschreiben einer älteren Datei.
+- Belegt: EditMode 106/106, PlayMode 71/71, beide Verifies, `check-meta`, Autoplay 6/6 Phasen.
+- Faced: Neue Save-Felder wären bei jedem Autosave verloren gegangen, weil `CaptureState` nur Helden-Komponenten
+  liest. Gelöst über `RunProfile`.
+- Learned: Ein Save neuerer Version wanderte bisher nach `*.corrupt`. Jetzt bleibt er liegen, damit ein
+  Downgrade keinen Spielstand zerstört.
+- Next: S2 Affixe.
+

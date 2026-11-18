@@ -9,7 +9,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -29,6 +29,12 @@ public sealed class SaveGame
     public List<ItemInstance> bag = new List<ItemInstance>();
     public int gold;
     public int zoneReached = 1;
+
+    // v2 (replayability S1): run profile, see RunProfile / SaveMigrations.
+    public bool difficultyUnlocked;
+    public string difficulty = RunProfile.Normal;
+    public int runSeed;
+    public List<ItemInstance> stash = new List<ItemInstance>();
 }
 
 /// <summary>One skill's rank (string key: JsonUtility has no dictionaries).</summary>

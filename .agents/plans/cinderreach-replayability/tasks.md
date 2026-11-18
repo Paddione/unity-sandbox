@@ -38,6 +38,10 @@ zeigen `Prozent: 100 %`.
 4. Save v2: neue Felder `difficultyUnlocked`, `difficulty`, `runSeed`, `stash`. Migration v1 → v2 ist
    Pflicht und getestet.
 
+5. Nachtrag S1 (2026-11-18): Die v2-Felder hängen nicht am Helden. `RunProfile` (statisch) hält sie zur
+   Laufzeit, `SaveService.CaptureState`/`ApplyState` lesen und füllen es, `DeleteSave` setzt es zurück.
+   Dafür war `Scripts/Save/SaveService.cs` zusätzlich zu den S1-`target_files` nötig.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -93,7 +97,7 @@ S1 zuerst (Save-Format). Danach S2 und S3 parallel (disjunkt). S4 nach S2 (Affix
 
 | Stufe | Abhängig von | Gewicht | Status |
 |---|---|---|---|
-| S1 save-v2 | Startbedingung | 15 % | offen |
+| S1 save-v2 | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 affix | S1 | 25 % | offen |
 | S3 layouts | S1 | 25 % | offen |
 | S4 kindled | S2 | 20 % | offen |
