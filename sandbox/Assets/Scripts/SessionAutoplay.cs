@@ -61,7 +61,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.commit = ArgValue(CommitFlag) ?? "unknown";
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         startBosses = BossController.BossesKilled;
-        float deadline = Time.realtimeSinceStartup + 600f;
+        float deadline = Time.realtimeSinceStartup + 840f; // act-one S5: route runs through the Kiln
 
         DiabloClickController hero = null;
         float heroDeadline = Time.realtimeSinceStartup + 30f;
@@ -106,8 +106,21 @@ public sealed class SessionAutoplay : MonoBehaviour
         yield return PhaseBoss(hero, deadline);
         bool bossOk = lastPhaseOk;
         if (bossOk) result.Reach(AutoplayResult.PhaseBoss);
-        yield return PhaseGate(hero, ZoneGate.OssuaryGateName, expectZone: 1, deadline);
-        if (bossOk && lastPhaseOk && SessionComplete.Shown >= 1) result.Reach(AutoplayResult.PhaseComplete);
+        // act-one S5: the Abbot opened the Kiln gate; fight through zone 3 to the Kilnmother.
+        yield return PhaseGate(hero, ZoneGate.KilnGateName, expectZone: 3, deadline);
+        bool kilnGateOk = lastPhaseOk;
+        yield return FightLoop(hero, "kiln", excludeBoss: true, maxDist: 40f, budget: 180f, deadline: deadline);
+        if (kilnGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone3);
+        yield return PhaseKilnmother(hero, deadline);
+        bool actOk = lastPhaseOk;
+        if (actOk) result.Reach(AutoplayResult.PhaseActBoss);
+        // Home by waypoint (used once per run): Kiln → Lantern Hold.
+        var kilnShrine = WaypointShrine.Find("Kiln");
+        if (kilnShrine != null) kilnShrine.TryDiscover(hero.gameObject);
+        bool home = WaypointShrine.Travel("Town", hero.gameObject);
+        Log($"phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}");
+        if (bossOk && actOk && home && RunProfile.Act.ActOneComplete && SessionComplete.ActOneMode)
+            result.Reach(AutoplayResult.PhaseComplete);
 
         int huskKills = startHusks - CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
@@ -128,6 +141,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.seed = LayoutSeeder.CurrentSeed;
         result.difficulty = DifficultyProfile.Current.name;
         result.classId = RunProfile.ClassId;
+        result.actOneComplete = RunProfile.Act.ActOneComplete;
         result.exit = Mathf.Max(legacyExit, result.ComputeExit());
         string dir = ArgValue(OutFlag)
             ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");
@@ -146,7 +160,7 @@ public sealed class SessionAutoplay : MonoBehaviour
     IEnumerator PhaseTownWaypoints(DiabloClickController hero, float deadline)
     {
         Log("phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)");
-        string[] stops = { "Campfire", Vendor.VendorObjectName, "ZGatePillar_0" };
+        string[] stops = { "Campfire", Vendor.VendorObjectName, "WaypointShrine_Town", "ZGatePillar_0" };
         int reached = 0;
         foreach (var name in stops)
         {
@@ -378,7 +392,52 @@ public sealed class SessionAutoplay : MonoBehaviour
     }
 
     static bool IsBoss(GameObject go) =>
-        go != null && go.GetComponent<BossController>() != null;
+        go != null && (go.GetComponent<BossController>() != null || go.GetComponent<KilnmotherController>() != null);
+
+    /// <summary>act-one S5: fight The Kilnmother until she falls and the Act I screen shows.</summary>
+    IEnumerator PhaseKilnmother(DiabloClickController hero, float deadline)
+    {
+        lastPhaseOk = false;
+        int startKills = KilnmotherController.Kills;
+        Log("phase actboss start (The Kilnmother, phase 1 + 2)");
+        var boss = GameObject.Find(KilnLayout.KilnmotherName);
+        if (boss == null)
+        {
+            Log("phase actboss: FAIL Kilnmother not found");
+            yield break;
+        }
+        var skills = hero.GetComponent<DiabloSkills>();
+        Vector3 lastPos = hero.transform.position;
+        float lastT = Time.realtimeSinceStartup;
+        int nudges = 0;
+        float end = Time.realtimeSinceStartup + 240f;
+        while (KilnmotherController.Kills <= startKills
+               && Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
+        {
+            TickGod(hero);
+            if (boss == null) break;
+            UnstickTick(hero, boss.transform.position, ref lastPos, ref lastT, ref nudges);
+            var toTarget = boss.transform.position - hero.transform.position;
+            toTarget.y = 0f;
+            if (toTarget.magnitude > hero.attackRange)
+            {
+                hero.AttackTarget(boss);
+                if (skills != null && toTarget.magnitude < 18f) CastProfile(skills, toTarget, inRange: false);
+            }
+            else
+            {
+                hero.SetAimPoint(boss.transform.position);
+                hero.Strike();
+                if (skills != null) CastProfile(skills, toTarget, inRange: true, boss: true);
+            }
+            yield return null;
+        }
+        int kills = KilnmotherController.Kills - startKills;
+        Log($"phase actboss: kills={kills} phaseTwo={KilnmotherController.PhaseTwoEntries} waves={KilnmotherController.WavesFired} " +
+            $"act={RunProfile.Act.ActOneComplete} overlay={SessionComplete.ActOneMode}");
+        phasesDone++;
+        lastPhaseOk = kills >= 1 && RunProfile.Act.ActOneComplete;
+    }
 
     static int CountHusks(bool excludeBoss)
     {

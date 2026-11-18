@@ -228,6 +228,41 @@ public sealed class DiabloShotCheck : MonoBehaviour
         var look = hero.GetComponent<ClassAppearance>();
         if (look != null) look.Apply(ClassCatalog.Fenwalker);
 
+        // 14) act-one: Cinder Kiln entrance, a thrall pack, the Kilnmother in phase 2, the Act I screen.
+        RunProfile.Act.Unlock(ActProgress.Kiln);
+        keepAlive = hero.GetComponent<PlayerHealth>();
+        TeleportHero(hero, KilnLayout.KilnArrival);
+        hero.distance = 18f;
+        hero.pitch = 50f;
+        yield return Wait(1.0f);
+        yield return Shot("kiln_entrance");
+        var pack = GameObject.Find(KilnLayout.ThrallPrefix + "0");
+        if (pack != null)
+        {
+            TeleportHero(hero, pack.transform.position + new Vector3(0f, 0f, 5f));
+            Face(hero, pack.transform.position - hero.transform.position);
+            hero.distance = 10f;
+            yield return Wait(0.8f);
+            yield return Shot("thrall_pack");
+        }
+        var mother = GameObject.Find(KilnLayout.KilnmotherName);
+        if (mother != null)
+        {
+            TeleportHero(hero, mother.transform.position + new Vector3(0f, 0f, 6f));
+            Face(hero, mother.transform.position - hero.transform.position);
+            var mc = mother.GetComponent<KilnmotherController>();
+            if (mc != null) { mc.EnterPhaseTwo(); mc.FireWaveNow(Time.time); }
+            BurningGround.Spawn(hero.transform.position + new Vector3(2f, 0f, -1f));
+            hero.distance = 13f;
+            yield return Wait(1.4f);
+            yield return Shot("kilnmother_phase2");
+        }
+        SessionComplete.ShowActComplete(hero.gameObject);
+        yield return Wait(0.5f);
+        yield return Shot("act_one_complete");
+        SessionComplete.ActOneMode = false;
+        keepAlive = null;
+
         // 13) SessionComplete overlay (S5 end screen, shown on boss death;
         // here opened directly as the visual proof — the gameplay proof is
         // the autoplay boss kill in docs/session-loop-run-log.md).
@@ -267,10 +302,17 @@ public sealed class DiabloShotCheck : MonoBehaviour
         Log($"shot {path}");
     }
 
+    /// <summary>Hero kept at full life while set (act-one Kiln shots: the zone mobs on arrival).</summary>
+    static PlayerHealth keepAlive;
+
     static IEnumerator Wait(float seconds)
     {
         float end = Time.time + seconds;
-        while (Time.time < end) yield return null;
+        while (Time.time < end)
+        {
+            if (keepAlive != null) keepAlive.Heal(keepAlive.MaxHP);
+            yield return null;
+        }
     }
 
     static void Log(string msg) => Debug.Log($"[ShotCheck] {msg}");

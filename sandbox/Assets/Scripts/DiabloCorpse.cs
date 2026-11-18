@@ -16,7 +16,23 @@ public sealed class DiabloCorpse : MonoBehaviour
 
     public static int Spawned;
 
+    /// <summary>
+    /// act-one perf: at most this many corpses lie at once; a new one makes the
+    /// oldest start sinking. The Cinder Kiln kills 26 enemies in seconds, and every
+    /// corpse is a full animated model.
+    /// </summary>
+    public const int MaxCorpses = 16;
+    /// <summary>The death take is over by then; the Animator stops, the pose stays.</summary>
+    public const float AnimatorSeconds = 1.5f;
+
+    static readonly System.Collections.Generic.List<DiabloCorpse> live =
+        new System.Collections.Generic.List<DiabloCorpse>();
+
+    /// <summary>Corpses currently lying or sinking (test seam).</summary>
+    public static int Live => live.Count;
+
     float age;
+    bool animatorStopped;
     Vector3 restPos;
 
     /// <summary>
@@ -106,9 +122,30 @@ public sealed class DiabloCorpse : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        live.Add(this);
+        // Over the cap: the oldest corpse that is still lying starts to sink now.
+        if (live.Count > MaxCorpses)
+            foreach (var c in live)
+                if (c != null && c != this && c.age < LieSeconds)
+                {
+                    c.age = LieSeconds;
+                    break;
+                }
+    }
+
+    void OnDisable() => live.Remove(this);
+
     void Update()
     {
         age += Time.deltaTime;
+        if (age >= AnimatorSeconds && !animatorStopped)
+        {
+            animatorStopped = true;
+            var anim = GetComponent<Animator>();
+            if (anim != null) anim.enabled = false;
+        }
         if (age <= LieSeconds) return;
         float t = (age - LieSeconds) / SinkSeconds;
         if (t >= 1f)

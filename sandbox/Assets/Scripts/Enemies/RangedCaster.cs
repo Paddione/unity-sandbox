@@ -72,14 +72,7 @@ public sealed class RangedCaster : MonoBehaviour
         Debug.Log($"[Caster] {gameObject.name} fired (shots={ShotsFired}).");
     }
 
-    Transform AcquireHero()
-    {
-        var solo = GameObject.Find("Player");
-        if (solo != null && solo.GetComponent<PlayerHealth>() != null) return solo.transform;
-        foreach (var h in GameObject.FindObjectsOfType<PlayerHealth>())
-            return h.transform;
-        return null;
-    }
+    Transform AcquireHero() => HeroLocator.Hero(); // cached per frame (act-one perf fix)
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
     public static void ResetRun() => ShotsFired = 0;

@@ -108,6 +108,31 @@ public static class KilnBuilder
         ret.transform.SetParent(root.transform, true);
     }
 
+    /// <summary>act-one S5: one waypoint shrine per zone (pedestal + glowing stone).</summary>
+    public static void BuildWaypoints()
+    {
+        foreach (var (id, name, zone, pos) in KilnLayout.Shrines)
+        {
+            var shrine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            shrine.name = "WaypointShrine_" + id;
+            shrine.transform.position = pos + Vector3.up * 0.5f;
+            shrine.transform.localScale = new Vector3(1f, 0.5f, 1f);
+            Paint(shrine, new Color(0.32f, 0.3f, 0.34f));
+            var stone = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            stone.name = "ShrineStone";
+            Object.DestroyImmediate(stone.GetComponent<Collider>());
+            stone.transform.SetParent(shrine.transform, false);
+            stone.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+            stone.transform.localScale = new Vector3(0.35f, 1.2f, 0.35f);
+            stone.transform.localRotation = Quaternion.Euler(0f, 45f, 0f);
+            PaintEmissive(stone, new Color(0.35f, 0.8f, 1f));
+            var ws = shrine.AddComponent<WaypointShrine>();
+            ws.shrineId = id;
+            ws.displayName = name;
+            ws.zone = zone;
+        }
+    }
+
     static GameObject SpawnEnemy(string model, string name, Vector3 pos, int hp, LootTier tier, float scale,
         Transform parent, bool thrall)
     {
@@ -214,6 +239,7 @@ public static class KilnBuilder
     public static void VerifyKiln(UnityEngine.SceneManagement.Scene scene)
     {
         bool root = false, gate = false, hint = false, ret = false, mother = false;
+        int shrines = 0;
         int domes = 0, embers = 0, thralls = 0, lancers = 0, elites = 0;
         foreach (var r in scene.GetRootGameObjects())
             foreach (var t in r.GetComponentsInChildren<Transform>(true))
@@ -233,12 +259,13 @@ public static class KilnBuilder
                 if (n.StartsWith(KilnLayout.LancerPrefix) && t.GetComponent<AshLancer>() != null) lancers++;
                 if (n.StartsWith(KilnLayout.ElitePrefix) && t.GetComponent<CinderThrall>() != null) elites++;
                 if (n == KilnLayout.KilnmotherName && t.GetComponent<KilnmotherController>() != null) mother = true;
+                if (n.StartsWith("WaypointShrine_") && t.GetComponent<WaypointShrine>() != null) shrines++;
             }
         Debug.Log($"[KilnBuilder] Verify: root={root} domes={domes} embers={embers} gate={gate} hint={hint} ret={ret} " +
-                  $"thralls={thralls} lancers={lancers} elites={elites} kilnmother={mother}");
+                  $"thralls={thralls} lancers={lancers} elites={elites} kilnmother={mother} shrines={shrines}");
         if (!root || domes < KilnDomes || embers < EmberLights || !gate || !hint || !ret
             || thralls != KilnLayout.ThrallCount || lancers != KilnLayout.LancerCount
-            || elites != KilnLayout.EliteCount || !mother)
+            || elites != KilnLayout.EliteCount || !mother || shrines != KilnLayout.Shrines.Length)
             throw new System.Exception("Kiln verify failed: zone 3 inventory incomplete.");
         Debug.Log("[KilnBuilder] Verify: OK (cinder kiln + gates present).");
     }

@@ -609,6 +609,7 @@ public static class SandboxBuilder
         TownBuilder.SpawnStashChest();
         OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
         KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)
+        KilnBuilder.BuildWaypoints(); // act-one S5: one shrine per zone
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)

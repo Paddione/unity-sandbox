@@ -60,6 +60,10 @@ Protokollschritt 1 prüft zusätzlich: `PROGRESS.md` von `cinderreach-replayabil
    `LootTier.ActBoss`. Kein `Skeleton_Brute.fbx` im Pack, Kilnmother nutzt den Warrior-Fallback des Abbots.
    Vertrag „jeder Husk bewaffnet“ (Builder + `DiabloD2FeelTests`) akzeptiert `AshLancer` als Bewaffnung.
 
+10. Nachtrag S5 (2026-11-18): Schreine im `KilnBuilder` statt `TownBuilder`. Perf-Fix außerhalb der S5-Dateien
+    (`HeroLocator`, `DiabloCorpse`-Deckel, Hero-Lookups in `EnemyAttack`, `RangedCaster`, `BossController`),
+    weil das FPS-Gate mit dem Kiln riss (R2 eingetreten, andere Ursache als vermutet: CPU-Suchen statt Draw Calls).
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -135,7 +139,7 @@ S1 zuerst (Save-Format und Freischaltkette). S2 nach S1. S3 und S4 nach S2, unte
 | S2 kiln-world | S1 | 20 % | landed 2026-11-18 |
 | S3 kiln-enemies | S2 | 20 % | landed 2026-11-18 |
 | S4 kilnmother | S2 | 25 % | landed 2026-11-18 |
-| S5 waypoints+proof | S3, S4 | 20 % | offen |
+| S5 waypoints+proof | S3, S4 | 20 % | landed 2026-11-18 |
 
 ## Verify (je Stufe)
 

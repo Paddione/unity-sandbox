@@ -157,10 +157,7 @@ public sealed class ZoneGate : MonoBehaviour
             Debug.Log($"[Zone] Gate {gameObject.name} is locked (zone {targetZone}).");
             return;
         }
-        var cc = hero.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-        hero.transform.position = destination;
-        if (cc != null) cc.enabled = true;
+        ZoneTravel.TeleportHero(hero, destination);
         Teleports++;
         if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: targetZone);
         Debug.Log($"[Zone] Gate {gameObject.name} → zone {targetZone} (teleports={Teleports}).");

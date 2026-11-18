@@ -101,6 +101,14 @@ public class DiabloAshenFenLoopTests
             "Body must keep the starter while loot goes to the bag.");
 
         ui.EquipIndex(inventory.Count - 1);
+        // second-class S4: 30 % of weapon drops belong to the other class and are
+        // correctly refused (loot is random here, so both outcomes are pinned).
+        if (!Equipment.CanEquip(looted, RunProfile.ClassId))
+        {
+            Assert.AreSame(looted, inventory.Get(inventory.Count - 1), "Foreign-class weapon stays in the bag.");
+            Assert.AreEqual("Worn Short Sword", equipment.weapon.baseType, "Starter stays wielded.");
+            yield break;
+        }
         Assert.AreSame(looted, equipment.GetEquipped(looted.slot),
             "Panel equip must wield the looted item in its own slot.");
         if (looted.slot == ItemSlot.Weapon)

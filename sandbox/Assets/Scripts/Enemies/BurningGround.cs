@@ -53,8 +53,7 @@ public sealed class BurningGround : MonoBehaviour
 
     void Update()
     {
-        var go = GameObject.Find(DiabloNetworkPlayer.HeroName);
-        Tick(Time.time, go != null ? go.transform : null);
+        Tick(Time.time, HeroLocator.Solo());
     }
 
     /// <summary>Damage once per second while burning (headless-callable). True when burnt out.</summary>

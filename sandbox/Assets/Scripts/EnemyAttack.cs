@@ -218,8 +218,8 @@ public sealed class EnemyAttack : MonoBehaviour
             if (victim.GetComponent<PlayerHealth>() != null) return victim;
             victim = null;
         }
-        var solo = GameObject.Find("Player");
-        if (solo != null && solo.GetComponent<PlayerHealth>() != null) return solo.transform;
+        var solo = HeroLocator.Solo(); // one scene search per frame for all enemies
+        if (solo != null) return solo;
         float best = float.MaxValue;
         Transform bestT = null;
         foreach (var h in GameObject.FindObjectsOfType<PlayerHealth>())

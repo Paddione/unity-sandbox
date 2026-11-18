@@ -51,6 +51,15 @@ public static class KilnLayout
     public static Vector3 EliteAnchor(int variant, int i) =>
         KilnOffset + new Vector3((i == 0 ? -1f : 1f) * (3f + variant), Y, -3.5f + variant * 2f);
 
+    // ---- S5 waypoint shrines: id, name, zone, position ----
+    public static readonly (string id, string name, int zone, Vector3 pos)[] Shrines =
+    {
+        ("Town", "Lantern Hold", ActProgress.Town, new Vector3(1.5f, 0f, 14.5f)),
+        ("Fen", "Ashen Fen", ActProgress.Town, new Vector3(-15f, 0f, -4f)),
+        ("Ossuary", "Sunken Ossuary", ActProgress.Ossuary, OssuaryOffset + new Vector3(-5f, 0f, 10f)),
+        ("Kiln", "Cinder Kiln", ActProgress.Kiln, KilnOffset + new Vector3(3.5f, 0f, 9.5f)),
+    };
+
     // ---- S4 boss ----
     public const string KilnmotherName = "The Kilnmother";
     public static readonly Vector3 KilnmotherPos = KilnOffset + new Vector3(0f, 0.05f, -7.5f);

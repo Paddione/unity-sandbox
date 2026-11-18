@@ -14,7 +14,7 @@
 #     (/dev/dxg), measured 47+ fps worst window on 2026-11-18. xvfb renders on
 #     llvmpipe (CPU, ~6 fps) and only proves the session, never the FPS gate.
 #     auto picks wslg when both exist; the window shows on the desktop ~2 min;
-#  3. hard timeout (AUTOPLAY_TIMEOUT, default 900 s) -> exit 2 (hang);
+#  3. hard timeout (AUTOPLAY_TIMEOUT, default 1200 s) -> exit 2 (hang);
 #  4. fps-gate.py --min-fps 30 --resolution 1280x720 --skip-first 1 on the log.
 #
 # Exit = max(autoplay, fps-gate); 2 = hang, 3 = Unity project busy (build).
@@ -30,7 +30,7 @@ OUT="${1:-$ROOT/artifacts/autoplay/$(date +%F)}"
 shift || true
 mkdir -p "$OUT"
 OUT="$(cd "$OUT" && pwd)"
-TIMEOUT="${AUTOPLAY_TIMEOUT:-900}"
+TIMEOUT="${AUTOPLAY_TIMEOUT:-1200}" # act-one: the run continues through the Cinder Kiln
 MIN_FPS="${AUTOPLAY_MIN_FPS:-30}"
 PLAYER_DIR="$ROOT/builds/autoplay-player"
 PLAYER="$PLAYER_DIR/cinderreach"

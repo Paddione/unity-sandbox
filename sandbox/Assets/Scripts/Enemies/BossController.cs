@@ -141,14 +141,7 @@ public sealed class BossController : MonoBehaviour
         return h != null ? h.gameObject : null;
     }
 
-    Transform AcquireHero()
-    {
-        var solo = GameObject.Find("Player");
-        if (solo != null && solo.GetComponent<PlayerHealth>() != null) return solo.transform;
-        foreach (var h in GameObject.FindObjectsOfType<PlayerHealth>())
-            return h.transform;
-        return null;
-    }
+    Transform AcquireHero() => HeroLocator.Hero(); // cached per frame (act-one perf fix)
 
     /// <summary>Ash-grey summon colour (URP Lit).</summary>
     public static readonly Color SummonTint = new Color(0.32f, 0.29f, 0.27f);

@@ -18,11 +18,14 @@ public sealed class AutoplayResult
     public const string PhaseGate = "gate";
     public const string PhaseZone2 = "zone2";
     public const string PhaseBoss = "boss";
+    // act-one S5: the run continues through the Cinder Kiln to the Kilnmother.
+    public const string PhaseZone3 = "zone3";
+    public const string PhaseActBoss = "actboss";
     public const string PhaseComplete = "complete";
 
     /// <summary>Canonical order; a full session reaches all of them.</summary>
     public static readonly string[] RequiredPhases =
-        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseComplete };
+        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseComplete };
 
     public int schema = Schema;
     public string commit = "unknown";
@@ -38,6 +41,8 @@ public sealed class AutoplayResult
     public string difficulty = "Normal";
     /// <summary>Hero class of the run (second-class S5; G-DIABLO06 judges each class).</summary>
     public string classId = "fenwalker";
+    /// <summary>Act I finished in this run (act-one S5).</summary>
+    public bool actOneComplete;
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)

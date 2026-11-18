@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-one
 
-Prozent: 80 %
+Prozent: 95 %
 
 ## Erledigt
 
@@ -30,9 +30,19 @@ Prozent: 80 %
   drei Varianten), PlayMode 82/82 (2 neu `KilnmotherLoopTests`), Verify `thralls=18 lancers=6 elites=2
   kilnmother=True armed=True`, Autoplay 6/6.
 
+- 2026-11-18: S5 waypoints+proof gelandet. `ZoneTravel` (ein Teleport-Pfad für Tore und Schreine),
+  `WaypointShrine` je Zone (Lantern Hold, Ashen Fen, Sunken Ossuary, Cinder Kiln; Entdeckung per Nähe, im Save),
+  `DiabloWaypointUI` (HD-Scaler), Autoplay-Route bis zur Kilnmother und per Wegpunkt zurück, Pflichtphasen
+  `zone3`/`actboss`, `actOneComplete` im Ergebnis, Nachtlauf-Timeout 60 min. Perf-Fix: `HeroLocator` (eine
+  Hero-Suche pro Frame statt ~50) und Leichen-Deckel (16, Animator aus nach 1,5 s). Belege: EditMode 191/191
+  (5 neu `WaypointTests`), PlayMode 84/84 (2 neu `CorpseCapTests`), Verify mit vier Schreinen, neun Läufe
+  (Normal/Kindled/Lanternbearer × Seeds 0–2) 8/8 Phasen, Akt I abgeschlossen; finaler Code schlechtestes
+  FPS-Fenster 36,5/36,9/38,6. Shots `26_kiln_entrance`, `27_thrall_pack`, `28_kilnmother_phase2`,
+  `29_act_one_complete`. Run-Log `docs/act-one-run-log.md`.
+
 ## Nächste Schritte
 
-1. S5 waypoints+proof (Wegpunkte, Autoplay bis zur Kilnmother, Shotcheck, Probe).
+1. dotfiles `G-DIABLO06` (acht Phasen) landen, Nachtlauf dispatchen, Live-Probe prüfen, dann 100 %.
 
 ## Offene Punkte
 

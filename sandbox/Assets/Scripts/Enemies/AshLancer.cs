@@ -34,8 +34,7 @@ public sealed class AshLancer : MonoBehaviour
 
     static Transform Hero()
     {
-        var go = GameObject.Find(DiabloNetworkPlayer.HeroName);
-        return go != null && go.GetComponent<PlayerHealth>() != null ? go.transform : null;
+        return HeroLocator.Solo();
     }
 
     /// <summary>State machine step (headless-callable with explicit time).</summary>

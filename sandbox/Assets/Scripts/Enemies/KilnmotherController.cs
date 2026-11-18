@@ -58,8 +58,7 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
 
     static Transform Hero()
     {
-        var go = GameObject.Find(DiabloNetworkPlayer.HeroName);
-        return go != null && go.GetComponent<PlayerHealth>() != null ? go.transform : null;
+        return HeroLocator.Solo();
     }
 
     public FireWave FireWaveNow(float now)

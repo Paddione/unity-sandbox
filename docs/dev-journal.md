@@ -477,3 +477,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   griffen auf den `Player` einer offenen Zonenszene zu bzw. kippten an einer Float-Zeitgrenze.
 - Next: S5 Wegpunkte, Autoplay-Route bis zur Kilnmother, Shotcheck, Probe.
 
+## 2026-11-18 — cinderreach-act-one S5 waypoints+proof
+
+- Done: Wegpunkt-Schreine + Reisefenster, Autoplay bis zur Kilnmother, acht Pflichtphasen, Kiln-Shots,
+  Run-Log, Perf-Fix (`HeroLocator`, Leichen-Deckel).
+- Belegt: EditMode 191/191, PlayMode 84/84, Verify, neun Läufe 8/8, FPS-Minimum auf finalem Code 36,5.
+- Faced: FPS-Gate rot (26,7) nach dem Kiln: ~50 `GameObject.Find("Player")` pro Frame und 26 animierte
+  Leichen im Massentod. Wegpunkt-Tests: `OnEnable` läuft im EditMode für `AddComponent` nicht (Szenensuche
+  statt Liste). `Kill_LootLandsInBag_EquipFromPanel` war seit second-class S4 flaky (30 % fremde Waffen),
+  jetzt beide Ausgänge gepinnt. Shotcheck starb im Kiln ohne Lebenssicherung.
+- Learned: Ankunft im Kiln mitten zwischen zwei Packs ist ein Balance-Befund für den Playtest.
+

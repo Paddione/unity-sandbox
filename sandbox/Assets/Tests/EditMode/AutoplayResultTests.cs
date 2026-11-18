@@ -44,10 +44,10 @@ public class AutoplayResultTests
     }
 
     [Test]
-    public void RequiredPhases_AreTheSixContractPhases()
+    public void RequiredPhases_AreTheEightContractPhases()
     {
         CollectionAssert.AreEqual(
-            new[] { "town", "zone1", "gate", "zone2", "boss", "complete" },
+            new[] { "town", "zone1", "gate", "zone2", "boss", "zone3", "actboss", "complete" },
             AutoplayResult.RequiredPhases);
     }
 
@@ -63,6 +63,9 @@ public class AutoplayResultTests
         Assert.AreEqual(1, r.ComputeExit());
         r.Reach(AutoplayResult.PhaseBoss);
         r.Reach(AutoplayResult.PhaseComplete);
+        Assert.IsFalse(r.AllPhasesReached(), "act-one: the Kiln and the Kilnmother are part of a full run");
+        r.Reach(AutoplayResult.PhaseZone3);
+        r.Reach(AutoplayResult.PhaseActBoss);
         Assert.IsTrue(r.AllPhasesReached());
         Assert.AreEqual(0, r.ComputeExit());
     }

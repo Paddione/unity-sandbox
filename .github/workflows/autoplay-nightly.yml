@@ -22,7 +22,7 @@ jobs:
   autoplay:
     name: Session autoplay (Linux player, WSLg GPU)
     runs-on: [self-hosted, Linux, X64, unity-licensed]
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout repository with Git LFS
         uses: actions/checkout@v4
