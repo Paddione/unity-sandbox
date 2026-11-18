@@ -21,6 +21,17 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>Set by the builder per tier (1 normal, 2 elite/brute).</summary>
     public int damage = 1;
 
+    /// <summary>
+    /// Encounter group (encounter-roles S1): 0 = front/always active,
+    /// 1 = back/hunter, released at the Kiln choke
+    /// (see <see cref="EncounterLayout"/>). Outside its zone the husk
+    /// stays passive even when the hero teleports away mid-fight.
+    /// </summary>
+    public int encounterGroup;
+
+    Vector3 homePos;
+    bool homeSet;
+
     /// <summary>Husks closer than this push apart while approaching (no stacking).</summary>
     public const float SeparationRadius = 1.1f;
     /// <summary>Probe radius/height for the dressing check (capsule waist).</summary>
@@ -43,8 +54,16 @@ public sealed class EnemyAttack : MonoBehaviour
     void Awake()
     {
         baseScale = transform.localScale;
+        SetHome(transform.position);
         anim = GetComponent<HuskAnimator>();
         if (anim == null) anim = gameObject.AddComponent<HuskAnimator>();
+    }
+
+    /// <summary>Anchor this husk to a zone (builder/seeder call it after placing).</summary>
+    public void SetHome(Vector3 at)
+    {
+        homePos = at;
+        homeSet = true;
     }
 
     void OnEnable() => live.Add(this);
@@ -66,7 +85,25 @@ public sealed class EnemyAttack : MonoBehaviour
             anim.SetMoving(false);
             return;
         }
+        if (!homeSet) SetHome(transform.position);
+        EncounterLayout.NoteHeroPosition(hero.position);
+        // Zone change aborts aggro: a Kiln husk ignores a hero who left for the Fen.
+        if (EncounterLayout.CurrentZone(hero.position) != EncounterLayout.CurrentZone(homePos))
+        {
+            CancelWindup();
+            anim.SetMoving(false);
+            return;
+        }
         float dist = PlanarDistance(hero);
+        // Back/hunter group: dormant until the choke, unless the hero pokes it.
+        if (encounterGroup == EncounterLayout.BackGroup
+            && !EncounterLayout.GroupActive(encounterGroup, hero.position)
+            && dist > EncounterLayout.PersonalSpace)
+        {
+            CancelWindup();
+            anim.SetMoving(false);
+            return;
+        }
         FaceHero(hero);
         if (dist > Range && dist <= AggroRange && windupStart < 0f
             && Time.time - lastStrike >= Cooldown)

@@ -88,15 +88,20 @@ public static class KilnBuilder
         TryKayKitDressing(root);
 
         // S3: Cinder Thralls (packs), Ash Lancers, two Kiln Elites at variant 0 anchors.
+        // Anchors and groups come from the encounter layout (variant 0 = previous positions).
         for (int i = 0; i < KilnLayout.ThrallCount; i++)
             SpawnEnemy("Skeletons/Characters/Skeleton_Minion.fbx", KilnLayout.ThrallPrefix + i,
-                KilnLayout.ThrallAnchor(0, i), 6, LootTier.Normal, 0.9f, root.transform, thrall: true);
+                EncounterLayout.KilnThrallAnchor(0, i), 6, LootTier.Normal, 0.9f, root.transform, thrall: true,
+                group: EncounterLayout.IsKilnFront(i) ? EncounterLayout.FrontGroup : EncounterLayout.BackGroup);
         for (int i = 0; i < KilnLayout.LancerCount; i++)
             SpawnEnemy("Skeletons/Characters/Skeleton_Rogue.fbx", KilnLayout.LancerPrefix + i,
-                KilnLayout.LancerAnchor(0, i), 10, LootTier.Normal, 1f, root.transform, thrall: false);
+                EncounterLayout.KilnLancerAnchor(0, i), 10, LootTier.Normal, 1f, root.transform, thrall: false,
+                group: EncounterLayout.IsKilnHunterLancer(i) ? EncounterLayout.BackGroup : EncounterLayout.FrontGroup);
         for (int i = 0; i < KilnLayout.EliteCount; i++)
             SpawnEnemy("Skeletons/Characters/Skeleton_Warrior.fbx", KilnLayout.ElitePrefix + i,
-                KilnLayout.EliteAnchor(0, i), 24, LootTier.Elite, 1.25f, root.transform, thrall: true);
+                EncounterLayout.KilnEliteAnchor(0, i), 24, LootTier.Elite, 1.25f, root.transform, thrall: true,
+                group: EncounterLayout.BackGroup);
+        SpawnKilnWardens(root.transform); // S1 hunter group: lancers + zone-bound wardens
 
         // S4: The Kilnmother at the north end of the ring.
         SpawnKilnmother(root.transform);
@@ -134,7 +139,7 @@ public static class KilnBuilder
     }
 
     static GameObject SpawnEnemy(string model, string name, Vector3 pos, int hp, LootTier tier, float scale,
-        Transform parent, bool thrall)
+        Transform parent, bool thrall, int group = EncounterLayout.FrontGroup)
     {
         // Skeleton_Brute is not in the pack: fall back to the Warrior like the Abbot does.
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ThirdParty/KayKit/" + model)
@@ -160,11 +165,24 @@ public static class KilnBuilder
         if (thrall)
         {
             e.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
+            e.GetComponent<EnemyAttack>().encounterGroup = group;
             e.AddComponent<CinderThrall>();
         }
         else e.AddComponent<AshLancer>();
         SandboxBuilder.WireHuskAnimator(e);
         return e;
+    }
+
+    /// <summary>Hunter group wardens (zone-bound casters beside the elites).</summary>
+    static void SpawnKilnWardens(Transform parent)
+    {
+        for (int k = 0; k < 2; k++)
+        {
+            var w = SpawnEnemy("Skeletons/Characters/Skeleton_Mage.fbx", EncounterBuilder.KilnWardenName(k),
+                EncounterLayout.KilnWardenAnchor(0, k), 12, LootTier.Normal, 1f, parent, thrall: true,
+                group: EncounterLayout.BackGroup);
+            w.AddComponent<RangedCaster>();
+        }
     }
 
     static void SpawnKilnmother(Transform parent)

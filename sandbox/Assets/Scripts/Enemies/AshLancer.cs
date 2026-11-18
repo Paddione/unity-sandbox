@@ -30,6 +30,12 @@ public sealed class AshLancer : MonoBehaviour
     bool hitThisCharge;
     Transform line;
 
+    /// <summary>Ansturmrichtung des laufenden Telegraphen (S2-Seam für Tests und Interrupts).</summary>
+    public Vector3 TelegraphDir => chargeDir;
+
+    /// <summary>Ist die Ansturmrichtung gerade sichtbar (Ziel- oder Telegraphenlinie)?</summary>
+    public bool TelegraphVisible => line != null && line.gameObject.activeSelf;
+
     void Update() => Tick(Time.time, Time.deltaTime, Hero());
 
     static Transform Hero()
@@ -54,10 +60,19 @@ public sealed class AshLancer : MonoBehaviour
         {
             case State.Idle:
             case State.Approach:
-                if (hero == null || dist > AggroRange) { Current = State.Idle; return; }
+                if (hero == null || dist > AggroRange)
+                {
+                    Current = State.Idle;
+                    ShowLine(false);
+                    return;
+                }
                 Current = State.Approach;
                 if (flat.sqrMagnitude > 0.0001f) transform.rotation = Quaternion.LookRotation(flat);
-                if (dist > HoldDistance + 0.5f) transform.position += flat.normalized * Mathf.Min(WalkSpeed * dt, dist - HoldDistance);
+                if (dist > HoldDistance + 0.5f)
+                {
+                    transform.position += flat.normalized * Mathf.Min(WalkSpeed * dt, dist - HoldDistance);
+                    ShowAim(flat.normalized, dist); // S2: Ansturmrichtung schon beim Annähern sichtbar
+                }
                 else Enter(State.Telegraph, now, flat);
                 break;
             case State.Telegraph:
@@ -109,6 +124,15 @@ public sealed class AshLancer : MonoBehaviour
 
     void ShowLine(bool on)
     {
+        ShowAim(chargeDir, ChargeLength, on);
+    }
+
+    /// <summary>Ziel- (Annäherung) oder Telegraphenlinie in Ansturmrichtung.</summary>
+    void ShowAim(Vector3 dir, float length, bool on = true)
+    {
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+        else dir = dir.normalized;
+        chargeDir = dir;
         if (!Application.isPlaying) return;
         if (on && line == null)
         {
@@ -130,9 +154,10 @@ public sealed class AshLancer : MonoBehaviour
         line.gameObject.SetActive(on);
         if (on)
         {
-            line.position = transform.position + chargeDir * (ChargeLength * 0.5f) + Vector3.up * 0.05f;
-            line.rotation = Quaternion.LookRotation(chargeDir);
-            line.localScale = new Vector3(0.35f, 0.02f, ChargeLength);
+            line.position = transform.position + dir * (length * 0.5f) + Vector3.up * 0.05f;
+            line.rotation = Quaternion.LookRotation(dir);
+            float width = Current == State.Telegraph ? 0.35f : 0.12f;
+            line.localScale = new Vector3(width, 0.02f, length);
         }
     }
 

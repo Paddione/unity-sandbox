@@ -117,12 +117,15 @@ public static class LayoutSeeder
             if (Place(KilnLayout.LancerPrefix + i, KilnLayout.LancerAnchor(k, i))) moved++;
         for (int i = 0; i < KilnLayout.EliteCount; i++)
             if (Place(KilnLayout.ElitePrefix + i, KilnLayout.EliteAnchor(k, i))) moved++;
+        for (int w = 0; w < 2; w++)
+            if (Place(EncounterLayout.KilnWardenPrefix + w, EncounterLayout.KilnWardenAnchor(k, w))) moved++;
         for (int v = 0; v < VariantCount; v++)
         {
             var root = FindIncludingInactive(PropRootPrefix + v);
             if (root != null) root.SetActive(v == Clamp(layout.props));
         }
         Current = layout;
+        EncounterLayout.SetVariant(Clamp(layout.kiln)); // encounter variant follows the kiln draw
         return moved;
     }
 

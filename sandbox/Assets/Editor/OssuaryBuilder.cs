@@ -75,12 +75,11 @@ public static class OssuaryBuilder
         ret.transform.SetParent(root.transform, true);
 
         // 8 Bone Wardens (normal) + 2 elites, host-authoritative casters.
+        // Anchors come from the encounter layout (variant 0 = this ring).
         for (int i = 0; i < CasterCount; i++)
-        {
-            float a = i * Mathf.PI * 2f / CasterCount;
-            SpawnCaster("Bone Warden", OssuaryOffset + new Vector3(Mathf.Cos(a) * 7f, 0.05f, Mathf.Sin(a) * 7f),
+            SpawnCaster("Bone Warden", EncounterLayout.OssuaryRingAnchor(i),
                 12, LootTier.Normal, 1f, root.transform);
-        }
+        EncounterBuilder.EnsureCover(root.transform);
         SpawnCaster("Bone Warden Elite", OssuaryOffset + new Vector3(-5f, 0.05f, -8f),
             24, LootTier.Elite, 1.2f, root.transform);
         SpawnCaster("Bone Warden Elite", OssuaryOffset + new Vector3(5f, 0.05f, -8f),

@@ -8,7 +8,9 @@ using UnityEngine;
 /// <see cref="AggroRange"/> and never strays more than <see cref="LeashRadius"/>
 /// from its spawn point; when the hero leaves aggro range or a knockback throws
 /// it past the leash, the warden walks home and ignores the hero until it is
-/// back (no march from the Ossuary into the Fen).
+/// back (no march from the Ossuary into the Fen). Before warning and shooting
+/// it checks fixed cover (encounter-roles S2): with the sight axis interrupted
+/// it sidesteps for a clear angle instead of wasting the shot.
 /// Projectiles spawn host-authoritatively (solo/host only, like loot);
 /// clients see the telegraph but never spawn.
 /// </summary>
@@ -28,6 +30,9 @@ public sealed class RangedCaster : MonoBehaviour
 
     /// <summary>Telegraphed shots fired this run (test seam).</summary>
     public static int ShotsFired;
+
+    /// <summary>Shots skipped for interrupted sight axes this run (test seam).</summary>
+    public static int CoverHolds;
 
     /// <summary>True while the windup runs (test seam, drives the orb).</summary>
     public bool Telegraphing => telegraphStart >= 0f;
@@ -99,9 +104,54 @@ public sealed class RangedCaster : MonoBehaviour
         else if (dist > HoldMax) pinned = !Step(flat.normalized, dist - HoldMax, dt);
         if ((inBand || pinned) && now - lastShot >= Cooldown)
         {
+            // Fixed cover before warning + shot: sidestep for a clear angle instead.
+            if (!HasClearShot(transform.position, hero.position))
+            {
+                CoverHolds++;
+                Strafe(dt);
+                return;
+            }
             telegraphStart = now;
             ShowTelegraph();
         }
+    }
+
+    /// <summary>Sight axis free of dressing (walls, pillars, sarcophagi)? Heroes and husks never block.</summary>
+    public static bool HasClearShot(Vector3 from, Vector3 to)
+    {
+        var origin = from + Vector3.up * 1.2f;
+        var dir = to - origin;
+        dir.y = 0f;
+        float dist = dir.magnitude;
+        if (dist < 0.001f) return true;
+        dir /= dist;
+        int mask = ~(1 << LayerMask.NameToLayer("Ignore Raycast"));
+        var hits = Physics.SphereCastAll(origin, 0.3f, dir, dist, mask, QueryTriggerInteraction.Ignore);
+        foreach (var h in hits)
+        {
+            var t = h.collider.transform;
+            Transform p = t;
+            bool friendly = false;
+            while (p != null)
+            {
+                if (p.GetComponent<EnemyHealth>() != null || p.GetComponent<PlayerHealth>() != null) { friendly = true; break; }
+                p = p.parent;
+            }
+            if (friendly) continue;
+            if (h.distance <= 0f) continue; // started inside (ground seam): not ahead
+            return false;
+        }
+        return true;
+    }
+
+    void Strafe(float dt)
+    {
+        var hero = AcquireHero();
+        if (hero == null) return;
+        var flat = new Vector3(hero.position.x - transform.position.x, 0f, hero.position.z - transform.position.z);
+        if (flat.sqrMagnitude < 0.0001f) return;
+        var side = Vector3.Cross(Vector3.up, flat.normalized);
+        if (!Step(side, MoveSpeed * dt, dt)) Step(-side, MoveSpeed * dt, dt);
     }
 
     void CancelTelegraph()
@@ -198,5 +248,9 @@ public sealed class RangedCaster : MonoBehaviour
     Transform AcquireHero() => HeroLocator.Hero(); // cached per frame (act-one perf fix)
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
-    public static void ResetRun() => ShotsFired = 0;
+    public static void ResetRun()
+    {
+        ShotsFired = 0;
+        CoverHolds = 0;
+    }
 }
