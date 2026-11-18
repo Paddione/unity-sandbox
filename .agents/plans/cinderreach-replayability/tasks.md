@@ -48,6 +48,11 @@ zeigen `Prozent: 100 %`.
    zusätzlich in `DiabloMelee`, `EnemyAttack`, `Loot/GoldDrop`, `Loot/LootDrop`, `Loot/LootTable`,
    `Progression/CharacterSheet`.
 
+7. Nachtrag S3 (2026-11-18): Gegner-Anker als Konstanten in `LayoutSeeder` (der Seeder verschiebt die
+   vorhandenen Szenen-Gegner), nur die Prop-Cluster entstehen im Builder. Erreichbarkeit als EditMode-Test
+   auf der echten Szene (Kapsel-Raster + Flutfüllung) statt PlayMode. Co-op-Peers erzwingen Variante 0,
+   bis `cinderreach-coop-session` S2 Gegnerpositionen repliziert.
+
 ## Partial-Manifest
 
 | Stufe | Inhalt | target_files |
@@ -105,7 +110,7 @@ S1 zuerst (Save-Format). Danach S2 und S3 parallel (disjunkt). S4 nach S2 (Affix
 |---|---|---|---|
 | S1 save-v2 | Startbedingung | 15 % | landed 2026-11-18 |
 | S2 affix | S1 | 25 % | landed 2026-11-18 |
-| S3 layouts | S1 | 25 % | offen |
+| S3 layouts | S1 | 25 % | landed 2026-11-18 |
 | S4 kindled | S2 | 20 % | offen |
 | S5 stash+proof | S3, S4 | 15 % | offen |
 

@@ -330,3 +330,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   alte Ganzzahl-Wurf.
 - Next: S3 Layouts.
 
+## 2026-11-18 — cinderreach-replayability S3 layouts (geseedete Ashen-Fen-Varianten)
+
+- Done: `LayoutSeeder` (3×3×3×3 Varianten), `LayoutProps_0..2` im Builder, Verify-Zähler `layouts`,
+  `-seed` im Autoplay und Seed-Rotation im Nachtlauf, `seed` im Ergebnis-JSON.
+- Belegt: EditMode 125/125, PlayMode 71/71, `VerifyDiabloZone` (`layouts=3`), `KayKitAssets.Verify`,
+  `check-meta`, Autoplay Seed 1 und 2 grün.
+- Faced: Erster Erreichbarkeitslauf komplett rot: Spawn steht auf `ZStep_1` (0,3 m), die Prüfkapsel
+  begann bei 0,15 m. Diagnose über den Warm-Editor (MCP `Unity_RunCommand`), Kapsel auf Stufenhöhe
+  angehoben. Controller-Drift nach dem Szenen-Neubau revertiert.
+- Learned: Gegnerpositionen sind im Netz nicht repliziert. Pro-Client-Seeds hätten die Co-op-Welt
+  gespalten, daher Variante 0 für Peers.
+- Next: S4 Kindled.
+

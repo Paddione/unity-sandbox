@@ -35,7 +35,10 @@ jobs:
         run: |
           OUT="artifacts/autoplay/$(date +%F)-${GITHUB_RUN_ID}"
           echo "out=$OUT" >> "$GITHUB_OUTPUT"
-          bash scripts/run-autoplay.sh "$OUT"
+          # replayability S3: rotate the Ashen Fen layout seed 0..2 by weekday.
+          SEED=$(( $(date +%u) % 3 ))
+          echo "layout seed $SEED"
+          bash scripts/run-autoplay.sh "$OUT" -seed "$SEED"
 
       - name: Copy result to host store
         if: always() && steps.run.outputs.out != ''

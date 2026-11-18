@@ -59,7 +59,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         startedAt = Time.realtimeSinceStartup;
         result.started = System.DateTime.UtcNow.ToString("o");
         result.commit = ArgValue(CommitFlag) ?? "unknown";
-        Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}");
+        Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         startBosses = BossController.BossesKilled;
         float deadline = Time.realtimeSinceStartup + 600f;
 
@@ -125,6 +125,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.exceptions = exceptionCount;
         result.duration_s = Time.realtimeSinceStartup - startedAt;
         result.fps_windows = new System.Collections.Generic.List<float>(FpsReporter.Windows);
+        result.seed = LayoutSeeder.CurrentSeed;
         result.exit = Mathf.Max(legacyExit, result.ComputeExit());
         string dir = ArgValue(OutFlag)
             ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");

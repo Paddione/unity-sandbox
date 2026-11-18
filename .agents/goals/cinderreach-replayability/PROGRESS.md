@@ -1,6 +1,6 @@
 # Progress: cinderreach-replayability
 
-Prozent: 40 %
+Prozent: 65 %
 
 ## Erledigt
 
@@ -22,10 +22,18 @@ Prozent: 40 %
   Dornen in `EnemyAttack`. Vergleichs-Tooltip `DiabloInventoryUI.CompareSummary`. Belege: EditMode 120/120
   (14 neu `AffixTableTests`), PlayMode 71/71, Verifies grün, Autoplay 6/6 Phasen, FPS-Minimum 49,0.
 
+- 2026-11-18: S3 layouts gelandet. `LayoutSeeder`: je 3 Varianten für Husk-Gruppe, Ash Elite, Fen Brute,
+  Prop-Cluster (81 Kombinationen, Variante 0 = bisherige Aufstellung). Seed aus `-seed N` oder
+  `RunProfile.RunSeed`, Co-op-Peers bleiben auf Variante 0. Builder legt `LayoutProps_0..2` an,
+  `VerifyDiabloZone` prüft `layouts=3`. Nachtlauf rotiert Seed 0..2 nach Wochentag, Ergebnis-JSON trägt
+  `seed`. Belege: EditMode 125/125 (5 neu `LayoutSeedTests`, Erreichbarkeit von Fen Gate, Truhe und allen
+  12 Gegner-Ankern für alle 81 Kombinationen), PlayMode 71/71, Verifies grün, Autoplay `-seed 1`
+  und `-seed 2` je 6/6 Phasen, 0 Exceptions, FPS-Minimum 50,3/50,4.
+
 ## Nächste Schritte
 
-1. S3 layouts, danach S4 kindled.
+1. S4 kindled.
 
 ## Offene Punkte
 
-- S3 bis S5 offen.
+- S4 und S5 offen.

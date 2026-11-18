@@ -887,6 +887,8 @@ public static class SandboxBuilder
             Paint(rock, new Color(0.38f, 0.36f, 0.36f));
         }
 
+        BuildLayoutProps();
+
         // Bloodstains where the fen earned its name.
         var stainSpots = new[]
         {
@@ -1181,6 +1183,10 @@ public static class SandboxBuilder
         bool allHusksArmed = true;
         bool net = false, transport = false, autostart = false, prefab = false;
         int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
+        int layoutRoots = 0;
+        foreach (var root in scene.GetRootGameObjects())
+            if (root.name.StartsWith(LayoutSeeder.PropRootPrefix) && root.transform.childCount > 0)
+                layoutRoots++;
         foreach (var root in scene.GetRootGameObjects())
             CountZoneRecursive(root.transform, ref player, ref clicker, ref melee,
                 ref equip, ref inv, ref wallet, ref health, ref ui, ref starterSword,
@@ -1192,14 +1198,15 @@ public static class SandboxBuilder
                   $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
-                  $"torches={torches} edges={edges} patches={patches} net={net}");
+                  $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots}");
         if (!player || !clicker || !melee || !equip || !inv || !wallet || !health || !ui
             || !vui || !vendor
             || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
             || !elite || !brute || !chest
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
             || edges != 4 || patches < 4
-            || !light || !camera || !net || !transport || !autostart || !prefab)
+            || !light || !camera || !net || !transport || !autostart || !prefab
+            || layoutRoots != LayoutSeeder.VariantCount)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (ashen fen + loot + netcode present).");
     }
@@ -1344,6 +1351,30 @@ public static class SandboxBuilder
         for (int i = 0; i < args.Length - 1; i++)
             if (args[i] == "-buildOut") return args[i + 1];
         return null;
+    }
+
+    /// <summary>
+    /// replayability S3: three prop-cluster roots (<see cref="LayoutSeeder.PropSets"/>),
+    /// variant 0 active, the others inactive until <see cref="LayoutSeeder"/> picks one.
+    /// </summary>
+    static void BuildLayoutProps()
+    {
+        for (int v = 0; v < LayoutSeeder.VariantCount; v++)
+        {
+            var root = new GameObject(LayoutSeeder.PropRootPrefix + v);
+            var spots = LayoutSeeder.PropSets[v];
+            for (int i = 0; i < spots.Length; i++)
+            {
+                var rock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                rock.name = $"LayoutRock_{v}_{i}";
+                rock.transform.SetParent(root.transform, false);
+                rock.transform.position = spots[i];
+                rock.transform.localScale = new Vector3(1.3f, 0.8f, 1.1f);
+                rock.transform.rotation = Quaternion.Euler(0f, 15f + i * 40f, 4f);
+                Paint(rock, new Color(0.34f, 0.32f, 0.31f));
+            }
+            root.SetActive(v == 0);
+        }
     }
 
     static void AddWall(string name, Vector3 pos, Vector3 scale)

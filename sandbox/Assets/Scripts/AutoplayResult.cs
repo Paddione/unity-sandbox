@@ -32,6 +32,8 @@ public sealed class AutoplayResult
     public int exceptions;
     public List<float> fps_windows = new List<float>();
     public int exit = 1;
+    /// <summary>Layout seed of the run (replayability S3), -1 when no zone layout ran.</summary>
+    public int seed = -1;
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)
