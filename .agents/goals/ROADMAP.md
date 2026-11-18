@@ -14,5 +14,8 @@ und gilt für alle Pläne.
 | 4 | `cinderreach-replayability` | #1 und #2 100 % | Kindled-Stufe, Layout-Seeds, Affixe, Stash | G-DIABLO02/03/06 |
 | 5 | `cinderreach-act-one` | #4 100 % | Zone 3, Akt-Boss, Akt-Freischaltkette, Wegpunkte | G-DIABLO02/03/06 |
 | 6 | `cinderreach-second-class` | #2 100 % (parallel zu #5) | Zweite Klasse, Skill-Baum, Klassenwahl, Save-Migration | G-DIABLO02/03/06 |
+| 7 | [`cinderreach-zone-contracts`](cinderreach-zone-contracts/GOAL.md) | #5 100 % | Optionale Jagd- und Bergungsaufträge | G-DIABLO06 |
+| 8 | [`cinderreach-smithing`](cinderreach-smithing/GOAL.md) | nach #7 empfohlen | Beute verwerten und einen Affix gezielt ersetzen | G-DIABLO06 |
+| 9 | [`cinderreach-skill-variants`](cinderreach-skill-variants/GOAL.md) | nach #8 empfohlen | Zwei spielstilprägende Varianten je ausgewähltem Skill | G-DIABLO06 |
 
 Bewusst offen (kein Goal angelegt): Eigner-/5-Personen-Playtest, Steam-Build.
