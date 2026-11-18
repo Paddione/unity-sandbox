@@ -37,6 +37,11 @@ public sealed class CharacterSheet
     public int fireballRank;
     public int arrowRank;
     public int cleaveRank;
+    // Lanternbearer (second-class S3). Ranks of the other class stay stored, they just never apply.
+    public int lanternBoltRank;
+    public int wispsRank;
+    public int haloRank;
+    public int veilRank;
 
     /// <summary>True while any point is unspent (drives the UI pulse).</summary>
     public bool HasUnspent => freeAttributePoints > 0 || freeSkillPoints > 0;
@@ -70,7 +75,11 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.Fireball: return fireballRank;
             case DiabloSkills.Skill.Arrow: return arrowRank;
             case DiabloSkills.Skill.Cleave: return cleaveRank;
-            default: return 0; // Lanternbearer ranks arrive in second-class S3
+            case DiabloSkills.Skill.LanternBolt: return lanternBoltRank;
+            case DiabloSkills.Skill.Wisps: return wispsRank;
+            case DiabloSkills.Skill.SearingHalo: return haloRank;
+            case DiabloSkills.Skill.VeilStep: return veilRank;
+            default: return 0;
         }
     }
 
@@ -83,7 +92,11 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.Fireball: fireballRank++; break;
             case DiabloSkills.Skill.Arrow: arrowRank++; break;
             case DiabloSkills.Skill.Cleave: cleaveRank++; break;
-            default: return false; // Lanternbearer ranks arrive in second-class S3
+            case DiabloSkills.Skill.LanternBolt: lanternBoltRank++; break;
+            case DiabloSkills.Skill.Wisps: wispsRank++; break;
+            case DiabloSkills.Skill.SearingHalo: haloRank++; break;
+            case DiabloSkills.Skill.VeilStep: veilRank++; break;
+            default: return false;
         }
         freeSkillPoints--;
         return true;
@@ -100,9 +113,13 @@ public sealed class CharacterSheet
     /// <summary>Focus skill-damage multiplier (1 + 8 % per point).</summary>
     public float FocusSkillMultiplier() => 1f + FocusSkillDamagePerPoint * focus;
 
+    /// <summary>Focus bonus scaled by the class (Lanternbearer 1.5, Fenwalker 1 = unchanged).</summary>
+    public float FocusSkillMultiplier(float classFocusFactor) =>
+        1f + FocusSkillDamagePerPoint * focus * classFocusFactor;
+
     /// <summary>Total skill-damage multiplier: rank × focus.</summary>
-    public float SkillMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
-        RankMultiplier(skill, gearRankBonus) * FocusSkillMultiplier();
+    public float SkillMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0, float classFocusFactor = 1f) =>
+        RankMultiplier(skill, gearRankBonus) * FocusSkillMultiplier(classFocusFactor);
 
     /// <summary>Cooldown factor from focus (floored at half base).</summary>
     public float CooldownMultiplier() =>
@@ -124,12 +141,17 @@ public sealed class CharacterSheet
         new SkillRankEntry { skill = DiabloSkills.Skill.Fireball.ToString(), rank = fireballRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.Arrow.ToString(), rank = arrowRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.Cleave.ToString(), rank = cleaveRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.LanternBolt.ToString(), rank = lanternBoltRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.Wisps.ToString(), rank = wispsRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.SearingHalo.ToString(), rank = haloRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.VeilStep.ToString(), rank = veilRank },
     };
 
     /// <summary>Import ranks from a save (unknown/missing skills stay 0).</summary>
     public void FromEntries(List<SkillRankEntry> entries)
     {
         fireballRank = arrowRank = cleaveRank = 0;
+        lanternBoltRank = wispsRank = haloRank = veilRank = 0;
         if (entries == null) return;
         foreach (var e in entries)
         {
@@ -140,6 +162,10 @@ public sealed class CharacterSheet
                 case "Fireball": fireballRank = rank; break;
                 case "Arrow": arrowRank = rank; break;
                 case "Cleave": cleaveRank = rank; break;
+                case "LanternBolt": lanternBoltRank = rank; break;
+                case "Wisps": wispsRank = rank; break;
+                case "SearingHalo": haloRank = rank; break;
+                case "VeilStep": veilRank = rank; break;
             }
         }
     }

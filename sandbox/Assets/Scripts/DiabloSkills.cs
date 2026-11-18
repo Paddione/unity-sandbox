@@ -264,11 +264,7 @@ public sealed class DiabloSkills : MonoBehaviour
         int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
         float mul;
         if (sheet != null)
-        {
-            // Class focus factor scales only the Focus bonus (Fenwalker 1 = unchanged).
-            float focusMul = 1f + (sheet.FocusSkillMultiplier() - 1f) * ActiveClass.focusSkillFactor;
-            mul = sheet.RankMultiplier(s, gearRanks) * focusMul;
-        }
+            mul = sheet.SkillMultiplier(s, gearRanks, ActiveClass.focusSkillFactor);
         else mul = 1f + CharacterSheet.RankDamageBonus * gearRanks;
         return Mathf.Max(1, Mathf.RoundToInt(baseDmg * mul));
     }

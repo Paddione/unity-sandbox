@@ -1,6 +1,6 @@
 # Progress: cinderreach-second-class
 
-Prozent: 45 %
+Prozent: 60 %
 
 ## Erledigt
 
@@ -22,9 +22,15 @@ Prozent: 45 %
   (8 neu `LanternSkillFormulaTests`), PlayMode 78/78 (4 neu `LanternSkillTests`), `DiabloD2Feel*` grün,
   Verifies grün, Autoplay Seed 0 (Fenwalker) 6/6 Phasen.
 
+- 2026-11-18: S3 sheet+ui gelandet. `CharacterSheet` mit Rängen für alle 7 Skills (Speicherung aller Ränge,
+  die der anderen Klasse bleiben erhalten und wirken nicht), Klassen-Focus-Faktor in `SkillMultiplier`,
+  `DiabloCharacterUI` baut die Rang-Zeilen aus `ClassCatalog` (3 bzw. 4, Neuaufbau bei Klassenwechsel,
+  Wisps-Zeile zeigt die Begleiterzahl). Belege: EditMode 163/163 (6 neu `ClassSheetUiTests`), PlayMode 78/78,
+  Verifies grün, Autoplay Seed 1 6/6 Phasen.
+
 ## Nächste Schritte
 
-1. S3 sheet+ui (Lanternbearer-Ränge), danach S4.
+1. S4 select+items (Klassenwahl, Held-Prefab je Klasse, Item-Bindung, Drops).
 
 ## Offene Punkte
 

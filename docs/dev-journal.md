@@ -412,3 +412,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Frames warten (Test-Frames ≈ 1 ms).
 - Next: S3 Ränge und Charakter-UI je Klasse.
 
+## 2026-11-18 — cinderreach-second-class S3 sheet+ui
+
+- Done: Lanternbearer-Ränge im Charakterbogen und Save, Klassen-Focus-Faktor, Rang-Zeilen aus dem Katalog.
+- Belegt: EditMode 163/163, PlayMode 78/78, Verifies, Autoplay Seed 1 grün.
+- Faced: Feldname `panel` kollidierte mit einer lokalen Variable in `BuildUI` (Kompilierfehler); Rechenfehler
+  im eigenen Test (7 statt 8 Punkte).
+- Next: S4 Klassenwahl und Items.
+

@@ -104,12 +104,15 @@ public class LanternSkillFormulaTests
     }
 
     [Test]
-    public void SpendSkill_RefusesUnrankedLanternSkillsUntilS3()
+    public void WispsRank_ThreeAddsAThirdWisp()
     {
-        var sheet = new CharacterSheet { freeSkillPoints = 1 };
-        Assert.IsFalse(sheet.SpendSkill(DiabloSkills.Skill.Wisps));
-        Assert.AreEqual(1, sheet.freeSkillPoints);
+        RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        var sheet = hero.GetComponent<DiabloProgression>().Sheet;
+        sheet.freeSkillPoints = 3;
+        for (int i = 0; i < 3; i++) Assert.IsTrue(sheet.SpendSkill(DiabloSkills.Skill.Wisps));
+        Assert.AreEqual(3, sheet.GetRank(DiabloSkills.Skill.Wisps));
         Assert.AreEqual(0, sheet.cleaveRank, "never leaks into Cleave");
+        Assert.AreEqual(3, skills.SummonWisps(cosmetic: true).Count);
     }
 
     [Test]

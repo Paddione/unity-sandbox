@@ -5,8 +5,8 @@ using UnityEngine.UI;
 /// <summary>
 /// S4 character sheet panel (UGUI, built at runtime like
 /// <see cref="DiabloInventoryUI"/>): attributes (Strength/Vitality/Focus, one
-/// point each) and skill ranks (Fireball/Arrow/Cleave 1–5, +20 % damage per
-/// rank). <c>C</c> toggles, <c>Esc</c> closes. Unspent points pulse so a fresh
+/// point each) and skill ranks (1–5, +20 % damage per rank) for the skills of
+/// the hero's class from <see cref="ClassCatalog"/> (second-class S3). <c>C</c> toggles, <c>Esc</c> closes. Unspent points pulse so a fresh
 /// level-up is impossible to miss. Public contract for tests: IsOpen, SetOpen.
 /// Local-only like the sheet itself; mirrors never open it.
 /// </summary>
@@ -20,10 +20,22 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     Text strengthText;
     Text vitalityText;
     Text focusText;
-    Text fireballText;
-    Text arrowText;
-    Text cleaveText;
+    readonly System.Collections.Generic.List<(DiabloSkills.Skill skill, Text text)> skillRows =
+        new System.Collections.Generic.List<(DiabloSkills.Skill, Text)>();
+    Transform panelRoot;
+    string builtFor;
     bool building;
+
+    /// <summary>Skills shown as rank rows (class order; test seam).</summary>
+    public DiabloSkills.Skill[] RowSkills
+    {
+        get
+        {
+            var a = new DiabloSkills.Skill[skillRows.Count];
+            for (int i = 0; i < a.Length; i++) a[i] = skillRows[i].skill;
+            return a;
+        }
+    }
 
     DiabloProgression prog;
     DiabloSkills skills;
@@ -89,22 +101,35 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         EnsureBuilt();
         var sheet = prog != null ? prog.Sheet : CharacterSheet.For(gameObject);
         if (sheet == null) return;
+        if (builtFor != RunProfile.Class.id) BuildSkillRows();
         attrPointsText.text = $"Attribute points: {sheet.freeAttributePoints}";
         skillPointsText.text = $"Skill points: {sheet.freeSkillPoints}";
         strengthText.text = $"Strength {sheet.strength}  (+{sheet.strength * CharacterSheet.StrengthMeleePerPoint} melee)";
         vitalityText.text = $"Vitality {sheet.vitality}  (+{sheet.VitalityLife():0} life)";
-        focusText.text = $"Focus {sheet.focus}  (+{(sheet.FocusSkillMultiplier() - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
-        fireballText.text = $"Fireball {RankPips(sheet.fireballRank)}";
-        arrowText.text = $"Bow {RankPips(sheet.arrowRank)}";
-        float radius = sheet.CleaveRadius(
-            skills != null ? skills.cleaveBaseRadius : 2.6f,
-            skills != null ? skills.cleaveRadiusPerRank : 0.4f);
-        cleaveText.text = $"Cleave {RankPips(sheet.cleaveRank)}  ({radius:0.0} m)";
+        float factor = RunProfile.Class.focusSkillFactor;
+        focusText.text = $"Focus {sheet.focus}  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
+        foreach (var (skill, text) in skillRows)
+            text.text = RowText(sheet, skill);
         if (!sheet.HasUnspent)
         {
             attrPointsText.rectTransform.localScale = Vector3.one;
             skillPointsText.rectTransform.localScale = Vector3.one;
         }
+    }
+
+    string RowText(CharacterSheet sheet, DiabloSkills.Skill skill)
+    {
+        string line = $"{DiabloSkills.SkillName(skill)} {RankPips(sheet.GetRank(skill))}";
+        if (skill == DiabloSkills.Skill.Cleave)
+        {
+            float radius = sheet.CleaveRadius(
+                skills != null ? skills.cleaveBaseRadius : 2.6f,
+                skills != null ? skills.cleaveRadiusPerRank : 0.4f);
+            line += $"  ({radius:0.0} m)";
+        }
+        else if (skill == DiabloSkills.Skill.Wisps && skills != null)
+            line += $"  ({skills.WispCountFor(sheet.wispsRank)} wisps)";
+        return line;
     }
 
     static string RankPips(int rank)
@@ -123,6 +148,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     public void SpendFireball() => SpendRank(DiabloSkills.Skill.Fireball);
     public void SpendArrow() => SpendRank(DiabloSkills.Skill.Arrow);
     public void SpendCleave() => SpendRank(DiabloSkills.Skill.Cleave);
+    public void SpendSkill(DiabloSkills.Skill skill) => SpendRank(skill);
 
     void Spend(CharacterSheet.Attribute attribute)
     {
@@ -178,10 +204,29 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         AddRow(panelGo.transform, "VIT", out vitalityText, SpendVitality);
         AddRow(panelGo.transform, "FOC", out focusText, SpendFocus);
         skillPointsText = MakeLabel(panelGo.transform, "", 16);
-        AddRow(panelGo.transform, "Q", out fireballText, SpendFireball);
-        AddRow(panelGo.transform, "E", out arrowText, SpendArrow);
-        AddRow(panelGo.transform, "R", out cleaveText, SpendCleave);
+        panelRoot = panelGo.transform;
+        BuildSkillRows();
         building = false;
+    }
+
+    /// <summary>One rank row per class skill (rebuilt when the class changes).</summary>
+    void BuildSkillRows()
+    {
+        foreach (var (_, text) in skillRows)
+            if (text != null)
+            {
+                var row = text.transform.parent.gameObject;
+                if (Application.isPlaying) Destroy(row); else DestroyImmediate(row);
+            }
+        skillRows.Clear();
+        var cls = RunProfile.Class;
+        for (int i = 0; i < cls.skills.Length; i++)
+        {
+            var skill = cls.skills[i];
+            AddRow(panelRoot, cls.keys[i], out Text text, () => SpendRank(skill));
+            skillRows.Add((skill, text));
+        }
+        builtFor = cls.id;
     }
 
     void AddRow(Transform parent, string key, out Text value, UnityEngine.Events.UnityAction onPlus)
