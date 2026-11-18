@@ -31,6 +31,7 @@ public static class RunProfile
         ClassId = ClassCatalog.FenwalkerId;
         Act = new ActProgress();
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
+        ContractProgress.Reset();
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

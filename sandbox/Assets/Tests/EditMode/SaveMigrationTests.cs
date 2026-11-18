@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsFour()
+    public void CurrentVersion_IsFive()
     {
-        Assert.AreEqual(4, SaveGame.CurrentVersion);
-        Assert.AreEqual(4, new SaveGame().v);
+        Assert.AreEqual(5, SaveGame.CurrentVersion);
+        Assert.AreEqual(5, new SaveGame().v);
     }
 
     [Test]
@@ -134,6 +134,41 @@ public class SaveMigrationTests
         SaveService.WriteSave(SaveService.CaptureState(hero), path);
         Assert.IsTrue(File.Exists(SaveMigrations.BackupPath(path, 1)));
         Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(path));
+    }
+
+    [Test]
+    public void V4_MigratesWithEmptyContractState()
+    {
+        const string v4 = @"{""v"":4,""level"":6,""xp"":340,""gold"":211,""zoneReached"":2}";
+        var outcome = SaveMigrations.Migrate(v4, out SaveGame save, out int from);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(4, from);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
+        Assert.IsNotNull(save.contract);
+        Assert.IsFalse(save.contract.hasContract);
+        Assert.AreEqual(6, save.level);
+        Assert.AreEqual(211, save.gold);
+    }
+
+    [Test]
+    public void ActiveContract_KeepsPositionThroughSaveReload()
+    {
+        hero = Hero();
+        RunProfile.RunSeed = 4242;
+        var offers = ContractCatalog.Offers(RunProfile.RunSeed, RunProfile.Act);
+        Assert.IsTrue(ContractProgress.TryAccept(offers[0]));
+        SaveService.SaveNow(hero, path: path);
+
+        RunProfile.Reset();
+        ContractProgress.Reset();
+        var fresh = Hero();
+        Object.DestroyImmediate(hero);
+        hero = fresh;
+        Assert.IsTrue(SaveService.TryLoad(hero, path));
+        Assert.IsTrue(ContractProgress.HasContract);
+        Assert.AreEqual(offers[0].id, ContractProgress.ActiveOffer.id);
+        Assert.AreEqual(offers[0].position, ContractProgress.ActiveOffer.position);
+        Assert.AreEqual(ContractStatus.Active, ContractProgress.Status);
     }
 
     [Test]

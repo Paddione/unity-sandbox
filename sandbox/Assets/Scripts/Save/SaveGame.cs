@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Serializable session snapshot (S2 persist). Solo-local JSON via
@@ -9,7 +10,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 4;
+    public const int CurrentVersion = 5;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -43,6 +44,25 @@ public sealed class SaveGame
     public int highestUnlockedZone = ActProgress.Ossuary;
     public bool actOneComplete;
     public List<string> waypoints = new List<string>();
+
+    // v5 (zone-contracts S1): frozen run contract, see ContractProgress.
+    public ContractSnapshot contract = new ContractSnapshot();
+}
+
+/// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted
+/// offer plus its Active/Complete/Claimed status. Empty when the run holds no
+/// contract; the active target position survives reloads verbatim.</summary>
+[System.Serializable]
+public sealed class ContractSnapshot
+{
+    public bool hasContract;
+    public string offerId = string.Empty;
+    public int type;
+    public int zone = ActProgress.Town;
+    public Vector3 position;
+    public int gold;
+    public string targetName = string.Empty;
+    public int status;
 }
 
 /// <summary>One skill's rank (string key: JsonUtility has no dictionaries).</summary>

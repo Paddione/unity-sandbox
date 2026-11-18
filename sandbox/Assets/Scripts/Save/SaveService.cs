@@ -92,6 +92,7 @@ public static class SaveService
         if (File.Exists(p)) File.Delete(p);
         LoadedZoneReached = 1;
         RunProfile.Reset();
+        ContractProgress.Reset();
     }
 
     /// <summary>
@@ -120,6 +121,7 @@ public static class SaveService
             actOneComplete = RunProfile.Act.ActOneComplete,
             waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
         };
+        ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog != null)
@@ -189,6 +191,7 @@ public static class SaveService
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.waypoints);
+        ContractProgress.FromSnapshot(save.contract);
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

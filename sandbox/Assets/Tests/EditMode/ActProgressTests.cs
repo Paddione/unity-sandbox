@@ -89,7 +89,7 @@ public class ActProgressTests
     {
         Assert.AreEqual(SaveMigrations.Outcome.Migrated,
             SaveMigrations.Migrate("{\"v\":3,\"level\":5,\"difficultyUnlocked\":false}", out SaveGame fresh, out _));
-        Assert.AreEqual(4, fresh.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, fresh.v);
         Assert.AreEqual(ActProgress.Ossuary, fresh.highestUnlockedZone);
         Assert.IsFalse(fresh.actOneComplete);
         Assert.IsNotNull(fresh.waypoints);

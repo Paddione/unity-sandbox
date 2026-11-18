@@ -121,6 +121,22 @@ public static class TownBuilder
         chest.AddComponent<StashChest>();
     }
 
+    /// <summary>
+    /// zone-contracts S2: contract board at the camp's east side (plain
+    /// notice post, box collider as click target, <see cref="ContractBoard"/>).
+    /// </summary>
+    public static void SpawnContractBoard()
+    {
+        var post = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        post.name = ContractBoard.BoardObjectName;
+        post.transform.position = new Vector3(3.5f, 0.9f, 14f);
+        post.transform.localScale = new Vector3(1.6f, 1.8f, 0.2f);
+        Paint(post, new Color(0.42f, 0.30f, 0.16f));
+        var col = post.GetComponent<BoxCollider>();
+        col.isTrigger = false;
+        post.AddComponent<ContractBoard>();
+    }
+
     /// <summary>Idle-only Mecanim rig (shared controller, built once per session).</summary>
     static void WireVendorIdle(GameObject vendor)
     {

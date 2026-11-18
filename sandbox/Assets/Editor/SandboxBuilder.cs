@@ -607,6 +607,7 @@ public static class SandboxBuilder
         BuildMoorField();
         TownBuilder.SpawnVendor();
         TownBuilder.SpawnStashChest();
+        TownBuilder.SpawnContractBoard();
         OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
         KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)
         KilnBuilder.BuildWaypoints(); // act-one S5: one shrine per zone
@@ -1198,6 +1199,7 @@ public static class SandboxBuilder
         int husks = 0, palisade = 0, torches = 0, spawns = 0, edges = 0, patches = 0;
         int layoutRoots = 0;
         bool stash = false;
+        bool board = false;
         bool classLook = false;
         foreach (var root in scene.GetRootGameObjects())
         {
@@ -1205,6 +1207,8 @@ public static class SandboxBuilder
                 layoutRoots++;
             if (root.name == StashChest.ObjectName && root.GetComponent<StashChest>() != null)
                 stash = true;
+            if (root.name == ContractBoard.BoardObjectName && root.GetComponent<ContractBoard>() != null)
+                board = true;
             if (root.name == "Player" && root.GetComponent<ClassAppearance>() != null
                 && root.GetComponent<ClassAppearance>().lanternbearerModel != null)
                 classLook = true;
@@ -1220,7 +1224,7 @@ public static class SandboxBuilder
                   $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
-                  $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots} stash={stash} classLook={classLook}");
+                  $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots} stash={stash} board={board} classLook={classLook}");
         if (!player || !clicker || !melee || !equip || !inv || !wallet || !health || !ui
             || !vui || !vendor
             || !starterSword || !goal || !campfire || !targetBar || !allHusksArmed
@@ -1228,7 +1232,7 @@ public static class SandboxBuilder
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
             || edges != 4 || patches < 4
             || !light || !camera || !net || !transport || !autostart || !prefab
-            || layoutRoots != LayoutSeeder.VariantCount || !stash || !classLook)
+            || layoutRoots != LayoutSeeder.VariantCount || !stash || !board || !classLook)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (ashen fen + loot + netcode present).");
     }

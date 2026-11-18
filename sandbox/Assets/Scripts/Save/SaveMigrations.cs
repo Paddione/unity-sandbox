@@ -46,6 +46,7 @@ public static class SaveMigrations
         if (save.v == 1) V1ToV2(save);
         if (save.v == 2) V2ToV3(save);
         if (save.v == 3) V3ToV4(save);
+        if (save.v == 4) V4ToV5(save);
         return Outcome.Migrated;
     }
 
@@ -76,6 +77,16 @@ public static class SaveMigrations
         save.actOneComplete = false;
         save.waypoints = new System.Collections.Generic.List<string>();
         save.v = 4;
+    }
+
+    /// <summary>
+    /// v4 → v5: empty contract state; older saves never held a contract.
+    /// An active target position set by newer code survives verbatim.
+    /// </summary>
+    static void V4ToV5(SaveGame save)
+    {
+        if (save.contract == null) save.contract = new ContractSnapshot();
+        save.v = 5;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>
