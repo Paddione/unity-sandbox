@@ -17,11 +17,15 @@ fi
 
 exec 9>"$PWD/artifacts/scene-capture.lock"
 flock -n 9
-if [[ -f "$project/Temp/UnityLockfile" ]] || pgrep -f "[U]nity -project[Pp]ath $project([[:space:]]|$)" >/dev/null; then
+editor_lock="$project/Temp/UnityLockfile"
+if [[ -f "$editor_lock" ]] || pgrep -f "[U]nity -project[Pp]ath $project([[:space:]]|$)" >/dev/null; then
   echo "The capture project is already open or locked." >&2
   exit 3
 fi
 
+# Unity updates these settings on graphical startup. Keep the input checkout intact.
+settings="$project/ProjectSettings"
+cp "$settings/PackageManagerSettings.asset" "$settings/ProjectSettings.asset" "$out/"
 export DISPLAY=:0 GALLIUM_DRIVER=d3d12
 runtime_dir="/run/user/$(id -u)"
 if [[ -S "$runtime_dir/bus" ]]; then
@@ -32,9 +36,13 @@ fi
 editor_pid=$!
 cleanup() {
   if kill -0 "$editor_pid" 2>/dev/null; then
-    "$cli" --non-interactive close "$project" --timeout 15 --force || kill "$editor_pid"
+    "$cli" --non-interactive close "$project" --timeout 45 --force || kill "$editor_pid"
     wait "$editor_pid" || true
   fi
+  if [[ -f "$editor_lock" ]]; then
+    flock -n "$editor_lock" mv -- "$editor_lock" "$out/editor.lock"
+  fi
+  cp "$out/PackageManagerSettings.asset" "$out/ProjectSettings.asset" "$settings/"
 }
 trap cleanup EXIT
 trap 'exit 130' INT
