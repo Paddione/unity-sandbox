@@ -74,7 +74,7 @@ public static class SmithingService
                 out _, out _, out _)) return false;
         var def = AffixLibrary.Get(replacementKey);
         if (def == null) return false;
-        def.Range(TierOf(expected), out min, out max);
+        (min, max) = AffixLibrary.GetRange(replacementKey, expected.itemLevel, TierOf(expected));
         s_offerGeneration++;
         return true;
     }
@@ -120,7 +120,7 @@ public static class SmithingService
         {
             var def = AffixLibrary.Get(replacementKey);
             int tier = TierOf(expected);
-            float rolled = def.Roll(tier, new System.Random());
+            float rolled = def.Roll(tier, expected.itemLevel, new System.Random());
             // Snapshot: Gold, Material, alter Affix, Bindung.
             int goldBefore = wallet.Gold;
             int matBefore = RunProfile.SmithingMaterial;

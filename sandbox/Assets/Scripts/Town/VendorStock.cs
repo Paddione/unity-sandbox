@@ -52,27 +52,29 @@ public sealed class VendorStock
             ItemRarity.Rare, ItemRarity.Rare, ItemRarity.Unique,
         };
         var slots = new[] { ItemSlot.Weapon, ItemSlot.Armor, ItemSlot.Helmet };
+        const int itemLevel = ItemLevelRules.VendorLevel;
+        int affixTier = DifficultyProfile.Current.affixTier;
         foreach (var rarity in rarities)
         {
             ItemInstance item;
             if (rarity == ItemRarity.Unique)
             {
                 var uniques = ItemDatabase.GetUniques();
-                item = uniques[rng.Next(uniques.Count)];
+                item = ItemDatabase.RollUnique(uniques[rng.Next(uniques.Count)], itemLevel, affixTier);
             }
             else
             {
                 var slot = slots[rng.Next(slots.Length)];
                 var bases = ItemDatabase.GetBaseTypes(slot);
-                // smithing S1: Händlerware bekommt die aktuelle Run-Stufe (Werte + Label).
-                int tier = System.Math.Max(1, DifficultyProfile.Current.affixTier);
                 item = new ItemInstance
                 {
                     slot = slot,
                     rarity = rarity,
                     baseType = bases[rng.Next(bases.Count)],
-                    affixes = AffixLibrary.RollAffixes(slot, rarity, rng, tier),
-                    affixTier = tier,
+                    affixes = AffixLibrary.RollAffixes(slot, rarity, rng, affixTier, itemLevel),
+                    affixTier = affixTier,
+                    itemLevel = itemLevel,
+                    instanceId = System.Guid.NewGuid().ToString("N"),
                 };
             }
             stock.offers.Add(new Offer { item = item, price = BuyPrice(item) });

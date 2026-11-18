@@ -1,7 +1,7 @@
 ---
 title: "Cinderreach Itemisierung und Rollen-Uniques"
 domains: [unity, gameplay, ui, networking]
-status: planned
+status: in_progress
 goal: cinderreach-itemization
 slug: cinderreach-itemization
 branch: feature/cinderreach-itemization

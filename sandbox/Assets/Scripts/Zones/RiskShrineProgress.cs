@@ -109,13 +109,11 @@ public sealed class RiskShrineProgress
             slot = slot,
             rarity = ItemRarity.Rare,
             baseType = bases[rng.Next(bases.Count)],
-            affixes = new System.Collections.Generic.List<Affix>(),
+            itemLevel = ItemLevelRules.RiskShrineRewardLevel,
+            affixTier = DifficultyProfile.Current.affixTier,
         };
-        string[] pool = { "Damage", "MaxHP", "Armor", "Crit" };
-        string first = pool[rng.Next(pool.Length)];
-        string second = pool[rng.Next(pool.Length)];
-        item.affixes.Add(new Affix(first, 1f + (float)rng.NextDouble() * 9f));
-        item.affixes.Add(new Affix(second, 1f + (float)rng.NextDouble() * 9f));
+        item.affixes = AffixLibrary.RollAffixes(slot, item.rarity, rng, item.affixTier, item.itemLevel);
+        item.EnsureIdentity();
         return item;
     }
 }

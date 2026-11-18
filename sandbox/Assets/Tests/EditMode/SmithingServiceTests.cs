@@ -252,6 +252,22 @@ public class SmithingServiceTests
     }
 
     [Test]
+    public void Reforge_PreviewsAndRollsWithinStoredLevelBracket()
+    {
+        var item = RareArmor();
+        item.itemLevel = 10;
+        item.affixTier = 2;
+        Assert.IsTrue(inv.Add(item));
+        RunProfile.SmithingMaterial = SmithingService.ReforgeMaterialCost;
+        Assert.IsTrue(SmithingService.PreviewReforge(hero, 0, item, 1, AffixLibrary.Thorns, out float min, out float max));
+        Assert.AreEqual(3f, min);
+        Assert.AreEqual(6f, max);
+        Assert.IsTrue(SmithingService.TryReforge(hero, 0, item, 1, AffixLibrary.Thorns));
+        Assert.That(item.affixes[1].value, Is.InRange(min, max));
+        Assert.AreEqual(10, item.itemLevel);
+    }
+
+    [Test]
     public void Reforge_TierTwoRollsInKindledSpan()
     {
         var item = RareArmor();

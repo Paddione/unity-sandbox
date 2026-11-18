@@ -32,6 +32,97 @@ public class AffixTableTests
     }
 
     [Test]
+    public void VendorEquipment_CarriesItsSourceLevel()
+    {
+        var gear = VendorStock.Roll(12).offers.FindAll(offer => offer.item.slot != ItemSlot.Consumable);
+        Assert.IsNotEmpty(gear);
+        foreach (var offer in gear)
+        {
+            Assert.AreEqual(ItemLevelRules.VendorLevel, offer.item.itemLevel);
+            Assert.IsNotEmpty(offer.item.instanceId);
+        }
+    }
+
+    [TestCase(0, 0)]
+    [TestCase(1, 1)]
+    [TestCase(4, 1)]
+    [TestCase(5, 2)]
+    [TestCase(9, 2)]
+    [TestCase(10, 3)]
+    [TestCase(40, 3)]
+    public void BracketBoundaries(int level, int bracket)
+    {
+        Assert.AreEqual(bracket, ItemLevelRules.GetBracket(level));
+    }
+
+    [Test]
+    public void DropAffixes_UseSourceLevelAndFrozenDifficultyTier()
+    {
+        var rng = new System.Random(27);
+        foreach (int level in new[] { 1, 5, 10 })
+        foreach (int tier in new[] { 1, 2 })
+        foreach (ItemSlot slot in new[] { ItemSlot.Weapon, ItemSlot.Armor, ItemSlot.Helmet })
+        {
+            var roll = new LootRoll { drops = true, slot = slot, rarity = ItemRarity.Rare, affixTier = tier };
+            for (int i = 0; i < 50; i++)
+            {
+                var item = LootDrop.BuildItem(roll, rng, level);
+                Assert.AreEqual(level, item.itemLevel);
+                Assert.AreEqual(tier, item.affixTier);
+                foreach (var affix in item.affixes)
+                {
+                    var range = AffixLibrary.GetRange(affix.key, level, tier);
+                    Assert.IsTrue(AffixLibrary.Get(affix.key).AllowedOn(slot));
+                    Assert.That(affix.value, Is.InRange(range.min, range.max), affix.key);
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void SourceLevel_ComesFromEncounterZoneAndTier()
+    {
+        Assert.AreEqual(1, ItemLevelRules.ForDrop(Vector3.zero, LootTier.Normal));
+        Assert.AreEqual(2, ItemLevelRules.ForDrop(Vector3.zero, LootTier.Chest));
+        Assert.AreEqual(5, ItemLevelRules.ForDrop(KilnLayout.OssuaryOffset, LootTier.Normal));
+        Assert.AreEqual(6, ItemLevelRules.ForDrop(KilnLayout.OssuaryOffset, LootTier.Elite));
+        Assert.AreEqual(12, ItemLevelRules.ForDrop(KilnLayout.KilnOffset, LootTier.ActBoss));
+    }
+
+    [Test]
+    public void SameSourceAndSeed_KeepsRollsAfterHeroLevels()
+    {
+        var hero = Hero();
+        var progression = hero.AddComponent<DiabloProgression>();
+        var roll = new LootRoll { drops = true, slot = ItemSlot.Armor, rarity = ItemRarity.Rare, affixTier = 1 };
+        int level = ItemLevelRules.ForDrop(KilnLayout.OssuaryOffset, LootTier.Elite);
+        var before = LootDrop.BuildItem(roll, new System.Random(11), level);
+        progression.SetState(20, 0);
+        var after = LootDrop.BuildItem(roll, new System.Random(11), level);
+
+        Assert.AreEqual(before.itemLevel, after.itemLevel);
+        Assert.AreEqual(before.baseType, after.baseType);
+        Assert.AreEqual(before.affixes.Count, after.affixes.Count);
+        for (int i = 0; i < before.affixes.Count; i++)
+        {
+            Assert.AreEqual(before.affixes[i].key, after.affixes[i].key);
+            Assert.AreEqual(before.affixes[i].value, after.affixes[i].value);
+        }
+        Assert.AreNotEqual(before.instanceId, after.instanceId);
+    }
+
+    [Test]
+    public void UniqueDrop_HasMaximumValuesInItsBracket()
+    {
+        var roll = new LootRoll { drops = true, slot = ItemSlot.Helmet, rarity = ItemRarity.Unique, affixTier = 2 };
+        var item = LootDrop.BuildItem(roll, new System.Random(0), 10);
+        Assert.AreEqual("Seer's Circlet", item.uniqueId);
+        Assert.IsNotEmpty(item.instanceId);
+        foreach (var affix in item.affixes)
+            Assert.AreEqual(AffixLibrary.GetRange(affix.key, 10, 2).max, affix.value);
+    }
+
+    [Test]
     public void Table_HasAtLeastTwelveUniqueAffixes()
     {
         Assert.GreaterOrEqual(AffixLibrary.All.Length, 12);

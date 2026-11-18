@@ -27,6 +27,25 @@ public class SaveMigrationTests
     ""zoneReached"": 2
 }";
 
+    [Test]
+    public void V9Migration_IdentifiesItemsWithoutRerolling()
+    {
+        const string json = "{\"v\":9,\"bag\":[{\"slot\":1,\"baseType\":\"Dagger\",\"affixes\":[{\"key\":\"Damage\",\"value\":7}]}]}";
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out var save, out _));
+        Assert.AreEqual(7f, save.bag[0].GetAffix("Damage"));
+        Assert.AreEqual(0, save.bag[0].itemLevel);
+        Assert.That(save.bag[0].instanceId, Does.Match("^[0-9a-f]{32}$"));
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out var repeated, out _));
+        Assert.AreEqual(save.bag[0].instanceId, repeated.bag[0].instanceId);
+
+        save.bag[0].itemLevel = 7;
+        var currentJson = JsonUtility.ToJson(save);
+        Assert.AreEqual(SaveMigrations.Outcome.Current, SaveMigrations.Migrate(currentJson, out var reloaded, out _));
+        Assert.AreEqual(save.bag[0].instanceId, reloaded.bag[0].instanceId);
+        Assert.AreEqual(7, reloaded.bag[0].itemLevel);
+        Assert.AreEqual(7f, reloaded.bag[0].GetAffix("Damage"));
+    }
+
     string path;
     GameObject hero;
 
@@ -58,10 +77,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsNine()
+    public void CurrentVersion_IsTen()
     {
-        Assert.AreEqual(9, SaveGame.CurrentVersion);
-        Assert.AreEqual(9, new SaveGame().v);
+        Assert.AreEqual(10, SaveGame.CurrentVersion);
+        Assert.AreEqual(10, new SaveGame().v);
     }
 
     [Test]

@@ -244,6 +244,8 @@ public static class SaveService
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>
     public static void WriteSave(SaveGame save, string path)
     {
+        foreach (var item in SaveMigrations.StoredItems(save))
+            if (item != null && !string.IsNullOrEmpty(item.baseType)) item.EnsureIdentity();
         SaveMigrations.BackupOlderVersion(path);
         string json = JsonUtility.ToJson(save, prettyPrint: true);
         string tmp = path + ".tmp";

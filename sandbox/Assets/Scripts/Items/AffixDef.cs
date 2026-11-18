@@ -33,10 +33,25 @@ public sealed class AffixDef
         else { min = t1Min; max = t1Max; }
     }
 
-    /// <summary>Roll a value inside the tier span (inclusive for integers).</summary>
-    public float Roll(int tier, System.Random rng)
+    public void Range(int tier, int itemLevel, out float min, out float max)
     {
-        Range(tier, out float min, out float max);
+        Range(tier, out min, out max);
+        float multiplier = ItemLevelRules.RangeMultiplier(itemLevel);
+        min *= multiplier;
+        max *= multiplier;
+        if (integer)
+        {
+            min = (float)System.Math.Round(min, System.MidpointRounding.AwayFromZero);
+            max = (float)System.Math.Round(max, System.MidpointRounding.AwayFromZero);
+        }
+    }
+
+    /// <summary>Roll a value inside the tier span (inclusive for integers).</summary>
+    public float Roll(int tier, System.Random rng) => Roll(tier, 0, rng);
+
+    public float Roll(int tier, int itemLevel, System.Random rng)
+    {
+        Range(tier, itemLevel, out float min, out float max);
         if (integer) return rng.Next((int)min, (int)max + 1);
         return (float)(min + rng.NextDouble() * (max - min));
     }

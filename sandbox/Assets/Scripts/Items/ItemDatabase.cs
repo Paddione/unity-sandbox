@@ -196,18 +196,34 @@ public static class ItemDatabase
         string id = ClassCatalog.Get(classId).id;
         string baseType = id == ClassCatalog.LanternbearerId ? LanternbearerWeapons[0]
             : id == ClassCatalog.RogueId ? RogueWeapons[0] : FenwalkerWeapons[0];
+        const int itemLevel = ItemLevelRules.KindledFinaleRewardLevel;
+        const int affixTier = 2;
         return new ItemInstance
         {
             slot = ItemSlot.Weapon,
             rarity = ItemRarity.Rare,
             baseType = baseType,
+            itemLevel = itemLevel,
+            affixTier = affixTier,
+            instanceId = System.Guid.NewGuid().ToString("N"),
             affixes = new List<Affix>
             {
-                new Affix("Damage", 6f),
-                new Affix("Crit", 12f),
-                new Affix("MaxHP", 10f),
+                new Affix(AffixLibrary.Damage, AffixLibrary.GetRange(AffixLibrary.Damage, itemLevel, affixTier).min),
+                new Affix(AffixLibrary.Crit, AffixLibrary.GetRange(AffixLibrary.Crit, itemLevel, affixTier).min),
+                new Affix(AffixLibrary.MaxHP, AffixLibrary.GetRange(AffixLibrary.MaxHP, itemLevel, affixTier).min),
             },
         };
+    }
+
+    /// <summary>Apply top bracket values to a newly generated Unique template.</summary>
+    public static ItemInstance RollUnique(ItemInstance item, int itemLevel, int affixTier)
+    {
+        item.itemLevel = itemLevel;
+        item.affixTier = affixTier;
+        item.EnsureIdentity();
+        foreach (var affix in item.affixes)
+            affix.value = AffixLibrary.GetRange(affix.key, itemLevel, affixTier).max;
+        return item;
     }
 
     public static List<ItemInstance> GetUniques()

@@ -22,18 +22,20 @@ public sealed class LootDrop : MonoBehaviour
         var profile = DifficultyProfile.Current;
         var roll = LootTable.Roll(tier, rng, Equipment.LocalMagicFind(), profile.uniqueMul);
         if (!roll.drops) return null;
-        return SpawnItem(pos, BuildItem(roll, rng), networked);
+        return SpawnItem(pos, BuildItem(roll, rng, ItemLevelRules.ForDrop(pos, tier)), networked);
     }
 
-    public static ItemInstance BuildItem(LootRoll roll, System.Random rng)
+    public static ItemInstance BuildItem(LootRoll roll, System.Random rng, int itemLevel = 1)
     {
+        int affixTier = roll.affixTier > 0 ? roll.affixTier : DifficultyProfile.Current.affixTier;
         string weaponClass = roll.slot == ItemSlot.Weapon ? WeaponClassFor(RunProfile.ClassId, rng) : "";
         if (roll.rarity == ItemRarity.Unique)
         {
-            if (roll.slot == ItemSlot.Weapon)
-                return ItemDatabase.UniqueWeaponForClass(weaponClass, rng);
             string id = roll.slot == ItemSlot.Armor ? "Cryptwarden Plate" : "Seer's Circlet";
-            return ItemDatabase.CreateUnique(id);
+            var unique = roll.slot == ItemSlot.Weapon
+                ? ItemDatabase.UniqueWeaponForClass(weaponClass, rng)
+                : ItemDatabase.CreateUnique(id);
+            return ItemDatabase.RollUnique(unique, itemLevel, affixTier);
         }
         var bases = roll.slot == ItemSlot.Weapon
             ? ItemDatabase.GetBaseTypes(roll.slot, weaponClass)
@@ -43,8 +45,10 @@ public sealed class LootDrop : MonoBehaviour
             slot = roll.slot,
             rarity = roll.rarity,
             baseType = bases[rng.Next(bases.Count)],
-            affixes = AffixLibrary.RollAffixes(roll.slot, roll.rarity, rng, DifficultyProfile.Current.affixTier),
-            affixTier = System.Math.Max(1, roll.affixTier), // smithing S1: Stufe am Drop erfassen
+            affixes = AffixLibrary.RollAffixes(roll.slot, roll.rarity, rng, affixTier, itemLevel),
+            affixTier = affixTier,
+            itemLevel = itemLevel,
+            instanceId = System.Guid.NewGuid().ToString("N"),
         };
     }
 

@@ -68,17 +68,25 @@ public static class AffixLibrary
     /// <summary>Tier-1 roll (P2 call sites).</summary>
     public static float RollValue(string key, System.Random rng) => RollValue(key, 1, rng);
 
-    public static float RollValue(string key, int tier, System.Random rng)
+    public static (float min, float max) GetRange(string key, int itemLevel, int affixTier)
     {
         var def = Get(key);
-        return def != null ? def.Roll(tier, rng) : 0f;
+        if (def == null) return (0f, 0f);
+        def.Range(affixTier, itemLevel, out float min, out float max);
+        return (min, max);
+    }
+
+    public static float RollValue(string key, int tier, System.Random rng, int itemLevel = 0)
+    {
+        var def = Get(key);
+        return def != null ? def.Roll(tier, itemLevel, rng) : 0f;
     }
 
     /// <summary>Tier comes from the run profile (Kindled = 2, wired in S4).</summary>
     public static List<Affix> RollAffixes(ItemSlot slot, ItemRarity rarity, System.Random rng) =>
         RollAffixes(slot, rarity, rng, 1);
 
-    public static List<Affix> RollAffixes(ItemSlot slot, ItemRarity rarity, System.Random rng, int tier)
+    public static List<Affix> RollAffixes(ItemSlot slot, ItemRarity rarity, System.Random rng, int tier, int itemLevel = 0)
     {
         var result = new List<Affix>();
         if (rarity == ItemRarity.Unique) return result;
@@ -87,7 +95,7 @@ public static class AffixLibrary
         for (int i = 0; i < count; i++)
         {
             string key = pool[rng.Next(pool.Count)];
-            result.Add(new Affix(key, RollValue(key, tier, rng)));
+            result.Add(new Affix(key, RollValue(key, tier, rng, itemLevel)));
         }
         return result;
     }

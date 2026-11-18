@@ -51,6 +51,7 @@ public static class SaveMigrations
         if (save.v == 6) V6ToV7(save);
         if (save.v == 7) V7ToV8(save);
         if (save.v == 8) V8ToV9(save);
+        if (save.v == 9) V9ToV10(save, json);
         return Outcome.Migrated;
     }
 
@@ -153,6 +154,34 @@ public static class SaveMigrations
     {
         if (save.kindledRewardClass == null) save.kindledRewardClass = "";
         save.v = 9;
+    }
+
+    static void V9ToV10(SaveGame save, string originalJson)
+    {
+        int index = 0;
+        using var hash = System.Security.Cryptography.SHA256.Create();
+        string fingerprint = System.Convert.ToBase64String(hash.ComputeHash(
+            System.Text.Encoding.UTF8.GetBytes(originalJson)));
+        foreach (var item in StoredItems(save))
+        {
+            if (item == null || string.IsNullOrEmpty(item.baseType)) continue;
+            if (string.IsNullOrEmpty(item.instanceId))
+            {
+                // Loading the same pre-v10 save before its next write yields the same IDs.
+                var bytes = System.Text.Encoding.UTF8.GetBytes($"{fingerprint}:{index}");
+                var digest = hash.ComputeHash(bytes);
+                System.Array.Resize(ref digest, 16);
+                item.instanceId = new System.Guid(digest).ToString("N");
+            }
+            index++;
+        }
+        save.v = 10;
+    }
+
+    internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)
+    {
+        foreach (var item in AllEquippedAndStored(save)) yield return item;
+        yield return save.riskReward;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>

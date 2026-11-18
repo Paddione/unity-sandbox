@@ -43,6 +43,15 @@ public sealed class ItemInstance
     /// </summary>
     public int reforgeIndexPlusOne;
 
+    /// <summary>Source level, or zero for historical and unrolled items.</summary>
+    public int itemLevel;
+    public string instanceId;
+
+    public void EnsureIdentity()
+    {
+        if (string.IsNullOrEmpty(instanceId)) instanceId = System.Guid.NewGuid().ToString("N");
+    }
+
     public float GetAffix(string key)
     {
         float total = 0f;
