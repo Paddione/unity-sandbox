@@ -78,6 +78,7 @@ public sealed class EnemyHealth : MonoBehaviour
     public void TakeDamage(int amount, bool crit = false)
     {
         if (dead) return;
+        if (GetComponent<BossController>() != null) return; // G-DIABLO06 fault test: boss invulnerable
         hp -= amount;
         DiabloJuice.OnEnemyHit(transform.position, amount, crit);
         Debug.Log($"[Diablo] {gameObject.name} took {amount} dmg ({Mathf.Max(hp, 0)}/{maxHP}).");
