@@ -9,7 +9,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 3;
+    public const int CurrentVersion = 4;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -38,6 +38,11 @@ public sealed class SaveGame
 
     // v3 (second-class S1): playable class, see ClassCatalog.
     public string classId = ClassCatalog.FenwalkerId;
+
+    // v4 (act-one S1): act progression, see ActProgress.
+    public int highestUnlockedZone = ActProgress.Ossuary;
+    public bool actOneComplete;
+    public List<string> waypoints = new List<string>();
 }
 
 /// <summary>One skill's rank (string key: JsonUtility has no dictionaries).</summary>

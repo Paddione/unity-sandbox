@@ -98,6 +98,9 @@ public static class SaveService
             runSeed = RunProfile.RunSeed,
             stash = RunProfile.Stash.ToList(),
             classId = RunProfile.ClassId,
+            highestUnlockedZone = RunProfile.Act.HighestUnlocked,
+            actOneComplete = RunProfile.Act.ActOneComplete,
+            waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
         };
         if (hero == null) return save;
         var prog = hero.GetComponent<DiabloProgression>();
@@ -167,6 +170,7 @@ public static class SaveService
         RunProfile.RunSeed = save.runSeed;
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
+        RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.waypoints);
     }
 
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>

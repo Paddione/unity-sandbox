@@ -45,6 +45,7 @@ public static class SaveMigrations
 
         if (save.v == 1) V1ToV2(save);
         if (save.v == 2) V2ToV3(save);
+        if (save.v == 3) V3ToV4(save);
         return Outcome.Migrated;
     }
 
@@ -63,6 +64,18 @@ public static class SaveMigrations
     {
         save.classId = ClassCatalog.FenwalkerId;
         save.v = 3;
+    }
+
+    /// <summary>
+    /// v3 → v4: the Ossuary was always open; a save that already unlocked Kindled
+    /// has beaten the Hollow Abbot, so the Cinder Kiln opens for it too.
+    /// </summary>
+    static void V3ToV4(SaveGame save)
+    {
+        save.highestUnlockedZone = save.difficultyUnlocked ? ActProgress.Kiln : ActProgress.Ossuary;
+        save.actOneComplete = false;
+        save.waypoints = new System.Collections.Generic.List<string>();
+        save.v = 4;
     }
 
     /// <summary>Version header of an existing file, 0 when missing/unreadable.</summary>

@@ -58,10 +58,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsThree()
+    public void CurrentVersion_IsFour()
     {
-        Assert.AreEqual(3, SaveGame.CurrentVersion);
-        Assert.AreEqual(3, new SaveGame().v);
+        Assert.AreEqual(4, SaveGame.CurrentVersion);
+        Assert.AreEqual(4, new SaveGame().v);
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class SaveMigrationTests
         var outcome = SaveMigrations.Migrate(V1Fixture, out SaveGame save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(1, from);
-        Assert.AreEqual(3, save.v, "v1 lifts through v2 to v3");
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v1 lifts through every step");
         Assert.AreEqual(ClassCatalog.FenwalkerId, save.classId);
         Assert.AreEqual(6, save.level);
         Assert.AreEqual(340, save.xp);
@@ -95,9 +95,9 @@ public class SaveMigrationTests
     public void FutureVersion_Refused()
     {
         Assert.AreEqual(SaveMigrations.Outcome.FutureVersion,
-            SaveMigrations.Migrate("{\"v\":4,\"level\":9}", out SaveGame save, out int from));
+            SaveMigrations.Migrate("{\"v\":99,\"level\":9}", out SaveGame save, out int from));
         Assert.IsNull(save);
-        Assert.AreEqual(4, from);
+        Assert.AreEqual(99, from);
     }
 
     [Test]

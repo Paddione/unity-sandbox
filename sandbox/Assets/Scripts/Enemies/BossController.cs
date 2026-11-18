@@ -120,7 +120,10 @@ public sealed class BossController : MonoBehaviour
         // replayability S4: the first kill unlocks Kindled and persists it.
         bool unlocked = DifficultyProfile.UnlockKindled();
         SessionComplete.KindledUnlockedThisRun |= unlocked;
-        if (unlocked && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
+        // act-one S1: the Abbot opens the Cinder Kiln.
+        bool kilnOpened = RunProfile.Act.Unlock(ActProgress.Kiln);
+        if (kilnOpened) UnityEngine.Debug.Log("[Act] Cinder Kiln unlocked.");
+        if ((unlocked || kilnOpened) && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
         SessionComplete.Show(hero, LastBossDrop);
     }
 

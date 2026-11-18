@@ -454,3 +454,9 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Runner waren nicht die Ursache.
 - second-class auf 100 %: alle sechs Kriterien belegt, `G-DIABLO06` live grün inkl. Normal/lanternbearer.
 
+## 2026-11-18 — cinderreach-act-one S1 act-save
+
+- Done: `ActProgress`, Save v4 + Migration v3 → v4, Kiln-Freischaltung beim Abbot-Kill mit Sofort-Save.
+- Belegt: EditMode 174/174, PlayMode 80/80, Verifies, Autoplay grün mit `[Act] Cinder Kiln unlocked.`
+- Next: S2 Cinder Kiln (Welt).
+

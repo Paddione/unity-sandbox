@@ -18,6 +18,8 @@ public static class RunProfile
     public static string ClassId = ClassCatalog.FenwalkerId;
 
     public static ClassDefinition Class => ClassCatalog.Get(ClassId);
+    /// <summary>Act I progression (act-one S1, save v4).</summary>
+    public static ActProgress Act = new ActProgress();
 
     /// <summary>Fresh-run defaults (New Game, headless tests).</summary>
     public static void Reset()
@@ -27,6 +29,7 @@ public static class RunProfile
         RunSeed = NewSeed();
         Stash = new Stash();
         ClassId = ClassCatalog.FenwalkerId;
+        Act = new ActProgress();
     }
 
     /// <summary>Non-negative seed from the system clock-based RNG.</summary>

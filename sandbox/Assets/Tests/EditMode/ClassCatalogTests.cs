@@ -88,7 +88,7 @@ public class ClassCatalogTests
         const string v2 = "{\"v\":2,\"level\":4,\"gold\":50,\"difficultyUnlocked\":true,\"difficulty\":\"Kindled\",\"runSeed\":7,\"stash\":[]}";
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(v2, out SaveGame save, out int from));
         Assert.AreEqual(2, from);
-        Assert.AreEqual(3, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
         Assert.AreEqual(ClassCatalog.FenwalkerId, save.classId);
         Assert.IsTrue(save.difficultyUnlocked, "v2 fields survive");
         Assert.AreEqual(7, save.runSeed);
