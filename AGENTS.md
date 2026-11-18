@@ -1,0 +1,10 @@
+# AGENTS.md für Unity Sandbox
+
+Die gemeinsame Arbeitsweise steht in `~/AGENTS.md` und `~/agentic-resources/AGENTS.md`. Der lokale Vertrag für Branch, Prüfungen und Fast-Forward-Abschluss steht in `repo.yaml`.
+
+## Unity-Arbeit
+
+- Arbeite in einem Worktree unter `~/.worktrees`. Anlage und Abschluss laufen über `python3 ~/scripts/agent-workspace.py create --repo unity-sandbox <branch>` und `python3 ~/scripts/agent-workspace.py land`.
+- Lese vor Änderungen die aktiven Ziele und Stufenpläne in `.agents/`. Plane Save-Migrationen auf Basis von aktuellem `main`.
+- Nutze `bash scripts/run-unity-tests.sh` für EditMode und PlayMode, `python3 scripts/check-meta.py` für Asset-Metadaten und `bash scripts/run-unity-build.sh` für Editor-Builds und Szenenverifikation. Das Spielprojekt liegt unter `sandbox/`. Die Editor-Version steht in `sandbox/ProjectSettings/ProjectVersion.txt`.
+- Installiere die Repository-Hooks bei einem frischen Checkout mit `python3 ~/scripts/agent-workspace.py install --repo ~/unity-sandbox`. Erzeuge die lokalen Skill-Links mit `python3 ~/scripts/agent-resources.py link-consumers`. Unity-spezifische Skills stehen im Home-Katalog. Die lokale Skill-Verknüpfung bleibt unversioniert.

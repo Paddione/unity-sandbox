@@ -44,3 +44,6 @@ UserSettings/
 # CI test XML and editor logs
 /artifacts/
 sandbox/artifacts/
+
+# Shared skills linked by agent-resources.py
+/.agents/skills/
