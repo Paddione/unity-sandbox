@@ -127,7 +127,9 @@ public static class OssuaryBuilder
         husk.transform.position = pos;
         husk.transform.localScale = Vector3.one * scale;
         husk.AddComponent<NetworkObject>();
-        husk.AddComponent<EnemyHealth>().SetTier(hp, tier);
+        var health = husk.AddComponent<EnemyHealth>();
+        health.SetTier(hp, tier);
+        health.corpseModel = prefab;
         husk.AddComponent<RangedCaster>();
         husk.AddComponent<EnemyAttack>().damage = tier == LootTier.Normal ? 1 : 2;
         SandboxBuilder.WireHuskAnimator(husk);
@@ -157,6 +159,7 @@ public static class OssuaryBuilder
         boss.AddComponent<NetworkObject>();
         var health = boss.AddComponent<EnemyHealth>();
         health.SetTier(BossController.BossMaxHP, LootTier.Boss);
+        health.corpseModel = prefab;
         boss.AddComponent<BossController>();
         boss.AddComponent<EnemyAttack>().damage = 3;
         SandboxBuilder.WireHuskAnimator(boss);

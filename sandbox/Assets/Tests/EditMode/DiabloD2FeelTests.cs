@@ -99,7 +99,8 @@ public class DiabloD2FeelTests
             var atk = husk.GetComponent<EnemyAttack>();
             Assert.IsNotNull(atk, $"Husk '{husk.name}' needs EnemyAttack.");
             var tier = husk.GetComponent<EnemyHealth>().tier;
-            Assert.AreEqual(tier == LootTier.Normal ? 1 : 2, atk.damage,
+            int expectedDamage = tier == LootTier.Normal ? 1 : (tier == LootTier.Boss ? 3 : 2);
+            Assert.AreEqual(expectedDamage, atk.damage,
                 $"Husk '{husk.name}' damage must follow its tier.");
         }
 
