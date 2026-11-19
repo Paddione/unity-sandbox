@@ -734,3 +734,12 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Faced: `wooden-crate.glb` steht im Index ungefiltert (27020 B), `.gitattributes` verlangt lfs — jeder frische
   Checkout zeigt es dirty. Pre-existing, bewusst nicht angefasst (explizite Pathspecs beim Commit).
 - Next: Post-Merge-CI-Run auf `main` als Live-Beleg beobachten.
+
+## 2026-11-19 — LFS-Heilung: wooden-crate.glb als Pointer
+
+- Anlass: `sandbox/Assets/ThirdParty/Meshy/crate/wooden-crate.glb` lag roh (27020 B) im Index, `.gitattributes`
+  verlangt `*.glb filter=lfs` — jeder frische Checkout zeigte den Worktree dirty (reine Clean-Filter-Artefakt,
+  Inhalt bit-identisch). Scan: einziger Violator von 509 Pattern-Dateien (508 sauber per `git lfs ls-files`).
+- Done: `git add` (Clean-Filter → Pointer `e53ae62d`, 130 B), Objekt liegt im gemeinsamen LFS-Store,
+  `git lfs push` vor dem Land, damit CI-Checkout (`lfs: true`) und frische Klone materialisieren.
+- Belegt: Pointer im Index, `git lfs status` Git→LFS-Mapping ok, Post-Merge-CI-Run als Roundtrip-Beleg.
