@@ -5,6 +5,8 @@
 *.psd filter=lfs diff=lfs merge=mine -text
 *.tga filter=lfs diff=lfs merge=mine -text
 *.fbx filter=lfs diff=lfs merge=mine -text
+*.glb filter=lfs diff=lfs merge=mine -text
+*.gltf filter=lfs diff=lfs merge=mine -text
 *.fbm filter=lfs diff=lfs merge=mine -text
 *.obj filter=lfs diff=lfs merge=mine -text
 *.blend filter=lfs diff=lfs merge=mine -text

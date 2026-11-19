@@ -599,6 +599,8 @@ public static class SandboxBuilder
             NewSceneSetup.EmptyScene, NewSceneMode.Single);
         scene.name = "DiabloZone";
 
+        LocalArtPilotDressing.EnsurePilotAssets();
+
         var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
         ground.name = "Ground";
         ground.transform.localScale = new Vector3(4f, 1f, 4f);
@@ -653,6 +655,7 @@ public static class SandboxBuilder
         chestLoot.isChest = true;
         chest.AddComponent<NetworkObject>();
         chest.AddComponent<LootNetRelay>();
+        LocalArtPilotDressing.DressLootChest(chest);
 
         // East rubble (collapsed passage, decoration only).
         for (int i = 0; i < 4; i++)
@@ -745,10 +748,11 @@ public static class SandboxBuilder
             new Vector3(-12f, 0.05f, 3f), 15, LootTier.Elite, 1.3f,
             new Color(1f, 0.3f, 0.3f));
 
-        // Brute (northeast fen, second elite).
-        SpawnZoneHusk("Skeletons/Characters/Skeleton_Warrior.fbx", "Fen Brute",
+        // Brute (northeast fen, second elite) — local-art pilot: ember hound visual.
+        var brute = SpawnZoneHusk("Skeletons/Characters/Skeleton_Warrior.fbx", "Fen Brute",
             new Vector3(9f, 0.05f, -6f), 12, LootTier.Elite, 1.25f,
             new Color(0.8f, 0.2f, 0.2f));
+        LocalArtPilotDressing.DressBrute(brute);
 
         // UI input for the code-built inventory panel. InputSystem module:
         // StandaloneInputModule reads the legacy Input API and throws every
@@ -778,6 +782,7 @@ public static class SandboxBuilder
 
         // Blender-built Ashen Fen props replace the greybox look (names kept).
         WorldArtBuilder.DressDiabloZone();
+        LocalArtPilotDressing.SwapAlcoveBanner();
 
         BuildDiabloZonePlayerPrefab();
         AssetDatabase.Refresh();
@@ -1120,7 +1125,7 @@ public static class SandboxBuilder
         return null;
     }
 
-    static void SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)
+    static GameObject SpawnZoneHusk(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Color? tint)
     {
         var prefab = LoadModel(model);
         var husk = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
@@ -1145,6 +1150,7 @@ public static class SandboxBuilder
             var rend = husk.GetComponentInChildren<Renderer>();
             if (rend != null) rend.material.color = tint.Value;
         }
+        return husk;
     }
 
     static void BuildDiabloZonePlayerPrefab()
@@ -1445,3 +1451,298 @@ public static class SandboxBuilder
         renderer.sharedMaterial = mat;
     }
 }
+
+/// <summary>
+/// Local-art pilot dressing (S2/S3): binds the locally generated assets
+/// (Assets/Art/LocalArtPilot) into the DiabloZone scene. Loot state,
+/// colliders and combat components stay on the pre-existing roots; only
+/// visuals are swapped, so zone verify counts are unaffected.
+/// </summary>
+public static class LocalArtPilotDressing
+{
+    public const string Root = "Assets/Art/LocalArtPilot";
+    const string ChestGlb = Root + "/LootChest.glb";
+    const string BannerGlb = Root + "/TornBanner.glb";
+    const string HoundFbx = Root + "/Quadruped.fbx";
+    const string HoundAlbedo = Root + "/EmberHound_Albedo.png";
+    const string HoundMetalRough = Root + "/EmberHound_MetalRough.png";
+    const string HoundNormal = Root + "/EmberHound_Normal.png";
+    const string IconPng = Root + "/LootIcon.png";
+    const string PrefabDir = Root + "/Prefabs";
+    const string HoundControllerPath = Root + "/HoundMimic.controller";
+
+    /// <summary>Idempotent asset pass: sprite import, hound PBR hookup, mimic controller, wrappers.</summary>
+    public static void EnsurePilotAssets()
+    {
+        EnsureIconSprite();
+        EnsureHoundMaterial();
+        EnsureHoundController();
+        System.IO.Directory.CreateDirectory(PrefabDir);
+        EnsureChestWrapper();
+        EnsureBannerWrapper();
+        EnsureHoundWrapper();
+        AssetDatabase.SaveAssets();
+    }
+
+    static void EnsureIconSprite()
+    {
+        var ti = AssetImporter.GetAtPath(IconPng) as TextureImporter;
+        if (ti == null) return;
+        if (ti.textureType != TextureImporterType.Sprite
+            || ti.spriteImportMode != SpriteImportMode.Single)
+        {
+            ti.textureType = TextureImporterType.Sprite;
+            ti.spriteImportMode = SpriteImportMode.Single;
+            ti.spritePixelsPerUnit = 256;
+            ti.SaveAndReimport();
+        }
+    }
+
+    static void EnsureHoundMaterial()
+    {
+        // Persistent URP/Lit material for the hound (assigned in the wrapper;
+        // FBX-embedded materials are not touched so reimports cannot revert).
+        System.IO.Directory.CreateDirectory(Root + "/Materials");
+        var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        var albedo = AssetDatabase.LoadAssetAtPath<Texture2D>(HoundAlbedo);
+        var metalRough = AssetDatabase.LoadAssetAtPath<Texture2D>(HoundMetalRough);
+        var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(HoundNormal);
+        if (albedo != null) m.SetTexture("_BaseMap", albedo);
+        if (normal != null) m.SetTexture("_BumpMap", normal);
+        if (metalRough != null) m.SetTexture("_MetallicGlossMap", metalRough);
+        m.SetFloat("_Metallic", 0.1f);
+        m.SetFloat("_Smoothness", 0.35f);
+        const string path = Root + "/Materials/Pilot_Hound.mat";
+        AssetDatabase.DeleteAsset(path);
+        AssetDatabase.CreateAsset(m, path);
+    }
+
+    static AnimationClip FindHoundTake(string needle)
+    {
+        AnimationClip fallback = null;
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(HoundFbx))
+        {
+            if (!(obj is AnimationClip clip)) continue;
+            if (clip.name == needle) return clip; // exact take, never __preview__
+            if (fallback == null && clip.name.Contains(needle)
+                && !clip.name.StartsWith("__preview__")) fallback = clip;
+        }
+        return fallback;
+    }
+
+    static void EnsureHoundController()
+    {
+        var run = FindHoundTake("Run");
+        var attack = FindHoundTake("Attack");
+        if (run == null || attack == null)
+        {
+            Debug.LogWarning("[LocalArtPilot] Hound takes missing; mimic stays idle.");
+            return;
+        }
+        AssetDatabase.DeleteAsset(HoundControllerPath);
+        var c = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(
+            "Assets/Art/LocalArtPilot/HoundMimic.controller");
+        var sm = c.layers[0].stateMachine;
+        foreach (var s in sm.states) sm.RemoveState(s.state);
+        var runState = sm.AddState("Run");
+        runState.motion = run;
+        var attackState = sm.AddState("Attack");
+        attackState.motion = attack;
+        sm.defaultState = runState;
+        var exit = attackState.AddTransition(runState);
+        exit.hasExitTime = true;
+        exit.duration = 0.15f;
+        AssetDatabase.SaveAssets();
+    }
+
+    static GameObject LoadVisual(string path, string fallback)
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[LocalArtPilot] Missing {path}; {fallback} fallback.");
+            return GameObject.CreatePrimitive(PrimitiveType.Cube);
+        }
+        return (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+    }
+
+    static void EnsureChestWrapper()
+    {
+        const string path = PrefabDir + "/PilotLootChest.prefab";
+        var visual = LoadVisual(ChestGlb, "chest");
+        visual.name = "PilotChestVisual";
+        var wrapper = new GameObject("PilotLootChest");
+        visual.transform.SetParent(wrapper.transform, false);
+        ConvertToUrpLit(wrapper, false, "Chest");
+        var icon = new GameObject("PilotLootIcon");
+        icon.transform.SetParent(wrapper.transform, false);
+        icon.transform.localPosition = new Vector3(0f, 1.55f, 0f);
+        icon.transform.localScale = Vector3.one * 0.35f;
+        var sr = icon.AddComponent<SpriteRenderer>();
+        var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(IconPng);
+        sr.sprite = sprite;
+        if (sprite != null)
+        {
+            var iconMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            iconMat.SetTexture("_BaseMap", sprite.texture);
+            iconMat.SetFloat("_AlphaClip", 1f);
+            iconMat.SetFloat("_Cutoff", 0.4f);
+            iconMat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+            string iconMatPath = Root + "/Materials/Pilot_Icon.mat";
+            AssetDatabase.DeleteAsset(iconMatPath);
+            AssetDatabase.CreateAsset(iconMat, iconMatPath);
+            sr.sharedMaterial = iconMat;
+        }
+        icon.AddComponent<LootIconBillboard>();
+        PrefabUtility.SaveAsPrefabAsset(wrapper, path);
+        Object.DestroyImmediate(wrapper);
+    }
+
+    static void EnsureBannerWrapper()
+    {
+        const string path = PrefabDir + "/PilotBanner.prefab";
+        var visual = LoadVisual(BannerGlb, "banner");
+        visual.name = "PilotBannerVisual";
+        var wrapper = new GameObject("PilotBanner");
+        visual.transform.SetParent(wrapper.transform, false);
+        // Blender pivot sits at the pole with the cloth hanging to -H:
+        // raise so the pole hangs at bracket height and the cloth clears
+        // the ground (alcove/ossuary have no wall brackets in this pass).
+        visual.transform.localPosition = new Vector3(0f, 1.9f, 0f);
+        ConvertToUrpLit(wrapper, true, "Banner");
+        PrefabUtility.SaveAsPrefabAsset(wrapper, path);
+        Object.DestroyImmediate(wrapper);
+    }
+
+    static void EnsureHoundWrapper()
+    {
+        const string path = PrefabDir + "/PilotHound.prefab";
+        var visual = LoadVisual(HoundFbx, "hound");
+        visual.name = "PilotHoundVisual";
+        // Blender +X (head) -> Unity +Z (forward): yaw -90°.
+        visual.transform.rotation = Quaternion.Euler(0f, -90f, 0f);
+        visual.transform.localScale = Vector3.one * 1.15f;
+        var wrapper = new GameObject("PilotHound");
+        visual.transform.SetParent(wrapper.transform, false);
+        var houndMat = AssetDatabase.LoadAssetAtPath<Material>(Root + "/Materials/Pilot_Hound.mat");
+        if (houndMat != null)
+            foreach (var r in visual.GetComponentsInChildren<Renderer>(true))
+                r.sharedMaterial = houndMat;
+        var animator = visual.AddComponent<Animator>();
+        animator.applyRootMotion = false;
+        var controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(HoundControllerPath);
+        if (controller != null) animator.runtimeAnimatorController = controller;
+        // Animator + mimic live on the FBX root: Generic takes bind their
+        // curves relative to the Animator's own transform.
+        visual.AddComponent<QuadrupedMimic>();
+        PrefabUtility.SaveAsPrefabAsset(wrapper, path);
+        Object.DestroyImmediate(wrapper);
+    }
+
+    static void HideVisuals(GameObject root)
+    {
+        foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+        {
+            if (r.gameObject == root) continue; // loot/collider host stays active
+            r.enabled = false;
+            r.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>glTF imports arrive on the glTF shader; zone tests pin URP/Lit.
+    /// Materials are saved as assets: nested prefab instances drop
+    /// in-memory materials on save (null override).</summary>
+    static void ConvertToUrpLit(GameObject root, bool alphaClip, string matPrefix)
+    {
+        System.IO.Directory.CreateDirectory(Root + "/Materials");
+        foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+        {
+            var src = r.sharedMaterial;
+            if (src != null && src.shader.name == "Universal Render Pipeline/Lit") continue;
+            var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            if (src != null)
+            {
+                if (src.HasProperty("_BaseMap") && src.GetTexture("_BaseMap") != null)
+                    m.SetTexture("_BaseMap", src.GetTexture("_BaseMap"));
+                else if (src.mainTexture != null)
+                    m.SetTexture("_BaseMap", src.mainTexture);
+                if (src.HasProperty("_BumpMap") && src.GetTexture("_BumpMap") != null)
+                    m.SetTexture("_BumpMap", src.GetTexture("_BumpMap"));
+            }
+            if (alphaClip)
+            {
+                m.SetFloat("_AlphaClip", 1f);
+                m.SetFloat("_Cutoff", 0.5f);
+                m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+            }
+            m.SetFloat("_Metallic", 0.1f);
+            m.SetFloat("_Smoothness", 0.35f);
+            string matPath = $"{Root}/Materials/Pilot_{matPrefix}_{r.name}.mat";
+            AssetDatabase.DeleteAsset(matPath);
+            AssetDatabase.CreateAsset(m, matPath);
+            r.sharedMaterial = m;
+        }
+    }
+
+    /// <summary>Loot chest: keep root (collider/loot/netcode), swap visuals.</summary>
+    public static void DressLootChest(GameObject chest)
+    {
+        if (chest == null) return;
+        HideVisuals(chest);
+        var wrapper = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/PilotLootChest.prefab");
+        if (wrapper == null) return;
+        var inst = (GameObject)PrefabUtility.InstantiatePrefab(wrapper);
+        inst.transform.SetParent(chest.transform, false);
+        inst.transform.localPosition = Vector3.zero;
+    }
+
+    /// <summary>Fen Brute becomes the ember hound: host keeps combat, hound mimics it.</summary>
+    public static void DressBrute(GameObject brute)
+    {
+        if (brute == null) return;
+        HideVisuals(brute);
+        var wrapper = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/PilotHound.prefab");
+        if (wrapper == null) return;
+        var inst = (GameObject)PrefabUtility.InstantiatePrefab(wrapper);
+        inst.transform.SetParent(brute.transform, false);
+        inst.transform.localPosition = Vector3.zero;
+        var animator = inst.GetComponent<Animator>();
+        if (animator != null && animator.runtimeAnimatorController == null)
+        {
+            // Fallback when the controller pass found no takes: drive the FBX
+            // default controller so the enemy still moves instead of T-posing.
+            var go = AssetDatabase.LoadAssetAtPath<GameObject>(HoundFbx);
+            if (go != null)
+            {
+                var fallback = go.GetComponentInChildren<Animator>();
+                if (fallback != null) animator.runtimeAnimatorController = fallback.runtimeAnimatorController;
+            }
+        }
+    }
+
+    /// <summary>Swap the WorldArt alcove banner for the pilot torn banner.</summary>
+    public static void SwapAlcoveBanner()
+    {
+        var old = GameObject.Find("AlcoveBanner");
+        Vector3 pos = new Vector3(-12f, 0f, -4.2f);
+        float yaw = 0f;
+        if (old != null)
+        {
+            pos = old.transform.position;
+            yaw = old.transform.rotation.eulerAngles.y;
+            Object.DestroyImmediate(old);
+        }
+        PlaceBanner("PilotBanner_Alcove", pos, yaw);
+    }
+
+    public static void PlaceBanner(string name, Vector3 pos, float yaw)
+    {
+        var wrapper = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/PilotBanner.prefab");
+        if (wrapper == null) return;
+        var inst = (GameObject)PrefabUtility.InstantiatePrefab(wrapper);
+        inst.name = name;
+        inst.transform.position = pos;
+        inst.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+    }
+}
+
