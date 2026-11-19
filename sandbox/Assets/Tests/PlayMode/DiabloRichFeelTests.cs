@@ -183,7 +183,9 @@ public class DiabloRichFeelTests
         var amb = DiabloAmbience.Instance;
         Assert.IsNotNull(amb);
         Assert.IsTrue(amb.Bed.loop);
-        Assert.IsTrue(amb.Bed.isPlaying);
+        // Muted test runs (SetUpFixture) configure but never start the bed.
+        if (DiabloAudio.MutePlayback) Assert.IsNotNull(amb.Bed.clip);
+        else Assert.IsTrue(amb.Bed.isPlaying);
         Assert.Greater(amb.Bed.clip.length, 4f);
         Assert.IsTrue(amb.Motes.isPlaying);
     }

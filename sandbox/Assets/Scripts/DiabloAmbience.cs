@@ -22,6 +22,17 @@ public sealed class DiabloAmbience : MonoBehaviour
     public AudioSource Bed => bed;
     public ParticleSystem Motes => motes;
 
+    /// <summary>Silent in tests (SetUpFixture mute) and batchmode runs: the
+    /// looping wind-and-drone bed is the PlayMode run's background drone.</summary>
+    static bool AmbienceMuted
+    {
+        get
+        {
+            try { return DiabloAudio.MutePlayback || Application.isBatchMode; }
+            catch { return DiabloAudio.MutePlayback; }
+        }
+    }
+
     public static DiabloAmbience Ensure(Transform hero)
     {
         if (instance == null)
@@ -42,7 +53,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         bed.loop = true;
         bed.volume = BedVolume;
         bed.spatialBlend = 0f;
-        bed.Play();
+        if (!AmbienceMuted) bed.Play();
 
         motes = NewSystem("Embers", "SkillArt/FireAdditive", 80);
         var main = motes.main;
