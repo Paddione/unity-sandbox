@@ -13,13 +13,12 @@ Greybox prototypes, one question per prototype, kill/pivot/continue, 5-person pl
 
 ## Tracking
 
-Goals live in the dotfiles repo (`.agents/goals/`):
+The current state of the game (Cinderreach) and the starting point for new work is
+[.agents/goals/CINDERREACH.md](.agents/goals/CINDERREACH.md). Active goals sit next to it under
+`.agents/goals/`. Tooling goals for this project (foundation, agentic loop, mechanics testbed, health
+probes) live in the dotfiles repo (`~/.agents/goals/`).
 
-- `unity-sandbox-foundation` — project, LFS, Starter Assets, CI
-- `unity-agentic-loop` — MCP wiring, credit forecast, human review
-- `unity-mechanics-testbed` — greybox prototypes, playtests, One-Page GDD
-
-See [docs/one-page-gdd.md](docs/one-page-gdd.md) for the current plan.
+See [docs/one-page-gdd.md](docs/one-page-gdd.md) for the game design.
 
 ## Status
 

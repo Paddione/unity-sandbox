@@ -27,4 +27,4 @@ Ausrüstung, Dropquellen, Kampfwerte, Rollen-Modifier, Loot-Darstellung, Inventa
 ## Abhängigkeiten
 
 - [Party Roles](../cinderreach-party-roles/GOAL.md) liefert den Rollenvertrag. Die Rogue-Modifier und ihre Nachweise benötigen die spielbaren Rogue-Fähigkeiten.
-- [Build Uniques](../cinderreach-build-uniques/GOAL.md) liefert vorhandene Unique-IDs und Effekte zur Wiederverwendung. Vorhandene Item-Grafik und Mengen- und Seltenheitsgewichte sind der Ausgangspunkt. Begründe Änderungen an der Verteilung mit der Erreichbarkeit der Matrix.
+- Build Uniques (abgeschlossen, Stand in [CINDERREACH.md](../CINDERREACH.md)) liefert vorhandene Unique-IDs und Effekte zur Wiederverwendung. Vorhandene Item-Grafik und Mengen- und Seltenheitsgewichte sind der Ausgangspunkt. Begründe Änderungen an der Verteilung mit der Erreichbarkeit der Matrix.
