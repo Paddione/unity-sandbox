@@ -30,4 +30,11 @@ public class PartyRosterTests
     {
         Assert.IsNull(PartyRoster.EnsureSoloParty(null));
     }
+
+    [Test]
+    public void WillJoinAsClient_FalseWithoutJoinFlags()
+    {
+        // Test runs never join: no -join/--net-client/-join-code/-coop-autoplay client on the line.
+        Assert.IsFalse(PartyRoster.WillJoinAsClient());
+    }
 }

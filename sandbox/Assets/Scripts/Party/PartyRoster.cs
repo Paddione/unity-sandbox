@@ -66,15 +66,29 @@ public sealed class PartyRoster : MonoBehaviour
         return nm != null && nm.IsListening && nm.IsServer;
     }
 
+    /// <summary>True when this process will join someone else's session (client boot runs before net starts).</summary>
+    public static bool WillJoinAsClient()
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] == "-join" || args[i] == "--net-client" || args[i] == "-join-code") return true;
+            if (args[i] == "-coop-autoplay" && i + 1 < args.Length && args[i + 1] == "client") return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Zone-scene boot: companions only where the camp spawn exists, never in
     /// tests. Solo fills missing roles at once; a listening host keeps an
-    /// empty roster so the join gate and role replacement still run.
+    /// empty roster so the join gate and role replacement still run. Joining
+    /// clients spawn nothing — their party is the host's.
     /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
     {
         if (!Application.isPlaying) return;
+        if (WillJoinAsClient()) return; // the join happens after scene boot, while IsSolo still lies
         if (!IsSolo() && !IsHost()) return; // clients run no party logic
         if (GameObject.Find("CoopSpawn_0") == null) return;
         var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
