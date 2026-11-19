@@ -37,6 +37,23 @@ public static class HeroLocator
         return null;
     }
 
+    /// <summary>
+    /// Every living hero in the scene (party-roles S4): the local hero,
+    /// co-op peers and active AI companions. Dead and stood-down entries
+    /// are skipped so heals and HUDs only see the fighting party.
+    /// </summary>
+    public static System.Collections.Generic.List<Transform> AllHeroes()
+    {
+        var list = new System.Collections.Generic.List<Transform>();
+        foreach (var h in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            if (h == null || !h.gameObject.activeInHierarchy) continue;
+            if (h.CurrentHP <= 0f) continue;
+            list.Add(h.transform);
+        }
+        return list;
+    }
+
     /// <summary>Lookups that hit the scene this run (test seam for the cache).</summary>
     public static int Frame => frame;
 }

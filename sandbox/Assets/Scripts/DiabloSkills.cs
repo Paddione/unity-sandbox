@@ -107,8 +107,14 @@ public sealed class DiabloSkills : MonoBehaviour
     readonly System.Collections.Generic.Dictionary<Skill, float> lastLantern =
         new System.Collections.Generic.Dictionary<Skill, float>();
 
+    /// <summary>
+    /// Class override for AI drivers: a companion casts as its own class,
+    /// not the player's. Null on heroes and mirrors (run profile rules).
+    /// </summary>
+    public ClassDefinition classOverride;
+
     /// <summary>Class of the local hero (run profile); mirrors only render casts.</summary>
-    public ClassDefinition ActiveClass => RunProfile.Class;
+    public ClassDefinition ActiveClass => classOverride ?? RunProfile.Class;
 
     /// <summary>
     /// Active skill variant (skill-variants S2). Unknown picks fall back to

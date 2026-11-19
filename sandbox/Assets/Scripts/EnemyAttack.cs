@@ -189,8 +189,13 @@ public sealed class EnemyAttack : MonoBehaviour
         DiabloJuice.OnPlayerHurt(hero.position, dealt);
         if (hp.CurrentHP <= 0f)
         {
-            hp.DieAndRespawn();
-            DiabloAudio.PlayPlayerDeath();
+            var comp = hp.GetComponent<PartyCompanion>();
+            if (comp != null) comp.Die(); // AI waits out death at camp, then rejoins (S4)
+            else
+            {
+                hp.DieAndRespawn();
+                DiabloAudio.PlayPlayerDeath();
+            }
         }
     }
 
