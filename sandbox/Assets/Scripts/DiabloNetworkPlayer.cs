@@ -356,10 +356,13 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         else SubmitCastServerRpc(skill, origin, dir);
     }
 
+    /// <summary>Accepted skill ids for cast mirrors (the whole enum, appended over time).</summary>
+    public static bool IsCastSkillId(int skill) => System.Enum.IsDefined(typeof(DiabloSkills.Skill), skill);
+
     [ServerRpc]
     void SubmitCastServerRpc(int skill, Vector3 origin, Vector3 dir)
     {
-        if (skill < 0 || skill > (int)DiabloSkills.Skill.Cleave) return;
+        if (!IsCastSkillId(skill)) return;
         // Anchor the visual to the caster: reject origins far from the player.
         var delta = origin - transform.position;
         delta.y = 0f;
@@ -515,7 +518,87 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             }
             lastHit[sender] = now;
             health.TakeDamage(damage);
+            // Server threat (party-roles S5): the sender owns this damage, never anyone else's.
+            ThreatTable.BookDamage(targetNb.gameObject, nb.transform, damage);
             return;
+        }
+    }
+
+    /// <summary>Last validated heal per sender (server cooldown gate, party-roles S5).</summary>
+    static readonly System.Collections.Generic.Dictionary<ulong, float> lastMendHit =
+        new System.Collections.Generic.Dictionary<ulong, float>();
+    static readonly System.Collections.Generic.Dictionary<ulong, float> lastRenewHit =
+        new System.Collections.Generic.Dictionary<ulong, float>();
+
+    /// <summary>Client heal request: validated on the server, then fanned out to the target's owner.</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitHealServerRpc(ulong targetNetId, float amount, int kind, ServerRpcParams rpcParams = default)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsServer) return;
+        if (nm.SpawnManager == null) return;
+        ulong sender = rpcParams.Receive.SenderClientId;
+        if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
+        // Only someone's hero is addressable here — enemies are never player
+        // objects, so foreign-heal is impossible by construction. Never self:
+        // mend is others-only, group self-heals never relay (DiabloSkills).
+        if (!targetNb.IsPlayerObject) return;
+        var targetHp = targetNb.GetComponent<PlayerHealth>();
+        if (targetHp == null || targetHp.CurrentHP <= 0f) return;
+        var senderNb = SenderPlayerObject(nm, sender);
+        if (senderNb == null) return;
+        if (targetNb.NetworkObjectId == senderNb.NetworkObjectId) return;
+        bool renew = kind == (int)DiabloSkills.Skill.RenewingCircle;
+        float range = renew ? DiabloSkills.GroupHealBaseRange : DiabloSkills.TargetHealBaseRange;
+        float cooldown = renew ? DiabloSkills.RenewBaseCooldown : DiabloSkills.MendBaseCooldown;
+        var lastHit = renew ? lastRenewHit : lastMendHit;
+        float last = lastHit.TryGetValue(sender, out float t) ? t : float.NegativeInfinity;
+        string reason = HitValidator.ValidateHeal(senderNb.transform.position, targetNb.transform.position,
+            range, last, cooldown, UnityEngine.Time.time, amount);
+        if (reason != null)
+        {
+            Debug.Log($"[Net] rejected heal from {sender}: {reason}.");
+            return;
+        }
+        lastHit[sender] = UnityEngine.Time.time;
+        ThreatTable.BookHeal(senderNb.transform, amount);
+        HealTargetClientRpc(targetNetId, amount, sender);
+    }
+
+    /// <summary>Someone's player object by owner, or null.</summary>
+    static NetworkObject SenderPlayerObject(NetworkManager nm, ulong sender)
+    {
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (nb.IsPlayerObject && nb.OwnerClientId == sender) return nb;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Server heal fan-out (party-roles S5): only the target's owner applies
+    /// the HP to its real hero; every other client books the sender's threat
+    /// (the sender already booked its own). Host calls this straight after a
+    /// local heal, clients reach it through <see cref="SubmitHealServerRpc"/>.
+    /// </summary>
+    [ClientRpc]
+    public void HealTargetClientRpc(ulong targetNetId, float amount, ulong senderClientId)
+    {
+        if (amount <= 0f || amount > HitValidator.MaxHeal) return;
+        var nm = NetworkManager.Singleton;
+        if (nm == null || nm.SpawnManager == null) return;
+        if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
+        var hp = targetNb.GetComponent<PlayerHealth>();
+        if (hp == null || hp.CurrentHP <= 0f) return;
+        if (targetNb.IsOwner) hp.Heal(amount);
+        if (nm.LocalClientId == senderClientId) return; // sender already booked its own threat
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (!nb.IsPlayerObject || nb.OwnerClientId != senderClientId) continue;
+            ThreatTable.BookHeal(nb.transform, amount);
+            break;
         }
     }
 }

@@ -39,6 +39,7 @@ public sealed class PartyRoster : MonoBehaviour
             if (c == null) { companions.RemoveAt(i); continue; }
             if (c.RejoinDue) c.Rejoin();
         }
+        ServerReconcile();
     }
 
     /// <summary>Class id that covers a role (tank holds, healer mends, dps kills).</summary>
@@ -58,15 +59,38 @@ public sealed class PartyRoster : MonoBehaviour
         return false; // a client rides someone else's party: S5 owns it
     }
 
-    /// <summary>Zone-scene boot: companions only where the camp spawn exists, never in tests.</summary>
+    /// <summary>True on a listening host (the only peer that runs party logic).</summary>
+    public static bool IsHost()
+    {
+        var nm = NetworkManager.Singleton;
+        return nm != null && nm.IsListening && nm.IsServer;
+    }
+
+    /// <summary>
+    /// Zone-scene boot: companions only where the camp spawn exists, never in
+    /// tests. Solo fills missing roles at once; a listening host keeps an
+    /// empty roster so the join gate and role replacement still run.
+    /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
     {
         if (!Application.isPlaying) return;
+        if (!IsSolo() && !IsHost()) return; // clients run no party logic
         if (GameObject.Find("CoopSpawn_0") == null) return;
         var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         if (hero == null || hero.GetComponent<PlayerHealth>() == null) return;
-        EnsureSoloParty(hero.transform);
+        var roster = Instance;
+        if (roster == null)
+        {
+            var go = new GameObject("PartyRoster");
+            roster = go.AddComponent<PartyRoster>();
+            roster.leader = hero.transform;
+        }
+        else if (roster.leader == null)
+        {
+            roster.leader = hero.transform;
+        }
+        if (IsSolo()) roster.FillMissingRoles(new[] { RunProfile.Class.role });
     }
 
     /// <summary>Fill the roles the leader's class does not cover. Idempotent per role.</summary>
@@ -84,23 +108,105 @@ public sealed class PartyRoster : MonoBehaviour
         {
             roster.leader = hero;
         }
-        roster.FillMissingRoles();
+        roster.FillMissingRoles(new[] { RunProfile.Class.role });
         return roster;
     }
 
-    void FillMissingRoles()
+    void FillMissingRoles(IList<ClassDefinition.PartyRole> humanRoles)
     {
-        var covered = new HashSet<ClassDefinition.PartyRole> { RunProfile.Class.role };
+        var covered = new HashSet<ClassDefinition.PartyRole>(humanRoles);
         foreach (var c in companions)
             if (c != null) covered.Add(c.Role.role);
-        int humans = 1; // S4: the local hero; S5 counts co-op peers
         foreach (ClassDefinition.PartyRole role in System.Enum.GetValues(typeof(ClassDefinition.PartyRole)))
         {
             if (covered.Contains(role)) continue;
-            if (humans + companions.Count >= PartySize) break;
+            if (humanRoles.Count + companions.Count >= PartySize) break;
             SpawnCompanion(ClassIdForRole(role));
             covered.Add(role);
         }
+    }
+
+    /// <summary>Host reconciliation (party-roles S5): join gate plus role replacement.</summary>
+    void ServerReconcile()
+    {
+        if (!IsHost()) return;
+        var remote = RemoteRoles(NetworkManager.Singleton);
+        var humans = new List<ClassDefinition.PartyRole> { RunProfile.Class.role };
+        humans.AddRange(remote);
+        if (NeedsJoinGate(humans.Count))
+        {
+            DisconnectNewestExtra(NetworkManager.Singleton);
+            return;
+        }
+        var compRoles = new List<ClassDefinition.PartyRole>();
+        foreach (var c in companions)
+            if (c != null) compRoles.Add(c.Role.role);
+        var pending = new List<ClassDefinition.PartyRole>(ReconcileRoles(compRoles, remote));
+        for (int i = companions.Count - 1; i >= 0; i--)
+        {
+            var c = companions[i];
+            if (c == null) { companions.RemoveAt(i); continue; }
+            if (pending.Contains(c.Role.role)) { pending.Remove(c.Role.role); RemoveCompanion(c); }
+        }
+        if (humans.Count + companions.Count < PartySize) FillMissingRoles(humans);
+    }
+
+    /// <summary>
+    /// Pure mapping (testable): which companion roles step aside when these
+    /// remote roles join — one companion per joining role.
+    /// </summary>
+    public static List<ClassDefinition.PartyRole> ReconcileRoles(
+        IList<ClassDefinition.PartyRole> companionRoles,
+        IList<ClassDefinition.PartyRole> remoteRoles)
+    {
+        var gone = new List<ClassDefinition.PartyRole>();
+        var taken = new List<ClassDefinition.PartyRole>(remoteRoles);
+        foreach (var r in companionRoles)
+        {
+            if (taken.Contains(r)) { gone.Add(r); taken.Remove(r); }
+        }
+        return gone;
+    }
+
+    /// <summary>True when the human party overflows (the join gate must refuse).</summary>
+    public static bool NeedsJoinGate(int humanCount) => humanCount > PartySize;
+
+    /// <summary>Roles of connected remote players, read from their class mirrors (host side).</summary>
+    public static List<ClassDefinition.PartyRole> RemoteRoles(NetworkManager nm)
+    {
+        var roles = new List<ClassDefinition.PartyRole>();
+        if (nm == null || nm.SpawnManager == null) return roles;
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (nb == null || !nb.IsPlayerObject || nb.IsLocalPlayer) continue;
+            var relay = nb.GetComponent<DiabloNetworkPlayer>();
+            int idx = relay != null ? relay.classIndex.Value : 0;
+            var cls = idx >= 0 && idx < ClassCatalog.All.Length ? ClassCatalog.All[idx] : ClassCatalog.Fenwalker;
+            roles.Add(cls.role);
+        }
+        return roles;
+    }
+
+    void RemoveCompanion(PartyCompanion c)
+    {
+        companions.Remove(c);
+        Debug.Log($"[Party] {c.Role.displayName} steps aside for a joining hero.");
+        Object.Destroy(c.gameObject);
+    }
+
+    void DisconnectNewestExtra(NetworkManager nm)
+    {
+        ulong newest = 0;
+        bool found = false;
+        foreach (var id in nm.ConnectedClientsIds)
+        {
+            if (id == nm.LocalClientId) continue;
+            if (!found || id > newest) { newest = id; found = true; }
+        }
+        if (!found) return;
+        Debug.Log($"[Party] party is full ({PartySize}): refusing client {newest}.");
+        nm.DisconnectClient(newest);
     }
 
     PartyCompanion SpawnCompanion(string companionClassId)

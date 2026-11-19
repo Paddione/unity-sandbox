@@ -82,11 +82,15 @@ public sealed class DiabloSkills : MonoBehaviour
 
     [Header("Healer (party-roles S3, Lanternbearer)")]
     public int mendHeal = 8;
-    public float targetHealRange = 12f;
-    public float mendCooldown = 5f;
+    public const float TargetHealBaseRange = 12f;
+    public float targetHealRange = TargetHealBaseRange;
+    public const float MendBaseCooldown = 5f;
+    public float mendCooldown = MendBaseCooldown;
     public int renewHeal = 5;
-    public float groupHealRadius = 6f;
-    public float renewCooldown = 12f;
+    public const float GroupHealBaseRange = 6f;
+    public float groupHealRadius = GroupHealBaseRange;
+    public const float RenewBaseCooldown = 12f;
+    public float renewCooldown = RenewBaseCooldown;
 
     /// <summary>
     /// Burning-halo window for the wick-of-the-halo Wisp priority
@@ -720,6 +724,7 @@ public sealed class DiabloSkills : MonoBehaviour
             target.Heal(EffectiveHeal(Skill.MendingLight));
             restored = target.CurrentHP - before;
             ThreatTable.BookHeal(transform, restored);
+            RelayHeal(target.gameObject, restored, Skill.MendingLight);
         }
         SpawnHealVisual(targetHealRange);
         return restored;
@@ -738,6 +743,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (!cosmetic)
         {
             int amount = EffectiveHeal(Skill.RenewingCircle);
+            var healed = new System.Collections.Generic.List<GameObject>();
             foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
             {
                 if (hp == null) continue;
@@ -747,12 +753,33 @@ public sealed class DiabloSkills : MonoBehaviour
                 if (to.magnitude > radius) continue;
                 float before = hp.CurrentHP;
                 hp.Heal(amount);
-                restored += hp.CurrentHP - before;
+                float got = hp.CurrentHP - before;
+                restored += got;
+                if (got > 0f) healed.Add(hp.gameObject);
             }
             ThreatTable.BookHeal(transform, restored);
+            foreach (var go in healed) RelayHeal(go, amount, Skill.RenewingCircle);
         }
         SpawnHealVisual(radius);
         return restored;
+    }
+
+    /// <summary>
+    /// Forward a locally-applied heal on a remote player's hero to its owner
+    /// (party-roles S5). Solo, self-heals and host-local targets need no
+    /// relay: the local apply already stands. Hosts fan out straight to the
+    /// owner, clients ask the server first (validated there).
+    /// </summary>
+    void RelayHeal(GameObject target, float amount, Skill kind)
+    {
+        if (amount <= 0f || target == null) return;
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var nm = NetworkManager.Singleton;
+        if (netPlayer == null || !netPlayer.IsSpawned || nm == null || !nm.IsListening) return;
+        var targetNb = target.GetComponent<NetworkObject>();
+        if (targetNb == null || !targetNb.IsPlayerObject || targetNb.IsOwner) return;
+        if (nm.IsServer) netPlayer.HealTargetClientRpc(targetNb.NetworkObjectId, amount, nm.LocalClientId);
+        else netPlayer.SubmitHealServerRpc(targetNb.NetworkObjectId, amount, (int)kind);
     }
 
     void SpawnHealVisual(float radius)

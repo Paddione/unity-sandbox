@@ -16,6 +16,9 @@ public static class HitValidator
     /// <summary>Upper bound for a single plausible hit (blocks 9999 fakes).</summary>
     public const int MaxDamage = 50;
 
+    /// <summary>Upper bound for a single plausible heal (blocks 9999 fakes).</summary>
+    public const int MaxHeal = 30;
+
     /// <summary>Planar (XZ) distance, like EnemyAttack/DiabloProjectile.</summary>
     public static float PlanarDistance(Vector3 a, Vector3 b)
     {
@@ -47,6 +50,24 @@ public static class HitValidator
         if (!CooldownReady(lastTime, cooldown, now)) return $"cooldown {now - lastTime:0.00}s < {cooldown:0.00}s";
         if (!InRange(attackerPos, targetPos, skillRange))
             return $"range {PlanarDistance(attackerPos, targetPos):0.00}m > {skillRange + RangeTolerance:0.00}m";
+        return null;
+    }
+
+    /// <summary>True for a plausible single-target heal amount.</summary>
+    public static bool HealPlausible(float amount) => amount > 0f && amount <= MaxHeal;
+
+    /// <summary>
+    /// Heal gate (party-roles S5): null when valid, else a reason
+    /// ("heal", "cooldown", "range") for logs/tests. Target liveness is
+    /// checked by the caller — heals only land on living allies.
+    /// </summary>
+    public static string ValidateHeal(Vector3 healerPos, Vector3 targetPos, float skillRange,
+        float lastTime, float cooldown, float now, float amount)
+    {
+        if (!HealPlausible(amount)) return $"heal {amount:0} outside 1..{MaxHeal}";
+        if (!CooldownReady(lastTime, cooldown, now)) return $"cooldown {now - lastTime:0.00}s < {cooldown:0.00}s";
+        if (!InRange(healerPos, targetPos, skillRange))
+            return $"range {PlanarDistance(healerPos, targetPos):0.00}m > {skillRange + RangeTolerance:0.00}m";
         return null;
     }
 

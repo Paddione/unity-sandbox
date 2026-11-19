@@ -11,6 +11,8 @@
 # and uses its own save file (-save-file), so the two never share a save.
 # Display as in run-autoplay.sh (COOP_DISPLAY=auto|wslg|xvfb). No FPS gate:
 # two players share one GPU, the pair proves content, not frame rate.
+# Classes: COOP_HOST_CLASS / COOP_CLIENT_CLASS set the -class flag per side
+# (party-roles S5: e.g. host fenwalker + client rogue to prove role replacement).
 #
 # Exit = max(host, client); 2 = hang (COOP_TIMEOUT, default 1200 s).
 # Usage (repo root): bash scripts/run-coop-pair.sh [out_dir]
@@ -88,13 +90,13 @@ else
 echo "run-coop-pair: host on port $PORT (display $MODE, timeout ${TIMEOUT}s)"
 set +e
 timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-  -host -port "$PORT" -autoplay -coop-autoplay host -save-file coop-host.json \
+  -host -port "$PORT" -autoplay -coop-autoplay host ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
   -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
 HOST_PID=$!
 sleep 8
 echo "run-coop-pair: client -> 127.0.0.1:$PORT"
 timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-  -join "127.0.0.1:$PORT" -coop-autoplay client -save-file coop-client.json \
+  -join "127.0.0.1:$PORT" -coop-autoplay client ${COOP_CLIENT_CLASS:+-class "$COOP_CLIENT_CLASS"} -save-file coop-client.json \
   -autoplay-out "$OUT/client" -logFile "$OUT/client/player.log" &
 CLIENT_PID=$!
 fi
