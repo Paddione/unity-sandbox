@@ -210,10 +210,16 @@ public sealed class LootDrop : MonoBehaviour
         RecordPickup();
         DiabloAudio.PlayLoot();
         GetComponent<Collider>().enabled = false;
-        foreach (var n in new[] { "LootVisual", "ItemIcon", "RarityGlow" })
+        foreach (var n in new[] { "LootVisual", "LootBall", "ItemIcon", "RarityGlow" })
         {
             var visual = transform.Find(n);
             if (visual != null) visual.gameObject.SetActive(false);
+            var ball = transform.Find("LootBall");
+            if (ball != null)
+            {
+                var nested = ball.Find(n);
+                if (nested != null) nested.gameObject.SetActive(false);
+            }
         }
     }
 }
