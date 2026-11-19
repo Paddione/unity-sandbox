@@ -300,7 +300,7 @@ public static class DiabloMenuArt
         if (lower.Contains("lantern") || lower.Contains("censer")) return "HoodedLantern";
         if (lower.Contains("bow")) return "ShortBow";
         if (lower.Contains("rogueblade") || lower.Contains("rogue blade")) return "Dagger";
-        if (lower.Contains("potion")) return "";
+        if (lower.Contains("potion")) return "HealingPotion";
         return "";
     }
 

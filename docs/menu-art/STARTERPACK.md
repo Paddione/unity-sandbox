@@ -17,6 +17,12 @@ Rebuilt from one script each; rerun to reproduce exactly.
   `docs/menu-art/build_props.py` (`--final`, EEVEE 64sp, transparent).
   Fix history: chest lid rotated to horizontal, banner cloth moved in
   front of pole, per-prop hide during framing, flame `#E84E00` @ 1.5.
+- 3 item icons (wave 2, missing bases): ShortBow (covers HuntingBow /
+  Worn Short Bow), HoodedLantern (covers Lantern / EmberCenser /
+  Worn Lantern), HealingPotion — `docs/menu-art/build_icons_extra.py`
+  (`--final`). Round history: bow limbs re-swept across screen-X so the
+  arc reads at 25/12; potion body rebuilt as solid red brew (emissive
+  shell blew out to cream).
 
 ## Reference concepts (`docs/menu-art/refs/`, NOT shipped)
 

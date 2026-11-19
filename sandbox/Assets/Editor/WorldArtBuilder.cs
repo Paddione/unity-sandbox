@@ -304,6 +304,28 @@ public static class WorldArtBuilder
                 Place("Heather_1", Flat(go.transform.position) + off, Jitter(rng, 180f), 1f, root, "RockTuft");
             }
 
+        // Stair-flank dressing: pebbles + tufts hugging the entry steps so
+        // the arrival reads detailed up close. Additive pass with its own
+        // seed (leaves the main scatter stream untouched), no colliders.
+        var detailRng = new System.Random(4242);
+        int detail = 0;
+        foreach (var side in new[] { -1f, 1f })
+            for (int k = 0; k < 6; k++)
+            {
+                float x = side * (2.6f + (float)detailRng.NextDouble() * 1.1f);
+                float z = 9.4f + (float)detailRng.NextDouble() * 3.4f;
+                Place("Rock_0", new Vector3(x, 0.05f, z), (float)detailRng.NextDouble() * 360f,
+                    0.22f + (float)detailRng.NextDouble() * 0.2f, root, $"FenDetail_Pebble_{detail++}");
+            }
+        for (int k = 0; k < 10; k++)
+        {
+            float x = (detailRng.Next(2) == 0 ? -1f : 1f) * (2.4f + (float)detailRng.NextDouble() * 1.6f);
+            float z = 9.2f + (float)detailRng.NextDouble() * 4f;
+            string kind = k % 3 == 0 ? "Grass_0" : (k % 3 == 1 ? "Heather_0" : "Heather_1");
+            Place(kind, new Vector3(x, 0f, z), (float)detailRng.NextDouble() * 360f,
+                0.8f + (float)detailRng.NextDouble() * 0.5f, root, $"FenDetail_Tuft_{k}");
+        }
+
         // Atmosphere: moor haze, cool moon key so the fires read warm.
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Linear;
