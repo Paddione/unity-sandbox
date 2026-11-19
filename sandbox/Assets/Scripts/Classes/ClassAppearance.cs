@@ -139,7 +139,9 @@ public sealed class ClassAppearance : MonoBehaviour
         var want = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.CreateStarterLantern()
             : cls.id == ClassCatalog.RogueId ? ItemDatabase.CreateStarterBow()
             : ItemDatabase.CreateStarterSword();
-        if (eq.weapon.baseType != want.baseType) eq.weapon = want;
+        if (eq.weapon.baseType == want.baseType) return;
+        want.instanceId = eq.weapon.instanceId;
+        eq.weapon = want;
     }
 
     static Transform FindDeep(Transform t, string name)

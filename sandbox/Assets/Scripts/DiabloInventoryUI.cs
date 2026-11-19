@@ -55,10 +55,10 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     /// </summary>
     void EnsureBuilt()
     {
-        if (canvas != null) return;
         inventory = GetComponent<Inventory>();
         equipment = GetComponent<Equipment>();
         health = GetComponent<PlayerHealth>();
+        if (canvas != null) return;
         BuildUI();
     }
 
@@ -101,6 +101,13 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     {
         EnsureBuilt();
         if (inventory == null || equipment == null) return;
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned)
+        {
+            var item = inventory.Get(index);
+            if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Equip, item);
+            return;
+        }
         if (inventory.EquipFromBag(index, equipment))
         {
             if (health != null) health.Refresh();
@@ -115,12 +122,35 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         EnsureBuilt();
         if (inventory == null || equipment == null) return;
         var slot = (ItemSlot)slotIndex;
+        if (slot != ItemSlot.Weapon && slot != ItemSlot.Armor && slot != ItemSlot.Helmet) return;
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned)
+        {
+            var item = equipment.GetEquipped(slot);
+            if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Unequip, item);
+            return;
+        }
         if (equipment.UnequipTo(slot, inventory))
         {
             if (health != null) health.Refresh();
             DiabloAudio.PlayUIClick();
             Refresh();
         }
+    }
+
+    public bool DiscardIndex(int index)
+    {
+        EnsureBuilt();
+        var item = inventory?.Get(index);
+        if (item == null) return false;
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned)
+            return relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Discard, item);
+        if (LootDrop.SpawnItem(transform.position + transform.forward * 1.5f, item, false) == null)
+            return false;
+        inventory.RemoveAt(index);
+        Refresh();
+        return true;
     }
 
     /// <summary>Rebuild slot labels, stats and bag grid from state.</summary>

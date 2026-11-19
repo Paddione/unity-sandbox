@@ -184,6 +184,8 @@ public static class SmithingService
     {
         inv = null; wallet = null;
         if (hero == null) return false;
+        var relay = hero.GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && !relay.IsServer) return false;
         inv = hero.GetComponent<Inventory>();
         wallet = hero.GetComponent<Wallet>();
         return inv != null && wallet != null;

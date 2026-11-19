@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Collections;
 using Unity.Netcode;
 
 /// <summary>
@@ -7,6 +8,24 @@ using Unity.Netcode;
 /// </summary>
 public sealed class LootNetRelay : NetworkBehaviour
 {
+    readonly NetworkVariable<FixedString4096Bytes> itemSnapshot = new();
+    readonly NetworkVariable<int> goldAmount = new();
+
+    internal void SetGold(int amount) => goldAmount.Value = amount;
+
+    internal void SetItem(ItemInstance item)
+    {
+        itemSnapshot.Value = new FixedString4096Bytes(JsonUtility.ToJson(item));
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (goldAmount.Value > 0)
+            GoldDrop.ShowNetworkPile(gameObject, goldAmount.Value);
+        else if (!itemSnapshot.Value.IsEmpty)
+            GetComponent<LootDrop>().ShowItem(JsonUtility.FromJson<ItemInstance>(itemSnapshot.Value.ToString()));
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void RequestChestServerRpc(ServerRpcParams rpcParams = default)
     {
@@ -36,13 +55,10 @@ public sealed class LootNetRelay : NetworkBehaviour
         if (loot == null || loot.collected || loot.item == null) return;
         if (TradeValidator.CanPickup(Planar(heroT.position, transform.position), loot.collected) != null)
             return;
-        foreach (var kv in nm.SpawnManager.SpawnedObjects)
-        {
-            var nb = kv.Value;
-            if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
-            loot.collected = true;
-            LootDrop.CollectInto(nb.gameObject, loot.item);
-        }
+        var player = heroT.GetComponent<DiabloNetworkPlayer>();
+        if (player == null || !player.TryGrantPickup(loot.item)) return;
+        loot.collected = true;
+        LootDrop.RecordPickup();
         var no = GetComponent<NetworkObject>();
         if (no != null && no.IsSpawned) no.Despawn();
         else Destroy(gameObject);
@@ -68,26 +84,12 @@ public sealed class LootNetRelay : NetworkBehaviour
             Debug.Log($"[Gold] rejected pile for {sender}: out of reach or taken.");
             return;
         }
+        var player = heroT.GetComponent<DiabloNetworkPlayer>();
+        if (player == null || !player.GrantPickupGold(pile.amount)) return;
         pile.collected = true;
-        GrantGoldClientRpc(pile.amount, sender);
         var no = GetComponent<NetworkObject>();
         if (no != null && no.IsSpawned) no.Despawn();
         else Destroy(gameObject);
-    }
-
-    /// <summary>Credit one pile to the collector's own purse (per-player gold).</summary>
-    [ClientRpc]
-    void GrantGoldClientRpc(int amount, ulong collector)
-    {
-        var nm = NetworkManager.Singleton;
-        if (nm == null || nm.LocalClientId != collector) return;
-        var local = nm.SpawnManager != null ? nm.SpawnManager.GetLocalPlayerObject() : null;
-        var hero = local != null ? local.gameObject : GameObject.Find(DiabloNetworkPlayer.HeroName);
-        if (hero == null) return;
-        var wallet = Wallet.EnsureWallet(hero);
-        var eq = hero.GetComponent<Equipment>();
-        if (wallet != null) wallet.Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
-        DiabloAudio.PlayLoot();
     }
 
     /// <summary>Sender's hero transform on this process (range validation).</summary>

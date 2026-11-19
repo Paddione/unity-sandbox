@@ -52,36 +52,65 @@ public sealed class LootDrop : MonoBehaviour
         };
     }
 
-    static GameObject SpawnItem(Vector3 pos, ItemInstance item, bool networked)
+    public static GameObject SpawnItem(Vector3 pos, ItemInstance item, bool networked)
     {
-        var loot = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        if (item == null) return null;
+        var nm = NetworkManager.Singleton;
+        var prefab = Resources.Load<GameObject>("NetworkLootDrop");
+        if (networked && (nm == null || !nm.IsServer || !nm.IsListening || prefab == null))
+            return null;
+        item.EnsureIdentity();
+        GameObject loot = prefab != null ? Instantiate(prefab, pos, Quaternion.identity) : new GameObject();
+        loot.transform.position = pos;
+        var drop = loot.GetComponent<LootDrop>() ?? loot.AddComponent<LootDrop>();
+        var trigger = loot.GetComponent<BoxCollider>() ?? loot.AddComponent<BoxCollider>();
+        trigger.isTrigger = true;
+        trigger.size = Vector3.one * 0.5f;
+        var toy = loot.AddComponent<ToyTrigger>();
+        toy.mode = ToyTrigger.Mode.Pickup;
+        if (networked)
+        {
+            try
+            {
+                loot.GetComponent<LootNetRelay>().SetItem(item);
+                loot.GetComponent<NetworkObject>().Spawn();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[Loot] Could not spawn pickup: {e.Message}");
+                Destroy(loot);
+                return null;
+            }
+        }
+        else drop.ShowItem(item);
         EnemyHealth.OrbsDropped++;
         EnemyHealth.ItemsDropped++;
         loot.name = $"DiabloOrb_{EnemyHealth.OrbsDropped}";
-        loot.transform.position = pos;
-        loot.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"))
-        {
-            color = ColorFor(item.rarity)
-        };
-        loot.GetComponent<Renderer>().sharedMaterial = mat;
-        loot.GetComponent<BoxCollider>().isTrigger = true;
-        loot.AddComponent<ToyTrigger>().mode = ToyTrigger.Mode.Pickup;
-        var drop = loot.AddComponent<LootDrop>();
-        drop.item = item;
         Debug.Log($"[Loot] Dropped {item.rarity} {item.slot} ({ItemLabel(item)}).");
-        // S3 VFX hook only: Rare+ drops earn a light pillar, Magic stays quiet.
-        if (PresentationVfx.ShouldBeamFor(item.rarity)) PresentationVfx.RareBeam(pos, item.rarity);
-        var nm = NetworkManager.Singleton;
-        // Only the server spawns networked loot; clients receive the replica.
-        // (Spawn() on a client only logs an error and spawns nothing.)
-        if (networked && nm != null && nm.IsServer)
-        {
-            loot.AddComponent<NetworkObject>();
-            loot.AddComponent<LootNetRelay>();
-            loot.GetComponent<NetworkObject>().Spawn();
-        }
         return loot;
+    }
+
+    internal void ShowItem(ItemInstance rolled)
+    {
+        item = rolled;
+        if (item == null) return;
+        var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        visual.name = "LootVisual";
+        visual.transform.SetParent(transform, false);
+        visual.transform.localScale = Vector3.one * 0.5f;
+        Destroy(visual.GetComponent<Collider>());
+        var renderer = visual.GetComponent<Renderer>();
+        var color = new MaterialPropertyBlock();
+        color.SetColor("_BaseColor", ColorFor(item.rarity));
+        renderer.SetPropertyBlock(color);
+        if (PresentationVfx.ShouldBeamFor(item.rarity))
+            PresentationVfx.RareBeam(transform.position, item.rarity);
+    }
+
+    internal static void RecordPickup()
+    {
+        ToyTrigger.Pickups++;
+        ToyTriggerShared.RefreshGoal();
     }
 
     /// <summary>
@@ -162,16 +191,29 @@ public sealed class LootDrop : MonoBehaviour
             return;
         }
         if (item == null) return;
-        collected = true;
-        var nm = NetworkManager.Singleton;
-        bool net = nm != null && nm.IsListening;
-        if (net && !nm.IsServer)
+        var relay = GetComponent<LootNetRelay>();
+        if (relay != null && relay.IsSpawned)
         {
-            var relay = GetComponent<LootNetRelay>();
-            CollectInto(go, item); // client prediction
-            if (relay != null) relay.RequestPickupServerRpc();
+            var player = go.GetComponent<DiabloNetworkPlayer>();
+            if (player != null && player.IsOwner) relay.RequestPickupServerRpc();
             return;
         }
-        CollectInto(go, item);
+        var inv = go.GetComponent<Inventory>();
+        var equipment = go.GetComponent<Equipment>();
+        if (inv != null)
+        {
+            if (!inv.Add(item)) return;
+        }
+        else
+        {
+            if (equipment == null || !Equipment.CanEquip(item, RunProfile.ClassId)) return;
+            equipment.Equip(item);
+        }
+        collected = true;
+        RecordPickup();
+        DiabloAudio.PlayLoot();
+        GetComponent<Collider>().enabled = false;
+        var visual = transform.Find("LootVisual");
+        if (visual != null) visual.gameObject.SetActive(false);
     }
 }

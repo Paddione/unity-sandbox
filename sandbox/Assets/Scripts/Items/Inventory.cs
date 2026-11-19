@@ -14,6 +14,17 @@ public sealed class Inventory : MonoBehaviour
     readonly List<ItemInstance> bag = new List<ItemInstance>();
 
     public int Count => bag.Count;
+
+    internal List<ItemInstance> Contents() => new(bag);
+
+    internal void SetContents(List<ItemInstance> items)
+    {
+        bag.Clear();
+        if (items != null) bag.AddRange(items);
+    }
+
+    internal int IndexOf(string instanceId) =>
+        string.IsNullOrEmpty(instanceId) ? -1 : bag.FindIndex(item => item.instanceId == instanceId);
     public int FreeSlots => Capacity - bag.Count;
 
     public ItemInstance Get(int index)
@@ -34,6 +45,7 @@ public sealed class Inventory : MonoBehaviour
     public bool Add(ItemInstance item)
     {
         if (item == null || bag.Count >= Capacity) return false;
+        item.EnsureIdentity();
         bag.Add(item);
         Debug.Log($"[Loot] Bagged {item.rarity} {item.slot} ({LootDrop.ItemLabel(item)}). " +
                   $"({bag.Count}/{Capacity}).");
@@ -44,11 +56,13 @@ public sealed class Inventory : MonoBehaviour
     /// Equip bag[index], swapping the previously equipped item back into the
     /// bag. Space is guaranteed: the swap slot frees exactly one slot.
     /// </summary>
-    public bool EquipFromBag(int index, Equipment eq)
+    public bool EquipFromBag(int index, Equipment eq) => EquipFromBag(index, eq, RunProfile.ClassId);
+
+    internal bool EquipFromBag(int index, Equipment eq, string classId)
     {
         if (eq == null || index < 0 || index >= bag.Count) return false;
         var item = bag[index];
-        if (!Equipment.CanEquip(item, RunProfile.ClassId))
+        if (!Equipment.CanEquip(item, classId))
         {
             Debug.Log($"[Loot] {item.baseType} is for {ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName} only.");
             return false;

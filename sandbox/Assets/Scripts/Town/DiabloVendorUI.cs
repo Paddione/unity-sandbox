@@ -44,10 +44,11 @@ public sealed class DiabloVendorUI : MonoBehaviour
     /// </summary>
     void EnsureBuilt()
     {
-        if (canvas != null) return;
         wallet = GetComponent<Wallet>();
         inventory = GetComponent<Inventory>();
-        stock = VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
+        if (canvas != null) return;
+        stock = GetComponent<DiabloNetworkPlayer>()?.CurrentNetworkStock
+            ?? VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
         BuildUI();
     }
 
@@ -72,14 +73,10 @@ public sealed class DiabloVendorUI : MonoBehaviour
         return p != null && p.IsSpawned ? p.OwnerClientId : 0;
     }
 
-    /// <summary>
-    /// Re-roll this hero's assortment after its network spawn (S4 co-op):
-    /// each joined client shops its own seed-derived stock.
-    /// </summary>
-    public void RestockForOwner()
+    public void ApplyServerStock(VendorStock serverStock)
     {
         EnsureBuilt();
-        stock = VendorStock.Roll(Vendor.StockSeed(VendorZoneSeed(), VendorClientId()));
+        stock = serverStock;
         if (IsOpen) Refresh();
     }
 
@@ -154,20 +151,9 @@ public sealed class DiabloVendorUI : MonoBehaviour
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned && CoopSessionRunning())
         {
-            if (BuyPrecheck(index)) relay.RequestVendorBuy(index, this);
+            if (BuyPrecheck(index)) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Buy, stock.offers[index].item);
             return;
         }
-        if (stock != null && stock.TryBuy(index, wallet, inventory))
-        {
-            DiabloAudio.PlayLoot();
-            Refresh();
-        }
-    }
-
-    /// <summary>Server-approved buy lands here (funds/bag re-checked).</summary>
-    public void ApplyApprovedBuy(int index)
-    {
-        EnsureBuilt();
         if (stock != null && stock.TryBuy(index, wallet, inventory))
         {
             DiabloAudio.PlayLoot();
@@ -194,20 +180,10 @@ public sealed class DiabloVendorUI : MonoBehaviour
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned && CoopSessionRunning())
         {
-            relay.RequestVendorSell(index, this);
+            var item = inventory?.Get(index);
+            if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Sell, item);
             return;
         }
-        if (VendorStock.TrySell(index, wallet, inventory))
-        {
-            DiabloAudio.PlayUIClick();
-            Refresh();
-        }
-    }
-
-    /// <summary>Server-approved sale lands here.</summary>
-    public void ApplyApprovedSell(int index)
-    {
-        EnsureBuilt();
         if (VendorStock.TrySell(index, wallet, inventory))
         {
             DiabloAudio.PlayUIClick();
@@ -228,6 +204,12 @@ public sealed class DiabloVendorUI : MonoBehaviour
     public void BuyPotion()
     {
         EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && CoopSessionRunning())
+        {
+            relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.BuyPotion);
+            return;
+        }
         if (VendorStock.BuyPotion(wallet, inventory))
         {
             DiabloAudio.PlayLoot();

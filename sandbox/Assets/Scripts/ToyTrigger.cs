@@ -34,7 +34,8 @@ public sealed class ToyTrigger : MonoBehaviour
                 Debug.Log($"[Toy] Trigger zone entered by Player (entries={TriggerEntries}).");
                 break;
             case Mode.Pickup:
-                if (collected) return;
+                // Rolled equipment advances the goal only after ownership transfers.
+                if (collected || GetComponent<LootDrop>() != null) return;
                 collected = true;
                 Pickups++;
                 Debug.Log($"[Toy] Orb picked up ({Pickups}/{Needed}): {gameObject.name}.");

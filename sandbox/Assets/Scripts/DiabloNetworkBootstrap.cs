@@ -10,6 +10,18 @@ using Unity.Netcode.Transports.UTP;
 /// </summary>
 public static class DiabloNetworkBootstrap
 {
+    public static void RegisterLootPrefab(NetworkManager manager)
+    {
+        var loot = Resources.Load<GameObject>("NetworkLootDrop");
+        if (loot == null) return;
+        var prefabs = manager.NetworkConfig.Prefabs;
+        if (prefabs.Contains(loot)) return;
+        foreach (var list in prefabs.NetworkPrefabsLists)
+            foreach (var entry in list.PrefabList)
+                if (entry.Prefab == loot) return;
+        prefabs.Add(new NetworkPrefab { Prefab = loot });
+    }
+
     public static void EnsureZoneNetcode()
     {
         var nmGo = GameObject.Find("NetworkManager");
@@ -20,10 +32,11 @@ public static class DiabloNetworkBootstrap
             nm = nmGo.AddComponent<NetworkManager>();
             var transport = nmGo.AddComponent<UnityTransport>();
             transport.SetConnectionData("127.0.0.1", 7777, "0.0.0.0");
-            nm.NetworkConfig.NetworkTransport = transport;
+            nm.NetworkConfig = new NetworkConfig { NetworkTransport = transport };
             nmGo.AddComponent<MultiplayerAutoStarter>();
             nmGo.AddComponent<ConnectionStatusLogger>();
         }
+        RegisterLootPrefab(nm);
         var prefab = Resources.Load<GameObject>("NetworkPlayerDiablo");
         if (prefab != null)
         {

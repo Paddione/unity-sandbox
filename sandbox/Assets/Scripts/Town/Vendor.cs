@@ -84,6 +84,9 @@ public sealed class Vendor : MonoBehaviour
             var item = inv.Get(i);
             if (item != null && item.slot == ItemSlot.Consumable)
             {
+                var relay = hero.GetComponent<DiabloNetworkPlayer>();
+                if (relay != null && relay.IsSpawned)
+                    return relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.DrinkPotion, item);
                 if (!inv.RemoveAt(i)) return false;
                 var health = hero.GetComponent<PlayerHealth>();
                 if (health != null) health.Heal(ItemDatabase.PotionHeal);

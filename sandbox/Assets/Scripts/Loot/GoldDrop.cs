@@ -42,6 +42,18 @@ public sealed class GoldDrop : MonoBehaviour
     /// <summary>Spawn a fixed-amount pile (deterministic tests + callers).</summary>
     public static GameObject SpawnPile(Vector3 pos, int amount)
     {
+        var nmSpawn = NetworkManager.Singleton;
+        var prefab = Resources.Load<GameObject>("NetworkLootDrop");
+        if (amount > 0 && nmSpawn != null && nmSpawn.IsListening && nmSpawn.IsServer
+            && prefab != null && nmSpawn.NetworkConfig.Prefabs.Contains(prefab))
+        {
+            var netPile = Instantiate(prefab, pos, Quaternion.identity);
+            netPile.GetComponent<LootNetRelay>().SetGold(amount);
+            netPile.GetComponent<NetworkObject>().Spawn();
+            netPile.name = $"GoldPile_{++PilesDropped}";
+            Debug.Log($"[Gold] Dropped {amount} gold.");
+            return netPile;
+        }
         var pile = GameObject.CreatePrimitive(PrimitiveType.Cube);
         PilesDropped++;
         pile.name = $"GoldPile_{PilesDropped}";
@@ -56,14 +68,20 @@ public sealed class GoldDrop : MonoBehaviour
         var drop = pile.AddComponent<GoldDrop>();
         drop.amount = Mathf.Max(0, amount);
         Debug.Log($"[Gold] Dropped {drop.amount} gold.");
-        var nmSpawn = NetworkManager.Singleton;
-        if (nmSpawn != null && nmSpawn.IsListening && nmSpawn.IsServer)
-        {
-            pile.AddComponent<NetworkObject>();
-            pile.AddComponent<LootNetRelay>();
-            pile.GetComponent<NetworkObject>().Spawn();
-        }
         return pile;
+    }
+
+    internal static void ShowNetworkPile(GameObject pickup, int amount)
+    {
+        var gold = pickup.AddComponent<GoldDrop>();
+        gold.amount = amount;
+        var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        visual.transform.SetParent(pickup.transform, false);
+        visual.transform.localScale = new Vector3(0.35f, 0.22f, 0.35f);
+        Destroy(visual.GetComponent<Collider>());
+        var color = new MaterialPropertyBlock();
+        color.SetColor("_BaseColor", new Color(1f, 0.8f, 0.2f));
+        visual.GetComponent<Renderer>().SetPropertyBlock(color);
     }
 
     void OnTriggerEnter(Collider other)
@@ -71,15 +89,6 @@ public sealed class GoldDrop : MonoBehaviour
         if (collected || other == null || other.gameObject == null) return;
         var go = other.gameObject;
         if (go.name != "Player" && !go.CompareTag("Player")) return;
-        var nm = NetworkManager.Singleton;
-        bool net = nm != null && nm.IsListening;
-        if (net && !nm.IsServer)
-        {
-            // Client: the host validates reach + once-only and credits the owner.
-            var relay = GetComponent<LootNetRelay>();
-            if (relay != null) relay.RequestGoldServerRpc();
-            return;
-        }
         CollectLocal(go);
     }
 
@@ -87,6 +96,13 @@ public sealed class GoldDrop : MonoBehaviour
     public void CollectLocal(GameObject go)
     {
         if (collected || go == null) return;
+        var relay = GetComponent<LootNetRelay>();
+        if (relay != null && relay.IsSpawned)
+        {
+            if (go.GetComponent<DiabloNetworkPlayer>() is { IsOwner: true })
+                relay.RequestGoldServerRpc();
+            return;
+        }
         collected = true;
         var wallet = Wallet.EnsureWallet(go);
         var eq = go.GetComponent<Equipment>();

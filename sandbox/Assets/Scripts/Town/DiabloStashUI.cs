@@ -27,8 +27,8 @@ public sealed class DiabloStashUI : MonoBehaviour
 
     void EnsureBuilt()
     {
-        if (canvas != null) return;
         inventory = GetComponent<Inventory>();
+        if (canvas != null) return;
         BuildUI();
     }
 
@@ -54,6 +54,12 @@ public sealed class DiabloStashUI : MonoBehaviour
     public bool StoreBagIndex(int index)
     {
         EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned)
+        {
+            var item = inventory?.Get(index);
+            return item != null && relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Store, item);
+        }
         bool ok = StashChest.Store(inventory, RunProfile.Stash, index);
         if (ok) { DiabloAudio.PlayUIClick(); Refresh(); }
         return ok;
@@ -62,6 +68,12 @@ public sealed class DiabloStashUI : MonoBehaviour
     public bool TakeStashIndex(int index)
     {
         EnsureBuilt();
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned)
+        {
+            var item = RunProfile.Stash.Get(index);
+            return item != null && relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Take, item);
+        }
         bool ok = StashChest.Take(RunProfile.Stash, inventory, index);
         if (ok) { DiabloAudio.PlayLoot(); Refresh(); }
         return ok;

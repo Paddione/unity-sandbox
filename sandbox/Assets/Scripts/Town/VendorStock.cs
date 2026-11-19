@@ -7,9 +7,11 @@ using UnityEngine;
 /// Pure data + rules, no GameObjects, so EditMode tests pin the economy
 /// without a scene. Potions are always in stock beside the 6 offers.
 /// </summary>
+[System.Serializable]
 public sealed class VendorStock
 {
     /// <summary>One trade offer: the item plus its fixed buy price.</summary>
+    [System.Serializable]
     public struct Offer
     {
         public ItemInstance item;
@@ -18,7 +20,7 @@ public sealed class VendorStock
 
     public const int OfferCount = 6;
 
-    public readonly List<Offer> offers = new List<Offer>();
+    public List<Offer> offers = new List<Offer>();
 
     public int seed;
 

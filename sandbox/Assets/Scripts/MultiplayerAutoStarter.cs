@@ -42,6 +42,10 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
     /// <summary>Apply transport data and start host, client or server.</summary>
     static bool Begin(JoinArgs args)
     {
+        var manager = NetworkManager.Singleton;
+        if (manager != null && manager.NetworkConfig.PlayerPrefab != null
+            && manager.NetworkConfig.PlayerPrefab.name == "NetworkPlayerDiablo")
+            DiabloNetworkBootstrap.RegisterLootPrefab(manager);
         if (args.RelayHost || args.JoinCode != null)
         {
             var manager0 = NetworkManager.Singleton;
