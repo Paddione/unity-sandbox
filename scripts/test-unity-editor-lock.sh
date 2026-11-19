@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test-unity-editor-lock.sh — stall handling of the machine-wide Unity editor
 # lock (scripts/lib/unity-editor-lock.sh) with a fake editor, no Unity needed.
-# Runs in an isolated TMPDIR lock; about 90 s. Exit 0 = all cases pass.
+# Runs in an isolated TMPDIR lock; about 2 min. Exit 0 = all cases pass.
 # Usage (repo root): bash scripts/test-unity-editor-lock.sh
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -9,6 +9,7 @@ WORK=$(mktemp -d)
 export TMPDIR="$WORK"
 export UNITY_LOCK_FILE="$WORK/unity-sandbox-editor.lock"
 export UNITY_STALL_S=4 UNITY_LOCK_POLL_S=1
+export UNITY_STALL_CPU_PROBE_S=2 UNITY_STALL_CPU_MIN_S=1
 unset UNITY_EDITOR_LOCK_HELD
 FAILS=0
 pass() { echo "PASS $1"; }
@@ -31,6 +32,17 @@ echo "fake editor start" >"$log"
 exec sleep 300
 EOF
 chmod +x "$WORK/fake-editor"
+
+# Fake busy editor: writes its log once, then burns CPU silently (a slow,
+# contended run — log-silent but alive).
+cat >"$WORK/fake-busy-editor" <<'EOF'
+#!/usr/bin/env bash
+log=""
+while [ $# -gt 0 ]; do [ "$1" = -logFile ] && log="$2"; shift; done
+echo "fake editor start" >"$log"
+exec bash -c 'while :; do :; done'
+EOF
+chmod +x "$WORK/fake-busy-editor"
 
 # shellcheck source=lib/unity-editor-lock.sh
 source "$ROOT/scripts/lib/unity-editor-lock.sh"
@@ -61,6 +73,23 @@ start_orphan_holder() {
 
 waiter() { # $1 = seconds allowed; exit 0 when the lock was acquired
   timeout "$1" bash -c "source '$ROOT/scripts/lib/unity-editor-lock.sh'; unity_lock_acquire waiter" >"$WORK/waiter.out" 2>&1
+}
+
+# Start a CPU-busy orphaned holder: burns a core while holding the lock, its
+# log stays silent. $1 = log, $2 = log age (s).
+start_busy_orphan_holder() {
+  local log="$1" age="$2"
+  (
+    exec 9>"$UNITY_LOCK_FILE"
+    flock 9
+    bash -c 'while :; do :; done' holder "$log" busy "$WORK" >/dev/null 2>&1 &
+    local p=$!
+    echo "x" >"$log"
+    touch -d "-${age} seconds" "$log"
+    unity_lock_owner "$p" "$log"
+    echo "$p" >"$WORK/holder.pids"
+  )
+  sleep 0.5
 }
 
 # 1. Orphaned holder with a silent log: the waiter ends it and takes the lock.
@@ -102,6 +131,20 @@ UNITY_EDITOR="$WORK/fake-editor" UNITY_TESTS_SKIP_WARMUP=1 PLATFORMS="EditMode P
   bash scripts/run-unity-tests.sh >"$WORK/t.out" 2>&1
 rc=$?
 if [ "$rc" -eq 2 ] && ! grep -q "Running PlayMode" "$WORK/t.out" && waiter 5; then pass "test stall -> exit 2 before the next platform, lock free"; else fail "test stall rc=$rc after $((SECONDS - t0))s: $(tail -3 "$WORK/t.out")"; fi
+
+# 7. CPU-busy holder with a silent log: the waiter spares it (slow, not stuck).
+start_busy_orphan_holder "$WORK/busy.log" 60
+hp=$(cut -d' ' -f1 <"$WORK/holder.pids")
+if ! waiter 10 && kill -0 "$hp" 2>/dev/null && grep -q "CPU-busy" "$WORK/waiter.out"; then pass "waiter spares a CPU-busy silent holder"; else fail "busy holder disturbed: $(cat "$WORK/waiter.out")"; fi
+unity_kill_tree "$hp"; sleep 1
+
+# 8. run-unity-tests.sh: a silent but CPU-busy platform run reaches the hard
+# timeout instead of tripping the stall verdict.
+t0=$SECONDS
+UNITY_EDITOR="$WORK/fake-busy-editor" UNITY_TESTS_SKIP_WARMUP=1 PLATFORMS="EditMode" UNITY_TEST_TIMEOUT_S=14 \
+  bash scripts/run-unity-tests.sh >"$WORK/t2.out" 2>&1
+rc=$?
+if [ "$rc" -eq 2 ] && grep -q "TIMEOUT after" "$WORK/t2.out" && ! grep -q "STALL" "$WORK/t2.out" && waiter 5; then pass "busy run reaches timeout, not stall"; else fail "busy run rc=$rc after $((SECONDS - t0))s: $(tail -3 "$WORK/t2.out")"; fi
 
 echo "test-unity-editor-lock: $FAILS failure(s)"
 [ "$FAILS" -eq 0 ]

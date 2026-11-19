@@ -12,8 +12,9 @@
 #    concurrent sessions queue instead of leaving the shared editor dead;
 #  - refuses to start when another Unity holds this project (exit 3);
 #    only a stale lockfile (no live holder) is removed;
-#  - hard timeout per platform (default 1500 s) and a stall watchdog (log
-#    silent for UNITY_STALL_S, default 600 s): exit 2 on either, at once, so
+#  - hard timeout per platform (default 1500 s) and a CPU-aware stall
+#    watchdog (log silent for UNITY_STALL_S, default 600 s, AND the process
+#    tree CPU-idle over the probe window): exit 2 on either, at once, so
 #    the lock goes to the next queued run; exit 1 on test/process failure;
 #    waiting runs end a stalled lock holder (scripts/lib/unity-editor-lock.sh);
 #  - heartbeat line every 60 s so a stuck run looks different from a slow one.

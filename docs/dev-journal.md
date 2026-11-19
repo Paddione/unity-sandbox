@@ -716,3 +716,21 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Learned: God-Held hält alle Aggro (Slam +20, Quick-Shot-DPS), Begleiter bleiben unverletzt, Heiler
   bleibt stumm — Heals 0 ist erklärter Befund, kein Defekt (Mechanik über PlayMode-Kampf belegt).
 - Next: Non-God-Ausdauerlauf (echte Balance), 4. Spieler-Join-Gate live prüfen, Rogue-Look (Knight-Platzhalter).
+
+## 2026-11-19 — Watchdog-Kalibrierung: CPU-aware Stall-Verdict
+
+- Anlass: Unity-Tests-Run auf `main` starb mit Exit 2 (Log-Stille ≥ 600 s) auf einem 1-Zeilen-Plan-Commit;
+  Re-Run grün. Datengrundlage: EditMode 344 Tests ≈ 13 s, PlayMode 220 Tests ≈ 94 s Testzeit (Run 01:18) —
+  gesunde Phasen liegen weit unter 600 s, aber Maschinen-Contention streut die Laufzeit (5–21 min),
+  und Stille allein unterscheidet langsam (CPU-busy) nicht von hängt (CPU-idle).
+- Done: `scripts/lib/unity-editor-lock.sh` — Stall-Verdict per `unity_tree_cpu_s` (kumulative Prozessbaum-CPU
+  via /proc, comm-feldsicher): still + idle → Kill (Exit 2, unverändert), still + busy (≥
+  `UNITY_STALL_CPU_MIN_S` in `UNITY_STALL_CPU_PROBE_S`) → frisches Stall-Fenster, begrenzt durch den harten
+  Timeout. Gilt für Holder (`unity_run_watched`) und Waiter (`unity_lock_reap_stale`, mit Cmdline-Recheck
+  nach dem Probe-Sleep). Jede Verdict-Zeile trägt ihre CPU-Evidenz (`+Ns/Ms`). Kein /proc → Legacy-Verhalten.
+  Header von `run-unity-build.sh`/`run-unity-tests.sh` nachgezogen.
+- Belegt: `scripts/test-unity-editor-lock.sh` 8/8 (2 neue Cases: Waiter schont CPU-busy-Halter, busy Run
+  erreicht Timeout statt STALL), `python3 -m pytest scripts -q` 5 passed, shellcheck ohne neue Findings.
+- Faced: `wooden-crate.glb` steht im Index ungefiltert (27020 B), `.gitattributes` verlangt lfs — jeder frische
+  Checkout zeigt es dirty. Pre-existing, bewusst nicht angefasst (explizite Pathspecs beim Commit).
+- Next: Post-Merge-CI-Run auf `main` als Live-Beleg beobachten.

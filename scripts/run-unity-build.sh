@@ -24,7 +24,8 @@
 #  - stall watchdog: a log silent for UNITY_STALL_S (default 600 s) ends the
 #    run like a timeout, and waiting runs end a stalled lock holder
 #    (scripts/lib/unity-editor-lock.sh), so one frozen editor cannot block
-#    the queue;
+#    the queue. The verdict is CPU-aware: silent AND idle ends the run,
+#    silent but CPU-busy grants a fresh window (slow, not stuck);
 #  - hard timeout (default 1500 s): kills stragglers, clears the lock,
 #    prints the log tail, exits 2 (distinguishes hang from build failure);
 #    a stall or timeout after the success marker counts as OK (shutdown hang);
