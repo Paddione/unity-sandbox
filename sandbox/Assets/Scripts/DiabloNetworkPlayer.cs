@@ -235,8 +235,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         if (!System.Enum.IsDefined(typeof(ItemRarity), item.rarity)) item.rarity = ItemRarity.Magic;
         if (item.rarity == ItemRarity.Unique)
         {
-            foreach (var u in ItemDatabase.GetUniques())
-                if (u != null && u.uniqueId == item.uniqueId) return item;
+            // S4 host catalog: known uniques (legacy, build, matrix) pass,
+            // unknown IDs are rejected and never equipped.
+            if (ItemDatabase.IsKnownUniqueId(item.uniqueId)) return item;
             return null;
         }
         if (string.IsNullOrEmpty(item.baseType)) return null;

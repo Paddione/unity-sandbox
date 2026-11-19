@@ -31,10 +31,12 @@ public sealed class LootDrop : MonoBehaviour
         string weaponClass = roll.slot == ItemSlot.Weapon ? WeaponClassFor(RunProfile.ClassId, rng) : "";
         if (roll.rarity == ItemRarity.Unique)
         {
-            string id = roll.slot == ItemSlot.Armor ? "Cryptwarden Plate" : "Seer's Circlet";
+            // S4: weapons keep the class-bound selection, armor/helmets split
+            // legacy/matrix so every matrix piece drops regularly.
             var unique = roll.slot == ItemSlot.Weapon
                 ? ItemDatabase.UniqueWeaponForClass(weaponClass, rng)
-                : ItemDatabase.CreateUnique(id);
+                : ItemDatabase.CreateUnique(roll.slot == ItemSlot.Armor
+                    ? ItemDatabase.UniqueArmor(rng) : ItemDatabase.UniqueHelmet(rng));
             return ItemDatabase.RollUnique(unique, itemLevel, affixTier);
         }
         var bases = roll.slot == ItemSlot.Weapon

@@ -171,7 +171,11 @@ public sealed class DiabloProjectile : MonoBehaviour
                 // Pass through: hit this husk once, keep flying.
                 pierce--;
                 struck.Add(husk);
-                if (!cosmetic) DiabloSkills.ApplyHit(husk, damage, from, knockback, owner);
+                if (!cosmetic)
+                {
+                    bool crit = DiabloSkills.ApplyHit(husk, damage, from, knockback, owner);
+                    NotifyKeen(crit);
+                }
                 transform.position = to;
                 travelled += step;
                 if (travelled >= maxRange) Fizzle();
@@ -283,7 +287,8 @@ public sealed class DiabloProjectile : MonoBehaviour
         }
         else if (directHit != null && !cosmetic)
         {
-            DiabloSkills.ApplyHit(directHit, damage, origin, knockback, owner);
+            bool keenCrit = DiabloSkills.ApplyHit(directHit, damage, origin, knockback, owner);
+            NotifyKeen(keenCrit);
         }
 
         // A wall-struck arrow stays stuck for a moment; everything else goes now.
@@ -312,6 +317,17 @@ public sealed class DiabloProjectile : MonoBehaviour
             HeroHits++;
             if (Application.isPlaying) DiabloJuice.OnPlayerHurt(hero.transform.position, dmg);
         }
+    }
+
+    /// <summary>
+    /// S4 keen-cadence: a Quick Shot crit consumes the cast's one cooldown cut.
+    /// Base projectiles never qualify (the helm only answers special casts).
+    /// </summary>
+    void NotifyKeen(bool crit)
+    {
+        if (kind != DiabloSkills.Skill.QuickShot || !crit || owner == null) return;
+        var skills = owner.GetComponent<DiabloSkills>();
+        if (skills != null) skills.TryKeenReduction(DiabloSkills.Skill.QuickShot, true);
     }
 
     /// <summary>

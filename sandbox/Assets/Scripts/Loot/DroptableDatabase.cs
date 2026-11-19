@@ -37,6 +37,15 @@ public static class DroptableDatabase
     /// </summary>
     public const float BuildUniqueWeaponShare = 0.5f;
 
+    /// <summary>
+    /// S4 matrix share of armor/helmet Unique drops: half of all armor/helmet
+    /// Uniques roll from the three matrix pieces, half stays legacy
+    /// (Cryptwarden Plate / Seer's Circlet). The aggregate Unique weight per
+    /// tier is unchanged — only the within-slot pick splits, so every matrix
+    /// armor/helmet is regularly reachable without touching rarity pacing.
+    /// </summary>
+    public const float MatrixNonWeaponShare = 0.5f;
+
     /// <summary>Gold roll for the tier: drop chance plus inclusive amount bounds.</summary>
     /// <summary>Kilnmother gold (act-one S4): 300–450.</summary>
     public const int ActBossGoldMin = 300;

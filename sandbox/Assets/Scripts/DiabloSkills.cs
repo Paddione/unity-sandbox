@@ -112,6 +112,46 @@ public sealed class DiabloSkills : MonoBehaviour
         new System.Collections.Generic.Dictionary<Skill, float>();
 
     /// <summary>
+    /// S4 keen-cadence: pending special cast awaiting its first crit. Set at
+    /// cast start (sync skills arm around their loop, Quick Shot arms at
+    /// launch and its projectile impacts consume). Per-instance state: two
+    /// wearers never share it, a reload rebuilds the component.
+    /// Duration/reset rule: one cut per cast — the first consumed crit
+    /// disarms until the next cast arms again.
+    /// </summary>
+    bool keenPending;
+    Skill keenPendingSkill;
+
+    void ArmKeen(Skill skill) { keenPending = true; keenPendingSkill = skill; }
+
+    /// <summary>
+    /// S4 keen-cadence: the first crit of a special cast cuts its remaining
+    /// cooldown by <see cref="BuildUniqueEffects.KeenCooldownCut"/> s, once
+    /// per cast. Base skills never qualify, even with the helm on.
+    /// </summary>
+    public bool TryKeenReduction(Skill skill, bool crit)
+    {
+        if (!crit || !keenPending || !keenPendingSkill.Equals(skill)) return false;
+        if (!IsPartySkill(skill)) return false;
+        if (!BuildUniqueEffects.HasKeenCadence(GetComponent<Equipment>())) return false;
+        keenPending = false;
+        ReduceCooldown(skill, BuildUniqueEffects.KeenCooldownCut);
+        return true;
+    }
+
+    /// <summary>Move a skill's last-cast timestamp back (floored at ready).</summary>
+    public void ReduceCooldown(Skill skill, float seconds)
+    {
+        if (seconds <= 0f) return;
+        float floor = Time.time - EffectiveCooldown(skill);
+        if (skill == Skill.Fireball) lastFireball = Mathf.Max(lastFireball - seconds, floor);
+        else if (skill == Skill.Arrow) lastArrow = Mathf.Max(lastArrow - seconds, floor);
+        else if (skill == Skill.Cleave) lastCleave = Mathf.Max(lastCleave - seconds, floor);
+        else if (lastLantern.ContainsKey(skill)) lastLantern[skill] = Mathf.Max(lastLantern[skill] - seconds, floor);
+        else lastLantern[skill] = floor;
+    }
+
+    /// <summary>
     /// Class override for AI drivers: a companion casts as its own class,
     /// not the player's. Null on heroes and mirrors (run profile rules).
     /// </summary>
@@ -623,16 +663,33 @@ public sealed class DiabloSkills : MonoBehaviour
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
             int blow = EffectiveDamage(Skill.SeismicSlam);
+            var slamEq = GetComponent<Equipment>();
+            var slamTargets = new System.Collections.Generic.List<GameObject>();
             foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
             {
                 if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
                 var to = husk.transform.position - transform.position;
                 to.y = 0f;
                 if (to.magnitude > radius) continue;
-                ApplyHit(husk, blow, transform.position, slamKnockback, transform);
+                slamTargets.Add(husk);
+            }
+            // S4 seismic-crown: the primary (nearest) target holds longer.
+            GameObject primary = null;
+            float bestD = float.MaxValue;
+            foreach (var t in slamTargets)
+            {
+                var d = t.transform.position - transform.position;
+                d.y = 0f;
+                if (d.magnitude < bestD) { bestD = d.magnitude; primary = t; }
+            }
+            ArmKeen(Skill.SeismicSlam);
+            foreach (var husk in slamTargets)
+            {
+                bool crit = ApplyHit(husk, blow, transform.position, slamKnockback, transform);
+                TryKeenReduction(Skill.SeismicSlam, crit);
                 ThreatTable.BookStun(husk, transform);
                 var atk = husk.GetComponent<EnemyAttack>();
-                if (atk != null) atk.Stun(slamStunSeconds);
+                if (atk != null) atk.Stun(BuildUniqueEffects.SlamStunFor(slamEq, slamStunSeconds, husk == primary));
                 hits++;
             }
             DiabloAudio.PlayWhoosh();
@@ -677,12 +734,16 @@ public sealed class DiabloSkills : MonoBehaviour
             if (driver != null) driver.OnStrike();
             int blow = EffectiveDamage(Skill.BladeFlurry);
             float radius = ScaledArea(flurryRadius);
+            ArmKeen(Skill.BladeFlurry);
             foreach (var husk in DiabloMelee.FindArcTargets(transform, dir, radius, DiabloMelee.ArcHalfAngle))
             {
                 if (husk == null) continue;
-                ApplyHit(husk, blow, transform.position, flurryKnockback, transform);
+                bool crit = ApplyHit(husk, blow, transform.position, flurryKnockback, transform);
+                TryKeenReduction(Skill.BladeFlurry, crit);
                 hits++;
             }
+            // S4 shadowstride: flurry hits grant the wearer brief haste.
+            if (hits > 0) BuildUniqueEffects.GrantShadowstrideHaste(gameObject);
             DiabloAudio.PlayWhoosh();
             PresentationVfx.CleaveArc(transform.position, radius);
             return hits;
@@ -725,6 +786,9 @@ public sealed class DiabloSkills : MonoBehaviour
             restored = target.CurrentHP - before;
             ThreatTable.BookHeal(transform, restored);
             RelayHeal(target.gameObject, restored, Skill.MendingLight);
+            // S4 mercy-shroud: the healed ally keeps a short absorb shield.
+            if (BuildUniqueEffects.HasMercyShroud(GetComponent<Equipment>()))
+                target.GrantShield(BuildUniqueEffects.MercyShieldAmount, BuildUniqueEffects.MercyShieldSeconds);
         }
         SpawnHealVisual(targetHealRange);
         return restored;
@@ -759,6 +823,20 @@ public sealed class DiabloSkills : MonoBehaviour
             }
             ThreatTable.BookHeal(transform, restored);
             foreach (var go in healed) RelayHeal(go, amount, Skill.RenewingCircle);
+            // S4 dawn-circle: the weakest injured ally in radius is mended once more.
+            if (BuildUniqueEffects.HasDawnCircle(GetComponent<Equipment>()))
+            {
+                var weakest = BuildUniqueEffects.WeakestAlly(transform, radius);
+                if (weakest != null)
+                {
+                    float wb = weakest.CurrentHP;
+                    weakest.Heal(amount);
+                    float bonus = weakest.CurrentHP - wb;
+                    restored += bonus;
+                    ThreatTable.BookHeal(transform, bonus);
+                    RelayHeal(weakest.gameObject, bonus, Skill.RenewingCircle);
+                }
+            }
         }
         SpawnHealVisual(radius);
         return restored;
@@ -939,6 +1017,9 @@ public sealed class DiabloSkills : MonoBehaviour
         {
             var q = DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
                 quickShotSpeed, quickShotRange, 0f, cosmetic);
+            // S4 nightfang: the rogue specialty pierces one extra target.
+            q.pierce = BuildUniqueEffects.QuickShotPierce(GetComponent<Equipment>());
+            if (!cosmetic) ArmKeen(Skill.QuickShot);
             var qd = GetComponent<DiabloAnimator>();
             EnterBowStance();
             if (qd != null) qd.OnBowShot();
@@ -977,12 +1058,12 @@ public sealed class DiabloSkills : MonoBehaviour
     /// heals pass <c>canCrit: false</c> and keep their normal result. Healing
     /// never rolls (this path only runs for damage).
     /// </summary>
-    public static void ApplyHit(GameObject target, int damage, Vector3 from, float knockback,
+    public static bool ApplyHit(GameObject target, int damage, Vector3 from, float knockback,
         Transform attacker = null, bool canCrit = true)
     {
-        if (target == null) return;
+        if (target == null) return false;
         var health = target.GetComponent<EnemyHealth>();
-        if (health == null) return;
+        if (health == null) return false;
         bool crit = false;
         if (canCrit) damage = DiabloJuice.RollCrit(attacker, damage, out crit);
         // Party threat (S2): local + client-prediction booking; the server books
@@ -996,7 +1077,7 @@ public sealed class DiabloSkills : MonoBehaviour
             var relay = player != null ? player.GetComponent<DiabloNetworkPlayer>() : null;
             if (relay != null) relay.SubmitRangedHitServerRpc(netObj.NetworkObjectId, damage);
             DiabloJuice.OnEnemyHit(target.transform.position, damage, crit);
-            return;
+            return crit;
         }
         health.TakeDamage(damage, crit);
         Equipment.ApplyLifeSteal(attacker, damage);
@@ -1005,6 +1086,7 @@ public sealed class DiabloSkills : MonoBehaviour
         DiabloAudio.PlayHit();
         DiabloMelee.LastStruck = target;
         DiabloMelee.LastStruckTime = Time.time;
+        return crit;
     }
 
     void Update()

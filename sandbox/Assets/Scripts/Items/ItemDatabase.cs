@@ -21,6 +21,20 @@ public static class ItemDatabase
     public const string NightfangId = "nightfang-edge";
     public const string RogueKeepsakeId = "Rogue's Keepsake";
 
+    /// <summary>
+    /// S4 role-unique matrix (cinderreach-itemization S4): six new armor/helmet
+    /// uniques on shared bases (ClassRestriction "" — freely wearable by every
+    /// class). The three matrix weapons reuse the class-bound build uniques
+    /// above (pinned by BuildUniqueLootTests), so "freely wearable" covers the
+    /// new armor/helmets; weapons keep their class binding.
+    /// </summary>
+    public const string BulwarkCarrierId = "bulwark-carrier";
+    public const string SeismicCrownId = "seismic-crown";
+    public const string MercyShroudId = "mercy-shroud";
+    public const string DawnCircleId = "circle-of-dawn";
+    public const string ShadowstrideVestId = "shadowstride-vest";
+    public const string KeenCadenceId = "keen-cadence";
+
     /// <summary>Class that may equip a base type; "" = every class.</summary>
     public static string ClassRestriction(string baseType)
     {
@@ -123,6 +137,60 @@ public static class ItemDatabase
                     baseType = "RogueBlade",
                     uniqueId = RogueKeepsakeId,
                     affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("Crit", 10f) },
+                };
+            case BulwarkCarrierId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Armor,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Breastplate",
+                    uniqueId = BulwarkCarrierId,
+                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("Armor", 3f) },
+                };
+            case SeismicCrownId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Helmet,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Helm",
+                    uniqueId = SeismicCrownId,
+                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("CooldownReduction", 8f) },
+                };
+            case MercyShroudId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Armor,
+                    rarity = ItemRarity.Unique,
+                    baseType = "ClothTunic",
+                    uniqueId = MercyShroudId,
+                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("MagicFind", 20f) },
+                };
+            case DawnCircleId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Helmet,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Circlet",
+                    uniqueId = DawnCircleId,
+                    affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 20f) },
+                };
+            case ShadowstrideVestId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Armor,
+                    rarity = ItemRarity.Unique,
+                    baseType = "LeatherVest",
+                    uniqueId = ShadowstrideVestId,
+                    affixes = new List<Affix> { new Affix("MoveSpeed", 0.3f), new Affix("Armor", 3f) },
+                };
+            case KeenCadenceId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Helmet,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Hood",
+                    uniqueId = KeenCadenceId,
+                    affixes = new List<Affix> { new Affix("Crit", 10f), new Affix("CritRating", 20f) },
                 };
             default:
                 return new ItemInstance
@@ -234,6 +302,94 @@ public static class ItemDatabase
             CreateUnique("Cryptwarden Plate"),
             CreateUnique("Seer's Circlet"),
         };
+    }
+
+    /// <summary>
+    /// S4 matrix (PartyRole, ItemSlot) → uniqueId. Weapons reuse the build
+    /// uniques (class-bound, pinned); armor/helmets are the six new IDs.
+    /// </summary>
+    public static string UniqueForMatrix(ClassDefinition.PartyRole role, ItemSlot slot)
+    {
+        switch (role)
+        {
+            case ClassDefinition.PartyRole.Tank:
+                if (slot == ItemSlot.Weapon) return LancerWardId;
+                if (slot == ItemSlot.Armor) return BulwarkCarrierId;
+                return SeismicCrownId;
+            case ClassDefinition.PartyRole.Healer:
+                if (slot == ItemSlot.Weapon) return WickOfHaloId;
+                if (slot == ItemSlot.Armor) return MercyShroudId;
+                return DawnCircleId;
+            default:
+                if (slot == ItemSlot.Weapon) return NightfangId;
+                if (slot == ItemSlot.Armor) return ShadowstrideVestId;
+                return KeenCadenceId;
+        }
+    }
+
+    /// <summary>All nine matrix unique IDs (3 roles × weapon/armor/helmet).</summary>
+    public static readonly string[] MatrixUniqueIds =
+    {
+        LancerWardId, BulwarkCarrierId, SeismicCrownId,
+        WickOfHaloId, MercyShroudId, DawnCircleId,
+        NightfangId, ShadowstrideVestId, KeenCadenceId,
+    };
+
+    static readonly string[] MatrixArmors = { BulwarkCarrierId, MercyShroudId, ShadowstrideVestId };
+    static readonly string[] MatrixHelmets = { SeismicCrownId, DawnCircleId, KeenCadenceId };
+
+    /// <summary>True for the nine S4 matrix IDs.</summary>
+    public static bool IsMatrixUnique(string uniqueId)
+    {
+        if (string.IsNullOrEmpty(uniqueId)) return false;
+        return System.Array.IndexOf(MatrixUniqueIds, uniqueId) >= 0;
+    }
+
+    /// <summary>
+    /// Host catalog check (S4): every uniqueId the game itself hands out —
+    /// legacy P2 uniques, build uniques and the S4 matrix. Unknown IDs are
+    /// rejected on the host path (SanitizeGearItem) and never equipped.
+    /// </summary>
+    public static bool IsKnownUniqueId(string uniqueId)
+    {
+        if (string.IsNullOrEmpty(uniqueId)) return false;
+        switch (uniqueId)
+        {
+            case "Emberbrand Blade":
+            case "Lantern of the Hold":
+            case "Cryptwarden Plate":
+            case "Seer's Circlet":
+            case LancerWardId:
+            case WickOfHaloId:
+            case NightfangId:
+            case RogueKeepsakeId:
+                return true;
+            default:
+                return IsMatrixUnique(uniqueId);
+        }
+    }
+
+    /// <summary>
+    /// Regular armor Unique pool (S4): legacy Cryptwarden Plate or one of the
+    /// three matrix armors (split share in <see cref="DroptableDatabase"/>).
+    /// The aggregate Unique weight is untouched — only the within-slot pick.
+    /// </summary>
+    public static string UniqueArmor(System.Random rng)
+    {
+        if (rng != null && rng.NextDouble() < DroptableDatabase.MatrixNonWeaponShare)
+            return MatrixArmors[rng.Next(MatrixArmors.Length)];
+        return "Cryptwarden Plate";
+    }
+
+    /// <summary>
+    /// Regular helmet Unique pool (S4): legacy Seer's Circlet or one of the
+    /// three matrix helmets. Same within-slot split as armor.
+    /// </summary>
+    public static string UniqueHelmet(System.Random rng)
+    {
+        if (rng != null && rng.NextDouble() < DroptableDatabase.MatrixNonWeaponShare)
+            return MatrixHelmets[rng.Next(MatrixHelmets.Length)];
+        return "Seer's Circlet";
     }
 
     /// <summary>

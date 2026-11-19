@@ -34,6 +34,37 @@ public sealed class PlayerHealth : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Mercy-shroud absorb (S4): granted by Mending Light while the healer
+    /// wears the vest. Server-authoritative: the non-cosmetic heal runs on the
+    /// authority (solo/host) and the absorb lives on the target's own health,
+    /// so host and client agree via the replicated HP. Runtime-only: a reload
+    /// rebuilds the hero without a shield.
+    /// </summary>
+    float shieldAmount;
+    float shieldUntil = float.NegativeInfinity;
+
+    /// <summary>Live absorb (0 when expired).</summary>
+    public float ShieldAmount => Time.time <= shieldUntil ? shieldAmount : 0f;
+
+    /// <summary>Grant an absorb shield for seconds (refreshes any running shield).</summary>
+    public void GrantShield(float amount, float duration)
+    {
+        if (amount <= 0f || duration <= 0f) return;
+        shieldAmount = amount;
+        shieldUntil = Time.time + duration;
+    }
+
+    /// <summary>Eat the shield first, return the unabsorbed rest.</summary>
+    float AbsorbShield(float amount)
+    {
+        float live = ShieldAmount;
+        if (live <= 0f || amount <= 0f) return amount;
+        float eaten = Mathf.Min(live, amount);
+        shieldAmount = live - eaten;
+        return amount - eaten;
+    }
+
     public void Heal(float amount)
     {
         if (amount <= 0f) return;
@@ -43,21 +74,60 @@ public sealed class PlayerHealth : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (amount <= 0f) return;
+        amount = AbsorbShield(amount);
+        if (amount <= 0f) return;
         currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
     }
 
     /// <summary>
     /// Directional damage: a held frontal <see cref="DiabloBlock"/> halves
     /// the hit, anything else lands unreduced. Undirected callers keep the
-    /// full-damage path above.
+    /// full-damage path above. S4 hooks share this path: the mercy shield
+    /// absorbs first, then the bulwark-carrier books threat on the attacker
+    /// (nearest husk at the reported attacker position) when the hit was
+    /// actually blocked. No static cross-owner state: threat lands on the
+    /// attacker's own table with this hero as source.
     /// </summary>
     public void TakeDamage(float amount, Vector3 fromPos)
     {
         if (amount <= 0f) return;
         var block = GetComponent<DiabloBlock>();
-        if (block != null && block.BlocksFrom(fromPos))
+        bool blocked = block != null && block.BlocksFrom(fromPos);
+        if (blocked)
             amount = DiabloBlock.Reduce(amount);
+        amount = AbsorbShield(amount);
+        if (blocked)
+        {
+            var eq = GetComponent<Equipment>();
+            if (BuildUniqueEffects.HasBulwark(eq))
+            {
+                var attacker = HuskAt(fromPos);
+                if (attacker != null) BuildUniqueEffects.BookBulwarkThreat(attacker, transform);
+            }
+        }
+        if (amount <= 0f) return;
         currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
+    }
+
+    /// <summary>
+    /// Attacker lookup for the bulwark hook: melee strikers report their own
+    /// position (<see cref="EnemyAttack"/>, lancer/thrall/boss slams), so the
+    /// nearest husk at that point is the attacker. Hostile projectile impacts
+    /// report the blast point near the hero and match nothing, so blocked
+    /// arrows never misbook threat.
+    /// </summary>
+    static GameObject HuskAt(Vector3 pos)
+    {
+        GameObject best = null;
+        float bestD = 0.75f;
+        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
+        {
+            if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
+            var d = husk.transform.position - pos;
+            d.y = 0f;
+            if (d.magnitude <= bestD) { bestD = d.magnitude; best = husk; }
+        }
+        return best;
     }
 
     /// <summary>Clamp current HP after equipment swaps change the max.</summary>
