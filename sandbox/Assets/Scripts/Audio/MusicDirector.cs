@@ -25,6 +25,22 @@ public class MusicDirector : MonoBehaviour
     bool usingPrimary = true;
     Coroutine fade;
 
+    /// <summary>Mirrors DiabloAudio.MutePlayback so music stays silent in tests.</summary>
+    public static bool MutePlayback
+    {
+        get => DiabloAudio.MutePlayback;
+        set => DiabloAudio.MutePlayback = value;
+    }
+
+    static bool PlaybackMuted
+    {
+        get
+        {
+            try { return DiabloAudio.MutePlayback || Application.isBatchMode; }
+            catch { return DiabloAudio.MutePlayback; }
+        }
+    }
+
     public static MusicDirector Ensure()
     {
         if (Instance != null) return Instance;
@@ -117,13 +133,16 @@ public class MusicDirector : MonoBehaviour
         var @in = usingPrimary ? secondary : primary;
         var @out = usingPrimary ? primary : secondary;
         usingPrimary = !usingPrimary;
-        try
+        if (!PlaybackMuted)
         {
-            @in.clip = next;
-            @in.volume = 0f;
-            @in.Play();
+            try
+            {
+                @in.clip = next;
+                @in.volume = 0f;
+                @in.Play();
+            }
+            catch { }
         }
-        catch { }
         crossfadeProgress = 0f;
         float t = 0f;
         while (t < CrossfadeSeconds)

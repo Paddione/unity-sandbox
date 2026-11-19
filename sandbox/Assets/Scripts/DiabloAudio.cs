@@ -47,6 +47,21 @@ public static class DiabloAudio
     public const float UIClickVolume = 0.35f;
     public const float VendorVolume = 0.5f;
 
+    /// <summary>When true, Play* methods bump counters and resolve clips but
+    /// never touch the audio device. Tests set this so suites stay silent;
+    /// batchmode runs are silent automatically (see PlaybackMuted).</summary>
+    public static bool MutePlayback { get; set; }
+
+    static bool PlaybackMuted
+    {
+        get
+        {
+            if (MutePlayback) return true;
+            try { return Application.isBatchMode; }
+            catch { return false; }
+        }
+    }
+
     static AudioSource source;
     static AudioClip swingClip, hitClip, deathClip, lootClip, uiClickClip, hurtClip, playerDeathClip;
     static AudioClip whooshClip, blastClip, twangClip, critClip, levelUpClip, ambientClip;
@@ -103,18 +118,26 @@ public static class DiabloAudio
     static void PlaySfx(AudioClip synth, string cueName, float volume)
     {
         EnsureBuilt();
-        try { source.PlayOneShot(Resolve(cueName, synth), volume * SfxGain); }
+        var clip = Resolve(cueName, synth);
+        if (PlaybackMuted) return;
+        try { source.PlayOneShot(clip, volume * SfxGain); }
         catch { soundedFallbacks++; }
     }
 
-    public static void PlaySwing() { EnsureBuilt(); source.PlayOneShot(swingClip); soundedSwings++; }
-    public static void PlayHit() { EnsureBuilt(); source.PlayOneShot(hitClip); soundedHits++; }
-    public static void PlayDeath() { EnsureBuilt(); source.PlayOneShot(deathClip); soundedDeaths++; }
-    public static void PlayLoot() { EnsureBuilt(); source.PlayOneShot(lootClip); soundedLoot++; }
+    static void PlayRaw(AudioClip clip)
+    {
+        if (PlaybackMuted) return;
+        try { source.PlayOneShot(clip); } catch { }
+    }
+
+    public static void PlaySwing() { EnsureBuilt(); soundedSwings++; PlayRaw(swingClip); }
+    public static void PlayHit() { EnsureBuilt(); soundedHits++; PlayRaw(hitClip); }
+    public static void PlayDeath() { EnsureBuilt(); soundedDeaths++; PlayRaw(deathClip); }
+    public static void PlayLoot() { EnsureBuilt(); soundedLoot++; PlayRaw(lootClip); }
     /// <summary>Menu tick: deep + quiet (presentation tuning) — routes gain + fallback like all SFX.</summary>
     public static void PlayUIClick() { EnsureBuilt(); PlaySfx(uiClickClip, "UIClick", UIClickVolume); }
-    public static void PlayHurt() { EnsureBuilt(); source.PlayOneShot(hurtClip); }
-    public static void PlayPlayerDeath() { EnsureBuilt(); source.PlayOneShot(playerDeathClip); }
+    public static void PlayHurt() { EnsureBuilt(); PlayRaw(hurtClip); }
+    public static void PlayPlayerDeath() { EnsureBuilt(); PlayRaw(playerDeathClip); }
     /// <summary>Fireball leaving the hand.</summary>
     public static void PlayWhoosh() { EnsureBuilt(); Varied(whooshClip, 0.9f); soundedCasts++; }
     /// <summary>Bowstring release.</summary>
@@ -196,7 +219,13 @@ public static class DiabloAudio
     public static void PlayVendorSell() { EnsureBuilt(); PlaySfx(vendorSellClip, "VendorSell", VendorVolume); soundedVendor++; }
     public static void PlayGate() { EnsureBuilt(); PlaySfx(gateClip, "Gate", 1f); soundedGate++; }
 
-    public static void PlayLevelUp() { EnsureBuilt(); source.PlayOneShot(levelUpClip, 0.9f); soundedLevelUps++; }
+    public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlayRawWithVolume(levelUpClip, 0.9f); }
+
+    static void PlayRawWithVolume(AudioClip clip, float volume)
+    {
+        if (PlaybackMuted) return;
+        try { source.PlayOneShot(clip, volume); } catch { }
+    }
 
     /// <summary>
     /// Repeats must not grate: a pooled pitched source per call (±8 %).
@@ -204,6 +233,7 @@ public static class DiabloAudio
     /// </summary>
     static void Varied(AudioClip clip, float volume)
     {
+        if (PlaybackMuted) return;
         var s = pitched[pitchedNext];
         pitchedNext = (pitchedNext + 1) % pitched.Length;
         s.pitch = 0.92f + (float)pitchRng.NextDouble() * 0.16f;

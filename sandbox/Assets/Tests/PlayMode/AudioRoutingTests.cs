@@ -11,6 +11,7 @@ public class AudioRoutingTests
     [SetUp]
     public void Setup()
     {
+        DiabloAudio.MutePlayback = true;
         DiabloAudio.ResetRun();
         DiabloAudio.ClearOverrides();
         DiabloSettings.MasterVol = 0.8f;
