@@ -22,17 +22,17 @@ public static class ClassCatalog
     public static readonly ClassDefinition Lanternbearer = new ClassDefinition(
         LanternbearerId, "Lanternbearer",
         "Carries Lantern Hold's light. Wisps fight beside her, the halo burns what comes close.",
-        new[] { DiabloSkills.Skill.LanternBolt, DiabloSkills.Skill.Wisps, DiabloSkills.Skill.SearingHalo, DiabloSkills.Skill.VeilStep },
-        new[] { "Q", "E", "R", "Space" },
+        new[] { DiabloSkills.Skill.LanternBolt, DiabloSkills.Skill.Wisps, DiabloSkills.Skill.SearingHalo, DiabloSkills.Skill.VeilStep, DiabloSkills.Skill.MendingLight, DiabloSkills.Skill.RenewingCircle },
+        new[] { "Q", "E", "R", "Space", "F", "G" },
         1.5f, 0.5f, "Adventurers/Characters/Mage.fbx",
         ClassDefinition.PartyRole.Healer, 1.5f);
 
-    /// <summary>Rogue (party-roles S1): ranged/melee DPS. S1 casts the shared base set; S3 adds Rogue specialty skills.</summary>
+    /// <summary>Rogue (party-roles S1 base set, S3 specialty): ranged/melee DPS with Quick Shot and Blade Flurry.</summary>
     public static readonly ClassDefinition Rogue = new ClassDefinition(
         RogueId, "Rogue",
         "Strikes from range and from the shadows. Fast bow shots and quick blades.",
-        new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow },
-        new[] { "Q", "E" },
+        new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.QuickShot, DiabloSkills.Skill.BladeFlurry },
+        new[] { "Q", "E", "R", "Space" },
         1.5f, 1.5f, "Adventurers/Characters/Rogue.fbx",
         ClassDefinition.PartyRole.Dps, 1.5f);
 

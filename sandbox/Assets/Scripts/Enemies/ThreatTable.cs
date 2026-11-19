@@ -51,6 +51,9 @@ public sealed class ThreatTable : MonoBehaviour
         return bestThreat > 0f ? best : null;
     }
 
+    /// <summary>True while any source holds threat (the enemy is in a fight).</summary>
+    public bool Engaged => threat.Count > 0;
+
     /// <summary>Forget all threat (death, zone change, tests).</summary>
     public void Clear() => threat.Clear();
 
@@ -92,5 +95,22 @@ public sealed class ThreatTable : MonoBehaviour
         var table = target.GetComponent<ThreatTable>();
         if (table == null) table = target.AddComponent<ThreatTable>();
         table.AddThreat(attacker, SlamThreatBonus);
+    }
+
+    /// <summary>
+    /// Book healing threat (party-roles S3): every engaged enemy near the
+    /// healer notices the mending. Amount is the HP actually restored.
+    /// </summary>
+    public static void BookHeal(Transform healer, float amount, float radius = 30f)
+    {
+        if (healer == null || amount <= 0f) return;
+        foreach (var table in Object.FindObjectsByType<ThreatTable>(FindObjectsSortMode.None))
+        {
+            if (table == null || !table.Engaged) continue;
+            var to = table.transform.position - healer.position;
+            to.y = 0f;
+            if (to.magnitude > radius) continue;
+            table.AddThreat(healer, amount);
+        }
     }
 }

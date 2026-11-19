@@ -44,6 +44,11 @@ public sealed class CharacterSheet
     public int veilRank;
     // Tank slam (party-roles S2).
     public int slamRank;
+    // Rogue + Healer specialties (party-roles S3).
+    public int quickRank;
+    public int flurryRank;
+    public int mendRank;
+    public int renewRank;
 
     /// <summary>True while any point is unspent (drives the UI pulse).</summary>
     public bool HasUnspent => freeAttributePoints > 0 || freeSkillPoints > 0;
@@ -82,6 +87,10 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.SearingHalo: return haloRank;
             case DiabloSkills.Skill.VeilStep: return veilRank;
             case DiabloSkills.Skill.SeismicSlam: return slamRank;
+            case DiabloSkills.Skill.QuickShot: return quickRank;
+            case DiabloSkills.Skill.BladeFlurry: return flurryRank;
+            case DiabloSkills.Skill.MendingLight: return mendRank;
+            case DiabloSkills.Skill.RenewingCircle: return renewRank;
             default: return 0;
         }
     }
@@ -100,6 +109,10 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.SearingHalo: haloRank++; break;
             case DiabloSkills.Skill.VeilStep: veilRank++; break;
             case DiabloSkills.Skill.SeismicSlam: slamRank++; break;
+            case DiabloSkills.Skill.QuickShot: quickRank++; break;
+            case DiabloSkills.Skill.BladeFlurry: flurryRank++; break;
+            case DiabloSkills.Skill.MendingLight: mendRank++; break;
+            case DiabloSkills.Skill.RenewingCircle: renewRank++; break;
             default: return false;
         }
         freeSkillPoints--;
@@ -161,6 +174,10 @@ public sealed class CharacterSheet
         new SkillRankEntry { skill = DiabloSkills.Skill.SearingHalo.ToString(), rank = haloRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.VeilStep.ToString(), rank = veilRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.SeismicSlam.ToString(), rank = slamRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.QuickShot.ToString(), rank = quickRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.BladeFlurry.ToString(), rank = flurryRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.MendingLight.ToString(), rank = mendRank },
+        new SkillRankEntry { skill = DiabloSkills.Skill.RenewingCircle.ToString(), rank = renewRank },
     };
 
     /// <summary>Import ranks from a save (unknown/missing skills stay 0).</summary>
@@ -168,6 +185,7 @@ public sealed class CharacterSheet
     {
         fireballRank = arrowRank = cleaveRank = 0;
         lanternBoltRank = wispsRank = haloRank = veilRank = slamRank = 0;
+        quickRank = flurryRank = mendRank = renewRank = 0;
         if (entries == null) return;
         foreach (var e in entries)
         {
@@ -183,6 +201,10 @@ public sealed class CharacterSheet
                 case "SearingHalo": haloRank = rank; break;
                 case "VeilStep": veilRank = rank; break;
                 case "SeismicSlam": slamRank = rank; break;
+                case "QuickShot": quickRank = rank; break;
+                case "BladeFlurry": flurryRank = rank; break;
+                case "MendingLight": mendRank = rank; break;
+                case "RenewingCircle": renewRank = rank; break;
             }
         }
     }

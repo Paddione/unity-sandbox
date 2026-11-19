@@ -29,9 +29,9 @@ public class ClassSheetUiTests
     [Test]
     public void Ranks_SaveAllSevenAndKeepTheOtherClass()
     {
-        var sheet = new CharacterSheet { fireballRank = 2, cleaveRank = 1, lanternBoltRank = 3, wispsRank = 4, haloRank = 1, veilRank = 2, slamRank = 3 };
+        var sheet = new CharacterSheet { fireballRank = 2, cleaveRank = 1, lanternBoltRank = 3, wispsRank = 4, haloRank = 1, veilRank = 2, slamRank = 3, quickRank = 1, flurryRank = 2, mendRank = 4, renewRank = 5 };
         var entries = sheet.ToEntries();
-        Assert.AreEqual(8, entries.Count);
+        Assert.AreEqual(12, entries.Count);
         var back = new CharacterSheet();
         back.FromEntries(entries);
         Assert.AreEqual(2, back.fireballRank);
@@ -41,12 +41,16 @@ public class ClassSheetUiTests
         Assert.AreEqual(1, back.GetRank(DiabloSkills.Skill.SearingHalo));
         Assert.AreEqual(2, back.GetRank(DiabloSkills.Skill.VeilStep));
         Assert.AreEqual(3, back.GetRank(DiabloSkills.Skill.SeismicSlam));
+        Assert.AreEqual(1, back.GetRank(DiabloSkills.Skill.QuickShot));
+        Assert.AreEqual(2, back.GetRank(DiabloSkills.Skill.BladeFlurry));
+        Assert.AreEqual(4, back.GetRank(DiabloSkills.Skill.MendingLight));
+        Assert.AreEqual(5, back.GetRank(DiabloSkills.Skill.RenewingCircle));
     }
 
     [Test]
     public void SpendSkill_RaisesEachLanternRankUpToFive()
     {
-        var sheet = new CharacterSheet { freeSkillPoints = 8 };
+        var sheet = new CharacterSheet { freeSkillPoints = 10 };
         foreach (var s in ClassCatalog.Lanternbearer.skills) Assert.IsTrue(sheet.SpendSkill(s), s.ToString());
         Assert.AreEqual(4, sheet.freeSkillPoints);
         for (int i = 1; i < CharacterSheet.MaxSkillRank; i++) sheet.SpendSkill(DiabloSkills.Skill.LanternBolt);
@@ -100,7 +104,7 @@ public class ClassSheetUiTests
         RunProfile.ClassId = ClassCatalog.LanternbearerId;
         ui.Refresh();
         CollectionAssert.AreEqual(ClassCatalog.Lanternbearer.skills, ui.RowSkills);
-        Assert.AreEqual(4, ui.RowSkills.Length);
+        Assert.AreEqual(6, ui.RowSkills.Length);
 
         var scaler = hero.GetComponentInChildren<CanvasScaler>();
         Assert.AreEqual(CanvasScaler.ScaleMode.ScaleWithScreenSize, scaler.uiScaleMode);

@@ -17,9 +17,9 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>
     /// Explicit values: co-op sends skills as int (DiabloNetworkPlayer), so
     /// existing values never move; Lanternbearer skills append (second-class S1),
-    /// party-role skills append after them (party-roles S2: SeismicSlam).
+    /// party-role skills append after them (party-roles S2: SeismicSlam, S3: Rogue + Healer).
     /// </summary>
-    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6, SeismicSlam = 7 }
+    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6, SeismicSlam = 7, QuickShot = 8, BladeFlurry = 9, MendingLight = 10, RenewingCircle = 11 }
 
     [Header("Fireball (Q)")]
     public int fireballDamage = 3;
@@ -68,6 +68,25 @@ public sealed class DiabloSkills : MonoBehaviour
     public float slamStunSeconds = 2f;
     /// <summary>No knockback: the tank holds the line, slammed husks stay in reach.</summary>
     public float slamKnockback = 0f;
+
+    [Header("Rogue (party-roles S3)")]
+    public int quickShotDamage = 2;
+    public float quickShotSpeed = 24f;
+    public float quickShotRange = 20f;
+    public float quickShotCooldown = 0.3f;
+    public int flurryDamage = 2;
+    public float flurryRadius = 2.4f;
+    public float flurryCooldown = 4f;
+    /// <summary>Flurry pops husks back a step so the rogue keeps its distance (halo pop).</summary>
+    public float flurryKnockback = 0.6f;
+
+    [Header("Healer (party-roles S3, Lanternbearer)")]
+    public int mendHeal = 8;
+    public float targetHealRange = 12f;
+    public float mendCooldown = 5f;
+    public int renewHeal = 5;
+    public float groupHealRadius = 6f;
+    public float renewCooldown = 12f;
 
     /// <summary>
     /// Burning-halo window for the wick-of-the-halo Wisp priority
@@ -245,6 +264,10 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.SearingHalo: return haloCooldown;
             case Skill.VeilStep: return veilCooldown;
             case Skill.SeismicSlam: return slamCooldown;
+            case Skill.QuickShot: return quickShotCooldown;
+            case Skill.BladeFlurry: return flurryCooldown;
+            case Skill.MendingLight: return mendCooldown;
+            case Skill.RenewingCircle: return renewCooldown;
             default: return cleaveCooldown;
         }
     }
@@ -281,14 +304,19 @@ public sealed class DiabloSkills : MonoBehaviour
         }
     }
 
+    /// <summary>True for skills appended by party-roles (SeismicSlam and later).</summary>
+    public static bool IsPartySkill(Skill s) => s >= Skill.SeismicSlam;
+
     /// <summary>
     /// Damage of one cast: base (+ weapon bonus for Bow/Cleave) × rank × focus.
-    /// Pure entry point for tests (uses the live sheet, no cooldown gate).
+    /// Party-role specialty skills scale with the class specialty factor on
+    /// top (S3 ×1.5 contract); pre-party skills keep their legacy scaling
+    /// untouched. Pure entry point for tests (uses the live sheet, no cooldown gate).
     /// </summary>
     public int EffectiveDamage(Skill s)
     {
         int baseDmg = BaseDamage(s);
-        if (baseDmg <= 0) return 0; // Veil Step deals no damage
+        if (baseDmg <= 0) return 0; // Veil Step and the heals deal no damage
         var sheet = CharacterSheet.For(gameObject);
         var eq = GetComponent<Equipment>();
         int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
@@ -296,7 +324,24 @@ public sealed class DiabloSkills : MonoBehaviour
         if (sheet != null)
             mul = sheet.SkillMultiplier(s, gearRanks, ActiveClass.focusSkillFactor);
         else mul = 1f + CharacterSheet.RankDamageBonus * gearRanks;
+        if (IsPartySkill(s) && ActiveClass.IsSpecialty(s))
+            mul *= ActiveClass.specialtyFactor;
         return Mathf.Max(1, Mathf.RoundToInt(baseDmg * mul));
+    }
+
+    /// <summary>
+    /// Heal of one cast (party-roles S3): base × rank × focus(class) ×
+    /// specialty factor. Pure entry point for tests (no cooldown gate).
+    /// </summary>
+    public int EffectiveHeal(Skill s)
+    {
+        int baseHeal = s == Skill.MendingLight ? mendHeal : s == Skill.RenewingCircle ? renewHeal : 0;
+        if (baseHeal <= 0) return 0;
+        var sheet = CharacterSheet.For(gameObject);
+        var eq = GetComponent<Equipment>();
+        int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
+        float mul = sheet != null ? sheet.SpecialtySkillMultiplier(s, ActiveClass, gearRanks) : 1f;
+        return Mathf.Max(1, Mathf.RoundToInt(baseHeal * mul));
     }
 
     /// <summary>Unscaled damage of a skill (weapon bonus for Bow/Cleave).</summary>
@@ -311,6 +356,8 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.Wisps: return wispDamage;
             case Skill.SearingHalo: return haloDamage;
             case Skill.SeismicSlam: return slamDamage;
+            case Skill.QuickShot: return quickShotDamage;
+            case Skill.BladeFlurry: return flurryDamage;
             default: return 0;
         }
     }
@@ -328,6 +375,7 @@ public sealed class DiabloSkills : MonoBehaviour
     {
         if (!ActiveClass.CanCast(s)) return false; // base set for all, specialty only for its class (party-roles S1)
         if (CooldownLeft(s) > 0f) return false;
+        if (s == Skill.MendingLight && FindHealTarget(targetHealRange) == null) return false; // no cooldown wasted
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
         dir.Normalize();
@@ -364,6 +412,30 @@ public sealed class DiabloSkills : MonoBehaviour
             DoSlam(cosmetic: false);
             var at = transform.position + Vector3.up * LaunchHeight;
             BroadcastIfNetworked(s, at, dir);
+            return true;
+        }
+
+        if (s == Skill.BladeFlurry)
+        {
+            DoFlurry(dir, cosmetic: false);
+            var fat = transform.position + Vector3.up * LaunchHeight;
+            BroadcastIfNetworked(s, fat, dir);
+            return true;
+        }
+
+        if (s == Skill.MendingLight)
+        {
+            DoTargetHeal(cosmetic: false);
+            var mat = transform.position + Vector3.up * LaunchHeight;
+            BroadcastIfNetworked(s, mat, dir);
+            return true;
+        }
+
+        if (s == Skill.RenewingCircle)
+        {
+            DoGroupHeal(cosmetic: false);
+            var rat = transform.position + Vector3.up * LaunchHeight;
+            BroadcastIfNetworked(s, rat, dir);
             return true;
         }
 
@@ -510,6 +582,120 @@ public sealed class DiabloSkills : MonoBehaviour
         Destroy(go, 0.4f);
     }
 
+    // ---------- Rogue + Healer (party-roles S3) ----------
+
+    /// <summary>
+    /// Blade Flurry (rogue specialty): quick blades through the frontal melee
+    /// cone (<see cref="DiabloMelee.ArcHalfAngle"/>) — every husk inside
+    /// <see cref="flurryRadius"/> takes the blow with a small pop.
+    /// Cosmetic mirrors only spawn the visual, never damage.
+    /// </summary>
+    public int DoFlurry(Vector3 dir, bool cosmetic)
+    {
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) dir = transform.forward;
+        dir.Normalize();
+        transform.rotation = Quaternion.LookRotation(dir);
+        int hits = 0;
+        if (!cosmetic)
+        {
+            ExitBowStance();
+            var driver = GetComponent<DiabloAnimator>();
+            if (driver != null) driver.OnStrike();
+            int blow = EffectiveDamage(Skill.BladeFlurry);
+            foreach (var husk in DiabloMelee.FindArcTargets(transform, dir, flurryRadius, DiabloMelee.ArcHalfAngle))
+            {
+                if (husk == null) continue;
+                ApplyHit(husk, blow, transform.position, flurryKnockback, transform);
+                hits++;
+            }
+            DiabloAudio.PlayWhoosh();
+        }
+        PresentationVfx.CleaveArc(transform.position, flurryRadius);
+        return hits;
+    }
+
+    /// <summary>Nearest injured living ally (not self) inside range, or null.</summary>
+    public PlayerHealth FindHealTarget(float range)
+    {
+        PlayerHealth best = null;
+        float bestD = float.MaxValue;
+        foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            if (hp == null || hp.transform == transform) continue;
+            if (hp.CurrentHP <= 0f || hp.CurrentHP >= hp.MaxHP) continue;
+            var to = hp.transform.position - transform.position;
+            to.y = 0f;
+            float d = to.magnitude;
+            if (d <= range && d < bestD) { bestD = d; best = hp; }
+        }
+        return best;
+    }
+
+    /// <summary>
+    /// Mending Light (healer specialty): mends the nearest injured ally in
+    /// <see cref="targetHealRange"/> for <see cref="EffectiveHeal"/> and books
+    /// the restored HP as threat. Returns the HP actually restored.
+    /// Cosmetic mirrors only spawn the visual, never healing or threat.
+    /// </summary>
+    public float DoTargetHeal(bool cosmetic)
+    {
+        float restored = 0f;
+        var target = FindHealTarget(targetHealRange);
+        if (!cosmetic && target != null)
+        {
+            float before = target.CurrentHP;
+            target.Heal(EffectiveHeal(Skill.MendingLight));
+            restored = target.CurrentHP - before;
+            ThreatTable.BookHeal(transform, restored);
+        }
+        SpawnHealVisual(targetHealRange);
+        return restored;
+    }
+
+    /// <summary>
+    /// Renewing Circle (healer specialty): mends the healer and every living
+    /// ally inside <see cref="groupHealRadius"/> for <see cref="EffectiveHeal"/>
+    /// and books the restored HP as threat. Returns the HP actually restored.
+    /// Cosmetic mirrors only spawn the visual, never healing or threat.
+    /// </summary>
+    public float DoGroupHeal(bool cosmetic)
+    {
+        float restored = 0f;
+        if (!cosmetic)
+        {
+            int amount = EffectiveHeal(Skill.RenewingCircle);
+            foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+            {
+                if (hp == null) continue;
+                if (hp.CurrentHP <= 0f) continue; // the dead respawn at camp, they are not mended
+                var to = hp.transform.position - transform.position;
+                to.y = 0f;
+                if (to.magnitude > groupHealRadius) continue;
+                float before = hp.CurrentHP;
+                hp.Heal(amount);
+                restored += hp.CurrentHP - before;
+            }
+            ThreatTable.BookHeal(transform, restored);
+        }
+        SpawnHealVisual(groupHealRadius);
+        return restored;
+    }
+
+    void SpawnHealVisual(float radius)
+    {
+        PresentationVfx.CleaveArc(transform.position, radius);
+        if (!Application.isPlaying) return;
+        var go = new GameObject("MendingLight");
+        go.transform.position = transform.position + Vector3.up * 1.2f;
+        var light = go.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = new Color(0.5f, 1f, 0.6f);
+        light.range = radius;
+        light.intensity = 2.5f;
+        Destroy(go, 0.5f);
+    }
+
     /// <summary>
     /// Veil Step (Space): blink up to <see cref="veilDistance"/> along dir,
     /// stopping in front of the first solid collider. Returns the distance moved.
@@ -623,6 +809,9 @@ public sealed class DiabloSkills : MonoBehaviour
         if (s == Skill.SearingHalo) { DoHalo(cosmetic: true); return null; }
         if (s == Skill.SeismicSlam) { DoSlam(cosmetic: true); return null; }
         if (s == Skill.Wisps) { SummonWisps(cosmetic: true); return null; }
+        if (s == Skill.BladeFlurry) { DoFlurry(dir, cosmetic: true); return null; }
+        if (s == Skill.MendingLight) { DoTargetHeal(cosmetic: true); return null; }
+        if (s == Skill.RenewingCircle) { DoGroupHeal(cosmetic: true); return null; }
         if (s == Skill.VeilStep) { SpawnVeilPuff(origin); return null; }
         return Launch(s, origin, dir, cosmetic: true);
     }
@@ -645,6 +834,16 @@ public sealed class DiabloSkills : MonoBehaviour
             if (d != null) d.OnStrike();
             DiabloAudio.PlayLantern();
             return bolt;
+        }
+        if (s == Skill.QuickShot)
+        {
+            var q = DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
+                quickShotSpeed, quickShotRange, 0f, cosmetic);
+            var qd = GetComponent<DiabloAnimator>();
+            EnterBowStance();
+            if (qd != null) qd.OnBowShot();
+            if (!cosmetic) DiabloAudio.PlayTwang();
+            return q;
         }
         var p = s == Skill.Fireball
             ? DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
@@ -719,13 +918,15 @@ public sealed class DiabloSkills : MonoBehaviour
         var charUI = GetComponent<DiabloCharacterUI>();
         if (charUI != null && charUI.IsOpen) return;
 
-        // Keys come from the class: Q/E/R(/Space) map to its skill slots.
+        // Keys come from the class: Q/E/R(/Space/F/G) map to its skill slots.
         // RMB is the melee outreach thrust (DiabloClickController), never a skill.
         var skills = ActiveClass.skills;
         if (kb != null && kb.qKey.wasPressedThisFrame && skills.Length > 0) Cast(skills[0]);
         else if (kb != null && kb.eKey.wasPressedThisFrame && skills.Length > 1) Cast(skills[1]);
         else if (kb != null && kb.rKey.wasPressedThisFrame && skills.Length > 2) Cast(skills[2]);
         else if (kb != null && kb.spaceKey.wasPressedThisFrame && skills.Length > 3) Cast(skills[3]);
+        else if (kb != null && kb.fKey.wasPressedThisFrame && skills.Length > 4) Cast(skills[4]);
+        else if (kb != null && kb.gKey.wasPressedThisFrame && skills.Length > 5) Cast(skills[5]);
 
         UpdateHud();
     }
@@ -757,6 +958,10 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.Wisps: return "Wisps";
             case Skill.SearingHalo: return "Searing Halo";
             case Skill.SeismicSlam: return "Seismic Slam";
+            case Skill.QuickShot: return "Quick Shot";
+            case Skill.BladeFlurry: return "Blade Flurry";
+            case Skill.MendingLight: return "Mending Light";
+            case Skill.RenewingCircle: return "Renewing Circle";
             default: return "Veil Step";
         }
     }

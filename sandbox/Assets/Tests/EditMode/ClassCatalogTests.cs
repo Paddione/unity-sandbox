@@ -63,8 +63,8 @@ public class ClassCatalogTests
     public void Lanternbearer_HasFourOwnSkillsOnQERSpace()
     {
         var l = ClassCatalog.Lanternbearer;
-        Assert.AreEqual(4, l.skills.Length);
-        Assert.AreEqual(4, l.keys.Length);
+        Assert.AreEqual(6, l.skills.Length);
+        Assert.AreEqual(6, l.keys.Length);
         foreach (var s in ClassCatalog.Fenwalker.skills)
             Assert.IsFalse(l.Has(s), $"{s} belongs to the Fenwalker");
         Assert.Greater(l.focusSkillFactor, 1f);
