@@ -87,6 +87,10 @@ public static class OssuaryBuilder
 
         // The Hollow Abbot (boss, north apse).
         SpawnBoss(OssuaryOffset + new Vector3(0f, 0.05f, -10f), root.transform);
+
+        // Local-art pilot: torn banner at the ossuary gate.
+        LocalArtPilotDressing.PlaceBanner("PilotBanner_Ossuary",
+            OssuaryOffset + new Vector3(3.2f, 0f, 8f), 180f);
     }
 
     static GameObject SpawnGate(string name, Vector3 at, Vector3 dest, int zone)
