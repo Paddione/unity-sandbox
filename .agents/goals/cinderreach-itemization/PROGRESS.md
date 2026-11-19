@@ -1,6 +1,6 @@
 # Progress – cinderreach-itemization
 
-Prozent: 33 %
+Prozent: 50 %
 
 ## Erledigt
 
@@ -14,11 +14,14 @@ Prozent: 33 %
 
 - S2 Linux-Player und Zwei-Prozess-Koop grün (Host 8 Phasen, Client Town/Fen bis zum Ossuary-Transfer, beide Exit 0 und keine Exceptions). Der Player protokolliert NGO-Warnungen beim Setzen des anfänglichen Loot-Snapshots vor Spawn.
 
+- S3 Krit/Fläche/Host-Validierung gelandet (Branch `feature/cinderreach-itemization`, Basis `bf9db19`): `GetCrit` = 5 % Basis + Legacy-`Crit` + `CritRating`/10 (Cap 75 %, 2× beibehalten); `ScaleArea` = `r·sqrt(1+inc/100)` (Cap 100 %, Treffer + VFX teilen sich den Radius für Cleave/Halo/Slam/Flurry/Renew/Feuerball-Explosion); 1 Wurf je Direkttreffer, Ticks/Thorns/Heal nie Crit (`HaloZone.Tick` mit `canCrit:false`); Koop-Intent (Skill+Anker/Ausrichtung, nie Schaden) mit Host-Berechnung aus S2-Ausrüstung + Crit-Flag-Replikation; Tooltip mit Flächenprozent.
+- S3 EditMode 340/340, PlayMode 213/213 (14/14 `ItemCombatStatsTests`: Formel/Cap, 2×, Server-Crit vs. Eingabe-Cap, sqrt+Cap, Slot-Spannen, Tooltip, skalierte Kanten innen/außen, Blast skaliert/Arrow unskaliert, Gruppenheil-Ring, Ticks/Thorns/Heal nie Crit, Threat nach Crit, Intent-Gate, Host-Execute+Cooldown). `check-meta.py` OK.
+
 ## Nächste Schritte
 
-- S3 auf aktuellem main beginnen. Krit-Wertung, Flächenskalierung und serverseitige Trefferauflösung integrieren.
+- S4 auf aktuellem main beginnen (9er Rollen-Unique-Matrix; Rogue-Nachweise brauchen Party-Roles-Skills vom laufenden Party-Roles-Vorhaben).
 
 ## Offene Punkte
 
 - Die für die Rogue-Modifier benötigten Kampffähigkeiten kommen aus dem laufenden Party-Roles-Vorhaben.
-- S3 bis S6 und die abschließenden Health-Gates stehen aus.
+- S4 bis S6 und die abschließenden Health-Gates stehen aus.

@@ -142,6 +142,13 @@ public sealed class EnemyHealth : NetworkBehaviour
         hp -= amount;
         if (IsSpawned && IsServer) NetHP.Value = Mathf.Max(hp, 0);
         DiabloJuice.OnEnemyHit(transform.position, amount, crit);
+        // S3: host replicates the number including the crit flag; clients
+        // never apply locally (early return above), they only render this.
+        if (IsSpawned && NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            var relay = DiabloNetworkPlayer.HostRelay();
+            if (relay != null) relay.BroadcastHit(transform.position, amount, crit);
+        }
         Debug.Log($"[Diablo] {gameObject.name} took {amount} dmg ({Mathf.Max(hp, 0)}/{maxHP}).");
         if (hp <= 0)
         {

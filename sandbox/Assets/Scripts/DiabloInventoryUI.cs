@@ -175,6 +175,10 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         PaintTabs();
     }
 
+    /// <summary>S3 area tooltip line: IncreasedArea percent + radius factor (test seam).</summary>
+    public static string AreaLine(Equipment eq) =>
+        eq == null ? "Area  +0%" : $"Area  +{eq.AreaBonusPct():0.#}% (radius x{eq.ScaleArea(1f):0.###})";
+
     string StatsBlock()
     {
         float armor = 0f;
@@ -183,6 +187,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         return $"Damage  {equipment.GetDamage():0.#}\n" +
                $"Max HP  {equipment.GetMaxHP():0.#}\n" +
                $"Crit  {equipment.GetCrit():0.#}%\n" +
+               AreaLine(equipment) + "\n" +
                $"XP gain  {equipment.GetXPMul():0.#}%\n" +
                $"Move speed  {equipment.GetMoveSpeed():0.##}\n" +
                $"Armor  {armor:0.#}\n\n" +

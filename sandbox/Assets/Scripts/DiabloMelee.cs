@@ -170,6 +170,10 @@ public sealed class DiabloMelee : MonoBehaviour
         return TryConeAttack(attacker, dir) > 0;
     }
 
+    /// <summary>
+    /// S3: exactly one crit roll per direct hit; the post-crit blow books
+    /// threat (ThreatTable.BookDamage with blow after crit).
+    /// </summary>
     void HitSingle(GameObject target, EnemyHealth health, Transform attacker)
     {
         int blow = DiabloJuice.RollCrit(attacker, CurrentDamage(attacker), out bool crit);

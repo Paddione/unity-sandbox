@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// Affix table (replayability S2): 14 affixes with tier-1 (Normal) and
-/// tier-2 (Kindled) spans. Keys stay strings for save compatibility. Tier-1
-/// spans of the seven P2 affixes keep their old ranges.
+/// Affix table (replayability S2, S3 adds CritRating + IncreasedArea): 16
+/// affixes with tier-1 (Normal) and tier-2 (Kindled) spans. Keys stay strings
+/// for save compatibility. Tier-1 spans of the seven P2 affixes keep their
+/// old ranges.
 /// Magic rolls 1–2 affixes, Rare 3–6, Unique items are fixed sets.
 /// </summary>
 public static class AffixLibrary
@@ -22,6 +23,8 @@ public static class AffixLibrary
     public const string FireDamage = "FireDamage";
     public const string Thorns = "Thorns";
     public const string MagicFind = "MagicFind";
+    public const string CritRating = "CritRating";
+    public const string IncreasedArea = "IncreasedArea";
 
     static readonly ItemSlot[] W = { ItemSlot.Weapon };
     static readonly ItemSlot[] A = { ItemSlot.Armor };
@@ -45,6 +48,12 @@ public static class AffixLibrary
         new AffixDef(FireDamage, W, 1, 4, 3, 8, true, "+{0} Fire Damage"),
         new AffixDef(Thorns, A, 1, 2, 2, 4, true, "{0} Thorns"),
         new AffixDef(MagicFind, AH, 5, 20, 15, 40, true, "+{0}% Magic Find"),
+        // S3: CritRating rides the Crit slots (WH) at 10 rating = 1 crit point;
+        // IncreasedArea is utility, so it rides Armor/Helmet (AH) and stays off
+        // weapons to keep the weapon pool damage-focused. Both integer, save
+        // keys are plain strings like every other affix.
+        new AffixDef(CritRating, WH, 5, 20, 15, 40, true, "+{0} Crit Rating"),
+        new AffixDef(IncreasedArea, AH, 5, 20, 15, 40, true, "+{0}% Area"),
     };
 
     public static int MagicAffixCount(System.Random rng) => rng.Next(1, 3); // 1-2

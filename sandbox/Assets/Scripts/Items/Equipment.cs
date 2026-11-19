@@ -74,7 +74,25 @@ public sealed class Equipment : MonoBehaviour
     }
 
     public float GetMoveSpeed() => BaseMoveSpeed + (armor != null ? armor.GetAffix("MoveSpeed") : 0f);
-    public float GetCrit() => 5f + (weapon != null ? weapon.GetAffix("Crit") : 0f) + (helmet != null ? helmet.GetAffix("Crit") : 0f);
+
+    /// <summary>S3 crit: 5 % base + legacy Crit points + 1 point per 10 CritRating, capped.</summary>
+    public const float BaseCritChance = 5f;
+    public const float MaxCritChance = 75f;
+    public float GetCrit() => UnityEngine.Mathf.Min(MaxCritChance,
+        BaseCritChance + Total(AffixLibrary.Crit) + Total(AffixLibrary.CritRating) / 10f);
+
+    /// <summary>S3 area: IncreasedArea summed over all slots, capped at 100 % (= 2x area).</summary>
+    public const float MaxIncreasedAreaPct = 100f;
+    public float AreaBonusPct() =>
+        UnityEngine.Mathf.Min(MaxIncreasedAreaPct, Total(AffixLibrary.IncreasedArea));
+
+    /// <summary>
+    /// Scale an AoE radius after rank/variant scaling. Hit volume and VFX share
+    /// the result, so visuals never lie about the lethal area. Single-target,
+    /// flight and move ranges bypass this on purpose.
+    /// </summary>
+    public float ScaleArea(float baseRadius) =>
+        baseRadius * UnityEngine.Mathf.Sqrt(1f + AreaBonusPct() / 100f);
     public float GetXPMul() => 100f + (helmet != null ? helmet.GetAffix("XPMul") : 0f);
 
     // --- replayability S2: aggregated affix effects --------------------------

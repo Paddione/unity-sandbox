@@ -376,6 +376,98 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         skills.ShowRemoteCast((DiabloSkills.Skill)skill, origin, dir);
     }
 
+    /// <summary>
+    /// S3 host hit feedback: replicate a host-applied hit (position, amount,
+    /// crit flag) so every client shows the same number. The host already
+    /// showed its own number locally in TakeDamage; the RPC skips the server.
+    /// </summary>
+    public void BroadcastHit(Vector3 at, int amount, bool crit)
+    {
+        if (!IsServer || !IsSpawned) return;
+        BroadcastHitClientRpc(at, amount, crit);
+    }
+
+    [ClientRpc]
+    void BroadcastHitClientRpc(Vector3 at, int amount, bool crit)
+    {
+        if (IsServer) return;
+        DiabloJuice.OnEnemyHit(at, amount, crit);
+    }
+
+    /// <summary>Anchor slack for skill intents (lag + cursor aim, mirrors cast visuals).</summary>
+    public const float SkillIntentAnchorTolerance = 3f;
+
+    /// <summary>
+    /// S3 intent gate (pure, testable without netcode): null when the intent is
+    /// valid, else a short reason ("skill", "class", "cooldown", "facing",
+    /// "anchor") for logs/tests. Rejects without any mutation. Damage is never
+    /// an input, so there is no damage check here: the host rolls it.
+    /// </summary>
+    public static string ValidateSkillIntent(int skillId, ClassDefinition senderClass,
+        Vector3 senderPos, Vector3 origin, Vector3 dir, float cooldownLeft)
+    {
+        if (!System.Enum.IsDefined(typeof(DiabloSkills.Skill), skillId))
+            return $"unknown skill {skillId}";
+        var skill = (DiabloSkills.Skill)skillId;
+        if (senderClass == null || !senderClass.CanCast(skill))
+            return $"class cannot cast {skill}";
+        if (cooldownLeft > 0f)
+            return $"cooldown {cooldownLeft:0.00}s left";
+        var flat = dir;
+        flat.y = 0f;
+        if (flat.sqrMagnitude < 0.0001f || float.IsNaN(flat.x) || float.IsNaN(flat.z))
+            return "facing";
+        float anchor = HitValidator.PlanarDistance(senderPos, origin);
+        if (anchor > SkillIntentAnchorTolerance)
+            return $"anchor {anchor:0.00}m > {SkillIntentAnchorTolerance:0.00}m";
+        return null;
+    }
+
+    /// <summary>
+    /// S3 client skill intent: skill id + anchor + facing, never damage. The
+    /// host validates (skill id, sender class contract, facing, cooldown,
+    /// anchor via HitValidator) and executes from S2 gear + authoritative
+    /// skill state, replicating the result including the crit flag.
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitSkillCastServerRpc(int skillId, Vector3 origin, Vector3 dir,
+        ServerRpcParams rpcParams = default)
+    {
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsServer) return;
+        if (!System.Enum.IsDefined(typeof(DiabloSkills.Skill), skillId))
+        {
+            Debug.Log($"[Net] rejected skill cast from {rpcParams.Receive.SenderClientId}: unknown skill {skillId}.");
+            return;
+        }
+        var skill = (DiabloSkills.Skill)skillId;
+        ulong sender = rpcParams.Receive.SenderClientId;
+        foreach (var kv in nm.SpawnManager.SpawnedObjects)
+        {
+            var nb = kv.Value;
+            if (!nb.IsPlayerObject || nb.OwnerClientId != sender) continue;
+            var senderRelay = nb.GetComponent<DiabloNetworkPlayer>();
+            int classIdx = senderRelay != null ? senderRelay.classIndex.Value : 0;
+            var senderClass = classIdx >= 0 && classIdx < ClassCatalog.All.Length
+                ? ClassCatalog.All[classIdx] : ClassCatalog.Fenwalker;
+            var skills = nb.GetComponent<DiabloSkills>();
+            if (skills == null)
+            {
+                Debug.Log($"[Net] rejected skill cast from {sender}: no skills on mirror.");
+                return;
+            }
+            string reason = ValidateSkillIntent(skillId, senderClass, nb.transform.position,
+                origin, dir, skills.CooldownLeft(skill));
+            if (reason != null)
+            {
+                Debug.Log($"[Net] rejected skill cast from {sender}: {reason}.");
+                return;
+            }
+            skills.ServerExecuteSkill(skill, dir, senderClass);
+            return;
+        }
+    }
+
     /// <summary>Server re-check radius for fireball/arrow hits (max skill range + slack).</summary>
     public const float RangedValidateRange = 24f;
 

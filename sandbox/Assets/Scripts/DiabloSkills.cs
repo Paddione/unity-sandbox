@@ -310,6 +310,17 @@ public sealed class DiabloSkills : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// S3 area scaling: rank/variant radius through the wearer's
+    /// <see cref="Equipment.ScaleArea"/>. One call site per skill, shared by the
+    /// hit loop and every visual, so both see the identical radius.
+    /// </summary>
+    public float ScaledArea(float baseRadius)
+    {
+        var eq = GetComponent<Equipment>();
+        return eq != null ? eq.ScaleArea(baseRadius) : baseRadius;
+    }
+
     /// <summary>True for skills appended by party-roles (SeismicSlam and later).</summary>
     public static bool IsPartySkill(Skill s) => s >= Skill.SeismicSlam;
 
@@ -376,10 +387,15 @@ public sealed class DiabloSkills : MonoBehaviour
         return CastToward(s, dir);
     }
 
-    /// <summary>Cast in a world direction (tests + external drivers).</summary>
-    public bool CastToward(Skill s, Vector3 dir)
+    /// <summary>
+    /// Cast in a world direction (tests + external drivers). The host passes
+    /// the sender's class explicitly (S3 intent path); everyone else casts
+    /// with the local run profile.
+    /// </summary>
+    public bool CastToward(Skill s, Vector3 dir, ClassDefinition classOverride = null)
     {
-        if (!ActiveClass.CanCast(s)) return false; // base set for all, specialty only for its class (party-roles S1)
+        var casterClass = classOverride ?? ActiveClass;
+        if (!casterClass.CanCast(s)) return false; // base set for all, specialty only for its class (party-roles S1)
         if (CooldownLeft(s) > 0f) return false;
         if (s == Skill.MendingLight && FindHealTarget(targetHealRange) == null) return false; // no cooldown wasted
         dir.y = 0f;
@@ -390,6 +406,20 @@ public sealed class DiabloSkills : MonoBehaviour
         else if (s == Skill.Cleave) lastCleave = Time.time;
         else lastLantern[s] = Time.time;
         lastUsed = s;
+
+        // S3 co-op intent: a networked client never applies damage itself. It
+        // sends skill + anchor + facing (never a damage number); the host
+        // validates and executes authoritatively. Locally only the cosmetic
+        // half plays, so nothing applies twice.
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var intentNet = NetworkManager.Singleton;
+        if (netPlayer != null && netPlayer.IsSpawned && intentNet != null
+            && intentNet.IsListening && !intentNet.IsServer)
+        {
+            netPlayer.SubmitSkillCastServerRpc((int)s, transform.position, dir);
+            PlayCosmetic(s, dir);
+            return true;
+        }
 
         if (s == Skill.Wisps || s == Skill.SearingHalo || s == Skill.VeilStep)
         {
@@ -456,6 +486,37 @@ public sealed class DiabloSkills : MonoBehaviour
         return true;
     }
 
+    /// <summary>S3: cosmetic half of a cast for intent-sending clients (no damage, no cooldown).</summary>
+    public void PlayCosmetic(Skill s, Vector3 dir)
+    {
+        switch (s)
+        {
+            case Skill.Cleave: DoCleave(dir, cosmetic: true); break;
+            case Skill.SearingHalo: DoHalo(cosmetic: true); break;
+            case Skill.SeismicSlam: DoSlam(cosmetic: true); break;
+            case Skill.BladeFlurry: DoFlurry(dir, cosmetic: true); break;
+            case Skill.MendingLight: DoTargetHeal(cosmetic: true); break;
+            case Skill.RenewingCircle: DoGroupHeal(cosmetic: true); break;
+            case Skill.Wisps: SummonWisps(cosmetic: true); break;
+            case Skill.VeilStep: DoVeilStep(dir); break; // movement stays client-side
+            default:
+                var origin = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
+                Launch(s, origin, dir, cosmetic: true);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// S3 host-authoritative execution: runs the sender mirror's skill from S2
+    /// gear + authoritative cooldown state after
+    /// <see cref="DiabloNetworkPlayer.ValidateSkillIntent"/> passed. A damage
+    /// number from the client is never consulted, so the HitValidator input cap
+    /// (MaxDamage) only gates legacy client-sent hits — a legitimate
+    /// server-rolled 2x crit may exceed it.
+    /// </summary>
+    public bool ServerExecuteSkill(Skill s, Vector3 dir, ClassDefinition senderClass) =>
+        CastToward(s, dir, senderClass);
+
     void BroadcastIfNetworked(Skill s, Vector3 origin, Vector3 dir)
     {
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
@@ -490,6 +551,7 @@ public sealed class DiabloSkills : MonoBehaviour
         int hits = 0;
         bool ward = !cosmetic && ActiveVariantId(Skill.SearingHalo) == SkillVariantCatalog.HaloWardId;
         if (!cosmetic) HaloZone.ClearFor(transform); // recasts replace the old ward
+        float radius = ScaledArea(haloRadius);
         if (!cosmetic)
         {
             int blow = EffectiveDamage(Skill.SearingHalo);
@@ -498,24 +560,24 @@ public sealed class DiabloSkills : MonoBehaviour
                 if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
                 var to = husk.transform.position - transform.position;
                 to.y = 0f;
-                if (to.magnitude > haloRadius) continue;
+                if (to.magnitude > radius) continue;
                 ApplyHit(husk, blow, transform.position, haloKnockback, transform);
                 hits++;
             }
             if (ward)
-                HaloZone.Spawn(transform, transform.position, blow, haloRadius,
+                HaloZone.Spawn(transform, transform.position, blow, radius,
                     SkillVariantCatalog.HaloWardDuration, SkillVariantCatalog.HaloTickInterval, haloKnockback);
-            BuildUniqueEffects.NotifyHalo(transform.position, haloRadius, HaloVisualSeconds);
+            BuildUniqueEffects.NotifyHalo(transform.position, radius, HaloVisualSeconds);
             DiabloAudio.PlayHalo();
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
         }
-        SpawnHaloVisual();
-        PresentationVfx.CleaveArc(transform.position, haloRadius);
+        SpawnHaloVisual(radius);
+        PresentationVfx.CleaveArc(transform.position, radius);
         return hits;
     }
 
-    void SpawnHaloVisual()
+    void SpawnHaloVisual(float radius)
     {
         if (!Application.isPlaying) return;
         var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
@@ -523,7 +585,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (prefab != null)
         {
             ring = Instantiate(prefab, transform.position, Quaternion.identity);
-            ring.transform.localScale = Vector3.one * (haloRadius / cleaveBaseRadius);
+            ring.transform.localScale = Vector3.one * (radius / cleaveBaseRadius);
             foreach (var r in ring.GetComponentsInChildren<Renderer>())
                 r.material.color = new Color(1f, 0.85f, 0.45f, r.material.color.a);
         }
@@ -534,7 +596,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (light == null) light = ring.AddComponent<Light>();
         light.type = LightType.Point;
         light.color = new Color(1f, 0.8f, 0.4f);
-        light.range = haloRadius * 2f;
+        light.range = radius * 2f;
         light.intensity = 4f;
         Destroy(ring, 0.6f);
     }
@@ -550,6 +612,7 @@ public sealed class DiabloSkills : MonoBehaviour
     public int DoSlam(bool cosmetic)
     {
         int hits = 0;
+        float radius = ScaledArea(slamRadius);
         if (!cosmetic)
         {
             ExitBowStance();
@@ -561,7 +624,7 @@ public sealed class DiabloSkills : MonoBehaviour
                 if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
                 var to = husk.transform.position - transform.position;
                 to.y = 0f;
-                if (to.magnitude > slamRadius) continue;
+                if (to.magnitude > radius) continue;
                 ApplyHit(husk, blow, transform.position, slamKnockback, transform);
                 ThreatTable.BookStun(husk, transform);
                 var atk = husk.GetComponent<EnemyAttack>();
@@ -570,12 +633,12 @@ public sealed class DiabloSkills : MonoBehaviour
             }
             DiabloAudio.PlayWhoosh();
         }
-        SpawnSlamVisual();
-        PresentationVfx.CleaveArc(transform.position, slamRadius);
+        SpawnSlamVisual(radius);
+        PresentationVfx.CleaveArc(transform.position, radius);
         return hits;
     }
 
-    void SpawnSlamVisual()
+    void SpawnSlamVisual(float radius)
     {
         if (!Application.isPlaying) return;
         var go = new GameObject("SeismicSlam");
@@ -583,7 +646,7 @@ public sealed class DiabloSkills : MonoBehaviour
         var light = go.AddComponent<Light>();
         light.type = LightType.Point;
         light.color = new Color(0.7f, 0.6f, 0.5f);
-        light.range = slamRadius * 2f;
+        light.range = radius * 2f;
         light.intensity = 3f;
         Destroy(go, 0.4f);
     }
@@ -609,15 +672,18 @@ public sealed class DiabloSkills : MonoBehaviour
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
             int blow = EffectiveDamage(Skill.BladeFlurry);
-            foreach (var husk in DiabloMelee.FindArcTargets(transform, dir, flurryRadius, DiabloMelee.ArcHalfAngle))
+            float radius = ScaledArea(flurryRadius);
+            foreach (var husk in DiabloMelee.FindArcTargets(transform, dir, radius, DiabloMelee.ArcHalfAngle))
             {
                 if (husk == null) continue;
                 ApplyHit(husk, blow, transform.position, flurryKnockback, transform);
                 hits++;
             }
             DiabloAudio.PlayWhoosh();
+            PresentationVfx.CleaveArc(transform.position, radius);
+            return hits;
         }
-        PresentationVfx.CleaveArc(transform.position, flurryRadius);
+        PresentationVfx.CleaveArc(transform.position, ScaledArea(flurryRadius));
         return hits;
     }
 
@@ -668,6 +734,7 @@ public sealed class DiabloSkills : MonoBehaviour
     public float DoGroupHeal(bool cosmetic)
     {
         float restored = 0f;
+        float radius = ScaledArea(groupHealRadius);
         if (!cosmetic)
         {
             int amount = EffectiveHeal(Skill.RenewingCircle);
@@ -677,14 +744,14 @@ public sealed class DiabloSkills : MonoBehaviour
                 if (hp.CurrentHP <= 0f) continue; // the dead respawn at camp, they are not mended
                 var to = hp.transform.position - transform.position;
                 to.y = 0f;
-                if (to.magnitude > groupHealRadius) continue;
+                if (to.magnitude > radius) continue;
                 float before = hp.CurrentHP;
                 hp.Heal(amount);
                 restored += hp.CurrentHP - before;
             }
             ThreatTable.BookHeal(transform, restored);
         }
-        SpawnHealVisual(groupHealRadius);
+        SpawnHealVisual(radius);
         return restored;
     }
 
@@ -769,7 +836,7 @@ public sealed class DiabloSkills : MonoBehaviour
         dir.Normalize();
         transform.rotation = Quaternion.LookRotation(dir);
         string variant = ActiveVariantId(Skill.Cleave);
-        float radius = SkillVariantCatalog.CleaveRadiusFor(this, variant);
+        float radius = ScaledArea(SkillVariantCatalog.CleaveRadiusFor(this, variant));
         float arc = SkillVariantCatalog.CleaveArcFor(variant);
         if (!cosmetic)
         {
@@ -853,7 +920,7 @@ public sealed class DiabloSkills : MonoBehaviour
         }
         var p = s == Skill.Fireball
             ? DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
-                fireballSpeed, fireballRange, fireballBlastRadius, cosmetic)
+                fireballSpeed, fireballRange, ScaledArea(fireballBlastRadius), cosmetic)
             : DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
                 arrowSpeed, arrowRange, 0f, cosmetic);
         var driver = GetComponent<DiabloAnimator>();
@@ -879,14 +946,18 @@ public sealed class DiabloSkills : MonoBehaviour
     /// Apply one projectile hit: direct damage solo/host, ServerRpc relay as a
     /// netcode client (the server re-validates range + cooldown + alive + damage
     /// via HitValidator, S2 host-authoritative).
+    /// Exactly one crit roll per direct hit (S3); periodic ticks, thorns and
+    /// heals pass <c>canCrit: false</c> and keep their normal result. Healing
+    /// never rolls (this path only runs for damage).
     /// </summary>
     public static void ApplyHit(GameObject target, int damage, Vector3 from, float knockback,
-        Transform attacker = null)
+        Transform attacker = null, bool canCrit = true)
     {
         if (target == null) return;
         var health = target.GetComponent<EnemyHealth>();
         if (health == null) return;
-        damage = DiabloJuice.RollCrit(attacker, damage, out bool crit);
+        bool crit = false;
+        if (canCrit) damage = DiabloJuice.RollCrit(attacker, damage, out crit);
         // Party threat (S2): local + client-prediction booking; the server books
         // authoritative threat when it applies damage (HitValidator, S5 wiring).
         ThreatTable.BookDamage(target, attacker, damage);

@@ -133,7 +133,7 @@ public sealed class HaloZone : MonoBehaviour
             var to = husk.transform.position - anchor;
             to.y = 0f;
             if (to.magnitude > radius) continue;
-            DiabloSkills.ApplyHit(husk, damage, anchor, knockback, owner);
+            DiabloSkills.ApplyHit(husk, damage, anchor, knockback, owner, canCrit: false);
             hits++;
         }
         return hits;
