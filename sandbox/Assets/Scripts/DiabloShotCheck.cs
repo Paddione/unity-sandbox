@@ -228,6 +228,30 @@ public sealed class DiabloShotCheck : MonoBehaviour
         var look = hero.GetComponent<ClassAppearance>();
         if (look != null) look.Apply(ClassCatalog.Fenwalker);
 
+        // 13c) Party roles (party-roles S6): tank slam ring, rogue quick shot
+        // and flurry, healer renewing circle — one pose per role.
+        Face(hero, boss.transform.position - hero.transform.position);
+        hero.distance = 9f;
+        hero.pitch = 45f;
+        skills.CastToward(DiabloSkills.Skill.SeismicSlam, boss.transform.position - hero.transform.position);
+        yield return Wait(0.12f);
+        yield return Shot("tank_seismic_slam");
+        RunProfile.ClassId = ClassCatalog.RogueId;
+        if (look != null) look.Apply(ClassCatalog.Rogue);
+        skills.CastToward(DiabloSkills.Skill.QuickShot, boss.transform.position - hero.transform.position);
+        yield return Wait(0.15f);
+        yield return Shot("rogue_quick_shot");
+        skills.CastToward(DiabloSkills.Skill.BladeFlurry, boss.transform.position - hero.transform.position);
+        yield return Wait(0.12f);
+        yield return Shot("rogue_blade_flurry");
+        RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        if (look != null) look.Apply(ClassCatalog.Lanternbearer);
+        skills.CastToward(DiabloSkills.Skill.RenewingCircle, boss.transform.position - hero.transform.position);
+        yield return Wait(0.12f);
+        yield return Shot("healer_renewing_circle");
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        if (look != null) look.Apply(ClassCatalog.Fenwalker);
+
         // 14) act-one: Cinder Kiln entrance, a thrall pack, the Kilnmother in phase 2, the Act I screen.
         RunProfile.Act.Unlock(ActProgress.Kiln);
         keepAlive = hero.GetComponent<PlayerHealth>();

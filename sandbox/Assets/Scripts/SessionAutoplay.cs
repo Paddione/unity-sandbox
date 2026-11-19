@@ -63,6 +63,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (coopHost) result.role = AutoplayResult.RoleHost;
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         startBosses = BossController.BossesKilled;
+        DiabloSkills.ResetRun();
         float deadline = Time.realtimeSinceStartup + 840f; // act-one S5: route runs through the Kiln
 
         DiabloClickController hero = null;
@@ -145,10 +146,27 @@ public sealed class SessionAutoplay : MonoBehaviour
         int huskKills = startHusks - CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
         DiabloClickController.ExternalDrive = false;
+        result.huskKills = huskKills;
+        result.healsCast = DiabloSkills.HealsCast;
+        result.hpRestored = DiabloSkills.HPRestored;
+        result.partyRoles = PartyRoleIds();
         Log($"DONE phases={phasesDone} huskKills={huskKills} bossKills={bossKills} " +
             $"phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} " +
-            $"exceptions={exceptionCount} result_phases={string.Join(",", result.phases)}");
+            $"exceptions={exceptionCount} party={string.Join(",", result.partyRoles)} " +
+            $"heals={result.healsCast} hpRestored={result.hpRestored:0} " +
+            $"result_phases={string.Join(",", result.phases)}");
         Finish(exceptionCount > 0 || bossKills < 1 || SessionComplete.Shown < 1 ? 1 : 0);
+    }
+
+    /// <summary>Party on the run: the hero's class plus AI companion classes.</summary>
+    static System.Collections.Generic.List<string> PartyRoleIds()
+    {
+        var roles = new System.Collections.Generic.List<string> { RunProfile.ClassId };
+        var roster = PartyRoster.Instance;
+        if (roster != null)
+            foreach (var c in roster.Companions)
+                if (c != null) roles.Add(c.classId);
+        return roles;
     }
 
     /// <summary>Stamp and write the result JSON, then quit with the worse of
@@ -379,14 +397,35 @@ public sealed class SessionAutoplay : MonoBehaviour
     }
 
     /// <summary>
-    /// Class combat profile (second-class S5). Fenwalker: unchanged (Fireball,
-    /// else Arrow; at the boss Cleave first). Lanternbearer: Wisps whenever
-    /// ready, Searing Halo with 3+ husks (or the boss) inside its radius, else
-    /// Lantern Bolt.
+    /// Class combat profile (second-class S5, rogue party-roles S6).
+    /// Fenwalker: unchanged (Fireball, else Arrow; at the boss Cleave first).
+    /// Lanternbearer: Wisps whenever ready, Searing Halo with 3+ husks (or
+    /// the boss) inside its radius, else Lantern Bolt. Rogue: Quick Shot
+    /// whenever ready, Blade Flurry into 2+ close husks, else base spells.
     /// </summary>
     static void CastProfile(DiabloSkills skills, Vector3 toTarget, bool inRange, bool boss = false)
     {
         bool Ready(DiabloSkills.Skill s) => skills.CooldownLeft(s) <= 0f;
+        if (RunProfile.ClassId == ClassCatalog.RogueId)
+        {
+            if (Ready(DiabloSkills.Skill.QuickShot)) { skills.CastToward(DiabloSkills.Skill.QuickShot, toTarget); return; }
+            int near = 0;
+            foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
+            {
+                if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
+                var d = h.transform.position - skills.transform.position;
+                d.y = 0f;
+                if (d.magnitude <= skills.flurryRadius) near++;
+            }
+            if (Ready(DiabloSkills.Skill.BladeFlurry) && near >= 2)
+            {
+                skills.CastToward(DiabloSkills.Skill.BladeFlurry, toTarget);
+                return;
+            }
+            if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
+            else if (Ready(DiabloSkills.Skill.Arrow)) skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
+            return;
+        }
         if (RunProfile.ClassId == ClassCatalog.LanternbearerId)
         {
             if (Ready(DiabloSkills.Skill.Wisps)) { skills.CastToward(DiabloSkills.Skill.Wisps, toTarget); return; }

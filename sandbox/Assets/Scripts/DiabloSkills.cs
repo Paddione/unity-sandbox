@@ -175,6 +175,14 @@ public sealed class DiabloSkills : MonoBehaviour
 
     /// <summary>Wisps for a rank: base 2, a third from rank 3.</summary>
     public int WispCountFor(int rank) => wispBaseCount + (rank >= 3 ? 1 : 0);
+
+    /// <summary>Heals cast this run (party-roles S6 autoplay proof).</summary>
+    public static int HealsCast;
+    /// <summary>HP restored by heals this run.</summary>
+    public static float HPRestored;
+
+    /// <summary>Reset run counters (scene load / headless tests).</summary>
+    public static void ResetRun() { HealsCast = 0; HPRestored = 0f; }
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     Text hud;
@@ -789,6 +797,7 @@ public sealed class DiabloSkills : MonoBehaviour
             // S4 mercy-shroud: the healed ally keeps a short absorb shield.
             if (BuildUniqueEffects.HasMercyShroud(GetComponent<Equipment>()))
                 target.GrantShield(BuildUniqueEffects.MercyShieldAmount, BuildUniqueEffects.MercyShieldSeconds);
+            if (restored > 0f) { HealsCast++; HPRestored += restored; }
         }
         SpawnHealVisual(targetHealRange);
         return restored;
@@ -837,6 +846,7 @@ public sealed class DiabloSkills : MonoBehaviour
                     RelayHeal(weakest.gameObject, bonus, Skill.RenewingCircle);
                 }
             }
+            if (restored > 0f) { HealsCast++; HPRestored += restored; }
         }
         SpawnHealVisual(radius);
         return restored;

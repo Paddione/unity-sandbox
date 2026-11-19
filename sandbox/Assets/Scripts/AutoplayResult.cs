@@ -45,6 +45,14 @@ public sealed class AutoplayResult
     public bool actOneComplete;
     /// <summary>"solo", or "host"/"client" in a co-op pair run (coop-session S1).</summary>
     public string role = RoleSolo;
+    /// <summary>Party on the run (party-roles S6): the hero's class plus AI companion classes.</summary>
+    public List<string> partyRoles = new List<string>();
+    /// <summary>Husks killed on the route (party-roles S6).</summary>
+    public int huskKills;
+    /// <summary>Heals cast on the route (party-roles S6).</summary>
+    public int healsCast;
+    /// <summary>HP restored by heals on the route (party-roles S6).</summary>
+    public float hpRestored;
 
     public const string RoleSolo = "solo";
     public const string RoleHost = "host";

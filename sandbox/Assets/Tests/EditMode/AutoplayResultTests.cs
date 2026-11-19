@@ -44,6 +44,21 @@ public class AutoplayResultTests
     }
 
     [Test]
+    public void Json_CarriesPartyFields()
+    {
+        var r = FullRun();
+        r.partyRoles = new System.Collections.Generic.List<string> { "fenwalker", "lanternbearer", "rogue" };
+        r.huskKills = 22;
+        r.healsCast = 7;
+        r.hpRestored = 84f;
+        var back = AutoplayResult.FromJson(r.ToJson());
+        CollectionAssert.AreEqual(new[] { "fenwalker", "lanternbearer", "rogue" }, back.partyRoles);
+        Assert.AreEqual(22, back.huskKills);
+        Assert.AreEqual(7, back.healsCast);
+        Assert.AreEqual(84f, back.hpRestored, 0.001f);
+    }
+
+    [Test]
     public void RequiredPhases_AreTheEightContractPhases()
     {
         CollectionAssert.AreEqual(

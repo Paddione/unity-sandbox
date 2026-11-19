@@ -702,3 +702,17 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Relay-Boot, Harness und Kompilierbarkeit (wie S2–S5 dokumentiert).
   `ugs-relay-probe.sh` blieb unverändert (Vorab-Check, Exit 0).
 - Next: Goal-Audit und 100 %.
+
+## 2026-11-19 — cinderreach-party-roles S6 (Gruppen-Beweis, Goal 100 %)
+
+- Done: S6 gelandet (Autoplay-Profil Rogue, Ergebnis-Felder `partyRoles`/`huskKills`/`healsCast`/`hpRestored`,
+  4 Party-Shots, Q11 + Entscheid + Run-Log). Belege: je Klasse Exit 0, 8/8 Phasen, 0 Exceptions
+  (163,0 s / 132,6 s / 189,7 s, Band ±25 %); Koop-Paar Tank+Rogue Exit 0/0 mit Rollenersatz und Join-Gate;
+  EditMode 346/346 + PlayMode 228/228; 34 Shotcheck-PNGs.
+- Faced: Stale-Default-Save überschrieb `-class` (alle Autoplay-Läufe spielten Fenwalker, Town-Phase
+  scheiterte am vollen Beutel) — isolierte `-save-file` pro Klasse als Fix, seitdem Pflicht für
+  Klassen-Beweise. Client-Boot spannte Phantom-KI vor dem Join (IsSolo lag) — `-join`-Erkennung als Fix,
+  per Re-Smoke belegt (Client-Log ohne `[Party]`).
+- Learned: God-Held hält alle Aggro (Slam +20, Quick-Shot-DPS), Begleiter bleiben unverletzt, Heiler
+  bleibt stumm — Heals 0 ist erklärter Befund, kein Defekt (Mechanik über PlayMode-Kampf belegt).
+- Next: Non-God-Ausdauerlauf (echte Balance), 4. Spieler-Join-Gate live prüfen, Rogue-Look (Knight-Platzhalter).

@@ -130,3 +130,12 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Setup: `DiabloMelee` (Kegel-Mehrfachtreffer + Stoß), `DiabloBlock` (Shift halten, frontal 60°), `DiabloClickController` (Strike/Thrust, RMB von `DiabloSkills` abgelöst), `PlayerHealth.TakeDamage(amount, fromPos)`, Reflexion in `DiabloProjectile`, `DiabloTargetBar`-Sprite-Fix (fillAmount ohne Sprite rendert nicht).
 - Exit criterion: `VerifyDiabloZone` grün, EditMode + PlayMode grün (inkl. `DiabloMeleeReworkTests`: ortsfester Mehrfachtreffer, Stoß-Reichweite, frontal halbiert/hinten voll, Projektil-Reflexion, Balken-Sprite), decision logged as Q10 continue/pivot/kill.
 - Headless proof: EditMode 305/305 + PlayMode 180/180 (dieser Branch).
+
+## Q11 — Trägt die Dreiergruppen-Schleife (Tank/Heiler/Rogue + Solo-KI)?
+
+- Question: bleibt die Session-Schleife tragfähig, wenn Fenwalker tankt (Threat-AoE mit Stun), Lanternbearer heilt (Ziel + AoE, Cooldowns) und Rogue Fern-/Nah-DPS liefert — solo mit zwei KI-Begleitern, im Koop mit rollengleichem Ersatz (max. 3)?
+- Setup: `ClassCatalog` (Rogue neu, Rollen + Spezial-Faktor 1,5), `ThreatTable` (Schaden 1:1, Slam +20, Heal gebucht), `DiabloSkills` (Seismic Slam 7, Quick Shot 8, Blade Flurry 9, Mending Light 10, Renewing Circle 11; Basis-Set für alle), `PartyCompanion`/`PartyRoster` (folgen, Threat-/Leader-Ziel, Cooldown-Skills, Tod → Camp + Wiedereinstieg; Host-Reconcile mit Join-Gate), Heal-/Threat-Relay über `DiabloNetworkPlayer`/`HitValidator`.
+- Exit criterion: Autoplay je Klasse Exit 0, 0 Exceptions, Clear-Zeit Rogue/Heiler-Gruppe innerhalb ±25 % der Fenwalker-Gruppe — erfüllt (163,0 s / 132,6 s / 189,7 s, alle 8/8 Phasen, 0 Exceptions, FPS-Pass; siehe `docs/party-roles-run-log.md`); Koop-Paar Host-Tank + Client-Rogue Exit 0/0, KI-Rogue tritt zurück, KI-Heiler bleibt, Client ohne Phantom-KI.
+- Headless proof: EditMode 346/346 + PlayMode 228/228 (S6-Branch, inkl. Peer-Tests von `main`); Ergebnis-JSON trägt `partyRoles`/`huskKills`/`healsCast`/`hpRestored`.
+- Windows: `stage-windows.sh` → `shotcheck-windows.sh` OK, Shots 26–29 (Slam, Quick Shot, Flurry, Renewing Circle).
+- Grenze: Heals 0 in God-Läufen (God-Held hält alle Aggro, Begleiter unverletzt) — Heil-Mechanik über `SoloPartyTests`/`PartySkillTests` belegt; Non-God-Ausdauerlauf bleibt Follow-up.
