@@ -294,6 +294,86 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.5f);
         yield return Shot("session_complete");
 
+        // S5 itemization presentation: one ground drop per rarity with its own
+        // sprite + glow, the open bag with the shared details card (rolls and
+        // +/- deltas), and the open vendor with the sell column.
+        {
+            // Clear stage: session overlay off, hero back at Lantern Hold.
+            foreach (Transform child in hero.transform)
+                if (child.name == "SessionCanvas") child.gameObject.SetActive(false);
+            TeleportHero(hero, new Vector3(-2.0f, 1f, 11f));
+            yield return Wait(0.6f);
+            var inv = hero.GetComponent<Inventory>();
+            var eq = hero.GetComponent<Equipment>();
+            var rng = new System.Random(1234);
+            if (inv != null && eq != null)
+            {
+                // Clean stage: only the three S5 demo items in the bag.
+                inv.SetContents(new System.Collections.Generic.List<ItemInstance>());
+                var purse = hero.GetComponent<Wallet>();
+                if (purse != null && purse.Gold < 200) purse.Add(200);
+                var equipped = new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Magic,
+                    baseType = "ShortSword",
+                    itemLevel = 3,
+                    affixes = new System.Collections.Generic.List<Affix>
+                    {
+                        new Affix(AffixLibrary.Damage, 3f),
+                    },
+                };
+                equipped.EnsureIdentity();
+                eq.Equip(equipped);
+                var magic = new ItemInstance
+                {
+                    slot = ItemSlot.Armor,
+                    rarity = ItemRarity.Magic,
+                    baseType = "ClothTunic",
+                    itemLevel = 3,
+                    affixes = AffixLibrary.RollAffixes(ItemSlot.Armor, ItemRarity.Magic, rng, 1, 3),
+                };
+                var rare = new ItemInstance
+                {
+                    slot = ItemSlot.Weapon,
+                    rarity = ItemRarity.Rare,
+                    baseType = "ShortBow",
+                    itemLevel = 6,
+                    affixes = AffixLibrary.RollAffixes(ItemSlot.Weapon, ItemRarity.Rare, rng, 1, 6),
+                };
+                var unique = ItemDatabase.RollUnique(ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId), 6, 1);
+                foreach (var it in new[] { magic, rare, unique }) { it.EnsureIdentity(); inv.Add(it); }
+                Vector3 fwd = hero.transform.forward.sqrMagnitude > 0.01f ? hero.transform.forward.normalized : camFwd;
+                Vector3 anchor = hero.transform.position + fwd * 2.5f;
+                LootDrop.SpawnItem(anchor - Vector3.right * 1.2f, magic, false);
+                LootDrop.SpawnItem(anchor, rare, false);
+                LootDrop.SpawnItem(anchor + Vector3.right * 1.2f, unique, false);
+                Face(hero, fwd);
+                hero.distance = 6f;
+                hero.pitch = 42f;
+                yield return Wait(0.8f);
+                yield return Shot("s5_ground_rarities");
+                var invUi = hero.GetComponent<DiabloInventoryUI>();
+                if (invUi != null)
+                {
+                    invUi.SetOpen(true);
+                    invUi.ShowTab(DiabloInventoryUI.MenuTab.Bag);
+                    invUi.Refresh();
+                    yield return Wait(0.4f);
+                    yield return Shot("s5_inventory_details");
+                    invUi.SetOpen(false);
+                }
+                var vendorUi = hero.GetComponent<DiabloVendorUI>();
+                if (vendorUi != null)
+                {
+                    vendorUi.SetOpen(true);
+                    yield return Wait(0.4f);
+                    yield return Shot("s5_vendor");
+                    vendorUi.SetOpen(false);
+                }
+            }
+        }
+
         hero.distance = baseDist;
         hero.pitch = basePitch;
         DiabloClickController.ExternalDrive = false;

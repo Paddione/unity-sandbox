@@ -1,6 +1,6 @@
 # Progress – cinderreach-itemization
 
-Prozent: 67 %
+Prozent: 83 %
 
 ## Erledigt
 
@@ -22,7 +22,9 @@ Prozent: 67 %
 
 ## Nächste Schritte
 
-- S5 auf aktuellem main beginnen (Gegenstandsgrafik, ItemDetails-Vergleich, Equip/Verkauf/Wegwerfen + Shots).
+- S5 Gegenstandsgrafik/Inventar/Händler gelandet: `DiabloMenuArt.ArtKeyFor` + `ItemIcon(ItemInstance)` mit explizitem Map-Eintrag je auslieferbarer Basis (19, inkl. Starter-/Klassenwaffen und Heiltrank) und je Matrix-/Legacy-Unique (15 IDs); Bögen/Laternen bekommen eigene prozedurale Silhouetten. `LootDropView` (NEU) zeigt Boden-Sprite + Raritätsglanz aus `DiabloPalette.Rarity` (Magic blau/Rare gelb/Unique orange), rein aus dem S2-Snapshot abgeleitet (Host=Client=LateJoin). `ItemDetailsView` (NEU) ist die EINE Karte für Inventar UND Händler (Name/Rarität/Slot → Itemlevel/Altbestand → Rolls → +/-Deltas → Unique-Effekt; leere/untragbare Slots erklären Zustand+Aktion). Equip/Sell/Discard laufen sichtbar getrennt über Instanz-ID mit Notice-Feedback (volle Tasche/Ablehnung) und sofortigem Refresh; Discard spawnt dieselbe Instanz, Re-Pickup behält Rolls.
+- S5 EditMode 358/358 (inkl. Art-Coverage: jede Basis + jede Matrix-/Legacy-ID löst expliziten Key, kein Fallback-Unknown; Distinktions-Test). PlayMode 252/253 — einziger Fail der bekannte Vorbefund `DiabloMeleeReworkTests.Thrust_OutreachesHuskMelee` (schlägt auch auf sauberem main, kein S5-Regress); neu `ItemPresentationTests` 5/5 (Ground-Sprite+Glow je Rarität, Snapshot-Parität, Karten-Hierarchie/Deltas/Unique-Text, Equip→Discard→Re-Pickup mit Rolls-Erhalt, Volltasche/Ablehnung) und Vendor-S5 2/2 (SellById+Notice, Broke-Buy-Notice); Vendor-Filterlauf 10/10 (ItemPresentation+VendorLoop). `check-meta.py` OK (neue .cs je mit .meta).
+- S5-Shots (Linux-Player `-shotcheck`, je 960×540 + 1920×1080, RC 0): `artifacts/shots/s5-{960x540,1920x1080}/{35_s5_ground_rarities,36_s5_inventory_details,37_s5_vendor}.png` (sha16: 960er 76103aa4/9e5d9b10/3bf77515, 1920er dd7c2783/5475412f/d4c6f616). Sichtbefund: Boden-Drops je Rarität mit eigener Silhouette (Bogen/Laterne/Rüstung, Billboard) + Glanz; Tasche „Bag 3 of 20" mit Raritätsrahmen + Detailkarte (Name/Rarität/Slot → Itemlevel → Rolls → vs.-equipped-Deltas → Unique-Effekt) + getrennte Buttons „Equip selected"/„Discard selected"; Händler mit „Gold: 200", 6 Buy-Rows mit Preisen + Potion + getrennten Sell-Rows. Nebenbefund gefixt: Händler-Spalten/Row-Container hatten keine VerticalLayoutGroups (Rows überlappten).
 
 ## Offene Punkte
 

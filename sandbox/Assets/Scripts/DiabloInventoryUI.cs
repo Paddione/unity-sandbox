@@ -105,15 +105,58 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (relay != null && relay.IsSpawned)
         {
             var item = inventory.Get(index);
-            if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Equip, item);
+            if (item != null && relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Equip, item))
+                SetNotice($"Equipping {LootDrop.ItemLabel(item)}… (host confirms)");
+            else if (item != null) SetNotice($"Equip rejected: {LootDrop.ItemLabel(item)}.");
+            Refresh();
+            return;
+        }
+        var candidate = inventory.Get(index);
+        if (candidate != null && !Equipment.CanEquip(candidate, RunProfile.ClassId))
+        {
+            SetNotice($"{LootDrop.ItemLabel(candidate)} is for {ClassCatalog.Get(ItemDatabase.ClassRestriction(candidate.baseType)).displayName} only — sell or discard it instead.");
+            Refresh();
             return;
         }
         if (inventory.EquipFromBag(index, equipment))
         {
             if (health != null) health.Refresh();
             DiabloAudio.PlayUIClick();
-            Refresh();
+            SetNotice(candidate != null ? $"Equipped {LootDrop.ItemLabel(candidate)}." : "Equipped.");
         }
+        else SetNotice("Cannot equip that item.");
+        Refresh();
+    }
+
+    /// <summary>S5: equip by instance ID (visible Equip action routes here).</summary>
+    public bool EquipById(string instanceId)
+    {
+        EnsureBuilt();
+        if (inventory == null) return false;
+        int index = inventory.IndexOf(instanceId);
+        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        int before = equipment != null && equipment.GetEquipped(inventory.Get(index).slot) != null ? 1 : 0;
+        EquipIndex(index);
+        return true;
+    }
+
+    /// <summary>S5: discard by instance ID; spawns the same instance (S2 rule).</summary>
+    public bool DiscardById(string instanceId)
+    {
+        EnsureBuilt();
+        if (inventory == null) return false;
+        int index = inventory.IndexOf(instanceId);
+        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        return DiscardIndex(index);
+    }
+
+    /// <summary>Latest action feedback (full bag / rejected action). Test seam.</summary>
+    public string Notice { get; private set; } = "";
+    Text noticeText;
+    void SetNotice(string text)
+    {
+        Notice = text ?? "";
+        if (noticeText != null) noticeText.text = Notice;
     }
 
     /// <summary>Move an equipped slot back into the bag (button hook).</summary>
@@ -143,12 +186,23 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         EnsureBuilt();
         var item = inventory?.Get(index);
         if (item == null) return false;
+        string label = LootDrop.ItemLabel(item);
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned)
-            return relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Discard, item);
+        {
+            bool ok = relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Discard, item);
+            SetNotice(ok ? $"Discarded {label} (host confirms)." : $"Discard rejected: {label}.");
+            Refresh();
+            return ok;
+        }
         if (LootDrop.SpawnItem(transform.position + transform.forward * 1.5f, item, false) == null)
+        {
+            SetNotice($"Cannot drop {label} here.");
+            Refresh();
             return false;
+        }
         inventory.RemoveAt(index);
+        SetNotice($"Discarded {label} — walk over it to pick it back up.");
         Refresh();
         return true;
     }
@@ -171,6 +225,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             if (statsDetailText != null) statsDetailText.text = StatsBlock();
         }
         RebuildBag();
+        if (noticeText != null) noticeText.text = Notice;
         RefreshSettingsLabels();
         PaintTabs();
     }
@@ -205,16 +260,11 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         return string.Join(", ", parts.ToArray());
     }
 
-    /// <summary>Bag detail line: item label plus the comparison to the equipped item.</summary>
+    /// <summary>Bag detail line: the shared S5 item card (inventory reuse).</summary>
     string DetailFor(ItemInstance item)
     {
         var equipped = equipment != null ? equipment.GetEquipped(item.slot) : null;
-        string fit = Equipment.CanEquip(item, RunProfile.ClassId) ? ""
-            : $"<color={WorseColor}>{ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName} only</color>\n";
-        string effect = BuildUniqueEffects.EffectTextFor(item);
-        if (!string.IsNullOrEmpty(effect)) effect = $"<color=#ff7d1a>{effect}</color>\n";
-        return fit + effect + $"{LootDrop.ItemLabel(item)} vs {(equipped != null ? LootDrop.ItemLabel(equipped) : "empty slot")}:\n" +
-               CompareSummary(item, equipped);
+        return ItemDetailsView.Render(item, equipped);
     }
 
     public const string BetterColor = "#6fd36f";
@@ -421,6 +471,22 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         var detailLayout = bagDetailText.gameObject.AddComponent<LayoutElement>();
         detailLayout.minHeight = 120f;
         detailLayout.preferredHeight = 120f;
+        // S5: visible separate actions for the selected (last) bag item.
+        var actionRow = new GameObject("BagActions");
+        actionRow.transform.SetParent(bagPage.transform, false);
+        var ahz = actionRow.AddComponent<HorizontalLayoutGroup>();
+        ahz.spacing = 6f;
+        var equipBtn = MakeSmallButton(actionRow.transform, "Equip selected");
+        equipBtn.onClick.AddListener(() =>
+        {
+            if (inventory != null && inventory.Count > 0) EquipIndex(inventory.Count - 1);
+        });
+        var discardBtn = MakeSmallButton(actionRow.transform, "Discard selected");
+        discardBtn.onClick.AddListener(() =>
+        {
+            if (inventory != null && inventory.Count > 0) DiscardIndex(inventory.Count - 1);
+        });
+        noticeText = MakeLabel(bagPage.transform, "", 14);
     }
 
     void BuildStatsPage()

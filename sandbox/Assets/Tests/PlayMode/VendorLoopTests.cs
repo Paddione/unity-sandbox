@@ -121,4 +121,32 @@ public class VendorLoopTests
         Object.DestroyImmediate(vendorGo);
         yield return null;
     }
+
+    [UnityTest]
+    public IEnumerator S5_SellById_MovesGoldAndShowsNotice()
+    {
+        var wallet = player.GetComponent<Wallet>();
+        var inv = player.GetComponent<Inventory>();
+        wallet.Add(50);
+        inv.Add(ItemDatabase.CreateStarterSword());
+        string id = inv.Get(0).instanceId;
+        ui.SetOpen(true);
+        yield return null;
+        int before = wallet.Gold;
+        ui.SellById(id);
+        Assert.AreEqual(0, inv.Count);
+        Assert.Greater(wallet.Gold, before);
+        Assert.IsNotEmpty(ui.Notice);
+        ui.SetOpen(false);
+    }
+
+    [UnityTest]
+    public IEnumerator S5_BuyRejectedWhenBroke_ShowsNotice()
+    {
+        ui.SetOpen(true);
+        yield return null;
+        ui.BuyOffer(0);
+        Assert.IsNotEmpty(ui.Notice, "broke buy must explain itself");
+        ui.SetOpen(false);
+    }
 }

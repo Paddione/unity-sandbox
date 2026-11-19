@@ -140,6 +140,26 @@ public sealed class DiabloVendorUI : MonoBehaviour
         else SaveService.SaveNow(gameObject);
     }
 
+    /// <summary>Latest action feedback (funds/capacity/rejection). Test seam.</summary>
+    public string Notice { get; private set; } = "";
+    Text noticeText;
+    void SetNotice(string text)
+    {
+        Notice = text ?? "";
+        if (noticeText != null) noticeText.text = Notice;
+    }
+
+    /// <summary>S5: sell by instance ID (visible Sell action routes here).</summary>
+    public bool SellById(string instanceId)
+    {
+        EnsureBuilt();
+        if (inventory == null) return false;
+        int index = inventory.IndexOf(instanceId);
+        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        SellBagIndex(index);
+        return true;
+    }
+
     /// <summary>
     /// Buy offers[index] (button hook). Solo/offline applies instantly; with
     /// a session running the host validates (range, row, once-only) and the
@@ -152,13 +172,26 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (relay != null && relay.IsSpawned && CoopSessionRunning())
         {
             if (BuyPrecheck(index)) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Buy, stock.offers[index].item);
+            else SetNotice(BuyRejection(index));
+            Refresh();
             return;
         }
         if (stock != null && stock.TryBuy(index, wallet, inventory))
         {
             DiabloAudio.PlayLoot();
-            Refresh();
+            SetNotice($"Bought {LootDrop.ItemLabel(stock.offers[index].item)}.");
         }
+        else SetNotice(BuyRejection(index));
+        Refresh();
+    }
+
+    string BuyRejection(int index)
+    {
+        if (stock == null || index < 0 || index >= stock.offers.Count) return "That offer is gone.";
+        if (inventory != null && inventory.FreeSlots <= 0)
+            return $"Bag is full ({Inventory.Capacity}/{Inventory.Capacity}) — sell or discard first.";
+        if (wallet != null) return $"Need {stock.offers[index].price}g for that.";
+        return "Cannot buy right now.";
     }
 
     /// <summary>Local funds/bag/row pre-check before asking the host.</summary>
@@ -177,18 +210,22 @@ public sealed class DiabloVendorUI : MonoBehaviour
     public void SellBagIndex(int index)
     {
         EnsureBuilt();
+        var item = inventory?.Get(index);
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned && CoopSessionRunning())
         {
-            var item = inventory?.Get(index);
             if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Sell, item);
+            else SetNotice("Nothing to sell in that slot.");
+            Refresh();
             return;
         }
         if (VendorStock.TrySell(index, wallet, inventory))
         {
             DiabloAudio.PlayUIClick();
-            Refresh();
+            SetNotice(item != null ? $"Sold {LootDrop.ItemLabel(item)}." : "Sold.");
         }
+        else SetNotice("That sale was rejected (stale row or missing item).");
+        Refresh();
     }
 
     /// <summary>True while a co-op session replicates (host + client alike).</summary>
@@ -225,6 +262,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
             goldText.text = wallet != null ? $"Gold: {wallet.Gold}" : "Gold: —";
         RebuildVendor();
         RebuildBag();
+        if (noticeText != null) noticeText.text = Notice;
     }
 
     void RebuildVendor()
@@ -281,6 +319,12 @@ public sealed class DiabloVendorUI : MonoBehaviour
                 $"Sell {LootDrop.ItemLabel(item)} — +{price}g",
                 DiabloPalette.Rarity(item.rarity));
             btn.onClick.AddListener(() => SellBagIndex(index));
+        }
+        if (bagDetailText != null && inventory.Count > 0)
+        {
+            var last = inventory.Get(inventory.Count - 1);
+            bagDetailText.text = ItemDetailsView.Render(last, null);
+            bagDetailText.supportRichText = true;
         }
     }
 
@@ -341,21 +385,38 @@ public sealed class DiabloVendorUI : MonoBehaviour
 
         var vendorCol = new GameObject("VendorColumn");
         vendorCol.transform.SetParent(colsGo.transform, false);
+        var vendorLayout = vendorCol.AddComponent<VerticalLayoutGroup>();
+        vendorLayout.spacing = 4f;
+        vendorLayout.childControlWidth = true;
+        vendorLayout.childControlHeight = false;
         MakeLabel(vendorCol.transform, "Wares", 16);
         vendorDetailText = MakeLabel(vendorCol.transform, "", 13);
         var vendorRows = new GameObject("VendorRows");
         vendorRows.transform.SetParent(vendorCol.transform, false);
+        var vendorRowsLayout = vendorRows.AddComponent<VerticalLayoutGroup>();
+        vendorRowsLayout.spacing = 4f;
+        vendorRowsLayout.childControlWidth = true;
+        vendorRowsLayout.childControlHeight = false;
         vendorList = vendorRows.transform;
 
         var bagCol = new GameObject("BagColumn");
         bagCol.transform.SetParent(colsGo.transform, false);
+        var bagLayout = bagCol.AddComponent<VerticalLayoutGroup>();
+        bagLayout.spacing = 4f;
+        bagLayout.childControlWidth = true;
+        bagLayout.childControlHeight = false;
         MakeLabel(bagCol.transform, "Your bag", 16);
         bagDetailText = MakeLabel(bagCol.transform, "", 13);
         var bagRows = new GameObject("BagRows");
         bagRows.transform.SetParent(bagCol.transform, false);
+        var bagRowsLayout = bagRows.AddComponent<VerticalLayoutGroup>();
+        bagRowsLayout.spacing = 4f;
+        bagRowsLayout.childControlWidth = true;
+        bagRowsLayout.childControlHeight = false;
         bagList = bagRows.transform;
 
         MakeLabel(panelGo.transform, "V toggles, 1 drinks a potion, Esc or click outside closes (saves).", 13);
+        noticeText = MakeLabel(panelGo.transform, "", 14);
         var closeBtn = MakeSmallButton(panelGo.transform, "Close (saves)");
         closeBtn.onClick.AddListener(() => SetOpen(false));
         building = false;

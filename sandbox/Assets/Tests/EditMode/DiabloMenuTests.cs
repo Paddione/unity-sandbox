@@ -111,4 +111,44 @@ public class DiabloMenuTests
         Assert.IsNotNull(eq.weapon);
         Object.DestroyImmediate(go);
     }
+
+    [Test]
+    public void S5Art_EveryBaseAndMatrixUnique_HasExplicitKey()
+    {
+        var legacy = new[] { "Emberbrand Blade", "Lantern of the Hold", "Cryptwarden Plate", "Seer's Circlet", "Rogue's Keepsake" };
+        foreach (var b in DiabloMenuArt.AllArtBases)
+        {
+            var item = new ItemInstance { baseType = b, rarity = ItemRarity.Magic, slot = ItemSlot.Weapon };
+            Assert.AreNotEqual("unknown", DiabloMenuArt.ArtKeyFor(item), b);
+            Assert.IsNotNull(DiabloMenuArt.ItemIcon(item), b);
+        }
+        foreach (var id in ItemDatabase.MatrixUniqueIds)
+        {
+            var item = ItemDatabase.CreateUnique(id);
+            item.rarity = ItemRarity.Unique;
+            Assert.AreEqual("unique:" + id, DiabloMenuArt.ArtKeyFor(item), id);
+            Assert.IsNotNull(DiabloMenuArt.ItemIcon(item), id);
+        }
+        foreach (var id in legacy)
+        {
+            var item = ItemDatabase.CreateUnique(id);
+            item.rarity = ItemRarity.Unique;
+            Assert.AreEqual("unique:" + id, DiabloMenuArt.ArtKeyFor(item), id);
+            Assert.IsNotNull(DiabloMenuArt.ItemIcon(item), id);
+        }
+        Assert.AreEqual("unknown", DiabloMenuArt.ArtKeyFor(null));
+    }
+
+    [Test]
+    public void S5Art_DistinctBasesGiveDistinctSprites()
+    {
+        var sword = new ItemInstance { baseType = "ShortSword", rarity = ItemRarity.Magic, slot = ItemSlot.Weapon };
+        var bow = new ItemInstance { baseType = "ShortBow", rarity = ItemRarity.Magic, slot = ItemSlot.Weapon };
+        var lantern = new ItemInstance { baseType = "EmberCenser", rarity = ItemRarity.Magic, slot = ItemSlot.Weapon };
+        var sword2 = new ItemInstance { baseType = "HeavyAxe", rarity = ItemRarity.Magic, slot = ItemSlot.Weapon };
+        Assert.AreNotEqual(DiabloMenuArt.ArtKeyFor(sword), DiabloMenuArt.ArtKeyFor(bow));
+        Assert.AreNotEqual(DiabloMenuArt.ArtKeyFor(sword), DiabloMenuArt.ArtKeyFor(lantern));
+        Assert.AreNotEqual(DiabloMenuArt.ArtKeyFor(bow), DiabloMenuArt.ArtKeyFor(lantern));
+        Assert.AreNotEqual(DiabloMenuArt.ArtKeyFor(sword), DiabloMenuArt.ArtKeyFor(sword2));
+    }
 }

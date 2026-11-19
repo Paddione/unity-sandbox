@@ -96,15 +96,10 @@ public sealed class LootDrop : MonoBehaviour
     {
         item = rolled;
         if (item == null) return;
-        var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        visual.name = "LootVisual";
-        visual.transform.SetParent(transform, false);
-        visual.transform.localScale = Vector3.one * 0.5f;
-        Destroy(visual.GetComponent<Collider>());
-        var renderer = visual.GetComponent<Renderer>();
-        var color = new MaterialPropertyBlock();
-        color.SetColor("_BaseColor", ColorFor(item.rarity));
-        renderer.SetPropertyBlock(color);
+        var visual = transform.Find("LootVisual");
+        if (visual != null) Destroy(visual.gameObject);
+        // S5: ground sprite of the concrete item + rarity glow behind it.
+        LootDropView.ShowOn(gameObject, item);
         if (PresentationVfx.ShouldBeamFor(item.rarity))
             PresentationVfx.RareBeam(transform.position, item.rarity);
     }
@@ -215,7 +210,10 @@ public sealed class LootDrop : MonoBehaviour
         RecordPickup();
         DiabloAudio.PlayLoot();
         GetComponent<Collider>().enabled = false;
-        var visual = transform.Find("LootVisual");
-        if (visual != null) visual.gameObject.SetActive(false);
+        foreach (var n in new[] { "LootVisual", "ItemIcon", "RarityGlow" })
+        {
+            var visual = transform.Find(n);
+            if (visual != null) visual.gameObject.SetActive(false);
+        }
     }
 }

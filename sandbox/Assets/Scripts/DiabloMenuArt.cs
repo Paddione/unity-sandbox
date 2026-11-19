@@ -123,6 +123,123 @@ public static class DiabloMenuArt
     }
 
     /// <summary>
+    /// S5 art key: explicit map entry for every deliverable base and every
+    /// matrix/legacy unique ID. Never "unknown" for shippable items — the
+    /// fallback is reserved for null/empty inputs (test seam).
+    /// </summary>
+    public static string ArtKeyFor(ItemInstance item)
+    {
+        if (item == null) return "unknown";
+        if (item.rarity == ItemRarity.Unique && !string.IsNullOrEmpty(item.uniqueId)
+            && ItemDatabase.IsKnownUniqueId(item.uniqueId))
+            return "unique:" + item.uniqueId;
+        string b = (item.baseType ?? "").Trim();
+        if (b.Length == 0) return "unknown";
+        foreach (var known in AllArtBases)
+            if (string.Equals(b, known, System.StringComparison.OrdinalIgnoreCase))
+                return "base:" + known;
+        // Display-name variants (e.g. "Worn Short Sword") resolve by keyword.
+        string lower = b.ToLowerInvariant();
+        foreach (var known in AllArtBases)
+            if (lower.Contains(known.ToLowerInvariant())) return "base:" + known;
+        if (lower.Contains("potion")) return "base:Healing Potion";
+        return "base:" + b; // novel base: still explicit, drawn by family glyph
+    }
+
+    /// <summary>Every shippable base type with an explicit art entry.</summary>
+    public static readonly string[] AllArtBases =
+    {
+        "ShortSword", "HeavyAxe", "Dagger",
+        "Lantern", "HoodedLantern", "EmberCenser",
+        "RogueBlade", "ShortBow", "HuntingBow",
+        "Worn Short Sword", "Worn Lantern", "Worn Short Bow",
+        "ClothTunic", "LeatherVest", "Breastplate",
+        "Hood", "Helm", "Circlet", "Healing Potion",
+    };
+
+    /// <summary>S5 overload: icon for a concrete item (base + unique art).</summary>
+    public static Sprite ItemIcon(ItemInstance item, int size = 64)
+    {
+        if (item == null) return ItemIcon("", ItemRarity.Magic, size);
+        string key = $"icon_{ArtKeyFor(item)}_{item.rarity}_{size}";
+        return Get(key, () =>
+        {
+            string iconName = ResolveIconName(item.rarity == ItemRarity.Unique && !string.IsNullOrEmpty(item.uniqueId)
+                ? UniqueBaseFor(item.uniqueId) ?? item.baseType : item.baseType);
+            if (!string.IsNullOrEmpty(iconName))
+            {
+                var baked = Resources.Load<Sprite>("MenuArt/" + iconName);
+                if (baked != null) return baked;
+            }
+            return BuildGlyphSprite(item.baseType, item.uniqueId, item.rarity, size);
+        });
+    }
+
+    static string UniqueBaseFor(string uniqueId)
+    {
+        try
+        {
+            var t = ItemDatabase.CreateUnique(uniqueId);
+            return t != null ? t.baseType : null;
+        }
+        catch { return null; }
+    }
+
+    static Sprite BuildGlyphSprite(string baseType, string uniqueId, ItemRarity rarity, int size)
+    {
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        Color ink = DiabloPalette.Parchment;
+        // Unique items draw in warm ember ink so the silhouette itself reads
+        // "unique" even before the orange rim.
+        if (rarity == ItemRarity.Unique) ink = new Color(1f, 0.82f, 0.55f, 1f);
+        Color glow = DiabloPalette.Rarity(rarity);
+        float c = size * 0.5f;
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float dx = (x - c) / c, dy = (y - c) / c;
+                float r = Mathf.Sqrt(dx * dx + dy * dy);
+                Color px = new Color(0, 0, 0, 0);
+                if (GlyphHitEx(baseType, uniqueId, dx, dy)) px = ink;
+                if (r > 0.82f && r < 0.98f) px = Color.Lerp(px, glow, 0.85f);
+                tex.SetPixel(x, y, px);
+            }
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+    }
+
+    /// <summary>
+    /// Extended glyph dispatch: baked-family blades/chests/helms plus bow arcs
+    /// and lantern bodies so every deliverable base has a distinct silhouette.
+    /// </summary>
+    static bool GlyphHitEx(string baseType, string uniqueId, float dx, float dy)
+    {
+        string b = ((baseType ?? "") + " " + (uniqueId ?? "")).ToLowerInvariant();
+        bool isBow = b.Contains("bow");
+        bool isLantern = b.Contains("lantern") || b.Contains("censer");
+        if (isBow)
+        {
+            // Bow arc: ring segment on the right + horizontal string + arrow.
+            float r = Mathf.Sqrt(dx * dx + dy * dy);
+            bool arc = r > 0.42f && r < 0.55f && dx > -0.1f;
+            bool str = Mathf.Abs(dx + 0.05f) < 0.05f && dy > -0.5f && dy < 0.5f;
+            bool arrow = Mathf.Abs(dy) < 0.05f && dx > -0.6f && dx < 0.6f;
+            return arc || str || arrow;
+        }
+        if (isLantern)
+        {
+            // Lantern: body rectangle + cap + handle arch.
+            bool body = Mathf.Abs(dx) < 0.28f && dy > -0.45f && dy < 0.25f;
+            bool cap = Mathf.Abs(dx) < 0.34f && dy >= 0.25f && dy < 0.36f;
+            bool handle = (dx * dx + (dy - 0.1f) * (dy - 0.1f) > 0.16f)
+                && (dx * dx + (dy - 0.1f) * (dy - 0.1f) < 0.25f) && dy > 0.3f;
+            bool glowDot = dx * dx + dy * dy < 0.03f;
+            return body || cap || handle || glowDot;
+        }
+        return GlyphHit(baseType, dx, dy);
+    }
+
+    /// <summary>
     /// Blender-rendered icon when a baked sprite exists
     /// (Assets/Resources/MenuArt), else the procedural glyph. Rarity tints
     /// the slot frame, never the icon, so one bake serves all rarities.
@@ -180,6 +297,10 @@ public static class DiabloMenuArt
         if (lower.Contains("hood")) return "Hood";
         if (lower.Contains("helm") || lower.Contains("helmet")) return "Helm";
         if (lower.Contains("circlet") || lower.Contains("crown")) return "Circlet";
+        if (lower.Contains("lantern") || lower.Contains("censer")) return "HoodedLantern";
+        if (lower.Contains("bow")) return "ShortBow";
+        if (lower.Contains("rogueblade") || lower.Contains("rogue blade")) return "Dagger";
+        if (lower.Contains("potion")) return "";
         return "";
     }
 
