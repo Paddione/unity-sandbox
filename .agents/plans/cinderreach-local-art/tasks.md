@@ -2,7 +2,7 @@
 title: Lokale Art-Pipeline für Cinderreach
 slug: cinderreach-local-art
 domains: [art, unity, gpu]
-status: planned
+status: completed
 branch: feature/cinderreach-local-art
 repo_main: main
 tickets: none
