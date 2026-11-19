@@ -133,6 +133,7 @@ public sealed class PlayerHealth : MonoBehaviour
     /// <summary>Clamp current HP after equipment swaps change the max.</summary>
     public void Refresh()
     {
+        if (equipment == null) equipment = GetComponent<Equipment>();
         currentHP = Mathf.Clamp(CurrentHP, 0f, MaxHP);
     }
 

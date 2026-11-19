@@ -4,9 +4,11 @@ using UnityEngine;
 /// AI party member (cinderreach-party-roles S4). Fills a missing party role
 /// in solo play: follows the leader, fights the leader's fight with its own
 /// class kit (via <see cref="DiabloSkills.classOverride"/>) and — as a
-/// healer — mends injured allies. Simple by design: no loot, no inventory,
-/// no dialogue. Death waits out <see cref="RejoinDelay"/> at camp, then the
-/// companion rejoins at the leader.
+/// healer — mends injured allies. Simple by design: no loot runs, no bag, no
+/// dialogue. Gear is equipped onto the companion by the player
+/// (<see cref="Equip"/>) and its level mirrors the protagonist
+/// (<see cref="DiabloProgression.MirrorHeroProgress"/>). Death waits out
+/// <see cref="RejoinDelay"/> at camp, then the companion rejoins at the leader.
 /// </summary>
 public sealed class PartyCompanion : MonoBehaviour
 {
@@ -29,6 +31,25 @@ public sealed class PartyCompanion : MonoBehaviour
     public Transform leader;
 
     public ClassDefinition Role => ClassCatalog.Get(classId);
+
+    /// <summary>Itemized gear (party-team): the companion's own three slots, never null after spawn.</summary>
+    public Equipment Gear => GetComponent<Equipment>();
+
+    /// <summary>
+    /// Equip an item onto the companion (party-team itemization). Class-bound
+    /// weapons only fit the companion's own class, like the hero's bag.
+    /// False without gear, without an item, or on a class mismatch.
+    /// </summary>
+    public bool Equip(ItemInstance item)
+    {
+        var gear = Gear;
+        if (gear == null || item == null) return false;
+        if (!Equipment.CanEquip(item, classId)) return false;
+        gear.Equip(item);
+        var hp = GetComponent<PlayerHealth>();
+        if (hp != null) hp.Refresh();
+        return true;
+    }
 
     DiabloSkills skills;
     DiabloMelee melee;

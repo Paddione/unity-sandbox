@@ -39,6 +39,7 @@ public sealed class PartyRoster : MonoBehaviour
             if (c == null) { companions.RemoveAt(i); continue; }
             if (c.RejoinDue) c.Rejoin();
         }
+        SyncCompanionLevels();
         ServerReconcile();
     }
 
@@ -152,17 +153,34 @@ public sealed class PartyRoster : MonoBehaviour
             DisconnectNewestExtra(NetworkManager.Singleton);
             return;
         }
+        ApplyRemoteRoles(remote);
+    }
+
+    /// <summary>
+    /// Join/leave path (party-team test seam, also used by the host): one
+    /// same-role companion steps aside per joining role, leavers refill the
+    /// roster back to a full party. Returns the removed count, or -1 when the
+    /// join gate trips (then nothing changes).
+    /// </summary>
+    public int ApplyRemoteRoles(IList<ClassDefinition.PartyRole> remoteRoles)
+    {
+        var remote = remoteRoles ?? new List<ClassDefinition.PartyRole>();
+        var humans = new List<ClassDefinition.PartyRole> { RunProfile.Class.role };
+        humans.AddRange(remote);
+        if (NeedsJoinGate(humans.Count)) return -1;
         var compRoles = new List<ClassDefinition.PartyRole>();
         foreach (var c in companions)
             if (c != null) compRoles.Add(c.Role.role);
         var pending = new List<ClassDefinition.PartyRole>(ReconcileRoles(compRoles, remote));
+        int removed = 0;
         for (int i = companions.Count - 1; i >= 0; i--)
         {
             var c = companions[i];
             if (c == null) { companions.RemoveAt(i); continue; }
-            if (pending.Contains(c.Role.role)) { pending.Remove(c.Role.role); RemoveCompanion(c); }
+            if (pending.Contains(c.Role.role)) { pending.Remove(c.Role.role); RemoveCompanion(c); removed++; }
         }
         if (humans.Count + companions.Count < PartySize) FillMissingRoles(humans);
+        return removed;
     }
 
     /// <summary>
@@ -234,16 +252,49 @@ public sealed class PartyRoster : MonoBehaviour
         float angle = companions.Count * 2.1f;
         go.transform.position = spawn + new Vector3(Mathf.Cos(angle) * 2f, 0.1f, Mathf.Sin(angle) * 2f);
         Tint(go, cls.role);
+        go.AddComponent<Equipment>(); // before PlayerHealth: MaxHP counts gear from the start
+        var comp = go.AddComponent<PartyCompanion>();
+        comp.classId = cls.id;
+        comp.leader = leader;
         go.AddComponent<PlayerHealth>();
         go.AddComponent<DiabloProgression>(); // class scaling for its kit; XP still flows to "Player" only
         go.AddComponent<DiabloSkills>();
         go.AddComponent<DiabloMelee>();
-        var comp = go.AddComponent<PartyCompanion>();
-        comp.classId = cls.id;
-        comp.leader = leader;
         companions.Add(comp);
+        // New companions arrive on the protagonist's level (party-team).
+        var heroProg = leader != null ? leader.GetComponent<DiabloProgression>() : null;
+        if (heroProg != null) go.GetComponent<DiabloProgression>().MirrorHeroProgress(heroProg);
         Debug.Log($"[Party] {cls.displayName} joins the party ({cls.role}).");
         return comp;
+    }
+
+    /// <summary>Keep AI companions on the protagonist's level (party-team).</summary>
+    void SyncCompanionLevels()
+    {
+        if (leader == null) return;
+        var heroProg = leader.GetComponent<DiabloProgression>();
+        if (heroProg == null) return;
+        int key = SyncKey(heroProg);
+        if (key == lastSyncKey) return;
+        lastSyncKey = key;
+        foreach (var c in companions)
+        {
+            if (c == null) continue;
+            var prog = c.GetComponent<DiabloProgression>();
+            if (prog != null) prog.MirrorHeroProgress(heroProg);
+        }
+    }
+
+    int lastSyncKey;
+
+    static int SyncKey(DiabloProgression p)
+    {
+        var s = p.Sheet;
+        int h = p.Level * 397 ^ p.Xp;
+        if (s != null)
+            h = h * 397 ^ (s.strength * 31 + s.vitality * 17 + s.focus * 13
+                + s.freeAttributePoints * 7 + s.freeSkillPoints);
+        return h;
     }
 
     static void Tint(GameObject go, ClassDefinition.PartyRole role)

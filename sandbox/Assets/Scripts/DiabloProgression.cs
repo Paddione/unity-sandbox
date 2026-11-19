@@ -22,6 +22,12 @@ public sealed class DiabloProgression : MonoBehaviour
     public const int XpChest = 5;
     public const int XpBoss = 120; // S5: The Hollow Abbot (Level 6 Meile)
 
+    /// <summary>True for AI companions (their progression mirrors the hero, never saves or HUDs).</summary>
+    public bool IsCompanion =>
+        companionFlag || GetComponent<PartyCompanion>() != null;
+
+    bool companionFlag;
+
     public int Level { get; private set; } = 1;
     public int Xp { get; private set; }
 
@@ -114,7 +120,7 @@ public sealed class DiabloProgression : MonoBehaviour
         if (!sheet.SpendAttribute(attribute)) return false;
         var hp = GetComponent<PlayerHealth>();
         if (hp != null) hp.Refresh();
-        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        if (!IsCompanion && Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
         return true;
     }
 
@@ -123,7 +129,7 @@ public sealed class DiabloProgression : MonoBehaviour
     {
         var sheet = Sheet ?? (Sheet = new CharacterSheet());
         if (!sheet.SpendSkill(skill)) return false;
-        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        if (!IsCompanion && Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
         return true;
     }
 
@@ -138,7 +144,10 @@ public sealed class DiabloProgression : MonoBehaviour
 
     void Awake()
     {
-        if (Application.isPlaying && IsLocalHero()) DiabloAmbience.Ensure(transform);
+        // Companions are named before their components land, so the flag is
+        // already correct here (PartyCompanion itself is attached later).
+        companionFlag = gameObject.name.StartsWith("Companion_");
+        if (Application.isPlaying && IsLocalHero() && !IsCompanion) DiabloAmbience.Ensure(transform);
     }
 
     bool IsLocalHero()
@@ -204,12 +213,40 @@ public sealed class DiabloProgression : MonoBehaviour
     void OnLevelUp()
     {
         LevelUps++;
-        SaveService.SaveNow(gameObject); // S2 autosave: level-up
         var hp = GetComponent<PlayerHealth>();
         if (hp != null) hp.Heal(hp.MaxHP);
+        if (IsCompanion) return; // mirrored levels stay quiet: no save, no fanfare
+        SaveService.SaveNow(gameObject); // S2 autosave: level-up
         Debug.Log($"[Diablo] Level up: {Level} (max life {(hp != null ? hp.MaxHP : 0f):0}).");
         DiabloAudio.PlayLevelUp();
         if (Application.isPlaying) StartCoroutine(LevelUpMoment());
+    }
+
+    /// <summary>
+    /// Keep AI companions on the protagonist's level (party-team): quietly
+    /// copy level, XP, attributes and skill ranks. No level-up fanfare, no
+    /// autosave, no XP bar — the companion fights at the hero's power without
+    /// touching the save. Clamps to <see cref="MaxLevel"/> like
+    /// <see cref="SetState(int, int)"/>.
+    /// </summary>
+    public void MirrorHeroProgress(DiabloProgression hero)
+    {
+        if (hero == null || hero == this) return;
+        Level = Mathf.Clamp(hero.Level, 1, MaxLevel);
+        Xp = Level >= MaxLevel ? 0 : Mathf.Max(0, hero.Xp);
+        var src = hero.Sheet;
+        if (src != null)
+        {
+            if (Sheet == null) Sheet = new CharacterSheet();
+            Sheet.freeAttributePoints = Mathf.Max(0, src.freeAttributePoints);
+            Sheet.freeSkillPoints = Mathf.Max(0, src.freeSkillPoints);
+            Sheet.strength = Mathf.Max(0, src.strength);
+            Sheet.vitality = Mathf.Max(0, src.vitality);
+            Sheet.focus = Mathf.Max(0, src.focus);
+            Sheet.FromEntries(src.ToEntries());
+        }
+        var hp = GetComponent<PlayerHealth>();
+        if (hp != null) hp.Refresh();
     }
 
     /// <summary>flash → sting → banner → pillar → refill → banner out.</summary>
@@ -237,7 +274,7 @@ public sealed class DiabloProgression : MonoBehaviour
 
     void Update()
     {
-        if (!IsLocalHero()) return;
+        if (!IsLocalHero() || IsCompanion) return; // companions mirror the hero: no own XP bar
         EnsureHud();
         levelLabel.text = $"Lv {Level}";
     }

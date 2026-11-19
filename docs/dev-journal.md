@@ -743,3 +743,23 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Done: `git add` (Clean-Filter → Pointer `e53ae62d`, 130 B), Objekt liegt im gemeinsamen LFS-Store,
   `git lfs push` vor dem Land, damit CI-Checkout (`lfs: true`) und frische Klone materialisieren.
 - Belegt: Pointer im Index, `git lfs status` Git→LFS-Mapping ok, Post-Merge-CI-Run als Roundtrip-Beleg.
+
+## 2026-11-19 — Party-Team-Härtung: Spawn/Despawn-Beweise + ausrüstbare Begleiter auf Heldenniveau
+
+- Anlass: Eigner-Nachfrage auf party-roles (100 %) — Spawn/Despawn der KI-Begleiter zusammen mit
+  Teamplay testen; Team ausrüstbar machen und auf Protagonisten-Level halten. Goal
+  `.agents/goals/cinderreach-party-team/` (Q12), Plan `.agents/plans/cinderreach-party-team/tasks.md`.
+- Done: `PartyRoster.ApplyRemoteRoles` (Join/Leave-Seam, `-1` bei Join-Gate; `ServerReconcile`
+  delegiert dorthin — ein Pfad für Host und Tests); Spawn-Reihenfolge `Equipment` vor
+  `PlayerHealth` + sofortiger Level-Mirror; `SyncCompanionLevels` im `Update` (Key-gecacht);
+  `PartyCompanion.Gear`/`Equip` (Klassenbindung via `Equipment.CanEquip`); `DiabloProgression`
+  `.MirrorHeroProgress` (Level/XP/Attribute/Ränge, quiet) + Companion-Guards (kein Ambience-Target,
+  keine XP-Leiste, kein Save, keine Fanfare); `PlayerHealth.Refresh` pflegt `Equipment` nach.
+- Belegt: `PartyTeamLifecycleTests` 5/5 + `PartyGearLevelTests` 4/4 neu (je `.meta` mit
+  Unity-GUID, 32 Hex ohne Bindestriche — Bindestrich-Form wird vom Importer ignoriert);
+  EditMode 358/358 + PlayMode 262/262; `scripts/check-meta.py` OK;
+  `python3 ~/scripts/agent-workspace.py check` still.
+- Falle: Erster gefilterter Lauf meldete 0/0 — nicht der Filter (`;`-Liste funktioniert), sondern die
+  ungültigen `.meta`-GUIDs (Assets wurden ignoriert). Log-Signal: „does not have a valid GUID".
+- Grenze: Build-Spiegel statt eigener Begleiter-Skillung; keine Begleiter-UI (Equip-API belegt,
+  UI Follow-up). Kein Save-/Netz-Format angerührt.

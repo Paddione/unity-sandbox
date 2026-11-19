@@ -139,3 +139,21 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Headless proof: EditMode 346/346 + PlayMode 228/228 (S6-Branch, inkl. Peer-Tests von `main`); Ergebnis-JSON trägt `partyRoles`/`huskKills`/`healsCast`/`hpRestored`.
 - Windows: `stage-windows.sh` → `shotcheck-windows.sh` OK, Shots 26–29 (Slam, Quick Shot, Flurry, Renewing Circle).
 - Grenze: Heals 0 in God-Läufen (God-Held hält alle Aggro, Begleiter unverletzt) — Heil-Mechanik über `SoloPartyTests`/`PartySkillTests` belegt; Non-God-Ausdauerlauf bleibt Follow-up.
+
+## Q12 — Bleiben Begleiter im Kampf belegt und auf Heldenniveau?
+
+- Question: bleibt die Dreiergruppe belastbar, wenn Spawn/Despawn der KI-Begleiter im laufenden
+  Teamplay passieren (Join/Leave/Overfull/Tod) und die Begleiter Ausrüstung tragen und das
+  Heldenlevel spiegeln — ohne eigenen Loot-Bag, ohne Save-Formatänderung?
+- Setup: `PartyRoster.ApplyRemoteRoles` (Join/Leave-Seam, `-1` bei Join-Gate; `ServerReconcile`
+  delegiert), Spawn-Reihenfolge `Equipment` vor `PlayerHealth` (+ sofortiger Level-Mirror),
+  `SyncCompanionLevels` im `Update` (Key-gecacht), `PartyCompanion.Gear`/`Equip`
+  (Klassenbindung wie Helden-Bag), `DiabloProgression.MirrorHeroProgress` (Level/XP/Attribute/Ränge,
+  quiet: keine XP-Leiste, kein Autosave, keine Fanfare), `PlayerHealth.Refresh` pflegt `Equipment` nach.
+- Exit criterion: neue PlayMode-Tests grün — `PartyTeamLifecycleTests` (Spawn kämpft/heilt/hält Threat
+  in einem Durchlauf; Despawn genau der Beitrittsrolle, Rest heilt/schadet weiter; Leave füllt ganz
+  nach; Overfull `-1` ohne Mutation; Tod hält Slot bis Rejoin), `PartyGearLevelTests` (Gear ab Spawn,
+  Klassenbindung, Waffen-/Rang-Boost + echter Ziel-Heal, Mirror-Mathe, kein Begleiter-`XpCanvas`).
+- Headless proof: EditMode 358/358 + PlayMode 262/262 (dieser Branch, inkl. aller Party-Bestands-Tests).
+- Grenze: Begleiter-Build ist ein Spiegel des Helden (keine eigene Skillung); Begleiter-UI (Bag/Vendor)
+  bleibt Follow-up — Ausrüsten läuft über die `Equip`-API.
