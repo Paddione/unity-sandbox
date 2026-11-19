@@ -763,3 +763,20 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   ungültigen `.meta`-GUIDs (Assets wurden ignoriert). Log-Signal: „does not have a valid GUID".
 - Grenze: Build-Spiegel statt eigener Begleiter-Skillung; keine Begleiter-UI (Equip-API belegt,
   UI Follow-up). Kein Save-/Netz-Format angerührt.
+
+## 2026-11-19 — Party-Team-Builds: Server nach gpu-metal, Windows-Client, Coop- + E2E-Beleg
+
+- Anlass: Eigner-„ja" auf cinderreach-party-team (`a4e8aaf`) — Server-Build, Windows-Client,
+  Coop-Smoke und E2E-Join gegen gpu-metal auf dieser Maschine.
+- Done: `SandboxBuilder.BuildDiabloZoneServer` Succeeded (49,1 s, 92 MB), Smoke lokal
+  `[Net] Server started`; neuer Code im Build belegt (`MirrorHeroProgress` in
+  `Sandbox.Runtime.dll`); `rsync` nach `gpu-metal:~/diablo-server/` + `BUILD_INFO.json`
+  (`a4e8aaf`, `diablo-zone`); `diablo-server.service` restart, active, `[Net] Server started`.
+  `SandboxBuilder.BuildDiabloZoneWindows` Succeeded (40,7 s, 139 MB), `stage-windows.sh` OK
+  (`Games\cinderreach`, neuer Code in staged DLL belegt, Tests korrekterweise absent).
+- Belegt: Coop-Paar Host-Tank + Client-Rogue Exit 0/0 — Host 8/8 Phasen, 49 Kills, 1 Heal
+  (`exceptions=0`); Host-Log `[Party] Lanternbearer/Rogue joins`, `Rogue steps aside`,
+  `Rogue joins` (Leave-Refill), Client 0 `[Party]`-Zeilen. E2E: frischer Linux-Player
+  `-join 100.74.227.118:7778` → `[Net] Client connected: 1 (total=1)` auf beiden Seiten.
+- Grenze: 2 `ArgumentNullException` im Server-Log sind Vorbestand (`EnemyHealth.DropOrb`
+  baut Material mit gestripptem Shader — Server ohne Rendering), unberührt von diesem Commit.
