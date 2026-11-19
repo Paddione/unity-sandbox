@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
 
 /// <summary>
@@ -23,11 +24,25 @@ public static class DiabloTestFixture
         Physics.SyncTransforms();
     }
 
-    /// <summary>Frame-rate independent test wait (replaces per-file WaitSeconds).</summary>
+    /// <summary>Real-time ceiling for one WaitSeconds call beyond its game-time span.</summary>
+    public const float WaitRealtimeSlack = 30f;
+
+    /// <summary>
+    /// Frame-rate independent test wait (replaces per-file WaitSeconds). Fails
+    /// fast instead of spinning until the stall watchdog when game time stops
+    /// (Time.timeScale left at 0 by a pause/hit-stop that never restored).
+    /// </summary>
     public static IEnumerator WaitSeconds(float seconds)
     {
         float end = Time.time + seconds;
-        while (Time.time < end) yield return null;
+        float realDeadline = Time.realtimeSinceStartup + seconds + WaitRealtimeSlack;
+        while (Time.time < end)
+        {
+            if (Time.realtimeSinceStartup > realDeadline)
+                Assert.Fail($"WaitSeconds({seconds}) exceeded {WaitRealtimeSlack} s real time: " +
+                            $"Time.timeScale={Time.timeScale}, game clock stalled.");
+            yield return null;
+        }
     }
 
     /// <summary>

@@ -28,6 +28,9 @@ jobs:
           lfs: true
           persist-credentials: false
 
+      - name: Test runner scripts
+        run: python3 -m pytest scripts -q
+
       - name: Run Unity Tests
         run: bash scripts/run-unity-tests.sh
 

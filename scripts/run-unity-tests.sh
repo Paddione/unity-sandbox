@@ -27,6 +27,9 @@
 #
 # Filter-first convention: run the cheapest suite that can fail for the change.
 #   PLATFORMS="EditMode" bash scripts/run-unity-tests.sh   # one suite only
+#   TEST_FILTER="LayoutSeedTests" PLATFORMS=EditMode bash scripts/run-unity-tests.sh
+# Failing tests (name, first Assets/ frame, message) and the slowest
+# UNITY_TESTS_SLOWEST (default 5) tests are printed by scripts/unity_test_report.py.
 #
 # Usage (from the repo root): bash scripts/run-unity-tests.sh
 set -euo pipefail
@@ -95,6 +98,19 @@ if [ "${UNITY_TESTS_SKIP_WARMUP:-0}" != 1 ]; then
   bash "$PWD/scripts/unity-warmup.sh" "$artifacts" || exit 1
 fi
 
+# Filtered runs (iteration only; the gate runs unfiltered):
+#   TEST_FILTER   -> -testFilter   (semicolon list or regex of full test names)
+#   TEST_CATEGORY -> -testCategory (semicolon list)
+# A filter that matches nothing in a platform is not a failure there.
+filter_args=()
+report_args=(--slowest "${UNITY_TESTS_SLOWEST:-5}")
+if [ -n "${TEST_FILTER:-}" ]; then filter_args+=(-testFilter "$TEST_FILTER"); fi
+if [ -n "${TEST_CATEGORY:-}" ]; then filter_args+=(-testCategory "$TEST_CATEGORY"); fi
+if [ "${#filter_args[@]}" -gt 0 ]; then
+  report_args+=(--allow-empty)
+  echo "run-unity-tests: filtered run (${filter_args[*]}) — not a full gate."
+fi
+
 failed=0
 # shellcheck disable=SC2206
 platforms=(${PLATFORMS:-EditMode PlayMode})
@@ -106,7 +122,8 @@ for platform in "${platforms[@]}"; do
   # -quit would kill -runTests (dev-journal Q5): never pass it here.
   unity_run_watched run-unity-tests "$log" "$TIMEOUT" \
       "$editor" -batchmode -nographics -projectPath "$project" -runTests \
-      -testPlatform "$platform" -testResults "$result" -logFile "$log"
+      -testPlatform "$platform" -testResults "$result" -logFile "$log" \
+      "${filter_args[@]}"
   rc=$UNITY_RUN_RC
   if [ "$UNITY_RUN_END" != done ]; then
     # Stall or timeout: infra hang. Stop here so the lock goes to the next run.
@@ -118,27 +135,7 @@ for platform in "${platforms[@]}"; do
     tail -n 60 "$log" >&2 || true
     failed=1
   fi
-  if ! python3 - "$result" "$platform" <<'PY'
-import os
-from pathlib import Path
-import sys
-import xml.etree.ElementTree as ET
-
-path, platform = Path(sys.argv[1]), sys.argv[2]
-if not path.is_file():
-    raise SystemExit(f"{platform}: test result XML missing")
-root = ET.parse(path).getroot()
-total = int(root.get("total", "0"))
-failed = int(root.get("failed", "0"))
-passed = int(root.get("passed", "0"))
-summary = f"{platform}: {passed}/{total} passed, {failed} failed ({root.get('result')})"
-print(summary)
-if os.environ.get("GITHUB_STEP_SUMMARY"):
-    with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as stream:
-        stream.write(summary + "\n\n")
-if root.get("result") != "Passed" or total < 1 or failed:
-    raise SystemExit(1)
-PY
+  if ! python3 "$PWD/scripts/unity_test_report.py" "$result" "$platform" "${report_args[@]}"
   then
     [ "$failed" = 2 ] || failed=1
   fi

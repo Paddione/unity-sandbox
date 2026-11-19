@@ -47,3 +47,8 @@ sandbox/artifacts/
 
 # Shared skills linked by agent-resources.py
 /.agents/skills/
+
+# Test-run leftovers (crashed Unity runs, pytest)
+__pycache__/
+sandbox/mono_crash.*.json
+sandbox/Assets/InitTestScene*.unity*
