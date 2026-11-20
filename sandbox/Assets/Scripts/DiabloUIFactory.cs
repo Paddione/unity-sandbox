@@ -116,11 +116,24 @@ public static class DiabloUIFactory
 
     public static LayoutElement SetLayout(GameObject go, float prefH = -1f, float prefW = -1f, float flexW = -1f, float flexH = -1f)
     {
-        var le = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
+        var le = go.GetComponent<LayoutElement>();
+        if (le == null) le = go.AddComponent<LayoutElement>();
         if (prefH >= 0f) { le.preferredHeight = prefH; le.minHeight = prefH; }
         if (prefW >= 0f) { le.preferredWidth = prefW; le.minWidth = prefW; }
         if (flexW >= 0f) le.flexibleWidth = flexW;
         if (flexH >= 0f) le.flexibleHeight = flexH;
+        // Most panels run their layout groups with childControlHeight = false, which
+        // positions children by their RectTransform size and ignores LayoutElement.
+        // Mirror the preferred size onto the rect so those groups stack correctly
+        // (a fresh RectTransform is 100x100 and made every row 100 px tall).
+        var rt = go.transform as RectTransform;
+        if (rt != null)
+        {
+            var size = rt.sizeDelta;
+            if (prefH >= 0f) size.y = prefH;
+            if (prefW >= 0f) size.x = prefW;
+            rt.sizeDelta = size;
+        }
         return le;
     }
 
@@ -206,6 +219,19 @@ public static class DiabloUIFactory
             crt.anchoredPosition = new Vector2(-10f, 0f);
         }
         return go;
+    }
+
+    /// <summary>
+    /// Multi-line item cards (ItemDetailsView) vary from 2 to 10 lines; shrink
+    /// to fit the box instead of spilling past its frame.
+    /// </summary>
+    public static void FitToBox(Text t, int maxSize, int minSize = 9)
+    {
+        t.resizeTextForBestFit = true;
+        t.resizeTextMinSize = minSize;
+        t.resizeTextMaxSize = maxSize;
+        t.verticalOverflow = VerticalWrapMode.Truncate;
+        t.alignment = TextAnchor.UpperLeft;
     }
 
     public static void MakeDivider(Transform parent, float height = 6f)

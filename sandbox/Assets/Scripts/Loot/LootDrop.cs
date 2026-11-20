@@ -161,7 +161,38 @@ public sealed class LootDrop : MonoBehaviour
 
     public static string ItemLabel(ItemInstance item)
     {
-        return item.rarity == ItemRarity.Unique ? item.uniqueId : item.baseType;
+        return PrettyName(item.rarity == ItemRarity.Unique ? item.uniqueId : item.baseType);
+    }
+
+    /// <summary>
+    /// Player-facing name for stable ids: kebab unique ids ("bulwark-carrier",
+    /// "wick-of-the-halo") become title case, CamelCase base types ("ClothTunic")
+    /// get spaces. Ids themselves stay untouched (save, network, art keys).
+    /// </summary>
+    public static string PrettyName(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return raw ?? "";
+        var sb = new System.Text.StringBuilder(raw.Length + 8);
+        if (raw.IndexOf('-') >= 0 && raw.IndexOf(' ') < 0)
+        {
+            var words = raw.Split('-');
+            for (int i = 0; i < words.Length; i++)
+            {
+                string w = words[i];
+                if (w.Length == 0) continue;
+                if (sb.Length > 0) sb.Append(' ');
+                bool small = i > 0 && (w == "of" || w == "the" || w == "and");
+                sb.Append(small ? w : char.ToUpperInvariant(w[0]) + w.Substring(1));
+            }
+            return sb.ToString();
+        }
+        for (int i = 0; i < raw.Length; i++)
+        {
+            char c = raw[i];
+            if (i > 0 && char.IsUpper(c) && char.IsLower(raw[i - 1])) sb.Append(' ');
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     void OnTriggerEnter(Collider other)

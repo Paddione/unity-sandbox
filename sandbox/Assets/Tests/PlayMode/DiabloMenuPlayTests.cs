@@ -117,10 +117,13 @@ public class DiabloMenuPlayTests
 
         Assert.IsTrue(pause.IsOpen);
         Assert.IsTrue(DiabloClickController.ExternalDrive);
+        Assert.AreEqual(0f, Time.timeScale, "solo pause freezes the world");
+        Assert.IsTrue(pause.HoldsTime);
 
         pause.OpenInventory();
         yield return null;
         Assert.IsFalse(pause.IsOpen);
+        Assert.AreEqual(1f, Time.timeScale, "leaving the pause resumes time");
         Assert.IsTrue(invUi.IsOpen);
 
         invUi.SetOpen(false);

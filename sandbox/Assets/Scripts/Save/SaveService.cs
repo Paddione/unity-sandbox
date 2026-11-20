@@ -255,6 +255,26 @@ public static class SaveService
         Debug.Log($"[Save] Saved level {save.level} ({save.gold} gold, zone {save.zoneReached}).");
     }
 
+    /// <summary>
+    /// Read-only look at the save for menus (class, level, gold). Never backs
+    /// up, migrates on disk or marks corrupt; false for missing/unreadable/future.
+    /// </summary>
+    public static bool TryPeek(out SaveGame save, string path = null)
+    {
+        save = null;
+        string json;
+        try { json = File.ReadAllText(path ?? DefaultPath); }
+        catch (Exception) { return false; }
+        try
+        {
+            var outcome = SaveMigrations.Migrate(json, out save, out _);
+            if (outcome == SaveMigrations.Outcome.Current || outcome == SaveMigrations.Outcome.Migrated) return save != null;
+        }
+        catch (Exception) { }
+        save = null;
+        return false;
+    }
+
     static bool TryRead(string path, out SaveGame save)
     {
         save = null;

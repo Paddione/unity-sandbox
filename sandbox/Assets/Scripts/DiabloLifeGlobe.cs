@@ -19,6 +19,8 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
     Image fill;
     Text label;
     Text deathNotice;
+    Text deathSub;
+    Image deathVeil;
     Text hudStatusText;
     Text fpsText;
     float fpsSmooth = 60f;
@@ -60,7 +62,7 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         float cur = health.CurrentHP;
         fill.fillAmount = max > 0f ? cur / max : 0f;
         label.text = $"{Mathf.CeilToInt(cur)} / {Mathf.CeilToInt(max)}";
-        deathNotice.enabled = Time.time - PlayerHealth.LastDeathTime < DeathNoticeSeconds;
+        UpdateDeathVeil(Time.time - PlayerHealth.LastDeathTime);
 
         if (hudStatusText != null)
         {
@@ -152,14 +154,61 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         fr.anchoredPosition = new Vector2(-14f, -10f);
         fpsText.enabled = DiabloSettings.ShowFPS;
 
-        deathNotice = MakeText(canvasGo.transform, "DeathNotice", 30);
-        deathNotice.text = "You died - back at Lantern Hold";
-        deathNotice.color = new Color(0.95f, 0.25f, 0.2f, 1f);
+        deathVeil = MakeImage(canvasGo.transform, "DeathVeil", null, new Color(0.09f, 0.01f, 0.015f, 0f));
+        var vr = deathVeil.rectTransform;
+        vr.anchorMin = Vector2.zero;
+        vr.anchorMax = Vector2.one;
+        vr.offsetMin = vr.offsetMax = Vector2.zero;
+        deathVeil.raycastTarget = false;
+        deathVeil.enabled = false;
+
+        deathNotice = MakeText(canvasGo.transform, "DeathNotice", 54);
+        deathNotice.text = "YOU HAVE FALLEN";
+        deathNotice.fontStyle = FontStyle.Bold;
+        deathNotice.color = new Color(0.92f, 0.22f, 0.18f, 1f);
         var r = deathNotice.rectTransform;
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0.5f);
-        r.sizeDelta = new Vector2(800f, 60f);
-        r.anchoredPosition = new Vector2(0f, 120f);
+        r.sizeDelta = new Vector2(1000f, 80f);
+        r.anchoredPosition = new Vector2(0f, 60f);
         deathNotice.enabled = false;
+
+        deathSub = MakeText(canvasGo.transform, "DeathSub", 20);
+        deathSub.text = "The lantern light carries you back to Lantern Hold.";
+        var sr = deathSub.rectTransform;
+        sr.anchorMin = sr.anchorMax = sr.pivot = new Vector2(0.5f, 0.5f);
+        sr.sizeDelta = new Vector2(1000f, 36f);
+        sr.anchoredPosition = new Vector2(0f, 0f);
+        deathSub.enabled = false;
+    }
+
+    /// <summary>
+    /// Death beat: the screen snaps to a blood-dark veil with the title, holds,
+    /// then lifts over the respawn at Lantern Hold. Pure presentation; the
+    /// respawn itself stays instant (<see cref="PlayerHealth.DieAndRespawn"/>).
+    /// </summary>
+    public static float DeathVeilAlpha(float sinceDeath)
+    {
+        if (sinceDeath < 0f || sinceDeath >= DeathNoticeSeconds) return 0f;
+        const float hold = 1.1f;
+        if (sinceDeath <= hold) return 0.88f;
+        return Mathf.Lerp(0.88f, 0f, Mathf.SmoothStep(0f, 1f, (sinceDeath - hold) / (DeathNoticeSeconds - hold)));
+    }
+
+    void UpdateDeathVeil(float sinceDeath)
+    {
+        bool shown = sinceDeath >= 0f && sinceDeath < DeathNoticeSeconds;
+        deathNotice.enabled = shown;
+        if (deathSub != null) deathSub.enabled = shown;
+        if (deathVeil != null) deathVeil.enabled = shown;
+        if (!shown) return;
+        float a = DeathVeilAlpha(sinceDeath);
+        if (deathVeil != null) deathVeil.color = new Color(0.09f, 0.01f, 0.015f, a);
+        float textA = Mathf.Clamp01(a / 0.88f * 1.4f);
+        deathNotice.color = new Color(0.92f, 0.22f, 0.18f, textA);
+        if (deathSub != null) deathSub.color = new Color(DiabloPalette.Parchment.r, DiabloPalette.Parchment.g, DiabloPalette.Parchment.b, textA * 0.85f);
+        // Title settles from slightly large to rest size: a short "impact" read.
+        float s = 1f + 0.12f * Mathf.Clamp01(1f - sinceDeath / 0.5f);
+        deathNotice.rectTransform.localScale = new Vector3(s, s, 1f);
     }
 
     static void Place(RectTransform r, Vector2 anchor, Vector2 offset, float size)

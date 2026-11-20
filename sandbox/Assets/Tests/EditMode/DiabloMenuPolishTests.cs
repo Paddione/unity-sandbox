@@ -53,7 +53,7 @@ public class DiabloMenuPolishTests
     }
 
     [Test]
-    public void SkillIcons_ResolveAllSevenClassSkills()
+    public void SkillIcons_ResolveEveryClassSkill()
     {
         foreach (DiabloSkills.Skill sk in System.Enum.GetValues(typeof(DiabloSkills.Skill)))
             Assert.IsNotNull(DiabloMenuArt.SkillIcon(sk), $"Missing SkillIcon for {sk}");
@@ -189,5 +189,70 @@ public class DiabloMenuPolishTests
         Assert.IsFalse(pause.IsOpen);
         DiabloClickController.ExternalDrive = false;
         Object.DestroyImmediate(go);
+    }
+
+    [Test]
+    public void DeathVeil_SnapsDarkHoldsThenLifts()
+    {
+        Assert.AreEqual(0f, DiabloLifeGlobe.DeathVeilAlpha(-1f));
+        Assert.Greater(DiabloLifeGlobe.DeathVeilAlpha(0f), 0.8f, "death must read at once");
+        Assert.AreEqual(DiabloLifeGlobe.DeathVeilAlpha(0f), DiabloLifeGlobe.DeathVeilAlpha(1f), 1e-4f, "holds");
+        Assert.Less(DiabloLifeGlobe.DeathVeilAlpha(2.5f), DiabloLifeGlobe.DeathVeilAlpha(1.5f), "lifts");
+        Assert.AreEqual(0f, DiabloLifeGlobe.DeathVeilAlpha(DiabloLifeGlobe.DeathNoticeSeconds));
+    }
+
+    [Test]
+    public void ClassCards_UseRoleAndRealSkillCount()
+    {
+        foreach (var cls in ClassCatalog.All)
+        {
+            StringAssert.Contains($"{cls.skills.Length} Skills", ClassSelectUI.CardStatTag(cls));
+            Assert.IsNotNull(DiabloMenuArt.ClassPortrait(cls.id), $"portrait for {cls.id}");
+        }
+        Assert.AreNotEqual(ClassSelectUI.CardSubtitle(ClassCatalog.Rogue), ClassSelectUI.CardSubtitle(ClassCatalog.Fenwalker));
+        Assert.AreNotEqual(DiabloPalette.ClassAccent(ClassCatalog.RogueId), DiabloPalette.ClassAccent(ClassCatalog.FenwalkerId));
+        Assert.AreNotSame(DiabloMenuArt.ClassPortrait(ClassCatalog.RogueId), DiabloMenuArt.ClassPortrait(ClassCatalog.FenwalkerId));
+    }
+
+    [Test]
+    public void MainMenu_YieldsStartToClassSelectInGameScene()
+    {
+        var hero = new GameObject("ClassLookProbe").AddComponent<ClassAppearance>();
+        try
+        {
+            Assert.IsTrue(MainMenu.ClassSelectOwnsStart(new string[0]));
+            Assert.IsFalse(MainMenu.ClassSelectOwnsStart(new[] { "-shotcheck" }));
+        }
+        finally { Object.DestroyImmediate(hero.gameObject); }
+    }
+
+    [Test]
+    public void ContinueLabel_NamesSavedHeroWithoutTouchingTheFile()
+    {
+        string path = System.IO.Path.Combine(Application.temporaryCachePath, "menu-peek-test.json");
+        try
+        {
+            var save = new SaveGame { level = 7, gold = 321, classId = ClassCatalog.RogueId };
+            SaveService.WriteSave(save, path);
+            var before = System.IO.File.ReadAllText(path);
+            string label = ClassSelectUI.ContinueLabel(path);
+            StringAssert.Contains("ROGUE", label);
+            StringAssert.Contains("LEVEL 7", label);
+            StringAssert.Contains("321G", label);
+            Assert.AreEqual(before, System.IO.File.ReadAllText(path), "peek must not rewrite the save");
+            Assert.AreEqual("CONTINUE SAVED EXPEDITION", ClassSelectUI.ContinueLabel(path + ".missing"));
+        }
+        finally { if (System.IO.File.Exists(path)) System.IO.File.Delete(path); }
+    }
+
+    [Test]
+    public void ItemLabels_ArePlayerReadable()
+    {
+        Assert.AreEqual("Bulwark Carrier", LootDrop.PrettyName(ItemDatabase.BulwarkCarrierId));
+        Assert.AreEqual("Wick of the Halo", LootDrop.PrettyName(ItemDatabase.WickOfHaloId));
+        Assert.AreEqual("Cloth Tunic", LootDrop.PrettyName("ClothTunic"));
+        Assert.AreEqual("Worn Short Sword", LootDrop.PrettyName("Worn Short Sword"));
+        Assert.AreEqual("Rogue's Keepsake", LootDrop.PrettyName(ItemDatabase.RogueKeepsakeId));
+        Assert.AreEqual("Bulwark Carrier", LootDrop.ItemLabel(ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId)));
     }
 }

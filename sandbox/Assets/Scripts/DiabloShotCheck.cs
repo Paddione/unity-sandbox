@@ -431,6 +431,15 @@ public sealed class DiabloShotCheck : MonoBehaviour
 
         hero.distance = baseDist;
         hero.pitch = basePitch;
+
+        // Death beat (presentation only: no respawn teleport here).
+        PlayerHealth.LastDeathTime = Time.time;
+        yield return Wait(0.3f);
+        yield return Shot("death_veil");
+        yield return Wait(1.7f);
+        yield return Shot("death_veil_lifting");
+        PlayerHealth.LastDeathTime = float.NegativeInfinity;
+
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);
@@ -466,8 +475,9 @@ public sealed class DiabloShotCheck : MonoBehaviour
 
     static IEnumerator Wait(float seconds)
     {
-        float end = Time.time + seconds;
-        while (Time.time < end)
+        // Unscaled: the pause shot freezes Time.timeScale (solo pause).
+        float end = Time.unscaledTime + seconds;
+        while (Time.unscaledTime < end)
         {
             if (keepAlive != null) keepAlive.Heal(keepAlive.MaxHP);
             yield return null;

@@ -1192,6 +1192,20 @@ public sealed class DiabloSkills : MonoBehaviour
         canvasGo.transform.SetParent(transform, false);
         DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: false);
 
+        // Bronze HUD plate under skills, key labels and the XP bar (XpCanvas sorts above at 6),
+        // so the bar reads against bright town paving and dark fen alike.
+        var plateGo = new GameObject("HudPlate", typeof(RectTransform));
+        plateGo.transform.SetParent(canvasGo.transform, false);
+        var plate = plateGo.AddComponent<Image>();
+        plate.sprite = DiabloMenuArt.PanelBackground();
+        plate.type = Image.Type.Sliced;
+        plate.color = new Color(1f, 1f, 1f, 0.92f);
+        plate.raycastTarget = false;
+        var prt = plate.rectTransform;
+        prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0f);
+        prt.sizeDelta = new Vector2(880f, 100f);
+        prt.anchoredPosition = new Vector2(0f, -6f);
+
         var rowGo = new GameObject("SkillSlotsRow", typeof(RectTransform));
         rowGo.transform.SetParent(canvasGo.transform, false);
         var rrt = rowGo.GetComponent<RectTransform>();
@@ -1211,7 +1225,7 @@ public sealed class DiabloSkills : MonoBehaviour
         hud.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         hud.fontSize = 14;
         hud.alignment = TextAnchor.MiddleCenter;
-        hud.color = DiabloPalette.ParchmentDim;
+        hud.color = DiabloPalette.Parchment;
         hud.horizontalOverflow = HorizontalWrapMode.Overflow;
         hud.raycastTarget = false;
         go.AddComponent<Shadow>();

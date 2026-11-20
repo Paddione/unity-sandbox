@@ -26,11 +26,14 @@ public static class DiabloPalette
     public static readonly Color GoldBright = new Color(0.98f, 0.80f, 0.28f, 1f);
     public static readonly Color LanternEmber = new Color(0.96f, 0.56f, 0.18f, 1f);
     public static readonly Color FenSteel = new Color(0.55f, 0.72f, 0.88f, 1f);
+    public static readonly Color RogueVerdant = new Color(0.56f, 0.80f, 0.46f, 1f); // #8FCC75 fen-moss
     public static readonly Color DisabledText = new Color(0.45f, 0.42f, 0.38f, 1f);
 
     public static Color ClassAccent(string classId)
     {
-        return classId == ClassCatalog.LanternbearerId ? LanternEmber : FenSteel;
+        if (classId == ClassCatalog.LanternbearerId) return LanternEmber;
+        if (classId == ClassCatalog.RogueId) return RogueVerdant;
+        return FenSteel;
     }
 
     public static Color Rarity(ItemRarity rarity)

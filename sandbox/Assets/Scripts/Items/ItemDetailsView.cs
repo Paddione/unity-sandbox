@@ -33,8 +33,8 @@ public sealed class ItemDetailsView : MonoBehaviour
     {
         if (item == null) return "Empty slot — no item here.";
         var sb = new System.Text.StringBuilder();
-        string name = item.rarity == ItemRarity.Unique && !string.IsNullOrEmpty(item.uniqueId)
-            ? item.uniqueId : item.baseType;
+        string name = LootDrop.PrettyName(item.rarity == ItemRarity.Unique && !string.IsNullOrEmpty(item.uniqueId)
+            ? item.uniqueId : item.baseType);
         sb.AppendLine($"{name} [{item.rarity}] ({item.slot})");
         sb.AppendLine(item.itemLevel <= 0
             ? "Item level: legacy stock (Altbestand, pre-level scaling)"

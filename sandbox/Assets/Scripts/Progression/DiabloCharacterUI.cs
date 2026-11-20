@@ -31,6 +31,9 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     readonly List<(DiabloSkills.Skill skill, Text label, Button plus)> skillRows = new List<(DiabloSkills.Skill, Text, Button)>();
     string builtFor = "";
     Text variantText;
+    readonly List<(DiabloSkills.Skill skill, Button button, Text label)> variantButtons =
+        new List<(DiabloSkills.Skill, Button, Text)>();
+    public const string VariantLockedHint = "Variants change only solo in Lantern Hold.";
     bool building;
 
     /// <summary>Skills currently displayed on the sheet (class-reactive; test seam).</summary>
@@ -133,6 +136,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             if (plus != null) plus.interactable = sheet.freeSkillPoints > 0 && sheet.GetRank(skill) < CharacterSheet.MaxSkillRank;
         }
         if (variantText != null) variantText.text = VariantLines();
+        RefreshVariantButtons();
         if (!sheet.HasUnspent)
         {
             attrPointsText.rectTransform.localScale = Vector3.one;
@@ -149,14 +153,14 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
             float radius = SkillVariantCatalog.CleaveRadiusFor(skills, variant);
             float arc = SkillVariantCatalog.CleaveArcFor(variant);
-            string shape = arc >= 360f ? "rundum" : $"{arc:0}°-Kegel";
+            string shape = arc >= 360f ? "360°" : $"{arc:0}° cone";
             line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {shape}, {radius:0.0} m)";
         }
         else if (skill == DiabloSkills.Skill.SearingHalo)
         {
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
             float dur = SkillVariantCatalog.HaloDurationFor(variant);
-            string mode = dur > 0f ? $"ortsfest, {dur:0} s" : "mitlaufend, sofort";
+            string mode = dur > 0f ? $"stays {dur:0} s" : "moves with you";
             line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {mode})";
         }
         else if (skill == DiabloSkills.Skill.Wisps && skills != null)
@@ -219,6 +223,37 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         return ok;
     }
 
+    /// <summary>
+    /// Swap a variant skill to its other variant (button hook). Outside the
+    /// Hold or in co-op the detail line explains why nothing changed.
+    /// </summary>
+    public bool CycleVariant(DiabloSkills.Skill skill)
+    {
+        EnsureBuilt();
+        var ids = SkillVariantCatalog.VariantIds(RunProfile.Class.id, skill);
+        if (ids.Length < 2) return false;
+        string current = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
+        string next = current == ids[0] ? ids[1] : ids[0];
+        bool ok = TrySelectVariant(skill, next);
+        if (detailText != null)
+            detailText.text = ok ? SkillVariantCatalog.Describe(RunProfile.Class.id, skill, next, skills) : VariantLockedHint;
+        if (ok) DiabloAudio.PlayUIClick();
+        return ok;
+    }
+
+    void RefreshVariantButtons()
+    {
+        bool can = CanChangeVariant();
+        foreach (var (skill, button, label) in variantButtons)
+        {
+            if (button == null) continue;
+            button.interactable = can;
+            if (label != null)
+                label.text = SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill,
+                    RunProfile.GetSkillVariant(RunProfile.Class.id, skill));
+        }
+    }
+
     /// <summary>Sheet lines for the variant skills (preview == runtime values).</summary>
     public string VariantLines()
     {
@@ -233,11 +268,11 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             sb.Append($"{DiabloSkills.SkillName(skill)}: ");
             sb.Append(SkillVariantCatalog.Describe(cls.id, skill, current, skills));
         }
-        if (sb.Length == 0) sb.Append("Keine Varianten für diese Klasse.");
+        if (sb.Length == 0) sb.Append("No skill variants for this class.");
         else if (!CanChangeVariant())
         {
             sb.AppendLine();
-            sb.Append("Wechsel nur solo im Lantern Hold.");
+            sb.Append(VariantLockedHint);
         }
         return sb.ToString();
     }
@@ -252,6 +287,9 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 10);
 
         var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(530f, 650f), new Vector2(-18f, 0f));
+        // Six-skill classes (Lanternbearer) plus variant lines outgrow a fixed height: fit to content.
+        var fit = panelGo.AddComponent<ContentSizeFitter>();
+        fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         var pr = panelGo.GetComponent<RectTransform>();
         pr.anchorMin = new Vector2(1f, 0.5f);
         pr.anchorMax = new Vector2(1f, 0.5f);
@@ -346,6 +384,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
                 if (Application.isPlaying) Destroy(row); else DestroyImmediate(row);
             }
         skillRows.Clear();
+        variantButtons.Clear();
         var parent = skillSection != null ? skillSection : panelRoot;
         var cls = RunProfile.Class;
         for (int i = 0; i < cls.skills.Length; i++)
@@ -355,6 +394,14 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
                 $"[{cls.keys[i]}] {DiabloSkills.SkillName(skill)} — Gain rank up to {CharacterSheet.MaxSkillRank} to boost potency.", 44f);
             skillRows.Add((skill, text, plus));
+            if (SkillVariantCatalog.VariantIds(cls.id, skill).Length >= 2)
+            {
+                var sk = skill;
+                var vBtn = DiabloUIFactory.MakeSmallButton(text.transform.parent, "Variant", () => CycleVariant(sk), 30f, 118f);
+                vBtn.gameObject.name = "VariantButton";
+                vBtn.transform.SetSiblingIndex(plus.transform.GetSiblingIndex());
+                variantButtons.Add((skill, vBtn, vBtn.GetComponentInChildren<Text>()));
+            }
         }
         builtFor = cls.id;
     }

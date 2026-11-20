@@ -138,6 +138,15 @@ public sealed class ClassSelectUI : MonoBehaviour
         if (net != null) net.PublishClass();
     }
 
+    /// <summary>Continue button text with the saved hero when the save is readable.</summary>
+    public static string ContinueLabel(string path = null)
+    {
+        if (!SaveService.TryPeek(out SaveGame save, path))
+            return "CONTINUE SAVED EXPEDITION";
+        var cls = ClassCatalog.Get(save.classId);
+        return $"CONTINUE  —  {cls.displayName.ToUpperInvariant()}  •  LEVEL {save.level}  •  {save.gold}G  •  {(save.difficulty ?? RunProfile.Normal).ToUpperInvariant()}";
+    }
+
     void RefreshContinueAndDiff()
     {
         bool hasSave = SaveService.HasSave();
@@ -145,11 +154,13 @@ public sealed class ClassSelectUI : MonoBehaviour
         {
             continueBtn.gameObject.SetActive(hasSave);
             if (hasSave && continueLabel != null)
-                continueLabel.text = "CONTINUE SAVED EXPEDITION  (Restores level, gear & gold)";
+                continueLabel.text = ContinueLabel();
         }
         if (diffBadgeText != null) diffBadgeText.text = DiabloInventoryUI.DifficultyText();
         if (diffToggleBtn != null)
         {
+            // Locked: the badge already explains how to unlock Kindled, a dead button only repeats it.
+            diffToggleBtn.gameObject.SetActive(RunProfile.DifficultyUnlocked);
             diffToggleBtn.interactable = RunProfile.DifficultyUnlocked;
             DiabloUIFactory.StyleButtonActive(diffToggleBtn, RunProfile.Difficulty == RunProfile.Kindled,
                 RunProfile.DifficultyUnlocked ? $"Mode: {RunProfile.Difficulty}" : "Mode: Normal (Kindled locked)");
@@ -235,7 +246,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         // Class Selection Card Deck
         var cardsRow = new GameObject("CardsRow", typeof(RectTransform));
         cardsRow.transform.SetParent(mainContent.transform, false);
-        DiabloUIFactory.SetLayout(cardsRow, prefH: 505f, flexW: 1f);
+        DiabloUIFactory.SetLayout(cardsRow, prefH: 590f, flexW: 1f);
         var ch = cardsRow.AddComponent<HorizontalLayoutGroup>();
         ch.spacing = 18f;
         ch.childControlWidth = true;
@@ -327,7 +338,8 @@ public sealed class ClassSelectUI : MonoBehaviour
         frame.transform.SetParent(topRow.transform, false);
         DiabloUIFactory.SetLayout(frame, prefH: 124f, prefW: 124f);
         var fImg = frame.AddComponent<Image>();
-        fImg.sprite = DiabloMenuArt.SlotBackground(cls.id == ClassCatalog.LanternbearerId ? ItemRarity.Unique : ItemRarity.Rare);
+        fImg.sprite = DiabloMenuArt.SlotBackground(cls.role == ClassDefinition.PartyRole.Healer ? ItemRarity.Unique
+            : cls.role == ClassDefinition.PartyRole.Dps ? ItemRarity.Magic : ItemRarity.Rare);
         fImg.type = Image.Type.Sliced;
         fImg.raycastTarget = false;
 
@@ -360,11 +372,11 @@ public sealed class ClassSelectUI : MonoBehaviour
         nameLbl.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(nameLbl.gameObject, prefH: 32f, flexW: 1f);
 
-        string subtitle = cls.id == ClassCatalog.LanternbearerId ? "Pyromancer of the Iron Lantern" : "Oathbound Vanguard of the Fen";
+        string subtitle = CardSubtitle(cls);
         var subLbl = DiabloUIFactory.MakeText(headCol.transform, "ClassRole", subtitle, 14, DiabloPalette.TrimGold);
         DiabloUIFactory.SetLayout(subLbl.gameObject, prefH: 20f, flexW: 1f);
 
-        string statTag = cls.id == ClassCatalog.LanternbearerId ? "Starter: Worn Lantern  •  4 Skills" : "Starter: Worn Short Sword  •  3 Skills";
+        string statTag = CardStatTag(cls);
         var statLbl = DiabloUIFactory.MakeText(headCol.transform, "ClassTag", statTag, 13, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(statLbl.gameObject, prefH: 20f, flexW: 1f);
 
@@ -432,6 +444,26 @@ public sealed class ClassSelectUI : MonoBehaviour
     }
 
     static GameObject skillsLblHeight(GameObject go) => go;
+
+    /// <summary>Card role line, driven by the party role so new classes never inherit another's title.</summary>
+    public static string CardSubtitle(ClassDefinition cls)
+    {
+        switch (cls.role)
+        {
+            case ClassDefinition.PartyRole.Healer: return "Healer  •  Keeper of the Iron Lantern";
+            case ClassDefinition.PartyRole.Dps: return "Damage  •  Blade of the Ashen Paths";
+            default: return "Tank  •  Oathbound Vanguard of the Fen";
+        }
+    }
+
+    /// <summary>Starter weapon and real skill count (matches ClassAppearance.SwapStarterWeapon).</summary>
+    public static string CardStatTag(ClassDefinition cls)
+    {
+        string starter = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.StarterLanternBase
+            : cls.id == ClassCatalog.RogueId ? ItemDatabase.StarterBowBase
+            : ItemDatabase.StarterSwordBase;
+        return $"Starter: {starter}  •  {cls.skills.Length} Skills";
+    }
 
     static void Stretch(RectTransform rt)
     {

@@ -27,9 +27,19 @@ public sealed class MainMenu : MonoBehaviour
                 || a == "--net-client" || a == "--net-server")
                 return; // automation boots straight into gameplay
         if (Object.FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include) != null) return;
+        if (ClassSelectOwnsStart(args)) return;
         var go = new GameObject("MainMenu");
         go.AddComponent<MainMenu>().Open();
     }
+
+    /// <summary>
+    /// One start screen: in the game scene the startup/class screen
+    /// (<see cref="ClassSelectUI"/>) already offers Continue, Co-op, Settings
+    /// and Quit, so this legacy title would only stack a second screen above it.
+    /// </summary>
+    public static bool ClassSelectOwnsStart(string[] args) =>
+        ClassSelectUI.ShouldShow(args)
+        && Object.FindFirstObjectByType<ClassAppearance>(FindObjectsInactive.Include) != null;
 
     public void Open()
     {

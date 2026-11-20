@@ -28,6 +28,8 @@ public sealed class SessionComplete : MonoBehaviour
     Text goldVal;
     Text dropVal;
     Text kindledBanner;
+    Button pressOnBtn;
+    Text subLine;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void StampStart()
@@ -83,6 +85,9 @@ public sealed class SessionComplete : MonoBehaviour
         if (!string.IsNullOrEmpty(KindledFinaleReward.LastOfferLine)) LastSummary += "\n" + KindledFinaleReward.LastOfferLine;
 
         if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : "EXPEDITION COMPLETE";
+        if (pressOnBtn != null) pressOnBtn.gameObject.SetActive(!ActOneMode);
+        if (subLine != null) subLine.text = ActOneMode ? "The ash settles over Cinderreach."
+            : "The way to the Cinder Kiln stands open. Press on, or regroup in Lantern Hold.";
         if (timeVal != null) timeVal.text = $"{secs:0}s";
         if (killsVal != null) killsVal.text = kills.ToString();
         if (goldVal != null) goldVal.text = $"{gold}g";
@@ -124,6 +129,7 @@ public sealed class SessionComplete : MonoBehaviour
         headerTitle = hdr.transform.Find("BannerLabel")?.GetComponent<Text>();
 
         var sub = DiabloUIFactory.MakeText(panel.transform, "SessionSub", "The ash settles over Cinderreach.", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        subLine = sub;
         DiabloUIFactory.SetLayout(sub.gameObject, prefH: 24f, flexW: 1f);
         DiabloUIFactory.MakeDivider(panel.transform);
 
@@ -148,6 +154,9 @@ public sealed class SessionComplete : MonoBehaviour
         DiabloUIFactory.MakeDivider(panel.transform);
 
         var btnRow = DiabloUIFactory.MakeHorizontalRow(panel.transform, "SessionButtons", 16f, 52f);
+        // Mid-act boss (Abbot): the Kiln still waits, so staying on the spot is the natural next step.
+        pressOnBtn = DiabloUIFactory.MakeButton(btnRow.transform, "PressOnButton", "Press On", 18, false, DiabloPalette.Parchment, PressOn);
+        DiabloUIFactory.SetLayout(pressOnBtn.gameObject, prefH: 48f, flexW: 1f);
         var townBtn = DiabloUIFactory.MakeButton(btnRow.transform, "TownButton", "Return to Town", 18, true, DiabloPalette.GoldBright, ReturnToTown);
         DiabloUIFactory.SetLayout(townBtn.gameObject, prefH: 48f, flexW: 1f);
         var menuBtn = DiabloUIFactory.MakeButton(btnRow.transform, "MenuButton", "Main Menu", 18, false, DiabloPalette.Parchment, BackToMenu);
@@ -175,6 +184,15 @@ public sealed class SessionComplete : MonoBehaviour
         val.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(val.gameObject, prefH: 28f, flexW: 1f);
         return val;
+    }
+
+    /// <summary>Close the overlay and keep playing where the hero stands (mid-act only).</summary>
+    public void PressOn()
+    {
+        DiabloAudio.PlayUIClick();
+        if (canvas != null) canvas.enabled = false;
+        DiabloClickController.ExternalDrive = false;
+        Debug.Log("[Session] Pressing on.");
     }
 
     void ReturnToTown()

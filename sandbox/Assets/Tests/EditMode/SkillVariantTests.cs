@@ -1,6 +1,7 @@
 using System.IO;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// skill-variants S1: catalog defaults/fallbacks, Hold-gated selection,
@@ -98,6 +99,31 @@ public class SkillVariantTests
     }
 
     [Test]
+    public void CycleVariant_ButtonPathTogglesInHoldOnly()
+    {
+        hero = Hero();
+        hero.transform.position = HoldPos;
+        var ui = hero.GetComponent<DiabloCharacterUI>();
+        ui.SetOpen(true);
+        bool hasButton = false;
+        foreach (var b in hero.GetComponentsInChildren<Button>(true))
+            if (b.name == "VariantButton") hasButton = true;
+        Assert.IsTrue(hasButton, "Fenwalker Cleave row offers a visible variant switch");
+
+        Assert.IsTrue(ui.CycleVariant(DiabloSkills.Skill.Cleave));
+        Assert.AreEqual(SkillVariantCatalog.CleaveFrontalId,
+            RunProfile.GetSkillVariant(ClassCatalog.FenwalkerId, DiabloSkills.Skill.Cleave));
+        Assert.IsTrue(ui.CycleVariant(DiabloSkills.Skill.Cleave));
+        Assert.AreEqual(SkillVariantCatalog.CleaveRoundId,
+            RunProfile.GetSkillVariant(ClassCatalog.FenwalkerId, DiabloSkills.Skill.Cleave));
+
+        hero.transform.position = FenPos;
+        Assert.IsFalse(ui.CycleVariant(DiabloSkills.Skill.Cleave), "locked outside the Hold");
+        Assert.IsFalse(ui.CycleVariant(DiabloSkills.Skill.Fireball), "no variants on Fireball");
+        ui.SetOpen(false);
+    }
+
+    [Test]
     public void Selection_UnknownIdRejected()
     {
         hero = Hero();
@@ -122,7 +148,7 @@ public class SkillVariantTests
         var sheet = prog.Sheet;
         Assert.AreEqual(2, sheet.GetRank(DiabloSkills.Skill.Cleave));
         Assert.AreEqual(2, sheet.strength);
-        Assert.IsTrue(ui.VariantLines().Contains("Frontalschlag"));
+        Assert.IsTrue(ui.VariantLines().Contains("Frontal Arc"));
         Assert.IsTrue(ui.VariantLines().Contains("90"));
     }
 

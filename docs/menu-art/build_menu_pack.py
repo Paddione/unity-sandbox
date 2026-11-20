@@ -23,7 +23,7 @@ import bmesh
 from mathutils import Euler, Vector
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "Resources", "MenuArt")
+OUT_DIR = os.environ.get("CINDERREACH_OUT_DIR") or os.path.join(REPO_ROOT, "sandbox", "Assets", "Resources", "MenuArt")
 ADV_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "ThirdParty", "KayKit", "Adventurers")
 DUN_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "ThirdParty", "KayKit", "Dungeon", "Models")
 MOOR_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "Art", "BloodMoor")
@@ -163,7 +163,7 @@ def portrait_lighting(center):
 
 
 def render_portrait(name, fbx_file, tex_file, pose_deg, azimuth=-18, elevation=8,
-                    sat=0.78, val=0.84, tint=None, prop_fn=None):
+                    sat=0.78, val=0.84, tint=None, prop_fn=None, margin=1.08, head_room=0.08):
     m = make_materials()
     objs = import_fbx(os.path.join(ADV_DIR, "Characters", fbx_file))
     bind_texture(objs, os.path.join(ADV_DIR, "Characters", tex_file), roughness=0.58, metallic=0.14, sat=sat, val=val, tint=tint)
@@ -177,13 +177,13 @@ def render_portrait(name, fbx_file, tex_file, pose_deg, azimuth=-18, elevation=8
     meshes = [o for o in bpy.data.objects if o.type == "MESH"]
     lo, hi = H.bbox(meshes)
     portrait_z_lo = max(lo.z, 0.72)
-    portrait_z_hi = hi.z + 0.08
+    portrait_z_hi = hi.z + head_room
     portrait_center = Vector(((lo.x + hi.x) * 0.5, (lo.y + hi.y) * 0.5, (portrait_z_lo + portrait_z_hi) * 0.5))
     bust_proxy = H.add_box("_BustFrameProxy", (1.28, 0.85, portrait_z_hi - portrait_z_lo),
                            location=portrait_center)
     bust_proxy.hide_render = True
     cam = H.add_camera("PortraitCam", location=(0, -4, 1.3), target=portrait_center, lens=55.0)
-    H.frame_objects(cam, [bust_proxy], azimuth=azimuth, elevation=elevation, margin=1.08, target=portrait_center)
+    H.frame_objects(cam, [bust_proxy], azimuth=azimuth, elevation=elevation, margin=margin, target=portrait_center)
     portrait_lighting(portrait_center)
 
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -269,6 +269,39 @@ def build_portrait_vendor():
     # Tone bright emerald rogue cloak down into weathered dark-fantasy moss-bronze leather!
     return render_portrait("PortraitVendor", "Rogue_Hooded.fbx", "rogue_texture.png", pose,
                            azimuth=-16, elevation=8, sat=0.52, val=0.72, tint="#8a7468", prop_fn=attach_gold)
+
+
+def build_portrait_rogue():
+    pose = {
+        "spine": (4, 0, 10),
+        "chest": (3, 0, 10),
+        "head": (2, 0, -14),
+        "upperarm.l": (-60, 0, -22),
+        "lowerarm.l": (-22, 0, -40),
+        "upperarm.r": (-34, 0, 40),
+        "lowerarm.r": (-10, 0, 60),
+    }
+
+    def attach_daggers(arm, m):
+        objs = []
+        for side, rot in (("r", (70, -20, -10)), ("l", (70, 20, 10))):
+            hand = bone_world_pos(arm, f"handslot.{side}")
+            dag = import_fbx(os.path.join(ADV_DIR, "Accessories", "dagger.fbx"))
+            bind_texture(dag, os.path.join(ADV_DIR, "Characters", "rogue_texture.png"), roughness=0.22, metallic=0.9)
+            for o in dag:
+                o.location = hand + Vector((0.0, -0.03, -0.02))
+                o.rotation_euler = Euler([math.radians(a) for a in rot])
+                o.scale = (0.9, 0.9, 0.9)
+            objs += dag
+        chest = bone_world_pos(arm, "chest")
+        H.add_light("POINT", "RogueEmber", location=(chest.x - 0.5, chest.y - 0.7, chest.z + 0.2),
+                    energy=60.0, light_color="#ff6a2a", shadow_soft=0.2)
+        return objs
+
+    # Game rig (Rogue.fbx, not the hooded vendor model) with twin daggers; desaturated like the other heroes.
+    return render_portrait("PortraitRogue", "Rogue.fbx", "rogue_texture.png", pose,
+                           azimuth=-14, elevation=8, sat=0.66, val=0.76, prop_fn=attach_daggers,
+                           margin=1.22, head_room=0.22)
 
 
 # --------------------------------------------------------------------------- 7 SKILL ICONS & 4 BADGES
@@ -463,6 +496,97 @@ def build_skill_veil_step():
         parts.append(H.add_tube(f"VeilStreak{i}", pts, radius=0.036, mat=m["veil_violet"] if i != 1 else m["cyan_rune"],
                                 taper=[0.1, 0.9, 0.3]))
     return render_icon_objs("SkillVeilStep", parts, azimuth=16, elevation=10, margin=1.14)
+
+
+def build_skill_quick_shot():
+    m = make_materials()
+    parts = []
+    # Three parallel arrows fanned flat, each with a short cyan speed wake: "many, fast".
+    for i, off in enumerate((-0.16, 0.0, 0.16)):
+        z = off
+        shaft = H.add_cylinder(f"QShaft{i}", 0.016, 0.62, location=(0.02, -0.02 + i * 0.01, z),
+                               rotation=(0, 90, 0), mat=m["gold"])
+        tip = H.add_cone(f"QTip{i}", 0.07, 0.18, radius_top=0.002, location=(0.41, -0.02 + i * 0.01, z),
+                         rotation=(0, 90, 0), mat=m["steel"], vertices=4)
+        tip.scale = (0.45, 0.7, 1.0)
+        fl = H.add_box(f"QFletch{i}", (0.12, 0.012, 0.05), location=(-0.26, -0.02, z), mat=m["crimson"], bevel=0.004)
+        wake = H.add_tube(f"QWake{i}", [(-0.46, 0.02, z), (-0.30, 0.01, z), (-0.12, 0.0, z)],
+                          radius=0.03, mat=m["cyan_rune"], taper=[0.05, 0.5, 0.9])
+        parts += [shaft, tip, fl, wake]
+    ring = H.add_torus("QRing", major=0.40, minor=0.016, location=(0, 0.08, 0), rotation=(90, 0, 0), mat=m["brass"])
+    parts.append(ring)
+    return render_icon_objs("SkillQuickShot", parts, azimuth=0, elevation=4, margin=1.10)
+
+
+def build_skill_blade_flurry():
+    m = make_materials()
+    parts = []
+    # Ring of four daggers spinning around a crimson vortex.
+    for i in range(4):
+        a = i * 90 + 20
+        r = 0.26
+        x, z = r * math.cos(math.radians(a)), r * math.sin(math.radians(a))
+        blade = H.add_cone(f"FBlade{i}", 0.06, 0.34, radius_top=0.004, location=(x, -0.02, z),
+                           rotation=(0, -a + 180, 0), mat=m["steel"], vertices=4)
+        blade.scale = (0.8, 0.3, 1.0)
+        parts.append(blade)
+    for i in range(3):
+        a0 = i * 120
+        pts = [(0.36 * math.cos(math.radians(a0 + d)), -0.05, 0.36 * math.sin(math.radians(a0 + d))) for d in (0, 35, 70)]
+        parts.append(H.add_tube(f"FSwirl{i}", pts, radius=0.03, mat=m["crimson_slash"], taper=[0.05, 0.9, 0.1]))
+    parts.append(H.add_sphere("FCore", 0.07, location=(0, -0.02, 0), mat=m["fire_red"], segments=16))
+    return render_icon_objs("SkillBladeFlurry", parts, azimuth=0, elevation=4, margin=1.12)
+
+
+def build_skill_seismic_slam():
+    m = make_materials()
+    parts = []
+    # Hammer-fist impact: cracked basalt slab, shockwave rings, ember fissures.
+    slab = H.add_cylinder("SSlab", 0.40, 0.08, location=(0, 0, -0.22), mat=m["basalt"], vertices=7, bevel=0.01)
+    parts.append(slab)
+    for i, (maj, mat) in enumerate(((0.30, m["fire_red"]), (0.42, m["gold"]))):
+        parts.append(H.add_torus(f"SWave{i}", major=maj, minor=0.016 + 0.006 * i, location=(0, 0, -0.16 + 0.01 * i), rotation=(0, 0, 0), mat=mat))
+    for i in range(5):
+        a = math.radians(i * 72 + 10)
+        pts = [(0.05 * math.cos(a), 0.05 * math.sin(a), -0.17), (0.20 * math.cos(a + 0.2), 0.20 * math.sin(a + 0.2), -0.17), (0.36 * math.cos(a), 0.36 * math.sin(a), -0.17)]
+        parts.append(H.add_tube(f"SCrack{i}", pts, radius=0.016, mat=m["fire_core"], taper=[1.0, 0.7, 0.1]))
+    head = H.add_box("SHammerHead", (0.30, 0.18, 0.16), location=(0, 0, 0.06), mat=m["dark_iron"], bevel=0.02)
+    handle = H.add_cylinder("SHandle", 0.028, 0.46, location=(0, 0, 0.34), mat=m["wood"])
+    band = H.add_cylinder("SBand", 0.034, 0.05, location=(0, 0, 0.16), mat=m["brass"])
+    parts += [head, handle, band]
+    return render_icon_objs("SkillSeismicSlam", parts, azimuth=18, elevation=22, margin=1.12)
+
+
+def build_skill_mending_light():
+    m = make_materials()
+    parts = []
+    # Cupped golden light: a warm cross-shaped beacon above two curved brass wards.
+    v = H.add_box("MCrossV", (0.08, 0.06, 0.40), location=(0, -0.02, 0.08), mat=m["wisp_gold"], bevel=0.02)
+    h = H.add_box("MCrossH", (0.30, 0.06, 0.08), location=(0, -0.02, 0.14), mat=m["wisp_gold"], bevel=0.02)
+    parts += [v, h]
+    for s in (-1, 1):
+        pts = [(0.34 * s, 0.0, 0.22), (0.38 * s, 0.0, -0.06), (0.16 * s, 0.0, -0.30)]
+        parts.append(H.add_tube(f"MWard{s}", pts, radius=0.034, mat=m["brass"], taper=[0.3, 1.0, 0.6]))
+    for i, loc in enumerate([(-0.22, -0.06, 0.34), (0.24, -0.06, 0.30), (0.0, -0.06, -0.24), (-0.12, -0.06, -0.10)]):
+        parts.append(H.add_sphere(f"MMote{i}", 0.03, location=loc, mat=m["fire_core"], segments=12))
+    return render_icon_objs("SkillMendingLight", parts, azimuth=0, elevation=4, margin=1.12)
+
+
+def build_skill_renewing_circle():
+    m = make_materials()
+    parts = []
+    # Ground rune circle seen from above-ish: brass ring, inner gold ring, rising light pillars.
+    parts.append(H.add_torus("RRingOuter", major=0.38, minor=0.024, location=(0, 0, -0.10), mat=m["brass"]))
+    parts.append(H.add_torus("RRingInner", major=0.26, minor=0.018, location=(0, 0, -0.10), mat=m["wisp_gold"]))
+    for i in range(6):
+        a = math.radians(i * 60)
+        parts.append(H.add_box(f"RRune{i}", (0.06, 0.06, 0.02), location=(0.32 * math.cos(a), 0.32 * math.sin(a), -0.09),
+                               rotation=(0, 0, i * 60 + 45), mat=m["cyan_rune"]))
+    for i in range(3):
+        a = math.radians(i * 120 + 30)
+        parts.append(H.add_cylinder(f"RPillar{i}", 0.022, 0.30 + 0.06 * i, location=(0.14 * math.cos(a), 0.14 * math.sin(a), 0.06 + 0.03 * i),
+                                    mat=m["fire_core"]))
+    return render_icon_objs("SkillRenewingCircle", parts, azimuth=16, elevation=34, margin=1.12)
 
 
 # --------------------------------------------------------------------------- 4 NAVIGATION / CREST / SETTINGS ICONS
@@ -685,6 +809,12 @@ TASKS = [
     ("SkillWisps", build_skill_wisps),
     ("SkillSearingHalo", build_skill_searing_halo),
     ("SkillVeilStep", build_skill_veil_step),
+    ("PortraitRogue", build_portrait_rogue),
+    ("SkillQuickShot", build_skill_quick_shot),
+    ("SkillBladeFlurry", build_skill_blade_flurry),
+    ("SkillSeismicSlam", build_skill_seismic_slam),
+    ("SkillMendingLight", build_skill_mending_light),
+    ("SkillRenewingCircle", build_skill_renewing_circle),
     ("CrestCinderreach", build_crest_cinderreach),
     ("WaypointSigil", build_waypoint_sigil),
     ("StashChestIcon", build_stash_chest_icon),

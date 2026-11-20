@@ -12,6 +12,8 @@ public sealed class PauseMenuUI : MonoBehaviour
 {
     public bool IsOpen { get; private set; }
     public bool SettingsOpen { get; private set; }
+    /// <summary>True while this menu holds solo time at 0 (co-op never pauses the shared world).</summary>
+    public bool HoldsTime { get; private set; }
 
     Canvas canvas;
     GameObject mainCard;
@@ -29,6 +31,9 @@ public sealed class PauseMenuUI : MonoBehaviour
 
     void Update()
     {
+        // A hit-stop that started just before opening restores its saved scale
+        // after us; re-assert the freeze while the menu is up.
+        if (HoldsTime && Time.timeScale != 0f) Time.timeScale = 0f;
         var kb = Keyboard.current;
         if (kb == null || !kb.escapeKey.wasPressedThisFrame) return;
         if (DiabloUIFactory.WasEscConsumedThisFrame) return;
@@ -67,6 +72,7 @@ public sealed class PauseMenuUI : MonoBehaviour
         IsOpen = open;
         if (canvas != null) canvas.enabled = open;
         DiabloClickController.ExternalDrive = open;
+        SetTimeHeld(open && Application.isPlaying && Diablo.IsSolo());
         if (open)
         {
             SettingsOpen = false;
@@ -74,6 +80,15 @@ public sealed class PauseMenuUI : MonoBehaviour
             RefreshStatus();
         }
     }
+
+    void SetTimeHeld(bool hold)
+    {
+        if (hold == HoldsTime) return;
+        HoldsTime = hold;
+        Time.timeScale = hold ? 0f : 1f;
+    }
+
+    void OnDisable() => SetTimeHeld(false);
 
     public void ShowMain()
     {

@@ -780,3 +780,24 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   `-join 100.74.227.118:7778` → `[Net] Client connected: 1 (total=1)` auf beiden Seiten.
 - Grenze: 2 `ArgumentNullException` im Server-Log sind Vorbestand (`EnemyHealth.DropOrb`
   baut Material mit gestripptem Shader — Server ohne Rendering), unberührt von diesem Commit.
+
+## 2026-11-21 — Menü-/Art-Branch gelandet, Layout-Fix und Spielfluss-Iteration 1
+
+- Rebase: `feature/cinderreach-menu-art-polish` (9-Slice-UI, Blender-Sprites, Startbildschirm,
+  Pause-Menü) lag seit 2026-11-18 ungelandet und kollidierte in 14 Dateien mit itemization S5,
+  party-roles/-team und skill-variants. Aufgelöst mit beiden Seiten: Vendor behält Koop-Handel
+  über den Host, Notice, Klick-außerhalb-Schließen und den „Close (saves)“-Knopf im neuen Layout;
+  Inventar behält Equip/Discard-Aktionen und `AreaLine`; Charakterblatt behält Skill-Varianten.
+- Layout-Ursache: Fast alle Panels laufen mit `childControlHeight = false`; `DiabloUIFactory.SetLayout`
+  setzte nur `LayoutElement`, die Gruppen positionierten deshalb jedes Kind mit 100 px Default-Höhe
+  (Divider als Goldklecks, Inhalte unter dem Panelrand). `SetLayout` spiegelt die Wunschgröße jetzt
+  auf die `RectTransform`. Item-Karten schrumpfen per `FitToBox` in ihre Box, das Charakterblatt
+  wächst per `ContentSizeFitter`.
+- Spielfluss: genau ein Startbildschirm (`MainMenu.ClassSelectOwnsStart`), Continue nennt Klasse,
+  Level, Gold und Stufe per nebenwirkungsfreiem `SaveService.TryPeek`; Solo-Pause friert die Zeit
+  ein (Hit-Stop-sicher); Todesschleier „YOU HAVE FALLEN“ statt Textzeile; „Press On“ nach dem Abbot;
+  Skill-Varianten haben erstmals einen Bedienpfad (Umschalter im Charakterblatt, solo im Hold).
+- Art: Rogue-Portrait (Spielmodell `Rogue.fbx`) und fünf fehlende Skill-Icons (Seismic Slam,
+  Quick Shot, Blade Flurry, Mending Light, Renewing Circle) per `build_menu_pack.py`; Kartentexte
+  aus Rolle/Starter/echter Skillzahl; Rogue-Akzentfarbe; HUD-Bronzeplatte unter Skill- und XP-Leiste;
+  Item-Namen lesbar (`LootDrop.PrettyName`: „Bulwark Carrier“, „Cloth Tunic“), Varianten englisch.

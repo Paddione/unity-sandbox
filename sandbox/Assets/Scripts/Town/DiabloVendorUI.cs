@@ -402,7 +402,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         canvasGo.transform.SetParent(transform, false);
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 11);
 
-        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(840f, 660f), Vector2.zero);
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(840f, 740f), Vector2.zero);
         panel = panelGo.transform;
         var layout = panelGo.AddComponent<VerticalLayoutGroup>();
         layout.padding = new RectOffset(16, 16, 14, 14);
@@ -448,7 +448,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         // Inspection comparison box
         var inspBox = new GameObject("InspectBox", typeof(RectTransform));
         inspBox.transform.SetParent(panelGo.transform, false);
-        DiabloUIFactory.SetLayout(inspBox, prefH: 96f, flexW: 1f);
+        DiabloUIFactory.SetLayout(inspBox, prefH: 128f, flexW: 1f);
         var ibImg = inspBox.AddComponent<Image>();
         ibImg.sprite = DiabloMenuArt.TooltipBackground();
         ibImg.type = Image.Type.Sliced;
@@ -458,10 +458,13 @@ public sealed class DiabloVendorUI : MonoBehaviour
         iv.childControlHeight = false;
         inspectText = DiabloUIFactory.MakeText(inspBox.transform, "InspectText",
             "Hover an item to compare stats against your equipped gear.", 14, DiabloPalette.Parchment);
-        DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 78f, flexW: 1f);
+        DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 112f, flexW: 1f);
+        DiabloUIFactory.FitToBox(inspectText, 14);
 
         noticeText = DiabloUIFactory.MakeText(panelGo.transform, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);
+        // Explicit footer close (direct child "SmallButton": the save-on-close contract tests click it).
+        DiabloUIFactory.MakeSmallButton(panelGo.transform, "Close (saves)", () => SetOpen(false), 34f);
     }
 
     Transform MakeColumn(Transform parent, string name, string heading, out Text subtitle)

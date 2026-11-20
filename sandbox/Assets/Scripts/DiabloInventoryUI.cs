@@ -418,7 +418,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         canvasGo.transform.SetParent(transform, false);
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 10);
 
-        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(540f, 690f), new Vector2(-18f, 0f));
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(540f, 760f), new Vector2(-18f, 0f));
         var pr = panelGo.GetComponent<RectTransform>();
         pr.anchorMin = new Vector2(1f, 0.5f);
         pr.anchorMax = new Vector2(1f, 0.5f);
@@ -608,6 +608,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         tv.childControlHeight = false;
 
         bagDetailText = DiabloUIFactory.MakeText(tipBox.transform, "BagTooltip", "", 14, DiabloPalette.Parchment);
+        DiabloUIFactory.FitToBox(bagDetailText, 14);
         DiabloUIFactory.SetLayout(bagDetailText.gameObject, prefH: 114f, flexW: 1f);
 
         // S5: visible separate actions for the selected (last) bag item.

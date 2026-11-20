@@ -347,7 +347,9 @@ public static class DiabloMenuArt
 
     public static Sprite ClassPortrait(string classId)
     {
-        return MenuArtSprite(classId == ClassCatalog.LanternbearerId ? "PortraitLanternbearer" : "PortraitFenwalker");
+        if (classId == ClassCatalog.LanternbearerId) return MenuArtSprite("PortraitLanternbearer");
+        if (classId == ClassCatalog.RogueId) return MenuArtSprite("PortraitRogue");
+        return MenuArtSprite("PortraitFenwalker");
     }
 
     public static Sprite SkillIcon(DiabloSkills.Skill skill)
@@ -362,6 +364,11 @@ public static class DiabloMenuArt
             case DiabloSkills.Skill.Wisps: res = "SkillWisps"; break;
             case DiabloSkills.Skill.SearingHalo: res = "SkillSearingHalo"; break;
             case DiabloSkills.Skill.VeilStep: res = "SkillVeilStep"; break;
+            case DiabloSkills.Skill.SeismicSlam: res = "SkillSeismicSlam"; break;
+            case DiabloSkills.Skill.QuickShot: res = "SkillQuickShot"; break;
+            case DiabloSkills.Skill.BladeFlurry: res = "SkillBladeFlurry"; break;
+            case DiabloSkills.Skill.MendingLight: res = "SkillMendingLight"; break;
+            case DiabloSkills.Skill.RenewingCircle: res = "SkillRenewingCircle"; break;
             default: return null;
         }
         return MenuArtSprite(res);

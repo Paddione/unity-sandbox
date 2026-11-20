@@ -111,7 +111,7 @@ public class ItemPresentationTests
             affixes = new System.Collections.Generic.List<Affix> { new Affix(AffixLibrary.Damage, 2f) },
         };
         string card = ItemDetailsView.Render(item, equipped);
-        StringAssert.Contains("ShortSword", card);
+        StringAssert.Contains("Short Sword", card);
         StringAssert.Contains("Rare", card);
         StringAssert.Contains("Weapon", card);
         StringAssert.Contains("Item level: 5", card);
@@ -121,7 +121,7 @@ public class ItemPresentationTests
         var unique = ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId);
         unique.itemLevel = 6;
         string ucard = ItemDetailsView.Render(unique, null);
-        StringAssert.Contains("bulwark-carrier", ucard);
+        StringAssert.Contains("Bulwark Carrier", ucard);
         StringAssert.Contains("Unique", ucard);
         StringAssert.Contains("threat", ucard.ToLowerInvariant());
     }
