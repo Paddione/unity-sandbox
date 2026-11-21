@@ -853,3 +853,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   `productName` heißt gleicher `persistentDataPath`, die Läufe schrieben also den echten
   `cinderreach-save.json` des installierten Spiels (zuletzt 2026-11-21 02:05). Jetzt
   `-save-file automation-save.json`. Der überschriebene Stand ist ohne Backup nicht wiederherstellbar.
+
+## 2026-11-21 — Gegnernamen und Bossbalken
+
+- Zielbalken zeigte Objektnamen mit Builder-Indizes („Ash Lancer_0“, beschworene Thralls als
+  „Kiln Summon_1_1“). `DiabloTargetBar.DisplayName` entfernt Indizes und bildet interne Namen ab,
+  `TierColor` färbt Elites stahlblau und Bosse gold.
+- Bossbalken: breiter Balken oben mit Name und Phase (I/II), solange ein lebender Boss (Tier Boss
+  oder ActBoss) im Umkreis von 24 m steht; Szenen-Scan mit 2 Hz, nie pro Frame. Der Zielbalken rückt
+  darunter und blendet aus, wenn das Ziel der Boss selbst ist (per Alpha, damit Namenssuchen das
+  Panel weiter finden). Belege: EditMode 381/381, PlayMode 272/272, Autoplay `-seed 0` PASS,
+  Shotcheck `abbot_phase2`/`kilnmother_phase2` mit Bossbalken.

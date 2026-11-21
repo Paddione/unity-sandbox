@@ -238,4 +238,26 @@ public class DiabloMenuPlayTests
         wpUi.SetOpen(false);
         yield return null;
     }
+
+    [UnityTest]
+    public IEnumerator BossBar_ShowsANearbyLivingBoss()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        var bossGo = Track(new GameObject("Hollow Abbot"));
+        bossGo.transform.position = new Vector3(0f, 0f, 6f);
+        var hp = bossGo.AddComponent<EnemyHealth>();
+        hp.SetTier(150, LootTier.Boss);
+        var bar = Track(new GameObject("BossBarTest")).AddComponent<DiabloTargetBar>();
+        yield return null;
+        yield return null;
+        Assert.AreEqual(hp, bar.ShownBoss, "a boss within range gets the wide bar");
+        var label = bar.transform.Find("TargetBarCanvas/BossPanel/BossName")?.GetComponent<Text>();
+        Assert.IsNotNull(label);
+        Assert.AreEqual("THE HOLLOW ABBOT", label.text);
+
+        bossGo.transform.position = new Vector3(0f, 0f, 80f);
+        yield return new WaitForSecondsRealtime(0.6f);
+        yield return null;
+        Assert.IsNull(bar.ShownBoss, "out of range hides the bar");
+    }
 }

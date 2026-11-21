@@ -290,4 +290,25 @@ public class DiabloMenuPolishTests
         Assert.IsFalse(DiabloNetworkPlayer.ShouldLoadSaveOnSpawn(isServer: true),
             "host/solo choose Continue or New on the start screen");
     }
+
+    [Test]
+    public void TargetBar_ShowsEnemyNamesNotObjectNames()
+    {
+        Assert.AreEqual("Ash Lancer", DiabloTargetBar.DisplayName("Ash Lancer_0"));
+        Assert.AreEqual("Cinder Thrall", DiabloTargetBar.DisplayName("Kiln Summon_1_2"));
+        Assert.AreEqual("Cinder Thrall", DiabloTargetBar.DisplayName("Cinder Thrall_12"));
+        Assert.AreEqual("Husk", DiabloTargetBar.DisplayName("Husk_3"));
+        Assert.AreEqual("The Hollow Abbot", DiabloTargetBar.DisplayName("Hollow Abbot"));
+        Assert.AreEqual("Bone Warden Elite", DiabloTargetBar.DisplayName("Bone Warden Elite"));
+        Assert.AreEqual(DiabloPalette.GoldBright, DiabloTargetBar.TierColor(LootTier.ActBoss));
+    }
+
+    [Test]
+    public void BossBar_OnlyForBossTiers()
+    {
+        Assert.IsTrue(DiabloTargetBar.IsBossTier(LootTier.Boss));
+        Assert.IsTrue(DiabloTargetBar.IsBossTier(LootTier.ActBoss));
+        Assert.IsFalse(DiabloTargetBar.IsBossTier(LootTier.Elite));
+        Assert.AreEqual("", DiabloTargetBar.PhaseLabel(null));
+    }
 }
