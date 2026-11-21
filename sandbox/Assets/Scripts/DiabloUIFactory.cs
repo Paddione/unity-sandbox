@@ -56,10 +56,8 @@ public static class DiabloUIFactory
     public static bool IsAnyModalOpen(GameObject hero = null)
     {
         if (DiabloClickController.ExternalDrive) return true;
-        var cls = Object.FindFirstObjectByType<ClassSelectUI>(FindObjectsInactive.Include);
-        if (cls != null && cls.IsOpen) return true;
-        var pause = Object.FindFirstObjectByType<PauseMenuUI>(FindObjectsInactive.Include);
-        if (pause != null && pause.IsOpen) return true;
+        if (ClassSelectUI.AnyOpen) return true;
+        if (PauseMenuUI.AnyOpen) return true;
         if (hero == null) hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         if (hero != null)
         {
@@ -95,8 +93,7 @@ public static class DiabloUIFactory
             var ch = hero.GetComponent<DiabloCharacterUI>();
             if (ch != null && ch.IsOpen) return true;
         }
-        var pause = Object.FindFirstObjectByType<PauseMenuUI>(FindObjectsInactive.Include);
-        return pause != null && pause.IsOpen;
+        return PauseMenuUI.AnyOpen;
     }
 
     public static void CloseSecondaryPanels(GameObject hero, MonoBehaviour except = null)

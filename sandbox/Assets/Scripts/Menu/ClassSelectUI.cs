@@ -16,6 +16,23 @@ public sealed class ClassSelectUI : MonoBehaviour
     public const string ClassFlag = "-class";
 
     public bool IsOpen { get; private set; }
+
+    static readonly List<ClassSelectUI> live = new List<ClassSelectUI>();
+
+    /// <summary>Any start/class screen open (no scene scan).</summary>
+    public static bool AnyOpen
+    {
+        get
+        {
+            for (int i = 0; i < live.Count; i++)
+                if (live[i] != null && live[i].IsOpen) return true;
+            return false;
+        }
+    }
+
+    void OnEnable() { if (!live.Contains(this)) live.Add(this); }
+
+    void OnDestroy() => live.Remove(this);
     public static bool ClassFromCommandLine { get; private set; }
 
     Canvas canvas;
@@ -74,6 +91,7 @@ public sealed class ClassSelectUI : MonoBehaviour
 
     public void SetOpen(bool open)
     {
+        if (!live.Contains(this)) live.Add(this); // EditMode AddComponent skips OnEnable
         if (open && canvas == null) Build();
         IsOpen = open;
         if (canvas != null) canvas.enabled = open;
@@ -325,8 +343,8 @@ public sealed class ClassSelectUI : MonoBehaviour
         btn.onClick.AddListener(() => ChooseNew(id));
 
         var v = card.AddComponent<VerticalLayoutGroup>();
-        v.padding = new RectOffset(18, 18, 16, 16);
-        v.spacing = 8f;
+        v.padding = new RectOffset(18, 18, 14, 14);
+        v.spacing = 6f;
         v.childControlWidth = true;
         v.childControlHeight = false;
 
@@ -394,12 +412,12 @@ public sealed class ClassSelectUI : MonoBehaviour
         {
             var sk = cls.skills[i];
             var key = cls.keys[i];
-            var row = DiabloUIFactory.MakeHorizontalRow(card.transform, $"SkillRow_{sk}", 10f, 34f);
+            var row = DiabloUIFactory.MakeHorizontalRow(card.transform, $"SkillRow_{sk}", 10f, 30f);
             row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
 
             var slot = new GameObject("IconSlot", typeof(RectTransform));
             slot.transform.SetParent(row.transform, false);
-            DiabloUIFactory.SetLayout(slot, prefH: 34f, prefW: 34f);
+            DiabloUIFactory.SetLayout(slot, prefH: 30f, prefW: 30f);
             var sImg = slot.AddComponent<Image>();
             sImg.sprite = DiabloMenuArt.SlotBackground(null, 64);
             sImg.type = Image.Type.Sliced;
@@ -423,7 +441,7 @@ public sealed class ClassSelectUI : MonoBehaviour
 
             var sText = DiabloUIFactory.MakeText(row.transform, "SkillDesc",
                 $"<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>[{key}]</color> {DiabloSkills.SkillName(sk)}", 15, DiabloPalette.Parchment);
-            DiabloUIFactory.SetLayout(sText.gameObject, prefH: 30f, flexW: 1f);
+            DiabloUIFactory.SetLayout(sText.gameObject, prefH: 28f, flexW: 1f);
         }
 
         // Flexible spacer before CTA banner

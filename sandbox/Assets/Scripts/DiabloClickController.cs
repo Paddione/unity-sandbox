@@ -228,7 +228,9 @@ public sealed class DiabloClickController : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out var aimHit, 200f))
                 SetAimPoint(aimHit.point);
-            if (!ShouldBlockClicks(GetComponent<DiabloInventoryUI>())
+            // Modal checks only on click frames (they walk the hero's panels).
+            bool clicked = mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame;
+            if (clicked && !ShouldBlockClicks(GetComponent<DiabloInventoryUI>())
                 && !DiabloUIFactory.IsWorldInputBlocked(gameObject))
             {
                 if (mouse.leftButton.wasPressedThisFrame)

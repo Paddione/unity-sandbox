@@ -70,6 +70,17 @@ public sealed class WaypointShrine : MonoBehaviour
         return list;
     }
 
+    /// <summary>Shrines that are not destinations yet (undiscovered or zone sealed), zone order.</summary>
+    public static List<WaypointShrine> Locked()
+    {
+        var open = Destinations();
+        var list = new List<WaypointShrine>();
+        foreach (var s in All())
+            if (s != null && !open.Contains(s)) list.Add(s);
+        list.Sort((a, b) => a.zone.CompareTo(b.zone));
+        return list;
+    }
+
     /// <summary>Travel to a shrine (UI button / autoplay). False when not a destination.</summary>
     public static bool Travel(string id, GameObject hero)
     {

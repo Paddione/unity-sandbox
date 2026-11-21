@@ -60,6 +60,23 @@ public sealed class DiabloWaypointUI : MonoBehaviour
             string id = s.shrineId;
             bool nearby = Vector3.Distance(transform.position, s.transform.position) < 8f;
             string caption = nearby ? $"{s.displayName}  (Here)" : s.displayName;
+            BuildRow(id, caption, nearby ? RowState.Here : RowState.Travel);
+        }
+        // Unattuned shrines stay visible as locked rows: the window doubles as act progress.
+        foreach (var s in WaypointShrine.Locked())
+            BuildRow(s.shrineId, $"{s.displayName}  —  {LockedReason(s)}", RowState.Locked);
+    }
+
+    enum RowState { Travel, Here, Locked }
+
+    /// <summary>Why a shrine is not a destination yet (zone sealed or shrine not reached).</summary>
+    public static string LockedReason(WaypointShrine s) =>
+        RunProfile.Act.IsUnlocked(s.zone) ? "not attuned" : "sealed";
+
+    void BuildRow(string id, string caption, RowState state)
+    {
+        bool nearby = state == RowState.Here;
+        {
 
             var go = new GameObject("Waypoint_" + id, typeof(RectTransform));
             go.transform.SetParent(list, false);
@@ -68,6 +85,8 @@ public sealed class DiabloWaypointUI : MonoBehaviour
             img.sprite = DiabloMenuArt.ButtonBackground(!nearby);
             img.type = Image.Type.Sliced;
             var b = go.AddComponent<Button>();
+            b.interactable = state == RowState.Travel;
+            if (state == RowState.Locked) img.color = new Color(0.55f, 0.52f, 0.5f, 0.75f);
             b.onClick.AddListener(() =>
             {
                 DiabloAudio.PlayUIClick();
@@ -96,7 +115,8 @@ public sealed class DiabloWaypointUI : MonoBehaviour
             }
 
             var label = DiabloUIFactory.MakeText(go.transform, "DestLabel", caption, 17,
-                nearby ? DiabloPalette.ParchmentDim : DiabloPalette.GoldBright);
+                state == RowState.Travel ? DiabloPalette.GoldBright
+                : state == RowState.Locked ? DiabloPalette.DisabledText : DiabloPalette.ParchmentDim);
             DiabloUIFactory.SetLayout(label.gameObject, prefH: 36f, flexW: 1f);
         }
     }

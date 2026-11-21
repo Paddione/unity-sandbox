@@ -35,7 +35,27 @@ public static class DiabloSettings
     {
         if (!Application.isPlaying) return;
         Load();
-        Apply();
+        ApplyAudioAndFeel();
+        bool savedResolution = false;
+        try { savedResolution = PlayerPrefs.HasKey(Prefix + "Resolution"); } catch { }
+        if (BootMayTouchDisplay(System.Environment.GetCommandLineArgs()))
+            ApplyDisplay(setResolution: savedResolution);
+    }
+
+    /// <summary>
+    /// Boot rule: automation (autoplay, shotcheck, batch) and explicit
+    /// -screen-* arguments own the display; the saved menu choice must not
+    /// override them (a forced 1080p fullscreen cost the FPS gate ~2.7x).
+    /// </summary>
+    public static bool BootMayTouchDisplay(string[] args)
+    {
+        foreach (var a in args)
+        {
+            if (a == null) continue;
+            if (a == "-autoplay" || a == "-shotcheck" || a == "-batchmode" || a == "-nographics"
+                || a.StartsWith("-screen-")) return false;
+        }
+        return true;
     }
 
     public static void Load()
@@ -144,12 +164,24 @@ public static class DiabloSettings
     /// <summary>Effective UI click/chime gain (master × ui).</summary>
     public static float EffectiveUI => MasterVol * UIVol;
 
+    /// <summary>Menu "Apply": everything, including the chosen resolution.</summary>
     public static void Apply()
+    {
+        ApplyAudioAndFeel();
+        ApplyDisplay(setResolution: true);
+    }
+
+    static void ApplyAudioAndFeel()
     {
         Clamp();
         try { AudioListener.volume = Mathf.Clamp01(MasterVol); } catch { }
         try { global::HitStop.Enabled = HitStop; } catch { }
         try { DiabloAmbience.ApplySettings(); } catch { }
+    }
+
+    static void ApplyDisplay(bool setResolution)
+    {
+        Clamp();
         try
         {
             if (Application.isPlaying && !Application.isBatchMode)
@@ -165,7 +197,7 @@ public static class DiabloSettings
         catch { }
         try
         {
-            if (Application.isPlaying && !Application.isBatchMode && !Application.isEditor)
+            if (setResolution && Application.isPlaying && !Application.isBatchMode && !Application.isEditor)
             {
                 var r = ResolutionSize;
                 Screen.SetResolution(r.w, r.h, Fullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);

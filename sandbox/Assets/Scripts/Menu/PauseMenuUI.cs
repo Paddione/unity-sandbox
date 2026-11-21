@@ -12,6 +12,23 @@ public sealed class PauseMenuUI : MonoBehaviour
 {
     public bool IsOpen { get; private set; }
     public bool SettingsOpen { get; private set; }
+    static readonly List<PauseMenuUI> live = new List<PauseMenuUI>();
+
+    /// <summary>Any pause menu open (no scene scan; the modal checks run on click frames).</summary>
+    public static bool AnyOpen
+    {
+        get
+        {
+            for (int i = 0; i < live.Count; i++)
+                if (live[i] != null && live[i].IsOpen) return true;
+            return false;
+        }
+    }
+
+    void OnEnable() { if (!live.Contains(this)) live.Add(this); }
+
+    void OnDestroy() => live.Remove(this);
+
     /// <summary>True while this menu holds solo time at 0 (co-op never pauses the shared world).</summary>
     public bool HoldsTime { get; private set; }
 
@@ -67,6 +84,7 @@ public sealed class PauseMenuUI : MonoBehaviour
 
     public void SetOpen(bool open)
     {
+        if (!live.Contains(this)) live.Add(this); // EditMode AddComponent skips OnEnable
         if (open && canvas == null) Build();
         if (IsOpen != open) DiabloAudio.PlayUIClick();
         IsOpen = open;

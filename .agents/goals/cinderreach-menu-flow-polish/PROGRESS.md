@@ -1,6 +1,6 @@
 # Progress: cinderreach-menu-flow-polish
 
-Prozent: 60 %
+Prozent: 90 %
 
 ## Erledigt
 
@@ -20,10 +20,17 @@ Prozent: 60 %
   `Games\cinderreach-wip`, installierte Version unberührt), u. a. `class_select`, `start_settings`,
   `vendor_open`, `bag_open`, `character_open`, `pause_menu`, `death_veil`.
 
+- 2026-11-21: Perf-Regression aus dem Menü-Branch per A/B belegt und behoben (K5):
+  `DiabloSettings.BootApply` erzwang 1080p-Vollbild + VSync und überstimmte `-screen-*`/Automation.
+  Vorher worst 20,5 fps (Gate rot), `main` 34,6; nachher worst 37,3 fps, PASS, Akt I komplett,
+  0 Exceptions (`run-autoplay.sh -seed 0`). Modal-Checks nur in Klick-Frames, `AnyOpen` statt Szenen-Scan.
+- 2026-11-21: Iteration 2: Waypoint-Fenster zeigt gesperrte Schreine („not attuned“/„sealed“),
+  „(Here)“ nicht klickbar; kompaktere Klassenkarten. EditMode 377/377, PlayMode 268/268,
+  Shotcheck 46 Motive.
+
 ## Nächste Schritte
 
-- Autoplay `-seed 0` mit FPS-Gate, landen.
-- Iteration 2: Waypoint-Panel an Inhalt anpassen, Startkarten gleich hoch, weitere Shot-Befunde.
+- Landen, danach weitere Iterationen nach Shot-Befunden.
 
 ## Offene Punkte
 

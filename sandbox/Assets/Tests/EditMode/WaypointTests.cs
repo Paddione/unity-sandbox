@@ -62,6 +62,19 @@ public class WaypointTests
     }
 
     [Test]
+    public void Locked_ShowsUnattunedAndSealedShrines()
+    {
+        RunProfile.Act.Discover("Town");
+        var locked = WaypointShrine.Locked();
+        Assert.AreEqual(WaypointShrine.All().Length - 1, locked.Count, "every non-destination is listed");
+        CollectionAssert.DoesNotContain(locked.ConvertAll(s => s.shrineId), "Town");
+        var kiln = WaypointShrine.Find("Kiln");
+        Assert.AreEqual("sealed", DiabloWaypointUI.LockedReason(kiln));
+        RunProfile.Act.Unlock(ActProgress.Kiln);
+        Assert.AreEqual("not attuned", DiabloWaypointUI.LockedReason(kiln));
+    }
+
+    [Test]
     public void Travel_TeleportsThroughZoneTravelAndSaves()
     {
         RunProfile.Act.Discover("Town");

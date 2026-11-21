@@ -801,3 +801,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Quick Shot, Blade Flurry, Mending Light, Renewing Circle) per `build_menu_pack.py`; Kartentexte
   aus Rolle/Starter/echter Skillzahl; Rogue-Akzentfarbe; HUD-Bronzeplatte unter Skill- und XP-Leiste;
   Item-Namen lesbar (`LootDrop.PrettyName`: „Bulwark Carrier“, „Cloth Tunic“), Varianten englisch.
+- Perf-Regression gefunden (A/B, gleiche Maschine, Autoplay `-seed 0` 1280×720): `main` `0619770`
+  Stadt ~110–120 fps, worst 34,6; Branch worst 20,5 (Gate rot), Stadt ~42. Ursache:
+  `DiabloSettings.BootApply` setzte beim Start immer `Screen.SetResolution(1920×1080, Vollbild)`
+  und VSync und überstimmte damit `-screen-*` und Automation. Jetzt: Boot fasst die Anzeige nur
+  ohne Automation/`-screen-*` an und die Auflösung nur, wenn der Spieler eine gespeichert hat
+  (`BootMayTouchDisplay`). Zusätzlich laufen Modal-Checks im Klick-Controller nur noch in
+  Klick-Frames, `ClassSelectUI`/`PauseMenuUI` melden sich statt per Szenen-Scan über `AnyOpen`.

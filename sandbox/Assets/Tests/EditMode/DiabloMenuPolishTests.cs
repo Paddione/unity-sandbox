@@ -255,4 +255,14 @@ public class DiabloMenuPolishTests
         Assert.AreEqual("Rogue's Keepsake", LootDrop.PrettyName(ItemDatabase.RogueKeepsakeId));
         Assert.AreEqual("Bulwark Carrier", LootDrop.ItemLabel(ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId)));
     }
+
+    [Test]
+    public void Settings_BootLeavesAutomationAndScreenArgsAlone()
+    {
+        Assert.IsTrue(DiabloSettings.BootMayTouchDisplay(new[] { "cinderreach.exe" }));
+        Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-autoplay" }));
+        Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-shotcheck" }));
+        Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-screen-width", "1280" }));
+        Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-screen-fullscreen", "0" }));
+    }
 }
