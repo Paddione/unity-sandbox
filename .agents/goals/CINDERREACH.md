@@ -43,7 +43,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Assets: KayKit (Dungeon 211 Modelle, Adventurers 6, Skeletons 4, Rig_Medium-Animationen) plus
   Blender-Pipeline (`docs/world-art`, `docs/menu-art`). Keine Fremd-IP, kein Asset-Store-Kauf ohne Freigabe.
 - Tests: `sandbox/Assets/Tests/{EditMode,PlayMode}`, gemeinsame Helfer in `DiabloTestFixture.cs`.
-  Letzter voller Lauf (itemization S3): EditMode 340/340, PlayMode 213/213.
+  Letzter voller Lauf (menu-flow-polish): EditMode 378/378, PlayMode 268/268.
 
 ## Systeme (Ist-Stand)
 
@@ -138,8 +138,23 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Zonen-Licht per URP-Volumes (`Settings/Volumes/*`, `ZoneAtmosphere`), Musik pro Zone + Boss
   (`MusicDirector`, Crossfade), 30 Audio-Cues (`DiabloAudio`, Synth als Fallback,
   `docs/audio/manifest.json`), gepoolte VFX (`PresentationVfx`).
-- Hauptmenü und Pause (`Menu/`), Einstellungen in eigener JSON-Datei. Laufzeit-UIs nutzen den
-  HD-Scaler (1920×1080, match 0,5, `DiabloHdTests`).
+- Menüs (`Menu/`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
+  Rolle/Starter/Skillzahl, Continue mit Spielstand-Info über `SaveService.TryPeek`, Co-op, Settings,
+  Quit, 0,45-s-Ausblenden). Das Legacy-`MainMenu` weicht im Spiel (`ClassSelectOwnsStart`).
+  `PauseMenuUI` (Esc) friert solo die Zeit ein (Hit-Stop-sicher, Koop nie). Offen-Status über
+  `ClassSelectUI.AnyOpen`/`PauseMenuUI.AnyOpen`, kein Szenen-Scan.
+- UI-Bausteine `DiabloUIFactory` (9-Slice-Chrome aus `DiabloMenuArt`): `SetLayout` setzt auch die
+  Rect-Größe, weil die Panels mit `childControlHeight = false` stapeln; Item-Karten per `FitToBox`.
+  Sprites aus Blender (`docs/menu-art/build_menu_pack.py`, `build_icons*.py`): Portraits aller drei
+  Klassen, Icons für alle 12 Skills, Startbild 1920×1080. Spielernamen über `LootDrop.PrettyName`.
+- HUD: Lebenskugel mit Todesschleier („YOU HAVE FALLEN“, rein präsentativ), Bronzeplatte unter
+  Skill- und XP-Leiste. Charakterblatt mit Varianten-Umschalter (solo im Lantern Hold),
+  Waypoint-Fenster mit gesperrten Schreinen („not attuned“/„sealed“), „Press On“ nach dem Abbot.
+- Einstellungen `DiabloSettings` (PlayerPrefs). Boot fasst Anzeige nur ohne Automation/`-screen-*`
+  an und die Auflösung nur, wenn der Spieler eine gespeichert hat (sonst Gate-Regression ~2,7×).
+  Laufzeit-UIs nutzen den HD-Scaler (1920×1080, match 0,5, `DiabloHdTests`).
+- Leere Ausrüstungsslots: serialisierte Leerstellen sind leere `ItemInstance`s, `Equipment.IsBlank`/
+  `NormalizeEmptySlots` macht sie zu `null`.
 
 ### Spielstand
 
@@ -225,3 +240,4 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-melee-rework` (dotfiles) | Kegelschlag, Stoß, Block mit Reflexion | `ffbcc0a` |
 | `cinderreach-coop-session` | Koop-Parität, Direkt- und Relay-Join | `8f47c17` |
 | `cinderreach-presentation` | Licht, Audio, VFX, Menü, 60 FPS | `6325e7d` |
+| `cinderreach-menu-flow-polish` | Ein Startbildschirm, Layout-Fix, Rogue-Art, Pause/Tod/Flow, Boot-Perf-Fix | `722c8cf` |
