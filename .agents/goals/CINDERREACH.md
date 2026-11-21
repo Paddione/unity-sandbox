@@ -141,6 +141,9 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Menüs (`Menu/`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
   Rolle/Starter/Skillzahl, Continue mit Spielstand-Info über `SaveService.TryPeek`, Co-op, Settings,
   Quit, 0,45-s-Ausblenden). Das Legacy-`MainMenu` weicht im Spiel (`ClassSelectOwnsStart`).
+  Neuer Held fragt nach („BEGIN ANEW?“), wenn ein gespeicherter oder aktueller Held ersetzt würde;
+  mitten in der Sitzung (solo) per Szenen-Reload mit frischem `RunProfile`. „New run“ in den Settings
+  setzt den Helden nach dem Reload fort (`SaveService.ContinueAfterReload`).
   `PauseMenuUI` (Esc) friert solo die Zeit ein (Hit-Stop-sicher, Koop nie). Offen-Status über
   `ClassSelectUI.AnyOpen`/`PauseMenuUI.AnyOpen`, kein Szenen-Scan.
 - UI-Bausteine `DiabloUIFactory` (9-Slice-Chrome aus `DiabloMenuArt`): `SetLayout` setzt auch die
@@ -180,7 +183,8 @@ liest für Menüs ohne Nebenwirkung.
   `.github/workflows/autoplay-nightly.yml` (02:30, Runner `unity-licensed`) für Normal, Kindled und
   Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay).
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
-  (`--autoplay`). 60 FPS @1080p belegt (schlechtestes Fenster 139 fps), Linux-Gate 30 FPS.
+  (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
+  WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 139 fps), Linux-Gate 30 FPS.
 - CI: `unity-tests.yml`, `unity-scene-captures.yml` (GPU-Runner), `autoplay-nightly.yml`.
 - Bekannte Grenze: Solo-Autoplay ohne `-seed` mit einem Save-Seed außerhalb 0–2 kann in einer
   seltenen Fen-Variante hängen. Der Nightly deckt nur Seeds 0–2 ab.

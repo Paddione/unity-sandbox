@@ -466,6 +466,25 @@ public sealed class DiabloShotCheck : MonoBehaviour
         Log($"RELOAD_CONTINUE {(resumed ? "PASS" : "FAIL")} level {levelBefore}->{levelAfter} gold {goldBefore}->{goldAfter}");
         yield return Shot("after_new_run");
 
+        // Start screen from in-game, pick a different class: confirm, then a fresh world and hero.
+        var csGo = new GameObject("ShotCheckNewHero");
+        var cs = csGo.AddComponent<ClassSelectUI>();
+        cs.SetOpen(true);
+        string newId = RunProfile.ClassId == ClassCatalog.RogueId ? ClassCatalog.FenwalkerId : ClassCatalog.RogueId;
+        cs.RequestNew(newId);
+        yield return Wait(0.3f);
+        yield return Shot("new_hero_confirm");
+        bool asked = cs.ConfirmVisible;
+        cs.ConfirmNew();
+        until = Time.realtimeSinceStartup + 15f;
+        while (Time.realtimeSinceStartup < until && SaveService.NewHeroAfterReload != null) yield return null;
+        yield return Wait(1.0f);
+        var fresh = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        int freshLevel = fresh != null && fresh.GetComponent<DiabloProgression>() != null ? fresh.GetComponent<DiabloProgression>().Level : -1;
+        bool freshOk = asked && RunProfile.ClassId == newId && freshLevel == 1 && RunProfile.Act.Waypoints.Count <= 1;
+        Log($"NEW_HERO {(freshOk ? "PASS" : "FAIL")} asked={asked} class={RunProfile.ClassId} level={freshLevel} waypoints={RunProfile.Act.Waypoints.Count}");
+        yield return Shot("after_new_hero");
+
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);

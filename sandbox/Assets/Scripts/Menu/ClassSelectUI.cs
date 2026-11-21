@@ -73,7 +73,16 @@ public sealed class ClassSelectUI : MonoBehaviour
 
     static void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
     {
-        if (SaveService.ContinueAfterReload) BeginReloadContinue();
+        if (SaveService.ContinueAfterReload || SaveService.NewHeroAfterReload != null) BeginReloadContinue();
+    }
+
+    bool StartFreshHero(string classId)
+    {
+        RunProfile.ClassId = ClassCatalog.Get(classId).id;
+        ApplyToHero();
+        HeroInWorld = true;
+        Debug.Log($"[Class] Fresh {RunProfile.Class.displayName} after the reload.");
+        return true;
     }
 
     /// <summary>
@@ -104,7 +113,9 @@ public sealed class ClassSelectUI : MonoBehaviour
             string p = SaveService.ContinueAfterReloadPath;
             SaveService.ContinueAfterReload = false;
             SaveService.ContinueAfterReloadPath = null;
-            bool ok = Continue(p);
+            string newClass = SaveService.NewHeroAfterReload;
+        SaveService.NewHeroAfterReload = null;
+        bool ok = newClass != null ? StartFreshHero(newClass) : Continue(p);
             Debug.Log(ok ? "[Class] Resumed the saved hero after the reload."
                          : "[Class] Reload continue found no readable save.");
             Destroy(gameObject);
@@ -113,6 +124,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         {
             awaitingReloadContinue = false;
             SaveService.ContinueAfterReload = false;
+            SaveService.NewHeroAfterReload = null;
             Debug.LogWarning("[Class] Reload continue timed out: no hero.");
             Destroy(gameObject);
         }
@@ -143,6 +155,12 @@ public sealed class ClassSelectUI : MonoBehaviour
         if (awaitingReloadContinue) { TickReloadContinue(); return; }
         if (!IsOpen) return;
         var kb = Keyboard.current;
+        if (kb != null && kb.escapeKey.wasPressedThisFrame && ConfirmVisible)
+        {
+            CancelNew();
+            DiabloUIFactory.MarkEscConsumed();
+            return;
+        }
         if (kb != null && kb.escapeKey.wasPressedThisFrame && settingsModal != null && settingsModal.activeSelf)
         {
             ShowSettings(false);
@@ -170,6 +188,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloClickController.ExternalDrive = open;
         if (open)
         {
+            CancelNew();
             ShowSettings(false);
             RefreshContinueAndDiff();
         }
@@ -188,14 +207,94 @@ public sealed class ClassSelectUI : MonoBehaviour
         fadeRoutine = null;
     }
 
-    /// <summary>New character of a class (card button). The first autosave replaces an old save.</summary>
+    /// <summary>New character of a class (direct seam). The first autosave replaces an old save.</summary>
     public void ChooseNew(string classId)
     {
         DiabloAudio.PlayUIClick();
         RunProfile.ClassId = ClassCatalog.Get(classId).id;
         ApplyToHero();
         Debug.Log($"[Class] New {RunProfile.Class.displayName}.");
+        HeroInWorld = true;
         SetOpen(false);
+    }
+
+    // ---- "Begin as <class>" with a hero at stake ----
+
+    /// <summary>True once a hero entered the world this session (new or continued).</summary>
+    public static bool HeroInWorld;
+    /// <summary>Class awaiting confirmation (null when no confirm is open). Test seam.</summary>
+    public string PendingNewClass { get; private set; }
+    public bool ConfirmVisible => confirmModal != null && confirmModal.activeSelf;
+    GameObject confirmModal;
+    Text confirmBody;
+    Text confirmGoLabel;
+
+    /// <summary>What a new hero would replace, or null when nothing is at stake.</summary>
+    /// <summary>Save path the confirm text peeks (null = default). Test seam.</summary>
+    public static string PeekPathOverride;
+
+    public static string ReplacedHeroLine(string path = null)
+    {
+        path = path ?? PeekPathOverride;
+        if (HeroInWorld)
+        {
+            var hero = Hero();
+            var prog = hero != null ? hero.GetComponent<DiabloProgression>() : null;
+            return $"your current {RunProfile.Class.displayName} (level {(prog != null ? prog.Level : 1)}) and this run's world";
+        }
+        if (SaveService.TryPeek(out SaveGame save, path))
+            return $"your saved {ClassCatalog.Get(save.classId).displayName} (level {save.level}, {save.gold} gold)";
+        return null;
+    }
+
+    /// <summary>Card button: confirm first when a hero would be replaced.</summary>
+    public void RequestNew(string classId)
+    {
+        string replaced = ReplacedHeroLine();
+        if (replaced == null || confirmModal == null) { BeginNew(classId); return; }
+        DiabloAudio.PlayUIClick();
+        PendingNewClass = ClassCatalog.Get(classId).id;
+        var cls = ClassCatalog.Get(PendingNewClass);
+        confirmBody.text = $"Begin a new {cls.displayName}?\n\nThis replaces {replaced} at the first autosave.";
+        confirmGoLabel.text = $"Begin as {cls.displayName}";
+        if (mainContent != null) mainContent.SetActive(false);
+        confirmModal.SetActive(true);
+    }
+
+    public void ConfirmNew()
+    {
+        string id = PendingNewClass;
+        CancelNew();
+        if (id != null) BeginNew(id);
+    }
+
+    public void CancelNew()
+    {
+        PendingNewClass = null;
+        if (confirmModal != null) confirmModal.SetActive(false);
+        if (mainContent != null) mainContent.SetActive(true);
+    }
+
+    /// <summary>
+    /// Fresh hero. Mid-session (solo) the world reloads with a reset run so
+    /// level, gear, act progress and dead enemies do not carry over; co-op
+    /// keeps the old in-place class switch (a reload would drop the peers).
+    /// </summary>
+    void BeginNew(string classId)
+    {
+        if (HeroInWorld && Application.isPlaying && Diablo.IsSolo())
+        {
+            DiabloAudio.PlayUIClick();
+            SaveService.NewHeroAfterReload = ClassCatalog.Get(classId).id;
+            SaveService.ContinueAfterReload = false;
+            RunProfile.Reset();
+            SessionComplete.ResetRun();
+            Debug.Log($"[Class] New {ClassCatalog.Get(classId).displayName}: reloading a fresh world.");
+            UnityEngine.SceneManagement.SceneManager.LoadScene(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            return;
+        }
+        ChooseNew(classId);
     }
 
     /// <summary>Continue the saved character (class from the save, no choice).</summary>
@@ -206,6 +305,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloAudio.PlayUIClick();
         ApplyToHero();
         Debug.Log($"[Class] Continue as {RunProfile.Class.displayName}.");
+        HeroInWorld = true;
         SetOpen(false);
         return true;
     }
@@ -407,6 +507,24 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.MakeHeader(settingsModal.transform, "SETTINGS", DiabloMenuArt.MenuArtSprite("SettingsCog"), () => ShowSettings(false));
         DiabloUIFactory.BuildSettingsWidgets(settingsModal.transform, settingsRefreshes, onBack: () => ShowSettings(false));
         settingsModal.SetActive(false);
+
+        // Confirm before a new hero replaces a saved or current one.
+        confirmModal = DiabloUIFactory.MakePanel(canvasGo.transform, "NewHeroConfirmPanel", new Vector2(600f, 290f), Vector2.zero);
+        var cv = confirmModal.AddComponent<VerticalLayoutGroup>();
+        cv.padding = new RectOffset(24, 24, 18, 20);
+        cv.spacing = 12f;
+        cv.childControlWidth = true;
+        cv.childControlHeight = false;
+        DiabloUIFactory.MakeHeader(confirmModal.transform, "BEGIN ANEW?", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelNew);
+        confirmBody = DiabloUIFactory.MakeText(confirmModal.transform, "ConfirmBody", "", 17, DiabloPalette.Parchment, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(confirmBody.gameObject, prefH: 112f, flexW: 1f);
+        var crow = DiabloUIFactory.MakeHorizontalRow(confirmModal.transform, "ConfirmButtons", 14f, 46f);
+        var goBtn = DiabloUIFactory.MakeButton(crow.transform, "ConfirmNewButton", "Begin", 17, true, DiabloPalette.GoldBright, ConfirmNew);
+        DiabloUIFactory.SetLayout(goBtn.gameObject, prefH: 44f, flexW: 1f);
+        confirmGoLabel = goBtn.GetComponentInChildren<Text>();
+        var backBtn = DiabloUIFactory.MakeButton(crow.transform, "CancelNewButton", "Back", 17, false, null, CancelNew);
+        DiabloUIFactory.SetLayout(backBtn.gameObject, prefH: 44f, flexW: 1f);
+        confirmModal.SetActive(false);
         RefreshContinueAndDiff();
         canvas.enabled = false;
     }
@@ -426,7 +544,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         cols.pressedColor = new Color(0.86f, 0.82f, 0.78f, 1f);
         btn.colors = cols;
         string id = cls.id;
-        btn.onClick.AddListener(() => ChooseNew(id));
+        btn.onClick.AddListener(() => RequestNew(id));
 
         var v = card.AddComponent<VerticalLayoutGroup>();
         v.padding = new RectOffset(18, 18, 14, 14);

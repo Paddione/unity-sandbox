@@ -842,3 +842,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   schreibt. Fix: `SaveService.ContinueAfterReload` vor dem Reload, `ClassSelectUI` hängt sich an
   `SceneManager.sceneLoaded` und setzt den Helden fort, sobald der (übernommene) Held steht.
 - Beleg im Player: Shotcheck-Schritt `RELOAD_CONTINUE` vergleicht Level und Gold vor/nach dem Reload.
+
+## 2026-11-21 — Neuer Held mit Rückfrage und frischer Welt, Automation-Saves isoliert
+
+- „Begin as <Klasse>“ fragt jetzt, wenn ein Held auf dem Spiel steht („BEGIN ANEW?“ mit dem
+  ersetzten Helden: gespeichert oder aktuell). Mitten in der Sitzung (solo) startet der neue Held per
+  Szenen-Reload mit `RunProfile.Reset()` (Welt, Akt, Truhe frisch; `SaveService.NewHeroAfterReload`),
+  Koop behält den Klassenwechsel an Ort und Stelle. Belege im Player: Shotcheck `NEW_HERO`.
+- Fund: `shotcheck-windows.sh` startete Shotcheck und Windows-Autoplay ohne `-save-file`; gleicher
+  `productName` heißt gleicher `persistentDataPath`, die Läufe schrieben also den echten
+  `cinderreach-save.json` des installierten Spiels (zuletzt 2026-11-21 02:05). Jetzt
+  `-save-file automation-save.json`. Der überschriebene Stand ist ohne Backup nicht wiederherstellbar.

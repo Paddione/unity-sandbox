@@ -92,6 +92,8 @@ public static class SaveService
     /// Path null = <see cref="DefaultPath"/> (test seam).
     /// </summary>
     public static bool ContinueAfterReload;
+    /// <summary>Class id of a fresh hero to start after an in-game reload (null = none).</summary>
+    public static string NewHeroAfterReload;
     public static string ContinueAfterReloadPath;
 
     /// <summary>Delete the save (New Game, after the caller's confirmation).</summary>

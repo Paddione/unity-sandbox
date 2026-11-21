@@ -34,6 +34,9 @@ public class ClassSelectTests
         if (File.Exists(path)) File.Delete(path);
         SaveService.ContinueAfterReload = false;
         SaveService.ContinueAfterReloadPath = null;
+        SaveService.NewHeroAfterReload = null;
+        ClassSelectUI.PeekPathOverride = null;
+        ClassSelectUI.HeroInWorld = false;
         RunProfile.Reset();
     }
 
@@ -87,5 +90,46 @@ public class ClassSelectTests
         Assert.AreEqual(321, hero.GetComponent<Wallet>().Gold, "gold comes back from the save");
         Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId, "class comes back from the save");
         Assert.IsTrue(ui == null, "the helper removes itself");
+    }
+
+    [UnityTest]
+    public IEnumerator RequestNew_ConfirmsBeforeReplacingASavedHero()
+    {
+        ClassSelectUI.HeroInWorld = false;
+        hero.GetComponent<Wallet>().SetGold(77);
+        SaveService.SaveNow(hero, path: path);
+        ClassSelectUI.PeekPathOverride = path;
+
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.RequestNew(ClassCatalog.RogueId);
+        Assert.IsTrue(ui.ConfirmVisible, "a saved hero is at stake: ask first");
+        Assert.AreEqual(ClassCatalog.RogueId, ui.PendingNewClass);
+        Assert.AreEqual(ClassCatalog.FenwalkerId, RunProfile.ClassId, "nothing changes before the confirm");
+        StringAssert.Contains("77 gold", ClassSelectUI.ReplacedHeroLine());
+
+        ui.CancelNew();
+        Assert.IsFalse(ui.ConfirmVisible);
+        Assert.IsTrue(ui.IsOpen, "Back returns to the cards");
+
+        ui.RequestNew(ClassCatalog.RogueId);
+        ui.ConfirmNew();
+        Assert.AreEqual(ClassCatalog.RogueId, RunProfile.ClassId);
+        Assert.IsFalse(ui.IsOpen);
+        Assert.IsTrue(ClassSelectUI.HeroInWorld);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator RequestNew_WithNothingAtStakeBeginsAtOnce()
+    {
+        ClassSelectUI.HeroInWorld = false;
+        ClassSelectUI.PeekPathOverride = path; // no file there
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.RequestNew(ClassCatalog.LanternbearerId);
+        Assert.IsFalse(ui.ConfirmVisible);
+        Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId);
+        yield return null;
     }
 }
