@@ -282,4 +282,12 @@ public class DiabloMenuPolishTests
         }
         finally { Object.DestroyImmediate(go); }
     }
+
+    [Test]
+    public void SpawnLoad_OnlyJoiningClientsBringTheirSave()
+    {
+        Assert.IsTrue(DiabloNetworkPlayer.ShouldLoadSaveOnSpawn(isServer: false), "a joining client brings its hero");
+        Assert.IsFalse(DiabloNetworkPlayer.ShouldLoadSaveOnSpawn(isServer: true),
+            "host/solo choose Continue or New on the start screen");
+    }
 }

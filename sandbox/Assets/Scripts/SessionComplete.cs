@@ -201,10 +201,12 @@ public sealed class SessionComplete : MonoBehaviour
         var hero = gameObject.name == "Player" ? gameObject : GameObject.Find("Player");
         if (hero != null)
         {
-            var cc = hero.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-            hero.transform.position = new Vector3(0f, 0.05f, 11f);
-            if (cc != null) cc.enabled = true;
+            // Arrive at the Lantern Hold waypoint like a waypoint trip (not inside the campfire),
+            // then autosave so a quit right after the overlay keeps the town position.
+            var shrine = WaypointShrine.Find("Town");
+            ZoneTravel.TeleportHero(hero, shrine != null ? shrine.Arrival : new Vector3(0f, 0.05f, 11f));
+            Physics.SyncTransforms();
+            if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: ActProgress.Town);
         }
         if (canvas != null) canvas.enabled = false;
         DiabloClickController.ExternalDrive = false;

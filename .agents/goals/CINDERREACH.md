@@ -163,6 +163,9 @@ Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 10`, Migrationskette v1 → �
 `SaveMigrations` mit Backup `*.vN.bak`. Neuere Versionen werden nicht geladen und bleiben unberührt.
 Neue Felder additiv anhängen, eine Migration schreiben und `SaveMigrationTests` auf `CurrentVersion`
 prüfen lassen.
+Laden: Solo und Host laden nur über „Continue“ auf dem Startbildschirm; beim Netzwerk-Spawn lädt nur
+ein beitretender Client seinen Helden (`DiabloNetworkPlayer.ShouldLoadSaveOnSpawn`). `SaveService.TryPeek`
+liest für Menüs ohne Nebenwirkung.
 
 ## Qualitätsnetz
 

@@ -24,7 +24,11 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         if (IsOwner)
         {
             TakeOverSoloHero(gameObject);
-            if (SaveService.HasSave() && SaveService.TryLoad(gameObject))
+            // Only a joining client brings its saved character along. The host (and
+            // solo, which is a host nobody joined) picks Continue or a new hero on the
+            // start screen; loading here made "Begin as <class>" keep the old hero's
+            // level and gear and let a stale save override an explicit -class.
+            if (ShouldLoadSaveOnSpawn(IsServer) && SaveService.HasSave() && SaveService.TryLoad(gameObject))
                 Debug.Log("[Net] loaded local save for co-op join.");
             PublishClass();
             SubmitJoinStatsServerRpc(UnityEngine.JsonUtility.ToJson(CaptureJoinReport(gameObject)));
@@ -35,6 +39,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             ApplyClassIndex(classIndex.Value);
         }
     }
+
+    /// <summary>Spawn-time save load rule: joining clients only (pure, EditMode-pinnable).</summary>
+    public static bool ShouldLoadSaveOnSpawn(bool isServer) => !isServer;
 
     /// <summary>Owner: push the run profile class to all mirrors.</summary>
     public void PublishClass()

@@ -818,3 +818,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Startbild `StartupBackdrop` neu: 1920×1080 statt hochskalierter 1024×576, Rogue ergänzt, Gruppe
   im rechten Drittel, damit die Klassenkarten (linke 64 %) niemanden verdecken.
 - Übergang: Der Startbildschirm blendet nach der Wahl 0,45 s aus (Eingabe sofort frei).
+
+## 2026-11-21 — Spawn-Load nur für beitretende Clients (Nightly-Lanternbearer rot)
+
+- Befund: Nightly `0619770` Lanternbearer-Lauf Exit 1 (Normal/Kindled grün). Solo läuft als Host
+  ohne Mitspieler; `DiabloNetworkPlayer.OnNetworkSpawn` lud für den Owner immer den lokalen
+  Spielstand. Im Nightly lag dort der Fenwalker Lv 6 aus dem Kindled-Lauf: `-class lanternbearer`
+  wurde überschrieben (`party=fenwalker,fenwalker,rogue`), der Trankkauf ging über den Host-Relay
+  (`bought=False`), Phase `town` fehlte. Für Spieler hieß das: „Begin as <Klasse>“ behielt Level,
+  Gold und Ausrüstung des alten Helden.
+- Fix: `ShouldLoadSaveOnSpawn(isServer)` — nur beitretende Clients bringen ihren Helden mit.
+  Host und Solo wählen auf dem Startbildschirm Continue (lädt) oder einen neuen Helden.
