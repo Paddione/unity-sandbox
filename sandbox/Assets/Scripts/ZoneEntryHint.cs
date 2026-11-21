@@ -50,7 +50,7 @@ public sealed class ZoneEntryHint : MonoBehaviour
         DiabloUIFactory.SetLayout(title.gameObject, prefH: 26f, flexW: 1f);
 
         var sub = DiabloUIFactory.MakeText(card.transform, "ZoneHint",
-            "WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  Esc Pause",
+            "WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  Alt Loot names  •  Esc Pause",
             13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(sub.gameObject, prefH: 20f, flexW: 1f);
 

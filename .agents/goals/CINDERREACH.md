@@ -153,6 +153,8 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - HUD: Lebenskugel mit Todesschleier („YOU HAVE FALLEN“, rein präsentativ), Bronzeplatte unter
   Skill- und XP-Leiste. Charakterblatt mit Varianten-Umschalter (solo im Lantern Hold),
   Waypoint-Fenster mit gesperrten Schreinen („not attuned“/„sealed“), „Press On“ nach dem Abbot.
+  Zielbalken mit Anzeigenamen (`DiabloTargetBar.DisplayName`, Tier-Farbe), Bossbalken mit Phase
+  (Boss/ActBoss im Umkreis 24 m), Alt zeigt Loot-Namen am Boden (`DiabloLootLabels`, `LootDrop.Live`).
 - Einstellungen `DiabloSettings` (PlayerPrefs). Boot fasst Anzeige nur ohne Automation/`-screen-*`
   an und die Auflösung nur, wenn der Spieler eine gespeichert hat (sonst Gate-Regression ~2,7×).
   Laufzeit-UIs nutzen den HD-Scaler (1920×1080, match 0,5, `DiabloHdTests`).

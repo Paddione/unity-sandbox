@@ -11,6 +11,13 @@ public sealed class LootDrop : MonoBehaviour
 {
     public ItemInstance item;
     public bool isChest;
+
+    /// <summary>Drops in the world (ground labels read this instead of scanning the scene).</summary>
+    public static readonly System.Collections.Generic.List<LootDrop> Live = new System.Collections.Generic.List<LootDrop>();
+
+    void OnEnable() { if (!Live.Contains(this)) Live.Add(this); }
+
+    void OnDisable() => Live.Remove(this);
     public bool collected;
 
     /// <summary>Roll the tier table and spawn loot; null when nothing drops.</summary>

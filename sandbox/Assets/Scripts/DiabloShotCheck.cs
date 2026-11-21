@@ -408,6 +408,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
                 hero.pitch = 42f;
                 yield return Wait(0.8f);
                 yield return Shot("s5_ground_rarities");
+                DiabloLootLabels.ForceShow = true; // as if Alt were held
+                yield return Wait(0.2f);
+                yield return Shot("loot_labels_alt");
+                DiabloLootLabels.ForceShow = false;
                 var invUi = hero.GetComponent<DiabloInventoryUI>();
                 if (invUi != null)
                 {

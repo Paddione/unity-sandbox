@@ -260,4 +260,34 @@ public class DiabloMenuPlayTests
         yield return null;
         Assert.IsNull(bar.ShownBoss, "out of range hides the bar");
     }
+
+    [UnityTest]
+    public IEnumerator LootLabels_NameNearbyDropsInRarityColor()
+    {
+        var hero = Track(new GameObject(DiabloNetworkPlayer.HeroName));
+        var camGo = Track(new GameObject("LabelCam"));
+        var cam = camGo.AddComponent<Camera>();
+        camGo.tag = "MainCamera";
+        camGo.transform.position = new Vector3(0f, 10f, -8f);
+        camGo.transform.LookAt(Vector3.zero);
+        var dropGo = Track(new GameObject("GroundDrop"));
+        dropGo.transform.position = new Vector3(1f, 0f, 1f);
+        var drop = dropGo.AddComponent<LootDrop>();
+        drop.item = ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId);
+        var labels = Track(new GameObject("Labels")).AddComponent<DiabloLootLabels>();
+        try
+        {
+            DiabloLootLabels.ForceShow = true;
+            yield return null;
+            yield return null;
+            Assert.AreEqual(1, labels.ShownCount);
+            var (text, color) = DiabloLootLabels.LabelFor(drop);
+            Assert.AreEqual("Bulwark Carrier", text);
+            Assert.AreEqual(DiabloPalette.Rarity(ItemRarity.Unique), color);
+            DiabloLootLabels.ForceShow = false;
+            yield return null;
+            Assert.AreEqual(0, labels.ShownCount, "labels only while Alt is held");
+        }
+        finally { DiabloLootLabels.ForceShow = false; }
+    }
 }

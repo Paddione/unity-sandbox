@@ -642,7 +642,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         DiabloUIFactory.SetLayout(statsDetailText.gameObject, prefH: 390f, flexW: 1f);
 
         var controlsBox = DiabloUIFactory.MakeText(statsPage.transform, "ControlsHint",
-            "Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  1 Potion  •  I/B Inventory  •  C Character  •  Esc Pause",
+            "Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  1 Potion  •  I/B Inventory  •  C Character  •  Alt Loot names  •  Esc Pause",
             13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(controlsBox.gameObject, prefH: 40f, flexW: 1f);
     }
