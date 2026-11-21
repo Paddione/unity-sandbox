@@ -15,6 +15,24 @@ public sealed class Equipment : MonoBehaviour
     public const float BaseMaxHP = 20f;
     public const float BaseMoveSpeed = 5f;
 
+    /// <summary>
+    /// Unity (scene serialization) and JsonUtility (saves) never keep a null
+    /// [Serializable] field: an empty slot comes back as a blank ItemInstance.
+    /// Blank means no base type and no unique id.
+    /// </summary>
+    public static bool IsBlank(ItemInstance item) =>
+        item == null || (string.IsNullOrEmpty(item.baseType) && string.IsNullOrEmpty(item.uniqueId));
+
+    /// <summary>Turn blank slot placeholders back into real empty slots.</summary>
+    public void NormalizeEmptySlots()
+    {
+        if (IsBlank(armor)) armor = null;
+        if (IsBlank(weapon)) weapon = null;
+        if (IsBlank(helmet)) helmet = null;
+    }
+
+    void Awake() => NormalizeEmptySlots();
+
     public void Equip(ItemInstance item)
     {
         if (item == null) return;
@@ -35,6 +53,7 @@ public sealed class Equipment : MonoBehaviour
     /// <summary>Currently equipped item in a slot (null when empty).</summary>
     public ItemInstance GetEquipped(ItemSlot slot)
     {
+        NormalizeEmptySlots();
         switch (slot)
         {
             case ItemSlot.Armor: return armor;

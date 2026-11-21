@@ -265,4 +265,21 @@ public class DiabloMenuPolishTests
         Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-screen-width", "1280" }));
         Assert.IsFalse(DiabloSettings.BootMayTouchDisplay(new[] { "x", "-screen-fullscreen", "0" }));
     }
+
+    [Test]
+    public void Equipment_BlankSerializedSlotsAreEmpty()
+    {
+        var go = new GameObject("BlankSlotHero");
+        try
+        {
+            var eq = go.AddComponent<Equipment>();
+            var inv = go.AddComponent<Inventory>();
+            eq.armor = new ItemInstance();   // what scene/Json serialization leaves in an empty slot
+            eq.helmet = new ItemInstance();
+            Assert.IsNull(eq.GetEquipped(ItemSlot.Armor), "blank placeholder reads as empty");
+            Assert.IsFalse(eq.UnequipTo(ItemSlot.Helmet, inv), "nothing to unequip");
+            Assert.AreEqual(0, inv.Count, "no phantom item lands in the bag");
+        }
+        finally { Object.DestroyImmediate(go); }
+    }
 }

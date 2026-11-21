@@ -89,18 +89,42 @@ public sealed class ClassSelectUI : MonoBehaviour
         }
     }
 
+    public const float FadeOutSeconds = 0.45f;
+    CanvasGroup fadeGroup;
+    Coroutine fadeRoutine;
+
     public void SetOpen(bool open)
     {
         if (!live.Contains(this)) live.Add(this); // EditMode AddComponent skips OnEnable
         if (open && canvas == null) Build();
+        bool wasOpen = IsOpen;
         IsOpen = open;
-        if (canvas != null) canvas.enabled = open;
+        if (fadeRoutine != null) { StopCoroutine(fadeRoutine); fadeRoutine = null; }
+        if (fadeGroup != null) { fadeGroup.alpha = 1f; fadeGroup.blocksRaycasts = open; }
+        // Leaving the start screen for the world: a short fade instead of a hard cut
+        // (input is released at once; only the picture lingers).
+        if (!open && wasOpen && canvas != null && fadeGroup != null && Application.isPlaying && isActiveAndEnabled)
+            fadeRoutine = StartCoroutine(FadeOut());
+        else if (canvas != null) canvas.enabled = open;
         DiabloClickController.ExternalDrive = open;
         if (open)
         {
             ShowSettings(false);
             RefreshContinueAndDiff();
         }
+    }
+
+    System.Collections.IEnumerator FadeOut()
+    {
+        float t0 = Time.unscaledTime;
+        while (Time.unscaledTime - t0 < FadeOutSeconds)
+        {
+            fadeGroup.alpha = 1f - Mathf.SmoothStep(0f, 1f, (Time.unscaledTime - t0) / FadeOutSeconds);
+            yield return null;
+        }
+        fadeGroup.alpha = 1f;
+        canvas.enabled = false;
+        fadeRoutine = null;
     }
 
     /// <summary>New character of a class (card button). The first autosave replaces an old save.</summary>
@@ -190,6 +214,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         var canvasGo = new GameObject("ClassSelectCanvas");
         canvasGo.transform.SetParent(transform, false);
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 25);
+        fadeGroup = canvasGo.AddComponent<CanvasGroup>();
 
         // Full-viewport obsidian backdrop covering gameplay HUD behind start screen cleanly
         var backdropBase = new GameObject("BackdropFill", typeof(RectTransform));

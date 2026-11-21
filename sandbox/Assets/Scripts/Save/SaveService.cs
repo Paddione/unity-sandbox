@@ -80,7 +80,7 @@ public static class SaveService
         if (prog != null && (prog.Level > 1 || prog.Xp > 0)) return true;
         if (wallet != null && wallet.Gold > 0) return true;
         if (inv != null && inv.Count > 0) return true;
-        return eq != null && (eq.armor != null || eq.weapon != null || eq.helmet != null);
+        return eq != null && (!Equipment.IsBlank(eq.armor) || !Equipment.IsBlank(eq.weapon) || !Equipment.IsBlank(eq.helmet));
     }
 
     public static bool HasSave(string path = null) => File.Exists(path ?? DefaultPath);
@@ -186,6 +186,7 @@ public static class SaveService
         eq.armor = save.equipmentArmor;
         eq.weapon = save.equipmentWeapon;
         eq.helmet = save.equipmentHelmet;
+        eq.NormalizeEmptySlots();
         var inv = hero.GetComponent<Inventory>();
         if (inv != null) UnityEngine.Object.DestroyImmediate(inv);
         inv = hero.AddComponent<Inventory>();

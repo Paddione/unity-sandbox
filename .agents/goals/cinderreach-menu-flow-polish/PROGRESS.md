@@ -28,6 +28,11 @@ Prozent: 90 %
   „(Here)“ nicht klickbar; kompaktere Klassenkarten. EditMode 377/377, PlayMode 268/268,
   Shotcheck 46 Motive.
 
+- 2026-11-21: Iteration 3: leere Ausrüstungsslots als echte Leerstellen (`Equipment.IsBlank`,
+  kein Phantom-Item beim Ablegen), Startbild 1920×1080 mit allen drei Helden rechts der Karten,
+  0,45-s-Ausblenden des Startbildschirms. EditMode 378/378, PlayMode 268/268, Autoplay `-seed 0`
+  PASS worst 38,8 fps, Shotcheck 46 Motive.
+
 ## Nächste Schritte
 
 - Landen, danach weitere Iterationen nach Shot-Befunden.

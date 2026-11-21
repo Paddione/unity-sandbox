@@ -33,7 +33,7 @@ if os.path.isdir(BPY_HELPERS_DIR) and BPY_HELPERS_DIR not in sys.path:
 import bpy_helpers as H  # noqa: E402
 
 ICON_SIZE = 256
-BACKDROP_SIZE = (1024, 576)
+BACKDROP_SIZE = (int(os.environ.get("CINDERREACH_BACKDROP_W", "1920")), int(os.environ.get("CINDERREACH_BACKDROP_H", "1080")))
 SAMPLES = int(os.environ.get("CINDERREACH_PACK_SAMPLES", "84"))
 BACKDROP_SAMPLES = int(os.environ.get("CINDERREACH_BACKDROP_SAMPLES", "96"))
 
@@ -713,7 +713,8 @@ def build_startup_backdrop():
     knight_objs = import_fbx(os.path.join(ADV_DIR, "Characters", "Knight.fbx"))
     bind_texture(knight_objs, os.path.join(ADV_DIR, "Characters", "knight_texture.png"), roughness=0.52, metallic=0.22, sat=0.82, val=0.84)
     k_arm = next(o for o in knight_objs if o.type == "ARMATURE")
-    k_arm.location = (2.68, 0.65, 0.0)
+    # Group sits in the right third: the start screen's class cards cover the left 64 %.
+    k_arm.location = (2.75, 0.75, 0.0)
     k_arm.rotation_euler = Euler((math.radians(90), 0, math.radians(-30)))
     pose_character(k_arm, {
         "spine": (3, 0, 4),
@@ -735,7 +736,7 @@ def build_startup_backdrop():
     mage_objs = import_fbx(os.path.join(ADV_DIR, "Characters", "Mage.fbx"))
     bind_texture(mage_objs, os.path.join(ADV_DIR, "Characters", "mage_texture.png"), roughness=0.62, metallic=0.10, sat=0.80, val=0.82)
     m_arm = next(o for o in mage_objs if o.type == "ARMATURE")
-    m_arm.location = (0.45, 1.15, 0.0)
+    m_arm.location = (0.95, 1.15, 0.0)
     m_arm.rotation_euler = Euler((math.radians(90), 0, math.radians(26)))
     pose_character(m_arm, {
         "spine": (2, 0, -6),
@@ -750,6 +751,29 @@ def build_startup_backdrop():
     build_mini_lantern(m, mlpos, scale=0.40)
     H.add_light("POINT", "HeldLanternLight", location=(mlpos.x, mlpos.y - 0.10, mlpos.z),
                 energy=55.0, light_color="#ff9428", shadow_soft=0.18)
+
+    # Rogue behind the hearth, twin daggers lowered, lit from the fire below.
+    rogue_objs = import_fbx(os.path.join(ADV_DIR, "Characters", "Rogue.fbx"))
+    bind_texture(rogue_objs, os.path.join(ADV_DIR, "Characters", "rogue_texture.png"), roughness=0.6, metallic=0.12, sat=0.70, val=0.80)
+    r_arm = next(o for o in rogue_objs if o.type == "ARMATURE")
+    r_arm.location = (2.25, 2.5, 0.0)
+    r_arm.rotation_euler = Euler((math.radians(90), 0, math.radians(-6)))
+    pose_character(r_arm, {
+        "spine": (4, 0, 2),
+        "head": (4, 0, 6),
+        "upperarm.l": (-60, 0, -24),
+        "lowerarm.l": (-20, 0, -40),
+        "upperarm.r": (-60, 0, 24),
+        "lowerarm.r": (-20, 0, 40),
+    })
+    for side, rot in (("r", (70, -20, -10)), ("l", (70, 20, 10))):
+        hand_r = bone_world_pos(r_arm, f"handslot.{side}")
+        dag = import_fbx(os.path.join(ADV_DIR, "Accessories", "dagger.fbx"))
+        bind_texture(dag, os.path.join(ADV_DIR, "Characters", "rogue_texture.png"), roughness=0.22, metallic=0.9)
+        for o in dag:
+            o.location = hand_r + Vector((0.0, -0.03, -0.02))
+            o.rotation_euler = Euler([math.radians(a) for a in rot])
+            o.scale = (0.9, 0.9, 0.9)
 
     # Architectural ruins / dark stone arches / gravestones across skyline with soft moonlight catch
     ruins = [
@@ -789,7 +813,7 @@ def build_startup_backdrop():
     H.add_light("AREA", "MoonFrontWash", location=(-3.0, -4.0, 3.2), target=(0.8, 1.4, 0.8),
                 energy=95.0, size=5.0, light_color="#486694")
 
-    H.add_camera("StartupCam", location=(-0.35, -5.6, 1.72), target=(0.75, 1.2, 0.96), lens=32.0)
+    H.add_camera("StartupCam", location=(-1.35, -7.9, 2.25), target=(-1.35, 1.4, 0.95), lens=32.0)
     os.makedirs(OUT_DIR, exist_ok=True)
     out_path = os.path.join(OUT_DIR, "StartupBackdrop.png")
     bpy.context.scene.render.filepath = out_path

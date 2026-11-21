@@ -808,3 +808,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   ohne Automation/`-screen-*` an und die Auflösung nur, wenn der Spieler eine gespeichert hat
   (`BootMayTouchDisplay`). Zusätzlich laufen Modal-Checks im Klick-Controller nur noch in
   Klick-Frames, `ClassSelectUI`/`PauseMenuUI` melden sich statt per Szenen-Scan über `AnyOpen`.
+
+## 2026-11-21 — Menü-Flow Iteration 3: leere Slots, Startbild, Übergang
+
+- Leere Ausrüstungsslots: Unity-Szenenserialisierung und `JsonUtility` halten `[Serializable]`-Felder
+  nie `null`, ein leerer Slot kam als leere `ItemInstance` zurück („[Magic] No bonuses“ im Inventar,
+  Klick darauf legte ein Phantom-Item in die Tasche). `Equipment.IsBlank`/`NormalizeEmptySlots`
+  (Awake, `GetEquipped`, nach `SaveService.ApplyState`), `HasProgress` prüft `IsBlank`.
+- Startbild `StartupBackdrop` neu: 1920×1080 statt hochskalierter 1024×576, Rogue ergänzt, Gruppe
+  im rechten Drittel, damit die Klassenkarten (linke 64 %) niemanden verdecken.
+- Übergang: Der Startbildschirm blendet nach der Wahl 0,45 s aus (Eingabe sofort frei).
