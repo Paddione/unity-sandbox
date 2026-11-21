@@ -829,3 +829,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Gold und Ausrüstung des alten Helden.
 - Fix: `ShouldLoadSaveOnSpawn(isServer)` — nur beitretende Clients bringen ihren Helden mit.
   Host und Solo wählen auf dem Startbildschirm Continue (lädt) oder einen neuen Helden.
+- Nachtrag Iteration 4: „Return to Town“ im Abschluss-Overlay landet am Town-Schrein statt im
+  Lagerfeuer, synchronisiert die Physik und speichert. Belege: EditMode 379/379, PlayMode 268/268,
+  Autoplay `-seed 2` Normal und danach Lanternbearer beide Exit 0 (Lanternbearer `bought=True`,
+  alle 8 Phasen).
+
+## 2026-11-21 — „New run“ setzt den gespeicherten Helden fort
+
+- Folge aus der Spawn-Load-Regel: `DiabloInventoryUI.StartNewRun` speichert und lädt die Szene neu;
+  `RuntimeInitializeOnLoad`-Boots laufen danach nicht erneut, und der Host lädt beim Spawn nicht mehr.
+  Ohne Gegenmaßnahme stünde ein frischer Level-1-Held da, den der nächste Autosave über den Spielstand
+  schreibt. Fix: `SaveService.ContinueAfterReload` vor dem Reload, `ClassSelectUI` hängt sich an
+  `SceneManager.sceneLoaded` und setzt den Helden fort, sobald der (übernommene) Held steht.
+- Beleg im Player: Shotcheck-Schritt `RELOAD_CONTINUE` vergleicht Level und Gold vor/nach dem Reload.

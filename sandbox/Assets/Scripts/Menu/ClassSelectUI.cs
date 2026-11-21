@@ -58,6 +58,66 @@ public sealed class ClassSelectUI : MonoBehaviour
             }
     }
 
+    // ---- continue after an in-game reload ("New run") ----
+    bool awaitingReloadContinue;
+    int reloadStartFrame;
+    float reloadDeadline;
+    public const float ReloadContinueTimeout = 10f;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void HookSceneReload()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    static void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (SaveService.ContinueAfterReload) BeginReloadContinue();
+    }
+
+    /// <summary>
+    /// Resume the saved hero once the reloaded scene's hero stands (network
+    /// takeover included). Runtime boots do not re-run after LoadScene, so
+    /// without this a "New run" would leave a fresh level-1 hero that the next
+    /// autosave writes over the real save.
+    /// </summary>
+    public static ClassSelectUI BeginReloadContinue()
+    {
+        var ui = new GameObject("ReloadContinue").AddComponent<ClassSelectUI>();
+        ui.awaitingReloadContinue = true;
+        ui.reloadStartFrame = Time.frameCount;
+        ui.reloadDeadline = Time.unscaledTime + ReloadContinueTimeout;
+        return ui;
+    }
+
+    void TickReloadContinue()
+    {
+        var target = Hero();
+        bool settled = Time.frameCount >= reloadStartFrame + 3; // let the owned hero take over 'Player'
+        var net = target != null ? target.GetComponent<DiabloNetworkPlayer>() : null;
+        var nm = Unity.Netcode.NetworkManager.Singleton;
+        bool netReady = net == null || nm == null || !nm.IsListening || net.IsSpawned;
+        if (target != null && settled && netReady)
+        {
+            awaitingReloadContinue = false;
+            string p = SaveService.ContinueAfterReloadPath;
+            SaveService.ContinueAfterReload = false;
+            SaveService.ContinueAfterReloadPath = null;
+            bool ok = Continue(p);
+            Debug.Log(ok ? "[Class] Resumed the saved hero after the reload."
+                         : "[Class] Reload continue found no readable save.");
+            Destroy(gameObject);
+        }
+        else if (Time.unscaledTime > reloadDeadline)
+        {
+            awaitingReloadContinue = false;
+            SaveService.ContinueAfterReload = false;
+            Debug.LogWarning("[Class] Reload continue timed out: no hero.");
+            Destroy(gameObject);
+        }
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
     {
@@ -80,6 +140,7 @@ public sealed class ClassSelectUI : MonoBehaviour
 
     void Update()
     {
+        if (awaitingReloadContinue) { TickReloadContinue(); return; }
         if (!IsOpen) return;
         var kb = Keyboard.current;
         if (kb != null && kb.escapeKey.wasPressedThisFrame && settingsModal != null && settingsModal.activeSelf)

@@ -85,6 +85,15 @@ public static class SaveService
 
     public static bool HasSave(string path = null) => File.Exists(path ?? DefaultPath);
 
+    /// <summary>
+    /// Set before an in-game scene reload ("New run"): the next loaded scene
+    /// continues the saved hero instead of starting fresh (spawn never loads
+    /// on the host, see <see cref="DiabloNetworkPlayer.ShouldLoadSaveOnSpawn"/>).
+    /// Path null = <see cref="DefaultPath"/> (test seam).
+    /// </summary>
+    public static bool ContinueAfterReload;
+    public static string ContinueAfterReloadPath;
+
     /// <summary>Delete the save (New Game, after the caller's confirmation).</summary>
     public static void DeleteSave(string path = null)
     {

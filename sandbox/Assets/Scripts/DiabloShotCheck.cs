@@ -440,6 +440,32 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Shot("death_veil_lifting");
         PlayerHealth.LastDeathTime = float.NegativeInfinity;
 
+        // In-game "New run" reloads the scene; the saved hero must come back (not a fresh level 1).
+        var prog0 = hero.GetComponent<DiabloProgression>();
+        var wallet0 = hero.GetComponent<Wallet>();
+        int levelBefore = prog0 != null ? prog0.Level : -1;
+        int goldBefore = wallet0 != null ? wallet0.Gold : -1;
+        var inv0 = hero.GetComponent<DiabloInventoryUI>();
+        if (inv0 == null) inv0 = hero.gameObject.AddComponent<DiabloInventoryUI>();
+        DiabloClickController.ExternalDrive = false;
+        inv0.StartNewRun(RunProfile.Normal);
+        float until = Time.realtimeSinceStartup + 15f;
+        GameObject after = null;
+        while (Time.realtimeSinceStartup < until)
+        {
+            yield return null;
+            if (SaveService.ContinueAfterReload) continue;
+            after = GameObject.Find(DiabloNetworkPlayer.HeroName);
+            if (after != null) break;
+        }
+        yield return Wait(1.0f);
+        after = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        int levelAfter = after != null && after.GetComponent<DiabloProgression>() != null ? after.GetComponent<DiabloProgression>().Level : -1;
+        int goldAfter = after != null && after.GetComponent<Wallet>() != null ? after.GetComponent<Wallet>().Gold : -1;
+        bool resumed = levelAfter == levelBefore && goldAfter == goldBefore;
+        Log($"RELOAD_CONTINUE {(resumed ? "PASS" : "FAIL")} level {levelBefore}->{levelAfter} gold {goldBefore}->{goldAfter}");
+        yield return Shot("after_new_run");
+
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);

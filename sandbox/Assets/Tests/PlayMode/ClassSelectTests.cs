@@ -32,6 +32,8 @@ public class ClassSelectTests
         Object.Destroy(hero);
         DiabloClickController.ExternalDrive = false;
         if (File.Exists(path)) File.Delete(path);
+        SaveService.ContinueAfterReload = false;
+        SaveService.ContinueAfterReloadPath = null;
         RunProfile.Reset();
     }
 
@@ -65,5 +67,25 @@ public class ClassSelectTests
         Assert.AreEqual(ClassCatalog.LanternbearerId, hero.GetComponent<ClassAppearance>().AppliedClassId);
         Assert.IsFalse(ui.IsOpen);
         yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator ReloadContinue_ResumesTheSavedHeroAfterNewRun()
+    {
+        RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        hero.GetComponent<Wallet>().SetGold(321);
+        SaveService.SaveNow(hero, path: path);
+        RunProfile.Reset();
+        hero.GetComponent<Wallet>().SetGold(0);
+
+        SaveService.ContinueAfterReload = true;
+        SaveService.ContinueAfterReloadPath = path;
+        var ui = ClassSelectUI.BeginReloadContinue();
+        for (int i = 0; i < 6; i++) yield return null;
+
+        Assert.IsFalse(SaveService.ContinueAfterReload, "the flag is consumed once");
+        Assert.AreEqual(321, hero.GetComponent<Wallet>().Gold, "gold comes back from the save");
+        Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId, "class comes back from the save");
+        Assert.IsTrue(ui == null, "the helper removes itself");
     }
 }

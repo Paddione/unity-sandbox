@@ -656,13 +656,18 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     /// <summary>
     /// Difficulty changes only with a new run: enemy HP scales at wake-up. Reloads zone with a fresh seed.
     /// </summary>
-    void StartNewRun(string difficulty)
+    public void StartNewRun(string difficulty)
     {
         if (!Diablo.IsSolo()) return;
         DiabloAudio.PlayUIClick();
         DifficultyProfile.Select(difficulty);
         RunProfile.RunSeed = RunProfile.NewSeed();
-        if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
+        if (Diablo.IsLocalAuthority())
+        {
+            SaveService.SaveNow(gameObject);
+            SaveService.ContinueAfterReload = true; // the reloaded scene resumes this hero
+            SaveService.ContinueAfterReloadPath = null;
+        }
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
