@@ -19,6 +19,9 @@ public sealed class ZoneGate : MonoBehaviour
     // act-one S2: Ossuary → Cinder Kiln (locked until the Abbot falls) and back.
     public const string KilnGateName = "KilnGate";
     public const string KilnReturnGateName = "KilnReturnGate";
+    // act-two-opening S1: Kiln → Glass Barrens (locked until the Kilnmother falls) and back.
+    public const string BarrensGateName = "BarrensGate";
+    public const string BarrensReturnGateName = "BarrensReturnGate";
     public const string LockedHintName = "GateHint";
 
     /// <summary>Gate leads into a zone the act has not opened yet.</summary>
@@ -237,6 +240,10 @@ public sealed class ZoneGate : MonoBehaviour
         return any;
     }
 
+    /// <summary>Hint text over a sealed gate, per target zone.</summary>
+    public static string LockedHintFor(int zone) =>
+        zone == ActProgress.Barrens ? BarrensLayout.LockedHint : KilnLayout.LockedHint;
+
     /// <summary>Locked-gate hint follows the act state (headless-callable).</summary>
     public void RefreshHint()
     {
@@ -245,7 +252,7 @@ public sealed class ZoneGate : MonoBehaviour
         if (Application.isPlaying && hint.GetComponent<TextMesh>() == null)
         {
             var tm = hint.gameObject.AddComponent<TextMesh>();
-            tm.text = KilnLayout.LockedHint;
+            tm.text = LockedHintFor(targetZone);
             tm.anchor = TextAnchor.MiddleCenter;
             tm.alignment = TextAlignment.Center;
             tm.characterSize = 0.5f;

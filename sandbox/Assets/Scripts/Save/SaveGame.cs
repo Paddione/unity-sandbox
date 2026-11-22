@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 10;
+    public const int CurrentVersion = 11;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -62,6 +62,9 @@ public sealed class SaveGame
     public bool kindledRewardPending;
     public string kindledRewardClass = "";
     public bool kindledRewardGranted;
+
+    // v11 (act-two-opening S1): Glass Barrens zone boss; the zone itself rides on highestUnlockedZone.
+    public bool actTwoBossDefeated;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

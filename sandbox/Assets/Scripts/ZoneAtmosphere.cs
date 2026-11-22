@@ -52,6 +52,8 @@ public sealed class ZoneAtmosphere : MonoBehaviour
                 return new Grade { bloomIntensity = 0.9f, bloomThreshold = 0.7f, vignette = 0.45f, exposure = -0.45f, saturation = -15f, temperature = -10f, tint = 5f };
             case ActProgress.Kiln: // Cinder Kiln: hot ember dark (shares Ossuary mood, hotter tint).
                 return new Grade { bloomIntensity = 1.0f, bloomThreshold = 0.65f, vignette = 0.5f, exposure = -0.35f, saturation = -5f, temperature = 15f, tint = 10f };
+            case ActProgress.Barrens: // Glass Barrens: pale cold glare, bright bloom off the glass, desaturated.
+                return new Grade { bloomIntensity = 1.2f, bloomThreshold = 0.75f, vignette = 0.35f, exposure = 0.05f, saturation = -20f, temperature = -20f, tint = -5f };
             default: // Lantern Hold / Ashen Fen town: warm 2700K lantern key-light, gentle bloom.
                 return new Grade { bloomIntensity = 0.6f, bloomThreshold = 0.9f, vignette = 0.25f, exposure = 0.15f, saturation = 10f, temperature = 25f, tint = 5f };
         }

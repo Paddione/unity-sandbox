@@ -52,6 +52,7 @@ public static class SaveMigrations
         if (save.v == 7) V7ToV8(save);
         if (save.v == 8) V8ToV9(save);
         if (save.v == 9) V9ToV10(save, json);
+        if (save.v == 10) V10ToV11(save);
         return Outcome.Migrated;
     }
 
@@ -176,6 +177,18 @@ public static class SaveMigrations
             index++;
         }
         save.v = 10;
+    }
+
+    /// <summary>
+    /// v10 → v11 (act-two-opening S1): a hero who already felled the Kilnmother
+    /// finds the Glass Barrens open; nobody has beaten the new zone boss yet.
+    /// </summary>
+    static void V10ToV11(SaveGame save)
+    {
+        if (save.actOneComplete && save.highestUnlockedZone >= ActProgress.Kiln)
+            save.highestUnlockedZone = ActProgress.Barrens;
+        save.actTwoBossDefeated = false;
+        save.v = 11;
     }
 
     internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)

@@ -110,12 +110,15 @@ public class MusicDirector : MonoBehaviour
             case "Zone1": return SynthLoop("AshenFenLoop", 146.8f, 103);
             case "Zone2": return SynthLoop("OssuaryLoop", 123.5f, 104);
             case "Boss": return SynthLoop("BossTrack", 98f, 105);
+            case "Zone4": return SynthLoop("GlassBarrensLoop", 110f, 106);
             default: return SynthLoop(track, 174.6f, 42);
         }
     }
 
     public void PlayMenu() => PlayTrack("Menu");
-    public void PlayZone(int zoneIndex) => PlayTrack("Zone" + Mathf.Clamp(zoneIndex, 0, 2));
+    /// <summary>Zones 0–3 keep their historical clamp (the Kiln shares the Ossuary loop); the Barrens get their own.</summary>
+    public void PlayZone(int zoneIndex) =>
+        PlayTrack(zoneIndex == ActProgress.Barrens ? "Zone4" : "Zone" + Mathf.Clamp(zoneIndex, 0, 2));
     public void PlayBoss() => PlayTrack("Boss");
 
     public void PlayTrack(string track)

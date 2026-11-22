@@ -140,9 +140,10 @@ public static class EncounterLayout
         return (a + ab * t - c).magnitude <= radius;
     }
 
-    /// <summary>Zone of a world position by annex offset (Town &lt; 100 m, Ossuary &lt; 300 m, else Kiln).</summary>
+    /// <summary>Zone of a world position by annex offset (Town &lt; 100 m, Ossuary &lt; 300 m, Kiln &lt; 500 m, else Barrens).</summary>
     public static int CurrentZone(Vector3 pos)
     {
+        if (pos.x >= 500f) return ActProgress.Barrens;
         if (pos.x >= 300f) return ActProgress.Kiln;
         if (pos.x >= 100f) return ActProgress.Ossuary;
         return ActProgress.Town;

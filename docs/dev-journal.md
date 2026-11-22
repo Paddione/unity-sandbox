@@ -871,3 +871,19 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   (`DiabloLootLabels`, gepoolte Schilder, überlappende Schilder rücken nach oben). Grundlage ist das
   neue Register `LootDrop.Live` statt eines Szenen-Scans. Steuerhinweise nennen „Alt Loot names“.
   Belege: EditMode 381/381, PlayMode 273/273, Autoplay `-seed 0` PASS, Shotcheck `loot_labels_alt`.
+
+## 2026-11-22 — Akt II eröffnet: Glass Barrens (act-two-opening S1)
+
+- Zone 4 **Glass Barrens** bei +600 m X: verglaste Ascheebene mit Dünen, zehn Glas-Spitzen in einem
+  Ost- und einem West-Bogen (Nord- und Südspur bleiben frei), kalte Glow-Lichter, KayKit-Ruinen.
+  Gebaut nur über `BarrensBuilder`, abgenommen durch `VerifyBarrens` in `VerifyDiabloZone`.
+- Akt-Kette: `ActProgress.Barrens = 4`. `CompleteAct` (Kilnmother) öffnet die Barrens mit,
+  `Unlock(Barrens)` ohne Akt I wird abgewiesen, `FromSave` schließt handeditierte Saves ohne Akt I.
+  `DefeatZoneBoss` hält den künftigen Zonen-Boss-Kill.
+- Save v11: `actTwoBossDefeated`. Migration v10 → v11 öffnet die Barrens für Kilnmother-Bezwinger.
+- Tor Kiln → Barrens südlich des Kuppelrings mit eigenem Hinweis („The glass stays sealed“),
+  Rücktor, Wegpunkt „Glass Barrens“ (an `KilnLayout.Shrines` angehängt, Index 3 bleibt Kiln),
+  eigener Licht-Grade, Ambience-Pegel und Musik-Loop.
+- Falle: `BarrensLayout` las `KilnLayout.KilnOffset`, während `KilnLayout.Shrines` `BarrensLayout`
+  liest — zyklischer statischer Initialisierer mit genullten Feldern. `BarrensLayout` hält den
+  Kiln-Offset jetzt selbst, `BarrensConfigTests` sperrt den Zyklus.

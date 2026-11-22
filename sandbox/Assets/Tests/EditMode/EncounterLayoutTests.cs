@@ -109,6 +109,7 @@ public class EncounterLayoutTests
         Assert.AreEqual(ActProgress.Town, EncounterLayout.CurrentZone(new Vector3(0f, 0f, 0f)));
         Assert.AreEqual(ActProgress.Ossuary, EncounterLayout.CurrentZone(new Vector3(200f, 0f, 0f)));
         Assert.AreEqual(ActProgress.Kiln, EncounterLayout.CurrentZone(new Vector3(400f, 0f, 0f)));
+        Assert.AreEqual(ActProgress.Barrens, EncounterLayout.CurrentZone(BarrensLayout.BarrensOffset));
     }
 
     [Test]

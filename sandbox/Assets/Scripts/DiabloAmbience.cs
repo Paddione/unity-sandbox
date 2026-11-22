@@ -131,6 +131,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         {
             case ActProgress.Ossuary: return 0.18f;
             case ActProgress.Kiln: return 0.15f;
+            case ActProgress.Barrens: return 0.2f;
             default: return BedVolume;
         }
     }

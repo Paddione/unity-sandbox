@@ -77,10 +77,26 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsTen()
+    public void CurrentVersion_IsEleven()
     {
-        Assert.AreEqual(10, SaveGame.CurrentVersion);
-        Assert.AreEqual(10, new SaveGame().v);
+        Assert.AreEqual(11, SaveGame.CurrentVersion);
+        Assert.AreEqual(11, new SaveGame().v);
+    }
+
+    [Test]
+    public void V10_OpensBarrensOnlyForKilnmotherSlayers()
+    {
+        const string slayerJson = @"{""v"":10,""level"":12,""actOneComplete"":true,""highestUnlockedZone"":3}";
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(slayerJson, out SaveGame slayer, out int from));
+        Assert.AreEqual(10, from);
+        Assert.AreEqual(11, slayer.v);
+        Assert.AreEqual(ActProgress.Barrens, slayer.highestUnlockedZone);
+        Assert.IsFalse(slayer.actTwoBossDefeated);
+
+        const string midAct = @"{""v"":10,""level"":7,""actOneComplete"":false,""highestUnlockedZone"":3}";
+        SaveMigrations.Migrate(midAct, out SaveGame mid, out _);
+        Assert.AreEqual(ActProgress.Kiln, mid.highestUnlockedZone, "Kiln stays the frontier until the Kilnmother falls");
+        Assert.IsFalse(mid.actTwoBossDefeated);
     }
 
     [Test]
@@ -291,6 +307,7 @@ public class SaveMigrationTests
         Assert.IsFalse(save.kindledRewardGranted);
         Assert.AreEqual("", save.kindledRewardClass);
         Assert.IsTrue(save.actOneComplete);
+        Assert.AreEqual(ActProgress.Barrens, save.highestUnlockedZone, "v11: Kilnmother slayers find the Barrens open");
     }
 
     [Test]

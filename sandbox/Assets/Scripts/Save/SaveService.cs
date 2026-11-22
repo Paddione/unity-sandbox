@@ -130,6 +130,7 @@ public static class SaveService
             classId = RunProfile.ClassId,
             highestUnlockedZone = RunProfile.Act.HighestUnlocked,
             actOneComplete = RunProfile.Act.ActOneComplete,
+            actTwoBossDefeated = RunProfile.Act.ZoneBossDefeated,
             waypoints = new System.Collections.Generic.List<string>(RunProfile.Act.Waypoints),
             smithingMaterial = System.Math.Max(0, RunProfile.SmithingMaterial),
             skillVariants = CaptureVariants(),
@@ -209,7 +210,7 @@ public static class SaveService
         RunProfile.RunSeed = save.runSeed;
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
-        RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.waypoints);
+        RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.actTwoBossDefeated, save.waypoints);
         ContractProgress.FromSnapshot(save.contract);
         RunProfile.SmithingMaterial = System.Math.Max(0, save.smithingMaterial);
         ApplyVariants(save);

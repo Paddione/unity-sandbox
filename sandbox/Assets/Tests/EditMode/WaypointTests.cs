@@ -72,6 +72,10 @@ public class WaypointTests
         Assert.AreEqual("sealed", DiabloWaypointUI.LockedReason(kiln));
         RunProfile.Act.Unlock(ActProgress.Kiln);
         Assert.AreEqual("not attuned", DiabloWaypointUI.LockedReason(kiln));
+        var barrens = WaypointShrine.Find("Barrens");
+        Assert.AreEqual("sealed", DiabloWaypointUI.LockedReason(barrens), "Act II waits for the Kilnmother");
+        RunProfile.Act.CompleteAct();
+        Assert.AreEqual("not attuned", DiabloWaypointUI.LockedReason(barrens));
     }
 
     [Test]

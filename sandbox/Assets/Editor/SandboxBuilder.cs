@@ -614,6 +614,7 @@ public static class SandboxBuilder
         RiskShrineBuilder.BuildRiskShrine(); // risk-shrines S2: solo shrine on a free fen anchor
         OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
         KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)
+        BarrensBuilder.BuildBarrens(); // act-two-opening S1: Glass Barrens (+600 m X)
         KilnBuilder.BuildWaypoints(); // act-one S5: one shrine per zone
 
         // South stairs (entry).
@@ -1197,6 +1198,7 @@ public static class SandboxBuilder
         var scene = EditorSceneManager.OpenScene(DiabloZoneScenePath);
         OssuaryBuilder.VerifyOssuary(scene); // S5: annex, gates, casters, boss
         KilnBuilder.VerifyKiln(scene); // act-one S2: zone 3, locked gate
+        BarrensBuilder.VerifyBarrens(scene); // act-two-opening S1: zone 4, sealed gate
         RiskShrineBuilder.VerifyRiskShrine(scene); // risk-shrines S2: solo shrine
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, wallet = false, health = false, ui = false, starterSword = false;

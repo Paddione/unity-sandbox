@@ -59,6 +59,8 @@ public static class KilnLayout
         ("Fen", "Ashen Fen", ActProgress.Town, new Vector3(-15f, 0f, -4f)),
         ("Ossuary", "Sunken Ossuary", ActProgress.Ossuary, OssuaryOffset + new Vector3(-5f, 0f, 10f)),
         ("Kiln", "Cinder Kiln", ActProgress.Kiln, KilnOffset + new Vector3(3.5f, 0f, 9.5f)),
+        // act-two-opening S1: appended, so index 3 stays the Kiln shrine.
+        ("Barrens", BarrensLayout.DisplayName, ActProgress.Barrens, BarrensLayout.ShrinePos),
     };
 
     // ---- S4 boss ----

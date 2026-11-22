@@ -36,9 +36,34 @@ public class ActProgressTests
         Assert.IsFalse(act.Unlock(4), "no zone 4 in Act I");
         Assert.IsTrue(act.Unlock(ActProgress.Kiln));
         Assert.IsFalse(act.Unlock(ActProgress.Kiln), "second unlock is a no-op");
+        Assert.IsFalse(act.IsUnlocked(ActProgress.Barrens), "Barrens sealed until the Kilnmother falls");
+        Assert.IsFalse(act.Unlock(ActProgress.Barrens), "no Barrens before Act I completes");
+        Assert.IsFalse(act.DefeatZoneBoss(), "no zone boss with the Barrens sealed");
         Assert.IsTrue(act.CompleteAct());
         Assert.IsFalse(act.CompleteAct());
         Assert.IsTrue(act.ActOneComplete);
+        Assert.IsTrue(act.IsUnlocked(ActProgress.Barrens), "the Kilnmother opens Act II");
+        Assert.IsFalse(act.Unlock(5), "no zone beyond the Barrens");
+        Assert.IsTrue(act.DefeatZoneBoss());
+        Assert.IsFalse(act.DefeatZoneBoss());
+    }
+
+    [Test]
+    public void SaveV11_RoundtripsBarrensAndZoneBoss()
+    {
+        var hero = new GameObject("Player");
+        RunProfile.Act.Unlock(ActProgress.Kiln);
+        RunProfile.Act.CompleteAct();
+        RunProfile.Act.DefeatZoneBoss();
+        RunProfile.Act.Discover("Barrens");
+        SaveService.SaveNow(hero, path: path);
+        RunProfile.Reset();
+        Assert.IsFalse(RunProfile.Act.IsUnlocked(ActProgress.Barrens));
+        Assert.IsTrue(SaveService.TryLoad(hero, path));
+        Assert.IsTrue(RunProfile.Act.IsUnlocked(ActProgress.Barrens));
+        Assert.IsTrue(RunProfile.Act.ZoneBossDefeated);
+        CollectionAssert.AreEqual(new[] { "Barrens" }, RunProfile.Act.Waypoints);
+        Object.DestroyImmediate(hero);
     }
 
     [Test]
@@ -110,7 +135,10 @@ public class ActProgressTests
     public void FromSave_ClampsAndNeverCompletesWithoutKiln()
     {
         var a = ActProgress.FromSave(99, true, null);
-        Assert.AreEqual(ActProgress.Kiln, a.HighestUnlocked);
+        Assert.AreEqual(ActProgress.Barrens, a.HighestUnlocked);
+        var forged = ActProgress.FromSave(ActProgress.Barrens, false, true, null);
+        Assert.AreEqual(ActProgress.Kiln, forged.HighestUnlocked, "no Barrens without Act I");
+        Assert.IsFalse(forged.ZoneBossDefeated);
         var b = ActProgress.FromSave(0, true, null);
         Assert.AreEqual(ActProgress.Ossuary, b.HighestUnlocked);
         Assert.IsFalse(b.ActOneComplete);
