@@ -74,6 +74,12 @@ public sealed class RangedCaster : NetworkBehaviour
 
         var flat = hero != null ? Flat(hero.position - transform.position) : Vector3.zero;
         float dist = flat.magnitude;
+        // act-two-opening S2: the Barrens arrival plaza holds casters too (the Kiln keeps its old behaviour).
+        if (hero != null && BarrensLayout.PlazaSafe(hero.position))
+        {
+            CancelTelegraph();
+            return;
+        }
         if (hero == null || dist > AggroRange || fromHome > LeashRadius + LeashSlack)
         {
             CancelTelegraph();
@@ -238,6 +244,16 @@ public sealed class RangedCaster : NetworkBehaviour
     void Fire(Transform hero)
     {
         if (!Diablo.IsLocalAuthority() && !Diablo.IsSolo()) return;
+        // act-two-opening S2: Dune Augurs cast a ground payload instead of the fireball.
+        var payload = GetComponent<ICasterPayload>();
+        if (payload != null)
+        {
+            payload.Cast(hero.position);
+            if (IsSpawned && IsServer) PayloadClientRpc(hero.position);
+            ShotsFired++;
+            Debug.Log($"[Caster] {gameObject.name} cast its payload (shots={ShotsFired}).");
+            return;
+        }
         var from = transform.position + Vector3.up * 1.2f;
         var dir = hero.position - from;
         DiabloProjectile.Spawn(DiabloSkills.Skill.Fireball, from, dir, transform,
@@ -252,6 +268,15 @@ public sealed class RangedCaster : NetworkBehaviour
     {
         if (IsServer) return;
         ShowTelegraph();
+    }
+
+    /// <summary>act-two-opening S2: clients show the same payload (damage stays with the authority).</summary>
+    [ClientRpc]
+    public void PayloadClientRpc(Vector3 at)
+    {
+        if (IsServer) return;
+        var payload = GetComponent<ICasterPayload>();
+        if (payload != null) payload.Cast(at);
     }
 
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);

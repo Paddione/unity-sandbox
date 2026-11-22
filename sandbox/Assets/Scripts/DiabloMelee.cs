@@ -178,7 +178,7 @@ public sealed class DiabloMelee : MonoBehaviour
     {
         int blow = DiabloJuice.RollCrit(attacker, CurrentDamage(attacker), out bool crit);
         ThreatTable.BookDamage(target, attacker, blow);
-        health.TakeDamage(blow, crit);
+        health.TakeDamage(blow, crit, attacker.position);
         Equipment.ApplyLifeSteal(attacker, blow);
         health.ApplyKnockback(attacker.position,
             health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);

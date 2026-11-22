@@ -119,6 +119,13 @@ public static class LayoutSeeder
             if (Place(KilnLayout.ElitePrefix + i, KilnLayout.EliteAnchor(k, i))) moved++;
         for (int w = 0; w < 2; w++)
             if (Place(EncounterLayout.KilnWardenPrefix + w, EncounterLayout.KilnWardenAnchor(k, w))) moved++;
+        // act-two-opening S2: the Glass Barrens follow the same encounter draw.
+        for (int i = 0; i < BarrensLayout.ShardbackCount; i++)
+            if (Place(BarrensLayout.ShardbackPrefix + i, BarrensLayout.ShardbackAnchor(k, i))) moved++;
+        for (int i = 0; i < BarrensLayout.AugurCount; i++)
+            if (Place(BarrensLayout.AugurPrefix + i, BarrensLayout.AugurAnchor(k, i))) moved++;
+        for (int i = 0; i < BarrensLayout.EliteCount; i++)
+            if (Place(BarrensLayout.ElitePrefix + i, BarrensLayout.EliteAnchor(k, i))) moved++;
         for (int v = 0; v < VariantCount; v++)
         {
             var root = FindIncludingInactive(PropRootPrefix + v);

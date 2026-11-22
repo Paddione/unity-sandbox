@@ -133,6 +133,19 @@ public sealed class EnemyHealth : NetworkBehaviour
     }
 
     /// <summary>
+    /// Directed damage (act-two-opening S2): every <see cref="IDamageFilter"/>
+    /// on this enemy shapes the hit by its origin (Shardback glass shield),
+    /// then the regular path applies it. Server/solo only filter; a spawned
+    /// client keeps the early return of <see cref="TakeDamage(int, bool)"/>.
+    /// </summary>
+    public void TakeDamage(int amount, bool crit, Vector3 from)
+    {
+        if (dead) return;
+        foreach (var f in GetComponents<IDamageFilter>()) amount = f.Filter(amount, from);
+        TakeDamage(amount, crit);
+    }
+
+    /// <summary>
     /// Apply damage; kills at zero and drops a loot orb.
     /// S2 host-authoritative: spawned clients never apply directly (they mirror
     /// NetHP); the server applies and replicates. Offline/unspawned stays local.

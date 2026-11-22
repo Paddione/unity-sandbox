@@ -104,6 +104,8 @@ public class DiabloD2FeelTests
         {
             // act-one S3: Ash Lancers are armed with their own charge instead of melee.
             if (husk.GetComponent<AshLancer>() != null) continue;
+            // act-two-opening S2: Dune Augurs are pure casters (RangedCaster + shard field).
+            if (husk.GetComponent<DuneAugur>() != null) continue;
             var atk = husk.GetComponent<EnemyAttack>();
             Assert.IsNotNull(atk, $"Husk '{husk.name}' needs EnemyAttack.");
             var tier = husk.GetComponent<EnemyHealth>().tier;

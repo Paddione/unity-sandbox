@@ -88,6 +88,7 @@ public sealed class WaypointShrine : MonoBehaviour
         if (target == null || hero == null || !Destinations().Contains(target)) return false;
         ZoneTravel.TeleportHero(hero, target.Arrival);
         if (target.zone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
+        if (target.zone == ActProgress.Barrens) BarrensLayout.ResetPlaza();
         Debug.Log($"[Waypoint] Travelled to {target.displayName}.");
         if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero, zoneReached: target.zone);
         return true;

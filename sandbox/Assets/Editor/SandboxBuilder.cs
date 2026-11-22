@@ -1256,7 +1256,9 @@ public static class SandboxBuilder
     {
         var a = g.GetComponent<Animator>();
         // act-one S3: Ash Lancers fight with their own charge instead of EnemyAttack.
-        bool attacks = g.GetComponent<EnemyAttack>() != null || g.GetComponent<AshLancer>() != null;
+        // act-two-opening S2: Dune Augurs cast shard fields through RangedCaster.
+        bool attacks = g.GetComponent<EnemyAttack>() != null || g.GetComponent<AshLancer>() != null
+            || (g.GetComponent<DuneAugur>() != null && g.GetComponent<RangedCaster>() != null);
         return attacks && g.GetComponent<HuskAnimator>() != null
             && a != null && a.runtimeAnimatorController != null;
     }

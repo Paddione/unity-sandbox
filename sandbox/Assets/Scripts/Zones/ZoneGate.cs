@@ -310,6 +310,7 @@ public sealed class ZoneGate : MonoBehaviour
         if (hero == null) return;
         ZoneTravel.TeleportHero(hero, dest);
         if (targetZone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
+        if (targetZone == ActProgress.Barrens) BarrensLayout.ResetPlaza();
         Teleports++;
         // S5: solo/host saves like before; a client saves its own hero too.
         var net = hero.GetComponent<DiabloNetworkPlayer>();

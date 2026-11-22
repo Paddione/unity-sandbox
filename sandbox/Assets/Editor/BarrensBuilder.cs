@@ -7,8 +7,9 @@ using UnityEngine;
 /// DiabloZone.unity. A pale vitrified floor, low ash dunes, a broken ring of
 /// teal glass spires with cold glow lights, KayKit ruins where present, and
 /// the gate pair Kiln → Barrens (sealed until the Kilnmother falls, see
-/// <see cref="ActProgress"/>) and Barrens → Kiln. Enemies and the zone boss
-/// follow in S2/S3.
+/// <see cref="ActProgress"/>) and Barrens → Kiln. S2: Shardbacks, Dune Augurs
+/// and Glass Elites at variant-0 anchors (<see cref="LayoutSeeder"/> moves
+/// them per seed). The zone boss follows in S3.
 /// </summary>
 public static class BarrensBuilder
 {
@@ -89,6 +90,7 @@ public static class BarrensBuilder
         }
 
         TryKayKitDressing(root);
+        SpawnEnemies(root.transform);
 
         var gate = SpawnGate(ZoneGate.BarrensGateName, BarrensLayout.BarrensGatePos, BarrensLayout.BarrensArrival,
             ActProgress.Barrens, withHint: true);
@@ -97,6 +99,69 @@ public static class BarrensBuilder
         var ret = SpawnGate(ZoneGate.BarrensReturnGateName, BarrensLayout.BarrensReturnPos, BarrensLayout.KilnReturnArrival,
             ActProgress.Kiln, withHint: false);
         ret.transform.SetParent(root.transform, true);
+    }
+
+    static void SpawnEnemies(Transform parent)
+    {
+        for (int i = 0; i < BarrensLayout.ShardbackCount; i++)
+            SpawnShardback(BarrensLayout.ShardbackPrefix + i, BarrensLayout.ShardbackAnchor(0, i), 14, LootTier.Normal, 1f, 1,
+                ShardGuard.DefaultArc, parent);
+        for (int i = 0; i < BarrensLayout.EliteCount; i++)
+            SpawnShardback(BarrensLayout.ElitePrefix + i, BarrensLayout.EliteAnchor(0, i), 30, LootTier.Elite, 1.3f, 2,
+                ShardGuard.EliteArc, parent);
+        for (int i = 0; i < BarrensLayout.AugurCount; i++)
+        {
+            var a = SpawnBody("Skeletons/Characters/Skeleton_Mage.fbx", BarrensLayout.AugurPrefix + i,
+                BarrensLayout.AugurAnchor(0, i), 9, LootTier.Normal, 1f, parent);
+            a.AddComponent<RangedCaster>();
+            a.AddComponent<DuneAugur>();
+            SandboxBuilder.WireHuskAnimator(a);
+        }
+    }
+
+    static void SpawnShardback(string name, Vector3 pos, int hp, LootTier tier, float scale, int damage, float arc, Transform parent)
+    {
+        var e = SpawnBody("Skeletons/Characters/Skeleton_Warrior.fbx", name, pos, hp, tier, scale, parent);
+        var attack = e.AddComponent<EnemyAttack>();
+        attack.damage = damage;
+        attack.turnRate = ShardGuard.TurnRate;
+        attack.encounterGroup = EncounterLayout.FrontGroup;
+        e.AddComponent<ShardGuard>().arcDegrees = arc;
+        // Readable guard: a glowing glass slab in front of the body (no collider).
+        var slab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        slab.name = "GlassShield";
+        Object.DestroyImmediate(slab.GetComponent<Collider>());
+        slab.transform.SetParent(e.transform, false);
+        slab.transform.localPosition = new Vector3(0f, 0.9f, 0.55f);
+        slab.transform.localScale = new Vector3(tier == LootTier.Elite ? 1.3f : 0.95f, 1.1f, 0.08f);
+        PaintEmissive(slab, GlassTeal * 0.8f);
+        SandboxBuilder.WireHuskAnimator(e);
+    }
+
+    static GameObject SpawnBody(string model, string name, Vector3 pos, int hp, LootTier tier, float scale, Transform parent)
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ThirdParty/KayKit/" + model);
+        GameObject e = prefab != null ? (GameObject)PrefabUtility.InstantiatePrefab(prefab)
+            : GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        if (e.GetComponent<Collider>() == null)
+        {
+            var col = e.AddComponent<CapsuleCollider>();
+            col.height = 1.7f;
+            col.radius = 0.35f;
+            col.center = new Vector3(0f, 0.85f, 0f);
+        }
+        e.name = name;
+        e.tag = "Husk";
+        e.transform.SetParent(parent, true);
+        e.transform.position = pos;
+        // Face north, toward the arrival: the shields meet the party head-on.
+        e.transform.rotation = Quaternion.LookRotation(Vector3.forward);
+        e.transform.localScale = Vector3.one * scale;
+        e.AddComponent<Unity.Netcode.NetworkObject>();
+        var health = e.AddComponent<EnemyHealth>();
+        health.SetTier(hp, tier);
+        health.corpseModel = prefab;
+        return e;
     }
 
     static GameObject SpawnGate(string name, Vector3 at, Vector3 dest, int zone, bool withHint)
@@ -180,7 +245,7 @@ public static class BarrensBuilder
     public static void VerifyBarrens(UnityEngine.SceneManagement.Scene scene)
     {
         bool root = false, gate = false, hint = false, ret = false, shrine = false;
-        int spires = 0, lights = 0, dunes = 0;
+        int spires = 0, lights = 0, dunes = 0, shardbacks = 0, augurs = 0, elites = 0;
         foreach (var r in scene.GetRootGameObjects())
             foreach (var t in r.GetComponentsInChildren<Transform>(true))
             {
@@ -196,13 +261,23 @@ public static class BarrensBuilder
                     hint = t.Find(ZoneGate.LockedHintName) != null;
                 }
                 if (n == ZoneGate.BarrensReturnGateName && zg != null && zg.targetZone == ActProgress.Kiln) ret = true;
+                var eh = t.GetComponent<EnemyHealth>();
+                if (n.StartsWith(BarrensLayout.ShardbackPrefix) && t.GetComponent<ShardGuard>() != null
+                    && t.GetComponent<EnemyAttack>() != null) shardbacks++;
+                if (n.StartsWith(BarrensLayout.ElitePrefix) && t.GetComponent<ShardGuard>() != null
+                    && eh != null && eh.tier == LootTier.Elite) elites++;
+                if (n.StartsWith(BarrensLayout.AugurPrefix) && t.GetComponent<DuneAugur>() != null
+                    && t.GetComponent<RangedCaster>() != null) augurs++;
                 var ws = t.GetComponent<WaypointShrine>();
                 if (ws != null && ws.shrineId == "Barrens" && ws.zone == ActProgress.Barrens) shrine = true;
             }
         Debug.Log($"[BarrensBuilder] Verify: root={root} spires={spires} lights={lights} dunes={dunes} " +
-                  $"gate={gate} hint={hint} ret={ret} shrine={shrine}");
+                  $"gate={gate} hint={hint} ret={ret} shrine={shrine} " +
+                  $"shardbacks={shardbacks} augurs={augurs} elites={elites}");
         if (!root || spires != BarrensLayout.ShardSpires || lights != BarrensLayout.GlassLights
-            || dunes != BarrensLayout.Dunes || !gate || !hint || !ret || !shrine)
+            || dunes != BarrensLayout.Dunes || !gate || !hint || !ret || !shrine
+            || shardbacks != BarrensLayout.ShardbackCount || augurs != BarrensLayout.AugurCount
+            || elites != BarrensLayout.EliteCount)
             throw new System.Exception("Barrens verify failed: zone 4 inventory incomplete.");
         Debug.Log("[BarrensBuilder] Verify: OK (glass barrens + gates present).");
     }

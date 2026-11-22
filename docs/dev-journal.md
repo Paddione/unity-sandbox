@@ -887,3 +887,16 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Falle: `BarrensLayout` las `KilnLayout.KilnOffset`, während `KilnLayout.Shrines` `BarrensLayout`
   liest — zyklischer statischer Initialisierer mit genullten Feldern. `BarrensLayout` hält den
   Kiln-Offset jetzt selbst, `BarrensConfigTests` sperrt den Zyklus.
+
+## 2026-11-22 — Glass-Barrens-Gegner (act-two-opening S2)
+
+- **Shardback**: Nahkämpfer mit gläsernem Frontschild (`ShardGuard`). Treffer aus dem 110°-Bogen verlieren
+  75 % (abgerundet, ein 1er-Stich prallt ab), Flanke und Rücken treffen voll, ein betäubter Shardback hat keine
+  Deckung. Er dreht sich langsam (`turnRate` 2,5), damit die Gruppe ihn über den Tank binden und von hinten treffen kann.
+- **Dune Augur**: Caster mit dem Bone-Warden-Brain, ruft statt eines Feuerballs ein Splitterfeld unter den Helden
+  (1 s Warnring, dann 3 s Schnitte). Gegenmittel ist Herausgehen, Blocken hilft nicht.
+- **Glass Elite**: Shardback-Elite mit 150°-Bogen und 30 HP.
+- Trefferrichtung: neuer Overload `EnemyHealth.TakeDamage(amount, crit, from)` mit `IDamageFilter`. Nur Treffer mit
+  bekanntem Ursprung (Nahkampf, Skills, Projektile, Koop-Validierung) laufen durch Filter.
+- Fair fights: Ankunfts-Plaza der Barrens wie im Kiln, gilt auch für Caster. Der Kiln-Choke wertete Helden in
+  den Barrens (x > 300) als „durch“ — jetzt auf 300–500 m begrenzt.

@@ -46,6 +46,7 @@ public static class RunProfile
         SkillVariants = new System.Collections.Generic.Dictionary<string, string>();
         Act = new ActProgress();
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
+        BarrensLayout.ResetPlaza();
         ContractProgress.Reset();
         SmithingMaterial = 0;
         RiskShrine.Reset();

@@ -21,6 +21,9 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>Set by the builder per tier (1 normal, 2 elite/brute).</summary>
     public int damage = 1;
 
+    /// <summary>Facing slerp rate toward the target (act-two-opening S2: Shardbacks turn slowly, see <see cref="ShardGuard"/>).</summary>
+    public float turnRate = 10f;
+
     /// <summary>
     /// Encounter group (encounter-roles S1): 0 = front/always active,
     /// 1 = back/hunter, released at the Kiln choke
@@ -98,7 +101,7 @@ public sealed class EnemyAttack : MonoBehaviour
             anim.SetMoving(false);
             return;
         }
-        if (KilnLayout.PlazaSafe(hero.position))
+        if (KilnLayout.PlazaSafe(hero.position) || BarrensLayout.PlazaSafe(hero.position))
         {
             // Fair-fights arrival plaza: hold while the hero orients.
             CancelWindup();
@@ -277,7 +280,7 @@ public sealed class EnemyAttack : MonoBehaviour
         d.y = 0f;
         if (d.sqrMagnitude < 0.0001f) return;
         transform.rotation = Quaternion.Slerp(transform.rotation,
-            Quaternion.LookRotation(d), 10f * Time.deltaTime);
+            Quaternion.LookRotation(d), turnRate * Time.deltaTime);
     }
 
     /// <summary>

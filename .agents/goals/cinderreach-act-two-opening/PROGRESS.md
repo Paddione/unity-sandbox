@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-two-opening
 
-Prozent: 20 %
+Prozent: 40 %
 
 ## Erledigt
 
@@ -8,11 +8,13 @@ Prozent: 20 %
 - 2026-11-22: S1 (Branch `feature/cinderreach-act-two-opening-s1`, Basis `bf6d5cd`): Zone 4 Glass Barrens (+600 m X) über `BarrensBuilder` + `BarrensLayout`, Tor Kiln→Barrens (versiegelt bis Kilnmother, eigener Hinweis) + Rücktor, Wegpunkt „Glass Barrens“, `ActProgress.Barrens`/`DefeatZoneBoss`, Save v11 (`actTwoBossDefeated`, Migration öffnet Barrens für Kilnmother-Bezwinger), Licht-Grade/Ambience/Musik-Loop Zone 4, `EncounterLayout.CurrentZone` x ≥ 500. Belege: EditMode 388/388 (neu `BarrensConfigTests` 5/5, erweiterte Act/Save/Waypoint-Tests), PlayMode 273/273, `VerifyDiabloZone` (`[BarrensBuilder] Verify: OK`, Kiln-Shrines 5) grün, `check-meta` grün. Autoplay `-seed 0`: Exit 0, 8/8 Phasen, 0 Exceptions, 51 Kills.
 
 - 2026-11-22: Eigner-Entscheid: kein 30-fps-Gate unter Linux, Performance wird auf Windows mit GPU getestet. `run-autoplay.sh` meldet das Linux-Gate nur noch (A/B `-seed 0` vorher: main 24,1 fps, S1 23,5 fps, beide unter WSLg).
+- 2026-11-22: S2 (Branch `feature/cinderreach-act-two-opening-s2`, Basis `bc48d20`): Gegnerfamilie der Glass Barrens. **Shardback** ×8 (Nahkampf, 14 HP, `ShardGuard`: frontaler 110°-Bogen schluckt 75 % abgerundet, Flanke/Rücken voll, betäubt ohne Deckung, `EnemyAttack.turnRate` 2,5 statt 10, gläserne Schildplatte), **Dune Augur** ×6 (`RangedCaster`-Brain + `DuneAugur`-Payload: `ShardField` unter dem Helden, 1,0 s Warnring, 3 s Splitter, 1 Schaden/0,75 s, unblockbar, Clients sehen das Feld per `PayloadClientRpc`), **Glass Elite** ×2 (Shardback-Elite, 30 HP, 2 Schaden, 150°-Bogen). Treffer-Richtung über `EnemyHealth.TakeDamage(amount, crit, from)` + `IDamageFilter` aus Nahkampf, Skills/Projektilen und Koop-`ApplyValidated`; Ticks/Dornen/Brände ungerichtet. 3 Layout-Varianten (`LayoutSeeder` folgt dem Kiln-Zug), Arrival-Plaza wie im Kiln (`BarrensLayout.PlazaSafe`, auch für Caster), Kiln-Choke ignoriert Helden in den Barrens. Belege: EditMode 397/397 (neu `BarrensEnemyTests` 9/9), PlayMode 276/276 (neu `BarrensCombatTests` 3/3), `VerifyDiabloZone` (`shardbacks=8 augurs=6 elites=2`) grün, `check-meta` grün, Autoplay `-seed 0` Exit 0, 8/8 Phasen, 0 Exceptions, 51 Kills.
 
 ## Nächste Schritte
 
-- S2 Gegnerfamilie (Schildträger, Flächenbeschwörer, Elite), Encounter-Layout mit 3 Varianten, Arrival-Plaza.
+- S3 Zonen-Boss (zwei Phasen, Telegraphen, Bossbalken, Musik, Kindled-Phase-2), Kill setzt `ZoneBossDefeated` + Save.
 
 ## Offene Punkte
 
-- S2–S5 offen.
+- S3–S5 offen.
+- Augurs gleiten ohne Lauf-Animation (`RangedCaster` treibt `HuskAnimator` nicht); Politur bei der Windows-Sichtprüfung in S5.

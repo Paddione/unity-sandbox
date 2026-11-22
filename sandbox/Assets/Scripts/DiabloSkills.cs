@@ -1093,7 +1093,7 @@ public sealed class DiabloSkills : MonoBehaviour
             DiabloJuice.OnEnemyHit(target.transform.position, damage, crit);
             return crit;
         }
-        health.TakeDamage(damage, crit);
+        health.TakeDamage(damage, crit, from);
         Equipment.ApplyLifeSteal(attacker, damage);
         if (health != null)
             health.ApplyKnockback(from, health.tier == LootTier.Normal ? knockback : knockback * 0.3f);

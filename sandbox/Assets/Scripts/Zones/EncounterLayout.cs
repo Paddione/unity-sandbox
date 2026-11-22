@@ -123,7 +123,7 @@ public static class EncounterLayout
     }
 
     public static bool PassedChoke(Vector3 heroPos) =>
-        (heroPos.x > 300f) && (heroPos.z - KilnLayout.KilnOffset.z) < ChokeKilnZ;
+        (heroPos.x > 300f && heroPos.x < 500f) && (heroPos.z - KilnLayout.KilnOffset.z) < ChokeKilnZ;
 
     // ---- shared math ----
 

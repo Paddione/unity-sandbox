@@ -525,7 +525,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
                 return;
             }
             lastHit[sender] = now;
-            health.TakeDamage(damage);
+            health.TakeDamage(damage, false, nb.transform.position);
             // Server threat (party-roles S5): the sender owns this damage, never anyone else's.
             ThreatTable.BookDamage(targetNb.gameObject, nb.transform, damage);
             return;
