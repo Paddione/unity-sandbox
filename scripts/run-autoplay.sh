@@ -15,9 +15,13 @@
 #     llvmpipe (CPU, ~6 fps) and only proves the session, never the FPS gate.
 #     auto picks wslg when both exist; the window shows on the desktop ~2 min;
 #  3. hard timeout (AUTOPLAY_TIMEOUT, default 1200 s) -> exit 2 (hang);
-#  4. fps-gate.py --min-fps 30 --resolution 1280x720 --skip-first 1 on the log.
+#  4. fps-gate.py --min-fps 30 --resolution 1280x720 --skip-first 1 on the log,
+#     advisory only since 2026-11-22: performance is proven on Windows with the
+#     GPU (scripts/shotcheck-windows.sh --autoplay, 60 fps @1080p). Set
+#     AUTOPLAY_FPS_STRICT=1 to let the Linux gate fail the run again.
 #
-# Exit = max(autoplay, fps-gate); 2 = hang, 3 = Unity project busy (build).
+# Exit = autoplay exit (max with fps-gate only under AUTOPLAY_FPS_STRICT=1);
+# 2 = hang, 3 = Unity project busy (build).
 # Usage (repo root): bash scripts/run-autoplay.sh [out_dir] [extra player args...]
 #   out_dir default: artifacts/autoplay/<YYYY-MM-DD>/
 #   extra player args are appended, e.g. -seed 1 (replayability).
@@ -88,6 +92,10 @@ FPS_RC=$?
 set -e
 
 EXIT=$RC
-[ "$FPS_RC" -gt "$EXIT" ] && EXIT=$FPS_RC
+if [ "${AUTOPLAY_FPS_STRICT:-0}" = "1" ]; then
+  [ "$FPS_RC" -gt "$EXIT" ] && EXIT=$FPS_RC
+elif [ "$FPS_RC" -ne 0 ]; then
+  echo "run-autoplay: Linux fps-gate is advisory (Windows GPU shotcheck is the perf gate)"
+fi
 echo "run-autoplay: player exit $RC, fps-gate exit $FPS_RC -> $EXIT (result $OUT/autoplay-result.json)"
 exit "$EXIT"

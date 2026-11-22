@@ -31,7 +31,8 @@ Koop und Autoplay spielen sie vollständig durch.
    (`actTwoBossDefeated`, Barrens-Freischaltung für Kilnmother-Bezwinger), `SaveMigrationTests` auf `CurrentVersion`.
 6. `LayoutSeeder`: je 3 Varianten für Gruppen und Elites der Zone, Koop-Peers auf Variante 0.
 7. Autoplay: neue Pflichtphasen nach `actboss` (`zone4`, `boss3`), Exit 0 für alle drei Klassen, Normal
-   und Kindled, `-seed 0..2`; FPS-Gate grün (Linux 30 fps, Windows-Shotcheck 60 fps @1080p).
+   und Kindled, `-seed 0..2`; Performance auf Windows mit GPU (Shotcheck `--autoplay`, 60 fps @1080p).
+   Das Linux-FPS-Gate ist nur ein Hinweis (Eigner-Entscheid 2026-11-22).
 8. Koop: `scripts/run-coop-pair.sh` durch die neue Zone, Gruppenreise über das Tor, Boss-Kill auf Host und
    Client konsistent.
 9. EditMode + PlayMode komplett grün inkl. neuer Tests (Akt-Kette, Gegner-KI, Boss-Phasen, Migration);

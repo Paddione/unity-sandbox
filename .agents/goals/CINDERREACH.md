@@ -181,12 +181,12 @@ liest für Menüs ohne Nebenwirkung.
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   `autoplay-result.json` mit den Phasen `town, zone1, zone2, boss, zone3, actboss, complete`.
-  `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30`). Nightly
+  `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Nightly
   `.github/workflows/autoplay-nightly.yml` (02:30, Runner `unity-licensed`) für Normal, Kindled und
   Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay).
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
   (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
-  WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 139 fps), Linux-Gate 30 FPS.
+  WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 139 fps). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.
 - CI: `unity-tests.yml`, `unity-scene-captures.yml` (GPU-Runner), `autoplay-nightly.yml`.
 - Bekannte Grenze: Solo-Autoplay ohne `-seed` mit einem Save-Seed außerhalb 0–2 kann in einer
   seltenen Fen-Variante hängen. Der Nightly deckt nur Seeds 0–2 ab.
@@ -205,7 +205,7 @@ liest für Menüs ohne Nebenwirkung.
      Beim Iterieren `PLATFORMS=EditMode TEST_FILTER=<Klasse> bash scripts/run-unity-tests.sh`.
    - `SandboxBuilder.VerifyDiabloZone` und `KayKitAssets.Verify` (`repo.yaml:verify`).
    - `python3 scripts/check-meta.py`.
-   - Bei Gameplay-Änderungen `bash scripts/run-autoplay.sh <out> -seed 0` mit grünem FPS-Gate.
+   - Bei Gameplay-Änderungen `bash scripts/run-autoplay.sh <out> -seed 0` (Exit 0, alle Phasen); Performance-Nachweis über den Windows-Shotcheck.
    - Bei dotfiles-Anteilen eigener dotfiles-Worktree, `python3 scripts/agent-workspace.py check`,
      `python3 -m pytest scripts/test_diablo_unity_health.py -q`, danach landen.
 5. Doku im selben Commit: `PROGRESS.md` mit Belegen, `docs/dev-journal.md`, bei Mechanik-Entscheiden
