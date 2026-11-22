@@ -70,7 +70,10 @@ public static class BarrensLayout
 
     /// <summary>Static blockers the anchors keep clear of (dunes, KayKit ruins), local XZ.</summary>
     public static readonly Vector2[] DuneSpots =
-        { new Vector2(-10f, 3f), new Vector2(9f, 6f), new Vector2(-6f, -9f), new Vector2(8f, -8f), new Vector2(0f, -15f) };
+        { new Vector2(-10f, 3f), new Vector2(9f, 6f), new Vector2(-6f, -9f), new Vector2(8f, -8f), new Vector2(-12.5f, 9.5f) };
+
+    // ---- S3 zone boss: the Glasswright at the south end, its elites in front ----
+    public static readonly Vector3 GlasswrightPos = BarrensOffset + new Vector3(0f, 0.05f, -14f);
     public static readonly Vector2[] RuinSpots =
         { new Vector2(-12f, -3f), new Vector2(12f, 1f), new Vector2(-4f, 7f), new Vector2(5f, -4f) };
 

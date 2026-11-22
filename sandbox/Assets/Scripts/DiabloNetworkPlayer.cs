@@ -310,6 +310,30 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         }
     }
 
+    /// <summary>act-two-opening S3: server tells every client the Glasswright fell (act state + autosave).</summary>
+    public void BroadcastZoneBossKill()
+    {
+        if (!IsServer || !IsSpawned) return;
+        NotifyZoneBossKillClientRpc();
+    }
+
+    [ClientRpc]
+    void NotifyZoneBossKillClientRpc()
+    {
+        if (IsServer) return; // the host books it in GlasswrightController.OnEnemyDeath
+        RunProfile.Act.DefeatZoneBoss();
+        var nm = NetworkManager.Singleton;
+        GameObject hero = null;
+        if (nm != null && nm.IsListening && nm.SpawnManager != null)
+        {
+            var local = nm.SpawnManager.GetLocalPlayerObject();
+            if (local != null) hero = local.gameObject;
+        }
+        if (hero == null) hero = GameObject.Find(HeroName);
+        if (hero != null) SaveService.SaveNow(hero);
+        try { MusicDirector.Ensure().PlayZone(ActProgress.Barrens); } catch { }
+    }
+
     /// <summary>Server: tell every client to autosave its own hero (boss kill).</summary>
     public void BroadcastBossKill()
     {

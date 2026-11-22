@@ -900,3 +900,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   bekanntem Ursprung (Nahkampf, Skills, Projektile, Koop-Validierung) laufen durch Filter.
 - Fair fights: Ankunfts-Plaza der Barrens wie im Kiln, gilt auch für Caster. Der Kiln-Choke wertete Helden in
   den Barrens (x > 300) als „durch“ — jetzt auf 300–500 m begrenzt.
+
+## 2026-11-22 — The Glasswright (act-two-opening S3)
+
+- Zonen-Boss der Glass Barrens. Phase 1 wirft Splitterlanzen im Fächer: drei leuchtende Linien warnen
+  0,9 s, dann schneidet jede einmal. Seitlich heraustreten ist die Antwort, frontales Blocken fängt sie.
+- Phase 2 hebt drei Glaspfeiler, die den Boss schützen (gerichtete Treffer halbiert), bis die Gruppe sie
+  zerschlägt. Dazu schnellere Lanzen und Splitterfelder. Auf Kindled ersetzt die Shatter Nova die Felder:
+  wer bei der Entladung weiter als 4 m vom Boss steht, wird getroffen — die Mechanik zieht in den Nahkampf,
+  die Lanzen strafen das Stehen in der Linie.
+- Enemy→Hero in Koop: Lanzen, Nova und Splitterfelder werden auf jedem Peer gespawnt und gegen den
+  eigenen Helden aufgelöst (wie das per-Client-HP-Modell). Das betrifft rückwirkend auch die Augur-Felder.

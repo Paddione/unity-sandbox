@@ -36,8 +36,8 @@ public sealed class DuneAugur : MonoBehaviour, ICasterPayload
 /// Glass shard field: <see cref="Telegraph"/> s warning ring, then
 /// <see cref="Active"/> s of shards dealing <see cref="Damage"/> every
 /// <see cref="TickInterval"/> s to a hero inside <see cref="Radius"/>.
-/// Hero damage only on the local authority (solo/host), like the Kiln
-/// hazards; clients spawn the same field for the visual.
+/// Every peer spawns the field (host directly, clients per ClientRpc) and
+/// resolves it against its own hero (per-client hero HP, act-two-opening S3).
 /// </summary>
 public sealed class ShardField : MonoBehaviour
 {
@@ -144,7 +144,7 @@ public sealed class ShardField : MonoBehaviour
         }
         if (now - lastTick < TickInterval) return false;
         lastTick = now;
-        if (hero == null || !Inside(transform.position, hero.position) || !Diablo.IsLocalAuthority()) return false;
+        if (hero == null || !Inside(transform.position, hero.position)) return false;
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null || hp.CurrentHP <= 0f) return false;
         int dmg = DifficultyProfile.Current.ScaleDamage(Damage);

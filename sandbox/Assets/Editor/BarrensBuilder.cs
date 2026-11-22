@@ -42,13 +42,13 @@ public static class BarrensBuilder
         PaintGlass(scar, new Color(0.22f, 0.4f, 0.38f), 0.95f);
 
         // Ash dunes: flat, wide, walkable-around lumps.
-        var dunes = new[] { new Vector3(-10f, 0f, 3f), new Vector3(9f, 0f, 6f), new Vector3(-6f, 0f, -9f), new Vector3(8f, 0f, -8f), new Vector3(0f, 0f, -15f) };
         for (int i = 0; i < BarrensLayout.Dunes; i++)
         {
+            var spot = BarrensLayout.DuneSpots[i];
             var dune = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             dune.name = DunePrefix + i;
             dune.transform.SetParent(root.transform, false);
-            dune.transform.localPosition = dunes[i] + Vector3.up * 0.1f;
+            dune.transform.localPosition = new Vector3(spot.x, 0.1f, spot.y);
             dune.transform.localScale = new Vector3(4.5f, 0.8f, 3.2f);
             dune.transform.localRotation = Quaternion.Euler(0f, i * 37f, 0f);
             Paint(dune, new Color(0.42f, 0.4f, 0.37f));
@@ -91,6 +91,7 @@ public static class BarrensBuilder
 
         TryKayKitDressing(root);
         SpawnEnemies(root.transform);
+        SpawnGlasswright(root.transform);
 
         var gate = SpawnGate(ZoneGate.BarrensGateName, BarrensLayout.BarrensGatePos, BarrensLayout.BarrensArrival,
             ActProgress.Barrens, withHint: true);
@@ -117,6 +118,27 @@ public static class BarrensBuilder
             a.AddComponent<DuneAugur>();
             SandboxBuilder.WireHuskAnimator(a);
         }
+    }
+
+    /// <summary>S3: the zone boss (KayKit Warrior at 2.2×, glass crown), melee through EnemyAttack.</summary>
+    static void SpawnGlasswright(Transform parent)
+    {
+        var boss = SpawnBody("Skeletons/Characters/Skeleton_Warrior.fbx", GlasswrightController.BossName,
+            BarrensLayout.GlasswrightPos, GlasswrightController.MaxHP, LootTier.Boss, 2.2f, parent);
+        var attack = boss.AddComponent<EnemyAttack>();
+        attack.damage = 3;
+        attack.encounterGroup = EncounterLayout.FrontGroup;
+        boss.AddComponent<GlasswrightController>();
+        boss.AddComponent<GlassWard>();
+        var crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        crown.name = "GlassCrown";
+        Object.DestroyImmediate(crown.GetComponent<Collider>());
+        crown.transform.SetParent(boss.transform, false);
+        crown.transform.localPosition = new Vector3(0f, 2.05f, 0f);
+        crown.transform.localRotation = Quaternion.Euler(0f, 45f, 0f);
+        crown.transform.localScale = new Vector3(0.5f, 0.35f, 0.5f);
+        PaintEmissive(crown, GlassTeal);
+        SandboxBuilder.WireHuskAnimator(boss);
     }
 
     static void SpawnShardback(string name, Vector3 pos, int hp, LootTier tier, float scale, int damage, float arc, Transform parent)
@@ -246,6 +268,7 @@ public static class BarrensBuilder
     {
         bool root = false, gate = false, hint = false, ret = false, shrine = false;
         int spires = 0, lights = 0, dunes = 0, shardbacks = 0, augurs = 0, elites = 0;
+        bool glasswright = false;
         foreach (var r in scene.GetRootGameObjects())
             foreach (var t in r.GetComponentsInChildren<Transform>(true))
             {
@@ -268,16 +291,18 @@ public static class BarrensBuilder
                     && eh != null && eh.tier == LootTier.Elite) elites++;
                 if (n.StartsWith(BarrensLayout.AugurPrefix) && t.GetComponent<DuneAugur>() != null
                     && t.GetComponent<RangedCaster>() != null) augurs++;
+                if (n == GlasswrightController.BossName && t.GetComponent<GlasswrightController>() != null
+                    && t.GetComponent<GlassWard>() != null && eh != null && eh.tier == LootTier.Boss) glasswright = true;
                 var ws = t.GetComponent<WaypointShrine>();
                 if (ws != null && ws.shrineId == "Barrens" && ws.zone == ActProgress.Barrens) shrine = true;
             }
         Debug.Log($"[BarrensBuilder] Verify: root={root} spires={spires} lights={lights} dunes={dunes} " +
                   $"gate={gate} hint={hint} ret={ret} shrine={shrine} " +
-                  $"shardbacks={shardbacks} augurs={augurs} elites={elites}");
+                  $"shardbacks={shardbacks} augurs={augurs} elites={elites} glasswright={glasswright}");
         if (!root || spires != BarrensLayout.ShardSpires || lights != BarrensLayout.GlassLights
             || dunes != BarrensLayout.Dunes || !gate || !hint || !ret || !shrine
             || shardbacks != BarrensLayout.ShardbackCount || augurs != BarrensLayout.AugurCount
-            || elites != BarrensLayout.EliteCount)
+            || elites != BarrensLayout.EliteCount || !glasswright)
             throw new System.Exception("Barrens verify failed: zone 4 inventory incomplete.");
         Debug.Log("[BarrensBuilder] Verify: OK (glass barrens + gates present).");
     }

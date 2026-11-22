@@ -111,9 +111,13 @@ public class MusicDirector : MonoBehaviour
             case "Zone2": return SynthLoop("OssuaryLoop", 123.5f, 104);
             case "Boss": return SynthLoop("BossTrack", 98f, 105);
             case "Zone4": return SynthLoop("GlassBarrensLoop", 110f, 106);
+            case GlassBossTrack: return SynthLoop("GlasswrightTrack", 92.5f, 107);
             default: return SynthLoop(track, 174.6f, 42);
         }
     }
+
+    /// <summary>act-two-opening S3: the Glasswright's own track.</summary>
+    public const string GlassBossTrack = "BossGlass";
 
     public void PlayMenu() => PlayTrack("Menu");
     /// <summary>Zones 0–3 keep their historical clamp (the Kiln shares the Ossuary loop); the Barrens get their own.</summary>

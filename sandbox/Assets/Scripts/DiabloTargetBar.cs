@@ -124,6 +124,8 @@ public sealed class DiabloTargetBar : MonoBehaviour
         if (abbot != null) return abbot.Phase.Value >= 2 ? "PHASE II" : "PHASE I";
         var kiln = boss.GetComponent<KilnmotherController>();
         if (kiln != null) return kiln.PhaseTwo ? "PHASE II" : "PHASE I";
+        var glass = boss.GetComponent<GlasswrightController>();
+        if (glass != null) return glass.PhaseTwo ? "PHASE II" : "PHASE I";
         return "";
     }
 

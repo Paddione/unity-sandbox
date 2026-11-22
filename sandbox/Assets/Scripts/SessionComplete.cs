@@ -43,9 +43,22 @@ public sealed class SessionComplete : MonoBehaviour
     public static bool ActOneMode;
     public const string ActOneTitle = "ACT I COMPLETE";
 
+    /// <summary>act-two-opening S3: the overlay was opened by the Glasswright's death.</summary>
+    public static bool ZoneBossMode;
+    public const string ZoneBossTitle = "GLASS BARRENS CLEARED";
+
+    /// <summary>Glasswright down: same overlay, Barrens title, Press On stays (Act II goes on).</summary>
+    public static void ShowZoneBossCleared(GameObject hero)
+    {
+        ActOneMode = false;
+        ZoneBossMode = true;
+        Show(hero, "Rare+ glass cache");
+    }
+
     /// <summary>Act I end screen (Kilnmother): same overlay, act title, all three zones in the totals.</summary>
     public static void ShowActComplete(GameObject hero)
     {
+        ZoneBossMode = false;
         ActOneMode = true;
         Show(hero, "Rare+ kiln hoard");
     }
@@ -84,9 +97,10 @@ public sealed class SessionComplete : MonoBehaviour
         if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
         if (!string.IsNullOrEmpty(KindledFinaleReward.LastOfferLine)) LastSummary += "\n" + KindledFinaleReward.LastOfferLine;
 
-        if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : "EXPEDITION COMPLETE";
+        if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : ZoneBossMode ? ZoneBossTitle : "EXPEDITION COMPLETE";
         if (pressOnBtn != null) pressOnBtn.gameObject.SetActive(!ActOneMode);
-        if (subLine != null) subLine.text = ActOneMode ? "The ash settles over Cinderreach."
+        if (subLine != null) subLine.text = ActOneMode ? "The ash settles over Cinderreach. The Glass Barrens lie open beyond the Kiln."
+            : ZoneBossMode ? "The Glasswright shatters. Act II goes on beyond the glass."
             : "The way to the Cinder Kiln stands open. Press on, or regroup in Lantern Hold.";
         if (timeVal != null) timeVal.text = $"{secs:0}s";
         if (killsVal != null) killsVal.text = kills.ToString();
@@ -233,6 +247,7 @@ public sealed class SessionComplete : MonoBehaviour
         LastSummary = "";
         KindledUnlockedThisRun = false;
         ActOneMode = false;
+        ZoneBossMode = false;
         BestDrop = "";
         DiabloClickController.ExternalDrive = false;
         sessionStart = Time.realtimeSinceStartup;
