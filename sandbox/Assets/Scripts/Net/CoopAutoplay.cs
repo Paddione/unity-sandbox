@@ -23,7 +23,7 @@ public sealed class CoopAutoplay : MonoBehaviour
     public const int MinFenHits = 3;
     /// <summary>The host left the Fen once its mirror is beyond this X (Ossuary at +200 m).</summary>
     public const float FenLeftX = 150f;
-    public const float Budget = 600f;
+    public const float Budget = 1000f;
 
     /// <summary>"host", "client" or null (no pair run).</summary>
     public static string Role => RoleFor(System.Environment.GetCommandLineArgs());
@@ -165,14 +165,34 @@ public sealed class CoopAutoplay : MonoBehaviour
         // fall back to quitting after the grace period (zone1 credit kept).
         float graceBy = Time.realtimeSinceStartup
             + (result.phases.Contains(AutoplayResult.PhaseZone1) ? 60f : 0f);
+        bool pulled = false;
         while (Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < graceBy && Connected())
         {
             if (hero.transform.position.x > FenLeftX)
             {
                 Log("phase zone2: pulled to the Ossuary by the host broadcast");
+                pulled = true;
                 break;
             }
             yield return null;
+        }
+        // act-two-opening S5: ride the host's gate broadcasts through the Kiln into
+        // the Glass Barrens and wait for the Glasswright kill to be booked here.
+        if (pulled)
+        {
+            float lastLog = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup < deadline && Connected() && !RunProfile.Act.ZoneBossDefeated)
+            {
+                Refill(hero, god);
+                if (Time.realtimeSinceStartup - lastLog > 30f)
+                {
+                    lastLog = Time.realtimeSinceStartup;
+                    Log($"following the host: hero at {hero.transform.position}");
+                }
+                yield return null;
+            }
+            Log($"phase boss3: zoneBossDefeated={RunProfile.Act.ZoneBossDefeated} hero at {hero.transform.position} connected={Connected()}");
+            if (RunProfile.Act.ZoneBossDefeated) result.Reach(AutoplayResult.PhaseBoss3);
         }
         DiabloClickController.ExternalDrive = false;
         Finish();

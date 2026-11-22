@@ -87,6 +87,8 @@ public class JoinArgsTests
         client.Reach(AutoplayResult.PhaseTown);
         Assert.AreEqual(1, client.ComputeExit(), "client needs zone1 too");
         client.Reach(AutoplayResult.PhaseZone1);
+        Assert.AreEqual(1, client.ComputeExit(), "act-two-opening: the client books the Glasswright kill too");
+        client.Reach(AutoplayResult.PhaseBoss3);
         Assert.AreEqual(0, client.ComputeExit());
         StringAssert.Contains("\"role\": \"client\"", client.ToJson());
 

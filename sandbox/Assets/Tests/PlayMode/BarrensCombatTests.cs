@@ -99,9 +99,9 @@ public class BarrensCombatTests
         var hp = sb.GetComponent<EnemyHealth>();
         yield return null;
         hp.TakeDamage(4, false, sb.transform.position + sb.transform.forward * 2f);
-        Assert.AreEqual(13, hp.CurrentHP);
+        Assert.AreEqual(12, hp.CurrentHP);
         hp.TakeDamage(4, false, sb.transform.position - sb.transform.forward * 2f);
-        Assert.AreEqual(9, hp.CurrentHP);
+        Assert.AreEqual(8, hp.CurrentHP);
         Assert.AreEqual(1, ShardGuard.Blocks);
     }
 

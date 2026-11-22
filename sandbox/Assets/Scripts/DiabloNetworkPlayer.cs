@@ -321,7 +321,12 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     void NotifyZoneBossKillClientRpc()
     {
         if (IsServer) return; // the host books it in GlasswrightController.OnEnemyDeath
-        RunProfile.Act.DefeatZoneBoss();
+        // Clients never booked the act chain (Abbot/Kilnmother kills only save on
+        // clients); the host's Glasswright kill proves both, so catch it up here.
+        if (!RunProfile.Act.IsUnlocked(ActProgress.Kiln)) RunProfile.Act.Unlock(ActProgress.Kiln);
+        if (!RunProfile.Act.ActOneComplete) RunProfile.Act.CompleteAct();
+        bool booked = RunProfile.Act.DefeatZoneBoss();
+        Debug.Log($"[Net] zone boss kill from host: booked={booked} defeated={RunProfile.Act.ZoneBossDefeated}.");
         var nm = NetworkManager.Singleton;
         GameObject hero = null;
         if (nm != null && nm.IsListening && nm.SpawnManager != null)

@@ -38,16 +38,16 @@ public class BarrensEnemyTests
         var go = Shardback();
         var hp = go.GetComponent<EnemyHealth>();
         hp.TakeDamage(4, false, new Vector3(0f, 0f, 3f)); // front
-        Assert.AreEqual(13, hp.CurrentHP, "4 × 25 % = 1");
+        Assert.AreEqual(12, hp.CurrentHP, "4 × 40 % = 2");
         Assert.AreEqual(1, ShardGuard.Blocks);
         hp.TakeDamage(4, false, new Vector3(3f, 0f, -0.5f)); // flank, outside 110°
-        Assert.AreEqual(9, hp.CurrentHP);
+        Assert.AreEqual(8, hp.CurrentHP);
         hp.TakeDamage(4, false, new Vector3(0f, 0f, -3f)); // back
-        Assert.AreEqual(5, hp.CurrentHP);
+        Assert.AreEqual(4, hp.CurrentHP);
         hp.TakeDamage(1, false, new Vector3(0f, 0f, 2f)); // 1-damage poke from the front
-        Assert.AreEqual(5, hp.CurrentHP, "a poke into the glass does nothing");
+        Assert.AreEqual(3, hp.CurrentHP, "a poke still chips the glass");
         hp.TakeDamage(2); // no origin (ticks, thorns, burns): unfiltered
-        Assert.AreEqual(3, hp.CurrentHP);
+        Assert.AreEqual(1, hp.CurrentHP);
         Assert.AreEqual(2, ShardGuard.Blocks);
         Object.DestroyImmediate(go);
     }
@@ -61,8 +61,10 @@ public class BarrensEnemyTests
         Assert.IsTrue(ShardGuard.InArc(at, fwd, new Vector3(0f, 0f, 3f), ShardGuard.DefaultArc));
         Assert.IsFalse(ShardGuard.InArc(at, fwd, side60, ShardGuard.DefaultArc), "60° off-axis is past 55°");
         Assert.IsTrue(ShardGuard.InArc(at, fwd, side60, ShardGuard.EliteArc), "elites cover 75° each side");
-        Assert.AreEqual(0, ShardGuard.Guarded(1));
-        Assert.AreEqual(2, ShardGuard.Guarded(8));
+        Assert.AreEqual(1, ShardGuard.Guarded(1));
+        Assert.AreEqual(1, ShardGuard.Guarded(2));
+        Assert.AreEqual(3, ShardGuard.Guarded(8));
+        Assert.AreEqual(0, ShardGuard.Guarded(0));
     }
 
     [Test]

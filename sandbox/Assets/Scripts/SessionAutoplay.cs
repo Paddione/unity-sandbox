@@ -64,7 +64,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         startBosses = BossController.BossesKilled;
         DiabloSkills.ResetRun();
-        float deadline = Time.realtimeSinceStartup + 840f; // act-one S5: route runs through the Kiln
+        float deadline = Time.realtimeSinceStartup + 1100f; // act-two-opening S5: route runs through the Barrens
 
         DiabloClickController hero = null;
         float heroDeadline = Time.realtimeSinceStartup + 30f;
@@ -135,12 +135,23 @@ public sealed class SessionAutoplay : MonoBehaviour
         yield return PhaseKilnmother(hero, deadline);
         bool actOk = lastPhaseOk;
         if (actOk) result.Reach(AutoplayResult.PhaseActBoss);
-        // Home by waypoint (used once per run): Kiln → Lantern Hold.
         var kilnShrine = WaypointShrine.Find("Kiln");
         if (kilnShrine != null) kilnShrine.TryDiscover(hero.gameObject);
+        // act-two-opening S5: the Kilnmother opened the Glass Barrens; fight through zone 4 to the Glasswright.
+        yield return PhaseGate(hero, ZoneGate.BarrensGateName, expectZone: ActProgress.Barrens, deadline);
+        bool barrensGateOk = lastPhaseOk;
+        yield return FightLoop(hero, "barrens", excludeBoss: true, maxDist: 40f, budget: 260f, deadline: deadline);
+        if (barrensGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone4);
+        yield return PhaseGlasswright(hero, deadline);
+        bool zoneBossOk = lastPhaseOk;
+        if (zoneBossOk) result.Reach(AutoplayResult.PhaseBoss3);
+        // Home by waypoint (used once per run): Barrens → Lantern Hold.
+        var barrensShrine = WaypointShrine.Find("Barrens");
+        if (barrensShrine != null) barrensShrine.TryDiscover(hero.gameObject);
         bool home = WaypointShrine.Travel("Town", hero.gameObject);
         Log($"phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}");
-        if (bossOk && actOk && home && RunProfile.Act.ActOneComplete && SessionComplete.ActOneMode)
+        if (bossOk && actOk && zoneBossOk && home && RunProfile.Act.ActOneComplete
+            && RunProfile.Act.ZoneBossDefeated && SessionComplete.ZoneBossMode)
             result.Reach(AutoplayResult.PhaseComplete);
 
         int huskKills = startHusks - CountHusks(excludeBoss: false);
@@ -290,6 +301,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             }
             yield return null;
         }
+        if (!cleared) Log($"phase combat_{label}: not cleared, {HuskCensus(hero.transform.position, excludeBoss)}");
         Log($"phase combat_{label} done (kills={start - CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})");
         phasesDone++;
         lastPhaseOk = cleared;
@@ -464,7 +476,65 @@ public sealed class SessionAutoplay : MonoBehaviour
     }
 
     static bool IsBoss(GameObject go) =>
-        go != null && (go.GetComponent<BossController>() != null || go.GetComponent<KilnmotherController>() != null);
+        go != null && (go.GetComponent<BossController>() != null || go.GetComponent<KilnmotherController>() != null
+            || go.GetComponent<GlasswrightController>() != null);
+
+    /// <summary>
+    /// act-two-opening S5: fight The Glasswright. Living Glass Pillars come
+    /// first (they ward the boss), then the boss until it falls and the
+    /// Barrens-cleared screen shows.
+    /// </summary>
+    IEnumerator PhaseGlasswright(DiabloClickController hero, float deadline)
+    {
+        lastPhaseOk = false;
+        int startKills = GlasswrightController.Kills;
+        Log("phase boss3 start (The Glasswright, phase 1 + 2)");
+        var boss = GameObject.Find(GlasswrightController.BossName);
+        if (boss == null)
+        {
+            Log("phase boss3: FAIL Glasswright not found");
+            yield break;
+        }
+        var skills = hero.GetComponent<DiabloSkills>();
+        Vector3 lastPos = hero.transform.position;
+        float lastT = Time.realtimeSinceStartup;
+        int nudges = 0;
+        float end = Time.realtimeSinceStartup + 260f;
+        while (GlasswrightController.Kills <= startKills
+               && Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
+        {
+            TickGod(hero);
+            if (boss == null) break;
+            GameObject target = boss;
+            foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
+                if (h != null && h.name.StartsWith(GlasswrightController.PillarPrefix) && h.GetComponent<EnemyHealth>() != null)
+                {
+                    target = h;
+                    break;
+                }
+            UnstickTick(hero, target.transform.position, ref lastPos, ref lastT, ref nudges);
+            var toTarget = target.transform.position - hero.transform.position;
+            toTarget.y = 0f;
+            if (toTarget.magnitude > hero.attackRange)
+            {
+                hero.AttackTarget(target);
+                if (skills != null && toTarget.magnitude < 18f) CastProfile(skills, toTarget, inRange: false);
+            }
+            else
+            {
+                hero.SetAimPoint(target.transform.position);
+                hero.Strike();
+                if (skills != null) CastProfile(skills, toTarget, inRange: true, boss: target == boss);
+            }
+            yield return null;
+        }
+        int kills = GlasswrightController.Kills - startKills;
+        Log($"phase boss3: kills={kills} phaseTwo={GlasswrightController.PhaseTwoEntries} lances={GlasswrightController.LanceVolleys} " +
+            $"novas={GlasswrightController.NovasFired} fields={GlasswrightController.FieldsCalled} warded={GlassWard.Warded} " +
+            $"zoneBoss={RunProfile.Act.ZoneBossDefeated} drop={GlasswrightController.LastZoneUnique?.uniqueId} overlay={SessionComplete.ZoneBossMode}");
+        phasesDone++;
+        lastPhaseOk = kills >= 1 && RunProfile.Act.ZoneBossDefeated;
+    }
 
     /// <summary>act-one S5: fight The Kilnmother until she falls and the Act I screen shows.</summary>
     IEnumerator PhaseKilnmother(DiabloClickController hero, float deadline)

@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-two-opening
 
-Prozent: 75 %
+Prozent: 90 %
 
 ## Erledigt
 
@@ -12,12 +12,12 @@ Prozent: 75 %
 - 2026-11-22: S3 (Branch `feature/cinderreach-act-two-opening-s3`, Basis `ec14049`): Zonen-Boss **The Glasswright** (420 HP, Tier Boss, Warrior-Rig 2,2× mit Glaskrone, Nahkampf 3 über `EnemyAttack`, Aggro 11 m, Südende `BarrensLayout.GlasswrightPos` hinter den Glass Elites; Düne 4 dafür nach Nordwest). Phase 1: Splitterlanzen-Fächer (3 × 14 m × 1,2 m, 0,9 s Linien-Telegraph, 3 Schaden, richtungsabhängig blockbar) alle 3,5 s. Phase 2 ab 50 %: drei Glass Pillars (12 HP) mit `GlassWard` (gerichtete Treffer halbiert, mind. 1), Lanzen alle 2,6 s, `ShardField` unter dem Ziel alle 6 s; Kindled stattdessen Shatter Nova (1,2 s Ring, 4 Schaden außerhalb 4 m). Bossbalken-Phase, eigener Musik-Track `BossGlass` beim Engage, Zonen-Loop nach dem Kill. Kill: `ActProgress.DefeatZoneBoss` + Save, Overlay „GLASS BARRENS CLEARED“ (Press On bleibt), Koop-`NotifyZoneBossKillClientRpc` bucht und speichert auf Clients; Lanzen/Nova/Felder per ClientRpc, jeder Peer löst gegen den eigenen Helden auf (Augur-Felder treffen damit auch Clients). Belege: EditMode 405/405 (neu `GlasswrightTests` 8/8), PlayMode 278/278 (neu `GlasswrightFightTests` 2/2), `VerifyDiabloZone` (`glasswright=True`) grün, `check-meta` grün, Autoplay `-seed 0` Exit 0, 8/8 Phasen, 0 Exceptions.
 - 2026-11-22: S4 (Branch `feature/cinderreach-act-two-opening-s4`, Basis `844e5b2`): Beute der Glass Barrens. `ItemLevelRules.BarrensLevel = 15` (Normal 15, Elite 16, Boss 17), neues Bracket 4 ab Itemlevel 15 mit Wertebereich ×1,75 (Kindled-Belohnung bleibt Bracket 3). Zwei Zonen-Uniques, frei tragbar, Top-Bracket-Rolls: **Shardback Aegis** (Rüstung, Breastplate: MaxHP, Armor, Thorns) und **Glasswright Prism** (Helm, Circlet: CritRating, IncreasedArea, CooldownReduction). Sie fallen nur aus Bracket-4-Quellen (`ItemDatabase.UniqueForSlot`, 50 % der Rüstungs-/Helm-Uniques dort, `DroptableDatabase.ZoneUniqueShare`), der erste Glasswright-Kill lässt zusätzlich garantiert eines fallen (Itemlevel 17, Overlay nennt es als bester Fund). Host-Katalog `IsKnownUniqueId` kennt beide, Save-Roundtrip belegt. Belege: EditMode 412/412 (neu `BarrensLootTests` 5/5, `AffixTableTests` um Bracket 4 und Barrens-Level erweitert), PlayMode 278/278, `check-meta` grün, Autoplay `-seed 1` Exit 0, 8/8 Phasen, 0 Exceptions.
 - Plan-Anpassung: Der Koop-Paarlauf durch Tor und Boss braucht die Autoplay-Phasen der Barrens und wandert deshalb von S4 nach S5.
+- 2026-11-22: S5 (Branch `feature/cinderreach-act-two-opening-s5`, Basis `f15b11f`): Autoplay-Route um `zone4`/`boss3` erweitert (Barrens-Tor, Zonenkampf mit 260 s Budget, `PhaseGlasswright` schlägt zuerst lebende Pfeiler, Heimweg per Barrens-Wegpunkt, `complete` verlangt Zonen-Boss + Barrens-Overlay), Koop-Client bleibt bis zum Glasswright-Kill (`ClientPhases` + `boss3`, Akt-Kette auf dem Client nachgebucht), Shotcheck-Posen 41–44, `ShardGuard` nachjustiert (60 %, gerundet, mind. 1). Belege in `docs/act-two-run-log.md`: Matrix 18/18 Exit 0 (3 Klassen × Normal/Kindled × Seeds 0–2), Koop-Paar Host 10/10 + Client `town,zone1,boss3` Exit 0/0, Windows-Autoplay 1080p 10/10 mit schlechtestem Fenster 131,5 fps (Gate 60 PASS), EditMode 412/412, PlayMode 278/278.
 
 ## Nächste Schritte
 
-- S5: Autoplay-Phasen `zone4`/`boss3`, Matrix 3 Klassen × Normal/Kindled × Seeds 0–2, Koop-Paarlauf durch Tor und Boss, Windows-Shotcheck mit Perf-Nachweis, Nightly + dotfiles-Health-Phasen, Doku, Fold-in.
+- Nightly per `workflow_dispatch` mit der neuen Route, dann dotfiles `AUTOPLAY_PHASES` um `zone4`/`boss3` erweitern, `G-DIABLO06` prüfen, Fold-in in CINDERREACH.md.
 
 ## Offene Punkte
 
-- S5 offen.
-- Augurs gleiten ohne Lauf-Animation (`RangedCaster` treibt `HuskAnimator` nicht); Politur bei der Windows-Sichtprüfung in S5.
+- Nightly-Beleg und dotfiles-Phasen für `G-DIABLO06` offen.

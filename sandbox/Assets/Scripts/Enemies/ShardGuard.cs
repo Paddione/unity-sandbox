@@ -12,8 +12,9 @@ public interface IDamageFilter
 
 /// <summary>
 /// Shardback glass shield (act-two-opening S2): hits from inside the frontal
-/// arc lose <see cref="Reduction"/> of their damage (rounded down, so a
-/// 1-damage poke does nothing). Flank and back hits land in full, and a
+/// arc lose <see cref="Reduction"/> of their damage (rounded, never below 1,
+/// so weak hits still chip through; S5 matrix showed 0-damage pokes stalled
+/// a Kindled Lanternbearer). Flank and back hits land in full, and a
 /// stunned Shardback (tank slam) drops its guard. The Shardback turns slowly
 /// (<see cref="EnemyAttack.turnRate"/>), so a party that holds its attention
 /// on the tank can hit it from behind.
@@ -22,7 +23,7 @@ public sealed class ShardGuard : MonoBehaviour, IDamageFilter
 {
     public const float DefaultArc = 110f;
     public const float EliteArc = 150f;
-    public const float Reduction = 0.75f;
+    public const float Reduction = 0.6f;
     public const float TurnRate = 2.5f;
 
     /// <summary>Full frontal arc in degrees.</summary>
@@ -42,7 +43,8 @@ public sealed class ShardGuard : MonoBehaviour, IDamageFilter
     }
 
     /// <summary>Damage left after a guarded hit.</summary>
-    public static int Guarded(int amount) => Mathf.Max(0, Mathf.FloorToInt(amount * (1f - Reduction)));
+    public static int Guarded(int amount) =>
+        amount <= 0 ? 0 : Mathf.Max(1, Mathf.RoundToInt(amount * (1f - Reduction)));
 
     public int Filter(int amount, Vector3 from)
     {

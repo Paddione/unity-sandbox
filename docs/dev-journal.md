@@ -917,3 +917,12 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Die Barrens droppen auf Itemlevel 15 (Elite 16, Boss 17) und öffnen Bracket 4 mit ×1,75 Wertebereich.
 - Zwei Zonen-Uniques nur aus Bracket-4-Quellen: Shardback Aegis (Rüstung) und Glasswright Prism (Helm).
   Der erste Glasswright-Kill garantiert eines davon; der Abschlussbildschirm nennt es als besten Fund.
+
+## 2026-11-22 — Akt-II-Nachweis (act-two-opening S5)
+
+- Autoplay läuft jetzt bis zum Glasswright (Phasen `zone4`, `boss3`); der Koop-Client bleibt bis zum Kill und
+  bucht ihn. Matrix 18/18, Koop-Paar grün, Windows 1080p schlechtestes Fenster 131,5 fps.
+- Balance aus der Matrix: Der Glasschild rundete schwache Treffer auf 0 und machte Kindled-Shardbacks für den
+  Lanternbearer von vorn unverwundbar. Jetzt 60 % Reduktion, gerundet, mindestens 1 Schaden.
+- Sichtprüfung: Augurs gleiten zwar ohne Laufanimation, im Kampf fällt das zwischen Splitterfeldern kaum auf.
+  Kein Blocker, als Politurpunkt notiert.

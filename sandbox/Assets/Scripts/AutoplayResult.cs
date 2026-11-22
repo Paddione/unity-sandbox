@@ -21,11 +21,14 @@ public sealed class AutoplayResult
     // act-one S5: the run continues through the Cinder Kiln to the Kilnmother.
     public const string PhaseZone3 = "zone3";
     public const string PhaseActBoss = "actboss";
+    // act-two-opening S5: on through the Glass Barrens to the Glasswright.
+    public const string PhaseZone4 = "zone4";
+    public const string PhaseBoss3 = "boss3";
     public const string PhaseComplete = "complete";
 
     /// <summary>Canonical order; a full session reaches all of them.</summary>
     public static readonly string[] RequiredPhases =
-        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseComplete };
+        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3, PhaseComplete };
 
     public int schema = Schema;
     public string commit = "unknown";
@@ -63,7 +66,9 @@ public sealed class AutoplayResult
     /// Hold and the Ashen Fen (coop-session S1). Later stages extend the list
     /// as gates and bosses become co-op.
     /// </summary>
-    public static readonly string[] ClientPhases = { PhaseTown, PhaseZone1 };
+    /// act-two-opening S5: the client stays through the host's route and must
+    /// book the Glasswright kill the host broadcasts (<c>boss3</c>).
+    public static readonly string[] ClientPhases = { PhaseTown, PhaseZone1, PhaseBoss3 };
 
     /// <summary>Required phases for a role (solo and host play the full route).</summary>
     public static string[] RequiredFor(string role) => role == RoleClient ? ClientPhases : RequiredPhases;

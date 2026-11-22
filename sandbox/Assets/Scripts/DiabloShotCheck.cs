@@ -340,6 +340,40 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.5f);
         yield return Shot("act_one_complete");
         SessionComplete.ActOneMode = false;
+        foreach (var sc in Object.FindObjectsByType<SessionComplete>(FindObjectsSortMode.None)) sc.PressOn();
+
+        // 15) act-two-opening: Glass Barrens arrival, a Shardback pack with an Augur field, the Glasswright in phase 2.
+        RunProfile.Act.CompleteAct();
+        TeleportHero(hero, BarrensLayout.BarrensArrival);
+        hero.distance = 18f;
+        hero.pitch = 50f;
+        yield return Wait(1.0f);
+        yield return Shot("barrens_arrival");
+        var shard = GameObject.Find(BarrensLayout.ShardbackPrefix + "1");
+        if (shard != null)
+        {
+            TeleportHero(hero, shard.transform.position + new Vector3(0f, 0f, 5f));
+            Face(hero, shard.transform.position - hero.transform.position);
+            ShardField.Spawn(hero.transform.position + new Vector3(-2f, 0f, 1f));
+            hero.distance = 10f;
+            yield return Wait(1.3f);
+            yield return Shot("shardback_pack");
+        }
+        var glass = GameObject.Find(GlasswrightController.BossName);
+        if (glass != null)
+        {
+            TeleportHero(hero, glass.transform.position + new Vector3(0f, 0f, 7f));
+            Face(hero, glass.transform.position - hero.transform.position);
+            var gc = glass.GetComponent<GlasswrightController>();
+            if (gc != null) { gc.EnterPhaseTwo(); gc.FireLancesNow(Time.time, hero.transform.position + new Vector3(2f, 0f, 0f)); }
+            hero.distance = 14f;
+            yield return Wait(0.6f);
+            yield return Shot("glasswright_phase2");
+        }
+        SessionComplete.ShowZoneBossCleared(hero.gameObject);
+        yield return Wait(0.5f);
+        yield return Shot("barrens_cleared");
+        SessionComplete.ZoneBossMode = false;
         keepAlive = null;
 
         // 13) SessionComplete overlay (S5 end screen, shown on boss death;
