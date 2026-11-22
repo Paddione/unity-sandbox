@@ -42,8 +42,7 @@ public sealed class LootDrop : MonoBehaviour
             // legacy/matrix so every matrix piece drops regularly.
             var unique = roll.slot == ItemSlot.Weapon
                 ? ItemDatabase.UniqueWeaponForClass(weaponClass, rng)
-                : ItemDatabase.CreateUnique(roll.slot == ItemSlot.Armor
-                    ? ItemDatabase.UniqueArmor(rng) : ItemDatabase.UniqueHelmet(rng));
+                : ItemDatabase.CreateUnique(ItemDatabase.UniqueForSlot(roll.slot, itemLevel, rng));
             return ItemDatabase.RollUnique(unique, itemLevel, affixTier);
         }
         var bases = roll.slot == ItemSlot.Weapon

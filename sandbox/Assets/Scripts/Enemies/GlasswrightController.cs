@@ -202,12 +202,37 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
         Debug.Log($"[Glasswright] slain (kills={Kills}, zone boss defeated={RunProfile.Act.ZoneBossDefeated}).");
         var hero = AcquireHero();
         var heroGo = hero != null ? hero.gameObject : GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (first) DropZoneUnique();
         if (first && heroGo != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(heroGo);
         var relay = DiabloNetworkPlayer.HostRelay();
         if (relay != null) relay.BroadcastZoneBossKill();
         if (Application.isPlaying)
             try { MusicDirector.Ensure().PlayZone(ActProgress.Barrens); } catch { }
         SessionComplete.ShowZoneBossCleared(heroGo);
+    }
+
+    /// <summary>Last guaranteed Barrens unique (test seam).</summary>
+    public static ItemInstance LastZoneUnique;
+
+    /// <summary>
+    /// act-two-opening S4: the first kill drops one Barrens unique at boss
+    /// level on top of the regular Boss-tier loot (authority only, networked
+    /// like any loot drop).
+    /// </summary>
+    void DropZoneUnique()
+    {
+        if (!Diablo.IsLocalAuthority() && !Diablo.IsSolo()) return;
+        var rng = new System.Random();
+        string id = ItemDatabase.ZoneUniqueIds[rng.Next(ItemDatabase.ZoneUniqueIds.Length)];
+        int level = ItemLevelRules.ForDrop(transform.position, LootTier.Boss);
+        var item = ItemDatabase.RollUnique(ItemDatabase.CreateUnique(id), level, DifficultyProfile.Current.affixTier);
+        LastZoneUnique = item;
+        var nm = NetworkManager.Singleton;
+        bool networked = nm != null && nm.IsListening;
+        if (Application.isPlaying)
+            LootDrop.SpawnItem(transform.position + new Vector3(1.2f, 0.8f, 0f), item, networked);
+        SessionComplete.BestDrop = LootDrop.PrettyName(id);
+        Debug.Log($"[Glasswright] dropped {id} (ilvl {level}).");
     }
 
     [ClientRpc]
@@ -249,6 +274,7 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
         LanceVolleys = 0;
         NovasFired = 0;
         FieldsCalled = 0;
+        LastZoneUnique = null;
     }
 }
 

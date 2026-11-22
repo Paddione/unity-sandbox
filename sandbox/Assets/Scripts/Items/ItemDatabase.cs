@@ -35,6 +35,14 @@ public static class ItemDatabase
     public const string ShadowstrideVestId = "shadowstride-vest";
     public const string KeenCadenceId = "keen-cadence";
 
+    /// <summary>
+    /// act-two-opening S4: Glass Barrens uniques, freely wearable. They drop only
+    /// from bracket-4 sources (the Barrens) and from the Glasswright's first kill.
+    /// </summary>
+    public const string ShardbackAegisId = "shardback-aegis";
+    public const string GlasswrightPrismId = "glasswright-prism";
+    public static readonly string[] ZoneUniqueIds = { ShardbackAegisId, GlasswrightPrismId };
+
     /// <summary>Class that may equip a base type; "" = every class.</summary>
     public static string ClassRestriction(string baseType)
     {
@@ -191,6 +199,24 @@ public static class ItemDatabase
                     baseType = "Hood",
                     uniqueId = KeenCadenceId,
                     affixes = new List<Affix> { new Affix("Crit", 10f), new Affix("CritRating", 20f) },
+                };
+            case ShardbackAegisId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Armor,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Breastplate",
+                    uniqueId = ShardbackAegisId,
+                    affixes = new List<Affix> { new Affix("MaxHP", 25f), new Affix("Armor", 5f), new Affix("Thorns", 3f) },
+                };
+            case GlasswrightPrismId:
+                return new ItemInstance
+                {
+                    slot = ItemSlot.Helmet,
+                    rarity = ItemRarity.Unique,
+                    baseType = "Circlet",
+                    uniqueId = GlasswrightPrismId,
+                    affixes = new List<Affix> { new Affix("CritRating", 25f), new Affix("IncreasedArea", 20f), new Affix("CooldownReduction", 10f) },
                 };
             default:
                 return new ItemInstance
@@ -363,6 +389,8 @@ public static class ItemDatabase
             case WickOfHaloId:
             case NightfangId:
             case RogueKeepsakeId:
+            case ShardbackAegisId:
+            case GlasswrightPrismId:
                 return true;
             default:
                 return IsMatrixUnique(uniqueId);
@@ -390,6 +418,18 @@ public static class ItemDatabase
         if (rng != null && rng.NextDouble() < DroptableDatabase.MatrixNonWeaponShare)
             return MatrixHelmets[rng.Next(MatrixHelmets.Length)];
         return "Seer's Circlet";
+    }
+
+    /// <summary>
+    /// act-two-opening S4: armor/helmet Unique pick at a bracket-4 source. Half
+    /// of those Uniques are the slot's Barrens unique, the rest keep the regular pool.
+    /// </summary>
+    public static string UniqueForSlot(ItemSlot slot, int itemLevel, System.Random rng)
+    {
+        if (ItemLevelRules.GetBracket(itemLevel) >= 4 && rng != null
+            && rng.NextDouble() < DroptableDatabase.ZoneUniqueShare)
+            return slot == ItemSlot.Armor ? ShardbackAegisId : GlasswrightPrismId;
+        return slot == ItemSlot.Armor ? UniqueArmor(rng) : UniqueHelmet(rng);
     }
 
     /// <summary>

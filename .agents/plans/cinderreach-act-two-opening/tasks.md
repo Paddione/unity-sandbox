@@ -45,8 +45,9 @@ feature/cinderreach-act-two-opening-sN`, `lock claim task cinderreach-act-two-op
   Kill setzt `ZoneBossDefeated` + Save.
 
 ### S4 Beute + Koop-Parität
-- `ItemLevelRules` Zone 4 (Itemlevel 15, neues Bracket 4), ≥ 2 Zonen-Uniques; Koop-Paarlauf durch Tor und Boss.
+- `ItemLevelRules` Zone 4 (Itemlevel 15, neues Bracket 4), ≥ 2 Zonen-Uniques. Der Koop-Paarlauf durch Tor und Boss
+  wandert nach S5, weil er die Autoplay-Phasen der Barrens braucht.
 
 ### S5 Nachweis + Fold-in
-- Autoplay-Phasen `zone4`/`boss3`, Matrix 3 Klassen × Normal/Kindled × Seeds 0–2, FPS-Gate,
+- Autoplay-Phasen `zone4`/`boss3`, Koop-Paarlauf durch Tor und Boss, Matrix 3 Klassen × Normal/Kindled × Seeds 0–2, FPS-Gate,
   Windows-Shotcheck, Nightly + dotfiles-Health-Vertrag, Doku, CINDERREACH.md-Fold-in.

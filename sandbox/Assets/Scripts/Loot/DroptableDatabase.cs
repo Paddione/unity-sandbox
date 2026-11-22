@@ -37,6 +37,9 @@ public static class DroptableDatabase
     /// </summary>
     public const float BuildUniqueWeaponShare = 0.5f;
 
+    /// <summary>act-two-opening S4: share of bracket-4 armor/helmet Uniques that are the Barrens uniques.</summary>
+    public const float ZoneUniqueShare = 0.5f;
+
     /// <summary>
     /// S4 matrix share of armor/helmet Unique drops: half of all armor/helmet
     /// Uniques roll from the three matrix pieces, half stays legacy

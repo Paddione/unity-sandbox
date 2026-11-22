@@ -6,11 +6,14 @@ public static class ItemLevelRules
     public const int VendorLevel = 1;
     public const int RiskShrineRewardLevel = 5;
     public const int KindledFinaleRewardLevel = 12;
+    /// <summary>act-two-opening S4: Glass Barrens source level (opens bracket 4).</summary>
+    public const int BarrensLevel = 15;
 
     public static int ForDrop(Vector3 sourcePosition, LootTier tier)
     {
         int zone = EncounterLayout.CurrentZone(sourcePosition);
-        int level = zone == ActProgress.Kiln ? 10 : zone == ActProgress.Ossuary ? 5 : 1;
+        int level = zone == ActProgress.Barrens ? BarrensLevel
+            : zone == ActProgress.Kiln ? 10 : zone == ActProgress.Ossuary ? 5 : 1;
         switch (tier)
         {
             case LootTier.Elite:
@@ -23,7 +26,7 @@ public static class ItemLevelRules
 
     /// <summary>Zero is the historical bracket and keeps its original tier range.</summary>
     public static int GetBracket(int itemLevel) =>
-        itemLevel < 1 ? 0 : itemLevel < 5 ? 1 : itemLevel < 10 ? 2 : 3;
+        itemLevel < 1 ? 0 : itemLevel < 5 ? 1 : itemLevel < 10 ? 2 : itemLevel < BarrensLevel ? 3 : 4;
 
     public static float RangeMultiplier(int itemLevel)
     {
@@ -31,6 +34,7 @@ public static class ItemLevelRules
         {
             case 2: return 1.25f;
             case 3: return 1.5f;
+            case 4: return 1.75f;
             default: return 1f;
         }
     }

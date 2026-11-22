@@ -911,3 +911,9 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   die Lanzen strafen das Stehen in der Linie.
 - Enemy→Hero in Koop: Lanzen, Nova und Splitterfelder werden auf jedem Peer gespawnt und gegen den
   eigenen Helden aufgelöst (wie das per-Client-HP-Modell). Das betrifft rückwirkend auch die Augur-Felder.
+
+## 2026-11-22 — Beute der Glass Barrens (act-two-opening S4)
+
+- Die Barrens droppen auf Itemlevel 15 (Elite 16, Boss 17) und öffnen Bracket 4 mit ×1,75 Wertebereich.
+- Zwei Zonen-Uniques nur aus Bracket-4-Quellen: Shardback Aegis (Rüstung) und Glasswright Prism (Helm).
+  Der erste Glasswright-Kill garantiert eines davon; der Abschlussbildschirm nennt es als besten Fund.

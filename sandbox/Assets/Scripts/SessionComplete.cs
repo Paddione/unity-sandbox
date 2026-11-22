@@ -52,7 +52,7 @@ public sealed class SessionComplete : MonoBehaviour
     {
         ActOneMode = false;
         ZoneBossMode = true;
-        Show(hero, "Rare+ glass cache");
+        Show(hero, string.IsNullOrEmpty(BestDrop) ? "Rare+ glass cache" : BestDrop);
     }
 
     /// <summary>Act I end screen (Kilnmother): same overlay, act title, all three zones in the totals.</summary>

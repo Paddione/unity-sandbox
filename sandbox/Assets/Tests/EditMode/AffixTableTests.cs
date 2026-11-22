@@ -49,7 +49,9 @@ public class AffixTableTests
     [TestCase(5, 2)]
     [TestCase(9, 2)]
     [TestCase(10, 3)]
-    [TestCase(40, 3)]
+    [TestCase(14, 3)]
+    [TestCase(15, 4)]
+    [TestCase(40, 4)]
     public void BracketBoundaries(int level, int bracket)
     {
         Assert.AreEqual(bracket, ItemLevelRules.GetBracket(level));
@@ -87,6 +89,8 @@ public class AffixTableTests
         Assert.AreEqual(5, ItemLevelRules.ForDrop(KilnLayout.OssuaryOffset, LootTier.Normal));
         Assert.AreEqual(6, ItemLevelRules.ForDrop(KilnLayout.OssuaryOffset, LootTier.Elite));
         Assert.AreEqual(12, ItemLevelRules.ForDrop(KilnLayout.KilnOffset, LootTier.ActBoss));
+        Assert.AreEqual(ItemLevelRules.BarrensLevel, ItemLevelRules.ForDrop(BarrensLayout.BarrensOffset, LootTier.Normal));
+        Assert.AreEqual(ItemLevelRules.BarrensLevel + 2, ItemLevelRules.ForDrop(BarrensLayout.GlasswrightPos, LootTier.Boss));
     }
 
     [Test]
