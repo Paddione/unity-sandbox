@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-two-opening
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -13,11 +13,12 @@ Prozent: 90 %
 - 2026-11-22: S4 (Branch `feature/cinderreach-act-two-opening-s4`, Basis `844e5b2`): Beute der Glass Barrens. `ItemLevelRules.BarrensLevel = 15` (Normal 15, Elite 16, Boss 17), neues Bracket 4 ab Itemlevel 15 mit Wertebereich ×1,75 (Kindled-Belohnung bleibt Bracket 3). Zwei Zonen-Uniques, frei tragbar, Top-Bracket-Rolls: **Shardback Aegis** (Rüstung, Breastplate: MaxHP, Armor, Thorns) und **Glasswright Prism** (Helm, Circlet: CritRating, IncreasedArea, CooldownReduction). Sie fallen nur aus Bracket-4-Quellen (`ItemDatabase.UniqueForSlot`, 50 % der Rüstungs-/Helm-Uniques dort, `DroptableDatabase.ZoneUniqueShare`), der erste Glasswright-Kill lässt zusätzlich garantiert eines fallen (Itemlevel 17, Overlay nennt es als bester Fund). Host-Katalog `IsKnownUniqueId` kennt beide, Save-Roundtrip belegt. Belege: EditMode 412/412 (neu `BarrensLootTests` 5/5, `AffixTableTests` um Bracket 4 und Barrens-Level erweitert), PlayMode 278/278, `check-meta` grün, Autoplay `-seed 1` Exit 0, 8/8 Phasen, 0 Exceptions.
 - Plan-Anpassung: Der Koop-Paarlauf durch Tor und Boss braucht die Autoplay-Phasen der Barrens und wandert deshalb von S4 nach S5.
 - 2026-11-22: S5 (Branch `feature/cinderreach-act-two-opening-s5`, Basis `f15b11f`): Autoplay-Route um `zone4`/`boss3` erweitert (Barrens-Tor, Zonenkampf mit 260 s Budget, `PhaseGlasswright` schlägt zuerst lebende Pfeiler, Heimweg per Barrens-Wegpunkt, `complete` verlangt Zonen-Boss + Barrens-Overlay), Koop-Client bleibt bis zum Glasswright-Kill (`ClientPhases` + `boss3`, Akt-Kette auf dem Client nachgebucht), Shotcheck-Posen 41–44, `ShardGuard` nachjustiert (60 %, gerundet, mind. 1). Belege in `docs/act-two-run-log.md`: Matrix 18/18 Exit 0 (3 Klassen × Normal/Kindled × Seeds 0–2), Koop-Paar Host 10/10 + Client `town,zone1,boss3` Exit 0/0, Windows-Autoplay 1080p 10/10 mit schlechtestem Fenster 131,5 fps (Gate 60 PASS), EditMode 412/412, PlayMode 278/278.
+- 2026-11-22: Nightly per `workflow_dispatch` (Run 45076307223, `c89dc40`): Normal, Kindled und Lanternbearer je Exit 0, 10/10 Phasen, 0 Exceptions (217 s / 329 s / 260 s). dotfiles `AUTOPLAY_PHASES` um `zone4`/`boss3` erweitert (`99d914d`), dazu Barrens-Skripte im Vertrag (`c8e2e0d`, `115c0c2`, `661eedb`); Probes live: `G-DIABLO02` 0, `G-DIABLO06` 0. Fold-in in CINDERREACH.md.
 
 ## Nächste Schritte
 
-- Nightly per `workflow_dispatch` mit der neuen Route, dann dotfiles `AUTOPLAY_PHASES` um `zone4`/`boss3` erweitern, `G-DIABLO06` prüfen, Fold-in in CINDERREACH.md.
+Keine.
 
 ## Offene Punkte
 
-- Nightly-Beleg und dotfiles-Phasen für `G-DIABLO06` offen.
+Keine.
