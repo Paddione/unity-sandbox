@@ -1,6 +1,6 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-19, `main` @ `c94259d`. Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-22, `main` @ `c89dc40`. Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte `ROADMAP.md`. Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -23,7 +23,8 @@ Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 Cinderreach ist ein isometrisches Co-op-ARPG (Unity 6000.0.85f2, URP, `sandbox/`), Arbeitstitel und
 `productName` „Cinderreach“. Eine Session führt von der Siedlung **Lantern Hold** durch **Ashen Fen**
 und **Sunken Ossuary** (Boss **The Hollow Abbot**) in den **Cinder Kiln** (Akt-Boss **The Kilnmother**)
-und schließt Akt I ab. Spieler wählen eine von drei Klassen, sammeln Beute mit Affixen, schmieden,
+und schließt Akt I ab. Der Kilnmother-Kill öffnet Akt II mit den **Glass Barrens** (Zonen-Boss
+**The Glasswright**). Spieler wählen eine von drei Klassen, sammeln Beute mit Affixen, schmieden,
 nehmen optionale Aufträge an und spielen die Stufen Normal und Kindled. Solo füllt KI die Gruppe auf
 drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO. Interne Bezeichner
 (`Diablo*`-Klassen, Szenendateien) bleiben bewusst unverändert, spielersichtbare Namen sind eigen
@@ -32,10 +33,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 ## Projektstruktur
 
 - Szenen: `DiabloZone.unity` (das Spiel, alle Zonen als Roots in einer Szene, +200 m X Ossuary,
-  +400 m X Kiln), `Diablo.unity` (früher Prototyp), `Greybox.unity` (Mechanik-Testbed).
+  +400 m X Kiln, +600 m X Glass Barrens), `Diablo.unity` (früher Prototyp), `Greybox.unity` (Mechanik-Testbed).
 - Szenen nur über Builder regenerieren, nie von Hand: `SandboxBuilder.BuildDiabloZone` mit
-  `TownBuilder`, `OssuaryBuilder`, `KilnBuilder`, `EncounterBuilder`, `RiskShrineBuilder`,
-  `LightingBuilder`, `VfxBuilder`. Abnahme: `SandboxBuilder.VerifyDiabloZone` (inkl. `VerifyKiln`).
+  `TownBuilder`, `OssuaryBuilder`, `KilnBuilder`, `BarrensBuilder`, `EncounterBuilder`, `RiskShrineBuilder`,
+  `LightingBuilder`, `VfxBuilder`. Abnahme: `SandboxBuilder.VerifyDiabloZone` (inkl. `VerifyKiln`, `VerifyBarrens`).
   Builder-Läufe re-serialisieren LFS-Controller (`*Locomotion.controller`, `VendorIdle.controller`):
   diese Seiteneffekte vor dem Commit revertieren.
 - Code: `sandbox/Assets/Scripts/` mit Unterordnern `Audio`, `Classes`, `Contracts`, `Difficulty`,
@@ -90,6 +91,16 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   2 Kiln Elites, 2 Kiln Wardens, **The Kilnmother** (320 HP, Feuerwellen mit 60°-Lücke, Phase 2
   schnellere Wellen + brennender Boden + 4 Thralls). Auf Kindled in Phase 2 stattdessen
   `KilnSectorPattern` (4×90°-Sektoren, max. 2 aktiv, 1,5 s Warnung, 2 s Brand).
+- Glass Barrens (`BarrensLayout`, Ankunfts-Plaza wie im Kiln, auch für Caster): 8 **Shardbacks**
+  (Nahkampf, `ShardGuard`: frontaler 110°-Bogen schluckt 60 % gerundet, mind. 1 Schaden, Flanke/Rücken
+  voll, betäubt ohne Deckung, `EnemyAttack.turnRate` 2,5), 6 **Dune Augurs** (`RangedCaster` + Payload
+  `DuneAugur`: `ShardField` unter dem Helden, 1 s Warnring, 3 s Splitter, unblockbar), 2 **Glass Elites**
+  (Shardback-Elite, 150°-Bogen, 30 HP). **The Glasswright** (420 HP, Aggro 11 m): Phase 1 Splitterlanzen-
+  Fächer (3 × 14 m, 0,9 s Linien-Telegraph, blockbar), Phase 2 ab 50 % drei Glass Pillars mit `GlassWard`
+  (gerichtete Treffer halbiert), schnellere Lanzen, `ShardField` unter dem Ziel; Kindled stattdessen
+  Shatter Nova (trifft alle außerhalb 4 m). Eigener Musik-Track `BossGlass`, Overlay „GLASS BARRENS CLEARED“.
+- Trefferrichtung: `EnemyHealth.TakeDamage(amount, crit, from)` läuft durch `IDamageFilter`-Komponenten
+  (Nahkampf, Skills, Projektile, Koop-`ApplyValidated`); Ticks, Dornen und Brände bleiben ungerichtet.
 - `EncounterLayout`: drei Begegnungen mit Deckung, getrennter Aggro und Prioritätszielen, sichere
   Ankunft und Rückzug in allen Layoutvarianten.
 
@@ -100,7 +111,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Beute: Seltenheiten Normal/Magic/Rare/Unique, `AffixLibrary` mit 14 Affixen in Tier 1/2 (u. a.
   Lebensraub ≤ 25 %, Gold Find, Magic Find, Skill-Rang, Cooldown-Reduktion ≤ 40 %, Feuerschaden,
   Dornen), Rare 3–6 Affixe, Vergleichs-Tooltip.
-- Itemlevel aus der Dropquelle, Roll-Brackets pro Itemlevel, Uniques an der Bracket-Obergrenze.
+- Itemlevel aus der Dropquelle (Fen 1, Ossuary 5, Kiln 10, Barrens 15; Elite +1, Boss +2), Roll-Brackets
+  pro Itemlevel (Bracket 4 ab 15 mit ×1,75), Uniques an der Bracket-Obergrenze. Zonen-Uniques
+  **Shardback Aegis** (Rüstung) und **Glasswright Prism** (Helm) nur aus Bracket-4-Quellen (50 % der
+  Rüstungs-/Helm-Uniques dort) und garantiert beim ersten Glasswright-Kill.
   Krit-Wertung (5 % Basis, Cap 75 %, 2× Schaden) und Flächen-Skalierung `r·sqrt(1+inc/100)` für
   Trefferprüfung und VFX gleichermaßen.
 - Klassengebundene Waffen, Drops zu 70 % passend zur Klasse des Finders. Build-Uniques
@@ -112,9 +126,12 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ### Zonen, Akt und Wiederspielbarkeit
 
-- Akt-Kette `ActProgress`: Abbot-Kill öffnet den Kiln, Kilnmother-Kill setzt „Akt I abgeschlossen“.
-- `ZoneGate`/`ZoneTravel`, Wegpunkt-Schreine in allen vier Zonen (`DiabloWaypointUI`).
-- `LayoutSeeder`: je 3 Varianten für Fen-Gruppen, Elites, Props und Kiln-Anker, Seed aus `-seed N`
+- Akt-Kette `ActProgress`: Abbot-Kill öffnet den Kiln, Kilnmother-Kill setzt „Akt I abgeschlossen“
+  und öffnet die Glass Barrens (`ActProgress.Barrens = 4`, Tor südlich des Kuppelrings), der
+  Glasswright-Kill setzt `ZoneBossDefeated`. Keine Aufträge für Zone 4.
+- `ZoneGate`/`ZoneTravel`, Wegpunkt-Schreine in allen Zonen inkl. „Glass Barrens“ (`KilnLayout.Shrines`,
+  Index 3 bleibt Kiln) (`DiabloWaypointUI`).
+- `LayoutSeeder`: je 3 Varianten für Fen-Gruppen, Elites, Props, Kiln- und Barrens-Anker, Seed aus `-seed N`
   oder Run-Seed. Koop-Peers bleiben auf Variante 0.
 - Kindled (`DifficultyProfile`): HP/Schaden ×1,8, Affix-Tier 2, Unique ×2, Gold ×1,5, freigeschaltet
   beim ersten Abbot-Kill. Einmaliger Kindled-Finale-Anspruch auf eine klassenkompatible Rare-Waffe.
@@ -164,7 +181,8 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 ### Spielstand
 
 `SaveService` schreibt `cinderreach-save.json` (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
-Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 10`, Migrationskette v1 → … → v10 in
+Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 11` (v11: `actTwoBossDefeated`, Migration öffnet die
+Barrens für Kilnmother-Bezwinger), Migrationskette v1 → … → v11 in
 `SaveMigrations` mit Backup `*.vN.bak`. Neuere Versionen werden nicht geladen und bleiben unberührt.
 Neue Felder additiv anhängen, eine Migration schreiben und `SaveMigrationTests` auf `CurrentVersion`
 prüfen lassen.
@@ -180,13 +198,14 @@ liest für Menüs ohne Nebenwirkung.
   `G-DIABLO06` nächtlicher Autoplay. Neue Prefabs, Skripte oder Pflichtphasen ziehen den Vertrag in
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
-  `autoplay-result.json` mit den Phasen `town, zone1, zone2, boss, zone3, actboss, complete`.
+  `autoplay-result.json` mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
+  complete` (Koop-Client: `town, zone1, boss3`, er bucht den Glasswright-Kill des Hosts samt Akt-Kette).
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Nightly
   `.github/workflows/autoplay-nightly.yml` (02:30, Runner `unity-licensed`) für Normal, Kindled und
   Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay).
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
   (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
-  WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 139 fps). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.
+  WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 131,5 fps über die volle Route bis zum Glasswright, 2026-11-22). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.
 - CI: `unity-tests.yml`, `unity-scene-captures.yml` (GPU-Runner), `autoplay-nightly.yml`.
 - Bekannte Grenze: Solo-Autoplay ohne `-seed` mit einem Save-Seed außerhalb 0–2 kann in einer
   seltenen Fen-Variante hängen. Der Nightly deckt nur Seeds 0–2 ab.
@@ -222,7 +241,7 @@ zuerst). `Diablo.IsSolo` zählt den Server nicht mit. Library nie bei laufendem
 - Design: `docs/one-page-gdd.md`, `docs/mechanics-questions.md` (Q1–Q10), `docs/decision-log.md`,
   `docs/dev-journal.md`, `docs/playtest-protocol.md`, `docs/fair-fights-playtest.md`.
 - Laufprotokolle: `session-loop-run-log.md`, `replayability-run-log.md`, `second-class-run-log.md`,
-  `act-one-run-log.md`, `coop-run-log.md`, `presentation-run-log.md` (alle unter `docs/`).
+  `act-one-run-log.md`, `act-two-run-log.md`, `coop-run-log.md`, `presentation-run-log.md` (alle unter `docs/`).
 - Betrieb: `docs/runbook.md`, `docs/ci-runner.md`, `docs/mcp.md`, `docs/kaykit-assets.md`.
 
 ## Konsolidierte Goals
@@ -250,3 +269,4 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-coop-session` | Koop-Parität, Direkt- und Relay-Join | `8f47c17` |
 | `cinderreach-presentation` | Licht, Audio, VFX, Menü, 60 FPS | `6325e7d` |
 | `cinderreach-menu-flow-polish` | Ein Startbildschirm, Layout-Fix, Rogue-Art, Pause/Tod/Flow, Boot-Perf-Fix | `722c8cf` |
+| `cinderreach-act-two-opening` | Akt II: Glass Barrens, Shardback/Augur/Elite, The Glasswright, Bracket 4 + 2 Zonen-Uniques, Save v11, Autoplay bis `boss3` | `c89dc40` |
