@@ -297,11 +297,12 @@ public static class DiabloAudio
     {
         // Scene opens destroy the synth objects (no DontDestroyOnLoad outside
         // play mode); rebuild instead of handing out dead clips.
-        if (built && source != null && swingClip != null) return;
+        if (built && source != null && swingClip != null) { EnsureListener(); return; }
         built = true;
         var go = new GameObject("DiabloAudio");
         if (Application.isPlaying) UnityEngine.Object.DontDestroyOnLoad(go);
         source = go.AddComponent<AudioSource>();
+        EnsureListener();
         var rng = new System.Random(1234); // deterministic clips
         swingClip = NoiseBurst("Swing", 0.12f, rng);
         hitClip = Thump("Hit", 0.15f, 180f, 90f);
@@ -340,6 +341,20 @@ public static class DiabloAudio
         veilClip = Sweep("VeilStep", 0.25f, 1400f, 480f);
         pitched = new AudioSource[4];
         for (int i = 0; i < pitched.Length; i++) pitched[i] = go.AddComponent<AudioSource>();
+    }
+
+    /// <summary>Without an AudioListener Unity renders silence: attach one to the
+    /// main camera when the scene has none (builder scenes carry their own).</summary>
+    static void EnsureListener()
+    {
+        if (!Application.isPlaying) return;
+        try
+        {
+            if (UnityEngine.Object.FindFirstObjectByType<AudioListener>() != null) return;
+            var cam = Camera.main;
+            if (cam != null) cam.gameObject.AddComponent<AudioListener>();
+        }
+        catch { }
     }
 
     /// <summary>Noise through a one-pole lowpass whose cutoff rises then falls.</summary>

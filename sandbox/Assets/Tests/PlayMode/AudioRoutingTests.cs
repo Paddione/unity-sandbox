@@ -159,6 +159,25 @@ public class AudioRoutingTests
         Assert.AreNotEqual(ossuary.name, kiln.name, "Kiln must not share the Ossuary theme.");
     }
 
+    [UnityTest]
+    public System.Collections.IEnumerator PlayingAudio_EnsuresAudioListenerOnMainCamera()
+    {
+        var camGo = new GameObject("ListenerTestCamera");
+        camGo.tag = "MainCamera";
+        camGo.AddComponent<Camera>();
+        var fallback = Object.FindFirstObjectByType<AudioListener>();
+        var fallbackGo = fallback != null ? fallback.gameObject : null;
+        if (fallbackGo != null) fallbackGo.SetActive(false);
+        Assert.IsNull(Object.FindFirstObjectByType<AudioListener>(), "Precondition: no listener.");
+        DiabloAudio.PlaySwing();
+        yield return null;
+        var ensured = camGo.GetComponent<AudioListener>();
+        if (fallbackGo != null) fallbackGo.SetActive(true);
+        Assert.IsNotNull(ensured,
+            "Without an AudioListener every source stays silent; DiabloAudio must ensure one.");
+        Object.Destroy(camGo);
+    }
+
     [Test]
     public void LegacySignatures_StillCallable()
     {

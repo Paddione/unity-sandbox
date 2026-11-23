@@ -71,6 +71,7 @@ public static class SandboxBuilder
         // Camera (controller drives it at runtime).
         var cam = new GameObject("Main Camera");
         cam.AddComponent<Camera>();
+        cam.AddComponent<AudioListener>(); // without a listener every AudioSource stays silent
         cam.tag = "MainCamera";
         cam.transform.position = new Vector3(0f, 3f, -7f);
 
@@ -345,6 +346,7 @@ public static class SandboxBuilder
         light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
         var cam = new GameObject("Main Camera");
         cam.AddComponent<Camera>();
+        cam.AddComponent<AudioListener>(); // without a listener every AudioSource stays silent
         cam.tag = "MainCamera";
         cam.transform.position = new Vector3(0f, 12f, -4f);
 
@@ -704,6 +706,7 @@ public static class SandboxBuilder
         light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
         var cam = new GameObject("Main Camera");
         cam.AddComponent<Camera>();
+        cam.AddComponent<AudioListener>(); // without a listener every AudioSource stays silent
         cam.tag = "MainCamera";
         cam.transform.position = new Vector3(0f, 12f, -4f);
 
@@ -1246,8 +1249,11 @@ public static class SandboxBuilder
                 ref brute, ref chest, ref net, ref transport, ref autostart,
                 ref prefab, ref allHusksArmed, ref husks, ref palisade, ref torches,
                 ref spawns, ref edges, ref patches, ref vendor, ref vui);
+        bool listener = false;
+        foreach (var root in scene.GetRootGameObjects())
+            if (root.GetComponentInChildren<AudioListener>(true) != null) listener = true;
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: " +
-                  $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} " +
+                  $"player={player} husks={husks} armed={allHusksArmed} elite={elite} brute={brute} listener={listener} " +
                   $"chest={chest} goal={goal} campfire={campfire} targetBar={targetBar} " +
                   $"starterSword={starterSword} spawns={spawns} palisade={palisade} " +
                   $"torches={torches} edges={edges} patches={patches} net={net} layouts={layoutRoots} stash={stash} board={board} smith={smith} classLook={classLook}");
@@ -1257,7 +1263,7 @@ public static class SandboxBuilder
             || !elite || !brute || !chest
             || husks < 10 || palisade < 12 || spawns != 4 || torches < 4
             || edges != 4 || patches < 4
-            || !light || !camera || !net || !transport || !autostart || !prefab
+            || !light || !camera || !listener || !net || !transport || !autostart || !prefab
             || layoutRoots != LayoutSeeder.VariantCount || !stash || !board || !smith || !classLook)
             throw new System.Exception("DiabloZone verify failed: zone inventory incomplete.");
         Debug.Log("[SandboxBuilder] VerifyDiabloZone: OK (ashen fen + loot + netcode present).");

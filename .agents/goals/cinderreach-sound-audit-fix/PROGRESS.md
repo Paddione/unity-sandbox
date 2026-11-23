@@ -18,4 +18,5 @@ Prozent: 85 %
 
 ## Offene Punkte
 
-- Eigner-Hörabnahme (Windows-Build) steht aus — echter Blocker für 100 %, braucht Eigner-Ohren; Klangpassung zum Setting ist per Unit-Test nicht beweisbar.
+- Eigner-Hörabnahme nach dem Listener-Fix (erneut gebaut/gestaged) steht aus — echter Blocker für 100 %, braucht Eigner-Ohren; Klangpassung zum Setting ist per Unit-Test nicht beweisbar.
+- Nachtrag 2026-11-23: Erste Hörabnahme meldete totale Stille. Ursache: Builder-Kamera ohne `AudioListener` (0 Treffer in der Szene), Unity gibt ohne Listener nichts aus; Tests liefen stumm/ mit Fallback-Listener und konnten das nicht sehen. Behoben: Listener an allen Builder-Kameras + Verify-Gate (`listener=`), Runtime-Garantie in `DiabloAudio.EnsureListener`, Szene per Builder regeneriert (1 Listener), neuer PlayMode-Test; EditMode 496/496, PlayMode 287/287.
