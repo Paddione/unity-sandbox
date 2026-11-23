@@ -270,7 +270,7 @@ public static class DiabloUIFactory
         return btn;
     }
 
-    public static Slider MakeSliderRow(Transform parent, string name, float value, UnityEngine.Events.UnityAction<float> onChange, out Text pctLabel)
+    public static Slider MakeSliderRow(Transform parent, string name, float value, UnityEngine.Events.UnityAction<float> onChange, out Text pctLabel, string label = null)
     {
         var row = new GameObject(name + "Row", typeof(RectTransform));
         row.transform.SetParent(parent, false);
@@ -283,7 +283,7 @@ public static class DiabloUIFactory
         hz.childForceExpandWidth = false;
         hz.childForceExpandHeight = false;
 
-        var lbl = MakeText(row.transform, "Label", name, 15, DiabloPalette.Parchment);
+        var lbl = MakeText(row.transform, "Label", label ?? name, 15, DiabloPalette.Parchment);
         SetLayout(lbl.gameObject, prefH: 28f, prefW: 110f);
 
         var sliderGo = new GameObject(name + "Slider", typeof(RectTransform));
@@ -368,20 +368,22 @@ public static class DiabloUIFactory
     }
 
     /// <summary>Builds a complete reusable Settings section (Volume, Display, Quality, Gameplay, Diff/Reset) cleanly.</summary>
+    static string OnOff(bool on) => on ? Loc.T("settings.on") : Loc.T("settings.off");
+
     public static void BuildSettingsWidgets(Transform parent, List<UnityEngine.Events.UnityAction> refreshActions,
         UnityAction<string> onStartNewRun = null, UnityEngine.Events.UnityAction onBack = null)
     {
-        var sMaster = MakeSliderRow(parent, "Master", DiabloSettings.MasterVol, v => { DiabloSettings.MasterVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tMaster);
-        var sMusic = MakeSliderRow(parent, "Music", DiabloSettings.MusicVol, v => { DiabloSettings.MusicVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tMusic);
-        var sSfx = MakeSliderRow(parent, "SFX", DiabloSettings.SFXVol, v => { DiabloSettings.SFXVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tSfx);
-        var sUi = MakeSliderRow(parent, "UI", DiabloSettings.UIVol, v => { DiabloSettings.UIVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tUi);
+        var sMaster = MakeSliderRow(parent, "Master", DiabloSettings.MasterVol, v => { DiabloSettings.MasterVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tMaster, Loc.T("settings.master"));
+        var sMusic = MakeSliderRow(parent, "Music", DiabloSettings.MusicVol, v => { DiabloSettings.MusicVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tMusic, Loc.T("settings.music"));
+        var sSfx = MakeSliderRow(parent, "SFX", DiabloSettings.SFXVol, v => { DiabloSettings.SFXVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tSfx, Loc.T("settings.sfx"));
+        var sUi = MakeSliderRow(parent, "UI", DiabloSettings.UIVol, v => { DiabloSettings.UIVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tUi, Loc.T("settings.ui"));
 
         MakeDivider(parent);
 
         var qRow = MakeHorizontalRow(parent, "QualityRow", 6f, 34f);
-        var qLbl = MakeText(qRow.transform, "QLbl", "Quality:", 14, DiabloPalette.ParchmentDim);
+        var qLbl = MakeText(qRow.transform, "QLbl", Loc.T("settings.quality"), 14, DiabloPalette.ParchmentDim);
         SetLayout(qLbl.gameObject, prefH: 30f, prefW: 72f);
-        string[] qNames = { "Low", "Med", "High" };
+        string[] qNames = { Loc.T("settings.quality.low"), Loc.T("settings.quality.med"), Loc.T("settings.quality.high") };
         var qBtns = new Button[3];
         for (int i = 0; i < 3; i++)
         {
@@ -405,7 +407,7 @@ public static class DiabloUIFactory
             DiabloSettings.Apply();
             RefreshAll(refreshActions);
         }, 32f);
-        var fullBtn = MakeSmallButton(dRow.transform, "Fullscreen", () =>
+        var fullBtn = MakeSmallButton(dRow.transform, Loc.T("settings.fullscreen"), () =>
         {
             DiabloAudio.PlayUIClick();
             DiabloSettings.Fullscreen = !DiabloSettings.Fullscreen;
@@ -431,7 +433,7 @@ public static class DiabloUIFactory
             DiabloSettings.Apply();
             RefreshAll(refreshActions);
         }, 32f);
-        var shakeBtn = MakeSmallButton(tRow.transform, "Shake", () =>
+        var shakeBtn = MakeSmallButton(tRow.transform, Loc.T("settings.shake"), () =>
         {
             DiabloAudio.PlayUIClick();
             DiabloSettings.ScreenShake = !DiabloSettings.ScreenShake;
@@ -439,7 +441,7 @@ public static class DiabloUIFactory
             DiabloSettings.Apply();
             RefreshAll(refreshActions);
         }, 32f);
-        var hitBtn = MakeSmallButton(tRow.transform, "HitStop", () =>
+        var hitBtn = MakeSmallButton(tRow.transform, Loc.T("settings.hitstop"), () =>
         {
             DiabloAudio.PlayUIClick();
             DiabloSettings.HitStop = !DiabloSettings.HitStop;
@@ -447,7 +449,7 @@ public static class DiabloUIFactory
             DiabloSettings.Apply();
             RefreshAll(refreshActions);
         }, 32f);
-        var dmgBtn = MakeSmallButton(tRow.transform, "DmgNum", () =>
+        var dmgBtn = MakeSmallButton(tRow.transform, Loc.T("settings.dmgnums"), () =>
         {
             DiabloAudio.PlayUIClick();
             DiabloSettings.ShowDamageNumbers = !DiabloSettings.ShowDamageNumbers;
@@ -464,12 +466,12 @@ public static class DiabloUIFactory
             diffText = MakeText(parent, "DiffStatus", DiabloInventoryUI.DifficultyText(), 14, DiabloPalette.TrimGold);
             SetLayout(diffText.gameObject, prefH: 22f, flexW: 1f);
             var runRow = MakeHorizontalRow(parent, "RunDiffRow", 6f, 34f);
-            MakeSmallButton(runRow.transform, "New run (Normal)", () => onStartNewRun(RunProfile.Normal), 32f);
-            kindledBtn = MakeSmallButton(runRow.transform, "New run (Kindled)", () => onStartNewRun(RunProfile.Kindled), 32f);
+            MakeSmallButton(runRow.transform, Loc.T("settings.newrun.normal"), () => onStartNewRun(RunProfile.Normal), 32f);
+            kindledBtn = MakeSmallButton(runRow.transform, Loc.T("settings.newrun.kindled"), () => onStartNewRun(RunProfile.Kindled), 32f);
         }
 
         var footer = MakeHorizontalRow(parent, "SettingsFooter", 8f, 36f);
-        MakeSmallButton(footer.transform, "Reset Defaults", () =>
+        MakeSmallButton(footer.transform, Loc.T("settings.reset"), () =>
         {
             DiabloAudio.PlayUIClick();
             DiabloSettings.ResetDefaults();
@@ -477,7 +479,7 @@ public static class DiabloUIFactory
         }, 34f);
         if (onBack != null)
         {
-            var closeB = MakeButton(footer.transform, "CloseButton", "Done", 15, true, DiabloPalette.GoldBright, onBack);
+            var closeB = MakeButton(footer.transform, "CloseButton", Loc.T("settings.done"), 15, true, DiabloPalette.GoldBright, onBack);
             SetLayout(closeB.gameObject, prefH: 34f, flexW: 1f);
         }
 
@@ -494,12 +496,12 @@ public static class DiabloUIFactory
 
             for (int i = 0; i < 3; i++) StyleButtonActive(qBtns[i], DiabloSettings.QualityLevel == i, qNames[i]);
             StyleButtonActive(resBtn, true, DiabloSettings.ResolutionLabel);
-            StyleButtonActive(fullBtn, DiabloSettings.Fullscreen, $"Screen: {(DiabloSettings.Fullscreen ? "Full" : "Win")}");
-            StyleButtonActive(vsyncBtn, DiabloSettings.VSync, $"VSync: {(DiabloSettings.VSync ? "ON" : "OFF")}");
-            StyleButtonActive(fpsBtn, DiabloSettings.ShowFPS, $"FPS: {(DiabloSettings.ShowFPS ? "ON" : "OFF")}");
-            StyleButtonActive(shakeBtn, DiabloSettings.ScreenShake, $"Shake: {(DiabloSettings.ScreenShake ? "ON" : "OFF")}");
-            StyleButtonActive(hitBtn, DiabloSettings.HitStop, $"HitStop: {(DiabloSettings.HitStop ? "ON" : "OFF")}");
-            StyleButtonActive(dmgBtn, DiabloSettings.ShowDamageNumbers, $"Numbers: {(DiabloSettings.ShowDamageNumbers ? "ON" : "OFF")}");
+            StyleButtonActive(fullBtn, DiabloSettings.Fullscreen, Loc.F("settings.screen", DiabloSettings.Fullscreen ? Loc.T("settings.screen.full") : Loc.T("settings.screen.window")));
+            StyleButtonActive(vsyncBtn, DiabloSettings.VSync, Loc.F("settings.vsync.state", OnOff(DiabloSettings.VSync)));
+            StyleButtonActive(fpsBtn, DiabloSettings.ShowFPS, Loc.F("settings.fps.state", OnOff(DiabloSettings.ShowFPS)));
+            StyleButtonActive(shakeBtn, DiabloSettings.ScreenShake, Loc.F("settings.shake.state", OnOff(DiabloSettings.ScreenShake)));
+            StyleButtonActive(hitBtn, DiabloSettings.HitStop, Loc.F("settings.hitstop.state", OnOff(DiabloSettings.HitStop)));
+            StyleButtonActive(dmgBtn, DiabloSettings.ShowDamageNumbers, Loc.F("settings.dmgnums.state", OnOff(DiabloSettings.ShowDamageNumbers)));
 
             if (diffText != null) diffText.text = DiabloInventoryUI.DifficultyText();
             if (kindledBtn != null)

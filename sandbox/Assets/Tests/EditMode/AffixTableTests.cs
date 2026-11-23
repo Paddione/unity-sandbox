@@ -309,10 +309,10 @@ public class AffixTableTests
         var equipped = Item(ItemSlot.Weapon, ("Damage", 3), ("Crit", 5));
         var candidate = Item(ItemSlot.Weapon, ("Damage", 5), ("LifeSteal", 4));
         string text = DiabloInventoryUI.CompareSummary(candidate, equipped);
-        StringAssert.Contains("+5 Damage <color=" + DiabloInventoryUI.BetterColor + ">(+2)</color>", text);
-        StringAssert.Contains("4% Life Steal <color=" + DiabloInventoryUI.BetterColor + ">(+4)</color>", text);
-        StringAssert.Contains("+0% Crit <color=" + DiabloInventoryUI.WorseColor + ">(-5)</color>", text);
+        StringAssert.Contains("+5 Schaden <color=" + DiabloInventoryUI.BetterColor + ">(+2)</color>", text);
+        StringAssert.Contains("4 % Lebensraub <color=" + DiabloInventoryUI.BetterColor + ">(+4)</color>", text);
+        StringAssert.Contains("+0 % Kritische Trefferchance <color=" + DiabloInventoryUI.WorseColor + ">(-5)</color>", text);
         StringAssert.DoesNotContain("<color", DiabloInventoryUI.CompareSummary(equipped, equipped));
-        Assert.AreEqual("no bonuses", DiabloInventoryUI.CompareSummary(Item(ItemSlot.Helmet), null));
+        Assert.AreEqual("keine Boni", DiabloInventoryUI.CompareSummary(Item(ItemSlot.Helmet), null));
     }
 }

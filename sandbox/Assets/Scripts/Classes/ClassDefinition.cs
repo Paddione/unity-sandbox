@@ -44,6 +44,9 @@ public sealed class ClassDefinition
         this.specialtyFactor = specialtyFactor;
     }
 
+    /// <summary>Shown key of skill slot <paramref name="i"/> ("Space" → "Leertaste").</summary>
+    public string KeyLabel(int i) => keys[i] == "Space" ? Loc.T("key.space") : keys[i];
+
     public bool Has(DiabloSkills.Skill skill) => System.Array.IndexOf(skills, skill) >= 0;
 
     /// <summary>True for the shared base set (castable by every class).</summary>

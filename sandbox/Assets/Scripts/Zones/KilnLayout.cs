@@ -19,7 +19,7 @@ public static class KilnLayout
     public static readonly Vector3 KilnReturnPos = KilnOffset + new Vector3(0f, 1f, 10f);
     /// <summary>Back in the Ossuary 8 m clear of the Kiln gate (no bounce).</summary>
     public static readonly Vector3 OssuaryReturnArrival = OssuaryOffset + new Vector3(6f, 1f, -5f);
-    public const string LockedHint = "Die Glut ruht noch";
+    public static string LockedHint => Loc.T("gate.locked.kiln");
 
     // ---- S3 enemies: three anchor variants, picked by LayoutSeeder ----
     public const int ThrallCount = 18;

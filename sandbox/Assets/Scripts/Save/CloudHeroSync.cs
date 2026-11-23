@@ -146,7 +146,7 @@ public static class CloudHeroSync
         }
         catch (System.Exception e)
         {
-            Status = "Cloud hero unavailable, playing from this PC.";
+            Status = Loc.T("cloud.status.unavailable");
             Debug.LogWarning($"[CloudHero] load failed ({e.Message}).");
             return;
         }
@@ -163,23 +163,23 @@ public static class CloudHeroSync
                 break;
             case CloudHeroAction.Download:
                 ApplyCloud(path, cloud, me, backupTag: "pre-cloud");
-                Status = "Hero loaded from your account.";
+                Status = Loc.T("cloud.status.loaded");
                 break;
             case CloudHeroAction.StartFresh:
                 SetAside(path, "owner-" + local.owner);
-                Status = "This PC's hero belongs to another account; you start fresh.";
+                Status = Loc.T("cloud.status.otherowner");
                 break;
             case CloudHeroAction.Ask:
                 ConflictPending = true;
                 pendingCloudJson = cloud.save;
                 pendingCloudTicks = cloud.savedTicks;
-                Status = "Two heroes found: choose which one to keep.";
+                Status = Loc.T("cloud.status.ask");
                 SaveService.TryPeek(out var localSave, path);
                 ParseSave(cloud.save, out var cloudSave);
                 Conflict?.Invoke(cloudSave, localSave);
                 return;
             default:
-                Status = cloud != null ? "Hero is in sync with your account." : "";
+                Status = cloud != null ? Loc.T("cloud.status.insync") : "";
                 break;
         }
         Synced?.Invoke();
@@ -195,7 +195,7 @@ public static class CloudHeroSync
         {
             ApplyCloud(path, new CloudHeroEnvelope { save = pendingCloudJson, savedTicks = pendingCloudTicks },
                 PlayerAccount.PlayerId, backupTag: "pc-hero");
-            Status = "Kept your account's hero (this PC's hero is backed up).";
+            Status = Loc.T("cloud.status.keptcloud");
         }
         else
         {
@@ -204,7 +204,7 @@ public static class CloudHeroSync
             if (meta.savedTicks <= pendingCloudTicks) meta.savedTicks = System.DateTime.UtcNow.Ticks;
             WriteMeta(path, meta);
             await UploadNowAsync();
-            Status = "This PC's hero is now your account's hero.";
+            Status = Loc.T("cloud.status.adopted");
         }
         pendingCloudJson = null;
         Synced?.Invoke();
@@ -243,7 +243,7 @@ public static class CloudHeroSync
         }
         catch (System.Exception e)
         {
-            Status = "Upload failed; your hero is safe on this PC and syncs next time.";
+            Status = Loc.T("cloud.status.uploadfail");
             Debug.LogWarning($"[CloudHero] upload failed ({e.Message}).");
             return false;
         }
@@ -251,7 +251,7 @@ public static class CloudHeroSync
         if (meta.savedTicks == env.savedTicks) meta.syncedTicks = env.savedTicks;
         meta.owner = env.owner;
         WriteMeta(path, meta);
-        Status = "Hero saved to your account.";
+        Status = Loc.T("cloud.status.saved");
         Debug.Log($"[CloudHero] uploaded ({env.save.Length} chars, player={env.owner}).");
         return true;
     }

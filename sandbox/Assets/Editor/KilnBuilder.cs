@@ -19,7 +19,7 @@ public static class KilnBuilder
     static Vector3 KilnArrival => KilnLayout.KilnArrival;
     static Vector3 KilnReturnPos => KilnLayout.KilnReturnPos;
     static Vector3 OssuaryReturnArrival => KilnLayout.OssuaryReturnArrival;
-    public const string LockedHint = KilnLayout.LockedHint;
+    public static string LockedHint => KilnLayout.LockedHint;
 
     public static void BuildKiln()
     {

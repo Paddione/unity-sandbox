@@ -35,5 +35,7 @@ public static partial class LocCatalog
         E("account.err.rejected", "Der Kontodienst hat diese Angaben abgelehnt.", "The account service rejected these details."),
         E("account.err.create", "Das Konto konnte nicht erstellt werden.", "Could not create the account."),
         E("account.err.signin", "Anmeldung fehlgeschlagen.", "Could not sign in."),
+        E("account.err.nopass", "Gib dein Passwort ein.", "Enter your password."),
+        E("account.err.signoutfirst", "Melde dich erst ab, um ein weiteres Konto zu erstellen.", "Sign out first to create another account."),
     };
 }

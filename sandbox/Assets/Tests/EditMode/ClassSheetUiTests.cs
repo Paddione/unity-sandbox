@@ -111,7 +111,7 @@ public class ClassSheetUiTests
         Assert.AreEqual(new Vector2(1920f, 1080f), scaler.referenceResolution);
         var texts = hero.GetComponentsInChildren<Text>();
         bool sawWisps = false;
-        foreach (var t in texts) if (t.text.StartsWith("Wisps")) sawWisps = true;
+        foreach (var t in texts) if (t.text.StartsWith("Irrlichter")) sawWisps = true;
         Assert.IsTrue(sawWisps, "Wisps row rendered");
     }
 

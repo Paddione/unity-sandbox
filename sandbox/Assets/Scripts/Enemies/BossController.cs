@@ -175,7 +175,7 @@ public sealed class BossController : NetworkBehaviour
         if (dead) return;
         dead = true;
         BossesKilled++;
-        if (string.IsNullOrEmpty(LastBossDrop)) LastBossDrop = "Rare+ boss cache";
+        if (string.IsNullOrEmpty(LastBossDrop)) LastBossDrop = Loc.T("loot.cache.boss");
         Debug.Log($"[Boss] {BossName} slain (kills={BossesKilled}, drop={LastBossDrop}).");
         // replayability S4: the first kill unlocks Kindled and persists it.
         bool unlocked = DifficultyProfile.UnlockKindled();

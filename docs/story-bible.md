@@ -163,6 +163,8 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | Ash Lancer | Aschenlanzer |
 | Kiln Elite | Ofenschinder |
 | Kiln Warden | Ofenwächter |
+| Bone Warden Elite | Ältester vom Stillen Grund |
+| Shrine Elite | Schreinhüter |
 | The Kilnmother | Die Ofenmutter |
 | Shardback | Scherbenrücken |
 | Dune Augur | Dünenseher |
@@ -221,8 +223,19 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | wick-of-the-halo | Docht des Kranzes |
 | Shardback Aegis | Scherbenpanzer |
 | Glasswright Prism | Prisma des Glasmachers |
+| Emberbrand Blade | Glutmalklinge |
+| Cryptwarden Plate | Panzer vom Stillen Grund |
+| Seer's Circlet | Reif des Sehers |
+| nightfang-edge | Nachtzahn |
+| Rogue's Keepsake | Andenken des Schmugglers |
+| bulwark-carrier | Karrenbollwerk |
+| seismic-crown | Erdstoßkrone |
+| mercy-shroud | Gnadentuch |
+| circle-of-dawn | Reif der Frühe |
+| shadowstride-vest | Schattenschrittweste |
+| keen-cadence | Scharfer Takt |
 
-Weitere Uniques übersetzt S2 nach demselben Muster (Ding + Herkunft) und trägt sie hier nach.
+Weitere Gegenstände (Basistypen, Affixe, Werte) stehen in `LocCatalog.Item.cs`, `LocCatalog.Affix.cs` und `LocCatalog.Stat.cs`.
 
 ### Story-Begriffe
 

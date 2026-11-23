@@ -189,7 +189,7 @@ public static class PlayerAccount
         var invalid = AccountRules.Check(user, pass);
         if (invalid != null) return invalid;
         if (!await EnsureSignedInAsync()) return AccountRules.Explain(AccountRules.CodeTransportError, null, true);
-        if (!IsGuest) return "Sign out first to create another account.";
+        if (!IsGuest) return Loc.T("account.err.signoutfirst");
         try
         {
             await AuthenticationService.Instance.AddUsernamePasswordAsync(user, pass);
@@ -210,7 +210,7 @@ public static class PlayerAccount
     /// </summary>
     public static async Task<string> SignInAsync(string user, string pass)
     {
-        var invalid = AccountRules.CheckUsername(user) ?? (string.IsNullOrEmpty(pass) ? "Enter your password." : null);
+        var invalid = AccountRules.CheckUsername(user) ?? (string.IsNullOrEmpty(pass) ? Loc.T("account.err.nopass") : null);
         if (invalid != null) return invalid;
         if (!await EnsureSignedInAsync()) return AccountRules.Explain(AccountRules.CodeTransportError, null, false);
         var auth = AuthenticationService.Instance;

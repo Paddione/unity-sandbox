@@ -5,8 +5,8 @@ public static partial class LocCatalog
     {
         E("smith.msg.reforged", "Umgeschmiedet: {0} (Stufe {1}).", "Reforged: {0} (T{1})."),
         E("smith.bag.row", "{0} [{1}] (Stufe {2})", "{0} [{1}] (T{2})"),
-        E("smith.bag.yield", "— ergibt +{0} Material", "— Salvage +{0}"),
-        E("smith.bag.noyield", "— nicht verwertbar", "— no salvage"),
+        E("smith.bag.yield", " — ergibt +{0} Material", " — Salvage +{0}"),
+        E("smith.bag.noyield", " — nicht verwertbar", " — no salvage"),
         E("smith.replacement.row", "{0}: {1:0.##}–{2:0.##} (Stufe {3})", "{0}: {1:0.##}–{2:0.##} (T{3})"),
         E("smith.msg.noitem", "Auf diesem Platz liegt kein Gegenstand.", "No item in this slot."),
         E("smith.msg.salvaged", "Verwertet ({0}): Material erhalten.", "Salvaged ({0}): material gained."),
@@ -23,5 +23,6 @@ public static partial class LocCatalog
         E("smith.col.affix", "Eigenschaft (Klick wählt)", "Affix (click selects)"),
         E("smith.col.replacement", "Ersatz und Spanne", "Replacement + range"),
         E("smith.footer", "F öffnet und schließt, Esc schließt (speichert).", "F toggles, Esc closes (saves)."),
+        E("smith.purse.none", "Gold: —", "Gold: —"),
     };
 }

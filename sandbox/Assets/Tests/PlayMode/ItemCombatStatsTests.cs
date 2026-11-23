@@ -158,8 +158,8 @@ public class ItemCombatStatsTests
     {
         eq.Equip(Item(ItemSlot.Armor, ("IncreasedArea", 44)));
         string line = DiabloInventoryUI.AreaLine(eq);
-        StringAssert.Contains("+44%", line);
-        StringAssert.Contains("x1.2", line);
+        StringAssert.Contains("+44 %", line);
+        StringAssert.Contains("×1,2", line);
     }
 
     // ---------- scaled hit space ----------

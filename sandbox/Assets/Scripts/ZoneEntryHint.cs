@@ -45,12 +45,12 @@ public sealed class ZoneEntryHint : MonoBehaviour
         v.childControlWidth = true;
         v.childControlHeight = false;
 
-        var title = DiabloUIFactory.MakeText(card.transform, "ZoneTitle", "LANTERN HOLD  •  THE ASHEN FEN", 18, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        var title = DiabloUIFactory.MakeText(card.transform, "ZoneTitle", Loc.T("hud.zonetoast.title"), 18, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         title.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(title.gameObject, prefH: 26f, flexW: 1f);
 
         var sub = DiabloUIFactory.MakeText(card.transform, "ZoneHint",
-            "WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  Alt Loot names  •  Esc Pause",
+            Loc.T("hud.zonetoast.keys"),
             13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(sub.gameObject, prefH: 20f, flexW: 1f);
 

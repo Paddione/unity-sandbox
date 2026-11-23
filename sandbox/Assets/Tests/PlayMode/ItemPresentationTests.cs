@@ -111,19 +111,19 @@ public class ItemPresentationTests
             affixes = new System.Collections.Generic.List<Affix> { new Affix(AffixLibrary.Damage, 2f) },
         };
         string card = ItemDetailsView.Render(item, equipped);
-        StringAssert.Contains("Short Sword", card);
-        StringAssert.Contains("Rare", card);
-        StringAssert.Contains("Weapon", card);
-        StringAssert.Contains("Item level: 5", card);
-        StringAssert.Contains("+4 Damage", card);
-        StringAssert.Contains("+2 Damage", card); // delta line carries a + prefix
-        StringAssert.Contains("+6 Crit", card);
+        StringAssert.Contains("Kurzschwert", card);
+        StringAssert.Contains("Selten", card);
+        StringAssert.Contains("Waffe", card);
+        StringAssert.Contains("Gegenstandsstufe: 5", card);
+        StringAssert.Contains("+4 Schaden", card);
+        StringAssert.Contains("+2 Schaden", card); // delta line carries a + prefix
+        StringAssert.Contains("+6 Krit", card);
         var unique = ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId);
         unique.itemLevel = 6;
         string ucard = ItemDetailsView.Render(unique, null);
-        StringAssert.Contains("Bulwark Carrier", ucard);
-        StringAssert.Contains("Unique", ucard);
-        StringAssert.Contains("threat", ucard.ToLowerInvariant());
+        StringAssert.Contains("Karrenbollwerk", ucard);
+        StringAssert.Contains("Einzigartig", ucard);
+        StringAssert.Contains("bedrohung", ucard.ToLowerInvariant());
     }
 
     [Test]
@@ -138,7 +138,7 @@ public class ItemPresentationTests
             affixes = new System.Collections.Generic.List<Affix> { new Affix(AffixLibrary.Damage, 2f) },
         };
         StringAssert.Contains("Altbestand", ItemDetailsView.Render(legacy, null));
-        StringAssert.Contains("Empty slot", ItemDetailsView.Render(null, null));
+        StringAssert.Contains("Leerer Platz", ItemDetailsView.Render(null, null));
     }
 
     [UnityTest]

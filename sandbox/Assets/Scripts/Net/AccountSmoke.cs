@@ -94,11 +94,11 @@ public sealed class AccountSmoke : MonoBehaviour
             Check(PlayerAccount.IsGuest && PlayerAccount.PlayerId != id, "sign-out continues as a new guest");
             var wrong = PlayerAccount.SignInAsync(user, pass + "x");
             yield return Await(wrong);
-            Check(wrong.Result == "Wrong username or password.", $"wrong password text ({wrong.Result})");
+            Check(wrong.Result == Loc.T("account.err.wrong"), $"wrong password text ({wrong.Result})");
             Check(PlayerAccount.IsGuest && PlayerAccount.PlayerId != id, "failed sign-in stays a guest");
             var taken = PlayerAccount.SignUpAsync(user, pass);
             yield return Await(taken);
-            Check(taken.Result == "That username is taken.", $"taken username text ({taken.Result})");
+            Check(taken.Result == Loc.T("account.err.taken"), $"taken username text ({taken.Result})");
             var right = PlayerAccount.SignInAsync(user, pass);
             yield return Await(right);
             Check(right.Result == null && PlayerAccount.PlayerId == id && PlayerAccount.DisplayName == "SmokeHero",

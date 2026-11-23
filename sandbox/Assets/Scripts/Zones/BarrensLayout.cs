@@ -28,7 +28,7 @@ public static class BarrensLayout
     public static readonly Vector3 BarrensReturnPos = BarrensOffset + new Vector3(-6f, 1f, 17f);
     /// <summary>Back in the Kiln 5 m clear of the Barrens gate (no bounce).</summary>
     public static readonly Vector3 KilnReturnArrival = KilnOffset + new Vector3(-6f, 1f, -8.5f);
-    public const string LockedHint = "The glass stays sealed";
+    public static string LockedHint => Loc.T("gate.locked.barrens");
 
     /// <summary>Waypoint shrine position (also listed in <see cref="KilnLayout.Shrines"/>).</summary>
     public static readonly Vector3 ShrinePos = BarrensOffset + new Vector3(4.5f, 0f, 12f);

@@ -106,7 +106,7 @@ public class ClassSelectTests
         Assert.IsTrue(ui.ConfirmVisible, "a saved hero is at stake: ask first");
         Assert.AreEqual(ClassCatalog.RogueId, ui.PendingNewClass);
         Assert.AreEqual(ClassCatalog.FenwalkerId, RunProfile.ClassId, "nothing changes before the confirm");
-        StringAssert.Contains("77 gold", ClassSelectUI.ReplacedHeroLine());
+        StringAssert.Contains("77 Gold", ClassSelectUI.ReplacedHeroLine());
 
         ui.CancelNew();
         Assert.IsFalse(ui.ConfirmVisible);

@@ -69,13 +69,13 @@ public class WaypointTests
         Assert.AreEqual(WaypointShrine.All().Length - 1, locked.Count, "every non-destination is listed");
         CollectionAssert.DoesNotContain(locked.ConvertAll(s => s.shrineId), "Town");
         var kiln = WaypointShrine.Find("Kiln");
-        Assert.AreEqual("sealed", DiabloWaypointUI.LockedReason(kiln));
+        Assert.AreEqual("versiegelt", DiabloWaypointUI.LockedReason(kiln));
         RunProfile.Act.Unlock(ActProgress.Kiln);
-        Assert.AreEqual("not attuned", DiabloWaypointUI.LockedReason(kiln));
+        Assert.AreEqual("nicht eingestimmt", DiabloWaypointUI.LockedReason(kiln));
         var barrens = WaypointShrine.Find("Barrens");
-        Assert.AreEqual("sealed", DiabloWaypointUI.LockedReason(barrens), "Act II waits for the Kilnmother");
+        Assert.AreEqual("versiegelt", DiabloWaypointUI.LockedReason(barrens), "Act II waits for the Kilnmother");
         RunProfile.Act.CompleteAct();
-        Assert.AreEqual("not attuned", DiabloWaypointUI.LockedReason(barrens));
+        Assert.AreEqual("nicht eingestimmt", DiabloWaypointUI.LockedReason(barrens));
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class WaypointTests
         RunProfile.Act.Discover("Ossuary");
         var ui = hero.AddComponent<DiabloWaypointUI>();
         ui.SetOpen(true);
-        CollectionAssert.AreEqual(new[] { "Lantern Hold", "Sunken Ossuary" }, ui.Labels());
+        CollectionAssert.AreEqual(new[] { "Laternenwacht", "Versunkenes Beinhaus" }, ui.Labels());
         Assert.IsTrue(DiabloClickController.ExternalDrive);
         var scaler = hero.GetComponentInChildren<CanvasScaler>();
         Assert.AreEqual(new Vector2(1920f, 1080f), scaler.referenceResolution);

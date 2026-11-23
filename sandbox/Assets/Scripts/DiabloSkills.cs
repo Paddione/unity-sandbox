@@ -1151,7 +1151,7 @@ public sealed class DiabloSkills : MonoBehaviour
         var cls = ActiveClass;
         var parts = new System.Collections.Generic.List<string>();
         for (int i = 0; i < cls.skills.Length; i++)
-            parts.Add(Slot(cls.keys[i], SkillName(cls.skills[i]), cls.skills[i]));
+            parts.Add(Slot(cls.KeyLabel(i), SkillName(cls.skills[i]), cls.skills[i]));
         return string.Join("     ", parts.ToArray()) + Loc.T("hud.skillbar.thrust");
     }
 

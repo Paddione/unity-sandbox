@@ -99,7 +99,7 @@ public class BossLoopTests
 
         Assert.AreEqual(1, BossController.BossesKilled);
         Assert.AreEqual(1, SessionComplete.Shown);
-        StringAssert.Contains("Kills", SessionComplete.LastSummary);
+        StringAssert.Contains("Erschlagen", SessionComplete.LastSummary);
         StringAssert.Contains("Gold", SessionComplete.LastSummary);
         StringAssert.Contains("40", SessionComplete.LastSummary);
         yield return null;

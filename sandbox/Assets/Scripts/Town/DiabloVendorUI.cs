@@ -202,7 +202,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (stock != null && stock.TryBuy(index, wallet, inventory))
         {
             DiabloAudio.PlayLoot();
-            SetNotice($"Bought {LootDrop.ItemLabel(stock.offers[index].item)}.");
+            SetNotice(Loc.F("vendor.notice.bought", LootDrop.ItemLabel(stock.offers[index].item)));
         }
         else SetNotice(BuyRejection(index));
         Refresh();
@@ -245,7 +245,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (VendorStock.TrySell(index, wallet, inventory))
         {
             DiabloAudio.PlayUIClick();
-            SetNotice(item != null ? $"Sold {LootDrop.ItemLabel(item)}." : "Sold.");
+            SetNotice(item != null ? Loc.F("vendor.notice.sold", LootDrop.ItemLabel(item)) : Loc.T("vendor.notice.sold.plain"));
         }
         else SetNotice(Loc.T("vendor.notice.salerejected"));
         Refresh();
@@ -282,7 +282,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
     {
         EnsureBuilt();
         if (goldText != null)
-            goldText.text = wallet != null ? $"Purse: {wallet.Gold}g" : "Purse: —";
+            goldText.text = wallet != null ? Loc.F("vendor.purse", wallet.Gold) : Loc.T("vendor.purse.none");
         RebuildVendor();
         RebuildBag();
         if (noticeText != null) noticeText.text = Notice;
@@ -425,7 +425,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
             ci.sprite = coinSpr;
             ci.preserveAspect = true;
         }
-        goldText = DiabloUIFactory.MakeText(purseRow.transform, "GoldLabel", "Purse: —", 18, DiabloPalette.GoldBright);
+        goldText = DiabloUIFactory.MakeText(purseRow.transform, "GoldLabel", Loc.T("vendor.purse.none"), 18, DiabloPalette.GoldBright);
         goldText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(goldText.gameObject, prefH: 30f, flexW: 1f);
         var hintLbl = DiabloUIFactory.MakeText(purseRow.transform, "VendorHint", Loc.T("vendor.footer"), 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleRight);

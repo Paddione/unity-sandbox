@@ -65,9 +65,9 @@ public class DiabloMenuTests
         DiabloSettings.Clamp();
         Assert.AreEqual(1f, DiabloSettings.MasterVol);
         Assert.AreEqual(2, DiabloSettings.QualityLevel);
-        Assert.AreEqual("High", DiabloSettings.QualityName);
+        Assert.AreEqual("Hoch", DiabloSettings.QualityName);
         DiabloSettings.QualityLevel = 0;
-        Assert.AreEqual("Low", DiabloSettings.QualityName);
+        Assert.AreEqual("Niedrig", DiabloSettings.QualityName);
         DiabloSettings.QualityLevel = 2; // restore default
         DiabloSettings.MasterVol = 0.8f;
     }

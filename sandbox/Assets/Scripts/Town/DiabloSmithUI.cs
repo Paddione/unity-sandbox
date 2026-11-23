@@ -135,7 +135,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
         if (purseText != null)
             purseText.text = wallet != null
                 ? Loc.F("smith.purse", wallet.Gold, RunProfile.SmithingMaterial, mat, gold)
-                : "Gold: —";
+                : Loc.T("smith.purse.none");
         RebuildBag();
         RebuildAffixes();
         RebuildReplacements();
@@ -250,7 +250,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
         headerImg.type = Image.Type.Sliced;
         headerGo.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 52f);
         MakeBannerLabel(headerGo.transform, Loc.T("smith.title"), 20);
-        purseText = MakeLabel(panelGo.transform, "Gold: —", 17);
+        purseText = MakeLabel(panelGo.transform, Loc.T("smith.purse.none"), 17);
         detailText = MakeLabel(panelGo.transform, "", 13);
         messageText = MakeLabel(panelGo.transform, "", 13);
 

@@ -333,11 +333,11 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         attrPointsText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(attrPointsText.gameObject, prefH: 24f, flexW: 1f);
 
-        AddRow(panelGo.transform, Loc.T("char.attr.str"), null, out strengthText, out strPlusBtn, SpendStrength,
+        AddRow(panelGo.transform, "STR", null, out strengthText, out strPlusBtn, SpendStrength,
             Loc.T("char.strength.tip"));
-        AddRow(panelGo.transform, Loc.T("char.attr.vit"), null, out vitalityText, out vitPlusBtn, SpendVitality,
+        AddRow(panelGo.transform, "VIT", null, out vitalityText, out vitPlusBtn, SpendVitality,
             Loc.T("char.vitality.tip"));
-        AddRow(panelGo.transform, Loc.T("char.attr.foc"), null, out focusText, out focPlusBtn, SpendFocus,
+        AddRow(panelGo.transform, "FOC", null, out focusText, out focPlusBtn, SpendFocus,
             Loc.T("char.focus.tip"));
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
@@ -392,7 +392,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             var skill = cls.skills[i];
             var spr = DiabloMenuArt.SkillIcon(skill);
             AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
-                Loc.F("char.skill.tip", cls.keys[i], DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank), 44f);
+                Loc.F("char.skill.tip", cls.KeyLabel(i), DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank), 44f);
             skillRows.Add((skill, text, plus));
             if (SkillVariantCatalog.VariantIds(cls.id, skill).Length >= 2)
             {

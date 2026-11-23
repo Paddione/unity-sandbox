@@ -46,7 +46,7 @@ public sealed partial class DiabloNetworkPlayer
         if (!IsOwner && announcedJoin)
         {
             Debug.Log($"[Net] {ShownName} left the party.");
-            DiabloJuice.ShowText(transform.position + Vector3.up * 2.4f, $"{ShownName} left", DiabloPalette.Parchment, 0.9f);
+            DiabloJuice.ShowText(transform.position + Vector3.up * 2.4f, Loc.F("net.player.left", ShownName), DiabloPalette.Parchment, 0.9f);
         }
     }
 
@@ -79,6 +79,6 @@ public sealed partial class DiabloNetworkPlayer
         if (IsOwner || announcedJoin || now.Length == 0) return;
         announcedJoin = true;
         Debug.Log($"[Net] {shown} joined the party.");
-        DiabloJuice.ShowText(transform.position + Vector3.up * 2.4f, $"{shown} joined", DiabloPalette.GoldBright, 0.9f);
+        DiabloJuice.ShowText(transform.position + Vector3.up * 2.4f, Loc.F("net.player.joined", shown), DiabloPalette.GoldBright, 0.9f);
     }
 }

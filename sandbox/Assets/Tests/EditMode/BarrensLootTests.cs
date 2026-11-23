@@ -49,8 +49,8 @@ public class BarrensLootTests
         }
         Assert.AreEqual(ItemSlot.Armor, ItemDatabase.CreateUnique(ItemDatabase.ShardbackAegisId).slot);
         Assert.AreEqual(ItemSlot.Helmet, ItemDatabase.CreateUnique(ItemDatabase.GlasswrightPrismId).slot);
-        Assert.AreEqual("Shardback Aegis", LootDrop.PrettyName(ItemDatabase.ShardbackAegisId));
-        Assert.AreEqual("Glasswright Prism", LootDrop.PrettyName(ItemDatabase.GlasswrightPrismId));
+        Assert.AreEqual("Scherbenpanzer", LootDrop.PrettyName(ItemDatabase.ShardbackAegisId));
+        Assert.AreEqual("Prisma des Glasmachers", LootDrop.PrettyName(ItemDatabase.GlasswrightPrismId));
     }
 
     [Test]

@@ -6,6 +6,7 @@ import re, sys, os
 Literal = re.compile(r'(?P<pre>\$@|@\$|\$|@)?"(?P<body>(?:[^"\\\n]|\\.)*)"')
 Hole = re.compile(r'\{[^{}]*\}')
 Word = re.compile(r'[A-Za-zÄÖÜäöüß]{2,}')
+Fragment = re.compile(r'[.:!?—]')
 Sink = re.compile(r'(return\s*$|\.text\s*=\s*$|[?:]\s*$|MakeSmallButton\(\s*$|label\s*[:=]\s*$|title\s*[:=]\s*$)')
 Skip = ["Debug.Log","Debug.Assert","Debug.LogWarning","Debug.LogError","[Header(","[Tooltip(","[MenuItem(","new GameObject(","Resources.Load",".Find(","CompareTag","Shader.Find","Animator.StringToHash","PlayerPrefs.","Console.Write","[assembly","FindGameObjectsWithTag","SetTrigger(","SetBool(","SetFloat(","SetInteger(",'Play("',"LogWarning(","LogError("]
 def is_player(body, before):
@@ -18,6 +19,8 @@ def is_player(body, before):
     w0=words[0]
     if len(w0)>=3 and w0.upper()==w0 and text.strip()==w0: return True
     if w0[0].isupper() and text.strip()==w0 and Sink.search(before.rstrip()): return True
+    if " " not in text.strip() and re.fullmatch(r'[\w.-]+\.\w{2,4}', text.strip()): return False  # file names
+    if "_" not in text and "/" not in text and Fragment.search(text) and any(len(w)>=3 and w[0].isupper() for w in words): return True
     return False
 def scan_text(src):
     inblock=False

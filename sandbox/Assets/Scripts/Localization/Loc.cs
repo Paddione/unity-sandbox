@@ -94,7 +94,12 @@ public static class Loc
                 if (e.key.StartsWith("name.", StringComparison.Ordinal) && !map.ContainsKey(e.en)) map[e.en] = e.key;
             nameKeys = map;
         }
-        return nameKeys.TryGetValue(internalName.Trim(), out var key) ? T(key) : internalName;
+        string n = internalName.Replace("(Clone)", "").Trim();
+        int us = n.IndexOf('_');
+        if (us > 0) n = n.Substring(0, us).Trim();             // "Glass Pillar_2" → "Glass Pillar"
+        if (nameKeys.TryGetValue(n, out var key)) return T(key);
+        if (nameKeys.TryGetValue("The " + n, out key)) return T(key); // "Hollow Abbot" → "The Hollow Abbot"
+        return internalName;
     }
 
     /// <summary>True when the catalog holds <paramref name="key"/>.</summary>

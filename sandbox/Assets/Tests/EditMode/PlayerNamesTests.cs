@@ -76,6 +76,6 @@ public class PlayerNamesTests
         Assert.AreEqual(DiabloPalette.GoldBright, HeroNameplates.ColorFor(own: true, alive: true));
         Assert.AreEqual(DiabloPalette.Parchment, HeroNameplates.ColorFor(own: false, alive: true));
         Assert.AreEqual(DiabloPalette.ParchmentDim, HeroNameplates.ColorFor(own: false, alive: false));
-        Assert.AreEqual("Playing as Mira", ClassSelectUI.AccountLabel("Mira"));
+        Assert.AreEqual("Unterwegs als Mira", ClassSelectUI.AccountLabel("Mira"));
     }
 }

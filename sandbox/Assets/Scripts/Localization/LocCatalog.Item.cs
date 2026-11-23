@@ -56,6 +56,6 @@ public static partial class LocCatalog
         E("item.card.vs", "Im Vergleich zum Angelegten:", "vs. equipped:"),
         E("item.card.unique", "Einzigartig: {0}", "Unique: {0}"),
         E("item.card.noitem", "kein Gegenstand", "no item"),
-        E("item.card.nobonus", "keine Boni", "  no bonuses"),
+        E("item.card.nobonus", "  keine Boni", "  no bonuses"),
     };
 }

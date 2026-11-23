@@ -191,7 +191,7 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         Debug.Log("[Net] Joining the Cinderreach server via relay.");
         var join = ServerDirectory.JoinAsync(Application.version);
         while (!join.IsCompleted && Time.realtimeSinceStartup < deadline) yield return null;
-        string error = !join.IsCompleted ? "timed out" : join.IsCompletedSuccessfully ? join.Result : "join failed";
+        string error = !join.IsCompleted ? Loc.T("net.err.timeout") : join.IsCompletedSuccessfully ? join.Result : Loc.T("net.err.joinfailed");
         if (error == null) yield break;
         ServerJoinError = error;
         Debug.LogWarning($"[Net] Join server failed ({error}), continuing solo.");

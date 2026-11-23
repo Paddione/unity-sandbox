@@ -99,9 +99,9 @@ public class DifficultyTests
     [Test]
     public void DifficultyText_ShowsLockHint()
     {
-        StringAssert.Contains("Kindled locked", DiabloInventoryUI.DifficultyText());
+        StringAssert.Contains("Entfacht gesperrt", DiabloInventoryUI.DifficultyText());
         DifficultyProfile.UnlockKindled();
         DifficultyProfile.Select(RunProfile.Kindled);
-        Assert.AreEqual("Difficulty: Kindled", DiabloInventoryUI.DifficultyText());
+        Assert.AreEqual("Schwierigkeit: Entfacht", DiabloInventoryUI.DifficultyText());
     }
 }

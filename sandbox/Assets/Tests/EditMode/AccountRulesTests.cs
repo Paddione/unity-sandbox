@@ -31,10 +31,10 @@ public class AccountRulesTests
     [Test]
     public void Explain_MapsServerFailures()
     {
-        Assert.AreEqual("Wrong username or password.", AccountRules.Explain(0, "Invalid username or password", false));
-        Assert.AreEqual("That username is taken.", AccountRules.Explain(AccountRules.CodeAccountAlreadyLinked, "", true));
-        Assert.AreEqual("No connection to the account service.", AccountRules.Explain(AccountRules.CodeTransportError, null, false));
-        Assert.AreEqual("Too many attempts. Wait a minute and try again.", AccountRules.Explain(AccountRules.CodeTooManyRequests, "", false));
-        Assert.AreEqual("Could not create the account.", AccountRules.Explain(0, "boom", true));
+        Assert.AreEqual("Benutzername oder Passwort falsch.", AccountRules.Explain(0, "Invalid username or password", false));
+        Assert.AreEqual("Dieser Benutzername ist vergeben.", AccountRules.Explain(AccountRules.CodeAccountAlreadyLinked, "", true));
+        Assert.AreEqual("Keine Verbindung zum Kontodienst.", AccountRules.Explain(AccountRules.CodeTransportError, null, false));
+        Assert.AreEqual("Zu viele Versuche. Warte eine Minute und versuche es erneut.", AccountRules.Explain(AccountRules.CodeTooManyRequests, "", false));
+        Assert.AreEqual("Das Konto konnte nicht erstellt werden.", AccountRules.Explain(0, "boom", true));
     }
 }

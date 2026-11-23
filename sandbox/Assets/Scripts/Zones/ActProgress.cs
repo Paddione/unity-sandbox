@@ -17,6 +17,18 @@ public sealed class ActProgress
     public const int FirstLockedZone = Kiln;
     public const int LastZone = Barrens;
 
+    /// <summary>Display name of a zone index (Town covers Lantern Hold and the Ashen Fen, cinderreach-deutsch-story).</summary>
+    public static string ZoneName(int zone)
+    {
+        switch (zone)
+        {
+            case Ossuary: return Loc.T("name.zone.ossuary");
+            case Kiln: return Loc.T("name.zone.kiln");
+            case Barrens: return Loc.T("name.zone.barrens");
+            default: return Loc.T("name.zone.fen");
+        }
+    }
+
     public int HighestUnlocked { get; private set; } = Ossuary;
     public bool ActOneComplete { get; private set; }
     /// <summary>act-two-opening: the Glass Barrens' zone boss has fallen.</summary>

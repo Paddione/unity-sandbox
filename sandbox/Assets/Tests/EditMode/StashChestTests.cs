@@ -73,7 +73,7 @@ public class StashChestTests
         var ui = hero.AddComponent<DiabloStashUI>();
         Assert.IsTrue(ui.StoreBagIndex(0));
         Assert.AreEqual(1, RunProfile.Stash.Count);
-        StringAssert.Contains("Chest 1 of 40", ui.CountLine());
+        StringAssert.Contains("Truhe 1 von 40", ui.CountLine());
         Assert.IsTrue(ui.TakeStashIndex(0));
         Assert.AreEqual(0, RunProfile.Stash.Count);
         Assert.AreEqual(1, bag.Count);

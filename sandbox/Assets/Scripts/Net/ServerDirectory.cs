@@ -159,10 +159,10 @@ public static class ServerDirectory
     /// </summary>
     public static async Task<string> JoinAsync(string build)
     {
-        if (!await RelayJoin.EnsureUgsAsync()) return "online services unreachable";
+        if (!await RelayJoin.EnsureUgsAsync()) return Loc.T("net.err.ugs");
         var nm = NetworkManager.Singleton;
         var transport = nm != null ? nm.GetComponent<UnityTransport>() : null;
-        if (transport == null) return "no network transport";
+        if (transport == null) return Loc.T("net.err.transport");
         try
         {
             var found = await LobbyService.Instance.QueryLobbiesAsync(Query(Name));
@@ -173,21 +173,21 @@ public static class ServerDirectory
                 code = CodeOf(l);
                 if (code != null) { pick = l; break; }
             }
-            if (code == null) return "server offline";
+            if (code == null) return Loc.T("net.err.offline");
             string serverBuild = pick.Data.TryGetValue(BuildKey, out var b) ? b.Value : "";
             if (!string.IsNullOrEmpty(build) && !string.IsNullOrEmpty(serverBuild) && serverBuild != build)
                 Debug.LogWarning($"[Server] build mismatch: server {serverBuild}, client {build}.");
             var join = await RelayService.Instance.JoinAllocationAsync(code);
             transport.SetRelayServerData(join.ToRelayServerData(Protocol));
             if (nm.NetworkConfig.NetworkTransport == null) nm.NetworkConfig.NetworkTransport = transport;
-            if (!nm.StartClient()) return "client did not start";
+            if (!nm.StartClient()) return Loc.T("net.err.clientstart");
             Debug.Log($"[Net] joining Cinderreach server via relay (lobby {pick.Id}).");
             return null;
         }
         catch (System.Exception e)
         {
             Debug.LogWarning($"[Net] join server failed ({e.Message}).");
-            return "join failed";
+            return Loc.T("net.err.joinfailed");
         }
     }
 }

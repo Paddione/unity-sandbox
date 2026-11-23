@@ -139,7 +139,8 @@ def main():
     for n, raw in enumerate(spec.read_text(encoding="utf-8").splitlines(), 1):
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
-        parts = [p.strip() for p in raw.split(" | ")]
+        parts = raw.split(" | ")
+        parts = [p.strip() for p in parts[:3]] + parts[3:]  # texts keep their spaces
         rel, lit = parts[0], parts[1]
         if rel == "-":  # catalog-only entry: - | - | key | de | en
             key, de, en = parts[2], parts[3], parts[4]

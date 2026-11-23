@@ -14,7 +14,7 @@ public sealed class SessionComplete : MonoBehaviour
     public static string LastSummary = "";
     /// <summary>The boss kill of this run unlocked Kindled (replayability S4).</summary>
     public static bool KindledUnlockedThisRun;
-    public const string KindledLine = "KINDLED UNLOCKED: Harder foes & richer loot (Settings -> Difficulty).";
+    public static string KindledLine => Loc.T("session.kindled");
     /// <summary>Best drop line of the session (set by boss loot, tests).</summary>
     public static string BestDrop = "";
 
@@ -41,18 +41,18 @@ public sealed class SessionComplete : MonoBehaviour
 
     /// <summary>act-one S4: the overlay was opened by the Kilnmother's death.</summary>
     public static bool ActOneMode;
-    public const string ActOneTitle = "ACT I COMPLETE";
+    public static string ActOneTitle => Loc.T("session.actone.title");
 
     /// <summary>act-two-opening S3: the overlay was opened by the Glasswright's death.</summary>
     public static bool ZoneBossMode;
-    public const string ZoneBossTitle = "GLASS BARRENS CLEARED";
+    public static string ZoneBossTitle => Loc.T("session.barrens.title");
 
     /// <summary>Glasswright down: same overlay, Barrens title, Press On stays (Act II goes on).</summary>
     public static void ShowZoneBossCleared(GameObject hero)
     {
         ActOneMode = false;
         ZoneBossMode = true;
-        Show(hero, string.IsNullOrEmpty(BestDrop) ? "Rare+ glass cache" : BestDrop);
+        Show(hero, string.IsNullOrEmpty(BestDrop) ? Loc.T("loot.cache.glass") : BestDrop);
     }
 
     /// <summary>Act I end screen (Kilnmother): same overlay, act title, all three zones in the totals.</summary>
@@ -60,7 +60,7 @@ public sealed class SessionComplete : MonoBehaviour
     {
         ZoneBossMode = false;
         ActOneMode = true;
-        Show(hero, "Rare+ kiln hoard");
+        Show(hero, Loc.T("loot.cache.kiln"));
     }
 
     /// <summary>Open the overlay for the hero (headless-callable).</summary>
@@ -92,19 +92,19 @@ public sealed class SessionComplete : MonoBehaviour
         int kills = EnemyHealth.HusksKilled + BossController.BossesKilled;
         int gold = hero != null ? hero.GetComponent<Wallet>()?.Gold ?? 0 : 0;
         float secs = PlaySeconds();
-        string dropText = string.IsNullOrEmpty(BestDrop) ? "None" : BestDrop;
-        LastSummary = $"Time {secs:0}s  •  Kills {kills}  •  Gold {gold}  •  Best Drop: {dropText}";
+        string dropText = string.IsNullOrEmpty(BestDrop) ? Loc.T("session.none") : BestDrop;
+        LastSummary = Loc.F("session.summary", secs, kills, gold, dropText);
         if (KindledUnlockedThisRun) LastSummary += "\n" + KindledLine;
         if (!string.IsNullOrEmpty(KindledFinaleReward.LastOfferLine)) LastSummary += "\n" + KindledFinaleReward.LastOfferLine;
 
-        if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : ZoneBossMode ? ZoneBossTitle : "EXPEDITION COMPLETE";
+        if (headerTitle != null) headerTitle.text = ActOneMode ? ActOneTitle : ZoneBossMode ? ZoneBossTitle : Loc.T("session.abbot.title");
         if (pressOnBtn != null) pressOnBtn.gameObject.SetActive(!ActOneMode);
-        if (subLine != null) subLine.text = ActOneMode ? "The ash settles over Cinderreach. The Glass Barrens lie open beyond the Kiln."
-            : ZoneBossMode ? "The Glasswright shatters. Act II goes on beyond the glass."
-            : "The way to the Cinder Kiln stands open. Press on, or regroup in Lantern Hold.";
-        if (timeVal != null) timeVal.text = $"{secs:0}s";
+        if (subLine != null) subLine.text = ActOneMode ? Loc.T("session.actone.sub")
+            : ZoneBossMode ? Loc.T("session.barrens.sub")
+            : Loc.T("session.abbot.sub");
+        if (timeVal != null) timeVal.text = Loc.F("session.secs", secs);
         if (killsVal != null) killsVal.text = kills.ToString();
-        if (goldVal != null) goldVal.text = $"{gold}g";
+        if (goldVal != null) goldVal.text = Loc.F("session.gold", gold);
         if (dropVal != null) dropVal.text = dropText;
         if (kindledBanner != null)
         {
@@ -142,7 +142,7 @@ public sealed class SessionComplete : MonoBehaviour
         var hdr = DiabloUIFactory.MakeHeader(panel.transform, ActOneTitle, DiabloMenuArt.MenuArtSprite("CrestCinderreach"));
         headerTitle = hdr.transform.Find("BannerLabel")?.GetComponent<Text>();
 
-        var sub = DiabloUIFactory.MakeText(panel.transform, "SessionSub", "The ash settles over Cinderreach.", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        var sub = DiabloUIFactory.MakeText(panel.transform, "SessionSub", "", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         subLine = sub;
         DiabloUIFactory.SetLayout(sub.gameObject, prefH: 24f, flexW: 1f);
         DiabloUIFactory.MakeDivider(panel.transform);
@@ -156,10 +156,10 @@ public sealed class SessionComplete : MonoBehaviour
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         grid.constraintCount = 2;
 
-        timeVal = MakeStatBox(gridGo.transform, "Time Elapsed", "0s", DiabloPalette.Parchment);
-        killsVal = MakeStatBox(gridGo.transform, "Foes Slain (Kills)", "0", DiabloPalette.Blood);
-        goldVal = MakeStatBox(gridGo.transform, "Gold Purse", "0g", DiabloPalette.GoldBright);
-        dropVal = MakeStatBox(gridGo.transform, "Best Relic", "None", DiabloPalette.Rarity(ItemRarity.Rare));
+        timeVal = MakeStatBox(gridGo.transform, "Time Elapsed", Loc.T("session.box.time"), Loc.F("session.secs", 0), DiabloPalette.Parchment);
+        killsVal = MakeStatBox(gridGo.transform, "Foes Slain (Kills)", Loc.T("session.box.kills"), "0", DiabloPalette.Blood);
+        goldVal = MakeStatBox(gridGo.transform, "Gold Purse", Loc.T("session.box.gold"), Loc.F("session.gold", 0), DiabloPalette.GoldBright);
+        dropVal = MakeStatBox(gridGo.transform, "Best Relic", Loc.T("session.box.best"), Loc.T("session.none"), DiabloPalette.Rarity(ItemRarity.Rare));
 
         kindledBanner = DiabloUIFactory.MakeText(panel.transform, "KindledBanner", KindledLine, 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(kindledBanner.gameObject, prefH: 38f, flexW: 1f);
@@ -169,19 +169,19 @@ public sealed class SessionComplete : MonoBehaviour
 
         var btnRow = DiabloUIFactory.MakeHorizontalRow(panel.transform, "SessionButtons", 16f, 52f);
         // Mid-act boss (Abbot): the Kiln still waits, so staying on the spot is the natural next step.
-        pressOnBtn = DiabloUIFactory.MakeButton(btnRow.transform, "PressOnButton", "Press On", 18, false, DiabloPalette.Parchment, PressOn);
+        pressOnBtn = DiabloUIFactory.MakeButton(btnRow.transform, "PressOnButton", Loc.T("session.btn.presson"), 18, false, DiabloPalette.Parchment, PressOn);
         DiabloUIFactory.SetLayout(pressOnBtn.gameObject, prefH: 48f, flexW: 1f);
-        var townBtn = DiabloUIFactory.MakeButton(btnRow.transform, "TownButton", "Return to Town", 18, true, DiabloPalette.GoldBright, ReturnToTown);
+        var townBtn = DiabloUIFactory.MakeButton(btnRow.transform, "TownButton", Loc.T("session.btn.town"), 18, true, DiabloPalette.GoldBright, ReturnToTown);
         DiabloUIFactory.SetLayout(townBtn.gameObject, prefH: 48f, flexW: 1f);
-        var menuBtn = DiabloUIFactory.MakeButton(btnRow.transform, "MenuButton", "Main Menu", 18, false, DiabloPalette.Parchment, BackToMenu);
+        var menuBtn = DiabloUIFactory.MakeButton(btnRow.transform, "MenuButton", Loc.T("session.btn.menu"), 18, false, DiabloPalette.Parchment, BackToMenu);
         DiabloUIFactory.SetLayout(menuBtn.gameObject, prefH: 48f, flexW: 1f);
 
         canvas.enabled = false;
     }
 
-    static Text MakeStatBox(Transform parent, string label, string initial, Color valueCol)
+    static Text MakeStatBox(Transform parent, string id, string label, string initial, Color valueCol)
     {
-        var box = new GameObject("StatBox_" + label, typeof(RectTransform));
+        var box = new GameObject("StatBox_" + id, typeof(RectTransform));
         box.transform.SetParent(parent, false);
         var img = box.AddComponent<Image>();
         img.sprite = DiabloMenuArt.TooltipBackground();

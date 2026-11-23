@@ -79,7 +79,7 @@ public class CloudHeroResolverTests
         var text = ClassSelectUI.HeroChoiceText(
             new SaveGame { classId = ClassCatalog.RogueId, level = 7, gold = 123 },
             new SaveGame { classId = ClassCatalog.FenwalkerId, level = 2, gold = 5 });
-        StringAssert.Contains("Rogue, level 7, 123 gold", text);
-        StringAssert.Contains("Fenwalker, level 2, 5 gold", text);
+        StringAssert.Contains("Schmuggler, Stufe 7, 123 Gold", text);
+        StringAssert.Contains("Moorgänger, Stufe 2, 5 Gold", text);
     }
 }

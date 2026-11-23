@@ -4,5 +4,6 @@ public static partial class LocCatalog
     static readonly Entry[] Key =
     {
         E("key.space.short", "Leer", "Spc"),
+        E("key.space", "Leertaste", "Space"),
     };
 }

@@ -27,5 +27,10 @@ public static partial class LocCatalog
         E("vendor.bag.empty", "Deine Tasche ist leer. Im Moor findet sich, was sich verkaufen lässt.", "Your bag is empty. Loot the fen to trade."),
         E("vendor.offers.count", "{0} Stück im Angebot. Anklicken kauft.", "{0} wares available. Click to buy."),
         E("vendor.notice.bagfull", "Die Tasche ist voll ({0}/{1}). Erst verkaufen oder wegwerfen.", "Bag is full ({0}/{1}) — sell or discard first."),
+        E("vendor.notice.bought", "{0} gekauft.", "Bought {0}."),
+        E("vendor.notice.sold", "{0} verkauft.", "Sold {0}."),
+        E("vendor.notice.sold.plain", "Verkauft.", "Sold."),
+        E("vendor.purse", "Geldbeutel: {0} Gold", "Purse: {0}g"),
+        E("vendor.purse.none", "Geldbeutel: —", "Purse: —"),
     };
 }

@@ -42,7 +42,7 @@ public sealed class DiabloWaypointUI : MonoBehaviour
     {
         var d = WaypointShrine.Destinations();
         var a = new string[d.Count];
-        for (int i = 0; i < a.Length; i++) a[i] = d[i].displayName;
+        for (int i = 0; i < a.Length; i++) a[i] = Loc.Display(d[i].displayName);
         return a;
     }
 
@@ -59,19 +59,19 @@ public sealed class DiabloWaypointUI : MonoBehaviour
         {
             string id = s.shrineId;
             bool nearby = Vector3.Distance(transform.position, s.transform.position) < 8f;
-            string caption = nearby ? $"{s.displayName}  (Here)" : s.displayName;
+            string caption = nearby ? Loc.F("waypoint.here", Loc.Display(s.displayName)) : Loc.Display(s.displayName);
             BuildRow(id, caption, nearby ? RowState.Here : RowState.Travel);
         }
         // Unattuned shrines stay visible as locked rows: the window doubles as act progress.
         foreach (var s in WaypointShrine.Locked())
-            BuildRow(s.shrineId, $"{s.displayName}  —  {LockedReason(s)}", RowState.Locked);
+            BuildRow(s.shrineId, Loc.F("waypoint.locked", Loc.Display(s.displayName), LockedReason(s)), RowState.Locked);
     }
 
     enum RowState { Travel, Here, Locked }
 
     /// <summary>Why a shrine is not a destination yet (zone sealed or shrine not reached).</summary>
     public static string LockedReason(WaypointShrine s) =>
-        RunProfile.Act.IsUnlocked(s.zone) ? "not attuned" : "sealed";
+        RunProfile.Act.IsUnlocked(s.zone) ? Loc.T("waypoint.notattuned") : Loc.T("waypoint.sealed");
 
     void BuildRow(string id, string caption, RowState state)
     {
@@ -134,12 +134,12 @@ public sealed class DiabloWaypointUI : MonoBehaviour
         v.childControlWidth = true;
         v.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panel.transform, "SANCTIFIED WAYPOINTS", DiabloMenuArt.MenuArtSprite("WaypointSigil"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(panel.transform, Loc.T("waypoint.title"), DiabloMenuArt.MenuArtSprite("WaypointSigil"), () => SetOpen(false));
 
-        var sub = DiabloUIFactory.MakeText(panel.transform, "WaypointSub", "Choose a discovered shrine to attune & travel:", 14, DiabloPalette.ParchmentDim);
+        var sub = DiabloUIFactory.MakeText(panel.transform, "WaypointSub", Loc.T("waypoint.sub"), 14, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(sub.gameObject, prefH: 22f, flexW: 1f);
 
-        emptyHint = DiabloUIFactory.MakeText(panel.transform, "EmptyHint", "Explore the world to discover additional Waypoint Shrines.", 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        emptyHint = DiabloUIFactory.MakeText(panel.transform, "EmptyHint", Loc.T("waypoint.empty"), 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(emptyHint.gameObject, prefH: 36f, flexW: 1f);
         emptyHint.gameObject.SetActive(false);
 
@@ -152,7 +152,7 @@ public sealed class DiabloWaypointUI : MonoBehaviour
         lv.childControlHeight = false;
         list = listGo.transform;
 
-        var hint = DiabloUIFactory.MakeText(panel.transform, "EscHint", "Click shrine to travel  •  Esc closes", 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        var hint = DiabloUIFactory.MakeText(panel.transform, "EscHint", Loc.T("waypoint.footer"), 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(hint.gameObject, prefH: 22f, flexW: 1f);
     }
 }

@@ -144,7 +144,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         {
             if (health != null) health.Refresh();
             DiabloAudio.PlayUIClick();
-            SetNotice(candidate != null ? $"Equipped {LootDrop.ItemLabel(candidate)}." : "Equipped.");
+            SetNotice(candidate != null ? Loc.F("inv.notice.equipped", LootDrop.ItemLabel(candidate)) : Loc.T("inv.notice.equipped.plain"));
         }
         else SetNotice(Loc.T("inv.notice.noequip"));
         Refresh();
@@ -261,9 +261,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
                 Loc.T("inv.stats.combat") +
                 Loc.F("inv.stats.dmg", DiabloPalette.ToHex(DiabloPalette.TrimGold), equipment.GetDamage()) +
                 Loc.F("inv.stats.maxhp", BetterColor, equipment.GetMaxHP()) +
-                $"Crit {equipment.GetCrit():0.#}%\n" +
+                Loc.F("inv.stats.crit", equipment.GetCrit()) +
                 Loc.F("inv.stats.speed", equipment.GetMoveSpeed(), equipment.GetXPMul()) +
-                $"CDR {Mathf.Min(Equipment.MaxCooldownReductionPct, equipment.Total(AffixLibrary.CooldownReduction)):0.#}%";
+                Loc.F("inv.stats.cdr", Mathf.Min(Equipment.MaxCooldownReductionPct, equipment.Total(AffixLibrary.CooldownReduction)));
             PaintEquipIcon(0, equipment.armor);
             PaintEquipIcon(1, equipment.weapon);
             PaintEquipIcon(2, equipment.helmet);

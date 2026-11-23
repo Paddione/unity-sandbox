@@ -162,7 +162,7 @@ public class GlasswrightTests
         var arrival = BarrensLayout.BarrensArrival - go.transform.position;
         arrival.y = 0f;
         Assert.Greater(arrival.magnitude, GlasswrightController.AggroRange + 10f, "no boss pull from the arrival");
-        Assert.AreEqual(GlasswrightController.BossName, DiabloTargetBar.DisplayName(go.name));
-        Assert.AreEqual("Glass Pillar", DiabloTargetBar.DisplayName("Glass Pillar_2_1"));
+        Assert.AreEqual("Der Glasmacher", DiabloTargetBar.DisplayName(go.name));
+        Assert.AreEqual("Glassäule", DiabloTargetBar.DisplayName("Glass Pillar_2_1"));
     }
 }

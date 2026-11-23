@@ -720,7 +720,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         for (int i = 0; i < cls.skills.Length; i++)
         {
             var sk = cls.skills[i];
-            var key = cls.keys[i];
+            var key = cls.KeyLabel(i);
             var row = DiabloUIFactory.MakeHorizontalRow(card.transform, $"SkillRow_{sk}", 10f, 30f);
             row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
 
@@ -789,7 +789,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         string starter = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.StarterLanternBase
             : cls.id == ClassCatalog.RogueId ? ItemDatabase.StarterBowBase
             : ItemDatabase.StarterSwordBase;
-        return Loc.F("menu.class.stattag", starter, cls.skills.Length);
+        return Loc.F("menu.class.stattag", LootDrop.PrettyName(starter), cls.skills.Length);
     }
 
     static void Stretch(RectTransform rt)

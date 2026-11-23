@@ -148,7 +148,7 @@ public class SkillVariantTests
         var sheet = prog.Sheet;
         Assert.AreEqual(2, sheet.GetRank(DiabloSkills.Skill.Cleave));
         Assert.AreEqual(2, sheet.strength);
-        Assert.IsTrue(ui.VariantLines().Contains("Frontal Arc"));
+        Assert.IsTrue(ui.VariantLines().Contains("Frontbogen"));
         Assert.IsTrue(ui.VariantLines().Contains("90"));
     }
 

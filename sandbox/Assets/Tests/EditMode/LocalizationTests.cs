@@ -19,7 +19,7 @@ public class LocalizationTests
     static string TestsDir => Path.Combine(Application.dataPath, "Tests", "EditMode");
 
     /// <summary>Upper bound for <c>loc-pending.txt</c>; only ever lowered, 0 closes S2.</summary>
-    public const int PendingCeiling = 567;
+    public const int PendingCeiling = 0;
 
     [TearDown]
     public void ResetLanguage() => Loc.Language = Loc.German;
@@ -78,9 +78,52 @@ public class LocalizationTests
     }
 
     [Test]
+    public void GermanTexts_CarryNoOldEnglishProperNames()
+    {
+        // Glossary names that changed in German (docs/story-bible.md) must not leak into German text.
+        var old = LocCatalog.All()
+            .Where(e => e.key.StartsWith("name.") && e.de != e.en && e.en.Length >= 4 && e.en.Contains(" "))
+            .Select(e => e.en.StartsWith("The ") ? e.en.Substring(4) : e.en)
+            .Distinct().ToList();
+        var bad = new List<string>();
+        foreach (var e in LocCatalog.All())
+            foreach (var name in old)
+                if (e.de.IndexOf(name, System.StringComparison.OrdinalIgnoreCase) >= 0) bad.Add($"{e.key}: {name}");
+        Assert.IsEmpty(bad, "German texts with old English names:\n" + string.Join("\n", bad));
+    }
+
+    [Test]
+    public void AffixesAndStats_HaveCatalogText()
+    {
+        var missing = new List<string>();
+        foreach (var d in AffixLibrary.All)
+        {
+            if (!Loc.Has("affix." + d.key.ToLowerInvariant())) missing.Add("affix." + d.key);
+            if (!Loc.Has("stat." + d.key.ToLowerInvariant())) missing.Add("stat." + d.key);
+        }
+        foreach (var c in ClassCatalog.All)
+            if (!Loc.Has("class.blurb." + c.id)) missing.Add("class.blurb." + c.id);
+        Assert.IsEmpty(missing, string.Join("\n", missing));
+    }
+
+    [Test]
+    public void Display_MapsSceneNamesToGerman()
+    {
+        Loc.Language = Loc.German;
+        Assert.AreEqual("Aschenhüne", Loc.Display("Ash Elite"));
+        Assert.AreEqual("Glassäule", Loc.Display("Glass Pillar_2"));
+        Assert.AreEqual("Der Hohle Abt", Loc.Display("Hollow Abbot"));
+        Assert.AreEqual("Laternenwacht", Loc.Display("Lantern Hold"));
+        Assert.AreEqual("Entfacht", Loc.Display(RunProfile.Kindled));
+        Assert.AreEqual("Laterne der Wacht", LootDrop.PrettyName("Lantern of the Hold"));
+        Assert.AreEqual("Kurzschwert", LootDrop.PrettyName("ShortSword"));
+        Assert.AreEqual("Gnadentuch", LootDrop.PrettyName(ItemDatabase.MercyShroudId));
+    }
+
+    [Test]
     public void EveryKeyUsedInCode_ExistsInCatalog()
     {
-        var call = new Regex(@"Loc\.(?:T|F)\(\s*""([^""]+)""");
+        var call = new Regex(@"Loc\.(?:T|F)\(\s*""([^""]+)""\s*[,)]");
         var missing = new List<string>();
         foreach (var file in RuntimeSources())
             foreach (Match m in call.Matches(File.ReadAllText(file)))
@@ -120,8 +163,9 @@ public class LocalizationTests
 /// <summary>
 /// Heuristic scan for player-visible English in runtime code. A finding is
 /// <c>relative/path.cs&lt;TAB&gt;literal</c>. Flags multi-word text, ALL-CAPS words
-/// and single capitalised words on display sinks (<c>return</c>, <c>.text =</c>,
-/// ternaries, button labels). Skips comments, log/assert lines and lines that
+/// single capitalised words on display sinks (<c>return</c>, <c>.text =</c>,
+/// ternaries, button labels) and sentence fragments (a capitalised word plus
+/// <c>. : ! ? —</c>, so "Sold." and $"Crit {x}:" count). Skips comments, log/assert lines and lines that
 /// only name objects or assets. Scripts/Localization is the one place text lives.
 /// </summary>
 public static class LocLint
@@ -129,6 +173,7 @@ public static class LocLint
     static readonly Regex Literal = new Regex(@"(?<pre>\$@|@\$|\$|@)?""(?<body>(?:[^""\\\n]|\\.)*)""");
     static readonly Regex Hole = new Regex(@"\{[^{}]*\}");
     static readonly Regex Word = new Regex(@"[A-Za-zÄÖÜäöüß]{2,}");
+    static readonly Regex Fragment = new Regex(@"[.:!?—]");
     static readonly Regex Sink = new Regex(@"(return\s*$|\.text\s*=\s*$|[?:]\s*$|MakeSmallButton\(\s*$|label\s*[:=]\s*$|title\s*[:=]\s*$)");
     static readonly string[] SkipMarkers =
     {
@@ -186,6 +231,10 @@ public static class LocLint
         if (w0.Length >= 3 && w0.ToUpperInvariant() == w0 && text.Trim() == w0) return true; // "QUIT"
         if (char.IsUpper(w0[0]) && text.Trim() == w0 && Sink.IsMatch(before.TrimEnd()))
             return true;                                                         // return "Bow";
+        if (Regex.IsMatch(text.Trim(), @"^[\w.-]+\.\w{2,4}$")) return false;  // file names ("LegacyRuntime.ttf")
+        if (!text.Contains("_") && !text.Contains("/") && Fragment.IsMatch(text)
+            && words.Any(w => w.Length >= 3 && char.IsUpper(w[0])))
+            return true;                                                         // "Sold." / $"Crit {x}:"
         return false;
     }
 }

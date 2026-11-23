@@ -49,13 +49,27 @@ public sealed class DiabloContractUI : MonoBehaviour
         if (ContractProgress.HasContract && ContractProgress.ActiveOffer != null)
         {
             var o = ContractProgress.ActiveOffer;
-            Lines.Add($"{o.targetName} — zone {o.zone} — {o.gold} gold — {ContractProgress.Status}");
+            Lines.Add(Loc.F("contract.line.active", Loc.Display(o.targetName), ActProgress.ZoneName(o.zone), o.gold, ContractText.Status(ContractProgress.Status)));
         }
         else
         {
             offers = ContractBoard.CurrentOffers();
             foreach (var o in offers)
-                Lines.Add($"{o.targetName} — zone {o.zone} — {o.gold} gold");
+                Lines.Add(Loc.F("contract.line.offer", Loc.Display(o.targetName), ActProgress.ZoneName(o.zone), o.gold));
+        }
+    }
+}
+
+/// <summary>Display text of <see cref="ContractStatus"/> (cinderreach-deutsch-story).</summary>
+public static class ContractText
+{
+    public static string Status(ContractStatus s)
+    {
+        switch (s)
+        {
+            case ContractStatus.Complete: return Loc.T("contract.status.complete");
+            case ContractStatus.Claimed: return Loc.T("contract.status.claimed");
+            default: return Loc.T("contract.status.active");
         }
     }
 }

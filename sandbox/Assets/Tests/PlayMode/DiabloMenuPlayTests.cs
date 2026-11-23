@@ -253,7 +253,7 @@ public class DiabloMenuPlayTests
         Assert.AreEqual(hp, bar.ShownBoss, "a boss within range gets the wide bar");
         var label = bar.transform.Find("TargetBarCanvas/BossPanel/BossName")?.GetComponent<Text>();
         Assert.IsNotNull(label);
-        Assert.AreEqual("THE HOLLOW ABBOT", label.text);
+        Assert.AreEqual("DER HOHLE ABT", label.text);
 
         bossGo.transform.position = new Vector3(0f, 0f, 80f);
         yield return new WaitForSecondsRealtime(0.6f);
@@ -282,7 +282,7 @@ public class DiabloMenuPlayTests
             yield return null;
             Assert.AreEqual(1, labels.ShownCount);
             var (text, color) = DiabloLootLabels.LabelFor(drop);
-            Assert.AreEqual("Bulwark Carrier", text);
+            Assert.AreEqual("Karrenbollwerk", text);
             Assert.AreEqual(DiabloPalette.Rarity(ItemRarity.Unique), color);
             DiabloLootLabels.ForceShow = false;
             yield return null;

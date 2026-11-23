@@ -82,7 +82,7 @@ public class DedicatedServerTests
     public void PanelStatus_ShowsServerSearch()
     {
         var args = new JoinArgs(JoinArgs.NetMode.Client, null, 0, joinServer: true);
-        Assert.AreEqual("Offline (no NetworkManager)", JoinPanel.StatusText(null, args));
+        Assert.AreEqual("Offline (kein NetworkManager)", JoinPanel.StatusText(null, args));
     }
 
     [Test]

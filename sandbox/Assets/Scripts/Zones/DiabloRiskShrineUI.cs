@@ -25,37 +25,37 @@ public sealed class DiabloRiskShrineUI : MonoBehaviour
     {
         if (!IsOpen) return;
         var shrine = FindShrine();
-        window = GUI.Window(GetInstanceID(), window, id => DrawWindow(shrine), "Risk Shrine");
+        window = GUI.Window(GetInstanceID(), window, id => DrawWindow(shrine), Loc.T("name.shrine.risk"));
     }
 
     void DrawWindow(RiskShrine shrine)
     {
         var progress = RunProfile.RiskShrine;
-        GUILayout.Label($"The fen offers a bargain. ({progress.State})");
+        GUILayout.Label(Loc.T("shrine.risk.offer"));
         if (shrine == null)
         {
-            GUILayout.Label("No shrine in this place.");
+            GUILayout.Label(Loc.T("shrine.risk.none"));
         }
         else if (progress.State == RiskShrineState.Unchosen)
         {
-            GUILayout.Label("Heal to full now, or face the empowered elite for a rare.");
-            if (GUILayout.Button("Accept healing (full HP)")) shrine.ChooseHeal(gameObject);
-            if (GUILayout.Button($"Face {RiskShrine.EliteName} ({RiskShrine.EliteHP} HP)")) shrine.ChooseChallenge(gameObject);
+            GUILayout.Label(Loc.T("shrine.risk.choice"));
+            if (GUILayout.Button(Loc.T("shrine.risk.heal"))) shrine.ChooseHeal(gameObject);
+            if (GUILayout.Button(Loc.F("shrine.risk.face", Loc.Display(RiskShrine.EliteName), RiskShrine.EliteHP))) shrine.ChooseChallenge(gameObject);
         }
         else if (progress.State == RiskShrineState.RewardAvailable)
         {
-            GUILayout.Label("The elite is slain. Your reward waits.");
-            if (GUILayout.Button("Take the rare")) shrine.ClaimReward(gameObject);
+            GUILayout.Label(Loc.T("shrine.risk.slain"));
+            if (GUILayout.Button(Loc.T("shrine.risk.take"))) shrine.ClaimReward(gameObject);
         }
         else
         {
             GUILayout.Label(progress.State == RiskShrineState.Healed
-                ? "You walk on, whole."
+                ? Loc.T("shrine.risk.healed")
                 : progress.State == RiskShrineState.ChallengeActive
-                    ? $"Slay {RiskShrine.EliteName}."
-                    : "The bargain is settled.");
+                    ? Loc.F("shrine.risk.slay", Loc.Display(RiskShrine.EliteName))
+                    : Loc.T("shrine.risk.settled"));
         }
-        if (GUILayout.Button("Step back")) SetOpen(false);
+        if (GUILayout.Button(Loc.T("shrine.risk.back"))) SetOpen(false);
         GUI.DragWindow();
     }
 

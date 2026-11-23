@@ -188,7 +188,7 @@ public sealed class DiabloProgression : MonoBehaviour
         float mul = eq != null ? eq.GetXPMul() / 100f : 1f;
         int xp = Mathf.Max(1, Mathf.RoundToInt(baseXp * mul));
         prog.AddXp(xp);
-        DiabloJuice.ShowText(at + Vector3.up * 2.4f, $"+{xp} XP", DiabloPalette.TrimGold);
+        DiabloJuice.ShowText(at + Vector3.up * 2.4f, Loc.F("hud.xp.gain", xp), DiabloPalette.TrimGold);
     }
 
     public void AddXp(int amount)

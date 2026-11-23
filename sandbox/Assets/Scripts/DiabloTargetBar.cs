@@ -79,10 +79,10 @@ public sealed class DiabloTargetBar : MonoBehaviour
         n = System.Text.RegularExpressions.Regex.Replace(n, @"(_\d+)+$", "");
         switch (n)
         {
-            case "Kiln Summon": return "Cinder Thrall";
-            case "Hollow Abbot": return "The Hollow Abbot";
-            case "Kilnmother": return "The Kilnmother";
-            default: return n.Replace('_', ' ');
+            case "Kiln Summon": return Loc.T("name.enemy.thrall");
+            case "Hollow Abbot": return Loc.T("name.enemy.abbot");
+            case "Kilnmother": return Loc.T("name.enemy.kilnmother");
+            default: return Loc.Display(n.Replace('_', ' '));
         }
     }
 
@@ -121,11 +121,11 @@ public sealed class DiabloTargetBar : MonoBehaviour
     {
         if (boss == null) return "";
         var abbot = boss.GetComponent<BossController>();
-        if (abbot != null) return abbot.Phase.Value >= 2 ? "PHASE II" : "PHASE I";
+        if (abbot != null) return abbot.Phase.Value >= 2 ? Loc.T("hud.boss.phase2") : Loc.T("hud.boss.phase1");
         var kiln = boss.GetComponent<KilnmotherController>();
-        if (kiln != null) return kiln.PhaseTwo ? "PHASE II" : "PHASE I";
+        if (kiln != null) return kiln.PhaseTwo ? Loc.T("hud.boss.phase2") : Loc.T("hud.boss.phase1");
         var glass = boss.GetComponent<GlasswrightController>();
-        if (glass != null) return glass.PhaseTwo ? "PHASE II" : "PHASE I";
+        if (glass != null) return glass.PhaseTwo ? Loc.T("hud.boss.phase2") : Loc.T("hud.boss.phase1");
         return "";
     }
 

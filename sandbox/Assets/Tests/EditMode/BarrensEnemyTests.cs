@@ -189,8 +189,8 @@ public class BarrensEnemyTests
         Assert.AreEqual(BarrensLayout.ShardbackCount, shardbacks);
         Assert.AreEqual(BarrensLayout.AugurCount, augurs);
         Assert.AreEqual(BarrensLayout.EliteCount, elites);
-        Assert.AreEqual("Dune Augur", DiabloTargetBar.DisplayName("Dune Augur_3"));
-        Assert.AreEqual("Glass Elite", DiabloTargetBar.DisplayName("Glass Elite_1"));
+        Assert.AreEqual("Dünenseher", DiabloTargetBar.DisplayName("Dune Augur_3"));
+        Assert.AreEqual("Glasvogt", DiabloTargetBar.DisplayName("Glass Elite_1"));
     }
 
     static float Flat(Vector3 v)

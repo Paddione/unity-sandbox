@@ -78,8 +78,8 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
                     if (inv.Get(i)?.slot == ItemSlot.Consumable) pot++;
             var sheet = prog != null ? prog.Sheet : null;
             int pts = sheet != null ? sheet.freeAttributePoints + sheet.freeSkillPoints : 0;
-            string ptsTag = pts > 0 ? $"   <color={DiabloPalette.ToHex(DiabloPalette.GoldBright)}>+{pts} pts [C]</color>" : "";
-            hudStatusText.text = $"<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>{gold}g</color>   •   Potions [1]: {pot}{ptsTag}";
+            string ptsTag = pts > 0 ? Loc.F("hud.globe.points", DiabloPalette.ToHex(DiabloPalette.GoldBright), pts) : "";
+            hudStatusText.text = Loc.F("hud.globe.purse", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, pot, ptsTag);
         }
         if (fpsText != null)
         {
@@ -165,7 +165,7 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         deathVeil.enabled = false;
 
         deathNotice = MakeText(canvasGo.transform, "DeathNotice", 54);
-        deathNotice.text = "YOU HAVE FALLEN";
+        deathNotice.text = Loc.T("hud.death.title");
         deathNotice.fontStyle = FontStyle.Bold;
         deathNotice.color = new Color(0.92f, 0.22f, 0.18f, 1f);
         var r = deathNotice.rectTransform;
@@ -175,7 +175,7 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         deathNotice.enabled = false;
 
         deathSub = MakeText(canvasGo.transform, "DeathSub", 20);
-        deathSub.text = "The lantern light carries you back to Lantern Hold.";
+        deathSub.text = Loc.T("hud.death.sub");
         var sr = deathSub.rectTransform;
         sr.anchorMin = sr.anchorMax = sr.pivot = new Vector2(0.5f, 0.5f);
         sr.sizeDelta = new Vector2(1000f, 36f);

@@ -145,7 +145,7 @@ public class DiabloMenuPolishTests
         Assert.IsNotNull(canvas);
         Assert.IsNotNull(canvas.GetComponent<GraphicRaycaster>(), "SessionCanvas must have GraphicRaycaster so buttons are clickable.");
         StringAssert.DoesNotContain("Beute", SessionComplete.LastSummary);
-        StringAssert.Contains("Kills", SessionComplete.LastSummary);
+        StringAssert.Contains("Erschlagen", SessionComplete.LastSummary);
         StringAssert.Contains("Gold", SessionComplete.LastSummary);
         SessionComplete.ResetRun();
         Object.DestroyImmediate(go);
@@ -206,7 +206,7 @@ public class DiabloMenuPolishTests
     {
         foreach (var cls in ClassCatalog.All)
         {
-            StringAssert.Contains($"{cls.skills.Length} Skills", ClassSelectUI.CardStatTag(cls));
+            StringAssert.Contains($"{cls.skills.Length} Fertigkeiten", ClassSelectUI.CardStatTag(cls));
             Assert.IsNotNull(DiabloMenuArt.ClassPortrait(cls.id), $"portrait for {cls.id}");
         }
         Assert.AreNotEqual(ClassSelectUI.CardSubtitle(ClassCatalog.Rogue), ClassSelectUI.CardSubtitle(ClassCatalog.Fenwalker));
@@ -236,11 +236,11 @@ public class DiabloMenuPolishTests
             SaveService.WriteSave(save, path);
             var before = System.IO.File.ReadAllText(path);
             string label = ClassSelectUI.ContinueLabel(path);
-            StringAssert.Contains("ROGUE", label);
-            StringAssert.Contains("LEVEL 7", label);
-            StringAssert.Contains("321G", label);
+            StringAssert.Contains("SCHMUGGLER", label);
+            StringAssert.Contains("STUFE 7", label);
+            StringAssert.Contains("321 GOLD", label);
             Assert.AreEqual(before, System.IO.File.ReadAllText(path), "peek must not rewrite the save");
-            Assert.AreEqual("CONTINUE SAVED EXPEDITION", ClassSelectUI.ContinueLabel(path + ".missing"));
+            Assert.AreEqual("GESPEICHERTE FUHRE FORTSETZEN", ClassSelectUI.ContinueLabel(path + ".missing"));
         }
         finally { if (System.IO.File.Exists(path)) System.IO.File.Delete(path); }
     }
@@ -248,12 +248,12 @@ public class DiabloMenuPolishTests
     [Test]
     public void ItemLabels_ArePlayerReadable()
     {
-        Assert.AreEqual("Bulwark Carrier", LootDrop.PrettyName(ItemDatabase.BulwarkCarrierId));
-        Assert.AreEqual("Wick of the Halo", LootDrop.PrettyName(ItemDatabase.WickOfHaloId));
-        Assert.AreEqual("Cloth Tunic", LootDrop.PrettyName("ClothTunic"));
-        Assert.AreEqual("Worn Short Sword", LootDrop.PrettyName("Worn Short Sword"));
-        Assert.AreEqual("Rogue's Keepsake", LootDrop.PrettyName(ItemDatabase.RogueKeepsakeId));
-        Assert.AreEqual("Bulwark Carrier", LootDrop.ItemLabel(ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId)));
+        Assert.AreEqual("Karrenbollwerk", LootDrop.PrettyName(ItemDatabase.BulwarkCarrierId));
+        Assert.AreEqual("Docht des Kranzes", LootDrop.PrettyName(ItemDatabase.WickOfHaloId));
+        Assert.AreEqual("Leinenkittel", LootDrop.PrettyName("ClothTunic"));
+        Assert.AreEqual("Abgewetztes Kurzschwert", LootDrop.PrettyName("Worn Short Sword"));
+        Assert.AreEqual("Andenken des Schmugglers", LootDrop.PrettyName(ItemDatabase.RogueKeepsakeId));
+        Assert.AreEqual("Karrenbollwerk", LootDrop.ItemLabel(ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId)));
     }
 
     [Test]
@@ -294,12 +294,12 @@ public class DiabloMenuPolishTests
     [Test]
     public void TargetBar_ShowsEnemyNamesNotObjectNames()
     {
-        Assert.AreEqual("Ash Lancer", DiabloTargetBar.DisplayName("Ash Lancer_0"));
-        Assert.AreEqual("Cinder Thrall", DiabloTargetBar.DisplayName("Kiln Summon_1_2"));
-        Assert.AreEqual("Cinder Thrall", DiabloTargetBar.DisplayName("Cinder Thrall_12"));
-        Assert.AreEqual("Husk", DiabloTargetBar.DisplayName("Husk_3"));
-        Assert.AreEqual("The Hollow Abbot", DiabloTargetBar.DisplayName("Hollow Abbot"));
-        Assert.AreEqual("Bone Warden Elite", DiabloTargetBar.DisplayName("Bone Warden Elite"));
+        Assert.AreEqual("Aschenlanzer", DiabloTargetBar.DisplayName("Ash Lancer_0"));
+        Assert.AreEqual("Schlackenknecht", DiabloTargetBar.DisplayName("Kiln Summon_1_2"));
+        Assert.AreEqual("Schlackenknecht", DiabloTargetBar.DisplayName("Cinder Thrall_12"));
+        Assert.AreEqual("Hülle", DiabloTargetBar.DisplayName("Husk_3"));
+        Assert.AreEqual("Der Hohle Abt", DiabloTargetBar.DisplayName("Hollow Abbot"));
+        Assert.AreEqual("Ältester vom Stillen Grund", DiabloTargetBar.DisplayName("Bone Warden Elite"));
         Assert.AreEqual(DiabloPalette.GoldBright, DiabloTargetBar.TierColor(LootTier.ActBoss));
     }
 
