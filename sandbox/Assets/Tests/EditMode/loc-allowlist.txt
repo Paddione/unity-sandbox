@@ -1,0 +1,2 @@
+# Literals the lint flags that are not player text (ids, object names, log lines).
+# Format: <path under Assets/Scripts><TAB><literal>.
