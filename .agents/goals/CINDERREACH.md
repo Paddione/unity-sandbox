@@ -15,6 +15,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 |---|---|---|
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
+| [`cinderreach-deutsch-story`](cinderreach-deutsch-story/GOAL.md) | 0 %, angelegt 2026-11-23 | S1 Stringtabelle `Loc` + Lint-Test |
 
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
