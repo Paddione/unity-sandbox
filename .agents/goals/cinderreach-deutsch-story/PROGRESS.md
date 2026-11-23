@@ -1,6 +1,6 @@
 # Progress: cinderreach-deutsch-story
 
-Prozent: 85 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -13,10 +13,12 @@ Prozent: 85 %
 - S5/S6 Inhalte: Ottilie und Merle als Szene-NPCs (`TownBuilder.SpawnStoryNpcs`), Marker auf Ilsabe/Jorin, Fundstücke Fuhrbrief/Lieferbuch/Grabtafeln, Szene neu gebaut, `VerifyDiabloZone` grün. Alle Quests H1–H9/N1–N5 über Dialoge, Kills, Funde und Zonenwechsel buchbar.
 - Nachweis bisher: Kompilierlauf grün, EditMode 496/496, PlayMode 284/284.
 
+- S7 Nachweis komplett: Session-Autoplay grün (Exit 0, beide Akte, deutsche Abschlusszeile), Koop-Trio `COOP_CLIENTS=2` grün mit identischem Queststand in allen drei v13-Saves, Windows-Shotcheck 60/60 (Dialog, Fuhrbuch, deutsche Menüs/Tooltips). Belege in `docs/story-run-log.md`.
+
 ## Nächste Schritte
 
-- S7 Rest: Session-Autoplay (läuft), Koop-Trio `COOP_CLIENTS=2`, Windows-Shotcheck (Dialog, Fuhrbuch, deutsche Menüs/Tooltips), `docs/story-run-log.md`, `CINDERREACH.md` nachziehen, `land`.
+- Abschluss: `CINDERREACH.md` nachgezogen, Goal entfernt, `land` (ff auf `main` + Push).
 
 ## Offene Punkte
 
-- S7-Nachweise offen (Autoplay, Koop, Windows-Shotcheck).
+Keine.

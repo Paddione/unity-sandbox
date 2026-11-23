@@ -15,9 +15,14 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 |---|---|---|
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
-| [`cinderreach-deutsch-story`](cinderreach-deutsch-story/GOAL.md) | 0 %, angelegt 2026-11-23 | S1 Stringtabelle `Loc` + Lint-Test |
-
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
+
+Abgeschlossen: `cinderreach-deutsch-story` (2026-11-23, Belege `docs/story-run-log.md`). Das Spiel ist
+vollständig deutsch (eigene Stringtabelle `Loc`, Englisch per `-lang en` als Fallback, Eigennamen laut
+Glossar in `docs/story-bible.md`; nur der Produktname „Cinderreach“ bleibt). Akt I und II haben je eine
+Hauptaufgabenkette (H1–H9) mit Nebenaufgaben (N1–N5) über NPC-Dialoge (Ottilie Wachs, Merle Sandkamp,
+Ilsabe Krumm, Jorin Hagedorn), Fuhrbuch (Taste J), HUD-Zielzeile und Fundstücke; Queststand im Save v13,
+im Koop per Host-Snapshot (Max-Merge) synchron.
 
 ## Spiel in einem Absatz
 
@@ -314,7 +319,8 @@ zuerst). `Diablo.IsSolo` zählt den Server nicht mit. Library nie bei laufendem
 - Design: `docs/one-page-gdd.md`, `docs/mechanics-questions.md` (Q1–Q10), `docs/decision-log.md`,
   `docs/dev-journal.md`, `docs/playtest-protocol.md`, `docs/fair-fights-playtest.md`.
 - Laufprotokolle: `session-loop-run-log.md`, `replayability-run-log.md`, `second-class-run-log.md`,
-  `act-one-run-log.md`, `act-two-run-log.md`, `coop-run-log.md`, `presentation-run-log.md` (alle unter `docs/`).
+  `act-one-run-log.md`, `act-two-run-log.md`, `coop-run-log.md`, `presentation-run-log.md`,
+  `story-run-log.md` (alle unter `docs/`). Story-SSOT: `docs/story-bible.md`.
 - Betrieb: `docs/runbook.md`, `docs/ci-runner.md`, `docs/mcp.md`, `docs/kaykit-assets.md`.
 
 ## Konsolidierte Goals
