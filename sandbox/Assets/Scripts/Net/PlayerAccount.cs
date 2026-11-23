@@ -111,6 +111,12 @@ public static class PlayerAccount
                 catch { /* nothing cached yet */ }
             }
             if (!auth.IsSignedIn) await auth.SignInAnonymouslyAsync();
+            if (!throwaway)
+            {
+                // A restored session may not carry the username yet; one lookup settles guest vs. account.
+                try { await auth.GetPlayerInfoAsync(); }
+                catch (System.Exception e) { Debug.LogWarning($"[Account] player info unavailable ({e.Message})."); }
+            }
             ready = true;
             Debug.Log($"[Account] signed in profile={Profile} player={auth.PlayerId} guest={IsGuest}");
             await LoadNameAsync(ArgValue(args, PlayerNameFlag));
@@ -168,6 +174,88 @@ public static class PlayerAccount
         {
             Debug.LogWarning($"[Account] player name unavailable ({e.Message}).");
         }
+    }
+
+    /// <summary>Raised after sign-in, sign-up or sign-out changed who is signed in (S3 cloud sync hooks here).</summary>
+    public static event System.Action AccountChanged;
+
+    /// <summary>
+    /// Create an account (S2). A guest keeps its player id: the username and
+    /// password are attached to the current identity, so its name (and later
+    /// its cloud hero) carry over. Returns null on success, else a player text.
+    /// </summary>
+    public static async Task<string> SignUpAsync(string user, string pass)
+    {
+        var invalid = AccountRules.Check(user, pass);
+        if (invalid != null) return invalid;
+        if (!await EnsureSignedInAsync()) return AccountRules.Explain(AccountRules.CodeTransportError, null, true);
+        if (!IsGuest) return "Sign out first to create another account.";
+        try
+        {
+            await AuthenticationService.Instance.AddUsernamePasswordAsync(user, pass);
+        }
+        catch (Unity.Services.Core.RequestFailedException e)
+        {
+            Debug.LogWarning($"[Account] sign-up failed ({e.ErrorCode}: {e.Message}).");
+            return AccountRules.Explain(e.ErrorCode, e.Message, true);
+        }
+        await AfterAccountChangeAsync("created account");
+        return null;
+    }
+
+    /// <summary>
+    /// Sign in to an existing account (S2). Replaces the current identity on
+    /// this profile; a guest identity without username is given up. Returns
+    /// null on success, else a player text.
+    /// </summary>
+    public static async Task<string> SignInAsync(string user, string pass)
+    {
+        var invalid = AccountRules.CheckUsername(user) ?? (string.IsNullOrEmpty(pass) ? "Enter your password." : null);
+        if (invalid != null) return invalid;
+        if (!await EnsureSignedInAsync()) return AccountRules.Explain(AccountRules.CodeTransportError, null, false);
+        var auth = AuthenticationService.Instance;
+        if (!IsGuest && string.Equals(Username, user, System.StringComparison.OrdinalIgnoreCase)) return null;
+        auth.SignOut(clearCredentials: true);
+        try
+        {
+            await auth.SignInWithUsernamePasswordAsync(user, pass);
+        }
+        catch (Unity.Services.Core.RequestFailedException e)
+        {
+            Debug.LogWarning($"[Account] sign-in failed ({e.ErrorCode}: {e.Message}); back to a guest.");
+            await FallBackToGuestAsync();
+            return AccountRules.Explain(e.ErrorCode, e.Message, false);
+        }
+        await AfterAccountChangeAsync("signed in");
+        return null;
+    }
+
+    /// <summary>Sign out of the account; this PC continues as a fresh guest.</summary>
+    public static async Task SignOutAsync()
+    {
+        if (!await EnsureSignedInAsync()) return;
+        AuthenticationService.Instance.SignOut(clearCredentials: true);
+        await FallBackToGuestAsync();
+        await AfterAccountChangeAsync("signed out");
+    }
+
+    static async Task FallBackToGuestAsync()
+    {
+        try
+        {
+            if (!AuthenticationService.Instance.IsSignedIn) await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[Account] guest sign-in failed ({e.Message}).");
+        }
+    }
+
+    static async Task AfterAccountChangeAsync(string what)
+    {
+        Debug.Log($"[Account] {what}: player={PlayerId} user={(IsGuest ? "(guest)" : Username)}");
+        await LoadNameAsync(null);
+        AccountChanged?.Invoke();
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 # Fortschritt – cinderreach-accounts
 
-Prozent: 25 %
+Prozent: 50 %
 
 ## Erledigt
 
@@ -14,10 +14,17 @@ Prozent: 25 %
   Namen („Client1 joined the party“ usw.). Nebenbefund behoben: der Relay-Host-Autoplay steuerte den abgetretenen
   Solo-Helden. EditMode 448/448, PlayMode 284/284.
 
+- S2 Konto: `PlayerAccount.SignUpAsync` (Gast hängt Benutzer/Passwort an, Spieler-ID bleibt), `SignInAsync`,
+  `SignOutAsync` (weiter als neuer Gast), `AccountRules` (UGS-Regeln, Fehlertexte), `AccountPanel` mit Anmelden,
+  Konto anlegen, Abmelden. Live-Probe `scripts/account-smoke.sh` gegen das UGS-Projekt (Lauf 2026-11-23, Benutzer
+  `crsmoke_1795459582`, danach gelöscht): 16/16 ok, u. a. Gast behält ID, Neustart stellt Konto und Namen wieder her,
+  falsches Passwort und belegter Name mit Klartext, Wiederanmeldung liefert dieselbe Spieler-ID. EditMode 466/466,
+  PlayMode 284/284.
+
 ## Nächste Schritte
 
-S2 Konto mit Benutzername und Passwort.
+S3 Cloud-Held.
 
 ## Offene Punkte
 
-- S2–S4 offen. Provider „Username & Password“ seit 2026-11-23 aktiv (Probe liefert `WRONG_USERNAME_PASSWORD`).
+- S3–S4 offen. Provider „Username & Password“ seit 2026-11-23 aktiv (Probe liefert `WRONG_USERNAME_PASSWORD`).

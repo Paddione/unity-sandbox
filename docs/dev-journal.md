@@ -991,3 +991,10 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   und erscheinen als Namensschilder über allen Netz-Helden sowie in Beitritts- und Abgangszeilen.
 - Der Relay-Host-Autoplay griff den Solo-Helden, bevor der Netz-Held ihn ablöste, und lief dann ins Leere. Er löst den
   Helden jetzt nach dem Warten auf die Mitspieler neu auf.
+
+## 2026-11-23 — Konten S2: Benutzername und Passwort
+
+- Startbildschirm → „Playing as …“ → Anmelden, Konto anlegen, Abmelden. Ein Gast, der ein Konto anlegt, behält seine
+  Spieler-ID (`AddUsernamePasswordAsync`), damit wandern Name und später der Cloud-Held mit.
+- `scripts/account-smoke.sh` prüft den Ablauf live am UGS-Projekt mit einem Wegwerf-Konto, das am Ende gelöscht wird.
+  Gelernt: Anmelden mit dem bereits aktiven Konto ist eine Leeraktion, der Test meldet sich vorher ab.

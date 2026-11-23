@@ -36,6 +36,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         live.Remove(this);
         PlayerAccount.NameChanged -= RefreshAccountLabel;
+        if (Account != null) PlayerAccount.AccountChanged -= Account.Refresh;
     }
     public static bool ClassFromCommandLine { get; private set; }
 
