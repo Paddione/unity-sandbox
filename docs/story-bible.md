@@ -1,0 +1,305 @@
+# Cinderreach – Story-Bibel
+
+Stand: 2026-11-23 (Goal `cinderreach-deutsch-story`, S3). Diese Datei ist die SSOT für Welt, Figuren,
+Aufgaben und Begriffe. Spieltexte in `Localization/` und die Questdaten in `Story/` folgen ihr.
+Änderungen an Namen erst hier, dann im Code.
+
+## Prämisse in drei Sätzen
+
+In Cinderreach trägt jeder Mensch eine **Glut** in sich, die beim Tod noch einige Tage im Körper bleibt.
+Seit drei Generationen brennt der **Glutofen** die Toten der Gegend, und aus ihrer Asche schmilzt der
+**Glasmacher** in der **Glasbrache** das **Glutglas**, das in den Laternen der **Laternenwacht** ohne Öl
+leuchtet und den kalten Aschennebel des Moors fernhält. Niemand in der Wacht fragt, wessen Licht über
+seiner Tür brennt, und genau davon erzählt das Spiel.
+
+## Die Kette
+
+Das Licht der Wacht entsteht in vier Gliedern. Jedes Glied ist eine Zone, jeder Boss hütet eines davon.
+
+| Glied | Ort | Hüter | Was dort geschieht |
+|---|---|---|---|
+| Die Toten | Versunkenes Beinhaus | Der Hohle Abt | Die Brüder vom Stillen Grund waschen und verzeichnen die Toten und geben sie dem Ofen. |
+| Das Feuer | Glutofen | Die Ofenmutter | Die Brennmeisterin brennt die Toten. Die Glut geht in die Asche über. |
+| Das Glas | Glasbrache | Der Glasmacher | Asche und Sand werden zu Glutglas geschmolzen. |
+| Das Licht | Laternenwacht | Ottilie Wachs | Die Lampenwärterin setzt das Glas in die Laternen. |
+
+Historischer Kern: Glasmacher brauchten früher Pottasche aus verbrannten Wäldern. In Cinderreach ist
+das Holz ausgegangen.
+
+## Die Wahrheit hinter der Kette
+
+Die Spieler entdecken sie in drei Schichten, je eine pro Wendepunkt.
+
+1. **Der Ofen holt mehr, als stirbt.** (Wendung Akt I, Beinhaus.) Der Abt hat die Toten nicht aus Wahn
+   zurückgehalten. Die Fuhrlisten des Ofens forderten Namen von Menschen, die noch lebten.
+2. **Die Wacht hat sie geliefert.** (Wendung Akt I, Glutofen.) Das Rußbuch der Ofenmutter verzeichnet
+   „Spenden“ aus der Laternenwacht: Kranke, Alte, Schuldner. Gegen Gold und Glas vermittelt hat sie
+   Ilsabe Krumm, mit dem Siegel des Vogts.
+3. **Die Hüllen wollen ihre Glut zurück.** (Wendung Akt II, Glasbrache.) Glutglas bewahrt die Glut nicht
+   als Wärme, es hält sie fest. Der Körper, dem sie gehört, steht ohne sie wieder auf und wird zur Hülle.
+   Die Hüllen im Moor kommen nicht trotz der Laternen. Sie kommen wegen der Laternen.
+
+Damit kippt die Ausgangsfrage. Die Wacht dachte, ihr Licht schütze sie vor dem Moor. In Wahrheit ruft ihr
+Licht das Moor herbei.
+
+## Ton und Sprachregeln
+
+- Düster, knapp, konkret. Kurze Sätze, Dinge statt Abstrakta: Karren, Ruß, Siegel, Docht, Scherbe.
+- Niemand hält Monologe über das Böse. Figuren reden über Arbeit, Schulden, Wetter, Tote mit Namen.
+- Keine Auserwählten, keine Prophezeiung, kein erwachendes Urböses. Alle Schuld ist menschengemacht und
+  hat eine Rechnung.
+- Ironie nur trocken und nur bei Ilsabe und dem Schmuggler.
+- Anrede: Die Figuren duzen die Gruppe („ihr“). Der Vogt siezt schriftlich.
+- UI-Texte sachlich und kurz, Imperativ ohne Ausrufezeichen („Truhe öffnen“, nicht „Öffne die Truhe!“).
+- Zahlen mit deutschem Dezimalkomma („1,5 s“), Prozent mit Leerzeichen („25 %“).
+
+## Die Gruppe
+
+Die Wacht schickt keine Helden, sie schickt eine **Fuhre**: drei Leute, die man entbehren kann und die
+sich auskennen. Die Rollen ergeben sich aus dem Weg.
+
+| Klasse (intern) | Anzeigename | Rolle | Warum gerade sie |
+|---|---|---|---|
+| Fenwalker | **Moorgänger** | Tank | Führt seit Jahren die Totenkarren durch den Nebel, trägt den lehmverschmierten Mooreichenschild, den der Nebel nicht durchdringt. Geht vorn, weil vorn der Weg ist. |
+| Lanternbearer | **Laternenträgerin** | Heilerin | Ottilies Gehilfin. Ihre Laterne heilt, weil das Glas Glut abgibt. Sie weiß nicht, woher die Glut kommt. Ab Akt II heilt sie mit dem Licht eines Menschen. |
+| Rogue | **Schmuggler** | Schaden | Hat Asche am Ofen vorbei in die Glasbrache verschoben, um am Glas mitzuverdienen. Kennt Hintertüren und Preise. Ist der Einzige, der von Anfang an ahnt, dass die Mengen nicht stimmen. |
+
+Die Klassennamen bleiben im Grammatikgeschlecht fest (Moorgänger, Laternenträgerin, Schmuggler). Die
+Laternenträgerin ist bewusst weiblich: Sie ist Ottilies Gehilfin und spricht in Akt II aus eigener Schuld.
+
+## Figuren
+
+### Ottilie Wachs – Lampenwärterin (neu, Laternenwacht)
+
+Früher Novizin im Beinhaus, vor elf Jahren in die Wacht gegangen, weil sie „lieber Licht pflegt als
+Leichen“. Zählt jeden Abend die Laternen und kennt jede beim Namen der Familie, über deren Tür sie hängt.
+Fromm aus Gewohnheit, praktisch aus Not. Ihr Widerspruch: Sie hat das Beinhaus verlassen, weil sie dem Abt
+nicht mehr glaubte, und schickt nun Fremde, um ihn zu töten. Am Ende von Akt I löscht sie die erste
+Laterne mit eigener Hand.
+
+Stimme: „Siebenundvierzig Laternen. Gestern achtundvierzig. Ich weiß, wessen Tür jetzt dunkel ist.“
+
+### Ilsabe Krumm – Händlerin (bestehend, Laternenwacht)
+
+Freundlich, schnell im Kopf, nie verlegen. Spricht in Verwaltungswörtern: „Abgabe“, „Spender“, „Ausgleich“.
+Hat die Lieferungen an den Ofen vermittelt, nennt das „Fürsorge für die, die niemanden mehr haben“, und
+glaubt das zur Hälfte. Bleibt bis zum Schluss ansprechbar und handelt weiter, auch nachdem die Gruppe alles
+weiß. Gerade das soll unbequem sein.
+
+Stimme: „Ich verkaufe nichts, was nicht vorher jemand hergegeben hat. Das ist der ganze Handel.“
+
+### Jorin Hagedorn – Schmied (bestehend, Laternenwacht)
+
+War Lehrling der Ofenmutter und hat die Lanzen der Aschenlanzer geschmiedet. Ist gegangen, als die ersten
+Schlackenknechte noch atmeten. Wortkarg. Nennt sie nie „Ofenmutter“, nur „die Meisterin“. Bittet nicht um
+Vergebung, sondern darum, seine Arbeit zurückzubekommen.
+
+Stimme: „Jede dieser Spitzen hab ich gehärtet. Bringt sie mir. Ich will sie einschmelzen, bevor sie noch
+wen findet.“
+
+### Merle Sandkamp – Karrnerin (neu, ab Akt II in der Laternenwacht)
+
+Fuhr Asche vom Ofen in die Glasbrache. Als die Feuer erloschen, kam sie mit einem leeren Karren und einem
+Sack voll ungeschliffenem Glutglas in die Wacht, um es zu verkaufen. Ihr Bruder Tamm ist in der Brache
+geblieben und wurde zum Scherbenrücken. Sie will ihn nicht retten. Sie will, dass er aufhört.
+
+Stimme: „In der Brache wächst einem das Glas auf der Brust, wenn man zu lange in eine Richtung schaut.
+Tamm hat immer nach Hause geschaut.“
+
+### Vogt Anselm Dreher – Auftragsbrett (nur schriftlich)
+
+Tritt nie auf. Seine Anschläge am Auftragsbrett sind höflich, gesiezt und sauber gesiegelt. Ab dem Ende von
+Akt I liegt dasselbe Siegel im Rußbuch. Das Brett bleibt danach in Betrieb.
+
+### Die Bosse
+
+**Der Hohle Abt** (Versunkenes Beinhaus). Oberster der Brüder vom Stillen Grund. Fand in den Fuhrlisten
+Namen von Lebenden und hörte auf, Tote herauszugeben. Als die Wacht Plünderer schickte, gab er seine
+eigene Glut, um die Gebeine seiner Brüder als Knochenwächter aufzustellen. Seitdem ist er hohl: Er spricht
+noch, aber er erinnert sich nur an Listen. Kein Wahnsinniger, sondern ein Verwalter, der zu spät Nein
+gesagt hat. In Phase 2 ruft er Hüllen, weil er die Toten, die er schützen wollte, nur noch als Waffe kennt.
+Letzte Worte: „Lest die Namen. Lest sie laut.“
+
+**Die Ofenmutter** (Glutofen). Brennmeisterin in dritter Generation. Als das Beinhaus keine Toten mehr
+schickte, ließ sie die Feuer nicht ausgehen, weil sie wusste, was in der Wacht passiert, wenn die Laternen
+erlöschen. Sie nahm, was man ihr brachte, und als das nicht reichte, ihre eigenen Knechte, die seitdem
+glühen und bersten. Sie hält sich nicht für grausam, sondern für die Einzige, die rechnen kann.
+Satz zur Gruppe: „Ich habe niemanden geholt. Sie wurden mir gebracht. Von euch.“
+
+**Der Glasmacher** (Glasbrache). Erfand das Glutglas aus Trauer: Er wollte seine Frau Wendeline nicht
+verlieren und schmolz ihre Asche in ein Prisma, das noch warm war, als er es in den Händen hielt. Er weiß
+seit vierzig Jahren, dass die Glut im Glas nicht ruht, und hält das für Gnade: Niemand im Glas wird
+vergessen. Sein Prisma ist der Helm „Prisma des Glasmachers“. Wer es trägt, trägt Wendeline.
+Satz zur Gruppe: „Ihr nennt es Gefangenschaft. Ich nenne es: nicht loslassen.“
+
+## Glossar (verbindlich)
+
+Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeigenamen.
+
+### Orte
+
+| Intern / alt | Deutsch |
+|---|---|
+| Cinderreach | Cinderreach (Produkt- und Landschaftsname, unverändert) |
+| Lantern Hold | Laternenwacht |
+| Ashen Fen | Aschenmoor |
+| Fen Gate | Moortor |
+| Sunken Ossuary | Versunkenes Beinhaus |
+| Cinder Kiln | Glutofen |
+| Glass Barrens | Glasbrache |
+| Waypoint / Shrine | Wegschrein |
+| Risk Shrine | Wagnisschrein |
+
+### Gegner
+
+| Intern / alt | Deutsch |
+|---|---|
+| Husk | Hülle |
+| Fen Brute | Moorschläger |
+| Ash Elite | Aschenhüne |
+| Bone Warden | Knochenwächter |
+| The Hollow Abbot | Der Hohle Abt |
+| Cinder Thrall | Schlackenknecht |
+| Ash Lancer | Aschenlanzer |
+| Kiln Elite | Ofenschinder |
+| Kiln Warden | Ofenwächter |
+| The Kilnmother | Die Ofenmutter |
+| Shardback | Scherbenrücken |
+| Dune Augur | Dünenseher |
+| Glass Elite | Glasvogt |
+| Glass Pillar | Glassäule |
+| The Glasswright | Der Glasmacher |
+
+### Klassen und Fähigkeiten
+
+| Intern / alt | Deutsch |
+|---|---|
+| Fenwalker | Moorgänger |
+| Lanternbearer | Laternenträgerin |
+| Rogue | Schmuggler |
+| Tank / Healer / DPS | Schild / Heilung / Schaden |
+| Fireball | Feuerball |
+| Bow / Arrow | Bogen |
+| Cleave | Spalten |
+| Seismic Slam | Erdstoß |
+| Lantern Bolt | Laternenblitz |
+| Wisps | Irrlichter |
+| Searing Halo | Sengender Kranz |
+| Veil Step | Schleierschritt |
+| Mending Light | Heilendes Licht |
+| Renewing Circle | Erneuernder Kreis |
+| Quick Shot | Schnellschuss |
+| Blade Flurry | Klingenwirbel |
+| Strike / Thrust / Block | Schlag / Stoß / Block |
+
+### Spielsysteme
+
+| Intern / alt | Deutsch |
+|---|---|
+| Normal / Kindled | Normal / Entfacht |
+| Magic / Rare / Unique | Magisch / Selten / Einzigartig |
+| Item level | Gegenstandsstufe |
+| Affix | Eigenschaft |
+| Vendor | Händlerin |
+| Smith / Salvage / Reforge | Schmiede / Verwerten / Umschmieden |
+| Stash | Truhe |
+| Contract Board / Hunt / Recovery | Auftragsbrett / Jagd / Bergung |
+| Quest log | Fuhrbuch |
+| Main task / Side task | Hauptaufgabe / Nebenaufgabe |
+| Gold | Gold |
+| Health potion | Heiltrank |
+| Strength / Vitality / Focus | Stärke / Vitalität / Fokus |
+| Level / Skill point | Stufe / Fertigkeitspunkt |
+| Act I / Act II | Akt I / Akt II |
+
+### Einzigartige Gegenstände
+
+| Intern / alt | Deutsch |
+|---|---|
+| Lantern of the Hold | Laterne der Wacht |
+| lancer-ward | Lanzenbann |
+| wick-of-the-halo | Docht des Kranzes |
+| Shardback Aegis | Scherbenpanzer |
+| Glasswright Prism | Prisma des Glasmachers |
+
+Weitere Uniques übersetzt S2 nach demselben Muster (Ding + Herkunft) und trägt sie hier nach.
+
+### Story-Begriffe
+
+| Begriff | Bedeutung |
+|---|---|
+| Glut | Lebensfunke jedes Menschen, bleibt nach dem Tod einige Tage im Körper |
+| Glutglas | Glas aus Totenasche, leuchtet ohne Öl |
+| Aschennebel | Kalter Nebel des Moors, in dem Hüllen wandern |
+| Fuhre | Die Gruppe der Spieler; ursprünglich ein Totentransport |
+| Fuhrliste | Liste der Toten, die das Beinhaus dem Ofen schuldet |
+| Rußbuch | Brennbuch der Ofenmutter mit allen Namen und Spendern |
+| Brüder vom Stillen Grund | Orden des Beinhauses |
+| Spende | Ilsabes Wort für einen Menschen, den die Wacht an den Ofen gab |
+
+## Akt I – „Wer das Licht bezahlt“
+
+Ausgangslage: Seit vierzig Tagen kommt kein Totenkarren mehr aus dem Beinhaus. Der Ofen hat nichts zu
+brennen, die Brache kein Glas, und in der Laternenwacht ist die erste Laterne erloschen.
+
+### Hauptaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele (Ereignis im Spiel) | Abschluss |
+|---|---|---|---|---|
+| H1 | Die dunkle Tür | Ottilie | Mit Ottilie sprechen. Den umgestürzten Totenkarren im Aschenmoor finden (Fundstück „Fuhrbrief“ nahe der Kiste). Den Moorschläger erschlagen, der ihn bewacht. | Fuhrbrief bei Ottilie abgeben. Sie liest: Der Karren war leer. |
+| H2 | Die Siegel vom Stillen Grund | Ottilie | Das Versunkene Beinhaus betreten. Knochenwächter zerschlagen (4). Den Hohlen Abt bezwingen. | Das Brevier des Abts wird beim Kill gefunden. |
+| H3 | Lest die Namen | Ottilie | Das Brevier zu Ottilie bringen. Mit Jorin über den Ofen sprechen. Den Glutofen betreten. | Ottilie erkennt in den Fuhrlisten Namen aus der Wacht, die noch lebten. Wendung 1. |
+| H4 | Asche schuldet niemand | Ottilie | Die Ofenmutter bezwingen. Das Rußbuch aufheben (fällt beim Kill). | Rußbuch zu Ottilie bringen. Wendung 2: Ilsabes Hand, Vogts Siegel. |
+| H5 | Siebenundvierzig | Ottilie | In die Laternenwacht zurückkehren und mit Ottilie sprechen. | Ottilie löscht die Laterne über Ilsabes Tür. Akt I abgeschlossen. |
+
+H2 begleitet das bestehende Tor: Der Abt-Kill öffnet weiterhin den Ofen. H4 begleitet den Kilnmother-Kill,
+der weiterhin Akt I abschließt und die Brache öffnet. H5 ist rein erzählerisch und sperrt nichts.
+
+### Nebenaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele | Belohnung | Was sie an der Hauptgeschichte ändert |
+|---|---|---|---|---|---|
+| N1 | Ilsabes Lieferbuch | Ilsabe | Den Moorvorrat im Aschenmoor bergen (die Kiste). Das Lieferbuch zu Ilsabe bringen. | 150 Gold | Das Lieferbuch zeigt Mengen, die nie ein Totenkarren gefahren hat. Wer N1 erledigt hat, erkennt in H4 Ilsabes Handschrift wieder; der Abschluss-Dialog von H4 hat eine eigene Zeile. |
+| N2 | Die stillen Brüder | Ottilie | Im Beinhaus drei Grabtafeln lesen (Fundstücke an den Sarkophagen). | 1 Fertigkeitsrang-Gegenstand (Selten) | Die Knochenwächter haben Namen. Der Abt hat seine Brüder nicht missbraucht, sie haben ihm ihre Gebeine angeboten. |
+| N3 | Hagedorns Spitzen | Jorin | Sechs Aschenlanzer im Glutofen erschlagen. Zu Jorin zurückkehren. | Ein kostenloses Umschmieden | Jorin gesteht, dass er wusste, wofür die Lanzen gedacht waren: nicht gegen Plünderer, sondern gegen Knechte, die fliehen wollten. |
+
+## Akt II – „Was im Glas wohnt“
+
+Ausgangslage: Die Feuer im Ofen sind erloschen. In der Wacht brennen noch siebenundvierzig Laternen, ohne
+Nachschub. Merle Sandkamp kommt mit einem leeren Karren aus der Glasbrache.
+
+### Hauptaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele | Abschluss |
+|---|---|---|---|---|
+| H6 | Die letzte Fuhre | Merle | Mit Merle sprechen. Die Glasbrache betreten. | Merle erzählt vom Glasmacher und von Tamm. |
+| H7 | Scherben lesen | Merle | Dünenseher erschlagen (3). Ihre Sehgläser zeigen die Laternenwacht von außen: Hüllen, die zum Licht ziehen. | Wendung 3 deutet sich an. |
+| H8 | Nicht loslassen | Merle | Den Glasmacher bezwingen. Das Prisma des Glasmachers tragen oder aufheben. | Der Glasmacher spricht von Wendeline und der Glut im Glas. |
+| H9 | Wessen Licht | Ottilie und Merle | In die Laternenwacht zurückkehren und mit beiden sprechen. | Ottilie hält eine Scherbe gegen ihre Laterne. Offenes Ende (siehe Ausblick). |
+
+### Nebenaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele | Belohnung | Was sie an der Hauptgeschichte ändert |
+|---|---|---|---|---|---|
+| N4 | Tamm | Merle | Einen Glasvogt in der Glasbrache bezwingen. Seine Karrnermarke zu Merle bringen. | 250 Gold | Tamm war einer der Glasvögte. Merle legt die Marke nicht weg, sondern in ihren Sack mit dem Glutglas. Sie verkauft das Glas danach nicht mehr. |
+| N5 | Was die Seher sahen | Ilsabe | Zwei Sehgläser behalten statt sie Merle zu geben (vier Dünenseher erschlagen). Zu Ilsabe bringen. | 1 einzigartiger Gegenstand aus Ilsabes Bestand | Ilsabe will die Sehgläser, um zu wissen, wann die Hüllen kommen. Sie plant schon die nächste Spende. Die Wacht hat aus Akt I nichts gelernt. |
+
+## Ausblick nach Akt II
+
+Kein Akt III in diesem Goal. Das Ende bleibt offen und unbequem:
+
+> Ottilie hält die Scherbe gegen ihre Laterne. Das Licht darin flackert im Takt eines Atems.
+> „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter. Sie wollen nur nach Hause.“
+> Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.
+
+Die spätere Entscheidung (Laternen brechen oder halten) ist der Haken für Akt III und wird hier nicht
+aufgelöst.
+
+## Zwischentexte
+
+| Anlass | Titel | Text |
+|---|---|---|
+| Abt besiegt | DER STILLE GRUND SCHWEIGT | Der Abt fällt wie ein leerer Mantel. In seinem Brevier stehen Namen, und neben manchen steht kein Todestag. |
+| Ofenmutter besiegt (Akt I) | AKT I ABGESCHLOSSEN | Zum ersten Mal seit drei Generationen kühlt der Ofen aus. Hinter ihm liegt die Glasbrache offen. |
+| Glasmacher besiegt | DIE GLASBRACHE IST STILL | Das Prisma ist warm. Es wird nicht kälter. |
+| Akt II beginnt (Merle erscheint) | AKT II – WAS IM GLAS WOHNT | Ein leerer Karren rollt durch das Moortor. Die Frau darauf hat seit Tagen niemanden gesehen, der noch glüht. |
