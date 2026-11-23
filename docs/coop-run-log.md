@@ -156,3 +156,19 @@ Image aus `scripts/publish-server-image.sh` lokal per `docker run … -server-na
 | s3-docker-2 | Server-Subtarget: Lead/Follow grün, aber 32 Server-Exceptions (`Material..ctor` ohne Shader in `EnemyHealth.DropOrb`, `GoldDrop`, `ToyTrigger.PaintGoal`, mitten in `Die()`) |
 | Player-Subtarget im Container | Segfault in `PlayerMain` nach dem Szenenstart, auch mit X11/GL/GTK-Bibliotheken: verworfen |
 | s3-docker-4 | Server-Subtarget mit Shader-Null-Schutz: Lead 4/4, Follow 3/3 (+ `boss`), Container-Exit 0, 0 Server-Exceptions |
+
+### Abnahme gegen den devmesh-Pod (S4)
+
+| Lauf | Aufbau | Ergebnis |
+|---|---|---|
+| s4-windows-2 | Pod `k3s-tablet`, Windows-Lead, Linux-Follow | beide verbunden, Windows nach ~40 s vom Server getrennt (kein Datenfluss nach dem Handshake), Lead-NRE am Tor |
+| s4-windows-3 | Pod `k3s-tablet`, Linux-Lead, Windows-Follow | Windows sieht den Lead nie bewegen, getrennt |
+| s4-local-win2 | lokaler Container (MTU 1500), Linux-Lead, Windows-Follow | grün: Follow `town,zone1,zone2,boss` |
+| s4-nodetest | Test-Pod `gpu-cluster2`, Linux-Lead, Windows-Follow | diesmal Linux getrennt: nicht plattform-, sondern pfadabhängig |
+| s4-pkt-1 | Test-Pod `k3s-tablet` mit Paketlimit 1200, Windows-Lead, Linux-Follow | grün: Lead 4/4, Follow 3/3, Gruppenreise, 0 Exceptions auf allen drei Prozessen |
+
+Ursache: Unity Transport sendet UDP-Nutzlasten bis 1400 Byte (1428 auf der Leitung), die Pods hängen an Flannel
+WireGuard mit MTU 1420. Volle Pakete gingen verloren, sobald eine fragmentierte zuverlässige Nachricht lief, der
+Client lief nach 30–60 s in den Timeout. `CompactPacketDriver` begrenzt auf 1200 Byte für alle Netzmodi.
+Nebenbei: per `timeout` abgebrochene Windows-Läufe lassen `cinderreach.exe` weiterlaufen (sperrt Logs/Staging),
+danach `taskkill /IM cinderreach.exe /F`.

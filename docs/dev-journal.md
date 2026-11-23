@@ -959,3 +959,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   und Lobby direkt anzusprechen kostet etwa 150 Zeilen und hält den Server heldenlos.
 - Testläufe veröffentlichen unter eigenem Namen (`-server-name`), damit sie nie Spieler vom echten Server abziehen.
 
+## 2026-11-23 — Dedizierter Server im Cluster: Paketgröße
+
+- Lokal liefen Server und Clients sauber, gegen den Pod im Heimcluster verlor aber jeweils ein Client nach
+  30–60 s die Verbindung. Gegentests (lokaler Container, anderer Knoten, Rollen getauscht) zeigten: kein
+  Windows-Problem, sondern der Netzpfad. Das WireGuard-Overlay des Clusters hat MTU 1420, Unity Transport schickt
+  bis zu 1428 Byte große Pakete.
+- Fix: höchstens 1200 Byte pro Paket, für alle Netzmodi. Danach hielt die Verbindung über die volle Route.
+
