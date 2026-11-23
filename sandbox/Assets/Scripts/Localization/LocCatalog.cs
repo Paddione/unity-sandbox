@@ -23,6 +23,7 @@ public static partial class LocCatalog
     public static IEnumerable<Entry[]> Domains()
     {
         yield return Names;
+        yield return Dialog;
         yield return Session;
         yield return Shrine;
         yield return Waypoint;

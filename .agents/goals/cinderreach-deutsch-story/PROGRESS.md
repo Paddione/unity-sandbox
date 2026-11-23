@@ -11,7 +11,7 @@ Prozent: 35 %
 
 ## Nächste Schritte
 
-- S4: Quest-/Dialog-/Fuhrbuch-System (Taste J), Save v13, Koop-Buchung.
+- S4 begonnen (nicht kompiliergeprüft): `Story/StoryModel.cs` (Quests H1–H9, N1–N5), `StoryState.cs` (Logik, Nachholen, Koop-Schnappschuss), `StoryDialogs.cs` (Dialogauswahl), `LocCatalog.Dialog.cs` (alle Dialogzeilen). Offen: `LocCatalog.Story.cs` (NPC-Namen, Questtitel, Ziele, Toasts), Director/NPCs/Fundstücke, Dialog- und Fuhrbuch-UI (J), Hooks in `EnemyHealth.Die`, `Vendor`, `SmithStation`, `IsAnyModalOpen`, Save v13, Koop-RPC, Tests.
 - S5/S6: Akt-I- und Akt-II-Inhalte aus der Story-Bibel, NPCs Ottilie und Merle im Builder.
 - S7: Nachweis (volle Suites, Autoplay, Koop-Trio, Windows-Shotcheck, `docs/story-run-log.md`).
 
