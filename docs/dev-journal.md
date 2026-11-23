@@ -951,3 +951,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Ein geleerter Server beendet sich nach 20 s. Der Supervisor (später Kubernetes) startet einen frischen Run,
   so bleibt kein halber Weltzustand zurück.
 
+## 2026-11-23 — Dedizierter Server, Stufe 2
+
+- Spieler klicken auf dem Startbildschirm „Join Server“ und landen ohne Code im laufenden Server. Der Server
+  steht in einer öffentlichen Lobby „Cinderreach Server“, die seinen Relay-Code trägt.
+- Die bequeme Sessions-API ließ sich nicht nutzen: Sie macht jeden anonym angemeldeten Ersteller zum Host. Relay
+  und Lobby direkt anzusprechen kostet etwa 150 Zeilen und hält den Server heldenlos.
+- Testläufe veröffentlichen unter eigenem Namen (`-server-name`), damit sie nie Spieler vom echten Server abziehen.
+

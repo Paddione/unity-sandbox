@@ -133,3 +133,15 @@ Gruppenreise durch das FenGate, Ossuary-Kampf), Client 2 `-coop-autoplay follow`
 Regeln: Leader = lebender Spieler mit kleinster ClientId (`DedicatedServer.Leader`), Broadcasts über ein
 beliebiges gespawntes Spielerobjekt (`DedicatedServer.AnyPlayer`), Server speichert nicht, keine KI-Begleiter,
 60-fps-Deckel. Ein Server, der Spieler hatte und 20 s leer bleibt, beendet sich (Neustart = frischer Run).
+
+### Relay-Server und Auffinden (S2)
+
+`COOP_SERVER=1 COOP_RELAY=1 COOP_CLIENTS=2 bash scripts/run-coop-pair.sh artifacts/coop-server/<lauf>`: Server
+`-server -server-relay -server-name "Cinderreach Server test-<pid>"`, Clients `-join-server -server-name …`.
+Die Sessions-API startet nur sessionlose (server-authentifizierte) Sessions als Server, ein anonym angemeldeter
+Prozess würde Host. Deshalb direkt Relay + Lobby (`ServerDirectory`): Allokation für 4 Spieler, NGO-Server darauf,
+öffentliche Lobby mit Join-Code und Build, Heartbeat alle 15 s, Löschen vor dem Beenden.
+
+| Lauf | Ergebnis |
+|---|---|
+| s2-relay-1 | `[Server] published … relay region europe-west4`, beide Clients `joining Cinderreach server via relay`, Lead 4/4, Follow 3/3, Server Exit 0, 0 Exceptions, keine Heartbeat-/Löschfehler |

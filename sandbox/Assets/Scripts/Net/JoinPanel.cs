@@ -77,6 +77,11 @@ public sealed class JoinPanel : MonoBehaviour
             JoinArgs.DefaultAddress, JoinArgs.DefaultPort, relayHost: true));
     }
 
+    /// <summary>Find and join the published Cinderreach server (no code, no address).</summary>
+    public static bool JoinServer() =>
+        MultiplayerAutoStarter.Restart(new JoinArgs(JoinArgs.NetMode.Client,
+            JoinArgs.DefaultAddress, JoinArgs.DefaultPort, joinServer: true));
+
     /// <summary>Join the relay code typed in the code field.</summary>
     public bool JoinByCode()
     {
@@ -103,6 +108,12 @@ public sealed class JoinPanel : MonoBehaviour
     {
         if (nm == null) return "Offline (no NetworkManager)";
         if (nm.ShutdownInProgress) return "Leaving session…";
+        if (current.JoinServer && !nm.IsListening)
+            return MultiplayerAutoStarter.ServerJoinError != null
+                ? $"Server: {MultiplayerAutoStarter.ServerJoinError}" : "Server: searching…";
+        if (current.JoinServer && nm.IsConnectedClient) return "Connected to the Cinderreach server";
+        if (MultiplayerAutoStarter.ServerJoinError != null && nm.IsHost && nm.ConnectedClientsIds.Count <= 1)
+            return $"Server unavailable ({MultiplayerAutoStarter.ServerJoinError}), playing solo";
         if (!nm.IsListening)
             return current.JoinCode != null ? $"Relay code {current.JoinCode}: connecting…"
                 : current.RelayHost ? "Relay: creating session…"
@@ -138,8 +149,9 @@ public sealed class JoinPanel : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         canvasGo.AddComponent<GraphicRaycaster>();
 
-        var panel = Panel(canvasGo.transform, "Panel", new Vector2(620f, 470f), Vector2.zero);
-        Label(panel.transform, "Co-op", 28, new Vector2(0f, 190f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
+        var panel = Panel(canvasGo.transform, "Panel", new Vector2(620f, 560f), Vector2.zero);
+        Label(panel.transform, "Co-op", 28, new Vector2(0f, 235f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
+        Button(panel.transform, "Join server", new Vector2(0f, 185f), () => JoinServer());
         Label(panel.transform, "Host on a port, join ip:port — or use a relay code", 16, new Vector2(0f, 150f), new Vector2(560f, 30f));
         AddressField = Field(panel.transform, "AddressField", $"{JoinArgs.DefaultAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 100f));
         Button(panel.transform, "Host", new Vector2(-190f, 35f), () => Host());

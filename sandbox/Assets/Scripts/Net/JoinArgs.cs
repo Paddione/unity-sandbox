@@ -29,9 +29,13 @@ public readonly struct JoinArgs
     public readonly string JoinCode;
     /// <summary>Host via relay instead of direct UTP (<c>-host-relay</c>).</summary>
     public readonly bool RelayHost;
+    /// <summary>Client: find and join the published dedicated server (<c>-join-server</c>).</summary>
+    public readonly bool JoinServer;
+    /// <summary>Dedicated server: publish through Relay + Lobby (<c>-server-relay</c>).</summary>
+    public readonly bool RelayServer;
 
     public JoinArgs(NetMode mode, string address, ushort port, string warning = null,
-        string joinCode = null, bool relayHost = false)
+        string joinCode = null, bool relayHost = false, bool joinServer = false, bool relayServer = false)
     {
         Mode = mode;
         Address = string.IsNullOrWhiteSpace(address) ? DefaultAddress : address.Trim();
@@ -39,6 +43,8 @@ public readonly struct JoinArgs
         Warning = warning;
         JoinCode = string.IsNullOrWhiteSpace(joinCode) ? null : joinCode.Trim();
         RelayHost = relayHost;
+        JoinServer = joinServer;
+        RelayServer = relayServer;
     }
 
     public bool IsClient => Mode == NetMode.Client;
@@ -93,7 +99,11 @@ public readonly struct JoinArgs
         }
         bool relayHost = Has(args, HostRelayFlag);
         if (relayHost) mode = NetMode.Host;
-        return new JoinArgs(mode, address, port, warning, joinCode, relayHost);
+        bool relayServer = Has(args, ServerDirectory.RelayFlag);
+        if (relayServer) mode = NetMode.Server;
+        bool joinServer = Has(args, ServerDirectory.JoinServerFlag);
+        if (joinServer) mode = NetMode.Client;
+        return new JoinArgs(mode, address, port, warning, joinCode, relayHost, joinServer, relayServer);
     }
 
     /// <summary>Split "host[:port]" (the JoinPanel field uses the same rule).</summary>

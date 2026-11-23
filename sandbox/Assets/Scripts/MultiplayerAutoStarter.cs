@@ -46,6 +46,17 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         if (manager != null && manager.NetworkConfig.PlayerPrefab != null
             && manager.NetworkConfig.PlayerPrefab.name == "NetworkPlayerDiablo")
             DiabloNetworkBootstrap.RegisterLootPrefab(manager);
+        if (args.JoinServer || args.RelayServer)
+        {
+            if (manager == null)
+            {
+                Debug.LogWarning("[Net] No NetworkManager in scene; solo greybox only.");
+                return false;
+            }
+            Current = args;
+            instance.StartCoroutine(instance.ServerDirectoryBoot(args));
+            return true;
+        }
         if (args.RelayHost || args.JoinCode != null)
         {
             var manager0 = NetworkManager.Singleton;
@@ -155,6 +166,36 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         if (ok) yield break; // session owns NGO from here
         Debug.LogWarning("[Net] Relay join failed, falling back to direct UTP.");
         DirectBegin(new JoinArgs(JoinArgs.NetMode.Client, args.Address, args.Port));
+    }
+
+    /// <summary>Last reason "Join server" failed (null while none did), for the panel.</summary>
+    public static string ServerJoinError { get; private set; }
+
+    /// <summary>
+    /// Dedicated server over Relay + Lobby (S2). Server: publish, else stay on direct UTP
+    /// (loudly). Client: find and join the published server, else keep playing solo.
+    /// </summary>
+    IEnumerator ServerDirectoryBoot(JoinArgs args)
+    {
+        float deadline = Time.realtimeSinceStartup + RelayBootSeconds;
+        if (args.RelayServer)
+        {
+            var publish = ServerDirectory.PublishAsync(Application.version);
+            while (!publish.IsCompleted && Time.realtimeSinceStartup < deadline) yield return null;
+            if (publish.IsCompletedSuccessfully && publish.Result) yield break;
+            Debug.LogWarning("[Server] relay publish failed, serving direct UTP only.");
+            DirectBegin(new JoinArgs(JoinArgs.NetMode.Server, args.Address, args.Port));
+            yield break;
+        }
+        ServerJoinError = null;
+        Debug.Log("[Net] Joining the Cinderreach server via relay.");
+        var join = ServerDirectory.JoinAsync(Application.version);
+        while (!join.IsCompleted && Time.realtimeSinceStartup < deadline) yield return null;
+        string error = !join.IsCompleted ? "timed out" : join.IsCompletedSuccessfully ? join.Result : "join failed";
+        if (error == null) yield break;
+        ServerJoinError = error;
+        Debug.LogWarning($"[Net] Join server failed ({error}), continuing solo.");
+        DirectBegin(new JoinArgs(JoinArgs.NetMode.Host, JoinArgs.DefaultAddress, JoinArgs.DefaultPort));
     }
 
     /// <summary>ParrelSync clones live next to the project as _clone_N.</summary>

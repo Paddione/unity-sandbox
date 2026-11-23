@@ -51,4 +51,37 @@ public class DedicatedServerTests
         foreach (var p in new[] { "town", "zone1", "zone2" }) follow.Reach(p);
         Assert.IsTrue(follow.AllPhasesReached());
     }
+
+    [Test]
+    public void JoinServerAndRelayServerFlags_SetTheirModes()
+    {
+        var c = JoinArgs.Parse(new[] { "x", "-join-server" });
+        Assert.AreEqual(JoinArgs.NetMode.Client, c.Mode);
+        Assert.IsTrue(c.JoinServer);
+        var s = JoinArgs.Parse(new[] { "x", "-server", "-server-relay" });
+        Assert.AreEqual(JoinArgs.NetMode.Server, s.Mode);
+        Assert.IsTrue(s.RelayServer);
+        Assert.IsFalse(JoinArgs.Parse(new[] { "x" }).JoinServer);
+    }
+
+    [Test]
+    public void ServerName_DefaultsAndOverrides_QueryFiltersByIt()
+    {
+        Assert.AreEqual("Cinderreach Server", ServerDirectory.NameFor(new[] { "x" }));
+        Assert.AreEqual("Cinderreach Server test-1", ServerDirectory.NameFor(new[] { "x", "-server-name", "Cinderreach Server test-1" }));
+        var q = ServerDirectory.Query("Cinderreach Server test-1");
+        Assert.AreEqual(1, q.Filters.Count);
+        Assert.AreEqual("Cinderreach Server test-1", q.Filters[0].Value);
+        var o = ServerDirectory.LobbyOptions("ABC123", "0.1.0");
+        Assert.AreEqual(false, o.IsPrivate);
+        Assert.AreEqual("ABC123", o.Data[ServerDirectory.JoinCodeKey].Value);
+    }
+
+    [Test]
+    public void PanelStatus_ShowsServerSearch()
+    {
+        var args = new JoinArgs(JoinArgs.NetMode.Client, null, 0, joinServer: true);
+        Assert.AreEqual("Offline (no NetworkManager)", JoinPanel.StatusText(null, args));
+    }
 }
+

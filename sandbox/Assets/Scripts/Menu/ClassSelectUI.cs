@@ -487,6 +487,15 @@ public sealed class ClassSelectUI : MonoBehaviour
         });
         DiabloUIFactory.SetLayout(coopBtn.gameObject, prefH: 38f, prefW: 130f);
 
+        // cinderreach-dedicated-server S2: one click into the always-on server (no code, no address).
+        var serverBtn = DiabloUIFactory.MakeButton(footerRow.transform, "JoinServerButton", "Join Server", 15, false, null, () =>
+        {
+            DiabloAudio.PlayUIClick();
+            JoinPanel.JoinServer();
+            JoinPanel.Open();
+        });
+        DiabloUIFactory.SetLayout(serverBtn.gameObject, prefH: 38f, prefW: 150f);
+
         var settingsBtn = DiabloUIFactory.MakeButton(footerRow.transform, "SettingsButton", "Settings", 15, false, null, () =>
         {
             DiabloAudio.PlayUIClick();

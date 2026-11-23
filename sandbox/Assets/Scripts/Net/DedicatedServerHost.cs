@@ -15,6 +15,8 @@ public sealed class DedicatedServerHost : MonoBehaviour
     float emptySince = -1f;
     bool readyLogged;
     int lastCount = -1;
+    float nextHeartbeat;
+    bool quitting;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
@@ -31,6 +33,16 @@ public sealed class DedicatedServerHost : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = DedicatedServer.ServerFrameRate;
         StandDownSoloHero();
+    }
+
+    System.Collections.IEnumerator QuitRoutine(NetworkManager nm)
+    {
+        // Unlist first (best effort, max 5 s) so no client picks a server that is going away.
+        var unpublish = ServerDirectory.UnpublishAsync();
+        float until = Time.realtimeSinceStartup + 5f;
+        while (!unpublish.IsCompleted && Time.realtimeSinceStartup < until) yield return null;
+        nm.Shutdown();
+        Application.Quit(0);
     }
 
     /// <summary>Deactivate the scene's offline hero: on a server nobody owns it.</summary>
@@ -52,6 +64,12 @@ public sealed class DedicatedServerHost : MonoBehaviour
             readyLogged = true;
             Debug.Log($"{ReadyLog} (frame cap {DedicatedServer.ServerFrameRate}).");
         }
+        if (ServerDirectory.Published && Time.realtimeSinceStartup >= nextHeartbeat)
+        {
+            nextHeartbeat = Time.realtimeSinceStartup + ServerDirectory.HeartbeatSeconds;
+            _ = ServerDirectory.HeartbeatAsync();
+        }
+        if (quitting) return;
         int count = nm.ConnectedClientsIds.Count;
         if (count != lastCount)
         {
@@ -69,8 +87,8 @@ public sealed class DedicatedServerHost : MonoBehaviour
         {
             Debug.Log("[Server] session over, all players left: quitting for a fresh run.");
             hadPlayers = false;
-            nm.Shutdown();
-            Application.Quit(0);
+            quitting = true;
+            StartCoroutine(QuitRoutine(nm));
         }
     }
 }

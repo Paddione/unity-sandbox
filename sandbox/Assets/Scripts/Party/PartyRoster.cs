@@ -73,7 +73,8 @@ public sealed class PartyRoster : MonoBehaviour
         var args = System.Environment.GetCommandLineArgs();
         for (int i = 0; i < args.Length; i++)
         {
-            if (args[i] == "-join" || args[i] == "--net-client" || args[i] == "-join-code") return true;
+            if (args[i] == "-join" || args[i] == "--net-client" || args[i] == "-join-code"
+                || args[i] == ServerDirectory.JoinServerFlag) return true;
             if (args[i] == "-coop-autoplay" && i + 1 < args.Length && args[i + 1] == "client") return true;
         }
         return false;

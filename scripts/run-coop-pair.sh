@@ -101,16 +101,23 @@ set +e
 if [ "$SERVER" = 1 ]; then
   # cinderreach-dedicated-server S1: headless server without a hero, clients lead/follow.
   SERVER_PEERS=("${PEERS[@]}")
-  echo "run-coop-pair: dedicated server on port $PORT (headless, timeout ${TIMEOUT}s, clients $CLIENTS)"
-  timeout --kill-after=30 "$TIMEOUT" "$PLAYER" -batchmode -nographics -server -port "$PORT" \
+  # S2: COOP_RELAY=1 publishes the server via Relay + Lobby under a run-unique name.
+  SERVER_NET=(-port "$PORT"); JOIN=(-join "127.0.0.1:$PORT")
+  if [ "${COOP_RELAY:-0}" = 1 ]; then
+    NAME="Cinderreach Server test-$$"
+    SERVER_NET=(-server-relay -server-name "$NAME"); JOIN=(-join-server -server-name "$NAME")
+  fi
+  echo "run-coop-pair: dedicated server ${SERVER_NET[*]} (headless, timeout ${TIMEOUT}s, clients $CLIENTS)"
+  timeout --kill-after=30 "$TIMEOUT" "$PLAYER" -batchmode -nographics -server "${SERVER_NET[@]}" \
     -logFile "$OUT/server/player.log" &
   HOST_PID=$!
   for _ in $(seq 1 60); do
     sleep 2
-    grep -aq '\[Server\] ready' "$OUT/server/player.log" 2>/dev/null && break
+    if [ "${COOP_RELAY:-0}" = 1 ]; then grep -aq '\[Server\] published' "$OUT/server/player.log" 2>/dev/null && break
+    else grep -aq '\[Server\] ready' "$OUT/server/player.log" 2>/dev/null && break; fi
     kill -0 "$HOST_PID" 2>/dev/null || break
   done
-  for k in $(seq 1 "$CLIENTS"); do start_client "$k" -join "127.0.0.1:$PORT"; sleep 3; done
+  for k in $(seq 1 "$CLIENTS"); do start_client "$k" "${JOIN[@]}"; sleep 3; done
 elif [ "${COOP_RELAY:-0}" = 1 ]; then
   echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
