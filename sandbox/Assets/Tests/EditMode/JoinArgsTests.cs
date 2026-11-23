@@ -87,9 +87,19 @@ public class JoinArgsTests
         client.Reach(AutoplayResult.PhaseTown);
         Assert.AreEqual(1, client.ComputeExit(), "client needs zone1 too");
         client.Reach(AutoplayResult.PhaseZone1);
-        Assert.AreEqual(1, client.ComputeExit(), "act-two-opening: the client books the Glasswright kill too");
         client.Reach(AutoplayResult.PhaseBoss3);
+        Assert.AreEqual(1, client.ComputeExit(), "coop-trio: the client fights through every zone of Act I and II");
+        foreach (var p in new[] { AutoplayResult.PhaseZone2, AutoplayResult.PhaseBoss, AutoplayResult.PhaseZone3,
+                     AutoplayResult.PhaseActBoss, AutoplayResult.PhaseZone4 })
+            client.Reach(p);
         Assert.AreEqual(0, client.ComputeExit());
+        CollectionAssert.DoesNotContain(AutoplayResult.ClientPhases, AutoplayResult.PhaseComplete,
+            "waypoint home stays host-only");
+
+        Assert.AreEqual(2, CoopAutoplay.PeersFor(new[] { "x" }), "pair run by default");
+        Assert.AreEqual(3, CoopAutoplay.PeersFor(new[] { "x", "-coop-peers", "3" }));
+        Assert.AreEqual(4, CoopAutoplay.PeersFor(new[] { "x", "-coop-peers", "9" }), "clamped to the 4-player cap");
+        Assert.AreEqual(2, CoopAutoplay.PeersFor(new[] { "x", "-coop-peers", "nope" }));
         StringAssert.Contains("\"role\": \"client\"", client.ToJson());
 
         var host = new AutoplayResult { role = AutoplayResult.RoleHost };

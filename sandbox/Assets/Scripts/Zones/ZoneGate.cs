@@ -55,6 +55,14 @@ public sealed class ZoneGate : MonoBehaviour
     /// </summary>
     public const float HostHoldSeconds = 3f;
 
+    /// <summary>
+    /// coop-trio: quiet time after a host broadcast. The travel lands after the
+    /// fade, so without it the host re-broadcast every frame until its own
+    /// teleport (13 duplicate travels per gate in the trio run).
+    /// </summary>
+    public const float BroadcastLockSeconds = 2f;
+    float broadcastLockUntil = -1f;
+
     GameObject dwellHero;
     float dwellSince = -1f;
     Vector3 dwellAnchor;
@@ -182,6 +190,7 @@ public sealed class ZoneGate : MonoBehaviour
             hostHoldSince = -1f;
             return false;
         }
+        if (now < broadcastLockUntil) return false;
         var hostHero = HostHero();
         bool hostOn = hostHero != null && StillOnGate(hostHero.gameObject);
         if (!hostOn)
@@ -205,6 +214,7 @@ public sealed class ZoneGate : MonoBehaviour
         hostHoldSince = -1f;
         var relay = DiabloNetworkPlayer.HostRelay();
         if (relay == null) return false;
+        broadcastLockUntil = now + BroadcastLockSeconds;
         Debug.Log($"[Zone] host broadcasts {gameObject.name} → zone {targetZone} (allOn={allOn}).");
         relay.BroadcastTravel(gameObject.name, destination, targetZone);
         return true;

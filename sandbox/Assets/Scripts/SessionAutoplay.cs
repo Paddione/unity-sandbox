@@ -87,16 +87,18 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (coopHost)
         {
             // coop-session S1: the pair run starts the route once the client is in.
+            // coop-trio: -coop-peers N waits for N players in total (host included).
+            int peers = CoopAutoplay.PeersFor(System.Environment.GetCommandLineArgs());
             var nm = Unity.Netcode.NetworkManager.Singleton;
             float joinBy = Time.realtimeSinceStartup + 90f;
-            while (Time.realtimeSinceStartup < joinBy && (nm == null || nm.ConnectedClientsIds.Count < 2))
+            while (Time.realtimeSinceStartup < joinBy && (nm == null || nm.ConnectedClientsIds.Count < peers))
             {
                 yield return null;
                 nm = Unity.Netcode.NetworkManager.Singleton;
             }
-            if (nm == null || nm.ConnectedClientsIds.Count < 2)
+            if (nm == null || nm.ConnectedClientsIds.Count < peers)
             {
-                Log("FAIL co-op client did not join within 90 s");
+                Log($"FAIL co-op: {(nm == null ? 0 : nm.ConnectedClientsIds.Count)}/{peers} players within 90 s");
                 Finish(1);
                 yield break;
             }

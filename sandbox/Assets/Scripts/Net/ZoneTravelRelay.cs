@@ -24,12 +24,14 @@ public static class ZoneTravelRelay
     /// <summary>
     /// Pure group-travel gate (S3): fire when every living hero stands on the
     /// gate, or when the host held it for <see cref="ZoneGate.HostHoldSeconds"/>
-    /// (pulls stragglers along). Never on a locked gate.
+    /// (pulls stragglers along). Never on a locked gate. coop-trio: the whole
+    /// group must still dwell <see cref="ZoneGate.DwellSeconds"/> like solo —
+    /// a party walking past the Fen gate together must not be yanked through.
     /// </summary>
     public static bool GroupReady(bool allLivingOnGate, float hostHoldTime, bool locked)
     {
         if (locked) return false;
-        if (allLivingOnGate) return true;
+        if (allLivingOnGate) return hostHoldTime >= ZoneGate.DwellSeconds;
         return hostHoldTime >= ZoneGate.HostHoldSeconds;
     }
 

@@ -13,6 +13,11 @@
 # two players share one GPU, the pair proves content, not frame rate.
 # Classes: COOP_HOST_CLASS / COOP_CLIENT_CLASS set the -class flag per side
 # (party-roles S5: e.g. host fenwalker + client rogue to prove role replacement).
+# Group (coop-trio): COOP_CLIENTS=N (1..3, default 1) starts N clients; the host
+# waits for all of them (-coop-peers N+1). Client k>1 writes to client<k>/,
+# saves to coop-client<k>.json and takes its class from COOP_CLIENT<k>_CLASS.
+# COOP_CLIENT_GOD=0 drops -autoplay-god on the clients (mortal clients: they
+# take real damage, so healers have hurt allies to mend; the host stays god).
 #
 # Exit = max(host, client); 2 = hang (COOP_TIMEOUT, default 1200 s).
 # Usage (repo root): bash scripts/run-coop-pair.sh [out_dir]
@@ -25,7 +30,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 OUT="${1:-$ROOT/artifacts/coop/$(date +%F)}"
-mkdir -p "$OUT/host" "$OUT/client"
+CLIENTS="${COOP_CLIENTS:-1}"
+case "$CLIENTS" in 1|2|3) ;; *) echo "run-coop-pair: COOP_CLIENTS must be 1..3, got $CLIENTS" >&2; exit 1 ;; esac
+cdir() { [ "$1" -eq 1 ] && echo client || echo "client$1"; }   # client k -> out subdir
+csave() { [ "$1" -eq 1 ] && echo coop-client.json || echo "coop-client$1.json"; }
+cclass() { if [ "$1" -eq 1 ]; then echo "${COOP_CLIENT_CLASS:-}"; else local v="COOP_CLIENT$1_CLASS"; echo "${!v:-}"; fi; }
+mkdir -p "$OUT/host"
+for k in $(seq 1 "$CLIENTS"); do mkdir -p "$OUT/$(cdir "$k")"; done
 OUT="$(cd "$OUT" && pwd)"
 TIMEOUT="${COOP_TIMEOUT:-1200}"
 PORT="${COOP_PORT:-7790}"
@@ -52,24 +63,38 @@ case "$MODE" in
   *) echo "run-coop-pair: COOP_DISPLAY must be auto|wslg|xvfb, got $MODE" >&2; exit 1 ;;
 esac
 
-COMMON=(-screen-width 960 -screen-height 540 -screen-fullscreen 0 -autoplay-god -autoplay-commit "$COMMIT")
-rm -f "$OUT/host/autoplay-result.json" "$OUT/client/autoplay-result.json"
+COMMON=(-screen-width 960 -screen-height 540 -screen-fullscreen 0 -autoplay-commit "$COMMIT")
+GOD=(-autoplay-god)
+CLIENT_GOD=(-autoplay-god)
+[ "${COOP_CLIENT_GOD:-1}" = 0 ] && CLIENT_GOD=()
+rm -f "$OUT"/*/autoplay-result.json
 # Fresh saves per run (S6): loot accumulates in the bag across runs, and a
 # full bag would fail the deterministic town potion buy. Previous saves are
 # archived with a timestamp, never silently deleted.
 SAVEDIR="${XDG_CONFIG_HOME:-$HOME/.config}/unity3d/Unity Technologies/Cinderreach"
-for s in coop-host.json coop-client.json; do
+for s in coop-host.json $(for k in $(seq 1 "$CLIENTS"); do csave "$k"; done); do
   if [ -f "$SAVEDIR/$s" ]; then
     bak="$SAVEDIR/$s.bak-$(date +%F-%H%M%S)"
     mv "$SAVEDIR/$s" "$bak" && echo "run-coop-pair: archived stale save to $bak"
   fi
 done
 
+PEERS=(-coop-peers $((CLIENTS + 1)))
+start_client() { # k target-args...
+  local k=$1; shift
+  local cls; cls="$(cclass "$k")"
+  echo "run-coop-pair: client $k -> $* ${cls:+(class $cls)}"
+  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" ${CLIENT_GOD[@]+"${CLIENT_GOD[@]}"} \
+    "$@" -coop-autoplay client ${cls:+-class "$cls"} -save-file "$(csave "$k")" \
+    -autoplay-out "$OUT/$(cdir "$k")" -logFile "$OUT/$(cdir "$k")/player.log" &
+  CLIENT_PIDS+=($!)
+}
+CLIENT_PIDS=()
+set +e
 if [ "${COOP_RELAY:-0}" = 1 ]; then
-  echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s)"
-  set +e
+  echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-    -host-relay -autoplay -coop-autoplay host -save-file coop-host.json \
+    "${GOD[@]}" -host-relay -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
     -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
   HOST_PID=$!
   echo "run-coop-pair: waiting for relay join code..."
@@ -81,26 +106,18 @@ if [ "${COOP_RELAY:-0}" = 1 ]; then
     kill -0 "$HOST_PID" 2>/dev/null || break
   done
   if [ -z "$CODE" ]; then echo "run-coop-pair: no relay join code from host" >&2; fi
-  echo "run-coop-pair: client -> relay code $CODE"
-  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-    -join-code "$CODE" -coop-autoplay client -save-file coop-client.json \
-    -autoplay-out "$OUT/client" -logFile "$OUT/client/player.log" &
-  CLIENT_PID=$!
+  for k in $(seq 1 "$CLIENTS"); do start_client "$k" -join-code "$CODE"; sleep 3; done
 else
-echo "run-coop-pair: host on port $PORT (display $MODE, timeout ${TIMEOUT}s)"
-set +e
-timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-  -host -port "$PORT" -autoplay -coop-autoplay host ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
-  -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
-HOST_PID=$!
-sleep 8
-echo "run-coop-pair: client -> 127.0.0.1:$PORT"
-timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-  -join "127.0.0.1:$PORT" -coop-autoplay client ${COOP_CLIENT_CLASS:+-class "$COOP_CLIENT_CLASS"} -save-file coop-client.json \
-  -autoplay-out "$OUT/client" -logFile "$OUT/client/player.log" &
-CLIENT_PID=$!
+  echo "run-coop-pair: host on port $PORT (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
+  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
+    "${GOD[@]}" -host -port "$PORT" -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
+    -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
+  HOST_PID=$!
+  sleep 8
+  for k in $(seq 1 "$CLIENTS"); do start_client "$k" -join "127.0.0.1:$PORT"; sleep 3; done
 fi
-wait "$CLIENT_PID"; CLIENT_RC=$?
+CLIENT_RCS=()
+for pid in "${CLIENT_PIDS[@]}"; do wait "$pid"; CLIENT_RCS+=($?); done
 wait "$HOST_PID"; HOST_RC=$?
 set -e
 
@@ -117,11 +134,15 @@ sys.exit(d["exit"])
 PY
 }
 set +e
-verdict client "$CLIENT_RC"; C=$?
+EXIT=0
+for k in $(seq 1 "$CLIENTS"); do
+  d="$(cdir "$k")"
+  verdict "$d" "${CLIENT_RCS[$((k - 1))]}"; C=$?
+  grep -a '\[CoopAutoplay\]' "$OUT/$d/player.log" | tail -n 8 || true
+  [ "$C" -gt "$EXIT" ] && EXIT=$C
+done
 verdict host "$HOST_RC"; H=$?
 set -e
-grep -a '\[CoopAutoplay\]' "$OUT/client/player.log" | tail -n 8 || true
-EXIT=$C
 [ "$H" -gt "$EXIT" ] && EXIT=$H
-echo "run-coop-pair: host $H, client $C -> $EXIT (logs $OUT/{host,client}/player.log)"
+echo "run-coop-pair: host $H, clients ${CLIENTS} -> $EXIT (logs $OUT/*/player.log)"
 exit "$EXIT"

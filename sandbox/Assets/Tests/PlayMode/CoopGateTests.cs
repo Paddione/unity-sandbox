@@ -52,10 +52,12 @@ public class CoopGateTests
     }
 
     [UnityTest]
-    public IEnumerator GroupReady_AllLivingOnGate_Fires()
+    public IEnumerator GroupReady_AllLivingOnGate_FiresAfterGroupDwell()
     {
-        Assert.IsTrue(ZoneTravelRelay.GroupReady(allLivingOnGate: true, hostHoldTime: 0f, locked: false));
-        Assert.IsTrue(ZoneTravelRelay.GroupReady(allLivingOnGate: true, hostHoldTime: 0f, locked: false),
+        Assert.IsFalse(ZoneTravelRelay.GroupReady(allLivingOnGate: true, hostHoldTime: 0f, locked: false),
+            "coop-trio: a party walking past the gate together is not pulled through");
+        Assert.IsTrue(ZoneTravelRelay.GroupReady(allLivingOnGate: true, hostHoldTime: ZoneGate.DwellSeconds, locked: false));
+        Assert.IsTrue(ZoneTravelRelay.GroupReady(allLivingOnGate: true, hostHoldTime: ZoneGate.DwellSeconds, locked: false),
             "idempotent");
         yield return null;
     }

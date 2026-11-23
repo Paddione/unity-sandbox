@@ -21,6 +21,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         itemSessionReady = false;
+        IgnoreAllyCollisions(gameObject);
         if (IsOwner)
         {
             TakeOverSoloHero(gameObject);
@@ -38,6 +39,36 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             classIndex.OnValueChanged += (_, now) => ApplyClassIndex(now);
             ApplyClassIndex(classIndex.Value);
         }
+    }
+
+    /// <summary>
+    /// coop-trio: heroes pass through each other. Each hero's CharacterController
+    /// otherwise body-blocks the others, and click-to-move steers in a straight
+    /// line, so an ally standing in a lane stalled a teammate for good (host
+    /// stuck 120 s behind a client in the trio run). Enemies and walls still block.
+    /// Runs on every process for each spawned hero, so all pairs are covered.
+    /// </summary>
+    public static int IgnoreAllyCollisions(GameObject hero)
+    {
+        var mine = hero != null ? hero.GetComponent<CharacterController>() : null;
+        var others = new System.Collections.Generic.List<CharacterController>();
+        foreach (var p in Object.FindObjectsByType<DiabloNetworkPlayer>(FindObjectsSortMode.None))
+            if (p != null && p.gameObject != hero) others.Add(p.GetComponent<CharacterController>());
+        return IgnorePairs(mine, others);
+    }
+
+    /// <summary>Ignore collisions between one hero controller and each ally controller (test seam).</summary>
+    public static int IgnorePairs(CharacterController mine, System.Collections.Generic.IEnumerable<CharacterController> allies)
+    {
+        if (mine == null || allies == null) return 0;
+        int n = 0;
+        foreach (var other in allies)
+        {
+            if (other == null || other == mine) continue;
+            Physics.IgnoreCollision(mine, other, true);
+            n++;
+        }
+        return n;
     }
 
     /// <summary>Spawn-time save load rule: joining clients only (pure, EditMode-pinnable).</summary>
@@ -321,21 +352,11 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     void NotifyZoneBossKillClientRpc()
     {
         if (IsServer) return; // the host books it in GlasswrightController.OnEnemyDeath
-        // Clients never booked the act chain (Abbot/Kilnmother kills only save on
-        // clients); the host's Glasswright kill proves both, so catch it up here.
-        if (!RunProfile.Act.IsUnlocked(ActProgress.Kiln)) RunProfile.Act.Unlock(ActProgress.Kiln);
-        if (!RunProfile.Act.ActOneComplete) RunProfile.Act.CompleteAct();
+        // A client that joined late (or missed a broadcast) catches the act chain up here.
+        if (!RunProfile.Act.ActOneComplete) BookKilnmotherKill();
         bool booked = RunProfile.Act.DefeatZoneBoss();
         Debug.Log($"[Net] zone boss kill from host: booked={booked} defeated={RunProfile.Act.ZoneBossDefeated}.");
-        var nm = NetworkManager.Singleton;
-        GameObject hero = null;
-        if (nm != null && nm.IsListening && nm.SpawnManager != null)
-        {
-            var local = nm.SpawnManager.GetLocalPlayerObject();
-            if (local != null) hero = local.gameObject;
-        }
-        if (hero == null) hero = GameObject.Find(HeroName);
-        if (hero != null) SaveService.SaveNow(hero);
+        SaveLocalHero();
         try { MusicDirector.Ensure().PlayZone(ActProgress.Barrens); } catch { }
     }
 
@@ -350,6 +371,47 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     void NotifyBossKillClientRpc()
     {
         if (IsServer) return; // the host saves through OnBossDeath directly
+        BookAbbotKill();
+        SaveLocalHero();
+    }
+
+    /// <summary>
+    /// coop-trio: a client books the host's Abbot kill like solo (Kindled unlock,
+    /// Cinder Kiln open), so its own save carries the act state.
+    /// </summary>
+    public static void BookAbbotKill()
+    {
+        bool kindled = DifficultyProfile.UnlockKindled();
+        SessionComplete.KindledUnlockedThisRun |= kindled;
+        bool kiln = RunProfile.Act.Unlock(ActProgress.Kiln);
+        Debug.Log($"[Net] abbot kill from host: kilnOpened={kiln} kindled={kindled}.");
+    }
+
+    /// <summary>coop-trio: a client books the host's Kilnmother kill (Act I complete, Barrens open).</summary>
+    public static void BookKilnmotherKill()
+    {
+        if (!RunProfile.Act.IsUnlocked(ActProgress.Kiln)) RunProfile.Act.Unlock(ActProgress.Kiln);
+        bool completed = RunProfile.Act.CompleteAct();
+        Debug.Log($"[Net] kilnmother kill from host: actCompleted={completed} barrens={RunProfile.Act.IsUnlocked(ActProgress.Barrens)}.");
+    }
+
+    /// <summary>Server: tell every client the Kilnmother fell (Act I state + autosave).</summary>
+    public void BroadcastActBossKill()
+    {
+        if (!IsServer || !IsSpawned) return;
+        NotifyActBossKillClientRpc();
+    }
+
+    [ClientRpc]
+    void NotifyActBossKillClientRpc()
+    {
+        if (IsServer) return; // the host books it in KilnmotherController.OnEnemyDeath
+        BookKilnmotherKill();
+        SaveLocalHero();
+    }
+
+    static void SaveLocalHero()
+    {
         var nm = NetworkManager.Singleton;
         GameObject hero = null;
         if (nm != null && nm.IsListening && nm.SpawnManager != null)

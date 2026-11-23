@@ -62,13 +62,13 @@ public sealed class AutoplayResult
     public const string RoleClient = "client";
 
     /// <summary>
-    /// Phases a co-op client must reach: it follows the host through Lantern
-    /// Hold and the Ashen Fen (coop-session S1). Later stages extend the list
-    /// as gates and bosses become co-op.
+    /// Phases a co-op client must reach (coop-trio): it follows the host from
+    /// Lantern Hold through all four zones, fights in each, and books every boss
+    /// kill the host broadcasts (Abbot, Kilnmother, Glasswright). Only the
+    /// host-side <c>gate</c> step and the waypoint-home <c>complete</c> stay host-only.
     /// </summary>
-    /// act-two-opening S5: the client stays through the host's route and must
-    /// book the Glasswright kill the host broadcasts (<c>boss3</c>).
-    public static readonly string[] ClientPhases = { PhaseTown, PhaseZone1, PhaseBoss3 };
+    public static readonly string[] ClientPhases =
+        { PhaseTown, PhaseZone1, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3 };
 
     /// <summary>Required phases for a role (solo and host play the full route).</summary>
     public static string[] RequiredFor(string role) => role == RoleClient ? ClientPhases : RequiredPhases;

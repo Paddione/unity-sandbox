@@ -130,6 +130,9 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
             catch (System.Exception e) { Debug.LogWarning($"[Kilnmother] Kindled reward failed: {e.Message}"); }
             SaveService.SaveNow(hero);
         }
+        // coop-trio: clients book Act I and autosave their own hero, like solo.
+        var relay = DiabloNetworkPlayer.HostRelay();
+        if (relay != null) relay.BroadcastActBossKill();
         SessionComplete.ShowActComplete(hero);
     }
 

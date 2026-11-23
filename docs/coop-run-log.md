@@ -67,3 +67,38 @@ Windows-Läufe zusätzlich über Einmal-Harness `/tmp/coop-win.sh`
   direkt `cinderreach.exe -join 127.0.0.1:7790 -coop-autoplay client ...`
   oder per Code `cinderreach.exe -join-code <CODE> -coop-autoplay client ...`.
   Shotcheck: `bash scripts/shotcheck-windows.sh` vom Repo-Root.
+
+## Dreiergruppe Akt I + II (coop-trio, 2026-11-23)
+
+Harness: `COOP_CLIENTS=2 [COOP_CLIENT_GOD=0] COOP_HOST_CLASS=… COOP_CLIENT_CLASS=… COOP_CLIENT2_CLASS=… bash scripts/run-coop-pair.sh <out>`.
+Host wartet per `-coop-peers 3` auf beide Clients. Clients kämpfen in jeder Zone mit Rollen-Skills und
+buchen jede Boss-Meldung des Hosts. Artefakte unter `artifacts/coop-trio/run<N>/{host,client,client2}/`.
+
+| Lauf | Klassen (Host/C1/C2) | Clients | Ergebnis | Befund |
+|---|---|---|---|---|
+| 1 | Fenwalker/Rogue/Lanternbearer | god | Host 10/10, C1 8/8, C2 8/8, 0 Exceptions | Saves aller drei: Kiln offen, Akt I, Glasswright, Level 5 |
+| 2 | dto. | sterblich | Host ohne `zone1`, Clients ohne `zone1` | F1/F2 Gate, Heiler ohne `zone4` (Bolts zählten nicht) |
+| 3 | dto. | sterblich | Clients 8/8, Host ohne `zone1` | F3 Host 120 s hinter stehendem Client blockiert |
+| 4 | dto. | sterblich | Host 10/10, C1 8/8, C2 8/8, 0 Exceptions, 194 s | Heals 8 / 24 HP, Rogue fällt am Glasswright und steigt wieder ein |
+| 5 | Lanternbearer/Fenwalker/Rogue | sterblich | Host 10/10, C1 8/8, C2 8/8, 0 Exceptions, 199 s | Rollen getauscht grün |
+| Paar | Standard (1 Client) | god | Host 10/10, Client 8/8 | Regression des Harness-Umbaus grün |
+
+Behobene Fehler:
+
+- B1: Clients buchten den Abbot-Kill nicht (Kiln im Client-Stand und -Save gesperrt, kein Kindled).
+  Jetzt `NotifyBossKillClientRpc` → `BookAbbotKill`.
+- B2: Der Kilnmother-Kill erreichte Clients gar nicht (Akt I nie abgeschlossen bis zum Glasswright).
+  Jetzt `BroadcastActBossKill` → `BookKilnmotherKill` + Autosave.
+- F1: Gruppentor feuerte ohne Verweilzeit, sobald alle Lebenden im Tor-Bereich standen. Das FenGate (0,1,−6)
+  liegt am Weg in den Fen, die Gruppe wurde im Vorbeigehen ins Ossuary gezogen. Jetzt 0,6 s wie solo.
+- F2: Nach einem Broadcast sendete der Host bis zum eigenen Teleport jeden Frame erneut (13× pro Tor,
+  Clients teleportierten mehrfach). Jetzt 2 s Sperre (`ZoneGate.BroadcastLockSeconds`), 3 Broadcasts je Lauf.
+- F3: Helden blockierten sich per `CharacterController`, ein stehender Mitspieler sperrte den Weg dauerhaft.
+  Jetzt `DiabloNetworkPlayer.IgnoreAllyCollisions` bei jedem Netz-Spawn. Gegner und Wände blocken weiter.
+
+Offen:
+
+- Mitspieler-HP werden nicht repliziert (Gegnerschaden bleibt pro Client, `EnemyAttack.AcquireHero`).
+  Heilziele richten sich nach lokalen Mirror-HP, ein Host-Heiler sieht verletzte Clients nicht verlässlich.
+- Host-Autoplay als Lanternbearer castet keine Heil-Skills (Treiberlücke, `SessionAutoplay.CastProfile`).
+- Boss-Overlays (`SessionComplete`) erscheinen nur beim Host, Clients sehen keinen Akt-Abschluss-Bildschirm.

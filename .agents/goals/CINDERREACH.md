@@ -141,7 +141,13 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 ### Gruppe und Koop
 
 - Solo-KI (`Party/PartyCompanion`, `PartyRoster`) füllt fehlende Rollen auf drei auf, folgt, kämpft,
-  heilt. Koop-Ersatz der KI durch Spieler gleicher Rolle ist S5 von Party Roles (offen).
+  heilt. Koop-Spieler ersetzen die KI ihrer Rolle 1:1 (max. drei Rollen).
+- Dreiergruppe (coop-trio, 2026-11-23): Host + zwei Clients spielen Akt I und die Glass Barrens
+  komplett durch (`COOP_CLIENTS=2 bash scripts/run-coop-pair.sh`, Host wartet per `-coop-peers 3`).
+  Clients buchen die Boss-Kills des Hosts in ihren eigenen Akt-Stand und Save (Abbot → Kindled + Kiln,
+  Kilnmother → Akt I + Barrens, Glasswright). Gruppen-Tore verlangen wie solo 0,6 s Verweilzeit und
+  senden nach einem Broadcast 2 s lang nicht erneut. Helden blockieren sich nicht gegenseitig
+  (`DiabloNetworkPlayer.IgnoreAllyCollisions`). Beleg `docs/coop-run-log.md`.
 - NGO-Host-Modell: `-host [-port N]`, `-join ip[:port]`, `-host-relay`, `-join-code` (UGS Multiplayer
   Services 2.5.0, Relay), `JoinPanel` (F7). Host-autoritative Treffer (`Net/HitValidator`),
   Gegner-HP/Phasen/Summons repliziert, Gruppenreise über Tore (`ZoneTravelRelay`), Gold/Vendor/Loot
@@ -199,10 +205,12 @@ liest für Menüs ohne Nebenwirkung.
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   `autoplay-result.json` mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
-  complete` (Koop-Client: `town, zone1, boss3`, er bucht den Glasswright-Kill des Hosts samt Akt-Kette).
+  complete` (Koop-Client siehe Koop-Paarlauf).
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Nightly
   `.github/workflows/autoplay-nightly.yml` (02:30, Runner `unity-licensed`) für Normal, Kindled und
-  Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay).
+  Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
+  Dreiergruppe, `COOP_CLIENT_GOD=0` für sterbliche Clients). Koop-Client-Phasen: `town, zone1, zone2,
+  boss, zone3, actboss, zone4, boss3` (je Zone Treffer oder Angriffs-Casts, je Boss die gebuchte Kill-Meldung).
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
   (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
   WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 131,5 fps über die volle Route bis zum Glasswright, 2026-11-22). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.

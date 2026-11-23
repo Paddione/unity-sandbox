@@ -11,18 +11,19 @@ using UnityEngine;
 /// husks near it (hits go through the validated ServerRpc), then writes its own
 /// <see cref="AutoplayResult"/> with <c>role: client</c> and the
 /// <see cref="AutoplayResult.ClientPhases"/>: <c>town</c> once it stood next to
-/// the host in Lantern Hold, <c>zone1</c> once it landed hits in the Ashen Fen
-/// and stayed connected until the host left the Fen (or the Fen is clear).
+/// the host in Lantern Hold, then (coop-trio) one phase per zone it fought in
+/// and per boss kill the host broadcast, through Act I and the Glass Barrens.
+/// Several clients may run at once (<c>-coop-peers</c> on the host).
 /// </summary>
 public sealed class CoopAutoplay : MonoBehaviour
 {
     public const string Flag = "-coop-autoplay";
     public const float FollowDistance = 3f;
     public const float EngageRange = 9f;
-    /// <summary>Hits the client must land in the Fen for zone1.</summary>
-    public const int MinFenHits = 3;
-    /// <summary>The host left the Fen once its mirror is beyond this X (Ossuary at +200 m).</summary>
-    public const float FenLeftX = 150f;
+    /// <summary>Strikes or attack casts the client must make in a zone to book it.</summary>
+    public const int MinZoneHits = 3;
+    /// <summary>Players the host waits for before the route starts (<c>-coop-peers N</c>, default 2).</summary>
+    public const string PeersFlag = "-coop-peers";
     public const float Budget = 1000f;
 
     /// <summary>"host", "client" or null (no pair run).</summary>
@@ -40,8 +41,20 @@ public sealed class CoopAutoplay : MonoBehaviour
         return null;
     }
 
+    /// <summary>Total players (host included) a pair/trio run waits for; 2..4.</summary>
+    public static int PeersFor(string[] args)
+    {
+        if (args != null)
+            for (int i = 0; i + 1 < args.Length; i++)
+                if (args[i] == PeersFlag && int.TryParse(args[i + 1], out int n))
+                    return Mathf.Clamp(n, 2, 4);
+        return 2;
+    }
+
     int exceptions;
     int hits;
+    int roleCasts;
+    int deaths;
     readonly AutoplayResult result = new AutoplayResult { role = AutoplayResult.RoleClient };
     float startedAt;
 
@@ -118,84 +131,129 @@ public sealed class CoopAutoplay : MonoBehaviour
         result.Reach(AutoplayResult.PhaseTown);
         Log("phase town: next to the host");
 
-        // 3. Fen: follow and fight until the host leaves the Fen or the Fen is clear.
+        // 3. coop-trio: follow the host through every zone and fight next to it.
+        // The host's gate broadcasts pull this hero from zone to zone; per zone it
+        // must land MinZoneHits validated hits, and each boss kill the host
+        // broadcasts must be booked here (Abbot → Kiln open, Kilnmother → Act I,
+        // Glasswright → zone boss). Ends with the Glasswright kill.
         var skills = hero.GetComponent<DiabloSkills>();
-        bool hostLeft = false, clear = false;
-        float quietSince = -1f;
-        while (Time.realtimeSinceStartup < deadline && Connected())
+        var zoneHits = new int[ActProgress.LastZone + 1];
+        int lastZone = ActProgress.Town;
+        bool wasDown = false;
+        float lastLog = Time.realtimeSinceStartup;
+        while (Time.realtimeSinceStartup < deadline && Connected() && !RunProfile.Act.ZoneBossDefeated)
         {
             Refill(hero, god);
+            var hp = hero.GetComponent<PlayerHealth>();
+            bool down = hp != null && hp.CurrentHP <= 0f;
+            if (down && !wasDown) { deaths++; Log($"hero down (deaths={deaths}) at {Fmt(hero.transform.position)}"); }
+            wasDown = down;
+            int zone = EncounterLayout.CurrentZone(hero.transform.position);
+            if (zone != lastZone)
+            {
+                Log($"zone {lastZone} → {zone}: hits there {zoneHits[lastZone]}, hero at {Fmt(hero.transform.position)}");
+                lastZone = zone;
+            }
+            BookPhases(zoneHits, zone);
             host = HostMirror();
             if (host == null) { yield return null; continue; }
-            if (host.position.x > FenLeftX) { hostLeft = true; break; }
+            if (Time.realtimeSinceStartup - lastLog > 30f)
+            {
+                lastLog = Time.realtimeSinceStartup;
+                Log($"following the host: zone {zone} hits {zoneHits[zone]} hero {Fmt(hero.transform.position)} host {Fmt(host.position)}");
+            }
             var husk = NearestHusk(hero.transform.position, host.position);
             if (husk != null)
             {
-                quietSince = -1f;
                 var to = Flat(husk.transform.position - hero.transform.position);
                 if (to.magnitude > hero.attackRange) hero.AttackTarget(husk);
                 else
                 {
                     hero.SetAimPoint(husk.transform.position);
-                    if (hero.Strike()) hits++;
-                    if (skills != null && skills.CooldownLeft(DiabloSkills.Skill.Fireball) <= 0f) skills.CastToward(DiabloSkills.Skill.Fireball, to);
+                    if (hero.Strike()) { hits++; zoneHits[zone]++; }
                 }
+                // Ranged classes (healer bolts, rogue shots) fight mostly by cast:
+                // a cast at a husk counts as taking part in the zone like a strike.
+                if (RoleCast(skills, to)) { roleCasts++; zoneHits[zone]++; }
             }
             else
             {
+                if (skills != null && TryHeal(skills)) roleCasts++;
                 var away = Flat(hero.transform.position - host.position);
                 if (away.magnitude > FollowDistance)
                     hero.SetDestination(host.position + away.normalized * FollowDistance);
-                if (hits >= MinFenHits)
-                {
-                    if (quietSince < 0f) quietSince = Time.realtimeSinceStartup;
-                    if (Time.realtimeSinceStartup - quietSince > 20f && NoHuskWithin(host.position, 40f))
-                    {
-                        clear = true;
-                        break;
-                    }
-                }
             }
             yield return null;
         }
-        Log($"phase fen: hits={hits} hostLeft={hostLeft} clear={clear} connected={Connected()}");
-        if (hits >= MinFenHits && (hostLeft || clear)) result.Reach(AutoplayResult.PhaseZone1);
-        // S3: stay for the host's gate broadcast so both sides reach zone 2.
-        // The broadcast pulls this hero to the Ossuary (own x passes FenLeftX);
-        // fall back to quitting after the grace period (zone1 credit kept).
-        float graceBy = Time.realtimeSinceStartup
-            + (result.phases.Contains(AutoplayResult.PhaseZone1) ? 60f : 0f);
-        bool pulled = false;
-        while (Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < graceBy && Connected())
-        {
-            if (hero.transform.position.x > FenLeftX)
-            {
-                Log("phase zone2: pulled to the Ossuary by the host broadcast");
-                pulled = true;
-                break;
-            }
-            yield return null;
-        }
-        // act-two-opening S5: ride the host's gate broadcasts through the Kiln into
-        // the Glass Barrens and wait for the Glasswright kill to be booked here.
-        if (pulled)
-        {
-            float lastLog = Time.realtimeSinceStartup;
-            while (Time.realtimeSinceStartup < deadline && Connected() && !RunProfile.Act.ZoneBossDefeated)
-            {
-                Refill(hero, god);
-                if (Time.realtimeSinceStartup - lastLog > 30f)
-                {
-                    lastLog = Time.realtimeSinceStartup;
-                    Log($"following the host: hero at {hero.transform.position}");
-                }
-                yield return null;
-            }
-            Log($"phase boss3: zoneBossDefeated={RunProfile.Act.ZoneBossDefeated} hero at {hero.transform.position} connected={Connected()}");
-            if (RunProfile.Act.ZoneBossDefeated) result.Reach(AutoplayResult.PhaseBoss3);
-        }
+        BookPhases(zoneHits, EncounterLayout.CurrentZone(hero.transform.position));
+        Log($"route end: hits={hits} roleCasts={roleCasts} deaths={deaths} perZone=[{zoneHits[1]},{zoneHits[2]},{zoneHits[3]},{zoneHits[4]}] " +
+            $"kiln={RunProfile.Act.IsUnlocked(ActProgress.Kiln)} actOne={RunProfile.Act.ActOneComplete} " +
+            $"zoneBoss={RunProfile.Act.ZoneBossDefeated} connected={Connected()}");
         DiabloClickController.ExternalDrive = false;
         Finish();
+    }
+
+    /// <summary>
+    /// Client phase booking (coop-trio): zoneN once the hero landed
+    /// <see cref="MinZoneHits"/> strikes or attack casts there and moved on (zone 4 counts in place),
+    /// bosses once the host's kill broadcast changed this process's act state.
+    /// </summary>
+    void BookPhases(int[] zoneHits, int zone)
+    {
+        if (zoneHits[ActProgress.Town] >= MinZoneHits && zone > ActProgress.Town) Reach(AutoplayResult.PhaseZone1);
+        if (zoneHits[ActProgress.Ossuary] >= MinZoneHits) Reach(AutoplayResult.PhaseZone2);
+        if (RunProfile.Act.IsUnlocked(ActProgress.Kiln)) Reach(AutoplayResult.PhaseBoss);
+        if (zoneHits[ActProgress.Kiln] >= MinZoneHits) Reach(AutoplayResult.PhaseZone3);
+        if (RunProfile.Act.ActOneComplete) Reach(AutoplayResult.PhaseActBoss);
+        if (zoneHits[ActProgress.Barrens] >= MinZoneHits) Reach(AutoplayResult.PhaseZone4);
+        if (RunProfile.Act.ZoneBossDefeated) Reach(AutoplayResult.PhaseBoss3);
+    }
+
+    void Reach(string phase)
+    {
+        if (result.phases.Contains(phase)) return;
+        result.Reach(phase);
+        Log($"phase {phase}");
+    }
+
+    /// <summary>
+    /// coop-trio: the client plays its class like a player would — specialty
+    /// skills by role (casts go out as host-validated intents), base Fireball
+    /// otherwise. True when a cast went out.
+    /// </summary>
+    static bool RoleCast(DiabloSkills skills, Vector3 to)
+    {
+        if (skills == null) return false;
+        float dist = to.magnitude;
+        switch (skills.ActiveClass.role)
+        {
+            case ClassDefinition.PartyRole.Tank:
+                if (dist <= skills.slamRadius && skills.CastToward(DiabloSkills.Skill.SeismicSlam, to)) return true;
+                break;
+            case ClassDefinition.PartyRole.Dps:
+                if (dist <= skills.flurryRadius && skills.CastToward(DiabloSkills.Skill.BladeFlurry, to)) return true;
+                if (dist <= skills.quickShotRange && skills.CastToward(DiabloSkills.Skill.QuickShot, to)) return true;
+                break;
+            case ClassDefinition.PartyRole.Healer:
+                if (TryHeal(skills)) return true;
+                if (dist <= skills.lanternBoltRange && skills.CastToward(DiabloSkills.Skill.LanternBolt, to)) return true;
+                break;
+        }
+        return skills.CastToward(DiabloSkills.Skill.Fireball, to);
+    }
+
+    /// <summary>Healer only: group heal when two allies are hurt nearby, else mend the nearest hurt ally.</summary>
+    static bool TryHeal(DiabloSkills skills)
+    {
+        if (skills.ActiveClass.role != ClassDefinition.PartyRole.Healer) return false;
+        int hurt = 0;
+        foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            if (hp == null || hp.CurrentHP <= 0f || hp.CurrentHP >= hp.MaxHP) continue;
+            if (Flat(hp.transform.position - skills.transform.position).magnitude <= skills.groupHealRadius) hurt++;
+        }
+        if (hurt >= 2 && skills.CastToward(DiabloSkills.Skill.RenewingCircle, skills.transform.forward)) return true;
+        return skills.CastToward(DiabloSkills.Skill.MendingLight, skills.transform.forward);
     }
 
     void Finish()
