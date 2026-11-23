@@ -27,6 +27,12 @@ jobs:
         with:
           lfs: true
           persist-credentials: false
+          # Reuse Unity's import cache in this persistent runner workspace.
+          clean: false
+
+      - name: Clean workspace except Unity import cache
+        id: clean
+        run: git clean -ffdx -e /sandbox/Library/
 
       - name: Test runner scripts
         run: python3 -m pytest scripts -q
@@ -36,8 +42,11 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.clean.outcome == 'success'
         with:
           name: Test results
-          path: artifacts
+          path: |
+            artifacts/EditMode.*
+            artifacts/PlayMode.*
+            artifacts/warmup-*.log
           retention-days: 14
