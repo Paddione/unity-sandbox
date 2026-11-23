@@ -926,3 +926,19 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Lanternbearer von vorn unverwundbar. Jetzt 60 % Reduktion, gerundet, mindestens 1 Schaden.
 - Sichtprüfung: Augurs gleiten zwar ohne Laufanimation, im Kampf fällt das zwischen Splitterfeldern kaum auf.
   Kein Blocker, als Politurpunkt notiert.
+
+## 2026-11-23 — Welt-Texturen
+
+- Bisher trug nur der Fen-Boden eine Textur. Ossuary, Kiln, Barrens und die Siedlungsobjekte waren
+  einfarbige Greybox-Würfel, die Blender-Props Flachfarben ohne UVs. Jetzt 16 prozedurale, nahtlose
+  Textursätze mit Normal-Maps: Schieferplatten und Quader im Ossuary, Basaltplatten mit glimmenden Fugen und
+  Brandziegel im Kiln, windgeriffelter Aschesand und geschichteter Sandstein in den Barrens, Moor mit Kieseln,
+  Rinde, Holz, Stein, Eisen und Knochen an den Props.
+- Welt-UVs statt Objekt-UVs: gestreckte Würfel behalten die Texeldichte, benachbarte Blöcke wiederholen nicht
+  dieselbe Kachelphase.
+- Erster Kiln-Entwurf leuchtete zu stark und überstrahlte Lancer-Telegraphen, erster Barrens-Sand wirkte wie
+  Zebrastreifen. Beides nach Windows-Shotcheck gedämpft.
+- Nebenfund: `GlassWard` lag in `GlasswrightController.cs` und wurde als eingebettetes MonoScript serialisiert.
+  Nach einem Neuaufbau mit frischer Library fand `VerifyBarrens` die Komponente nicht mehr. Eigene Datei
+  `GlassWard.cs` behebt die fragile Bindung.
+

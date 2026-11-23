@@ -16,7 +16,6 @@ public static class WorldArtBuilder
     public const string Root = "Assets/Art/BloodMoor";
     const string Models = Root + "/Models";
     const string Materials = Root + "/Materials";
-    const string GroundTexture = Root + "/Textures/MoorGround.png";
 
     /// <summary>FBX material name → (albedo sRGB, smoothness, emission).</summary>
     static readonly Dictionary<string, (Color albedo, float smooth, Color emission)> Look =
@@ -51,11 +50,13 @@ public static class WorldArtBuilder
     public static void EnsureAssets()
     {
         Directory.CreateDirectory(Materials);
-        Directory.CreateDirectory(Path.GetDirectoryName(GroundTexture));
+        // Textured surfaces (ZoneSurfaceBuilder) win; flat palette materials stay for
+        // glow, metal accents and foliage that have no texture set.
+        ZoneSurfaceBuilder.EnsureAssets();
         var mats = new Dictionary<string, Material>();
-        foreach (var kv in Look) mats[kv.Key] = EnsureMaterial(kv.Key, kv.Value.albedo, kv.Value.smooth, kv.Value.emission);
-        EnsureGroundTexture();
-        EnsureMaterial("MoorGround", Color.white, 0.05f, Color.black, GroundTexture);
+        foreach (var kv in Look)
+            mats[kv.Key] = ZoneSurfaceBuilder.Load(kv.Key)
+                ?? EnsureMaterial(kv.Key, kv.Value.albedo, kv.Value.smooth, kv.Value.emission);
 
         foreach (var prop in Props)
         {
@@ -78,7 +79,7 @@ public static class WorldArtBuilder
         AssetDatabase.SaveAssets();
     }
 
-    static Material EnsureMaterial(string name, Color albedo, float smooth, Color emission, string texture = null)
+    static Material EnsureMaterial(string name, Color albedo, float smooth, Color emission)
     {
         string path = $"{Materials}/{name}.mat";
         var m = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -90,12 +91,6 @@ public static class WorldArtBuilder
         m.SetColor("_BaseColor", albedo);
         m.SetFloat("_Smoothness", smooth);
         m.enableInstancing = true;
-        if (texture != null)
-        {
-            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texture);
-            m.SetTexture("_BaseMap", tex);
-            m.SetTextureScale("_BaseMap", new Vector2(6f, 6f));
-        }
         if (emission.maxColorComponent > 0f)
         {
             m.EnableKeyword("_EMISSION");
@@ -107,48 +102,6 @@ public static class WorldArtBuilder
         return m;
     }
 
-    /// <summary>Moor ground: moss/peat/heather noise, tileable (seamless by wrapping noise).</summary>
-    static void EnsureGroundTexture()
-    {
-        if (File.Exists(GroundTexture)) return;
-        const int size = 256;
-        var tex = new Texture2D(size, size, TextureFormat.RGB24, false);
-        var moss = Hex("#3A4A28");
-        var peat = Hex("#3A2E22");
-        var heath = Hex("#4E5530");
-        var dark = Hex("#232A1A");
-        for (int y = 0; y < size; y++)
-            for (int x = 0; x < size; x++)
-            {
-                float u = (float)x / size, v = (float)y / size;
-                float n1 = Tileable(u, v, 4f, 0f);
-                float n2 = Tileable(u, v, 12f, 37f);
-                float n3 = Tileable(u, v, 32f, 71f);
-                var c = Color.Lerp(moss, peat, Mathf.SmoothStep(0.35f, 0.7f, n1));
-                c = Color.Lerp(c, heath, Mathf.SmoothStep(0.55f, 0.8f, n2) * 0.6f);
-                c = Color.Lerp(c, dark, (n3 - 0.5f) * 0.6f + 0.15f);
-                tex.SetPixel(x, y, c);
-            }
-        tex.Apply();
-        File.WriteAllBytes(GroundTexture, tex.EncodeToPNG());
-        Object.DestroyImmediate(tex);
-        AssetDatabase.ImportAsset(GroundTexture);
-        var ti = (TextureImporter)AssetImporter.GetAtPath(GroundTexture);
-        ti.wrapMode = TextureWrapMode.Repeat;
-        ti.mipmapEnabled = true;
-        ti.SaveAndReimport();
-    }
-
-    /// <summary>Perlin sampled on a torus so the texture tiles without seams.</summary>
-    static float Tileable(float u, float v, float freq, float offset)
-    {
-        float a = u * Mathf.PI * 2f, b = v * Mathf.PI * 2f;
-        float r = freq / (Mathf.PI * 2f);
-        float x = Mathf.Cos(a) * r + offset, y = Mathf.Sin(a) * r + offset;
-        float z = Mathf.Cos(b) * r + offset * 0.5f, w = Mathf.Sin(b) * r + offset * 0.5f;
-        return (Mathf.PerlinNoise(x + z, y + w) + Mathf.PerlinNoise(x - w, y + z)) * 0.5f;
-    }
-
     // ------------------------------------------------------------------ scene
 
     /// <summary>Dress the open DiabloZone scene (call after the greybox is built).</summary>
@@ -158,11 +111,7 @@ public static class WorldArtBuilder
         var root = new GameObject("WorldDressing").transform;
         var rng = new System.Random(1337);
 
-        // Ground: textured fen instead of a flat paint.
-        var ground = GameObject.Find("Ground");
-        if (ground != null)
-            ground.GetComponent<Renderer>().sharedMaterial =
-                AssetDatabase.LoadAssetAtPath<Material>($"{Materials}/MoorGround.mat");
+        // Ground texture: ZoneSurfaceBuilder.Apply (FenMoor) after all builders.
 
         // Greybox holders keep name/position/collider, hand their look to a prop.
         int i = 0;

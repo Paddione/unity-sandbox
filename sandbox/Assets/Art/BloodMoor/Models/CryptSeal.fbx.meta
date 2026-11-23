@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Bark
-    second: {fileID: 2100000, guid: fa5531af2a4e08a51a060eb9b4b713c4, type: 2}
+    second: {fileID: 2100000, guid: e051720ece891b81eb7a34818e5df531, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -18,12 +18,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: BloodCloth
-    second: {fileID: 2100000, guid: 8a863738811976888bd31ade5651c24a, type: 2}
+    second: {fileID: 2100000, guid: 8951ba1d21eadad2fa1924a497f051cc, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Bone
-    second: {fileID: 2100000, guid: 757ec9c575cff9d83bf503380b68595f, type: 2}
+    second: {fileID: 2100000, guid: 890f9eb2470ad24d980ea27825cffae7, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -33,7 +33,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: DarkWood
-    second: {fileID: 2100000, guid: 6fd81b91d4af19cc2ae0639f8ebd0d06, type: 2}
+    second: {fileID: 2100000, guid: 41b0be99f6d8ba4ab941c62a1ce397ed, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -63,12 +63,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Iron
-    second: {fileID: 2100000, guid: 9dc956177a522e74c93ed9b6a3ae15b6, type: 2}
+    second: {fileID: 2100000, guid: 3ad9e6f6262bf26a4bdb74c7803f8bd1, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Moss
-    second: {fileID: 2100000, guid: 656b3465484b9b3c483d7bb805398470, type: 2}
+    second: {fileID: 2100000, guid: 604f571bc7bf97e909d86aea01b3cd84, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -78,7 +78,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Stone
-    second: {fileID: 2100000, guid: abf0ad69485c168babc07fe626ddf7c7, type: 2}
+    second: {fileID: 2100000, guid: a93c4f34d3ede7301983619d2db29dc4, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

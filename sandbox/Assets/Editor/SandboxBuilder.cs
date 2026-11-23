@@ -784,6 +784,7 @@ public static class SandboxBuilder
         // Blender-built Ashen Fen props replace the greybox look (names kept).
         WorldArtBuilder.DressDiabloZone();
         LocalArtPilotDressing.SwapAlcoveBanner();
+        ZoneSurfaceBuilder.Apply(); // world-textures: textured floors, pillars, domes, spires
 
         BuildDiabloZonePlayerPrefab();
         AssetDatabase.Refresh();

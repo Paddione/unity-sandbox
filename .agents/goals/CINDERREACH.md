@@ -36,7 +36,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   +400 m X Kiln, +600 m X Glass Barrens), `Diablo.unity` (früher Prototyp), `Greybox.unity` (Mechanik-Testbed).
 - Szenen nur über Builder regenerieren, nie von Hand: `SandboxBuilder.BuildDiabloZone` mit
   `TownBuilder`, `OssuaryBuilder`, `KilnBuilder`, `BarrensBuilder`, `EncounterBuilder`, `RiskShrineBuilder`,
-  `LightingBuilder`, `VfxBuilder`. Abnahme: `SandboxBuilder.VerifyDiabloZone` (inkl. `VerifyKiln`, `VerifyBarrens`).
+  `LightingBuilder`, `VfxBuilder`, zuletzt `ZoneSurfaceBuilder.Apply` (Oberflächen). Abnahme: `SandboxBuilder.VerifyDiabloZone` (inkl. `VerifyKiln`, `VerifyBarrens`).
   Builder-Läufe re-serialisieren LFS-Controller (`*Locomotion.controller`, `VendorIdle.controller`):
   diese Seiteneffekte vor dem Commit revertieren.
 - Code: `sandbox/Assets/Scripts/` mit Unterordnern `Audio`, `Classes`, `Contracts`, `Difficulty`,
@@ -160,6 +160,14 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ### Präsentation
 
+- Welt-Oberflächen (2026-11-23): 16 kachelbare Textursätze aus `docs/world-art/build_zone_textures.py`
+  (numpy, Seeds fest) unter `Art/Zones/Textures` (Albedo mit Smoothness im Alpha, Höhe → Normal-Map beim
+  Import, Kiln-Basalt mit Emissions-Adern). `ZoneSurfaceBuilder.Apply` gibt Fen-Boden, Ossuary-Boden/-Pfeiler/
+  -Sarkophage/-Deckung, Kiln-Boden/-Kuppeln/-Schlacke, Barrens-Sand/-Dünen/-Spitzen, Schmiede, Auftragsbrett und
+  Wegpunkt-Schreine per Namensregel ein Material und Welt-UVs (Box-Projektion, Meter pro Kachel). Die
+  Blender-Props bekommen Box-UVs beim Import (`WorldPropUvPostprocessor`) und für Stein, Rinde, Holz, Moos,
+  Knochen, Eisen, Tuch die Zonen-Materialien. Spielmechanisch lesbare Flächen (Tore, Glasnarbe, Glaspfeiler,
+  Risiko-Schrein, Emissions-Marker) bleiben einfarbig. Kiln-Adern bewusst gedimmt, damit Telegraphen dominieren.
 - Zonen-Licht per URP-Volumes (`Settings/Volumes/*`, `ZoneAtmosphere`), Musik pro Zone + Boss
   (`MusicDirector`, Crossfade), 30 Audio-Cues (`DiabloAudio`, Synth als Fallback,
   `docs/audio/manifest.json`), gepoolte VFX (`PresentationVfx`).
