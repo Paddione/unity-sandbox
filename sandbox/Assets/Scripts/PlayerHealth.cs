@@ -127,7 +127,10 @@ public sealed class PlayerHealth : MonoBehaviour
         var block = GetComponent<DiabloBlock>();
         bool blocked = block != null && block.BlocksFrom(fromPos);
         if (blocked)
+        {
             amount = DiabloBlock.Reduce(amount);
+            DiabloAudio.PlayBlock();
+        }
         amount = AbsorbShield(amount);
         if (blocked)
         {

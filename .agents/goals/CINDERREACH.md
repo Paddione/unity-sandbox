@@ -15,6 +15,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 |---|---|---|
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
+| [`cinderreach-sound-audit-fix`](cinderreach-sound-audit-fix/GOAL.md) | Audit + Fix gelandet: 35 Cues, eigenes Kiln-Thema, Menü-/Boss-Musik verdrahtet, Probe `G-DIABLO07` grün | Eigner-Hörabnahme auf Windows-Build, dann 100 % |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
 Abgeschlossen: `cinderreach-deutsch-story` (2026-11-23, Belege `docs/story-run-log.md`). Das Spiel ist
@@ -225,8 +226,11 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Knochen, Eisen, Tuch die Zonen-Materialien. Spielmechanisch lesbare Flächen (Tore, Glasnarbe, Glaspfeiler,
   Risiko-Schrein, Emissions-Marker) bleiben einfarbig. Kiln-Adern bewusst gedimmt, damit Telegraphen dominieren.
 - Zonen-Licht per URP-Volumes (`Settings/Volumes/*`, `ZoneAtmosphere`), Musik pro Zone + Boss
-  (`MusicDirector`, Crossfade), 30 Audio-Cues (`DiabloAudio`, Synth als Fallback,
-  `docs/audio/manifest.json`), gepoolte VFX (`PresentationVfx`).
+  (`MusicDirector`, Crossfade; jedes Gebiet eigener Synth-Charakter inkl. `KilnLoop`, Menü-Thema
+  ab Startbildschirm, Boss-Thema ab Phase 2 bzw. Glasswright), 35 Audio-Cues (`DiabloAudio`, Synth
+  als Fallback, `docs/audio/manifest.json`; Heal/Quest/Shrine/Block/Footstep seit
+  `cinderreach-sound-audit-fix`, Vertrag `scripts/check-audio-manifest.py` = Probe `G-DIABLO07`),
+  gepoolte VFX (`PresentationVfx`).
 - Menüs (`Menu/`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
   Rolle/Starter/Skillzahl, Continue mit Spielstand-Info über `SaveService.TryPeek`, Co-op, Settings,
   Quit, 0,45-s-Ausblenden). Das Legacy-`MainMenu` weicht im Spiel (`ClassSelectOwnsStart`).

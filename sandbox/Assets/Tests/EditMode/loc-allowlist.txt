@@ -159,7 +159,6 @@ Net/ServerDirectory.cs	Cinderreach Server
 Net/ServerDirectory.cs	[Server] published
 MultiplayerAutoStarter.cs	[Net] Joining via relay code {args.JoinCode}.
 MultiplayerAutoStarter.cs	[Net] Starting host via relay (code follows).
-Audio/MusicDirector.cs	Zone
 DiabloCorpse.cs	Ignore Raycast
 DiabloNetworkPlayer.cs	class cannot cast {skill}
 DiabloNetworkPlayer.cs	cooldown {cooldownLeft:0.00}s left

@@ -799,7 +799,7 @@ public sealed class DiabloSkills : MonoBehaviour
             // S4 mercy-shroud: the healed ally keeps a short absorb shield.
             if (BuildUniqueEffects.HasMercyShroud(GetComponent<Equipment>()))
                 target.GrantShield(BuildUniqueEffects.MercyShieldAmount, BuildUniqueEffects.MercyShieldSeconds);
-            if (restored > 0f) { HealsCast++; HPRestored += restored; }
+            if (restored > 0f) { HealsCast++; HPRestored += restored; DiabloAudio.PlayHeal(); }
         }
         SpawnHealVisual(targetHealRange);
         return restored;
@@ -844,7 +844,7 @@ public sealed class DiabloSkills : MonoBehaviour
                     RelayHeal(weakest.gameObject, bonus, Skill.RenewingCircle);
                 }
             }
-            if (restored > 0f) { HealsCast++; HPRestored += restored; }
+            if (restored > 0f) { HealsCast++; HPRestored += restored; DiabloAudio.PlayHeal(); }
         }
         SpawnHealVisual(radius);
         return restored;

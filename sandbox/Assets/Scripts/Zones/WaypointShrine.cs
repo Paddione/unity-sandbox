@@ -47,6 +47,7 @@ public sealed class WaypointShrine : MonoBehaviour
         d.y = 0f;
         if (d.magnitude > DiscoverRadius) return false;
         if (!RunProfile.Act.Discover(shrineId)) return false;
+        DiabloAudio.PlayShrine();
         Debug.Log($"[Waypoint] Discovered {displayName}.");
         if (Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
         return true;
@@ -87,6 +88,12 @@ public sealed class WaypointShrine : MonoBehaviour
         var target = Find(id);
         if (target == null || hero == null || !Destinations().Contains(target)) return false;
         ZoneTravel.TeleportHero(hero, target.Arrival);
+        try
+        {
+            if (target.shrineId == "Town") MusicDirector.Ensure().PlayTown();
+            else MusicDirector.Ensure().PlayZone(target.zone);
+        }
+        catch { }
         if (target.zone == ActProgress.Kiln) KilnLayout.ResetPlaza(); // fair-fights: re-arm arrival safety
         if (target.zone == ActProgress.Barrens) BarrensLayout.ResetPlaza();
         Debug.Log($"[Waypoint] Travelled to {target.displayName}.");

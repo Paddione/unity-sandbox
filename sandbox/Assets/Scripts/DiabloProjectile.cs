@@ -149,6 +149,7 @@ public sealed class DiabloProjectile : MonoBehaviour
                 var block = hero.GetComponent<DiabloBlock>();
                 if (block != null && block.BlocksFrom(transform.position))
                 {
+                    DiabloAudio.PlayBlock();
                     Reflect(hero);
                     return;
                 }

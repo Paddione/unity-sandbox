@@ -49,6 +49,7 @@ public sealed class MainMenu : MonoBehaviour
         canvas.enabled = true;
         DiabloClickController.ExternalDrive = true;
         LastAction = "open";
+        try { MusicDirector.Ensure().PlayMenu(); } catch { }
     }
 
     public void CloseToGame()
@@ -57,6 +58,7 @@ public sealed class MainMenu : MonoBehaviour
         if (canvas != null) canvas.enabled = false;
         DiabloClickController.ExternalDrive = false;
         LastAction = "play";
+        try { MusicDirector.Ensure().PlayZone(ActProgress.Town); } catch { }
     }
 
     public bool NewGame(bool confirmOverwrite)

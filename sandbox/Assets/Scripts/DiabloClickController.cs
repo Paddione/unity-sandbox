@@ -38,6 +38,9 @@ public sealed class DiabloClickController : MonoBehaviour
     Vector3 destination;
     bool hasDestination;
     GameObject attackTarget;
+    float stepAccum;
+    /// <summary>Metres between footstep cues while moving.</summary>
+    public const float StepStride = 1.9f;
 
     void Awake()
     {
@@ -381,6 +384,12 @@ public sealed class DiabloClickController : MonoBehaviour
     void Move(Vector3 planar)
     {
         controller.Move(planar * Time.deltaTime);
+        stepAccum += planar.magnitude * Time.deltaTime;
+        if (stepAccum >= StepStride)
+        {
+            stepAccum = 0f;
+            DiabloAudio.PlayFootstep();
+        }
     }
 
     void Face(Vector3 planar)

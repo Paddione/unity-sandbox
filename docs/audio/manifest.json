@@ -1,5 +1,5 @@
 {
- "version": "S2",
+ "version": "S3-sound-audit",
  "license": "All entries are locally synthesized recipes (no third-party assets, license: free). Future studio .ogg renders replace the synth clips 1:1 by cue name.",
  "budget": "<= 60MB total audio, .ogg quality 0.6 target",
  "format": {
@@ -211,6 +211,48 @@
    "seed": 214,
    "synth": "Sweep 0.8s 180->720Hz",
    "license": "free"
+  },
+  {
+   "cue": "Ambient",
+   "prompt": "seamless moor wind + low drone loop (DiabloAmbience bed, PlayCue no-op)",
+   "seed": 1234,
+   "synth": "Ambient 6s loop",
+   "license": "free"
+  },
+  {
+   "cue": "Heal",
+   "prompt": "warm healing chime, inharmonic partials",
+   "seed": 1234,
+   "synth": "Chime 0.55s 523Hz (1/2.76/5.4)",
+   "license": "free"
+  },
+  {
+   "cue": "Quest",
+   "prompt": "quest turn-in sting, major triad + octave",
+   "seed": 1234,
+   "synth": "Sting C-E-G-C",
+   "license": "free"
+  },
+  {
+   "cue": "Shrine",
+   "prompt": "waypoint shrine bell, low chime",
+   "seed": 1234,
+   "synth": "Chime 0.7s 392Hz (1/2.76/5.4)",
+   "license": "free"
+  },
+  {
+   "cue": "Block",
+   "prompt": "blocked hit clang, thump + metallic ping",
+   "seed": 1234,
+   "synth": "Crit 0.12s + 1760Hz ping",
+   "license": "free"
+  },
+  {
+   "cue": "Footstep",
+   "prompt": "soft footstep tick, short noise burst, low gain",
+   "seed": 1234,
+   "synth": "NoiseBurst 0.06s vol 0.22",
+   "license": "free"
   }
  ],
  "music": [
@@ -218,7 +260,7 @@
    "track": "MenuTheme",
    "prompt": "dark devotional menu theme, slow minor pads 60s seamless loop",
    "seed": 101,
-   "synth": "SynthLoop root 220Hz (placeholder)",
+   "synth": "SynthLoop root 220Hz, devotional fifth pad, slow pulse (character per MusicDirector.SpecFor)",
    "license": "free",
    "length": "60-90s loop"
   },
@@ -226,7 +268,7 @@
    "track": "LanternHoldLoop",
    "prompt": "warm hearth zone loop, soft strings plus fire crackle 60-90s seamless",
    "seed": 102,
-   "synth": "SynthLoop root 174.6Hz (placeholder)",
+   "synth": "SynthLoop root 174.6Hz, warm major-third hearth pad, low noise",
    "license": "free",
    "length": "60-90s loop"
   },
@@ -234,7 +276,7 @@
    "track": "AshenFenLoop",
    "prompt": "cold moor zone loop, low drone plus wind gusts 60-90s seamless",
    "seed": 103,
-   "synth": "SynthLoop root 146.8Hz (placeholder)",
+   "synth": "SynthLoop root 146.8Hz, minor wind-heavy moor drone, high noise",
    "license": "free",
    "length": "60-90s loop"
   },
@@ -242,7 +284,7 @@
    "track": "OssuaryLoop",
    "prompt": "crypt zone loop, deep bells plus whispers 60-90s seamless",
    "seed": 104,
-   "synth": "SynthLoop root 123.5Hz (placeholder)",
+   "synth": "SynthLoop root 123.5Hz, crypt bell partials 2.76x, sub weight",
    "license": "free",
    "length": "60-90s loop"
   },
@@ -250,7 +292,31 @@
    "track": "BossTrack",
    "prompt": "boss battle track, driving percussion plus choir stabs",
    "seed": 105,
-   "synth": "SynthLoop root 98Hz (placeholder)",
+   "synth": "SynthLoop root 98Hz, driving sub pulse 1Hz, bell stab",
+   "license": "free",
+   "length": "boss loop"
+  },
+  {
+   "track": "KilnLoop",
+   "prompt": "cinder kiln forge loop, deep sub pulse plus metallic bell 60-90s seamless",
+   "seed": 108,
+   "synth": "SynthLoop root 130.8Hz, forge sub + 0.5Hz pulse, metallic bell",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "GlassBarrensLoop",
+   "prompt": "glass barrens loop, high glass partials plus sparse wind 60-90s seamless",
+   "seed": 106,
+   "synth": "SynthLoop root 110Hz, glass partials 3.98x, sparse pulse",
+   "license": "free",
+   "length": "60-90s loop"
+  },
+  {
+   "track": "GlasswrightTrack",
+   "prompt": "glasswright boss track, glass stabs plus driving sub pulse",
+   "seed": 107,
+   "synth": "SynthLoop root 92.5Hz, glass + sub boss pulse 0.8Hz",
    "license": "free",
    "length": "boss loop"
   }

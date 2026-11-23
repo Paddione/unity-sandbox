@@ -73,21 +73,50 @@ public class MusicDirector : MonoBehaviour
         ? DiabloSettings.MasterVol * DiabloSettings.MusicVol
         : 1f;
 
+    /// <summary>Per-track synth character: fifth/major-third spacing, sub-octave weight,
+    /// bell/glass partials, wind noise and a slow pulse — so areas differ in timbre, not only pitch.</summary>
+    struct TrackSpec
+    {
+        public float Interval, Sub, Bell, Glass, Noise, PulseHz;
+        public TrackSpec(float interval, float sub, float bell, float glass, float noise, float pulseHz)
+        { Interval = interval; Sub = sub; Bell = bell; Glass = glass; Noise = noise; PulseHz = pulseHz; }
+    }
+
+    static TrackSpec SpecFor(string name)
+    {
+        switch (name)
+        {
+            case "MenuTheme": return new TrackSpec(1.5f, 0.2f, 0.1f, 0f, 0.03f, 0.125f);
+            case "LanternHoldLoop": return new TrackSpec(1.26f, 0.1f, 0.15f, 0f, 0.02f, 0.1f); // warm major third, hearth
+            case "AshenFenLoop": return new TrackSpec(1.19f, 0.3f, 0f, 0f, 0.12f, 0.07f); // minor, wind-heavy moor
+            case "OssuaryLoop": return new TrackSpec(1.19f, 0.4f, 0.5f, 0f, 0.04f, 0.05f); // crypt bells
+            case "KilnLoop": return new TrackSpec(1.19f, 0.6f, 0.2f, 0f, 0.06f, 0.5f); // forge sub + slow pulse
+            case "GlassBarrensLoop": return new TrackSpec(1.33f, 0.1f, 0.1f, 0.55f, 0.03f, 0.08f); // glass partials
+            case "GlasswrightTrack": return new TrackSpec(1.19f, 0.5f, 0.1f, 0.4f, 0.04f, 0.8f);
+            default: return new TrackSpec(1.19f, 0.55f, 0.25f, 0f, 0.05f, 1f); // boss: driving sub pulse
+        }
+    }
+
     AudioClip SynthLoop(string name, float root, int seed)
     {
         const float seconds = 8f; // short deterministic stand-in; real loops are 60-90 s .ogg
         int n = Mathf.Max(1, Mathf.RoundToInt(seconds * DiabloAudio.SampleRate));
         var data = new float[n];
         var rng = new System.Random(seed);
+        var spec = SpecFor(name);
         float brown = 0f;
         for (int i = 0; i < n; i++)
         {
             float t = i / (float)DiabloAudio.SampleRate;
             brown = Mathf.Clamp(brown + (float)(rng.NextDouble() * 2.0 - 1.0) * 0.02f, -1f, 1f) * 0.998f;
+            float cycle = i / (float)n;
+            float pulse = spec.PulseHz > 0f ? 0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * spec.PulseHz * seconds * cycle) : 1f;
             float pad = Mathf.Sin(2f * Mathf.PI * root * t)
-                + 0.5f * Mathf.Sin(2f * Mathf.PI * root * 1.5f * t)
-                + 0.25f * Mathf.Sin(2f * Mathf.PI * root * 2f * t);
-            data[i] = (pad * 0.18f + brown * 0.05f);
+                + 0.5f * Mathf.Sin(2f * Mathf.PI * root * spec.Interval * t)
+                + spec.Sub * Mathf.Sin(2f * Mathf.PI * root * 0.5f * t)
+                + spec.Bell * Mathf.Sin(2f * Mathf.PI * root * 2.76f * t) * Mathf.Exp(-0.5f * (cycle % 0.25f) * 4f)
+                + spec.Glass * Mathf.Sin(2f * Mathf.PI * root * 3.98f * t);
+            data[i] = (pad * 0.16f * pulse + brown * spec.Noise);
         }
         int edge = Mathf.Min(data.Length / 2, Mathf.RoundToInt(0.005f * DiabloAudio.SampleRate));
         for (int i = 0; i < edge; i++)
@@ -109,6 +138,7 @@ public class MusicDirector : MonoBehaviour
             case "Zone0": return SynthLoop("LanternHoldLoop", 174.6f, 102);
             case "Zone1": return SynthLoop("AshenFenLoop", 146.8f, 103);
             case "Zone2": return SynthLoop("OssuaryLoop", 123.5f, 104);
+            case "Zone3": return SynthLoop("KilnLoop", 130.8f, 108);
             case "Boss": return SynthLoop("BossTrack", 98f, 105);
             case "Zone4": return SynthLoop("GlassBarrensLoop", 110f, 106);
             case GlassBossTrack: return SynthLoop("GlasswrightTrack", 92.5f, 107);
@@ -120,9 +150,23 @@ public class MusicDirector : MonoBehaviour
     public const string GlassBossTrack = "BossGlass";
 
     public void PlayMenu() => PlayTrack("Menu");
-    /// <summary>Zones 0–3 keep their historical clamp (the Kiln shares the Ossuary loop); the Barrens get their own.</summary>
-    public void PlayZone(int zoneIndex) =>
-        PlayTrack(zoneIndex == ActProgress.Barrens ? "Zone4" : "Zone" + Mathf.Clamp(zoneIndex, 0, 2));
+
+    /// <summary>Track per Act zone: Town plays the Fen field theme (Lantern Hold itself
+    /// is reached by waypoint, see <see cref="PlayTown"/>), every later zone its own.</summary>
+    public static string ZoneTrack(int zoneIndex)
+    {
+        switch (zoneIndex)
+        {
+            case ActProgress.Ossuary: return "Zone2";
+            case ActProgress.Kiln: return "Zone3";
+            case ActProgress.Barrens: return "Zone4";
+            default: return "Zone1";
+        }
+    }
+
+    public void PlayZone(int zoneIndex) => PlayTrack(ZoneTrack(zoneIndex));
+    /// <summary>Lantern Hold hearth theme (waypoint arrival in town).</summary>
+    public void PlayTown() => PlayTrack("Zone0");
     public void PlayBoss() => PlayTrack("Boss");
 
     public void PlayTrack(string track)

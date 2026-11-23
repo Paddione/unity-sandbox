@@ -22,6 +22,7 @@ public static class DiabloAudio
         Fireball, Arrow, Cleave,
         HuskGrowl, WardenTaunt, BossRoar,
         Gold, RareDrop, VendorBuy, VendorSell, Gate,
+        Heal, Quest, Shrine, Block, Footstep,
     }
 
     public static int soundedSwings;
@@ -39,6 +40,11 @@ public static class DiabloAudio
     public static int soundedRare;
     public static int soundedVendor;
     public static int soundedGate;
+    public static int soundedHeals;
+    public static int soundedQuests;
+    public static int soundedShrines;
+    public static int soundedBlocks;
+    public static int soundedSteps;
     /// <summary>Synth-fallback hits: asset override missing, synth clip used.</summary>
     public static int soundedFallbacks;
     public static string lastFallbackCue;
@@ -70,6 +76,7 @@ public static class DiabloAudio
     static AudioClip fireballClip, arrowClip, cleaveClip;
     static AudioClip huskGrowlClip, wardenTauntClip, bossRoarClip;
     static AudioClip goldClip, rareDropClip, vendorBuyClip, vendorSellClip, gateClip;
+    static AudioClip healClip, questClip, shrineClip, blockClip, footstepClip;
     static readonly System.Random pitchRng = new System.Random(77);
     static bool built;
 
@@ -165,6 +172,11 @@ public static class DiabloAudio
     public static AudioClip VendorBuyClip { get { EnsureBuilt(); return vendorBuyClip; } }
     public static AudioClip VendorSellClip { get { EnsureBuilt(); return vendorSellClip; } }
     public static AudioClip GateClip { get { EnsureBuilt(); return gateClip; } }
+    public static AudioClip HealClip { get { EnsureBuilt(); return healClip; } }
+    public static AudioClip QuestClip { get { EnsureBuilt(); return questClip; } }
+    public static AudioClip ShrineClip { get { EnsureBuilt(); return shrineClip; } }
+    public static AudioClip BlockClip { get { EnsureBuilt(); return blockClip; } }
+    public static AudioClip FootstepClip { get { EnsureBuilt(); return footstepClip; } }
 
     /// <summary>Generic cue entry point (counts toward the >=20 catalogue).</summary>
     public static void PlayCue(Cue cue)
@@ -200,6 +212,12 @@ public static class DiabloAudio
             case Cue.VendorBuy: PlayVendorBuy(); break;
             case Cue.VendorSell: PlayVendorSell(); break;
             case Cue.Gate: PlayGate(); break;
+            case Cue.Heal: PlayHeal(); break;
+            case Cue.Quest: PlayQuest(); break;
+            case Cue.Shrine: PlayShrine(); break;
+            case Cue.Block: PlayBlock(); break;
+            case Cue.Footstep: PlayFootstep(); break;
+            case Cue.Ambient: break; // looping bed is owned by DiabloAmbience, never a hit
             default: PlayHit(); break;
         }
     }
@@ -218,6 +236,11 @@ public static class DiabloAudio
     public static void PlayVendorBuy() { EnsureBuilt(); PlaySfx(vendorBuyClip, "VendorBuy", VendorVolume); soundedVendor++; }
     public static void PlayVendorSell() { EnsureBuilt(); PlaySfx(vendorSellClip, "VendorSell", VendorVolume); soundedVendor++; }
     public static void PlayGate() { EnsureBuilt(); PlaySfx(gateClip, "Gate", 1f); soundedGate++; }
+    public static void PlayHeal() { EnsureBuilt(); PlaySfx(healClip, "Heal", 0.8f); soundedHeals++; }
+    public static void PlayQuest() { EnsureBuilt(); PlaySfx(questClip, "Quest", 0.9f); soundedQuests++; }
+    public static void PlayShrine() { EnsureBuilt(); PlaySfx(shrineClip, "Shrine", 0.85f); soundedShrines++; }
+    public static void PlayBlock() { EnsureBuilt(); PlaySfx(blockClip, "Block", 0.9f); soundedBlocks++; }
+    public static void PlayFootstep() { EnsureBuilt(); PlaySfx(footstepClip, "Footstep", 0.22f); soundedSteps++; }
 
     public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlayRawWithVolume(levelUpClip, 0.9f); }
 
@@ -261,6 +284,11 @@ public static class DiabloAudio
         soundedRare = 0;
         soundedVendor = 0;
         soundedGate = 0;
+        soundedHeals = 0;
+        soundedQuests = 0;
+        soundedShrines = 0;
+        soundedBlocks = 0;
+        soundedSteps = 0;
         soundedFallbacks = 0;
         lastFallbackCue = null;
     }
@@ -302,6 +330,11 @@ public static class DiabloAudio
         vendorBuyClip = Sweep("VendorBuy", 0.18f, 330f, 495f);
         vendorSellClip = Sweep("VendorSell", 0.18f, 495f, 330f);
         gateClip = Sweep("Gate", 0.8f, 180f, 720f);
+        healClip = Chime("Heal", 0.55f, 523.25f);
+        questClip = Sting("Quest");
+        shrineClip = Chime("Shrine", 0.7f, 392f);
+        blockClip = Crit("Block", 0.12f);
+        footstepClip = NoiseBurst("Footstep", 0.06f, rng);
         lanternClip = Chime("LanternBolt", 0.45f, 660f);
         haloClip = Sweep("SearingHalo", 0.4f, 220f, 880f);
         veilClip = Sweep("VeilStep", 0.25f, 1400f, 480f);

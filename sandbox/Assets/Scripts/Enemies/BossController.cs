@@ -98,6 +98,8 @@ public sealed class BossController : NetworkBehaviour
         phaseTwo = true;
         PhaseTwoEntries++;
         Debug.Log($"[Boss] {BossName} enters phase 2 (adds={PhaseTwoEntries}).");
+        try { DiabloAudio.PlayBossRoar(); } catch { }
+        try { MusicDirector.Ensure().PlayBoss(); } catch { }
         PresentationVfx.PhaseTwoBurst(transform.position);
         if (IsSpawned)
         {

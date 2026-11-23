@@ -119,6 +119,47 @@ public class AudioRoutingTests
     }
 
     [Test]
+    public void NewEventCues_ResolveAndCount_AndAmbientIsNoHit()
+    {
+        DiabloAudio.PlayHeal();
+        DiabloAudio.PlayQuest();
+        DiabloAudio.PlayShrine();
+        DiabloAudio.PlayBlock();
+        DiabloAudio.PlayFootstep();
+        Assert.AreEqual(1, DiabloAudio.soundedHeals);
+        Assert.AreEqual(1, DiabloAudio.soundedQuests);
+        Assert.AreEqual(1, DiabloAudio.soundedShrines);
+        Assert.AreEqual(1, DiabloAudio.soundedBlocks);
+        Assert.AreEqual(1, DiabloAudio.soundedSteps);
+        foreach (var clip in new[]
+        {
+            DiabloAudio.HealClip, DiabloAudio.QuestClip, DiabloAudio.ShrineClip,
+            DiabloAudio.BlockClip, DiabloAudio.FootstepClip,
+        })
+            Assert.IsNotNull(clip, "Every event cue must resolve a synth clip.");
+        int hits = DiabloAudio.soundedHits;
+        DiabloAudio.PlayCue(DiabloAudio.Cue.Ambient);
+        Assert.AreEqual(hits, DiabloAudio.soundedHits, "Ambient bed must never fall through to Hit.");
+        DiabloAudio.PlayCue(DiabloAudio.Cue.Heal);
+        Assert.AreEqual(2, DiabloAudio.soundedHeals, "PlayCue must route Heal.");
+    }
+
+    [Test]
+    public void EveryZone_HasItsOwnTrack_AndKilnDiffersFromOssuary()
+    {
+        Assert.AreEqual("Zone1", MusicDirector.ZoneTrack(ActProgress.Town));
+        Assert.AreEqual("Zone2", MusicDirector.ZoneTrack(ActProgress.Ossuary));
+        Assert.AreEqual("Zone3", MusicDirector.ZoneTrack(ActProgress.Kiln));
+        Assert.AreEqual("Zone4", MusicDirector.ZoneTrack(ActProgress.Barrens));
+        var md = MusicDirector.Ensure();
+        var kiln = md.TrackClip("Zone3");
+        var ossuary = md.TrackClip("Zone2");
+        Assert.IsNotNull(kiln);
+        Assert.AreEqual("KilnLoop", kiln.name);
+        Assert.AreNotEqual(ossuary.name, kiln.name, "Kiln must not share the Ossuary theme.");
+    }
+
+    [Test]
     public void LegacySignatures_StillCallable()
     {
         // Compile-time + headless smoke proof that no existing Play* broke.

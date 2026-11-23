@@ -234,7 +234,7 @@ public sealed class StoryDirector : MonoBehaviour
         switch (plan.kind)
         {
             case StoryTalkKind.Offer: State.Accept(plan.questId); break;
-            case StoryTalkKind.TurnIn: State.TurnIn(plan.questId); break;
+            case StoryTalkKind.TurnIn: if (State.TurnIn(plan.questId)) DiabloAudio.PlayQuest(); break;
             case StoryTalkKind.Talk: State.Apply(StoryObjectiveType.Talk, npc); break;
         }
         State.Refresh(RunProfile.Act);
