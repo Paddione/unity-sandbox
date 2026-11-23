@@ -32,12 +32,19 @@ public sealed class ClassSelectUI : MonoBehaviour
 
     void OnEnable() { if (!live.Contains(this)) live.Add(this); }
 
-    void OnDestroy() => live.Remove(this);
+    void OnDestroy()
+    {
+        live.Remove(this);
+        PlayerAccount.NameChanged -= RefreshAccountLabel;
+    }
     public static bool ClassFromCommandLine { get; private set; }
 
     Canvas canvas;
     GameObject mainContent;
     GameObject settingsModal;
+    /// <summary>accounts S1: player name window, opened from the title row.</summary>
+    public AccountPanel Account { get; private set; }
+    Text accountLabel;
     Button continueBtn;
     Text continueLabel;
     Text diffBadgeText;
@@ -158,6 +165,12 @@ public sealed class ClassSelectUI : MonoBehaviour
         if (kb != null && kb.escapeKey.wasPressedThisFrame && ConfirmVisible)
         {
             CancelNew();
+            DiabloUIFactory.MarkEscConsumed();
+            return;
+        }
+        if (kb != null && kb.escapeKey.wasPressedThisFrame && Account != null && Account.IsOpen)
+        {
+            Account.SetOpen(false);
             DiabloUIFactory.MarkEscConsumed();
             return;
         }
@@ -445,6 +458,19 @@ public sealed class ClassSelectUI : MonoBehaviour
         var subTitle = DiabloUIFactory.MakeText(titleCol.transform, "Subtitle", "THE ASHEN FEN  •  CHOOSE YOUR HERO", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
         DiabloUIFactory.SetLayout(subTitle.gameObject, prefH: 24f, flexW: 1f);
 
+        // accounts S1: who other players will see; click to rename.
+        var accountBtn = DiabloUIFactory.MakeButton(brandRow.transform, "AccountButton", "", 15, false, null, () =>
+        {
+            DiabloAudio.PlayUIClick();
+            Account.SetOpen(true);
+        });
+        DiabloUIFactory.SetLayout(accountBtn.gameObject, prefH: 44f, prefW: 280f);
+        accountLabel = accountBtn.GetComponentInChildren<Text>();
+        PlayerAccount.NameChanged += RefreshAccountLabel;
+        RefreshAccountLabel();
+        if (!Application.isBatchMode)
+            _ = PlayerAccount.EnsureSignedInAsync(); // loads the online name; offline keeps the local one
+
         DiabloUIFactory.MakeDivider(mainContent.transform, 6f);
 
         // Class Selection Card Deck
@@ -534,8 +560,17 @@ public sealed class ClassSelectUI : MonoBehaviour
         var backBtn = DiabloUIFactory.MakeButton(crow.transform, "CancelNewButton", "Back", 17, false, null, CancelNew);
         DiabloUIFactory.SetLayout(backBtn.gameObject, prefH: 44f, flexW: 1f);
         confirmModal.SetActive(false);
+        Account = AccountPanel.Build(canvasGo.transform);
         RefreshContinueAndDiff();
         canvas.enabled = false;
+    }
+
+    /// <summary>Title-row label: the name this player shows online.</summary>
+    public static string AccountLabel(string name) => $"Playing as {name}";
+
+    void RefreshAccountLabel()
+    {
+        if (accountLabel != null) accountLabel.text = AccountLabel(PlayerAccount.DisplayName);
     }
 
     void BuildClassCard(Transform parent, ClassDefinition cls)

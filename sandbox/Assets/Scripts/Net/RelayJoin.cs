@@ -49,29 +49,16 @@ public static class RelayJoin
     }
 
     /// <summary>
-    /// UGS init + anonymous sign-in, once per process. Always starts from a
-    /// cleared credential cache: two processes on one machine share the same
-    /// player-prefs cache, and the same anonymous identity cannot join its
-    /// own session twice. (This game only ever caches anonymous throwaway
-    /// sessions, so nothing of value is wiped.)
+    /// UGS init + sign-in, once per process (cinderreach-accounts S1: identity,
+    /// profiles and names live in <see cref="PlayerAccount"/>). False when the
+    /// services are unreachable; callers fall back to direct UTP with a warning.
     /// </summary>
     public static async Task<bool> EnsureUgsAsync()
     {
         if (ugsReady) return true;
-        try
-        {
-            await UnityServices.InitializeAsync();
-            try { AuthenticationService.Instance.SignOut(clearCredentials: true); }
-            catch { /* fresh machine: nothing cached to clear */ }
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            ugsReady = true;
-            return true;
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"[Relay] UGS unavailable, falling back to direct UTP ({e.Message}).");
-            return false;
-        }
+        ugsReady = await PlayerAccount.EnsureSignedInAsync();
+        if (!ugsReady) Debug.LogWarning("[Relay] UGS unavailable, falling back to direct UTP.");
+        return ugsReady;
     }
 
     /// <summary>

@@ -91,7 +91,7 @@ start_client() { # k target-args...
   local cls; cls="$(cclass "$k")"
   echo "run-coop-pair: client $k -> $* ${cls:+(class $cls)}"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" ${CLIENT_GOD[@]+"${CLIENT_GOD[@]}"} \
-    "$@" -coop-autoplay "$(crole "$k")" ${SERVER_PEERS[@]+"${SERVER_PEERS[@]}"} ${cls:+-class "$cls"} -save-file "$(csave "$k")" \
+    "$@" -coop-autoplay "$(crole "$k")" ${SERVER_PEERS[@]+"${SERVER_PEERS[@]}"} ${cls:+-class "$cls"} -save-file "$(csave "$k")" -player-name "Client$k" \
     -autoplay-out "$OUT/$(cdir "$k")" -logFile "$OUT/$(cdir "$k")/player.log" &
   CLIENT_PIDS+=($!)
 }
@@ -121,7 +121,7 @@ if [ "$SERVER" = 1 ]; then
 elif [ "${COOP_RELAY:-0}" = 1 ]; then
   echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-    "${GOD[@]}" -host-relay -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
+    "${GOD[@]}" -host-relay -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json -player-name Host \
     -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
   HOST_PID=$!
   echo "run-coop-pair: waiting for relay join code..."
@@ -137,7 +137,7 @@ elif [ "${COOP_RELAY:-0}" = 1 ]; then
 else
   echo "run-coop-pair: host on port $PORT (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
-    "${GOD[@]}" -host -port "$PORT" -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
+    "${GOD[@]}" -host -port "$PORT" -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json -player-name Host \
     -autoplay-out "$OUT/host" -logFile "$OUT/host/player.log" &
   HOST_PID=$!
   sleep 8

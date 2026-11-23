@@ -103,6 +103,15 @@ public sealed class SessionAutoplay : MonoBehaviour
                 yield break;
             }
             Log($"co-op host: client joined ({nm.ConnectedClientsIds.Count} connected)");
+            // Relay hosting signs in first, so the solo hero found above may since have
+            // stood down for the owned network hero: drive whichever "Player" is live now.
+            var live = GameObject.Find(DiabloNetworkPlayer.HeroName);
+            var liveCtl = live != null ? live.GetComponent<DiabloClickController>() : null;
+            if (liveCtl != null && liveCtl.isActiveAndEnabled && liveCtl != hero)
+            {
+                hero = liveCtl;
+                Log("co-op host: driving the owned network hero (solo hero stood down)");
+            }
         }
         DiabloClickController.ExternalDrive = true;
         HitStop.Enabled = false;

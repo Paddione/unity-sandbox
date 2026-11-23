@@ -981,3 +981,13 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - KI-Begleiter laufen in Formation hinter dem Helden, holen mit 1,6-facher Geschwindigkeit auf, brechen Kämpfe
   ab 8 m Abstand zum Helden ab und reisen bei jedem Tor, Wegpunkt und Gruppensprung sofort mit
   (`PartyRoster.PortWithLeader`). Vorher folgten sie nur per Leine ab 15 m.
+
+## 2026-11-23 — Konten S1: Identität und Namen
+
+- Mitspieler hatten keinen Namen, und jeder Start erzeugte eine neue anonyme UGS-Identität, weil das Spiel den
+  Anmelde-Cache löschte (zwei Spielkopien auf einem PC teilen sich PlayerPrefs). Jetzt trennen Auth-Profile die
+  Kopien: Normale Starts behalten Profil `main`, Automation und Server bekommen ein Wegwerf-Profil pro Prozess.
+- Namen laufen über UGS Player Names, werden lokal und auf dem Server bereinigt (UGS verbietet Leerzeichen, daher `_`)
+  und erscheinen als Namensschilder über allen Netz-Helden sowie in Beitritts- und Abgangszeilen.
+- Der Relay-Host-Autoplay griff den Solo-Helden, bevor der Netz-Held ihn ablöste, und lief dann ins Leere. Er löst den
+  Helden jetzt nach dem Warten auf die Mitspieler neu auf.

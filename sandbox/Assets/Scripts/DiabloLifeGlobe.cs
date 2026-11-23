@@ -46,6 +46,7 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         instance = this;
         BuildUI();
         if (GetComponent<DiabloLootLabels>() == null) gameObject.AddComponent<DiabloLootLabels>();
+        if (GetComponent<HeroNameplates>() == null) gameObject.AddComponent<HeroNameplates>(); // accounts S1
     }
 
     void OnDestroy()

@@ -56,6 +56,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     {
         itemSessionReady = false;
         IgnoreAllyCollisions(gameObject);
+        SpawnNames();
         if (!IsOwner)
         {
             hpState.OnValueChanged += (_, now) => ApplyMirroredHp(now);
