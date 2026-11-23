@@ -1,9 +1,10 @@
 # Fortschritt – cinderreach-accounts
 
-Prozent: 75 %
+Prozent: 100 %
 
 ## Erledigt
 
+- Provider „Username & Password“ vom Eigner aktiviert (2026-11-23, Probe liefert `WRONG_USERNAME_PASSWORD`).
 - Vorprüfung 2026-11-23: Cloud Save und Player Names im UGS-Projekt `02e05e98-…` erreichbar (HTTP 200), Provider
   „Username & Password“ noch nicht aktiv (`PERMISSION_DENIED`).
 
@@ -28,10 +29,17 @@ Prozent: 75 %
   danach gelöscht): 3 Läufe, 0 Fehler, u. a. Upload auf PC 1, Gast-Held gegen Konto-Held fragt auf PC 2, Konto-Held
   kommt an (Stufe 7, 123 Gold, Rogue), PC-Held als `.pc-hero.bak` gesichert. EditMode 479/479, PlayMode 284/284.
 
+- S4 Abnahme: lokaler Relay-Server-Lauf mit Namen grün; Server-Image `ghcr.io/paddione/cinderreach-server@sha256:a6f619ab…`
+  (`dc62621`), dotfiles `4dae8d16`, Pod bereit und veröffentlicht. Windows-Client `Games\cinderreach` (`dc62621`):
+  Konto-Probe create/restore/pc2 je 0 Fehler (Held kommt nach „Neuinstallation“ = frischem Profil ohne lokalen Save
+  aus der Cloud), Produktivlauf gegen den Pod mit WinTester (Lead) und LinuxTester (Follow), beide Namen sichtbar,
+  0 Exceptions. Installer `Cinderreach-Setup-0.1.0-dc62621.exe`, Runbook „Konten, Namen und Cloud-Held“,
+  `docs/coop-run-log.md` Abschnitt „Spielernamen und Konten“.
+
 ## Nächste Schritte
 
-S4 Abnahme (Windows-Client, Koop mit Namen, Held nach Neuinstallation, Installer, Runbook, Ist-Stand).
+Keine.
 
 ## Offene Punkte
 
-- S4 offen. Provider „Username & Password“ seit 2026-11-23 aktiv (Probe liefert `WRONG_USERNAME_PASSWORD`).
+Keine.

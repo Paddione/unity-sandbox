@@ -46,6 +46,26 @@ python3 ~/scripts/unity_ops.py rebuild --scene greybox
   oder kein Argument die Greybox. Die Szene steht in der Logzeile
   `Server build result: … (scene <Datei>)`.
 
+## Konten, Namen und Cloud-Held
+
+Unity Authentication im UGS-Projekt „Cinderreach“ (`02e05e98-…`, Umgebung `production`), Provider „Username &
+Password“ aktiv (Unity Cloud Dashboard → Player Authentication → Identity Providers).
+
+- Identität: Jede Spielkopie meldet sich mit einem Auth-Profil an (`main`, oder `-profile NAME` für eine zweite Kopie
+  auf demselben PC). Gäste behalten ihre anonyme Identität über Neustarts. Automation (`-autoplay`, `-coop-autoplay`,
+  `-shotcheck`, `-save-file`) und Server bekommen Wegwerf-Profile `auto<pid>`.
+- Namen: UGS Player Names, im Startbildschirm über „Playing as …“ änderbar, `-player-name` für Testläufe. Der Server
+  bereinigt jeden Namen (`PlayerNames.Sanitize`), Namensschilder zeigen ihn über allen Netz-Helden.
+- Konto: Startbildschirm → „Playing as …“ → Anmelden / Konto anlegen / Abmelden. „Konto anlegen“ als Gast behält die
+  Spieler-ID. Kein Passwort-Zurücksetzen: ein vergessenes Passwort heißt neues Konto (Nicht-Ziel).
+- Cloud-Held: Nur angemeldete Konten synchronisieren (Cloud-Save-Schlüssel `hero`). Lokale Arbeitskopie bleibt
+  `cinderreach-save.json`, daneben `cinderreach-save.json.meta.json` (Besitzer, letzter Abgleich). Ersetzte Helden
+  liegen als `*.pre-cloud.bak`, `*.pc-hero.bak` oder `*.owner-<id>.bak` im selben Ordner
+  (`%USERPROFILE%\AppData\LocalLow\Unity Technologies\Cinderreach`).
+- Live-Probe: `bash scripts/account-smoke.sh [out]` legt ein Wegwerf-Konto an, prüft Anmelden, Neustart, Abmelden,
+  Fehlertexte, Upload, Konflikt und Download auf einem zweiten Profil und löscht das Konto (Exit 0 = alles grün).
+- Spieler löschen oder sperren: Unity Cloud Dashboard → Player Management.
+
 ## Dedizierter Server (devmesh)
 
 Spieler klicken auf dem Startbildschirm „Join Server“. Der Client sucht die öffentliche Lobby „Cinderreach Server“

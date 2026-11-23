@@ -172,3 +172,15 @@ WireGuard mit MTU 1420. Volle Pakete gingen verloren, sobald eine fragmentierte 
 Client lief nach 30–60 s in den Timeout. `CompactPacketDriver` begrenzt auf 1200 Byte für alle Netzmodi.
 Nebenbei: per `timeout` abgebrochene Windows-Läufe lassen `cinderreach.exe` weiterlaufen (sperrt Logs/Staging),
 danach `taskkill /IM cinderreach.exe /F`.
+
+## Spielernamen und Konten (cinderreach-accounts, 2026-11-23)
+
+Namen per `-player-name`, Konten über `scripts/account-smoke.sh` (Wegwerf-Konto, danach gelöscht).
+
+| Lauf | Aufbau | Ergebnis |
+|---|---|---|
+| s1-relay-trio | `COOP_RELAY=1 COOP_CLIENTS=2`, Host + 2 Clients | volle Route Exit 0, 0 Exceptions; jeder Prozess meldet „Client1/Client2/Host joined the party“ |
+| s4-server-relay | `COOP_SERVER=1 COOP_RELAY=1 COOP_CLIENTS=2` | Lead `town,zone1,gate,zone2`, Follow `town,zone1,zone2`, Server Exit 0; Server und Clients kennen beide Namen |
+| s4-smoke-linux | `account-smoke.sh` (Linux-Player) | create/restore/pc2 je 0 Fehler: Gast behält ID, Neustart stellt Konto her, Upload, Konflikt, Download |
+| s4-smoke-windows | gleiche Probe mit `Games\cinderreach\cinderreach.exe` (`dc62621`) | create/restore/pc2 je 0 Fehler, Konto-Held (Stufe 7, 123 Gold) kommt auf dem zweiten Profil an |
+| s4-prod-names | devmesh-Pod (Image `sha256:a6f619ab…`), Windows `-join-server` Lead „WinTester“, Linux Follow „LinuxTester“ | Lead `town,zone1,gate,zone2`, Follow `town,zone1,zone2,boss`, je 0 Exceptions, beide sehen den Namen des anderen |
