@@ -1,3 +1,4 @@
+using Unity.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -5,6 +6,10 @@ using UnityEngine;
 public sealed partial class DiabloNetworkPlayer
 {
     public enum ItemAction { Equip, Unequip, Store, Take, Sell, Discard, Buy, BuyPotion, DrinkPotion }
+
+    public readonly NetworkVariable<FixedString64Bytes> visualArmor = new NetworkVariable<FixedString64Bytes>();
+    public readonly NetworkVariable<FixedString64Bytes> visualWeapon = new NetworkVariable<FixedString64Bytes>();
+    public readonly NetworkVariable<FixedString64Bytes> visualHelmet = new NetworkVariable<FixedString64Bytes>();
 
     bool itemSessionReady;
     Stash ownedStash;
@@ -158,6 +163,10 @@ public sealed partial class DiabloNetworkPlayer
 
     void SendItemState(bool includeStock = false, bool lootSound = false, bool heal = false)
     {
+        var equipment = GetComponent<Equipment>();
+        visualArmor.Value = VisualId(equipment.armor, ItemSlot.Armor);
+        visualWeapon.Value = VisualId(equipment.weapon, ItemSlot.Weapon);
+        visualHelmet.Value = VisualId(equipment.helmet, ItemSlot.Helmet);
         string stock = includeStock ? JsonUtility.ToJson(ownedStock) : "";
         if (IsOwner) RefreshOwnedItemState(stock, lootSound, heal);
         else
@@ -169,6 +178,10 @@ public sealed partial class DiabloNetworkPlayer
             });
         }
     }
+
+    static FixedString64Bytes VisualId(ItemInstance item, ItemSlot slot) =>
+        item?.rarity == ItemRarity.Unique && HeroGearModels.IsKnown(item.uniqueId, slot)
+            ? new FixedString64Bytes(item.uniqueId) : default;
 
     [ClientRpc]
     void ApplyItemStateClientRpc(string json, string stock, bool lootSound, bool heal,

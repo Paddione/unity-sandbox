@@ -120,8 +120,9 @@ public class DiabloMeleeReworkTests
         yield return null;
         Assert.Less(husk.GetComponent<EnemyHealth>().HPFraction(), 1f,
             "Thrust damages past husk melee range (2.0 m).");
-        Assert.AreEqual(0f, Vector3.Distance(before, player.transform.position), 0.001f,
-            "Thrust must not move the hero.");
+        // The fixture has no floor, so the controller can fall during the yielded frame.
+        var displacement = Vector3.ProjectOnPlane(player.transform.position - before, Vector3.up);
+        Assert.AreEqual(0f, displacement.magnitude, 0.001f, "Thrust must not advance the hero.");
         Object.DestroyImmediate(husk);
     }
 

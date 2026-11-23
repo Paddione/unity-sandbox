@@ -89,6 +89,15 @@ public sealed class NetworkItemLifecycleTests
         vendor.transform.position = hero.transform.position;
         managers.Add(vendor);
 
+        var armor = ItemDatabase.CreateUnique(ItemDatabase.ShardbackAegisId);
+        Assert.That(inventory.Add(armor), Is.True);
+        Assert.That(player.RequestItemAction(DiabloNetworkPlayer.ItemAction.Equip, armor), Is.True);
+        Assert.That(player.visualArmor.Value.ToString(), Is.EqualTo(armor.uniqueId));
+        Assert.That(player.RequestItemAction(DiabloNetworkPlayer.ItemAction.Unequip, armor), Is.True);
+        Assert.That(player.visualArmor.Value.ToString(), Is.Empty);
+        Assert.That(inventory.Get(inventory.Count - 1).instanceId, Is.EqualTo(armor.instanceId));
+        Assert.That(inventory.RemoveAt(inventory.Count - 1), Is.True);
+
         while (inventory.FreeSlots > 0) inventory.Add(ItemDatabase.CreateHealingPotion());
         var item = ItemDatabase.RollUnique(ItemDatabase.CreateUnique(ItemDatabase.LancerWardId), 10, 2);
         var pile = LootDrop.SpawnItem(hero.transform.position + Vector3.right * 1.5f, item, true);

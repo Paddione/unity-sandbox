@@ -1,0 +1,470 @@
+Asset	Herkunft	Einsatzort
+Assets/Art/BloodMoor/Materials/Blood.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Coal.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Flame.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Gold.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Grass.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Heather.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/HeatherBloom.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Materials/Rune.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Banner.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/BloodSplat_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/BloodSplat_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/BonePile.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Brazier.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/BrokenPillar.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Campfire.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/CryptSeal.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/DeadTree_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/DeadTree_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Grass_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Gravestone_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Gravestone_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Heather_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Heather_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Rock_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Rock_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Rock_2.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Stake_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Stake_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/Stake_2.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/StoneStep.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/StoneWall_0.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/BloodMoor/Models/StoneWall_1.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/EmberHound_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/EmberHound_MetalRough.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/EmberHound_Normal.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/HoundMimic.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/LootChest.glb	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/LootIcon.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/LootIconBillboard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Materials/Pilot_Banner_BannerPole.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Materials/Pilot_Banner_TornBannerCloth.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Materials/Pilot_Chest_PilotChestVisual.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Materials/Pilot_Hound.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Materials/Pilot_Icon.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Prefabs/PilotBanner.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Prefabs/PilotHound.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Prefabs/PilotLootChest.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/Quadruped.fbx	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/QuadrupedMimic.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/LocalArtPilot/TornBanner.glb	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Bark.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/BarrensSand.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/BarrensStone.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/BloodCloth.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Bone.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/CryptAshlar.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/CryptFlagstone.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/DarkWood.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/FenMoor.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Iron.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/KilnBasalt.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/KilnBrick.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Moss.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Planks.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Slag.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/Stone.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Bark_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Bark_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BarrensSand_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BarrensSand_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BarrensStone_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BarrensStone_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BloodCloth_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/BloodCloth_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Bone_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Bone_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/CryptAshlar_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/CryptAshlar_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/CryptFlagstone_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/CryptFlagstone_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/DarkWood_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/DarkWood_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/FenMoor_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/FenMoor_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Iron_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Iron_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/KilnBasalt_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/KilnBasalt_Emission.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/KilnBasalt_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/KilnBrick_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/KilnBrick_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Moss_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Moss_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Planks_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Planks_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Slag_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Slag_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Stone_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/Stone_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/DefaultNetworkPrefabs.asset	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
+Assets/InputSystem_Actions.inputactions	Cinderreach	Build configuration: Assets/InputSystem_Actions.inputactions
+Assets/Resources/BillingMode.json	Cinderreach	Runtime asset: Assets/Resources/BillingMode.json
+Assets/Resources/CinderreachHeroArt.asset	Cinderreach	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
+Assets/Resources/DiabloLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Resources/HuskLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/Resources/HuskLocomotion.controller
+Assets/Resources/MenuArt/BloodBanner.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/BloodBanner.png
+Assets/Resources/MenuArt/Breastplate.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Breastplate.png
+Assets/Resources/MenuArt/Circlet.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Circlet.png
+Assets/Resources/MenuArt/ClothTunic.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ClothTunic.png
+Assets/Resources/MenuArt/CrestCinderreach.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/CrestCinderreach.png
+Assets/Resources/MenuArt/Dagger.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Dagger.png
+Assets/Resources/MenuArt/EmberCenser.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/EmberCenser.png
+Assets/Resources/MenuArt/GoldCoin.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/GoldCoin.png
+Assets/Resources/MenuArt/HealingPotion.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HealingPotion.png
+Assets/Resources/MenuArt/HeavyAxe.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HeavyAxe.png
+Assets/Resources/MenuArt/Helm.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Helm.png
+Assets/Resources/MenuArt/Hood.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Hood.png
+Assets/Resources/MenuArt/HoodedLantern.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HoodedLantern.png
+Assets/Resources/MenuArt/Lantern.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Lantern.png
+Assets/Resources/MenuArt/LeatherVest.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/LeatherVest.png
+Assets/Resources/MenuArt/LootChest.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/LootChest.png
+Assets/Resources/MenuArt/PortraitFenwalker.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitFenwalker.png
+Assets/Resources/MenuArt/PortraitLanternbearer.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitLanternbearer.png
+Assets/Resources/MenuArt/PortraitRogue.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitRogue.png
+Assets/Resources/MenuArt/PortraitVendor.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitVendor.png
+Assets/Resources/MenuArt/SettingsCog.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SettingsCog.png
+Assets/Resources/MenuArt/ShortBow.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ShortBow.png
+Assets/Resources/MenuArt/ShortSword.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ShortSword.png
+Assets/Resources/MenuArt/SkillArrow.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillArrow.png
+Assets/Resources/MenuArt/SkillBladeFlurry.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillBladeFlurry.png
+Assets/Resources/MenuArt/SkillCleave.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillCleave.png
+Assets/Resources/MenuArt/SkillFireball.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillFireball.png
+Assets/Resources/MenuArt/SkillLanternBolt.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillLanternBolt.png
+Assets/Resources/MenuArt/SkillMendingLight.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillMendingLight.png
+Assets/Resources/MenuArt/SkillQuickShot.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillQuickShot.png
+Assets/Resources/MenuArt/SkillRenewingCircle.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillRenewingCircle.png
+Assets/Resources/MenuArt/SkillSearingHalo.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillSearingHalo.png
+Assets/Resources/MenuArt/SkillSeismicSlam.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillSeismicSlam.png
+Assets/Resources/MenuArt/SkillVeilStep.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillVeilStep.png
+Assets/Resources/MenuArt/SkillWisps.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillWisps.png
+Assets/Resources/MenuArt/StartupBackdrop.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/StartupBackdrop.png
+Assets/Resources/MenuArt/StashChestIcon.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/StashChestIcon.png
+Assets/Resources/MenuArt/TorchSconce.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/TorchSconce.png
+Assets/Resources/MenuArt/WaypointSigil.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/WaypointSigil.png
+Assets/Resources/NetworkLootDrop.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
+Assets/Resources/NetworkPlayer.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab
+Assets/Resources/NetworkPlayerDiablo.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Resources/SkillArt/ArrowProjectile.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab
+Assets/Resources/SkillArt/CleaveArc.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab
+Assets/Resources/SkillArt/FireAdditive.mat	Cinderreach	Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
+Assets/Resources/SkillArt/FireSmoke.mat	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
+Assets/Resources/SkillArt/FireballBlast.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab
+Assets/Resources/SkillArt/FireballProjectile.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
+Assets/Resources/SkillArt/HeroBow.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Assets/Resources/SkillArt/SoftParticle.png	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/SoftParticle.png
+Assets/Resources/VendorIdle.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/Resources/VendorIdle.controller
+Assets/Scenes/Diablo.unity	Cinderreach	Build scene: Assets/Scenes/Diablo.unity
+Assets/Scenes/DiabloZone.unity	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scenes/Greybox.unity	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/CampfireHeal.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Classes/ClassAppearance.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Classes/HeroArtSource.cs	Cinderreach	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
+Assets/Scripts/ConnectionStatusLogger.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/Contracts/ContractBoard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/DiabloAnimator.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloClickController.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloFire.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/DiabloInventoryUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloMelee.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloNetworkPlayer.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloTargetBar.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/AshLancer.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/BossController.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/CinderThrall.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/DuneAugur.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/GlassWard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/GlasswrightController.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/KilnmotherController.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/RangedCaster.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Enemies/ShardGuard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/EnemyAttack.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/EnemyHealth.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/FpsReporter.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/HuskAnimator.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Items/Equipment.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Items/Inventory.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Items/Wallet.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Loot/LootDrop.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
+Assets/Scripts/Loot/LootNetRelay.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
+Assets/Scripts/MultiplayerAutoStarter.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/PlayerHealth.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Story/StoryNpc.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Story/StoryPickup.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/ThirdPersonController.cs	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab
+Assets/Scripts/Town/DiabloVendorUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Town/SmithStation.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Town/StashChest.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Town/Vendor.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/ToyTrigger.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/ZoneEntryHint.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Zones/RiskShrine.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Zones/WaypointShrine.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/Zones/ZoneGate.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Settings/DefaultVolumeProfile.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Assets/Settings/Mobile_RPAsset.asset	Cinderreach	ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Assets/Settings/Mobile_Renderer.asset	Cinderreach	ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Assets/Settings/PC_RPAsset.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset
+Assets/Settings/PC_Renderer.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset
+Assets/Settings/SampleSceneProfile.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Assets/Settings/UniversalRenderPipelineGlobalSettings.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Assets/ThirdParty/KayKit/Adventurers/Accessories/arrow_bow.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/barbarian_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/bow_withString.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/knight_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/mage_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/ranger_texture.png	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
+Assets/ThirdParty/KayKit/Adventurers/Accessories/rogue_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Adventurers/Accessories/sword_1handed.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Knight.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Mage.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Ranger.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
+Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue_Hooded.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Adventurers/barbarian_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/knight_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/mage_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/ranger_texture_URP.mat	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
+Assets/ThirdParty/KayKit/Adventurers/rogue_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatMelee.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/VendorIdle.controller
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_MovementBasic.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Dungeon/KayKitURP.mat	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/barrel_small_stack.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/chest.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/chest_gold.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/column.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/dungeon_texture.png	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/floor_tile_large.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/pillar.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/rubble_half.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/rubble_large.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/sword_shield_broken.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/torch_lit.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/wall.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/wall_broken.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/wall_corner.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity
+Assets/ThirdParty/KayKit/Skeletons/Accessories/skeleton_texture.png	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Mage.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Minion.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Rogue.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Warrior.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/skeleton_texture_URP.mat	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Editor/Scripts/GltfImporter.cs	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/Includes/Emission.cginc	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/Includes/Normal.cginc	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/BaseColor.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/Emission.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/MetallicRoughness.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/Normal.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/Occlusion.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/PBR_metallic_roughness.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/ScreenGrab.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/TextureTransform.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.cloud.gltfast/Runtime/Shader/glTF-pbrMetallicRoughness.shadergraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Editor/AssetImporter/InputActionImporter.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Editor/Icons/InputSystemUIInputModule@64.png	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionAsset.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionReference.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Runtime/Plugins/PlayerInput/DefaultInputActions.inputactions	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Runtime/Plugins/UI/InputSystemUIInputModule.cs	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.netcode.gameobjects/Runtime/Components/NetworkTransform.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Packages/com.unity.netcode.gameobjects/Runtime/Configuration/NetworkPrefabsList.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/Greybox.unity
+Packages/com.unity.netcode.gameobjects/Runtime/Core/NetworkManager.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Packages/com.unity.netcode.gameobjects/Runtime/Core/NetworkObject.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab | Runtime asset: Assets/Resources/NetworkPlayer.prefab | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Packages/com.unity.netcode.gameobjects/Runtime/Transports/UTP/UnityTransport.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/DynamicGI/DynamicGISkyOcclusion.urtshader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/ProbeVolumeCellDilation.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/ProbeVolumeSubdivide.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/RenderingLayerMask/TraceRenderingLayerMask.urtshader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/VirtualOffset/TraceVirtualOffset.urtshader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/VoxelizeScene.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeSamplingDebugMesh.fbx	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeVolumeDebug.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeVolumeFragmentationDebug.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeVolumeNumbersDisplayTex.png	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeVolumeOffsetDebug.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Debug/ProbeVolumeSamplingDebug.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Lighting/ProbeVolume/ProbeVolumeBlendStates.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Lighting/ProbeVolume/ProbeVolumeUploadData.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Lighting/ProbeVolume/ProbeVolumeUploadDataL2.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Lighting/ProbeVolume/ProbeVolumesOptions.cs	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/DebugOccluder.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/DebugOcclusionTest.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferCopyKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/InstanceDataBufferUploadKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/InstanceOcclusionCullingKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/InstanceTransformUpdateKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/InstanceWindDataUpdateKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/OccluderDepthPyramidKernels.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/GPUDriven/OcclusionCullingDebug.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/STP/StpPreTaa.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/STP/StpSetup.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/STP/StpTaa.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.core/Runtime/Volume/VolumeProfile.cs	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.core/Shaders/CoreCopy.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Editor/AssetVersion.cs	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/CinderreachHeroArt.asset | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/UniversalMetadata.cs	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Editor/Volume/DefaultVolumeProfile.asset	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/2D/Data/Textures/FalloffLookupTexture.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Data/PostProcessData.asset	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Data/PostProcessData.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Data/UniversalRenderPipelineAsset.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Decal/DBuffer/DBufferClear.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/Decal.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/ParticlesUnlit.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/SpriteMask-Default.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Materials/TerrainLit.mat	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/Bloom.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ChannelMixer.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ChromaticAberration.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ColorAdjustments.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ColorCurves.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ColorLookup.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/DepthOfField.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/FilmGrain.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/LensDistortion.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/LiftGammaGain.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/MotionBlur.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/PaniniProjection.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ScreenSpaceLensFlare.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/ShadowsMidtonesHighlights.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/SplitToning.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/Tonemapping.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/Vignette.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/Overrides/WhiteBalance.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/RendererFeatures/ScreenSpaceAmbientOcclusion.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Runtime/UniversalRenderPipelineGlobalSettings.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Runtime/UniversalRendererData.cs	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Light2D.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Shadow2D-Projected.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Shadow2D-Shadow-Geometry.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Shadow2D-Shadow-Sprite.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Shadow2D-Unshadow-Geometry.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Shadow2D-Unshadow-Sprite.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Lit-Default.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Mask.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Unlit-Default.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractive.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractiveMasked.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/AutodeskInteractive/AutodeskInteractiveTransparent.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/CameraMotionVectors.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Debug/DebugReplacement.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Debug/HDRDebugView.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Debug/ProbeVolumeSamplingDebugPositionNormal.compute	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Decal.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/CinderreachHeroArt.asset | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab | Runtime asset: Assets/Resources/VendorIdle.controller
+Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree7.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree8_PBRLit.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree9_URP.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Particles/ParticlesUnlit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Bloom.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/BokehDepthOfField.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/CameraMotionBlur.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/EdgeAdaptiveSpatialUpsampling.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/FinalPost.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/GaussianDepthOfField.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/LensFlareDataDriven.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/LensFlareScreenSpace.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/LutBuilderHdr.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/LutBuilderLdr.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/PaniniProjection.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/ScalingSetup.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/StopNaN.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/SubpixelMorphologicalAntialiasing.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/TemporalAA.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/UberPost.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainDetailLit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Terrain/WavingGrass.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Terrain/WavingGrassBillboard.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/BlitHDROverlay.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepth.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/CoreBlit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/CoreBlitColorAndDepth.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/FallbackError.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/Sampling.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/ScreenSpaceAmbientOcclusion.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/Utils/StencilDeferred.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/XR/XRMirrorView.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/XR/XRMotionVector.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Shaders/XR/XROcclusionMesh.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BayerMatrix.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_0.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_1.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_10.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_11.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_12.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_13.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_14.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_15.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_16.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_17.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_18.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_19.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_2.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_20.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_21.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_22.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_23.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_24.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_25.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_26.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_27.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_28.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_29.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_3.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_30.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_31.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_4.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_5.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_6.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_7.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_8.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise16/L/LDR_LLL1_9.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_0.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_1.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_2.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_3.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_4.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_5.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise256/LDR_LLL1_6.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/BlueNoise64/L/LDR_LLL1_0.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/DebugFont.tga	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Large01.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Large02.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium01.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium02.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium03.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium04.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium05.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Medium06.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Thin01.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/FilmGrain/Thin02.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/SMAA/AreaTex.tga	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.render-pipelines.universal/Textures/SMAA/SearchTex.tga	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
+Packages/com.unity.rendering.light-transport/Editor/UnifiedRTShaderImporter.cs	com.unity.rendering.light-transport	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/Editor/Data/SubGraph/SubGraphAsset.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/Editor/Generation/Targets/BuiltIn/Editor/ShaderGraph/BuiltInMetadata.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphImporter.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/Editor/Importers/ShaderGraphMetadata.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/Editor/Importers/ShaderSubGraphImporter.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/Editor/Importers/ShaderSubGraphMetadata.cs	com.unity.shadergraph	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/LODDitheringTransition.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8Billboard.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8CameraFacingLeafEffect.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8ColorAlpha.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8InterpolatedNormals.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8LODTransition.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8Wind.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree8Wind.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9CameraFacingLeafEffect.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9Wind.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9Wind.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTreeCommon.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.ugui/Runtime/UGUI/EventSystem/EventSystem.cs	com.unity.ugui	Build scene: Assets/Scenes/DiabloZone.unity

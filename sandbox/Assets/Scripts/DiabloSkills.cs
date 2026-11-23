@@ -208,10 +208,21 @@ public sealed class DiabloSkills : MonoBehaviour
 
     float bowUntil = float.NegativeInfinity;
     GameObject heldBow;
+    Renderer[] bowRenderers;
+    bool showBowModel = true;
     Renderer[] swordRenderers;
 
     /// <summary>True while the hero holds the bow instead of the sword.</summary>
     public bool BowDrawn => heldBow != null && heldBow.activeSelf;
+
+    internal void SetStarterBowModelVisible(bool visible)
+    {
+        if (showBowModel == visible) return;
+        showBowModel = visible;
+        if (bowRenderers == null) return;
+        foreach (var renderer in bowRenderers)
+            renderer.enabled = visible;
+    }
 
     /// <summary>Draw the bow (hide the sword) for BowStanceSeconds.</summary>
     public void EnterBowStance()
@@ -250,6 +261,9 @@ public sealed class DiabloSkills : MonoBehaviour
             bow.transform.localPosition = new Vector3(-0.35f, 1.0f, 0.25f);
             bow.transform.localRotation = Quaternion.identity;
         }
+        bowRenderers = bow.GetComponentsInChildren<Renderer>(true);
+        foreach (var renderer in bowRenderers)
+            renderer.enabled = showBowModel;
         return bow;
     }
 

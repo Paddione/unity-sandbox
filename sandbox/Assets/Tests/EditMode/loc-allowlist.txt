@@ -242,3 +242,44 @@ Story/StoryModel.cs	Fen Brute
 Story/StoryModel.cs	Glass Elite
 Story/StoryModel.cs	Hollow Abbot
 Story/StoryModel.cs	Kiln Summon
+# Cinderreach gear IDs, scene-object names and diagnostic output.
+Classes/HeroEquipmentAppearance.cs	Chest art
+Classes/HeroEquipmentAppearance.cs	Head art
+Classes/HeroEquipmentAppearance.cs	Lantern of the Hold
+Classes/HeroEquipmentAppearance.cs	Left hand art
+Classes/HeroEquipmentAppearance.cs	Right hand art
+Classes/HeroGearModels.cs	Asymmetric leather panels
+Classes/HeroGearModels.cs	Bearded axe head
+Classes/HeroGearModels.cs	Censer bowl
+Classes/HeroGearModels.cs	Censer core
+Classes/HeroGearModels.cs	Censer handle
+Classes/HeroGearModels.cs	Central prism
+Classes/HeroGearModels.cs	Corner post
+Classes/HeroGearModels.cs	Cryptwarden Plate
+Classes/HeroGearModels.cs	Diagonal clasp
+Classes/HeroGearModels.cs	Emberbrand Blade
+Classes/HeroGearModels.cs	Fault spire
+Classes/HeroGearModels.cs	Flame edge
+Classes/HeroGearModels.cs	Forward cowl
+Classes/HeroGearModels.cs	Glass splinter
+Classes/HeroGearModels.cs	Guard clasp
+Classes/HeroGearModels.cs	Hood crest
+Classes/HeroGearModels.cs	Hooked blade
+Classes/HeroGearModels.cs	Invalid gear outline: {name}.
+Classes/HeroGearModels.cs	Jagged cuirass
+Classes/HeroGearModels.cs	Lantern of the Hold
+Classes/HeroGearModels.cs	Left prism
+Classes/HeroGearModels.cs	Light chamber
+Classes/HeroGearModels.cs	Oracle stone
+Classes/HeroGearModels.cs	Raised spine
+Classes/HeroGearModels.cs	Recurved limb
+Classes/HeroGearModels.cs	Right prism
+Classes/HeroGearModels.cs	Seer's Circlet
+Classes/HeroGearModels.cs	Split mantle
+Classes/HeroGearModels.cs	Square foot
+Classes/HeroGearModels.cs	Square roof
+Classes/HeroGearModels.cs	Sun ray
+Classes/HeroGearModels.cs	Tall shield breastplate
+Classes/HeroGearModels.cs	Tomb plate
+Classes/HeroGearModels.cs	Yellow chest guard
+DiabloShotCheck.cs	DONE {index} equipment shots

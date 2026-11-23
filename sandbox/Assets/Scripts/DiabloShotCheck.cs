@@ -12,6 +12,7 @@ using UnityEngine;
 public sealed class DiabloShotCheck : MonoBehaviour
 {
     public const string Flag = "-shotcheck";
+    const string EquipmentFlag = "-equipment-shots";
 
     string dir;
     int index;
@@ -59,6 +60,15 @@ public sealed class DiabloShotCheck : MonoBehaviour
         float baseDist = hero.distance, basePitch = hero.pitch, baseYaw = hero.yaw;
         var camFwd = Quaternion.Euler(0f, baseYaw, 0f) * Vector3.forward;
         var camRight = Quaternion.Euler(0f, baseYaw, 0f) * Vector3.right;
+
+        if (HasArg(EquipmentFlag))
+        {
+            yield return EquipmentShots(hero, -camFwd);
+            DiabloClickController.ExternalDrive = false;
+            Log($"DONE {index} equipment shots");
+            Quit(0);
+            yield break;
+        }
 
         // 1) Gameplay framing, idle with sword.
         yield return Shot("gameplay_idle");
@@ -584,6 +594,40 @@ public sealed class DiabloShotCheck : MonoBehaviour
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);
+    }
+
+    IEnumerator EquipmentShots(DiabloClickController hero, Vector3 towardCamera)
+    {
+        var equipment = hero.GetComponent<Equipment>();
+        var appearance = hero.GetComponent<ClassAppearance>();
+        var inventory = hero.GetComponent<Inventory>();
+        float distance = hero.distance;
+        float pitch = hero.pitch;
+        Face(hero, towardCamera);
+        foreach (var cls in ClassCatalog.All)
+        {
+            appearance.Apply(cls);
+            yield return Wait(.35f);
+            yield return Shot("base_" + cls.id);
+        }
+
+        hero.distance = 5f;
+        hero.pitch = 33f;
+        foreach (var id in ItemDatabase.UniqueIds)
+        {
+            var item = ItemDatabase.CreateUnique(id);
+            appearance.Apply(ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)));
+            var facing = item.slot == ItemSlot.Weapon
+                ? Quaternion.Euler(0, id == ItemDatabase.NightfangId ? 45f : -45f, 0) * towardCamera
+                : id == ItemDatabase.ShardbackAegisId ? -towardCamera : towardCamera;
+            Face(hero, facing);
+            equipment.Equip(item);
+            yield return Wait(.35f);
+            yield return Shot(id.Replace(' ', '-').Replace("'", ""));
+            equipment.UnequipTo(item.slot, inventory);
+        }
+        hero.distance = distance;
+        hero.pitch = pitch;
     }
 
     static void TeleportHero(DiabloClickController hero, Vector3 pos)

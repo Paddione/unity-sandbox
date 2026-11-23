@@ -8,6 +8,7 @@
     "Unity.InputSystem.TestFramework",
     "Sandbox.Runtime",
     "Unity.Netcode.Runtime",
+    "Unity.Collections",
     "Unity.Networking.Transport"
   ],
   "includePlatforms": [],

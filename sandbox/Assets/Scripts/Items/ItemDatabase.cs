@@ -79,155 +79,146 @@ public static class ItemDatabase
         }
     }
 
+    static readonly Dictionary<string, System.Func<ItemInstance>> UniqueFactories =
+        new Dictionary<string, System.Func<ItemInstance>>(System.StringComparer.Ordinal)
+        {
+            ["Emberbrand Blade"] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "ShortSword",
+                uniqueId = "Emberbrand Blade",
+                affixes = new List<Affix> { new Affix("Damage", 6f), new Affix("Crit", 10f) },
+            },
+            ["Lantern of the Hold"] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "Lantern",
+                uniqueId = "Lantern of the Hold",
+                affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("CooldownReduction", 10f), new Affix("MaxHP", 10f) },
+            },
+            ["Cryptwarden Plate"] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "Breastplate",
+                uniqueId = "Cryptwarden Plate",
+                affixes = new List<Affix> { new Affix("MaxHP", 30f), new Affix("Armor", 4f) },
+            },
+            [LancerWardId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "HeavyAxe",
+                uniqueId = LancerWardId,
+                affixes = new List<Affix> { new Affix("Damage", 5f) },
+            },
+            [WickOfHaloId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "EmberCenser",
+                uniqueId = WickOfHaloId,
+                affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 10f) },
+            },
+            [NightfangId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "ShortBow",
+                uniqueId = NightfangId,
+                affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("Crit", 8f) },
+            },
+            [RogueKeepsakeId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "RogueBlade",
+                uniqueId = RogueKeepsakeId,
+                affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("Crit", 10f) },
+            },
+            [BulwarkCarrierId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "Breastplate",
+                uniqueId = BulwarkCarrierId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("Armor", 3f) },
+            },
+            [SeismicCrownId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Helm",
+                uniqueId = SeismicCrownId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("CooldownReduction", 8f) },
+            },
+            [MercyShroudId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "ClothTunic",
+                uniqueId = MercyShroudId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("MagicFind", 20f) },
+            },
+            [DawnCircleId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Circlet",
+                uniqueId = DawnCircleId,
+                affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 20f) },
+            },
+            [ShadowstrideVestId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "LeatherVest",
+                uniqueId = ShadowstrideVestId,
+                affixes = new List<Affix> { new Affix("MoveSpeed", 0.3f), new Affix("Armor", 3f) },
+            },
+            [KeenCadenceId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Hood",
+                uniqueId = KeenCadenceId,
+                affixes = new List<Affix> { new Affix("Crit", 10f), new Affix("CritRating", 20f) },
+            },
+            [ShardbackAegisId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "Breastplate",
+                uniqueId = ShardbackAegisId,
+                affixes = new List<Affix> { new Affix("MaxHP", 25f), new Affix("Armor", 5f), new Affix("Thorns", 3f) },
+            },
+            [GlasswrightPrismId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Circlet",
+                uniqueId = GlasswrightPrismId,
+                affixes = new List<Affix> { new Affix("CritRating", 25f), new Affix("IncreasedArea", 20f), new Affix("CooldownReduction", 10f) },
+            },
+            ["Seer's Circlet"] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Circlet",
+                uniqueId = "Seer's Circlet",
+                affixes = new List<Affix> { new Affix("XPMul", 20f), new Affix("Crit", 8f) },
+            },
+        };
+
+    public static IEnumerable<string> UniqueIds => UniqueFactories.Keys;
+
     public static ItemInstance CreateUnique(string uniqueId)
     {
-        switch (uniqueId)
-        {
-            case "Emberbrand Blade":
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "ShortSword",
-                    uniqueId = "Emberbrand Blade",
-                    affixes = new List<Affix> { new Affix("Damage", 6f), new Affix("Crit", 10f) },
-                };
-            case "Lantern of the Hold":
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Lantern",
-                    uniqueId = "Lantern of the Hold",
-                    affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("CooldownReduction", 10f), new Affix("MaxHP", 10f) },
-                };
-            case "Cryptwarden Plate":
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Breastplate",
-                    uniqueId = "Cryptwarden Plate",
-                    affixes = new List<Affix> { new Affix("MaxHP", 30f), new Affix("Armor", 4f) },
-                };
-            case LancerWardId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "HeavyAxe",
-                    uniqueId = LancerWardId,
-                    affixes = new List<Affix> { new Affix("Damage", 5f) },
-                };
-            case WickOfHaloId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "EmberCenser",
-                    uniqueId = WickOfHaloId,
-                    affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 10f) },
-                };
-            case NightfangId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "ShortBow",
-                    uniqueId = NightfangId,
-                    affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("Crit", 8f) },
-                };
-            case RogueKeepsakeId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Unique,
-                    baseType = "RogueBlade",
-                    uniqueId = RogueKeepsakeId,
-                    affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("Crit", 10f) },
-                };
-            case BulwarkCarrierId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Breastplate",
-                    uniqueId = BulwarkCarrierId,
-                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("Armor", 3f) },
-                };
-            case SeismicCrownId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Helmet,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Helm",
-                    uniqueId = SeismicCrownId,
-                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("CooldownReduction", 8f) },
-                };
-            case MercyShroudId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Unique,
-                    baseType = "ClothTunic",
-                    uniqueId = MercyShroudId,
-                    affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("MagicFind", 20f) },
-                };
-            case DawnCircleId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Helmet,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Circlet",
-                    uniqueId = DawnCircleId,
-                    affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 20f) },
-                };
-            case ShadowstrideVestId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Unique,
-                    baseType = "LeatherVest",
-                    uniqueId = ShadowstrideVestId,
-                    affixes = new List<Affix> { new Affix("MoveSpeed", 0.3f), new Affix("Armor", 3f) },
-                };
-            case KeenCadenceId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Helmet,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Hood",
-                    uniqueId = KeenCadenceId,
-                    affixes = new List<Affix> { new Affix("Crit", 10f), new Affix("CritRating", 20f) },
-                };
-            case ShardbackAegisId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Breastplate",
-                    uniqueId = ShardbackAegisId,
-                    affixes = new List<Affix> { new Affix("MaxHP", 25f), new Affix("Armor", 5f), new Affix("Thorns", 3f) },
-                };
-            case GlasswrightPrismId:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Helmet,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Circlet",
-                    uniqueId = GlasswrightPrismId,
-                    affixes = new List<Affix> { new Affix("CritRating", 25f), new Affix("IncreasedArea", 20f), new Affix("CooldownReduction", 10f) },
-                };
-            default:
-                return new ItemInstance
-                {
-                    slot = ItemSlot.Helmet,
-                    rarity = ItemRarity.Unique,
-                    baseType = "Circlet",
-                    uniqueId = "Seer's Circlet",
-                    affixes = new List<Affix> { new Affix("XPMul", 20f), new Affix("Crit", 8f) },
-                };
-        }
+        if (uniqueId != null && UniqueFactories.TryGetValue(uniqueId, out var factory))
+            return factory();
+        return UniqueFactories["Seer's Circlet"]();
     }
 
     /// <summary>
@@ -390,26 +381,8 @@ public static class ItemDatabase
     /// legacy P2 uniques, build uniques and the S4 matrix. Unknown IDs are
     /// rejected on the host path (SanitizeGearItem) and never equipped.
     /// </summary>
-    public static bool IsKnownUniqueId(string uniqueId)
-    {
-        if (string.IsNullOrEmpty(uniqueId)) return false;
-        switch (uniqueId)
-        {
-            case "Emberbrand Blade":
-            case "Lantern of the Hold":
-            case "Cryptwarden Plate":
-            case "Seer's Circlet":
-            case LancerWardId:
-            case WickOfHaloId:
-            case NightfangId:
-            case RogueKeepsakeId:
-            case ShardbackAegisId:
-            case GlasswrightPrismId:
-                return true;
-            default:
-                return IsMatrixUnique(uniqueId);
-        }
-    }
+    public static bool IsKnownUniqueId(string uniqueId) =>
+        uniqueId != null && UniqueFactories.ContainsKey(uniqueId);
 
     /// <summary>
     /// Regular armor Unique pool (S4): legacy Cryptwarden Plate or one of the

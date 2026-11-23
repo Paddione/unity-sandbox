@@ -83,6 +83,7 @@ public static class KayKitAssets
     [MenuItem("Sandbox/KayKit/Verify Imported Assets")]
     public static void Verify()
     {
+        CinderreachHeroArt.Verify();
         for (var i = 0; i < Packs.Length; i++)
         {
             var sub = $"{Root}/{Packs[i]}/{ModelDirs[i]}";

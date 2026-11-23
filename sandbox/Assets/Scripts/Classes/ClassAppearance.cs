@@ -22,6 +22,7 @@ public sealed class ClassAppearance : MonoBehaviour
     readonly List<Renderer> baseBody = new List<Renderer>();
     GameObject skinRoot;
     GameObject lantern;
+    HeroEquipmentAppearance gear;
 
     void Start()
     {
@@ -36,17 +37,32 @@ public sealed class ClassAppearance : MonoBehaviour
         if (cls == null) cls = ClassCatalog.Fenwalker;
         CollectBaseBody();
         bool lanternbearer = cls.id == ClassCatalog.LanternbearerId;
-        foreach (var r in baseBody) if (r != null) r.enabled = !lanternbearer;
+        if (Application.isPlaying && gear == null)
+        {
+            var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
+            if (source != null && source.LightClothing != null && GetComponent<Equipment>() != null)
+            {
+                var candidate = gameObject.AddComponent<HeroEquipmentAppearance>();
+                if (candidate.Initialize(this, source.LightClothing)) gear = candidate;
+                else Destroy(candidate);
+            }
+        }
+        foreach (var r in baseBody) if (r != null) r.enabled = gear == null && !lanternbearer;
         SetSword(!lanternbearer);
         if (lanternbearer)
         {
-            if (skinRoot == null) skinRoot = BuildSkin();
+            if (gear == null && skinRoot == null) skinRoot = BuildSkin();
             if (lantern == null) lantern = BuildLantern();
         }
-        if (skinRoot != null) skinRoot.SetActive(lanternbearer);
+        if (skinRoot != null) skinRoot.SetActive(gear == null && lanternbearer);
         if (lantern != null) lantern.SetActive(lanternbearer);
         SwapStarterWeapon(cls);
         AppliedClassId = cls.id;
+    }
+
+    internal void SetStarterLanternVisible(bool visible)
+    {
+        if (lantern != null) lantern.SetActive(visible);
     }
 
     void CollectBaseBody()
