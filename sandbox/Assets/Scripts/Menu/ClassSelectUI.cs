@@ -37,6 +37,8 @@ public sealed class ClassSelectUI : MonoBehaviour
         live.Remove(this);
         PlayerAccount.NameChanged -= RefreshAccountLabel;
         if (Account != null) PlayerAccount.AccountChanged -= Account.Refresh;
+        CloudHeroSync.Synced -= OnCloudSynced;
+        CloudHeroSync.Conflict -= OnCloudConflict;
     }
     public static bool ClassFromCommandLine { get; private set; }
 
@@ -469,8 +471,10 @@ public sealed class ClassSelectUI : MonoBehaviour
         accountLabel = accountBtn.GetComponentInChildren<Text>();
         PlayerAccount.NameChanged += RefreshAccountLabel;
         RefreshAccountLabel();
+        CloudHeroSync.Synced += OnCloudSynced;
+        CloudHeroSync.Conflict += OnCloudConflict;
         if (!Application.isBatchMode)
-            _ = PlayerAccount.EnsureSignedInAsync(); // loads the online name; offline keeps the local one
+            _ = CloudHeroSync.SignInAndSyncAsync(); // online name + cloud hero; offline keeps the local ones
 
         DiabloUIFactory.MakeDivider(mainContent.transform, 6f);
 
@@ -562,8 +566,64 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.SetLayout(backBtn.gameObject, prefH: 44f, flexW: 1f);
         confirmModal.SetActive(false);
         Account = AccountPanel.Build(canvasGo.transform);
+        BuildHeroChoice(canvasGo.transform);
         RefreshContinueAndDiff();
         canvas.enabled = false;
+    }
+
+    // ------------------------------------------------ accounts S3: cloud hero
+
+    GameObject heroChoiceModal;
+    Text heroChoiceBody;
+
+    void OnCloudSynced()
+    {
+        if (this == null) return;
+        RefreshContinueAndDiff();
+        if (Account != null && Account.IsOpen && !string.IsNullOrEmpty(CloudHeroSync.Status))
+            Account.Status.text = CloudHeroSync.Status;
+    }
+
+    void OnCloudConflict(SaveGame cloud, SaveGame local)
+    {
+        if (this == null || heroChoiceModal == null) return;
+        heroChoiceBody.text = HeroChoiceText(cloud, local);
+        heroChoiceModal.SetActive(true);
+    }
+
+    /// <summary>Conflict prompt body (pure): both heroes with class and level.</summary>
+    public static string HeroChoiceText(SaveGame cloud, SaveGame local)
+    {
+        string Describe(SaveGame s) => s == null ? "unreadable"
+            : $"{ClassCatalog.Get(s.classId).displayName}, level {s.level}, {s.gold} gold";
+        return $"Your account has a hero ({Describe(cloud)}).\nThis PC has another one ({Describe(local)}).\n" +
+               "Keep which? The other one is backed up on this PC.";
+    }
+
+    void BuildHeroChoice(Transform canvas)
+    {
+        heroChoiceModal = DiabloUIFactory.MakePanel(canvas, "HeroChoicePanel", new Vector2(640f, 320f), Vector2.zero);
+        var v = heroChoiceModal.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(24, 24, 18, 20);
+        v.spacing = 12f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+        DiabloUIFactory.MakeHeader(heroChoiceModal.transform, "WHICH HERO?", DiabloMenuArt.MenuArtSprite("CrestCinderreach"));
+        heroChoiceBody = DiabloUIFactory.MakeText(heroChoiceModal.transform, "HeroChoiceBody", "", 17, DiabloPalette.Parchment, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(heroChoiceBody.gameObject, prefH: 120f, flexW: 1f);
+        var row = DiabloUIFactory.MakeHorizontalRow(heroChoiceModal.transform, "HeroChoiceButtons", 14f, 46f);
+        var cloudBtn = DiabloUIFactory.MakeButton(row.transform, "KeepCloudHeroButton", "Account hero", 17, true, DiabloPalette.GoldBright, () => ChooseHero(true));
+        DiabloUIFactory.SetLayout(cloudBtn.gameObject, prefH: 44f, flexW: 1f);
+        var localBtn = DiabloUIFactory.MakeButton(row.transform, "KeepLocalHeroButton", "This PC's hero", 17, false, null, () => ChooseHero(false));
+        DiabloUIFactory.SetLayout(localBtn.gameObject, prefH: 44f, flexW: 1f);
+        heroChoiceModal.SetActive(false);
+    }
+
+    async void ChooseHero(bool keepCloud)
+    {
+        DiabloAudio.PlayUIClick();
+        if (heroChoiceModal != null) heroChoiceModal.SetActive(false);
+        await CloudHeroSync.ResolveConflictAsync(keepCloud);
     }
 
     /// <summary>Title-row label: the name this player shows online.</summary>

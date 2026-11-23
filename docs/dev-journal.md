@@ -998,3 +998,11 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Spieler-ID (`AddUsernamePasswordAsync`), damit wandern Name und später der Cloud-Held mit.
 - `scripts/account-smoke.sh` prüft den Ablauf live am UGS-Projekt mit einem Wegwerf-Konto, das am Ende gelöscht wird.
   Gelernt: Anmelden mit dem bereits aktiven Konto ist eine Leeraktion, der Test meldet sich vorher ab.
+
+## 2026-11-23 — Konten S3: Held in der Cloud
+
+- Ein angemeldetes Konto lädt den Helden 2 s nach jedem Speichern in UGS Cloud Save und gleicht ihn bei jedem
+  Kontowechsel ab. Der lokale Save bleibt Arbeitskopie und Offline-Rückfall, eine Side-Car-Datei merkt sich Besitzer
+  und letzten Abgleich. Nur ein echter Konflikt (beide Seiten geändert, oder Gast-Held trifft Konto-Held) fragt.
+- Gelernt: Der Abgleich hing anfangs nur am Startbildschirm. Ohne ihn (Batch-Lauf, Beitritt per Kommandozeile)
+  lief nach dem Anmelden kein Abgleich. Jetzt hängt er sich beim Spielstart an die Kontowechsel.

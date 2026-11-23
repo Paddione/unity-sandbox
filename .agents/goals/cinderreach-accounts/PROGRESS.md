@@ -1,6 +1,6 @@
 # Fortschritt – cinderreach-accounts
 
-Prozent: 50 %
+Prozent: 75 %
 
 ## Erledigt
 
@@ -21,10 +21,17 @@ Prozent: 50 %
   falsches Passwort und belegter Name mit Klartext, Wiederanmeldung liefert dieselbe Spieler-ID. EditMode 466/466,
   PlayMode 284/284.
 
+- S3 Cloud-Held: Paket `com.unity.services.cloudsave` 3.4.2, `CloudHeroResolver` (rein: None/Upload/Download/Ask/
+  StartFresh), `CloudHeroSync` (Schlüssel `hero`, Hülle `{v, savedTicks, owner, save}`, Side-Car `<save>.meta.json`,
+  Upload 2 s nach jedem lokalen Schreiben, Abgleich bei jedem Kontowechsel, ersetzte Helden als `.bak`),
+  Startbildschirm-Dialog „WHICH HERO?“. Live-Probe `account-smoke.sh` 2026-11-23 (Benutzer `crsmoke_1795460655`,
+  danach gelöscht): 3 Läufe, 0 Fehler, u. a. Upload auf PC 1, Gast-Held gegen Konto-Held fragt auf PC 2, Konto-Held
+  kommt an (Stufe 7, 123 Gold, Rogue), PC-Held als `.pc-hero.bak` gesichert. EditMode 479/479, PlayMode 284/284.
+
 ## Nächste Schritte
 
-S3 Cloud-Held.
+S4 Abnahme (Windows-Client, Koop mit Namen, Held nach Neuinstallation, Installer, Runbook, Ist-Stand).
 
 ## Offene Punkte
 
-- S3–S4 offen. Provider „Username & Password“ seit 2026-11-23 aktiv (Probe liefert `WRONG_USERNAME_PASSWORD`).
+- S4 offen. Provider „Username & Password“ seit 2026-11-23 aktiv (Probe liefert `WRONG_USERNAME_PASSWORD`).

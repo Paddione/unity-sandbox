@@ -101,6 +101,7 @@ public static class SaveService
     {
         string p = path ?? DefaultPath;
         if (File.Exists(p)) File.Delete(p);
+        CloudHeroSync.NotifyLocalDelete(p);
         LoadedZoneReached = 1;
         RunProfile.Reset();
         ContractProgress.Reset();
@@ -268,6 +269,7 @@ public static class SaveService
         if (File.Exists(path)) File.Delete(path);
         File.Move(tmp, path);
         Debug.Log($"[Save] Saved level {save.level} ({save.gold} gold, zone {save.zoneReached}).");
+        CloudHeroSync.NotifyLocalWrite(path); // accounts S3: stamp + queue the cloud upload
     }
 
     /// <summary>

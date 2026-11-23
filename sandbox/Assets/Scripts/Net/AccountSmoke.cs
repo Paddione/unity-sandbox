@@ -8,7 +8,10 @@ using Unity.Services.Authentication;
 /// explicit <c>-profile</c>:
 /// <c>-account-smoke create</c>: guest → create account (same player id) → name;
 /// <c>-account-smoke restore</c>: restored account session → sign out (new
-/// guest) → sign in (original id again) → delete the test account.
+/// guest) → sign in (original id again);
+/// <c>-account-smoke pc2</c> (second profile and save file = another PC): a
+/// guest hero meets the account's cloud hero → conflict → keep the account
+/// hero → it arrives locally → delete the test account.
 /// Credentials come from CR_SMOKE_USER / CR_SMOKE_PASS, never from the command line.
 /// Every verdict is one <c>ACCOUNT_SMOKE</c> log line; exit 0 = all good.
 /// </summary>
@@ -69,6 +72,15 @@ public sealed class AccountSmoke : MonoBehaviour
             var name = PlayerAccount.SetDisplayNameAsync("SmokeHero");
             yield return Await(name);
             Check(name.Result == "SmokeHero", $"display name {name.Result}");
+            // S3: a hero written while signed in reaches the account.
+            var hero = new SaveGame { level = 7, gold = 123, classId = ClassCatalog.RogueId };
+            SaveService.WriteSave(hero, SaveService.DefaultPath);
+            var flush = CloudHeroSync.FlushAsync();
+            yield return Await(flush);
+            Check(CloudHeroSync.Enabled, "cloud sync enabled for the account");
+            var meta = CloudHeroSync.ReadMeta(SaveService.DefaultPath);
+            Check(meta.owner == guestId && meta.syncedTicks == meta.savedTicks && meta.savedTicks > 0,
+                $"hero uploaded (owner={meta.owner}, synced={meta.syncedTicks == meta.savedTicks})");
             PlayerPrefs.SetString("cinderreach.smokeId", guestId);
             PlayerPrefs.Save();
         }
@@ -91,10 +103,30 @@ public sealed class AccountSmoke : MonoBehaviour
             yield return Await(right);
             Check(right.Result == null && PlayerAccount.PlayerId == id && PlayerAccount.DisplayName == "SmokeHero",
                 "sign-in returns the original player id and name");
+        }
+        else if (mode == "pc2")
+        {
+            Check(PlayerAccount.IsGuest, "second PC starts as a guest");
+            Check(!CloudHeroSync.Enabled, "guests never sync");
+            SaveService.WriteSave(new SaveGame { level = 2, gold = 5, classId = ClassCatalog.FenwalkerId }, SaveService.DefaultPath);
+            SaveGame conflictCloud = null, conflictLocal = null;
+            CloudHeroSync.Conflict += (c, l) => { conflictCloud = c; conflictLocal = l; };
+            var signIn2 = PlayerAccount.SignInAsync(user, pass); // AccountChanged starts the sync
+            yield return Await(signIn2);
+            Check(signIn2.Result == null, "second PC signs in");
+            float until = Time.realtimeSinceStartup + 20f;
+            while (!CloudHeroSync.ConflictPending && Time.realtimeSinceStartup < until) yield return null;
+            Check(CloudHeroSync.ConflictPending && conflictCloud != null && conflictLocal != null
+                  && conflictCloud.level == 7 && conflictLocal.level == 2,
+                $"guest hero vs. account hero asks (cloud lv {conflictCloud?.level}, pc lv {conflictLocal?.level})");
+            var keep = CloudHeroSync.ResolveConflictAsync(keepCloud: true);
+            yield return Await(keep);
+            Check(SaveService.TryPeek(out var arrived) && arrived.level == 7 && arrived.gold == 123
+                  && arrived.classId == ClassCatalog.RogueId, $"account hero arrived (lv {arrived?.level}, {arrived?.gold} gold)");
+            Check(System.IO.File.Exists(SaveService.DefaultPath + ".pc-hero.bak"), "this PC's hero is backed up");
             var del = AuthenticationService.Instance.DeleteAccountAsync();
             yield return Await(del);
             Check(!del.IsFaulted, "test account deleted");
-            PlayerPrefs.DeleteKey("cinderreach.smokeId");
         }
         else Check(false, $"unknown mode {mode}");
         Finish();
