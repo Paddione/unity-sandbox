@@ -36,7 +36,8 @@ public sealed class CoopAutoplay : MonoBehaviour
             if (args[i] == Flag)
             {
                 var v = args[i + 1].ToLowerInvariant();
-                if (v == AutoplayResult.RoleHost || v == AutoplayResult.RoleClient) return v;
+                if (v == AutoplayResult.RoleHost || v == AutoplayResult.RoleClient
+                    || v == AutoplayResult.RoleLead || v == AutoplayResult.RoleFollow) return v;
             }
         return null;
     }
@@ -55,13 +56,14 @@ public sealed class CoopAutoplay : MonoBehaviour
     int hits;
     int roleCasts;
     int deaths;
-    readonly AutoplayResult result = new AutoplayResult { role = AutoplayResult.RoleClient };
+    readonly AutoplayResult result = new AutoplayResult { role = Role ?? AutoplayResult.RoleClient };
     float startedAt;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     static void Boot()
     {
-        if (Role != AutoplayResult.RoleClient) return;
+        var role = Role;
+        if (role != AutoplayResult.RoleClient && role != AutoplayResult.RoleLead && role != AutoplayResult.RoleFollow) return;
         var go = new GameObject("CoopAutoplay");
         DontDestroyOnLoad(go);
         go.AddComponent<CoopAutoplay>();
@@ -110,7 +112,17 @@ public sealed class CoopAutoplay : MonoBehaviour
         DiabloClickController.ExternalDrive = true;
         HitStop.Enabled = false;
 
-        // 2. Town: reach the host in Lantern Hold.
+        if (result.role == AutoplayResult.RoleLead)
+        {
+            yield return LeadRoute(hero, god, deadline);
+            DiabloClickController.ExternalDrive = false;
+            Finish();
+            yield break;
+        }
+        bool serverRun = result.role == AutoplayResult.RoleFollow;
+        bool leaderSeen = false;
+
+        // 2. Town: reach the host (dedicated server: the lead) in Lantern Hold.
         Transform host = null;
         while (Time.realtimeSinceStartup < deadline)
         {
@@ -143,6 +155,12 @@ public sealed class CoopAutoplay : MonoBehaviour
         float lastLog = Time.realtimeSinceStartup;
         while (Time.realtimeSinceStartup < deadline && Connected() && !RunProfile.Act.ZoneBossDefeated)
         {
+            if (serverRun)
+            {
+                // Dedicated server: the lead quits after its route; that ends this follower's run too.
+                if (HostMirror() != null) leaderSeen = true;
+                else if (leaderSeen) { Log("lead left, follower run over"); break; }
+            }
             Refill(hero, god);
             var hp = hero.GetComponent<PlayerHealth>();
             bool down = hp != null && hp.CurrentHP <= 0f;
@@ -289,13 +307,120 @@ public sealed class CoopAutoplay : MonoBehaviour
         return nm != null && nm.IsConnectedClient;
     }
 
-    /// <summary>The host's hero as seen by this client (the mirror owned by the server).</summary>
+    /// <summary>
+    /// The hero this client follows: the host's mirror (owned by the server), or on a
+    /// dedicated server the other player with the lowest client id (the lead).
+    /// </summary>
     static Transform HostMirror()
     {
+        DiabloNetworkPlayer lead = null;
         foreach (var p in Object.FindObjectsByType<DiabloNetworkPlayer>(FindObjectsSortMode.None))
-            if (p.IsSpawned && !p.IsOwner && p.OwnerClientId == NetworkManager.ServerClientId)
-                return p.transform;
-        return null;
+        {
+            if (!p.IsSpawned || p.IsOwner) continue;
+            if (p.OwnerClientId == NetworkManager.ServerClientId) return p.transform;
+            if (lead == null || p.OwnerClientId < lead.OwnerClientId) lead = p;
+        }
+        return lead != null ? lead.transform : null;
+    }
+
+    /// <summary>Spawned heroes in the session (own included).</summary>
+    static int PlayerCount()
+    {
+        int n = 0;
+        foreach (var p in Object.FindObjectsByType<DiabloNetworkPlayer>(FindObjectsSortMode.None))
+            if (p.IsSpawned) n++;
+        return n;
+    }
+
+    /// <summary>Seconds the lead fights per zone before it moves on (followers need their hits too).</summary>
+    public const float LeadZoneSeconds = 45f;
+    /// <summary>Strikes or casts the lead lands per zone.</summary>
+    public const int LeadZoneHits = 8;
+
+    /// <summary>
+    /// Dedicated-server lead (S1): waits for the party, fights in the Fen, walks the party
+    /// through the Fen Gate (the server's leader rule moves everyone) and fights in the Ossuary.
+    /// </summary>
+    IEnumerator LeadRoute(DiabloClickController hero, bool god, float deadline)
+    {
+        int peers = PeersFor(System.Environment.GetCommandLineArgs());
+        float joinBy = Time.realtimeSinceStartup + 120f;
+        while (Time.realtimeSinceStartup < joinBy && Connected() && PlayerCount() < peers)
+            yield return null;
+        if (PlayerCount() < peers)
+        {
+            Log($"FAIL lead: {PlayerCount()}/{peers} players within 120 s");
+            yield break;
+        }
+        Log($"lead: party of {PlayerCount()} together");
+        result.Reach(AutoplayResult.PhaseTown);
+
+        yield return LeadFight(hero, god, ActProgress.Town, deadline);
+        if (lastLeadHits >= LeadZoneHits) Reach(AutoplayResult.PhaseZone1);
+
+        var gate = GameObject.Find(ZoneGate.FenGateName);
+        if (gate == null) { Log("FAIL lead: Fen Gate missing"); yield break; }
+        float gateBy = Time.realtimeSinceStartup + 120f;
+        while (Time.realtimeSinceStartup < gateBy && Connected()
+               && EncounterLayout.CurrentZone(hero.transform.position) != ActProgress.Ossuary)
+        {
+            Refill(hero, god);
+            hero.SetDestination(gate.transform.position);
+            yield return null;
+        }
+        if (EncounterLayout.CurrentZone(hero.transform.position) != ActProgress.Ossuary)
+        {
+            Log($"FAIL lead: no group travel into the Ossuary, hero at {Fmt(hero.transform.position)}");
+            yield break;
+        }
+        Reach(AutoplayResult.PhaseGate);
+        yield return LeadFight(hero, god, ActProgress.Ossuary, deadline);
+        if (lastLeadHits >= LeadZoneHits) Reach(AutoplayResult.PhaseZone2);
+        // Give followers time to land their own hits before the lead leaves.
+        float linger = Time.realtimeSinceStartup + 20f;
+        while (Time.realtimeSinceStartup < linger && Connected()) { Refill(hero, god); yield return null; }
+    }
+
+    int lastLeadHits;
+
+    IEnumerator LeadFight(DiabloClickController hero, bool god, int zone, float deadline)
+    {
+        lastLeadHits = 0;
+        var skills = hero.GetComponent<DiabloSkills>();
+        float until = Time.realtimeSinceStartup + LeadZoneSeconds;
+        float hardStop = Time.realtimeSinceStartup + 180f;
+        while (Connected() && Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < hardStop
+               && (lastLeadHits < LeadZoneHits || Time.realtimeSinceStartup < until))
+        {
+            Refill(hero, god);
+            var husk = NearestHuskWithin(hero.transform.position, 30f, zone);
+            if (husk == null) { yield return null; continue; }
+            var to = Flat(husk.transform.position - hero.transform.position);
+            if (to.magnitude > hero.attackRange) hero.AttackTarget(husk);
+            else
+            {
+                hero.SetAimPoint(husk.transform.position);
+                if (hero.Strike()) { hits++; lastLeadHits++; }
+            }
+            if (RoleCast(skills, to)) { roleCasts++; lastLeadHits++; }
+            yield return null;
+        }
+        Log($"lead fight zone {zone}: {lastLeadHits} hits");
+    }
+
+    static GameObject NearestHuskWithin(Vector3 from, float range, int zone)
+    {
+        GameObject best = null;
+        float bestD = range;
+        foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
+        {
+            var eh = h.GetComponent<EnemyHealth>();
+            if (eh == null || eh.tier == LootTier.Boss) continue;
+            if (EncounterLayout.CurrentZone(h.transform.position) != zone) continue;
+            float d = Flat(h.transform.position - from).magnitude;
+            if (d < bestD) { bestD = d; best = h; }
+        }
+        return best;
     }
 
     static GameObject NearestHusk(Vector3 from, Vector3 host)

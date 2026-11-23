@@ -24,7 +24,7 @@ public sealed class MainMenu : MonoBehaviour
         var args = System.Environment.GetCommandLineArgs();
         foreach (var a in args)
             if (a == SessionAutoplay.Flag || a == "-shotcheck" || a == "-batchmode"
-                || a == "--net-client" || a == "--net-server")
+                || a == "--net-client" || a == "--net-server" || a == DedicatedServer.Flag)
                 return; // automation boots straight into gameplay
         if (Object.FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include) != null) return;
         if (ClassSelectOwnsStart(args)) return;

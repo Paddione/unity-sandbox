@@ -63,7 +63,7 @@ public readonly struct JoinArgs
             else warning = $"invalid port '{portText}', using {DefaultPort}";
         }
 
-        if (Has(args, "--net-server")) mode = NetMode.Server;
+        if (DedicatedServer.Requested(args)) mode = NetMode.Server;
         if (isClone || Has(args, "--net-client")) mode = NetMode.Client;
         if (Has(args, HostFlag)) mode = NetMode.Host;
 

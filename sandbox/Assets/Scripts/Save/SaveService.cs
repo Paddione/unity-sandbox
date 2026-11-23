@@ -257,6 +257,8 @@ public static class SaveService
     /// <summary>Persist an explicit snapshot (S4 point writes go through here).</summary>
     public static void WriteSave(SaveGame save, string path)
     {
+        // Dedicated server: players own their characters, the server keeps no save.
+        if (DedicatedServer.RequestedByProcess) return;
         foreach (var item in SaveMigrations.StoredItems(save))
             if (item != null && !string.IsNullOrEmpty(item.baseType)) item.EnsureIdentity();
         SaveMigrations.BackupOlderVersion(path);

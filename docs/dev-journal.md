@@ -942,3 +942,12 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Nach einem Neuaufbau mit frischer Library fand `VerifyBarrens` die Komponente nicht mehr. Eigene Datei
   `GlassWard.cs` behebt die fragile Bindung.
 
+## 2026-11-23 — Dedizierter Server, Stufe 1
+
+- Ziel: Spieler aus dem Internet treten einem dauerhaft laufenden Server bei. Eigner-Entscheidung: Pod im
+  devmesh-Heimcluster, erreichbar über Unity Relay (keine offenen Ports).
+- Der Server hat keinen eigenen Helden. Wo das Spiel den Host-Helden fragte (Gruppenreise am Tor), führt jetzt
+  der erste lebende Spieler. ClientRpcs laufen über irgendein Spielerobjekt, weil der Server keines besitzt.
+- Ein geleerter Server beendet sich nach 20 s. Der Supervisor (später Kubernetes) startet einen frischen Run,
+  so bleibt kein halber Weltzustand zurück.
+

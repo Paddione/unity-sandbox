@@ -144,7 +144,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         foreach (var a in args)
             if (a == SessionAutoplay.Flag || a == "-shotcheck" || a == ClassFlag
-                || a == "--net-client" || a == "--net-server" || a == "-batchmode"
+                || a == "--net-client" || a == "--net-server" || a == DedicatedServer.Flag || a == "-batchmode"
                 || a == CoopAutoplay.Flag)
                 return false;
         return !MultiplayerAutoStarter.IsClone();

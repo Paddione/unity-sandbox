@@ -119,3 +119,17 @@ Host-Autoplay als Lanternbearer heilt jetzt zuerst (Renewing ab 2 Verletzten, so
 Vorher (Lauf 5 oben, gleicher Host-Heiler ohne Sync): `heals=0`, ein Client-Tod.
 Solo-Lanternbearer Seeds 0 und 1: 10/10 (ein erster Seed-1-Lauf lief im Barrens-Budget mit 2 Shardbacks
 aus, die Wiederholung war grün). EditMode 417/417, PlayMode 280/280.
+
+## Dedizierter Server (cinderreach-dedicated-server S1, 2026-11-23)
+
+`COOP_SERVER=1 COOP_CLIENTS=2 bash scripts/run-coop-pair.sh artifacts/coop-server/<lauf>`: headless
+`-batchmode -nographics -server -port N` ohne eigenen Helden, Client 1 `-coop-autoplay lead` (Fen-Kampf,
+Gruppenreise durch das FenGate, Ossuary-Kampf), Client 2 `-coop-autoplay follow` (folgt dem Lead).
+
+| Lauf | Ergebnis |
+|---|---|
+| s1-1 | Lead 4/4 (`town,zone1,gate,zone2`, 21 + 18 Treffer), Follow 3/3 (+ `boss`: Abbot-Kill vom Server gebucht), Server stellt Solo-Helden ab, `[Zone] host broadcasts FenGate → zone 2`, nach dem Verlassen nach 20 s Exit 0, je 0 Exceptions |
+
+Regeln: Leader = lebender Spieler mit kleinster ClientId (`DedicatedServer.Leader`), Broadcasts über ein
+beliebiges gespawntes Spielerobjekt (`DedicatedServer.AnyPlayer`), Server speichert nicht, keine KI-Begleiter,
+60-fps-Deckel. Ein Server, der Spieler hatte und 20 s leer bleibt, beendet sich (Neustart = frischer Run).

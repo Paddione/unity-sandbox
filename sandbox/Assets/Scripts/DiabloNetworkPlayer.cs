@@ -187,6 +187,8 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         if (nm == null || !nm.IsListening || !nm.IsServer || nm.SpawnManager == null) return null;
         var hostObj = nm.SpawnManager.GetLocalPlayerObject();
         var relay = hostObj != null ? hostObj.GetComponent<DiabloNetworkPlayer>() : null;
+        // Dedicated server: no own player object, any spawned player carries ClientRpcs to everyone.
+        if (relay == null && !nm.IsHost) relay = DedicatedServer.AnyPlayer();
         return relay != null && relay.IsSpawned ? relay : null;
     }
 

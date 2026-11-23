@@ -77,7 +77,7 @@ public static class LayoutSeeder
     }
 
     public static bool IsCoopPeer() =>
-        HasArg("--net-client") || HasArg("--net-server") || MultiplayerAutoStarter.IsClone();
+        HasArg("--net-client") || HasArg("--net-server") || HasArg(DedicatedServer.Flag) || MultiplayerAutoStarter.IsClone();
 
     /// <summary><c>-seed N</c> when given (also stored as the run seed), else the run profile seed.</summary>
     public static int EffectiveSeed()

@@ -89,6 +89,7 @@ public sealed class PartyRoster : MonoBehaviour
     static void Boot()
     {
         if (!Application.isPlaying) return;
+        if (DedicatedServer.RequestedByProcess) return; // no server hero to lead AI companions
         if (WillJoinAsClient()) return; // the join happens after scene boot, while IsSolo still lies
         if (!IsSolo() && !IsHost()) return; // clients run no party logic
         if (GameObject.Find("CoopSpawn_0") == null) return;

@@ -227,6 +227,8 @@ public sealed class ZoneGate : MonoBehaviour
     /// </summary>
     public static Transform HostHero()
     {
+        // Dedicated server (no hero of its own): the leading player decides.
+        if (DedicatedServer.Active) return DedicatedServer.Leader();
         var nm = NetworkManager.Singleton;
         if (nm != null && nm.IsListening && nm.SpawnManager != null)
         {

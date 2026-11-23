@@ -7,6 +7,8 @@
 #           (SessionAutoplay waits for the client, then plays the full route)
 #   client: -join 127.0.0.1:$PORT -autoplay-god -coop-autoplay client
 #           (CoopAutoplay follows the host through Lantern Hold and the Fen)
+# COOP_SERVER=1 (cinderreach-dedicated-server): a headless -server without a hero instead of the host;
+# client 1 leads (-coop-autoplay lead), the others follow; the server must quit by itself afterwards.
 # Each writes autoplay-result.json (role host|client) into its own directory
 # and uses its own save file (-save-file), so the two never share a save.
 # Display as in run-autoplay.sh (COOP_DISPLAY=auto|wslg|xvfb). No FPS gate:
@@ -35,7 +37,10 @@ case "$CLIENTS" in 1|2|3) ;; *) echo "run-coop-pair: COOP_CLIENTS must be 1..3, 
 cdir() { [ "$1" -eq 1 ] && echo client || echo "client$1"; }   # client k -> out subdir
 csave() { [ "$1" -eq 1 ] && echo coop-client.json || echo "coop-client$1.json"; }
 cclass() { if [ "$1" -eq 1 ]; then echo "${COOP_CLIENT_CLASS:-}"; else local v="COOP_CLIENT$1_CLASS"; echo "${!v:-}"; fi; }
-mkdir -p "$OUT/host"
+SERVER="${COOP_SERVER:-0}"
+HOSTDIR=host; [ "$SERVER" = 1 ] && HOSTDIR=server
+crole() { if [ "$SERVER" != 1 ]; then echo client; elif [ "$1" -eq 1 ]; then echo lead; else echo follow; fi; }
+mkdir -p "$OUT/$HOSTDIR"
 for k in $(seq 1 "$CLIENTS"); do mkdir -p "$OUT/$(cdir "$k")"; done
 OUT="$(cd "$OUT" && pwd)"
 TIMEOUT="${COOP_TIMEOUT:-1200}"
@@ -80,18 +85,33 @@ for s in coop-host.json $(for k in $(seq 1 "$CLIENTS"); do csave "$k"; done); do
 done
 
 PEERS=(-coop-peers $((CLIENTS + 1)))
+[ "$SERVER" = 1 ] && PEERS=(-coop-peers "$CLIENTS")   # dedicated server: only clients are players
 start_client() { # k target-args...
   local k=$1; shift
   local cls; cls="$(cclass "$k")"
   echo "run-coop-pair: client $k -> $* ${cls:+(class $cls)}"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" ${CLIENT_GOD[@]+"${CLIENT_GOD[@]}"} \
-    "$@" -coop-autoplay client ${cls:+-class "$cls"} -save-file "$(csave "$k")" \
+    "$@" -coop-autoplay "$(crole "$k")" ${SERVER_PEERS[@]+"${SERVER_PEERS[@]}"} ${cls:+-class "$cls"} -save-file "$(csave "$k")" \
     -autoplay-out "$OUT/$(cdir "$k")" -logFile "$OUT/$(cdir "$k")/player.log" &
   CLIENT_PIDS+=($!)
 }
 CLIENT_PIDS=()
+SERVER_PEERS=()
 set +e
-if [ "${COOP_RELAY:-0}" = 1 ]; then
+if [ "$SERVER" = 1 ]; then
+  # cinderreach-dedicated-server S1: headless server without a hero, clients lead/follow.
+  SERVER_PEERS=("${PEERS[@]}")
+  echo "run-coop-pair: dedicated server on port $PORT (headless, timeout ${TIMEOUT}s, clients $CLIENTS)"
+  timeout --kill-after=30 "$TIMEOUT" "$PLAYER" -batchmode -nographics -server -port "$PORT" \
+    -logFile "$OUT/server/player.log" &
+  HOST_PID=$!
+  for _ in $(seq 1 60); do
+    sleep 2
+    grep -aq '\[Server\] ready' "$OUT/server/player.log" 2>/dev/null && break
+    kill -0 "$HOST_PID" 2>/dev/null || break
+  done
+  for k in $(seq 1 "$CLIENTS"); do start_client "$k" -join "127.0.0.1:$PORT"; sleep 3; done
+elif [ "${COOP_RELAY:-0}" = 1 ]; then
   echo "run-coop-pair: host via relay (display $MODE, timeout ${TIMEOUT}s, clients $CLIENTS)"
   timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" \
     "${GOD[@]}" -host-relay -autoplay -coop-autoplay host "${PEERS[@]}" ${COOP_HOST_CLASS:+-class "$COOP_HOST_CLASS"} -save-file coop-host.json \
@@ -141,7 +161,17 @@ for k in $(seq 1 "$CLIENTS"); do
   grep -a '\[CoopAutoplay\]' "$OUT/$d/player.log" | tail -n 8 || true
   [ "$C" -gt "$EXIT" ] && EXIT=$C
 done
-verdict host "$HOST_RC"; H=$?
+if [ "$SERVER" = 1 ]; then
+  # The server has no autoplay result: it must quit on its own (exit 0) once everyone left.
+  if [ "$HOST_RC" -eq 0 ] && grep -aq '\[Server\] session over' "$OUT/server/player.log"; then
+    echo "run-coop-pair: server quit after the session (exit 0)"; H=0
+  else
+    echo "run-coop-pair: server did not end cleanly (exit $HOST_RC)" >&2; H=1
+  fi
+  grep -a '\[Server\]\|\[Zone\]' "$OUT/server/player.log" | tail -n 12 || true
+else
+  verdict host "$HOST_RC"; H=$?
+fi
 set -e
 [ "$H" -gt "$EXIT" ] && EXIT=$H
 echo "run-coop-pair: host $H, clients ${CLIENTS} -> $EXIT (logs $OUT/*/player.log)"

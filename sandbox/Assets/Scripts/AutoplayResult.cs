@@ -60,6 +60,16 @@ public sealed class AutoplayResult
     public const string RoleSolo = "solo";
     public const string RoleHost = "host";
     public const string RoleClient = "client";
+    /// <summary>Dedicated-server run: the client that walks the route (S1).</summary>
+    public const string RoleLead = "lead";
+    /// <summary>Dedicated-server run: a client following the lead (S1).</summary>
+    public const string RoleFollow = "follow";
+
+    /// <summary>Phases the lead must reach on a dedicated server (Fen fight, group travel, Ossuary fight).</summary>
+    public static readonly string[] LeadPhases = { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2 };
+
+    /// <summary>Phases a follower must reach on a dedicated server.</summary>
+    public static readonly string[] FollowPhases = { PhaseTown, PhaseZone1, PhaseZone2 };
 
     /// <summary>
     /// Phases a co-op client must reach (coop-trio): it follows the host from
@@ -71,7 +81,11 @@ public sealed class AutoplayResult
         { PhaseTown, PhaseZone1, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3 };
 
     /// <summary>Required phases for a role (solo and host play the full route).</summary>
-    public static string[] RequiredFor(string role) => role == RoleClient ? ClientPhases : RequiredPhases;
+    public static string[] RequiredFor(string role) =>
+        role == RoleClient ? ClientPhases
+        : role == RoleLead ? LeadPhases
+        : role == RoleFollow ? FollowPhases
+        : RequiredPhases;
 
     /// <summary>Record a reached phase once, keeping first-reach order.</summary>
     public void Reach(string phase)
