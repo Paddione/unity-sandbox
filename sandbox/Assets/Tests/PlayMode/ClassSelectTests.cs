@@ -35,6 +35,7 @@ public class ClassSelectTests
         SaveService.ContinueAfterReload = false;
         SaveService.ContinueAfterReloadPath = null;
         SaveService.NewHeroAfterReload = null;
+        SaveService.NewHeroProfile = default;
         ClassSelectUI.PeekPathOverride = null;
         ClassSelectUI.HeroInWorld = false;
         RunProfile.Reset();
@@ -59,6 +60,10 @@ public class ClassSelectTests
     public IEnumerator Continue_LoadsTheSavedClassWithoutAChoice()
     {
         RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        RunProfile.Hero = new HeroProfile
+        {
+            heroName = "Selma", gender = (int)HeroGender.Female, hairStyle = 1, hairColor = 3, build = (int)HeroBuild.Slim,
+        };
         SaveService.SaveNow(hero, path: path);
         RunProfile.Reset();
         Assert.AreEqual(ClassCatalog.FenwalkerId, RunProfile.ClassId);
@@ -68,6 +73,9 @@ public class ClassSelectTests
         Assert.IsTrue(ui.Continue(path));
         Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId);
         Assert.AreEqual(ClassCatalog.LanternbearerId, hero.GetComponent<ClassAppearance>().AppliedClassId);
+        Assert.AreEqual("Selma", RunProfile.Hero.heroName, "hero name comes back from the save, not the account");
+        Assert.AreEqual("Selma", hero.GetComponent<ClassAppearance>().AppliedProfile.heroName);
+        Assert.AreEqual(1, hero.GetComponent<ClassAppearance>().AppliedProfile.hairStyle);
         Assert.IsFalse(ui.IsOpen);
         yield return null;
     }
@@ -114,6 +122,9 @@ public class ClassSelectTests
 
         ui.RequestNew(ClassCatalog.RogueId);
         ui.ConfirmNew();
+        Assert.IsTrue(ui.CustomizeVisible, "confirming opens the creation step before the run starts");
+        Assert.AreEqual(ClassCatalog.RogueId, ui.PendingCustomizeClass);
+        ui.StartCustomizedHero();
         Assert.AreEqual(ClassCatalog.RogueId, RunProfile.ClassId);
         Assert.IsFalse(ui.IsOpen);
         Assert.IsTrue(ClassSelectUI.HeroInWorld);
@@ -121,7 +132,7 @@ public class ClassSelectTests
     }
 
     [UnityTest]
-    public IEnumerator RequestNew_WithNothingAtStakeBeginsAtOnce()
+    public IEnumerator RequestNew_WithNothingAtStakeOpensCustomizeAtOnce()
     {
         ClassSelectUI.HeroInWorld = false;
         ClassSelectUI.PeekPathOverride = path; // no file there
@@ -129,7 +140,67 @@ public class ClassSelectTests
         ui.SetOpen(true);
         ui.RequestNew(ClassCatalog.LanternbearerId);
         Assert.IsFalse(ui.ConfirmVisible);
+        Assert.IsTrue(ui.CustomizeVisible);
+        Assert.AreEqual(ClassCatalog.LanternbearerId, ui.PendingCustomizeClass);
+        Assert.IsNotNull(HeroNames.Clean(ui.DraftProfile.heroName), "a random name is prefilled");
+        ui.StartCustomizedHero();
         Assert.AreEqual(ClassCatalog.LanternbearerId, RunProfile.ClassId);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator Customize_CyclesPreviewAndStart_ApplyLookAndName()
+    {
+        var head = new GameObject("head");
+        head.transform.SetParent(hero.transform, false);
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.OpenCustomize(ClassCatalog.RogueId);
+        Assert.IsTrue(ui.CustomizeVisible);
+        string firstName = ui.DraftProfile.heroName;
+        Assert.IsNotNull(HeroNames.Clean(firstName));
+
+        int gender0 = ui.DraftProfile.gender;
+        ui.CycleGender();
+        Assert.AreNotEqual(gender0, ui.DraftProfile.gender);
+        Assert.AreEqual(ui.DraftProfile.gender, hero.GetComponent<ClassAppearance>().AppliedProfile.gender, "preview follows the draft");
+        ui.CycleHair();
+        ui.CycleHairColor();
+        ui.CycleBuild();
+        var draft = ui.DraftProfile;
+        Assert.AreEqual(draft.hairStyle, hero.GetComponent<ClassAppearance>().AppliedProfile.hairStyle);
+        if (draft.hairStyle != 4)
+            Assert.IsNotNull(hero.GetComponent<ClassAppearance>().HairObject, "hair is built on the head bone");
+        ui.SetDraftName("  Wunschname  ");
+        ui.RerollDraftName();
+        Assert.IsNotNull(HeroNames.Clean(ui.DraftProfile.heroName));
+        ui.SetDraftName("Wunschname");
+        ui.StartCustomizedHero();
+
+        Assert.IsFalse(ui.CustomizeVisible);
+        Assert.IsFalse(ui.IsOpen);
+        Assert.AreEqual(ClassCatalog.RogueId, RunProfile.ClassId);
+        Assert.AreEqual("Wunschname", RunProfile.Hero.heroName);
+        Assert.AreEqual(draft.hairStyle, RunProfile.Hero.hairStyle);
+        Assert.AreEqual(draft.build, RunProfile.Hero.build);
+        Assert.AreEqual("Wunschname", hero.GetComponent<ClassAppearance>().AppliedProfile.heroName);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator Customize_InvalidNameBlocksTheStart()
+    {
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.OpenCustomize(ClassCatalog.FenwalkerId);
+        ui.SetDraftName("x");
+        ui.StartCustomizedHero();
+        Assert.IsTrue(ui.CustomizeVisible, "a one-letter name does not start the run");
+        Assert.IsTrue(ui.IsOpen);
+        ui.SetDraftName("Gueltig");
+        ui.StartCustomizedHero();
+        Assert.IsFalse(ui.IsOpen);
+        Assert.AreEqual("Gueltig", RunProfile.Hero.heroName);
         yield return null;
     }
 }

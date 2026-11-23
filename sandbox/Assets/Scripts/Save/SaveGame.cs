@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 13;
+    public const int CurrentVersion = 14;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -69,6 +69,13 @@ public sealed class SaveGame
     // v13 (cinderreach-deutsch-story S4): story quest state, see StoryState.
     public List<StoryQuestEntry> storyQuests = new List<StoryQuestEntry>();
     public List<string> storyFlags = new List<string>();
+
+    // v14 (character-creation): hero look + name, see HeroProfile. Separate from the account name.
+    public string heroName = "";
+    public int heroGender;
+    public int heroHairStyle;
+    public int heroHairColor;
+    public int heroBuild = (int)HeroBuild.Athletic;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

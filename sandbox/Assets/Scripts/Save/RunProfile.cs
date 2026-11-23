@@ -38,6 +38,9 @@ public static class RunProfile
     /// <summary>Story quest progress (cinderreach-deutsch-story S4, save v13).</summary>
     public static StoryState Story = new StoryState();
 
+    /// <summary>Hero look + name (character-creation, save v14). Separate from the account name.</summary>
+    public static HeroProfile Hero = HeroProfile.CreateDefault(new System.Random());
+
     /// <summary>Fresh-run defaults (New Game, headless tests).</summary>
     public static void Reset()
     {
@@ -57,6 +60,7 @@ public static class RunProfile
         KindledRewardPending = false;
         KindledRewardClass = "";
         KindledRewardGranted = false;
+        Hero = HeroProfile.CreateDefault(new System.Random());
     }
 
     static string VariantKey(string classId, DiabloSkills.Skill skill) => classId + ":" + skill;

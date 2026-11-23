@@ -77,10 +77,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsThirteen()
+    public void CurrentVersion_IsFourteen()
     {
-        Assert.AreEqual(13, SaveGame.CurrentVersion);
-        Assert.AreEqual(13, new SaveGame().v);
+        Assert.AreEqual(14, SaveGame.CurrentVersion);
+        Assert.AreEqual(14, new SaveGame().v);
     }
 
     [Test]
@@ -89,10 +89,47 @@ public class SaveMigrationTests
         const string json = @"{""v"":12,""level"":5,""gold"":40}";
         var outcome = SaveMigrations.Migrate(json, out var save, out _);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
-        Assert.AreEqual(13, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
         Assert.IsNotNull(save.storyQuests);
         Assert.IsEmpty(save.storyQuests);
         Assert.IsNotNull(save.storyFlags);
+    }
+
+    [Test]
+    public void V13_GetsDefaultHeroProfileWithRandomName()
+    {
+        const string json = @"{""v"":13,""level"":5,""gold"":40,""runSeed"":1234}";
+        var outcome = SaveMigrations.Migrate(json, out var save, out _);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(14, save.v);
+        Assert.IsNotNull(HeroNames.Clean(save.heroName), save.heroName);
+        Assert.That(save.heroGender, Is.InRange(0, 2));
+        Assert.That(save.heroHairStyle, Is.InRange(0, HeroAppearance.HairStyleCount - 1));
+        Assert.That(save.heroHairColor, Is.InRange(0, HeroAppearance.HairColorCount - 1));
+        // Same seed migrates to the same name (no account name involved).
+        SaveMigrations.Migrate(json, out var again, out _);
+        Assert.AreEqual(save.heroName, again.heroName);
+    }
+
+    [Test]
+    public void HeroProfile_SurvivesSaveRoundtrip()
+    {
+        hero = Hero();
+        RunProfile.Hero = new HeroProfile
+        {
+            heroName = "Mira", gender = (int)HeroGender.Female, hairStyle = 2, hairColor = 6, build = (int)HeroBuild.Sturdy,
+        };
+        SaveService.SaveNow(hero, path: path);
+        RunProfile.Reset();
+        var fresh = Hero();
+        Object.DestroyImmediate(hero);
+        hero = fresh;
+        Assert.IsTrue(SaveService.TryLoad(fresh, path));
+        Assert.AreEqual("Mira", RunProfile.Hero.heroName);
+        Assert.AreEqual((int)HeroGender.Female, RunProfile.Hero.gender);
+        Assert.AreEqual(2, RunProfile.Hero.hairStyle);
+        Assert.AreEqual(6, RunProfile.Hero.hairColor);
+        Assert.AreEqual((int)HeroBuild.Sturdy, RunProfile.Hero.build);
     }
 
     [Test]

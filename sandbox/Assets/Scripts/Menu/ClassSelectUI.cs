@@ -89,6 +89,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     bool StartFreshHero(string classId)
     {
         RunProfile.ClassId = ClassCatalog.Get(classId).id;
+        RunProfile.Hero = HeroProfile.Sanitized(SaveService.NewHeroProfile);
         ApplyToHero();
         HeroInWorld = true;
         Debug.Log($"[Class] Fresh {RunProfile.Class.displayName} after the reload.");
@@ -165,6 +166,12 @@ public sealed class ClassSelectUI : MonoBehaviour
         if (awaitingReloadContinue) { TickReloadContinue(); return; }
         if (!IsOpen) return;
         var kb = Keyboard.current;
+        if (kb != null && kb.escapeKey.wasPressedThisFrame && CustomizeVisible)
+        {
+            CancelCustomize();
+            DiabloUIFactory.MarkEscConsumed();
+            return;
+        }
         if (kb != null && kb.escapeKey.wasPressedThisFrame && ConfirmVisible)
         {
             CancelNew();
@@ -205,7 +212,10 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloClickController.ExternalDrive = open;
         if (open)
         {
+            PendingCustomizeClass = null;
+            if (customizeModal != null) customizeModal.SetActive(false);
             CancelNew();
+            if (mainContent != null) mainContent.SetActive(true);
             ShowSettings(false);
             RefreshContinueAndDiff();
         }
@@ -246,6 +256,20 @@ public sealed class ClassSelectUI : MonoBehaviour
     Text confirmBody;
     Text confirmGoLabel;
 
+    // ---- character-creation step (after the class pick) ----
+    GameObject customizeModal;
+    Text customizeClassLabel;
+    Text genderValue, hairValue, hairColorValue, buildValue, customizeHint;
+    Button customizeStartBtn;
+    Text customizeStartLabel;
+    InputField heroNameField;
+    /// <summary>Class being customized (null when the step is closed). Test seam.</summary>
+    public string PendingCustomizeClass { get; private set; }
+    /// <summary>Draft hero look while customizing. Test seam.</summary>
+    public HeroProfile DraftProfile { get; private set; }
+    public bool CustomizeVisible => customizeModal != null && customizeModal.activeSelf;
+    readonly System.Random draftRng = new System.Random();
+
     /// <summary>What a new hero would replace, or null when nothing is at stake.</summary>
     /// <summary>Save path the confirm text peeks (null = default). Test seam.</summary>
     public static string PeekPathOverride;
@@ -264,11 +288,11 @@ public sealed class ClassSelectUI : MonoBehaviour
         return null;
     }
 
-    /// <summary>Card button: confirm first when a hero would be replaced.</summary>
+    /// <summary>Card button: confirm first when a hero would be replaced, then customize.</summary>
     public void RequestNew(string classId)
     {
         string replaced = ReplacedHeroLine();
-        if (replaced == null || confirmModal == null) { BeginNew(classId); return; }
+        if (replaced == null || confirmModal == null) { OpenCustomize(classId); return; }
         DiabloAudio.PlayUIClick();
         PendingNewClass = ClassCatalog.Get(classId).id;
         var cls = ClassCatalog.Get(PendingNewClass);
@@ -282,14 +306,125 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         string id = PendingNewClass;
         CancelNew();
-        if (id != null) BeginNew(id);
+        if (id != null) OpenCustomize(id);
     }
 
     public void CancelNew()
     {
         PendingNewClass = null;
         if (confirmModal != null) confirmModal.SetActive(false);
+        if (mainContent != null && !CustomizeVisible) mainContent.SetActive(true);
+    }
+
+    // ---- character-creation step ----
+
+    bool draftNameEdited;
+
+    /// <summary>Open the creation step for a class with a fresh random draft (name included).</summary>
+    public void OpenCustomize(string classId)
+    {
+        if (customizeModal == null) { BeginNew(classId); return; }
+        DiabloAudio.PlayUIClick();
+        PendingCustomizeClass = ClassCatalog.Get(classId).id;
+        DraftProfile = HeroProfile.CreateDefault(draftRng);
+        draftNameEdited = false;
+        if (mainContent != null) mainContent.SetActive(false);
+        if (confirmModal != null) confirmModal.SetActive(false);
+        customizeModal.SetActive(true);
+        RefreshCustomize();
+        PreviewDraft();
+    }
+
+    public void CancelCustomize()
+    {
+        PendingCustomizeClass = null;
+        if (customizeModal != null) customizeModal.SetActive(false);
         if (mainContent != null) mainContent.SetActive(true);
+        ApplyToHero();
+    }
+
+    void PreviewDraft()
+    {
+        var target = Hero();
+        if (target == null || PendingCustomizeClass == null) return;
+        var look = target.GetComponent<ClassAppearance>();
+        if (look != null) look.Apply(ClassCatalog.Get(PendingCustomizeClass), DraftProfile);
+    }
+
+    void RefreshCustomize()
+    {
+        var p = DraftProfile;
+        if (customizeClassLabel != null)
+            customizeClassLabel.text = Loc.F("menu.create.class", ClassCatalog.Get(PendingCustomizeClass ?? ClassCatalog.FenwalkerId).displayName);
+        if (genderValue != null)
+            genderValue.text = Loc.T(p.gender == (int)HeroGender.Female ? "menu.create.gender.female"
+                : p.gender == (int)HeroGender.Male ? "menu.create.gender.male" : "menu.create.gender.nonbinary");
+        if (hairValue != null) hairValue.text = Loc.T($"menu.create.hair.{Mathf.Clamp(p.hairStyle, 0, 5)}");
+        if (hairColorValue != null) hairColorValue.text = Loc.T($"menu.create.haircolor.{Mathf.Clamp(p.hairColor, 0, 9)}");
+        if (buildValue != null) buildValue.text = Loc.T($"menu.create.build.{Mathf.Clamp(p.build, 0, 2)}");
+        if (heroNameField != null && heroNameField.text != p.heroName) heroNameField.SetTextWithoutNotify(p.heroName);
+        if (customizeStartLabel != null)
+            customizeStartLabel.text = Loc.F("menu.create.start", ClassCatalog.Get(PendingCustomizeClass ?? ClassCatalog.FenwalkerId).displayName);
+    }
+
+    public void CycleGender()
+    {
+        var p = DraftProfile;
+        p.gender = (p.gender + 1) % 3;
+        if (!draftNameEdited) p.heroName = HeroNames.RandomName((HeroGender)p.gender, draftRng);
+        DraftProfile = p; RefreshCustomize(); PreviewDraft();
+    }
+
+    public void CycleHair()
+    {
+        var p = DraftProfile; p.hairStyle = (p.hairStyle + 1) % HeroAppearance.HairStyleCount;
+        DraftProfile = p; RefreshCustomize(); PreviewDraft();
+    }
+
+    public void CycleHairColor()
+    {
+        var p = DraftProfile; p.hairColor = (p.hairColor + 1) % HeroAppearance.HairColorCount;
+        DraftProfile = p; RefreshCustomize(); PreviewDraft();
+    }
+
+    public void CycleBuild()
+    {
+        var p = DraftProfile; p.build = (p.build + 1) % HeroAppearance.BuildCount;
+        DraftProfile = p; RefreshCustomize(); PreviewDraft();
+    }
+
+    /// <summary>Dice button: a fresh random name for the draft gender.</summary>
+    public void RerollDraftName()
+    {
+        var p = DraftProfile;
+        p.heroName = HeroNames.RandomName((HeroGender)Mathf.Clamp(p.gender, 0, 2), draftRng);
+        DraftProfile = p; draftNameEdited = false; RefreshCustomize();
+    }
+
+    /// <summary>Name field edit (test seam mirrors the InputField).</summary>
+    public void SetDraftName(string raw)
+    {
+        var p = DraftProfile; p.heroName = raw ?? ""; DraftProfile = p; draftNameEdited = true;
+        if (heroNameField != null && heroNameField.text != p.heroName) heroNameField.SetTextWithoutNotify(p.heroName);
+    }
+
+    /// <summary>Start button: a clean name is required; the draft becomes the hero and the run begins.</summary>
+    public void StartCustomizedHero()
+    {
+        if (PendingCustomizeClass == null) return;
+        string raw = heroNameField != null ? heroNameField.text : DraftProfile.heroName;
+        string clean = HeroNames.Clean(raw);
+        if (clean == null)
+        {
+            if (customizeHint != null) customizeHint.text = Loc.T("menu.create.name.rule");
+            return;
+        }
+        var p = DraftProfile; p.heroName = clean; DraftProfile = p;
+        RunProfile.Hero = HeroProfile.Sanitized(p);
+        string classId = PendingCustomizeClass;
+        PendingCustomizeClass = null;
+        if (customizeModal != null) customizeModal.SetActive(false);
+        BeginNew(classId);
     }
 
     /// <summary>
@@ -303,6 +438,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         {
             DiabloAudio.PlayUIClick();
             SaveService.NewHeroAfterReload = ClassCatalog.Get(classId).id;
+            SaveService.NewHeroProfile = HeroProfile.Sanitized(RunProfile.Hero);
             SaveService.ContinueAfterReload = false;
             RunProfile.Reset();
             SessionComplete.ResetRun();
@@ -352,10 +488,11 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         var target = Hero();
         if (target == null) return;
+        RunProfile.Hero = HeroProfile.Sanitized(RunProfile.Hero);
         var look = target.GetComponent<ClassAppearance>();
-        if (look != null) look.Apply(RunProfile.Class);
+        if (look != null) look.Apply(RunProfile.Class, RunProfile.Hero);
         var net = target.GetComponent<DiabloNetworkPlayer>();
-        if (net != null) net.PublishClass();
+        if (net != null) net.PublishHeroName();
     }
 
     /// <summary>Continue button text with the saved hero when the save is readable.</summary>
@@ -568,6 +705,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         confirmModal.SetActive(false);
         Account = AccountPanel.Build(canvasGo.transform);
         BuildHeroChoice(canvasGo.transform);
+        BuildCustomize(canvasGo.transform);
         RefreshContinueAndDiff();
         canvas.enabled = false;
     }
@@ -599,6 +737,56 @@ public sealed class ClassSelectUI : MonoBehaviour
             : Loc.F("menu.herochoice.describe", ClassCatalog.Get(s.classId).displayName, s.level, s.gold);
         return Loc.F("menu.herochoice.body", Describe(cloud), Describe(local)) +
                Loc.T("menu.herochoice.ask");
+    }
+
+    void BuildCustomize(Transform canvas)
+    {
+        customizeModal = DiabloUIFactory.MakePanel(canvas, "HeroCustomizePanel", new Vector2(620f, 600f), Vector2.zero);
+        var v = customizeModal.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(24, 24, 18, 20);
+        v.spacing = 10f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+        DiabloUIFactory.MakeHeader(customizeModal.transform, Loc.T("menu.create.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelCustomize);
+        customizeClassLabel = DiabloUIFactory.MakeText(customizeModal.transform, "CustomizeClass", "", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(customizeClassLabel.gameObject, prefH: 24f, flexW: 1f);
+
+        genderValue = CycleRow(customizeModal.transform, "GenderRow", "menu.create.gender", CycleGender);
+        hairValue = CycleRow(customizeModal.transform, "HairRow", "menu.create.hair", CycleHair);
+        hairColorValue = CycleRow(customizeModal.transform, "HairColorRow", "menu.create.haircolor", CycleHairColor);
+        buildValue = CycleRow(customizeModal.transform, "BuildRow", "menu.create.build", CycleBuild);
+
+        var nameLabel = DiabloUIFactory.MakeText(customizeModal.transform, "HeroNameLabel", Loc.T("menu.create.name"), 15, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(nameLabel.gameObject, prefH: 22f, flexW: 1f);
+        var nameRow = DiabloUIFactory.MakeHorizontalRow(customizeModal.transform, "HeroNameRow", 10f, 46f);
+        heroNameField = AccountPanel.Field(nameRow.transform, "HeroNameField", "", 16);
+        heroNameField.onValueChanged.AddListener(raw => SetDraftName(raw));
+        DiabloUIFactory.SetLayout(heroNameField.gameObject, prefH: 44f, flexW: 1f);
+        var diceBtn = DiabloUIFactory.MakeButton(nameRow.transform, "RerollNameButton", Loc.T("menu.create.random"), 15, false, null, RerollDraftName);
+        DiabloUIFactory.SetLayout(diceBtn.gameObject, prefH: 44f, prefW: 120f);
+
+        customizeHint = DiabloUIFactory.MakeText(customizeModal.transform, "CustomizeHint", "", 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(customizeHint.gameObject, prefH: 22f, flexW: 1f);
+
+        var row = DiabloUIFactory.MakeHorizontalRow(customizeModal.transform, "CustomizeButtons", 14f, 46f);
+        customizeStartBtn = DiabloUIFactory.MakeButton(row.transform, "StartCustomizedButton", "", 17, true, DiabloPalette.GoldBright, StartCustomizedHero);
+        DiabloUIFactory.SetLayout(customizeStartBtn.gameObject, prefH: 44f, flexW: 1f);
+        customizeStartLabel = customizeStartBtn.GetComponentInChildren<Text>();
+        var backBtn = DiabloUIFactory.MakeButton(row.transform, "CancelCustomizeButton", Loc.T("menu.back"), 17, false, null, CancelCustomize);
+        DiabloUIFactory.SetLayout(backBtn.gameObject, prefH: 44f, flexW: 1f);
+        customizeModal.SetActive(false);
+    }
+
+    Text CycleRow(Transform parent, string rowName, string labelKey, UnityEngine.Events.UnityAction onCycle)
+    {
+        var row = DiabloUIFactory.MakeHorizontalRow(parent, rowName, 10f, 42f);
+        var label = DiabloUIFactory.MakeText(row.transform, "Label", Loc.T(labelKey), 15, DiabloPalette.ParchmentDim);
+        DiabloUIFactory.SetLayout(label.gameObject, prefH: 38f, prefW: 150f);
+        var value = DiabloUIFactory.MakeText(row.transform, "Value", "", 16, DiabloPalette.Parchment, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(value.gameObject, prefH: 38f, flexW: 1f);
+        var btn = DiabloUIFactory.MakeSmallButton(row.transform, "›", onCycle, 38f, 52f);
+        DiabloUIFactory.SetLayout(btn.gameObject, prefH: 38f, prefW: 52f);
+        return value;
     }
 
     void BuildHeroChoice(Transform canvas)

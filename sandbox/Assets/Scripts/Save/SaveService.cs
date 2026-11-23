@@ -94,6 +94,8 @@ public static class SaveService
     public static bool ContinueAfterReload;
     /// <summary>Class id of a fresh hero to start after an in-game reload (null = none).</summary>
     public static string NewHeroAfterReload;
+    /// <summary>Hero profile of a fresh hero to start after an in-game reload.</summary>
+    public static HeroProfile NewHeroProfile;
     public static string ContinueAfterReloadPath;
 
     /// <summary>Delete the save (New Game, after the caller's confirmation).</summary>
@@ -121,6 +123,8 @@ public static class SaveService
 
     public static SaveGame CaptureState(GameObject hero, int zoneReached = 1)
     {
+        var heroProfile = HeroProfile.Sanitized(RunProfile.Hero);
+        RunProfile.Hero = heroProfile;
         var save = new SaveGame
         {
             zoneReached = Mathf.Max(1, zoneReached),
@@ -142,6 +146,11 @@ public static class SaveService
             kindledRewardGranted = RunProfile.KindledRewardGranted,
             storyQuests = RunProfile.Story.ToSave(),
             storyFlags = new System.Collections.Generic.List<string>(RunProfile.Story.Flags),
+            heroName = heroProfile.heroName,
+            heroGender = heroProfile.gender,
+            heroHairStyle = heroProfile.hairStyle,
+            heroHairColor = heroProfile.hairColor,
+            heroBuild = heroProfile.build,
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -213,6 +222,13 @@ public static class SaveService
         RunProfile.RunSeed = save.runSeed;
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
+        RunProfile.Hero = HeroProfile.Sanitized(new HeroProfile
+        {
+            heroName = save.heroName, gender = save.heroGender, hairStyle = save.heroHairStyle,
+            hairColor = save.heroHairColor, build = save.heroBuild,
+        });
+        var heroLook = hero.GetComponent<ClassAppearance>();
+        if (heroLook != null) heroLook.Apply(RunProfile.Class, RunProfile.Hero);
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.actTwoBossDefeated, save.waypoints);
         RunProfile.Story = StoryState.FromSave(save.storyQuests, save.storyFlags);
         RunProfile.Story.Refresh(RunProfile.Act);

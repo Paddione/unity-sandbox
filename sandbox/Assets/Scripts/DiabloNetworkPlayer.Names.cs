@@ -14,8 +14,14 @@ public sealed partial class DiabloNetworkPlayer
     public readonly NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>(
         default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    /// <summary>Name to show over this hero (never empty).</summary>
-    public string ShownName => PlayerNames.Display(playerName.Value.ToString());
+    /// <summary>Hero name from creation (character-creation), written by the server only; wins over the account name on the plate.</summary>
+    public readonly NetworkVariable<FixedString32Bytes> heroName = new NetworkVariable<FixedString32Bytes>(
+        default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    /// <summary>Name to show over this hero (never empty): the hero name when set, else the account name.</summary>
+    public string ShownName => heroName.Value.Length > 0
+        ? HeroNames.Clean(heroName.Value.ToString()) ?? PlayerNames.Display(playerName.Value.ToString())
+        : PlayerNames.Display(playerName.Value.ToString());
 
     /// <summary>Live network heroes (nameplates read this instead of scanning the scene).</summary>
     public static readonly System.Collections.Generic.List<DiabloNetworkPlayer> Live =
@@ -60,12 +66,28 @@ public sealed partial class DiabloNetworkPlayer
     {
         if (!IsSpawned || !IsOwner) return;
         SubmitNameServerRpc(PlayerAccount.DisplayName);
+        var hero = HeroNames.Clean(RunProfile.Hero.heroName);
+        if (hero != null) SubmitHeroNameServerRpc(hero);
+    }
+
+    /// <summary>Owner republishes its hero name + look after creation (creation happens before spawn in solo, peers see it on join).</summary>
+    public void PublishHeroName()
+    {
+        ReportName();
+        PublishClass();
     }
 
     [ServerRpc]
     void SubmitNameServerRpc(string raw)
     {
         playerName.Value = new FixedString32Bytes(ServerCleanName(raw, OwnerClientId));
+    }
+
+    [ServerRpc]
+    void SubmitHeroNameServerRpc(string raw)
+    {
+        string clean = HeroNames.Clean(raw);
+        if (clean != null) heroName.Value = new FixedString32Bytes(clean);
     }
 
     /// <summary>Server rule (pure): cleaned name, else "Wanderer &lt;client id&gt;" so heroes stay apart.</summary>

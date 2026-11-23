@@ -55,6 +55,7 @@ public static class SaveMigrations
         if (save.v == 10) V10ToV11(save);
         if (save.v == 11) V11ToV12(save);
         if (save.v == 12) V12ToV13(save);
+        if (save.v == 13) V13ToV14(save);
         return Outcome.Migrated;
     }
 
@@ -212,6 +213,21 @@ public static class SaveMigrations
         if (save.storyQuests == null) save.storyQuests = new System.Collections.Generic.List<StoryQuestEntry>();
         if (save.storyFlags == null) save.storyFlags = new System.Collections.Generic.List<string>();
         save.v = 13;
+    }
+
+    /// <summary>
+    /// v13 → v14 (character-creation): pre-creation heroes get a default look
+    /// and a random hero name seeded by the run (account name stays untouched).
+    /// </summary>
+    static void V13ToV14(SaveGame save)
+    {
+        var p = HeroProfile.MigrationDefault(save.runSeed ^ (save.level * 397));
+        save.heroName = p.heroName;
+        save.heroGender = p.gender;
+        save.heroHairStyle = p.hairStyle;
+        save.heroHairColor = p.hairColor;
+        save.heroBuild = p.build;
+        save.v = 14;
     }
 
     internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)

@@ -18,6 +18,10 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     public readonly NetworkVariable<int> classIndex = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    /// <summary>Packed hero look (character-creation, <see cref="HeroAppearance.Pack"/>): mirrors apply it with the class.</summary>
+    public readonly NetworkVariable<int> appearanceCode = new NetworkVariable<int>(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     /// <summary>
     /// coop-hp-sync: the owner's (current, max) HP. Enemy hits stay simulated
     /// per process, so only the owner's value is real; mirrors show it
@@ -77,6 +81,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         else
         {
             classIndex.OnValueChanged += (_, now) => ApplyClassIndex(now);
+            appearanceCode.OnValueChanged += (_, __) => ApplyClassIndex(classIndex.Value);
             ApplyClassIndex(classIndex.Value);
         }
     }
@@ -114,12 +119,13 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     /// <summary>Spawn-time save load rule: joining clients only (pure, EditMode-pinnable).</summary>
     public static bool ShouldLoadSaveOnSpawn(bool isServer) => !isServer;
 
-    /// <summary>Owner: push the run profile class to all mirrors.</summary>
+    /// <summary>Owner: push the run profile class and hero look to all mirrors.</summary>
     public void PublishClass()
     {
         if (!IsSpawned || !IsOwner) return;
         int idx = System.Array.IndexOf(ClassCatalog.All, RunProfile.Class);
         classIndex.Value = idx < 0 ? 0 : idx;
+        appearanceCode.Value = HeroAppearance.Pack(RunProfile.Hero);
     }
 
     void ApplyClassIndex(int idx)
@@ -127,7 +133,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         var look = GetComponent<ClassAppearance>();
         if (look == null) return;
         var cls = idx >= 0 && idx < ClassCatalog.All.Length ? ClassCatalog.All[idx] : ClassCatalog.Fenwalker;
-        look.Apply(cls);
+        look.Apply(cls, HeroAppearance.Unpack(appearanceCode.Value, ShownName));
         Debug.Log($"[Class] mirror {gameObject.name} (client {OwnerClientId}) shows {cls.displayName}.");
     }
 

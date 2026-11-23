@@ -19,9 +19,15 @@ public sealed class ClassAppearance : MonoBehaviour
 
     public string AppliedClassId { get; private set; } = ClassCatalog.FenwalkerId;
 
+    /// <summary>Look chosen at creation (character-creation), applied with the class.</summary>
+    public HeroProfile AppliedProfile { get; private set; } = HeroProfile.Sanitized(new HeroProfile { heroName = "Wanderer" });
+    public GameObject HairObject => hair;
+
     readonly List<Renderer> baseBody = new List<Renderer>();
+    readonly Dictionary<Transform, Vector3> boneScales = new Dictionary<Transform, Vector3>();
     GameObject skinRoot;
     GameObject lantern;
+    GameObject hair;
     HeroEquipmentAppearance gear;
 
     void Start()
@@ -29,10 +35,12 @@ public sealed class ClassAppearance : MonoBehaviour
         // Mirrors follow the owner's network class; the local hero follows the run profile.
         var net = GetComponent<DiabloNetworkPlayer>();
         if (net != null && net.IsSpawned && !net.IsOwner) return;
-        Apply(RunProfile.Class);
+        Apply(RunProfile.Class, RunProfile.Hero);
     }
 
-    public void Apply(ClassDefinition cls)
+    public void Apply(ClassDefinition cls) => Apply(cls, AppliedProfile);
+
+    public void Apply(ClassDefinition cls, HeroProfile profile)
     {
         if (cls == null) cls = ClassCatalog.Fenwalker;
         CollectBaseBody();
@@ -58,6 +66,86 @@ public sealed class ClassAppearance : MonoBehaviour
         if (lantern != null) lantern.SetActive(lanternbearer);
         SwapStarterWeapon(cls);
         AppliedClassId = cls.id;
+        AppliedProfile = HeroProfile.Sanitized(profile);
+        ApplyProportions();
+        RebuildHair();
+    }
+
+    void LateUpdate()
+    {
+        // A worn helmet covers the hair; unequipping brings it back.
+        if (hair == null) return;
+        var eq = GetComponent<Equipment>();
+        bool covered = eq != null && !Equipment.IsBlank(eq.helmet);
+        if (hair.activeSelf == covered) hair.SetActive(!covered);
+    }
+
+    /// <summary>Gender+build bone scales (cosmetic only; controller and stats never read them).</summary>
+    void ApplyProportions()
+    {
+        HeroAppearance.GetProportions((HeroGender)AppliedProfile.gender, (HeroBuild)AppliedProfile.build, out var scales);
+        foreach (var t in GetComponentsInChildren<Transform>(true))
+        {
+            bool chest = t.name == "chest" || t.name == "spine";
+            bool arm = t.name.StartsWith("shoulder") || t.name.StartsWith("upperarm") || t.name.StartsWith("arm");
+            if (!chest && !arm) continue;
+            if (!boneScales.TryGetValue(t, out var original)) { original = t.localScale; boneScales[t] = original; }
+            float f = chest ? scales.x : scales.z;
+            t.localScale = new Vector3(original.x * f, original.y * (chest ? scales.y : f), original.z * f);
+        }
+    }
+
+    void RebuildHair()
+    {
+        if (hair != null) { if (Application.isPlaying) Destroy(hair); else DestroyImmediate(hair); hair = null; }
+        if (AppliedProfile.hairStyle == 4) return; // Glatze
+        var head = FindDeep(transform, "head");
+        if (head == null) return;
+        hair = BuildHair(head, AppliedProfile);
+    }
+
+    static GameObject BuildHair(Transform head, HeroProfile profile)
+    {
+        var root = new GameObject(HeroAppearance.HairRootName);
+        root.transform.SetParent(head, false);
+        var mat = HairMaterial(profile.hairColor);
+        AddHairPart(root, "HairCap", PrimitiveType.Sphere, new Vector3(0f, 0.10f, -0.01f), new Vector3(0.24f, 0.17f, 0.24f), mat);
+        switch (profile.hairStyle)
+        {
+            case 1: // Lang
+                AddHairPart(root, "HairBack", PrimitiveType.Cube, new Vector3(0f, -0.08f, -0.11f), new Vector3(0.20f, 0.34f, 0.07f), mat);
+                break;
+            case 2: // Zopf
+                AddHairPart(root, "HairTail", PrimitiveType.Capsule, new Vector3(0f, -0.10f, -0.13f), new Vector3(0.08f, 0.22f, 0.08f), mat);
+                break;
+            case 3: // Kapuze
+                AddHairPart(root, "HairHood", PrimitiveType.Sphere, new Vector3(0f, 0.06f, -0.03f), new Vector3(0.30f, 0.26f, 0.30f), mat);
+                break;
+            case 5: // Knoten
+                AddHairPart(root, "HairBun", PrimitiveType.Sphere, new Vector3(0f, 0.22f, -0.05f), new Vector3(0.11f, 0.10f, 0.11f), mat);
+                break;
+        }
+        return root;
+    }
+
+    static void AddHairPart(GameObject root, string name, PrimitiveType kind, Vector3 pos, Vector3 scale, Material mat)
+    {
+        var part = GameObject.CreatePrimitive(kind);
+        part.name = name;
+        var col = part.GetComponent<Collider>();
+        if (Application.isPlaying) Destroy(col); else DestroyImmediate(col);
+        part.transform.SetParent(root.transform, false);
+        part.transform.localPosition = pos;
+        part.transform.localScale = scale;
+        var r = part.GetComponent<Renderer>();
+        if (r != null) r.sharedMaterial = mat;
+    }
+
+    static Material HairMaterial(int colorIndex)
+    {
+        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"))
+        { color = HeroAppearance.HairColor(colorIndex), name = "HeroHairMaterial" };
+        return mat;
     }
 
     internal void SetStarterLanternVisible(bool visible)

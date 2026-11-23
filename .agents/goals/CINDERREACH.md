@@ -18,7 +18,11 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | [`cinderreach-sound-audit-fix`](cinderreach-sound-audit-fix/GOAL.md) | Audit + Fix gelandet: 35 Cues, eigenes Kiln-Thema, Menü-/Boss-Musik verdrahtet, Probe `G-DIABLO07` grün | Eigner-Hörabnahme auf Windows-Build, dann 100 % |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
-Abgeschlossen: `cinderreach-deutsch-story` (2026-11-23, Belege `docs/story-run-log.md`). Das Spiel ist
+Abgeschlossen: `cinderreach-character-creation` (2026-11-23): Charaktererstellung im `ClassSelectUI`
+(Klasse → Gender/Frisur/Haarfarbe/Build/Name → Start) mit zufälligem deutschen Heldennamen als
+Standard (Würfel + Editieren), rein kosmetischen Proportions-/Haar-Aufsätzen, Save v14 und
+Koop-Sync (gepackter Look + Heldname im Nameplate vor dem Accountnamen); EditMode 504/504,
+PlayMode 290/290. `cinderreach-deutsch-story` (2026-11-23, Belege `docs/story-run-log.md`). Das Spiel ist
 vollständig deutsch (eigene Stringtabelle `Loc`, Englisch per `-lang en` als Fallback, Eigennamen laut
 Glossar in `docs/story-bible.md`; nur der Produktname „Cinderreach“ bleibt). Akt I und II haben je eine
 Hauptaufgabenkette (H1–H9) mit Nebenaufgaben (N1–N5) über NPC-Dialoge (Ottilie Wachs, Merle Sandkamp,
@@ -87,6 +91,12 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Spezial-Skills skalieren ×1,5 über die Klassen-Faktoren in `ClassDefinition`.
 - Klassenwahl `ClassSelectUI` beim Start („Continue saved hero“ bei Save), übersprungen für
   Autoplay, Shotcheck, Koop-Peers und `-class`.
+- Charaktererstellung (character-creation): `HeroProfile` in `RunProfile.Hero` (Save v14,
+  Migration `V13ToV14` mit Default-Look + Zufallsname aus dem Run-Seed). `ClassAppearance.Apply(cls, profile)`
+  setzt Gender-/Build-Proportionen (chest/spine, shoulder/upperarm, Faktoren 0,85–1,25, kein
+  Gameplay-Effekt) und Haar-Aufsätze am `head`-Knochen (6 Frisuren, 10 Farben; Helm verdeckt das Haar).
+  Koop: `DiabloNetworkPlayer.appearanceCode` (Owner) + serverbereinigter `heroName`; `ShownName`
+  zeigt den Heldennamen, der Accountname (`PlayerAccount`) bleibt getrennt.
 
 ### Gegner, Begegnungen und Bosse
 
