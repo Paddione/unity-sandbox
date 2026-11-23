@@ -219,6 +219,32 @@ public sealed class DiabloShotCheck : MonoBehaviour
         charUI.SetOpen(false);
         yield return Wait(0.2f);
 
+        // 9b) Story dialog + expedition log (cinderreach-deutsch-story S7):
+        // accept H1 first so the log shows a tracked task, then Ottilie's offer.
+        StoryDirector.State.Refresh(RunProfile.Act);
+        var storyPlan = StoryDialogs.Plan(StoryDirector.State, StoryIds.Ottilie);
+        if (storyPlan.dialog != null)
+        {
+            var dlgUI = hero.GetComponent<StoryDialogUI>();
+            if (dlgUI == null) dlgUI = hero.gameObject.AddComponent<StoryDialogUI>();
+            dlgUI.Show(storyPlan, StoryIds.Ottilie);
+            yield return Wait(0.4f);
+            yield return Shot("story_dialog");
+            dlgUI.Advance();
+            dlgUI.Advance();
+            yield return Wait(0.3f);
+            yield return Shot("story_dialog_2");
+            while (dlgUI.IsOpen) dlgUI.Advance();
+            yield return Wait(0.2f);
+        }
+        var logUI = hero.GetComponent<StoryQuestUI>();
+        if (logUI == null) logUI = hero.gameObject.AddComponent<StoryQuestUI>();
+        logUI.SetOpen(true);
+        yield return Wait(0.4f);
+        yield return Shot("story_questlog");
+        logUI.SetOpen(false);
+        yield return Wait(0.2f);
+
         var pauseGo = new GameObject("ShotCheckPause");
         var pauseUI = pauseGo.AddComponent<PauseMenuUI>();
         pauseUI.SetOpen(true);
