@@ -29,36 +29,36 @@ public sealed class AccountPanel
         v.spacing = 10f;
         v.childControlWidth = true;
         v.childControlHeight = false;
-        DiabloUIFactory.MakeHeader(p.Root.transform, "PLAYER", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => p.SetOpen(false));
+        DiabloUIFactory.MakeHeader(p.Root.transform, Loc.T("account.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => p.SetOpen(false));
 
         var hint = DiabloUIFactory.MakeText(p.Root.transform, "NameHint",
-            "Other players see this name above your hero.", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
+            Loc.T("account.namehint"), 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
         DiabloUIFactory.SetLayout(hint.gameObject, prefH: 24f, flexW: 1f);
         p.NameField = Field(p.Root.transform, "NameField", PlayerAccount.DisplayName, PlayerNames.MaxLength);
 
         var row = DiabloUIFactory.MakeHorizontalRow(p.Root.transform, "NameButtons", 12f, 44f);
-        var save = DiabloUIFactory.MakeButton(row.transform, "SaveNameButton", "Save name", 16, true, DiabloPalette.GoldBright, () => p.SaveName());
+        var save = DiabloUIFactory.MakeButton(row.transform, "SaveNameButton", Loc.T("account.savename"), 16, true, DiabloPalette.GoldBright, () => p.SaveName());
         DiabloUIFactory.SetLayout(save.gameObject, prefH: 42f, flexW: 1f);
-        var close = DiabloUIFactory.MakeButton(row.transform, "CloseAccountButton", "Close", 16, false, null, () => p.SetOpen(false));
+        var close = DiabloUIFactory.MakeButton(row.transform, "CloseAccountButton", Loc.T("join.btn.close"), 16, false, null, () => p.SetOpen(false));
         DiabloUIFactory.SetLayout(close.gameObject, prefH: 42f, flexW: 1f);
 
-        // S2: account (username + password); a guest's identity carries over on "Create account".
+        // S2: account (username + password); a guest's identity carries over on Loc.T("account.signup").
         DiabloUIFactory.MakeDivider(p.Root.transform, 6f);
         var acctHint = DiabloUIFactory.MakeText(p.Root.transform, "AccountHint",
-            "An account keeps your name and hero on every PC.", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
+            Loc.T("account.accounthint"), 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
         DiabloUIFactory.SetLayout(acctHint.gameObject, prefH: 24f, flexW: 1f);
         p.UserField = Field(p.Root.transform, "UserField", "", AccountRules.UserMax);
-        p.UserField.placeholder = Placeholder(p.UserField, "Username");
+        p.UserField.placeholder = Placeholder(p.UserField, Loc.T("account.username"));
         p.PassField = Field(p.Root.transform, "PassField", "", AccountRules.PassMax, password: true);
-        p.PassField.placeholder = Placeholder(p.PassField, "Password");
+        p.PassField.placeholder = Placeholder(p.PassField, Loc.T("account.password"));
 
         p.signedOutRow = DiabloUIFactory.MakeHorizontalRow(p.Root.transform, "SignInButtons", 12f, 44f);
-        var signIn = DiabloUIFactory.MakeButton(p.signedOutRow.transform, "SignInButton", "Sign in", 16, true, DiabloPalette.GoldBright, () => p.SignIn());
+        var signIn = DiabloUIFactory.MakeButton(p.signedOutRow.transform, "SignInButton", Loc.T("account.signin"), 16, true, DiabloPalette.GoldBright, () => p.SignIn());
         DiabloUIFactory.SetLayout(signIn.gameObject, prefH: 42f, flexW: 1f);
-        var signUp = DiabloUIFactory.MakeButton(p.signedOutRow.transform, "SignUpButton", "Create account", 16, false, null, () => p.SignUp());
+        var signUp = DiabloUIFactory.MakeButton(p.signedOutRow.transform, "SignUpButton", Loc.T("account.signup"), 16, false, null, () => p.SignUp());
         DiabloUIFactory.SetLayout(signUp.gameObject, prefH: 42f, flexW: 1f);
         p.signOutRow = DiabloUIFactory.MakeHorizontalRow(p.Root.transform, "SignOutButtons", 12f, 44f);
-        var signOut = DiabloUIFactory.MakeButton(p.signOutRow.transform, "SignOutButton", "Sign out", 16, false, DiabloPalette.ParchmentDim, () => p.SignOut());
+        var signOut = DiabloUIFactory.MakeButton(p.signOutRow.transform, "SignOutButton", Loc.T("account.signout"), 16, false, DiabloPalette.ParchmentDim, () => p.SignOut());
         DiabloUIFactory.SetLayout(signOut.gameObject, prefH: 42f, flexW: 1f);
 
         p.Status = DiabloUIFactory.MakeText(p.Root.transform, "AccountStatus", "", 15, DiabloPalette.Parchment, TextAnchor.MiddleLeft);
@@ -94,7 +94,7 @@ public sealed class AccountPanel
         if (busy) return;
         DiabloAudio.PlayUIClick();
         busy = true;
-        Status.text = "Signing in…";
+        Status.text = Loc.T("account.signingin");
         var error = await PlayerAccount.SignInAsync(UserField.text.Trim(), PassField.text);
         busy = false;
         if (Root == null) return;
@@ -108,7 +108,7 @@ public sealed class AccountPanel
         if (busy) return;
         DiabloAudio.PlayUIClick();
         busy = true;
-        Status.text = "Creating account…";
+        Status.text = Loc.T("account.creating");
         var error = await PlayerAccount.SignUpAsync(UserField.text.Trim(), PassField.text);
         busy = false;
         if (Root == null) return;
@@ -122,7 +122,7 @@ public sealed class AccountPanel
         if (busy) return;
         DiabloAudio.PlayUIClick();
         busy = true;
-        Status.text = "Signing out…";
+        Status.text = Loc.T("account.signingout");
         await PlayerAccount.SignOutAsync();
         busy = false;
         if (Root != null) Refresh();
@@ -143,10 +143,10 @@ public sealed class AccountPanel
     /// <summary>Who is signed in (pure enough for the panel; offline reads as such).</summary>
     public static string StatusLine()
     {
-        if (!PlayerAccount.SignedIn) return "Offline: the name is kept on this PC and shown once you play online.";
+        if (!PlayerAccount.SignedIn) return Loc.T("account.status.offline");
         return PlayerAccount.IsGuest
-            ? "Signed in as a guest on this PC."
-            : $"Signed in as {PlayerAccount.Username}.";
+            ? Loc.T("account.status.guest")
+            : Loc.F("account.status.user", PlayerAccount.Username);
     }
 
     async void SaveName()
@@ -155,14 +155,14 @@ public sealed class AccountPanel
         var wanted = NameField.text;
         if (PlayerNames.Sanitize(wanted) == null)
         {
-            Status.text = $"Use {PlayerNames.MinLength}–{PlayerNames.MaxLength} letters, digits, '-' or '_'.";
+            Status.text = Loc.F("account.name.rule", PlayerNames.MinLength, PlayerNames.MaxLength);
             return;
         }
-        Status.text = "Saving…";
+        Status.text = Loc.T("account.saving");
         var shown = await PlayerAccount.SetDisplayNameAsync(wanted);
         if (Root == null) return;
         NameField.text = shown ?? PlayerAccount.DisplayName;
-        Status.text = shown != null ? $"You are now {shown}." : "That name did not work.";
+        Status.text = shown != null ? Loc.F("account.name.done", shown) : Loc.T("account.name.failed");
     }
 
     /// <summary>Layout-driven text field in the start-screen style.</summary>

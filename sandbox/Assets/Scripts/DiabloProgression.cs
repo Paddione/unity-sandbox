@@ -255,8 +255,8 @@ public sealed class DiabloProgression : MonoBehaviour
         EnsureHud();
         StartCoroutine(Tween(0.1f, t => SetAlpha(flash, 0.6f * (1f - OutCubic(t)))));
         yield return new WaitForSecondsRealtime(0.05f);
-        banner.text = $"LEVEL {Level}";
-        bannerSub.text = $"+{LifePerLevel:0} Life  +1 Attribut, +1 Skill";
+        banner.text = Loc.F("hud.levelup.title", Level);
+        bannerSub.text = Loc.F("hud.levelup.gains", LifePerLevel);
         banner.enabled = true;
         bannerSub.enabled = true;
         DiabloAmbience.LevelPillar(transform.position);
@@ -276,7 +276,7 @@ public sealed class DiabloProgression : MonoBehaviour
     {
         if (!IsLocalHero() || IsCompanion) return; // companions mirror the hero: no own XP bar
         EnsureHud();
-        levelLabel.text = $"Lv {Level}";
+        levelLabel.text = Loc.F("hud.level.short", Level);
     }
 
     void TweenFill(float target)

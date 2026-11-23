@@ -170,14 +170,30 @@ public sealed class LootDrop : MonoBehaviour
         return PrettyName(item.rarity == ItemRarity.Unique ? item.uniqueId : item.baseType);
     }
 
+    /// <summary>Catalog key of an item id: "Rogue's Keepsake" → "item.name.rogue-s-keepsake",
+    /// "ShortSword" → "item.name.shortsword" (cinderreach-deutsch-story).</summary>
+    public static string ItemNameKey(string raw)
+    {
+        var sb = new System.Text.StringBuilder("item.name.", raw.Length + 10);
+        bool dash = false;
+        foreach (char c in raw.ToLowerInvariant())
+        {
+            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) { if (dash && sb.Length > 10) sb.Append('-'); sb.Append(c); dash = false; }
+            else dash = true;
+        }
+        return sb.ToString();
+    }
+
     /// <summary>
-    /// Player-facing name for stable ids: kebab unique ids ("bulwark-carrier",
+    /// Player-facing name for stable ids (catalog first, see <see cref="ItemNameKey"/>): kebab unique ids ("bulwark-carrier",
     /// "wick-of-the-halo") become title case, CamelCase base types ("ClothTunic")
     /// get spaces. Ids themselves stay untouched (save, network, art keys).
     /// </summary>
     public static string PrettyName(string raw)
     {
         if (string.IsNullOrEmpty(raw)) return raw ?? "";
+        string key = ItemNameKey(raw);
+        if (Loc.Has(key)) return Loc.T(key);
         var sb = new System.Text.StringBuilder(raw.Length + 8);
         if (raw.IndexOf('-') >= 0 && raw.IndexOf(' ') < 0)
         {

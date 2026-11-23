@@ -42,23 +42,23 @@ public static class BuildUniqueEffects
     public static string EffectText(string uniqueId)
     {
         if (uniqueId == LancerWardId)
-            return "Cleave interrupts one charging Lancer (it recovers exhausted).";
+            return Loc.T("unique.effect.lancerward");
         if (uniqueId == WickOfHaloId)
-            return "Wisps strike prey inside your burning halo first.";
+            return Loc.T("unique.effect.wick");
         if (uniqueId == NightfangId)
-            return "Quick Shot pierces one extra target.";
+            return Loc.T("unique.effect.nightfang");
         if (uniqueId == BulwarkCarrierId)
-            return "A blocked frontal hit calls out the attacker (threat).";
+            return Loc.T("unique.effect.bulwark");
         if (uniqueId == SeismicCrownId)
-            return "Seismic Slam holds its main target 2 s longer.";
+            return Loc.T("unique.effect.seismiccrown");
         if (uniqueId == MercyShroudId)
-            return "Mending Light grants a 5 HP shield (4 s).";
+            return Loc.T("unique.effect.mercyshroud");
         if (uniqueId == DawnCircleId)
-            return "Renewing Circle mends the weakest ally once more.";
+            return Loc.T("unique.effect.dawncircle");
         if (uniqueId == ShadowstrideVestId)
-            return "Blade Flurry hits grant +30% move speed (3 s).";
+            return Loc.T("unique.effect.shadowstride");
         if (uniqueId == KeenCadenceId)
-            return "The first crit of a special cast cuts its cooldown by 2 s.";
+            return Loc.T("unique.effect.keencadence");
         return "";
     }
 

@@ -23,6 +23,24 @@ public static partial class LocCatalog
     public static IEnumerable<Entry[]> Domains()
     {
         yield return Names;
+        yield return Char;
+        yield return Hud;
+        yield return Key;
+        yield return Stash;
+        yield return Town;
+        yield return Vendor;
+        yield return Smith;
+        yield return Inv;
+        yield return Reward;
+        yield return Unique;
+        yield return Stat;
+        yield return Affix;
+        yield return Item;
+        yield return Account;
+        yield return Join;
+        yield return Settings;
+        yield return Menu;
+        yield return Class;
     }
 
     /// <summary>All entries in declaration order (duplicates included, for tests).</summary>

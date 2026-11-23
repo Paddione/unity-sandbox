@@ -98,15 +98,15 @@ public sealed class DiabloSmithUI : MonoBehaviour
     {
         EnsureBuilt();
         var item = inventory != null ? inventory.Get(index) : null;
-        if (item == null) { Say("Kein Gegenstand in diesem Slot."); return; }
+        if (item == null) { Say(Loc.T("smith.msg.noitem")); return; }
         int before = inventory.Count;
         if (SmithingService.TrySalvage(gameObject, index, item))
         {
-            Say($"Verwertet ({LootDrop.ItemLabel(item)}): Material erhalten.");
+            Say(Loc.F("smith.msg.salvaged", LootDrop.ItemLabel(item)));
             if (selectedBag >= before - 1) selectedBag = -1;
             DiabloAudio.PlayLoot();
         }
-        else Say("Verwertung abgelehnt (Unique, Belegung oder stale Angebot).");
+        else Say(Loc.T("smith.msg.salvagerejected"));
         Refresh();
     }
 
@@ -116,15 +116,14 @@ public sealed class DiabloSmithUI : MonoBehaviour
         EnsureBuilt();
         var item = inventory != null ? inventory.Get(selectedBag) : null;
         if (item == null || selectedAffix < 0 || string.IsNullOrEmpty(selectedReplacement))
-        { Say("Wähle Gegenstand, Eigenschaft und Ersatz."); return; }
+        { Say(Loc.T("smith.msg.pickall")); return; }
         if (SmithingService.TryReforge(gameObject, selectedBag, item, selectedAffix, selectedReplacement))
         {
             float v = item.affixes[selectedAffix].value;
-            Say($"Umschmiedet: {selectedReplacement} " +
-                $"{AffixLibrary.Describe(new Affix(selectedReplacement, v))} (T{item.affixTier}).");
+            Say(Loc.F("smith.msg.reforged", AffixLibrary.Describe(new Affix(selectedReplacement, v)), item.affixTier));
             DiabloAudio.PlayLoot();
         }
-        else Say("Umschmieden abgelehnt (Mittel, Bindung, Keys oder stale Angebot).");
+        else Say(Loc.T("smith.msg.reforgerejected"));
         Refresh();
     }
 
@@ -135,7 +134,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
         SmithingService.ReforgeCost(out int mat, out int gold);
         if (purseText != null)
             purseText.text = wallet != null
-                ? $"Gold: {wallet.Gold}   Material: {RunProfile.SmithingMaterial}   (Reforge: {mat} + {gold}g)"
+                ? Loc.F("smith.purse", wallet.Gold, RunProfile.SmithingMaterial, mat, gold)
                 : "Gold: —";
         RebuildBag();
         RebuildAffixes();
@@ -159,8 +158,8 @@ public sealed class DiabloSmithUI : MonoBehaviour
             int yield = SmithingService.SalvageYield(item);
             string mark = index == selectedBag ? "» " : "";
             var btn = MakeRowButton(bagList,
-                $"{mark}{LootDrop.ItemLabel(item)} [{item.rarity}] (T{item.affixTier})" +
-                (yield > 0 ? $" — Salvage +{yield}" : " — kein Salvage"),
+                mark + Loc.F("smith.bag.row", LootDrop.ItemLabel(item), ItemText.Rarity(item.rarity), item.affixTier) +
+                (yield > 0 ? Loc.F("smith.bag.yield", yield) : Loc.T("smith.bag.noyield")),
                 DiabloPalette.Rarity(item.rarity));
             btn.onClick.AddListener(() => SelectBag(index));
         }
@@ -174,10 +173,10 @@ public sealed class DiabloSmithUI : MonoBehaviour
             else DestroyImmediate(child.gameObject);
         var item = inventory != null ? inventory.Get(selectedBag) : null;
         if (detailText != null)
-            detailText.text = item == null ? "Wähle einen Gegenstand." :
+            detailText.text = item == null ? Loc.T("smith.msg.pickitem") :
                 item.reforgeIndexPlusOne != 0
-                    ? $"{LootDrop.ItemLabel(item)}: Slot {item.reforgeIndexPlusOne} gebunden."
-                    : $"{LootDrop.ItemLabel(item)}: Affix zum Umschmieden wählen.";
+                    ? Loc.F("smith.detail.bound", LootDrop.ItemLabel(item), item.reforgeIndexPlusOne)
+                    : Loc.F("smith.detail.pickaffix", LootDrop.ItemLabel(item));
         if (item == null || item.affixes == null) return;
         for (int i = 0; i < item.affixes.Count; i++)
         {
@@ -202,11 +201,11 @@ public sealed class DiabloSmithUI : MonoBehaviour
             var def = AffixLibrary.Get(key);
             def.Range(item.affixTier, out float min, out float max);
             string mark = key == selectedReplacement ? "» " : "";
-            string label = $"{mark}{key}: {min:0.##}–{max:0.##} (T{item.affixTier})";
+            string label = mark + Loc.F("smith.replacement.row", AffixLibrary.StatName(key), min, max, item.affixTier);
             var btn = MakeRowButton(replacementList, label, DiabloPalette.Parchment);
             btn.onClick.AddListener(() => SelectReplacement(key));
         }
-        var go = MakeRowButton(replacementList, "Umschmieden (3 Material + 50 Gold)", DiabloPalette.Parchment);
+        var go = MakeRowButton(replacementList, Loc.T("smith.btn.reforge"), DiabloPalette.Parchment);
         go.onClick.AddListener(ReforgeSelected);
     }
 
@@ -250,7 +249,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
         headerImg.sprite = DiabloMenuArt.HeaderBanner();
         headerImg.type = Image.Type.Sliced;
         headerGo.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 52f);
-        MakeBannerLabel(headerGo.transform, "Lantern Hold smithy", 20);
+        MakeBannerLabel(headerGo.transform, Loc.T("smith.title"), 20);
         purseText = MakeLabel(panelGo.transform, "Gold: —", 17);
         detailText = MakeLabel(panelGo.transform, "", 13);
         messageText = MakeLabel(panelGo.transform, "", 13);
@@ -262,12 +261,12 @@ public sealed class DiabloSmithUI : MonoBehaviour
         cols.childControlWidth = true;
         cols.childControlHeight = true;
 
-        bagList = MakeColumn(colsGo.transform, "Bag (click selects, shows salvage)");
-        affixList = MakeColumn(colsGo.transform, "Affix (click selects)");
-        replacementList = MakeColumn(colsGo.transform, "Replacement + range");
+        bagList = MakeColumn(colsGo.transform, Loc.T("smith.col.bag"));
+        affixList = MakeColumn(colsGo.transform, Loc.T("smith.col.affix"));
+        replacementList = MakeColumn(colsGo.transform, Loc.T("smith.col.replacement"));
 
-        MakeLabel(panelGo.transform, "F toggles, Esc closes (saves).", 13);
-        var closeBtn = MakeSmallButton(panelGo.transform, "Close (saves)");
+        MakeLabel(panelGo.transform, Loc.T("smith.footer"), 13);
+        var closeBtn = MakeSmallButton(panelGo.transform, Loc.T("town.close"));
         closeBtn.onClick.AddListener(() => SetOpen(false));
         building = false;
     }

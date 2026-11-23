@@ -12,16 +12,14 @@ public static class ClassCatalog
     public const string RogueId = "rogue";
 
     public static readonly ClassDefinition Fenwalker = new ClassDefinition(
-        FenwalkerId, "Fenwalker",
-        "Sword, bow and fire. Cleaves through husk packs, holds the line.",
+        FenwalkerId,
         new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave, DiabloSkills.Skill.SeismicSlam },
         new[] { "Q", "E", "R", "Space" },
         1f, 1f, "Adventurers/Characters/Knight.fbx",
         ClassDefinition.PartyRole.Tank, 1f);
 
     public static readonly ClassDefinition Lanternbearer = new ClassDefinition(
-        LanternbearerId, "Lanternbearer",
-        "Carries Lantern Hold's light. Wisps fight beside her, the halo burns what comes close.",
+        LanternbearerId,
         new[] { DiabloSkills.Skill.LanternBolt, DiabloSkills.Skill.Wisps, DiabloSkills.Skill.SearingHalo, DiabloSkills.Skill.VeilStep, DiabloSkills.Skill.MendingLight, DiabloSkills.Skill.RenewingCircle },
         new[] { "Q", "E", "R", "Space", "F", "G" },
         1.5f, 0.5f, "Adventurers/Characters/Mage.fbx",
@@ -29,8 +27,7 @@ public static class ClassCatalog
 
     /// <summary>Rogue (party-roles S1 base set, S3 specialty): ranged/melee DPS with Quick Shot and Blade Flurry.</summary>
     public static readonly ClassDefinition Rogue = new ClassDefinition(
-        RogueId, "Rogue",
-        "Strikes from range and from the shadows. Fast bow shots and quick blades.",
+        RogueId,
         new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.QuickShot, DiabloSkills.Skill.BladeFlurry },
         new[] { "Q", "E", "R", "Space" },
         1.5f, 1.5f, "Adventurers/Characters/Rogue.fbx",

@@ -92,7 +92,7 @@ public sealed class DiabloStashUI : MonoBehaviour
 
     /// <summary>Header line (test seam).</summary>
     public string CountLine() =>
-        $"Chest {RunProfile.Stash.Count} of {Stash.Capacity}   Bag {(inventory != null ? inventory.Count : 0)} of {Inventory.Capacity}";
+        Loc.F("stash.count", RunProfile.Stash.Count, Stash.Capacity, (inventory != null ? inventory.Count : 0), Inventory.Capacity);
 
     public void Refresh()
     {
@@ -122,11 +122,11 @@ public sealed class DiabloStashUI : MonoBehaviour
         if (inspectText == null || item == null) return;
         if (item.slot == ItemSlot.Consumable)
         {
-            inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> — Restores +{ItemDatabase.PotionHeal} HP (Key 1).";
+            inspectText.text = Loc.F("stash.potion.tip", LootDrop.ItemLabel(item), ItemDatabase.PotionHeal);
             return;
         }
         var eq = equipment != null ? equipment.GetEquipped(item.slot) : null;
-        string eqName = eq != null ? LootDrop.ItemLabel(eq) : "empty slot";
+        string eqName = eq != null ? LootDrop.ItemLabel(eq) : Loc.T("town.emptyslot");
         inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> vs {eqName}:\n{DiabloInventoryUI.CompareSummary(item, eq)}";
     }
 
@@ -143,9 +143,9 @@ public sealed class DiabloStashUI : MonoBehaviour
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panelGo.transform, "LANTERN HOLD VAULT", DiabloMenuArt.MenuArtSprite("StashChestIcon"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(panelGo.transform, Loc.T("stash.title"), DiabloMenuArt.MenuArtSprite("StashChestIcon"), () => SetOpen(false));
 
-        countText = DiabloUIFactory.MakeText(panelGo.transform, "CountLine", "Chest 0 of 40   Bag 0 of 20", 16, DiabloPalette.TrimGold, TextAnchor.MiddleCenter);
+        countText = DiabloUIFactory.MakeText(panelGo.transform, "CountLine", Loc.T("stash.count.zero"), 16, DiabloPalette.TrimGold, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(countText.gameObject, prefH: 26f, flexW: 1f);
 
         var colsGo = new GameObject("Columns", typeof(RectTransform));
@@ -158,8 +158,8 @@ public sealed class DiabloStashUI : MonoBehaviour
         cols.childForceExpandWidth = true;
         cols.childForceExpandHeight = true;
 
-        stashList = MakeColumn(colsGo.transform, "StashColumn", "Shared Chest (Click to Take)");
-        bagList = MakeColumn(colsGo.transform, "BagColumn", "Your Bag (Click to Store)");
+        stashList = MakeColumn(colsGo.transform, "StashColumn", Loc.T("stash.chest"));
+        bagList = MakeColumn(colsGo.transform, "BagColumn", Loc.T("stash.bag"));
 
         var inspBox = new GameObject("InspectBox", typeof(RectTransform));
         inspBox.transform.SetParent(panelGo.transform, false);
@@ -170,7 +170,7 @@ public sealed class DiabloStashUI : MonoBehaviour
         var iv = inspBox.AddComponent<VerticalLayoutGroup>();
         iv.padding = new RectOffset(12, 12, 8, 8);
         inspectText = DiabloUIFactory.MakeText(inspBox.transform, "InspectText",
-            "Hover an item to inspect & compare stats. Esc closes and saves.", 14, DiabloPalette.Parchment);
+            Loc.T("stash.hint"), 14, DiabloPalette.Parchment);
         DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 74f, flexW: 1f);
     }
 

@@ -9,8 +9,10 @@ public sealed class ClassDefinition
     public enum PartyRole { Tank, Healer, Dps }
 
     public readonly string id;
-    public readonly string displayName;
-    public readonly string blurb;
+    /// <summary>Shown name from the catalog (<c>name.class.&lt;id&gt;</c>, cinderreach-deutsch-story).</summary>
+    public string displayName => Loc.T("name.class." + id);
+    /// <summary>Class-select lore line from the catalog (<c>class.blurb.&lt;id&gt;</c>).</summary>
+    public string blurb => Loc.T("class.blurb." + id);
     public readonly DiabloSkills.Skill[] skills;
     /// <summary>Key label per skill (same order as <see cref="skills"/>).</summary>
     public readonly string[] keys;
@@ -28,13 +30,11 @@ public sealed class ClassDefinition
     /// <summary>Base set every class can cast (cinderreach-party-roles S1): Fireball + Arrow. Melee runs through DiabloMelee for all classes.</summary>
     public static readonly DiabloSkills.Skill[] BaseSkills = { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow };
 
-    public ClassDefinition(string id, string displayName, string blurb, DiabloSkills.Skill[] skills,
+    public ClassDefinition(string id, DiabloSkills.Skill[] skills,
         string[] keys, float focusSkillFactor, float strengthMeleeFactor, string modelPath,
         PartyRole role, float specialtyFactor)
     {
         this.id = id;
-        this.displayName = displayName;
-        this.blurb = blurb;
         this.skills = skills;
         this.keys = keys;
         this.focusSkillFactor = focusSkillFactor;

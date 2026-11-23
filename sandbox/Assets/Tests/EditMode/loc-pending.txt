@@ -1,9 +1,6 @@
 # Untranslated player-visible literals (cinderreach-deutsch-story S2 empties this list).
 # Format: <path under Assets/Scripts><TAB><literal>. Lines move to LocCatalog or loc-allowlist.txt.
 Audio/MusicDirector.cs	Zone
-Classes/ClassCatalog.cs	Carries Lantern Hold's light. Wisps fight beside her, the halo burns what comes close.
-Classes/ClassCatalog.cs	Strikes from range and from the shadows. Fast bow shots and quick blades.
-Classes/ClassCatalog.cs	Sword, bow and fire. Cleaves through husk packs, holds the line.
 Contracts/ContractBoard.cs	contract claim write rejected
 Contracts/ContractCatalog.cs	Ash Elite
 Contracts/ContractCatalog.cs	Bone Warden
@@ -14,49 +11,6 @@ Contracts/ContractCatalog.cs	Kiln Elite
 Contracts/ContractCatalog.cs	Kiln Relic
 Contracts/ContractCatalog.cs	Sunken Relic
 DiabloCorpse.cs	Ignore Raycast
-DiabloInventoryUI.cs	  (Kindled locked: defeat the Hollow Abbot)
-DiabloInventoryUI.cs	<b>Combat Summary</b>\n
-DiabloInventoryUI.cs	<b>{LootDrop.ItemLabel(item)}</b>\nConsumable: restores <color={BetterColor}>+{ItemDatabase.PotionHeal} HP</color>. Click or press 1 to drink.
-DiabloInventoryUI.cs	<color={DiabloPalette.ToHex(DiabloPalette.GoldBright)}><b>{RunProfile.Class.displayName}</b></color>  •  Lv {lv}  •  {RunProfile.Difficulty}\n
-DiabloInventoryUI.cs	<color={DiabloPalette.ToHex(DiabloPalette.ParchmentDim)}>{slot}: — Empty —</color>
-DiabloInventoryUI.cs	<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>Gold: {gold}g</color>   •   Potions: {potions}  (Key 1 heals)
-DiabloInventoryUI.cs	<color={goldHex}><b>Attributes</b></color>   STR {str}   •   VIT {vit}   •   FOC {foc}\n\n
-DiabloInventoryUI.cs	<color={goldHex}><b>Expedition</b></color>\n
-DiabloInventoryUI.cs	<color={goldHex}><b>Offense & Defense</b></color>\n
-DiabloInventoryUI.cs	<color={rHex}><b>{LootDrop.ItemLabel(item)}</b></color> <color={DiabloPalette.ToHex(DiabloPalette.ParchmentDim)}>[{item.rarity}]</color>\n
-DiabloInventoryUI.cs	<size=13>{AffixSummary(item)}</size>
-DiabloInventoryUI.cs	Area  +{eq.AreaBonusPct():0.#}% (radius x{eq.ScaleArea(1f):0.###})
-DiabloInventoryUI.cs	Bag: {count} / {Inventory.Capacity} slots   •   Gold: {(wallet != null ? wallet.Gold : 0)}g   •   Potions: {potions}
-DiabloInventoryUI.cs	CINDERREACH INVENTORY
-DiabloInventoryUI.cs	Cannot drop {label} here.
-DiabloInventoryUI.cs	Cannot equip that item.
-DiabloInventoryUI.cs	Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  1 Potion  •  I/B Inventory  •  C Character  •  Alt Loot names  •  Esc Pause
-DiabloInventoryUI.cs	DMG <color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>{equipment.GetDamage():0.#}</color>   •   
-DiabloInventoryUI.cs	Discard rejected: {label}.
-DiabloInventoryUI.cs	Discard selected
-DiabloInventoryUI.cs	Discarded {label} (host confirms).
-DiabloInventoryUI.cs	Discarded {label} — walk over it to pick it back up.
-DiabloInventoryUI.cs	Drink Potion (1)
-DiabloInventoryUI.cs	Equip rejected: {LootDrop.ItemLabel(item)}.
-DiabloInventoryUI.cs	Equip selected
-DiabloInventoryUI.cs	Equipped Gear (click slot to move to Bag):
-DiabloInventoryUI.cs	Equipping {LootDrop.ItemLabel(item)}… (host confirms)
-DiabloInventoryUI.cs	Hover or click a bag item to inspect or equip.
-DiabloInventoryUI.cs	Item is no longer in the bag.
-DiabloInventoryUI.cs	Max HP <color={BetterColor}>{equipment.GetMaxHP():0.#}</color>   •   
-DiabloInventoryUI.cs	No bonuses
-DiabloInventoryUI.cs	Potion
-DiabloInventoryUI.cs	Speed {equipment.GetMoveSpeed():0.##}   •   XP Gain {equipment.GetXPMul():0.#}%   •   
-DiabloInventoryUI.cs	Your bag is empty. Defeat foes or browse the Vendor in Lantern Hold.
-DiabloInventoryUI.cs	no bonuses
-DiabloInventoryUI.cs	{LootDrop.ItemLabel(candidate)} is for {ClassCatalog.Get(ItemDatabase.ClassRestriction(candidate.baseType)).displayName} only — sell or discard it instead.
-DiabloInventoryUI.cs	{text} <color={color}>({sign}{delta:0.#})</color>
-DiabloInventoryUI.cs	• Damage: <b>{equipment.GetDamage():0.#}</b>  (Fire +{fireDmg:0.#})   •   Crit: <b>{equipment.GetCrit():0.#}%</b>\n
-DiabloInventoryUI.cs	• Gold Find: +{gf:0.#}%   •   Magic Find: +{mf:0.#}%\n
-DiabloInventoryUI.cs	• Life Steal: {ls:0.#}%   •   Cooldown Red.: {cdr:0.#}%   •   All Skills: +{ranks}\n
-DiabloInventoryUI.cs	• Max HP: <b>{equipment.GetMaxHP():0.#}</b>   •   Armor: <b>{armor:0.#}</b>   •   Thorns: {thorns}\n
-DiabloInventoryUI.cs	• Move Speed: {equipment.GetMoveSpeed():0.##}   •   XP Bonus: {equipment.GetXPMul():0.#}%\n
-DiabloInventoryUI.cs	• Unlocks & Mode: {DifficultyText()}
 DiabloLifeGlobe.cs	   <color={DiabloPalette.ToHex(DiabloPalette.GoldBright)}>+{pts} pts [C]</color>
 DiabloLifeGlobe.cs	<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>{gold}g</color>   •   Potions [1]: {pot}{ptsTag}
 DiabloLifeGlobe.cs	The lantern light carries you back to Lantern Hold.
@@ -92,15 +46,9 @@ DiabloMenuArt.cs	tab_on_{w}x{h}
 DiabloNetworkPlayer.cs	class cannot cast {skill}
 DiabloNetworkPlayer.cs	cooldown {cooldownLeft:0.00}s left
 DiabloNetworkPlayer.cs	unknown skill {skillId}
-DiabloProgression.cs	+{LifePerLevel:0} Life  +1 Attribut, +1 Skill
-DiabloProgression.cs	LEVEL {Level}
-DiabloProgression.cs	Lv {Level}
 DiabloProjectile.cs	Arrow
 DiabloProjectile.cs	Fireball
 DiabloProjectile.cs	LanternBolt
-DiabloSettings.cs	High
-DiabloSettings.cs	Low
-DiabloSettings.cs	Med
 DiabloShotCheck.cs	)} asked={asked} class={RunProfile.ClassId} level={freshLevel} waypoints={RunProfile.Act.Waypoints.Count}
 DiabloShotCheck.cs	)} level {levelBefore}->{levelAfter} gold {goldBefore}->{goldAfter}
 DiabloShotCheck.cs	Cryptwarden Plate
@@ -113,20 +61,6 @@ DiabloShotCheck.cs	FAIL no controllable hero within 30 s
 DiabloShotCheck.cs	NEW_HERO {(freshOk ? 
 DiabloShotCheck.cs	RELOAD_CONTINUE {(resumed ? 
 DiabloShotCheck.cs	start, output {dir}
-DiabloSkills.cs	     RMB: Thrust
-DiabloSkills.cs	Blade Flurry
-DiabloSkills.cs	Bow
-DiabloSkills.cs	Cleave
-DiabloSkills.cs	Fireball
-DiabloSkills.cs	Lantern Bolt
-DiabloSkills.cs	Mending Light
-DiabloSkills.cs	Quick Shot
-DiabloSkills.cs	Renewing Circle
-DiabloSkills.cs	Searing Halo
-DiabloSkills.cs	Seismic Slam
-DiabloSkills.cs	Spc
-DiabloSkills.cs	Veil Step
-DiabloSkills.cs	Wisps
 DiabloTargetBar.cs	Cinder Thrall
 DiabloTargetBar.cs	Hollow Abbot
 DiabloTargetBar.cs	Kiln Summon
@@ -152,128 +86,12 @@ Enemies/GlasswrightController.cs	The Glasswright
 Enemies/KilnmotherController.cs	Kiln Summon_{i}_{PhaseTwoEntries}
 Enemies/RangedCaster.cs	Ignore Raycast
 EnemyAttack.cs	Ignore Raycast
-Items/AffixLibrary.cs	+{0} Crit Rating
-Items/AffixLibrary.cs	+{0} Fire Damage
-Items/AffixLibrary.cs	+{0} Move Speed
-Items/AffixLibrary.cs	+{0} to all Skills
-Items/AffixLibrary.cs	+{0}% Attack Speed
-Items/AffixLibrary.cs	+{0}% Gold Find
-Items/AffixLibrary.cs	+{0}% Magic Find
-Items/AffixLibrary.cs	{0}% Life Steal
-Items/BuildUniqueEffects.cs	A blocked frontal hit calls out the attacker (threat).
-Items/BuildUniqueEffects.cs	Blade Flurry hits grant +30% move speed (3 s).
-Items/BuildUniqueEffects.cs	Cleave interrupts one charging Lancer (it recovers exhausted).
-Items/BuildUniqueEffects.cs	Mending Light grants a 5 HP shield (4 s).
-Items/BuildUniqueEffects.cs	Quick Shot pierces one extra target.
-Items/BuildUniqueEffects.cs	Renewing Circle mends the weakest ally once more.
-Items/BuildUniqueEffects.cs	Seismic Slam holds its main target 2 s longer.
-Items/BuildUniqueEffects.cs	The first crit of a special cast cuts its cooldown by 2 s.
-Items/BuildUniqueEffects.cs	Wisps strike prey inside your burning halo first.
-Items/Equipment.cs	(dmg={GetDamage()}, hp={GetMaxHP()}).
 Items/Inventory.cs	({(current != null ? 
-Items/ItemDatabase.cs	Cryptwarden Plate
-Items/ItemDatabase.cs	Emberbrand Blade
-Items/ItemDatabase.cs	Healing Potion
-Items/ItemDatabase.cs	Lantern of the Hold
-Items/ItemDatabase.cs	Rogue's Keepsake
-Items/ItemDatabase.cs	Seer's Circlet
-Items/ItemDatabase.cs	Worn Lantern
-Items/ItemDatabase.cs	Worn Short Bow
-Items/ItemDatabase.cs	Worn Short Sword
-Items/ItemDetailsView.cs	  no bonuses
-Items/ItemDetailsView.cs	Cannot equip: {who} only. You may still sell or discard it.
-Items/ItemDetailsView.cs	Empty slot — no item here.
-Items/ItemDetailsView.cs	Item level: legacy stock (Altbestand, pre-level scaling)
-Items/ItemDetailsView.cs	Item level: {item.itemLevel}
-Items/ItemDetailsView.cs	Rolls: none
-Items/ItemDetailsView.cs	Use: drink to restore +10 HP (key 1).
-Items/ItemDetailsView.cs	no item
-Items/ItemDetailsView.cs	vs. equipped:
-Loot/KindledFinaleReward.cs	Kindled-Belohnung wartet (Speichern fehlgeschlagen).
-Loot/KindledFinaleReward.cs	Kindled-Belohnung wartet (Tasche voll).
-Loot/KindledFinaleReward.cs	Kindled-Belohnung: Rare {weapon.baseType} (+{weapon.GetAffix(
-Loot/KindledFinaleReward.cs	forced save failure
-Menu/AccountPanel.cs	An account keeps your name and hero on every PC.
-Menu/AccountPanel.cs	Create account
-Menu/AccountPanel.cs	Creating account…
-Menu/AccountPanel.cs	Offline: the name is kept on this PC and shown once you play online.
-Menu/AccountPanel.cs	Other players see this name above your hero.
-Menu/AccountPanel.cs	PLAYER
-Menu/AccountPanel.cs	Save name
-Menu/AccountPanel.cs	Sign in
-Menu/AccountPanel.cs	Sign out
-Menu/AccountPanel.cs	Signed in as a guest on this PC.
-Menu/AccountPanel.cs	Signed in as {PlayerAccount.Username}.
-Menu/AccountPanel.cs	Signing in…
-Menu/AccountPanel.cs	Signing out…
-Menu/AccountPanel.cs	That name did not work.
-Menu/AccountPanel.cs	Use {PlayerNames.MinLength}–{PlayerNames.MaxLength} letters, digits, '-' or '_'.
-Menu/AccountPanel.cs	You are now {shown}.
 Menu/ClassSelectUI.cs	<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>[{key}]</color> {DiabloSkills.SkillName(sk)}
-Menu/ClassSelectUI.cs	Account hero
-Menu/ClassSelectUI.cs	BEGIN ANEW?
-Menu/ClassSelectUI.cs	BEGIN AS {cls.displayName.ToUpperInvariant()}
-Menu/ClassSelectUI.cs	Begin a new {cls.displayName}?\n\nThis replaces {replaced} at the first autosave.
-Menu/ClassSelectUI.cs	Begin as {cls.displayName}
-Menu/ClassSelectUI.cs	CINDERREACH
-Menu/ClassSelectUI.cs	COMBAT SKILLS
-Menu/ClassSelectUI.cs	CONTINUE  —  {cls.displayName.ToUpperInvariant()}  •  LEVEL {save.level}  •  {save.gold}G  •  {(save.difficulty ?? RunProfile.Normal).ToUpperInvariant()}
-Menu/ClassSelectUI.cs	CONTINUE SAVED EXPEDITION
-Menu/ClassSelectUI.cs	Damage  •  Blade of the Ashen Paths
-Menu/ClassSelectUI.cs	Healer  •  Keeper of the Iron Lantern
-Menu/ClassSelectUI.cs	Join Server
-Menu/ClassSelectUI.cs	Keep which? The other one is backed up on this PC.
-Menu/ClassSelectUI.cs	Mode: Normal
-Menu/ClassSelectUI.cs	Mode: Normal (Kindled locked)
-Menu/ClassSelectUI.cs	Playing as {name}
-Menu/ClassSelectUI.cs	SETTINGS
-Menu/ClassSelectUI.cs	Starter: {starter}  •  {cls.skills.Length} Skills
-Menu/ClassSelectUI.cs	THE ASHEN FEN  •  CHOOSE YOUR HERO
-Menu/ClassSelectUI.cs	Tank  •  Oathbound Vanguard of the Fen
-Menu/ClassSelectUI.cs	This PC's hero
-Menu/ClassSelectUI.cs	WHICH HERO?
-Menu/ClassSelectUI.cs	Your account has a hero ({Describe(cloud)}).\nThis PC has another one ({Describe(local)}).\n
-Menu/ClassSelectUI.cs	[Class] Reload continue found no readable save.
-Menu/ClassSelectUI.cs	your current {RunProfile.Class.displayName} (level {(prog != null ? prog.Level : 1)}) and this run's world
-Menu/ClassSelectUI.cs	your saved {ClassCatalog.Get(save.classId).displayName} (level {save.level}, {save.gold} gold)
-Menu/ClassSelectUI.cs	{ClassCatalog.Get(s.classId).displayName}, level {s.level}, {s.gold} gold
-Menu/MainMenu.cs	CINDERREACH
-Menu/MainMenu.cs	Co-op: host / join
-Menu/MainMenu.cs	Dmg Nums
-Menu/MainMenu.cs	New Game
-Menu/MainMenu.cs	New Game (overwrite)
-Menu/MainMenu.cs	PRESS ANY KEY — LANTERN HOLD AWAITS
-Menu/MainMenu.cs	SETTINGS
-Menu/MainMenu.cs	SFX
-Menu/PauseMenu.cs	PAUSED
-Menu/PauseMenu.cs	Settings: shake on/off
-Menu/PauseMenuUI.cs	Character & Skills (C)
-Menu/PauseMenuUI.cs	Inventory & Gear (I)
-Menu/PauseMenuUI.cs	PAUSED
-Menu/PauseMenuUI.cs	Resume Expedition
-Menu/PauseMenuUI.cs	SETTINGS
-Menu/PauseMenuUI.cs	Save & Main Menu
-Menu/PauseMenuUI.cs	Save & Quit
-Menu/PauseMenuUI.cs	Settings & Audio
 MultiplayerAutoStarter.cs	[Net] Joining via relay code {args.JoinCode}.
 MultiplayerAutoStarter.cs	[Net] Starting host via relay (code follows).
 MultiplayerAutoStarter.cs	join failed
 MultiplayerAutoStarter.cs	timed out
-Net/AccountRules.cs	Could not create the account.
-Net/AccountRules.cs	Could not sign in.
-Net/AccountRules.cs	Invalid username or password
-Net/AccountRules.cs	No connection to the account service.
-Net/AccountRules.cs	Password needs a lower-case and an upper-case letter, a digit and a symbol.
-Net/AccountRules.cs	Password: {PassMin}–{PassMax} characters.
-Net/AccountRules.cs	That username is taken.
-Net/AccountRules.cs	The account service rejected these details.
-Net/AccountRules.cs	This account is already linked.
-Net/AccountRules.cs	This account is banned.
-Net/AccountRules.cs	Too many attempts. Wait a minute and try again.
-Net/AccountRules.cs	Username: letters, digits and . - @ _ only.
-Net/AccountRules.cs	Username: {UserMin}–{UserMax} characters.
-Net/AccountRules.cs	Wrong username or password.
-Net/AccountRules.cs	already exists
 Net/AccountSmoke.cs	That username is taken.
 Net/AccountSmoke.cs	Wrong username or password.
 Net/AccountSmoke.cs	account hero arrived (lv {arrived?.level}, {arrived?.gold} gold)
@@ -329,23 +147,6 @@ Net/JoinArgs.cs	-join without address, using
 Net/JoinArgs.cs	-join-code without a code, using 
 Net/JoinArgs.cs	empty address, using 
 Net/JoinArgs.cs	invalid port '{portText}', using {DefaultPort}
-Net/JoinPanel.cs	Connected to the Cinderreach server
-Net/JoinPanel.cs	Connecting to {current.Address}:{current.Port}…
-Net/JoinPanel.cs	Host on a port, join ip:port — or use a relay code
-Net/JoinPanel.cs	Hosting on port {current.Port}, waiting for players
-Net/JoinPanel.cs	Hosting on port {current.Port}, {others} joined
-Net/JoinPanel.cs	Join server
-Net/JoinPanel.cs	Joined via relay {current.JoinCode}
-Net/JoinPanel.cs	Leaving session…
-Net/JoinPanel.cs	Not connected
-Net/JoinPanel.cs	Offline (no NetworkManager)
-Net/JoinPanel.cs	Relay code {RelayJoin.LastJoinCode}, waiting for players
-Net/JoinPanel.cs	Relay code {RelayJoin.LastJoinCode}, {others} joined
-Net/JoinPanel.cs	Relay code {current.JoinCode}: connecting…
-Net/JoinPanel.cs	Relay join code
-Net/JoinPanel.cs	Relay: creating session…
-Net/JoinPanel.cs	Server unavailable ({MultiplayerAutoStarter.ServerJoinError}), playing solo
-Net/JoinPanel.cs	Server: searching…
 Net/PlayerAccount.cs	Enter your password.
 Net/PlayerAccount.cs	Sign out first to create another account.
 Net/PlayerAccount.cs	created account
@@ -362,34 +163,6 @@ Net/TradeValidator.cs	bag full
 Net/TradeValidator.cs	gold {gold} < price {price}
 Net/TradeValidator.cs	price {price} not for sale
 Net/TradeValidator.cs	price {price} outside 1..{MaxSellPrice}
-Progression/DiabloCharacterUI.cs	<b>{RunProfile.Class.displayName}</b>  •  Level {lv}\n<size=13>Invest points from leveling up.</size>
-Progression/DiabloCharacterUI.cs	Attribute points: 0
-Progression/DiabloCharacterUI.cs	Attribute points: {sheet.freeAttributePoints}
-Progression/DiabloCharacterUI.cs	CHARACTER & SKILLS (C)
-Progression/DiabloCharacterUI.cs	FOC
-Progression/DiabloCharacterUI.cs	Focus  <b>{sheet.focus}</b>  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)
-Progression/DiabloCharacterUI.cs	Focus amplifies skill damage and shortens all cooldowns.
-Progression/DiabloCharacterUI.cs	Hover an attribute or skill for details. C toggles.
-Progression/DiabloCharacterUI.cs	No skill variants for this class.
-Progression/DiabloCharacterUI.cs	STR
-Progression/DiabloCharacterUI.cs	Skill points: 0
-Progression/DiabloCharacterUI.cs	Skill points: {sheet.freeSkillPoints}
-Progression/DiabloCharacterUI.cs	Strength  <b>{sheet.strength}</b>  (+{sheet.strength * CharacterSheet.StrengthMeleePerPoint} melee dmg)
-Progression/DiabloCharacterUI.cs	Strength increases basic melee cleave & sword strike damage.
-Progression/DiabloCharacterUI.cs	VIT
-Progression/DiabloCharacterUI.cs	Variants change only solo in Lantern Hold.
-Progression/DiabloCharacterUI.cs	Vitality  <b>{sheet.vitality}</b>  (+{sheet.VitalityLife():0} max HP)
-Progression/DiabloCharacterUI.cs	Vitality increases maximum health by +5 per point.
-Progression/DiabloCharacterUI.cs	[{cls.keys[i]}] {DiabloSkills.SkillName(skill)} — Gain rank up to {CharacterSheet.MaxSkillRank} to boost potency.
-Progression/DiabloCharacterUI.cs	moves with you
-Progression/SkillVariantCatalog.cs	Fire Ward
-Progression/SkillVariantCatalog.cs	Fire Ward: stays where cast, {HaloWardDuration:0} s, ticks every {HaloTickInterval:0.0} s, same area.
-Progression/SkillVariantCatalog.cs	Frontal Arc
-Progression/SkillVariantCatalog.cs	Frontal Arc: {FrontalArcDegrees:0}° cone, {CleaveRadiusFor(skills, id):0.0} m reach (x{FrontalRangeFactor:0.0}).
-Progression/SkillVariantCatalog.cs	Moving Aura
-Progression/SkillVariantCatalog.cs	Moving Aura: instant ring that travels with you.
-Progression/SkillVariantCatalog.cs	Whirl
-Progression/SkillVariantCatalog.cs	Whirl: 360° around you, {CleaveRadiusFor(skills, id):0.0} m.
 Save/CloudHeroSync.cs	Cloud hero unavailable, playing from this PC.
 Save/CloudHeroSync.cs	Hero is in sync with your account.
 Save/CloudHeroSync.cs	Hero loaded from your account.
@@ -471,59 +244,6 @@ SessionComplete.cs	Time Elapsed
 SessionComplete.cs	Time {secs:0}s  •  Kills {kills}  •  Gold {gold}  •  Best Drop: {dropText}
 Town/DiabloContractUI.cs	{o.targetName} — zone {o.zone} — {o.gold} gold
 Town/DiabloContractUI.cs	{o.targetName} — zone {o.zone} — {o.gold} gold — {ContractProgress.Status}
-Town/DiabloSmithUI.cs	 — kein Salvage
-Town/DiabloSmithUI.cs	Affix (click selects)
-Town/DiabloSmithUI.cs	Bag (click selects, shows salvage)
-Town/DiabloSmithUI.cs	Close (saves)
-Town/DiabloSmithUI.cs	F toggles, Esc closes (saves).
-Town/DiabloSmithUI.cs	Gold: {wallet.Gold}   Material: {RunProfile.SmithingMaterial}   (Reforge: {mat} + {gold}g)
-Town/DiabloSmithUI.cs	Kein Gegenstand in diesem Slot.
-Town/DiabloSmithUI.cs	Lantern Hold smithy
-Town/DiabloSmithUI.cs	Replacement + range
-Town/DiabloSmithUI.cs	Umschmieden (3 Material + 50 Gold)
-Town/DiabloSmithUI.cs	Umschmieden abgelehnt (Mittel, Bindung, Keys oder stale Angebot).
-Town/DiabloSmithUI.cs	Verwertet ({LootDrop.ItemLabel(item)}): Material erhalten.
-Town/DiabloSmithUI.cs	Verwertung abgelehnt (Unique, Belegung oder stale Angebot).
-Town/DiabloSmithUI.cs	Wähle Gegenstand, Eigenschaft und Ersatz.
-Town/DiabloSmithUI.cs	Wähle einen Gegenstand.
-Town/DiabloSmithUI.cs	{LootDrop.ItemLabel(item)}: Affix zum Umschmieden wählen.
-Town/DiabloSmithUI.cs	{LootDrop.ItemLabel(item)}: Slot {item.reforgeIndexPlusOne} gebunden.
-Town/DiabloStashUI.cs	<b>{LootDrop.ItemLabel(item)}</b> — Restores +{ItemDatabase.PotionHeal} HP (Key 1).
-Town/DiabloStashUI.cs	Chest 0 of 40   Bag 0 of 20
-Town/DiabloStashUI.cs	Chest {RunProfile.Stash.Count} of {Stash.Capacity}   Bag {(inventory != null ? inventory.Count : 0)} of {Inventory.Capacity}
-Town/DiabloStashUI.cs	Hover an item to inspect & compare stats. Esc closes and saves.
-Town/DiabloStashUI.cs	LANTERN HOLD VAULT
-Town/DiabloStashUI.cs	Shared Chest (Click to Take)
-Town/DiabloStashUI.cs	Your Bag (Click to Store)
-Town/DiabloStashUI.cs	empty slot
-Town/DiabloVendorUI.cs	<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) — Restores +{ItemDatabase.PotionHeal} HP when consumed (Key 1).
-Town/DiabloVendorUI.cs	<color={DiabloInventoryUI.WorseColor}>Need {offer.price}g</color>
-Town/DiabloVendorUI.cs	<color={DiabloInventoryUI.WorseColor}>Other class</color>
-Town/DiabloVendorUI.cs	Bag is full ({Inventory.Capacity}/{Inventory.Capacity}) — sell or discard first.
-Town/DiabloVendorUI.cs	Bag {inventory.Count}/{Inventory.Capacity}. Click item to sell (25%).
-Town/DiabloVendorUI.cs	Buy for {ItemDatabase.PotionPrice}g
-Town/DiabloVendorUI.cs	Buy for {offer.price}g
-Town/DiabloVendorUI.cs	Cannot buy right now.
-Town/DiabloVendorUI.cs	Close (saves)
-Town/DiabloVendorUI.cs	Healing Potion
-Town/DiabloVendorUI.cs	Hover an item to compare stats against your equipped gear.
-Town/DiabloVendorUI.cs	Item is no longer in the bag.
-Town/DiabloVendorUI.cs	LANTERN HOLD MERCHANT
-Town/DiabloVendorUI.cs	Need {stock.offers[index].price}g for that.
-Town/DiabloVendorUI.cs	No bag.
-Town/DiabloVendorUI.cs	No stock.
-Town/DiabloVendorUI.cs	Nothing to sell in that slot.
-Town/DiabloVendorUI.cs	Restores +{ItemDatabase.PotionHeal} HP (Key 1)
-Town/DiabloVendorUI.cs	Sell for +{price}g
-Town/DiabloVendorUI.cs	Sold out. Leave Lantern Hold for fresh wares.
-Town/DiabloVendorUI.cs	That offer is gone.
-Town/DiabloVendorUI.cs	That sale was rejected (stale row or missing item).
-Town/DiabloVendorUI.cs	V toggles  •  1 drinks potion  •  Esc / click outside closes
-Town/DiabloVendorUI.cs	Wares for Sale
-Town/DiabloVendorUI.cs	Your Bag (Sell 25%)
-Town/DiabloVendorUI.cs	Your bag is empty. Loot the fen to trade.
-Town/DiabloVendorUI.cs	empty slot
-Town/DiabloVendorUI.cs	{stock.offers.Count} wares available. Click to buy.
 ZoneEntryHint.cs	Clear the Ashen Fen, loot the west elite, open the chest, 
 ZoneEntryHint.cs	LANTERN HOLD  •  THE ASHEN FEN
 ZoneEntryHint.cs	WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  Alt Loot names  •  Esc Pause

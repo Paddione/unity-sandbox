@@ -128,15 +128,15 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (relay != null && relay.IsSpawned)
         {
             if (relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Equip, item))
-                SetNotice($"Equipping {LootDrop.ItemLabel(item)}… (host confirms)");
-            else SetNotice($"Equip rejected: {LootDrop.ItemLabel(item)}.");
+                SetNotice(Loc.F("inv.notice.equipping", LootDrop.ItemLabel(item)));
+            else SetNotice(Loc.F("inv.notice.equiprejected", LootDrop.ItemLabel(item)));
             Refresh();
             return;
         }
         var candidate = item;
         if (!Equipment.CanEquip(candidate, RunProfile.ClassId))
         {
-            SetNotice($"{LootDrop.ItemLabel(candidate)} is for {ClassCatalog.Get(ItemDatabase.ClassRestriction(candidate.baseType)).displayName} only — sell or discard it instead.");
+            SetNotice(Loc.F("inv.notice.classlock", LootDrop.ItemLabel(candidate), ClassCatalog.Get(ItemDatabase.ClassRestriction(candidate.baseType)).displayName));
             Refresh();
             return;
         }
@@ -146,7 +146,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             DiabloAudio.PlayUIClick();
             SetNotice(candidate != null ? $"Equipped {LootDrop.ItemLabel(candidate)}." : "Equipped.");
         }
-        else SetNotice("Cannot equip that item.");
+        else SetNotice(Loc.T("inv.notice.noequip"));
         Refresh();
     }
 
@@ -156,7 +156,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         EnsureBuilt();
         if (inventory == null) return false;
         int index = inventory.IndexOf(instanceId);
-        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        if (index < 0) { SetNotice(Loc.T("inv.notice.gone")); Refresh(); return false; }
         int before = equipment != null && equipment.GetEquipped(inventory.Get(index).slot) != null ? 1 : 0;
         EquipIndex(index);
         return true;
@@ -168,7 +168,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         EnsureBuilt();
         if (inventory == null) return false;
         int index = inventory.IndexOf(instanceId);
-        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        if (index < 0) { SetNotice(Loc.T("inv.notice.gone")); Refresh(); return false; }
         return DiscardIndex(index);
     }
 
@@ -224,18 +224,18 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (relay != null && relay.IsSpawned)
         {
             bool ok = relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Discard, item);
-            SetNotice(ok ? $"Discarded {label} (host confirms)." : $"Discard rejected: {label}.");
+            SetNotice(ok ? Loc.F("inv.notice.discardhost", label) : Loc.F("inv.notice.discardrejected", label));
             Refresh();
             return ok;
         }
         if (LootDrop.SpawnItem(transform.position + transform.forward * 1.5f, item, false) == null)
         {
-            SetNotice($"Cannot drop {label} here.");
+            SetNotice(Loc.F("inv.notice.nodrop", label));
             Refresh();
             return false;
         }
         inventory.RemoveAt(index);
-        SetNotice($"Discarded {label} — walk over it to pick it back up.");
+        SetNotice(Loc.F("inv.notice.discarded", label));
         Refresh();
         return true;
     }
@@ -249,20 +249,20 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         int potions = CountPotions();
         if (heroHeaderText != null)
             heroHeaderText.text =
-                $"<color={DiabloPalette.ToHex(DiabloPalette.GoldBright)}><b>{RunProfile.Class.displayName}</b></color>  •  Lv {lv}  •  {RunProfile.Difficulty}\n" +
-                $"<color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>Gold: {gold}g</color>   •   Potions: {potions}  (Key 1 heals)";
+                Loc.F("inv.hero.header", DiabloPalette.ToHex(DiabloPalette.GoldBright), RunProfile.Class.displayName, lv, Loc.Display(RunProfile.Difficulty)) +
+                Loc.F("inv.hero.gold", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, potions);
 
         if (equipment != null)
         {
-            armorText.text = SlotLine("Armor", equipment.armor);
-            weaponText.text = SlotLine("Weapon", equipment.weapon);
-            helmetText.text = SlotLine("Helmet", equipment.helmet);
+            armorText.text = SlotLine(Loc.T("item.slot.armor"), equipment.armor);
+            weaponText.text = SlotLine(Loc.T("item.slot.weapon"), equipment.weapon);
+            helmetText.text = SlotLine(Loc.T("item.slot.helmet"), equipment.helmet);
             statsText.text =
-                $"<b>Combat Summary</b>\n" +
-                $"DMG <color={DiabloPalette.ToHex(DiabloPalette.TrimGold)}>{equipment.GetDamage():0.#}</color>   •   " +
-                $"Max HP <color={BetterColor}>{equipment.GetMaxHP():0.#}</color>   •   " +
+                Loc.T("inv.stats.combat") +
+                Loc.F("inv.stats.dmg", DiabloPalette.ToHex(DiabloPalette.TrimGold), equipment.GetDamage()) +
+                Loc.F("inv.stats.maxhp", BetterColor, equipment.GetMaxHP()) +
                 $"Crit {equipment.GetCrit():0.#}%\n" +
-                $"Speed {equipment.GetMoveSpeed():0.##}   •   XP Gain {equipment.GetXPMul():0.#}%   •   " +
+                Loc.F("inv.stats.speed", equipment.GetMoveSpeed(), equipment.GetXPMul()) +
                 $"CDR {Mathf.Min(Equipment.MaxCooldownReductionPct, equipment.Total(AffixLibrary.CooldownReduction)):0.#}%";
             PaintEquipIcon(0, equipment.armor);
             PaintEquipIcon(1, equipment.weapon);
@@ -277,7 +277,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
 
     /// <summary>S3 area tooltip line: IncreasedArea percent + radius factor (test seam).</summary>
     public static string AreaLine(Equipment eq) =>
-        eq == null ? "Area  +0%" : $"Area  +{eq.AreaBonusPct():0.#}% (radius x{eq.ScaleArea(1f):0.###})";
+        eq == null ? "Area  +0%" : Loc.F("inv.stats.area", eq.AreaBonusPct(), eq.ScaleArea(1f));
 
     int CountPotions()
     {
@@ -305,29 +305,29 @@ public sealed class DiabloInventoryUI : MonoBehaviour
 
         string goldHex = DiabloPalette.ToHex(DiabloPalette.TrimGold);
         return
-            $"<color={goldHex}><b>Attributes</b></color>   STR {str}   •   VIT {vit}   •   FOC {foc}\n\n" +
-            $"<color={goldHex}><b>Offense & Defense</b></color>\n" +
-            $"• Damage: <b>{equipment.GetDamage():0.#}</b>  (Fire +{fireDmg:0.#})   •   Crit: <b>{equipment.GetCrit():0.#}%</b>\n" +
-            $"• Max HP: <b>{equipment.GetMaxHP():0.#}</b>   •   Armor: <b>{armor:0.#}</b>   •   Thorns: {thorns}\n" +
-            $"• Life Steal: {ls:0.#}%   •   Cooldown Red.: {cdr:0.#}%   •   All Skills: +{ranks}\n" +
+            Loc.F("inv.stats.attributes", goldHex, str, vit, foc) +
+            Loc.F("inv.stats.offdef", goldHex) +
+            Loc.F("inv.stats.line1", equipment.GetDamage(), fireDmg, equipment.GetCrit()) +
+            Loc.F("inv.stats.line4", equipment.GetMaxHP(), armor, thorns) +
+            Loc.F("inv.stats.line3", ls, cdr, ranks) +
             $"• {AreaLine(equipment)}\n\n" +
-            $"<color={goldHex}><b>Expedition</b></color>\n" +
-            $"• Move Speed: {equipment.GetMoveSpeed():0.##}   •   XP Bonus: {equipment.GetXPMul():0.#}%\n" +
-            $"• Gold Find: +{gf:0.#}%   •   Magic Find: +{mf:0.#}%\n" +
-            $"• Unlocks & Mode: {DifficultyText()}";
+            Loc.F("inv.stats.expedition", goldHex) +
+            Loc.F("inv.stats.line5", equipment.GetMoveSpeed(), equipment.GetXPMul()) +
+            Loc.F("inv.stats.line2", gf, mf) +
+            Loc.F("inv.stats.line6", DifficultyText());
     }
 
     static string SlotLine(string slot, ItemInstance item)
     {
-        if (item == null) return $"<color={DiabloPalette.ToHex(DiabloPalette.ParchmentDim)}>{slot}: — Empty —</color>";
+        if (item == null) return Loc.F("inv.slot.empty", DiabloPalette.ToHex(DiabloPalette.ParchmentDim), slot);
         string rHex = DiabloPalette.ToHex(DiabloPalette.Rarity(item.rarity));
-        return $"<color={rHex}><b>{LootDrop.ItemLabel(item)}</b></color> <color={DiabloPalette.ToHex(DiabloPalette.ParchmentDim)}>[{item.rarity}]</color>\n" +
+        return Loc.F("inv.slot.item", rHex, LootDrop.ItemLabel(item), DiabloPalette.ToHex(DiabloPalette.ParchmentDim), ItemText.Rarity(item.rarity)) +
                $"<size=13>{AffixSummary(item)}</size>";
     }
 
     static string AffixSummary(ItemInstance item)
     {
-        if (item == null || item.affixes == null || item.affixes.Count == 0) return "No bonuses";
+        if (item == null || item.affixes == null || item.affixes.Count == 0) return Loc.T("inv.nobonus.cap");
         var parts = new List<string>();
         foreach (var a in item.affixes) parts.Add(AffixLibrary.Describe(a));
         return string.Join(", ", parts.ToArray());
@@ -336,9 +336,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     /// <summary>Bag detail line: the shared S5 item card (inventory reuse).</summary>
     string DetailFor(ItemInstance item)
     {
-        if (item == null) return "Hover or click a bag item to inspect or equip.";
+        if (item == null) return Loc.T("inv.baghint");
         if (item.slot == ItemSlot.Consumable)
-            return $"<b>{LootDrop.ItemLabel(item)}</b>\nConsumable: restores <color={BetterColor}>+{ItemDatabase.PotionHeal} HP</color>. Click or press 1 to drink.";
+            return Loc.F("inv.potion.tip", LootDrop.ItemLabel(item), BetterColor, ItemDatabase.PotionHeal);
         var equipped = equipment != null ? equipment.GetEquipped(item.slot) : null;
         return ItemDetailsView.Render(item, equipped);
     }
@@ -363,7 +363,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         }
         Collect(item);
         Collect(equipped);
-        if (keys.Count == 0) return "no bonuses";
+        if (keys.Count == 0) return Loc.T("inv.nobonus");
         var lines = new List<string>();
         foreach (var key in keys)
         {
@@ -391,7 +391,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         int count = inventory != null ? inventory.Count : 0;
         int potions = CountPotions();
         if (bagCountText != null)
-            bagCountText.text = $"Bag: {count} / {Inventory.Capacity} slots   •   Gold: {(wallet != null ? wallet.Gold : 0)}g   •   Potions: {potions}";
+            bagCountText.text = Loc.F("inv.bag.count", count, Inventory.Capacity, (wallet != null ? wallet.Gold : 0), potions);
         for (int i = 0; i < Inventory.Capacity; i++)
         {
             var item = inventory != null && i < inventory.Count ? inventory.Get(i) : null;
@@ -407,7 +407,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             }
             else
             {
-                bagDetailText.text = "Your bag is empty. Defeat foes or browse the Vendor in Lantern Hold.";
+                bagDetailText.text = Loc.T("inv.bag.empty");
             }
         }
     }
@@ -430,11 +430,11 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panelGo.transform, "CINDERREACH INVENTORY", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(panelGo.transform, Loc.T("inv.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
 
         // Tab Bar
         var tabGo = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "TabBar", 6f, 38f);
-        string[] names = { "1 Inventory", "2 Bag", "3 Stats", "4 Settings" };
+        string[] names = { Loc.T("inv.tab.inventory"), Loc.T("inv.tab.bag"), Loc.T("inv.tab.stats"), Loc.T("inv.tab.settings") };
         for (int i = 0; i < 4; i++)
         {
             int tab = i;
@@ -506,10 +506,10 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         heroHeaderText = DiabloUIFactory.MakeText(heroBox.transform, "HeroHeaderText", "", 15, DiabloPalette.Parchment);
         DiabloUIFactory.SetLayout(heroHeaderText.gameObject, prefH: 64f, flexW: 1f);
 
-        var hint = DiabloUIFactory.MakeText(inventoryPage.transform, "EquipHint", "Equipped Gear (click slot to move to Bag):", 14, DiabloPalette.ParchmentDim);
+        var hint = DiabloUIFactory.MakeText(inventoryPage.transform, "EquipHint", Loc.T("inv.equiphint"), 14, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(hint.gameObject, prefH: 20f, flexW: 1f);
 
-        string[] slots = { "Armor", "Weapon", "Helmet" };
+        string[] slots = { Loc.T("item.slot.armor"), Loc.T("item.slot.weapon"), Loc.T("item.slot.helmet") };
         for (int s = 0; s < 3; s++)
         {
             int slot = s;
@@ -580,7 +580,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         var topRow = DiabloUIFactory.MakeHorizontalRow(bagPage.transform, "BagTopRow", 8f, 30f);
         bagCountText = DiabloUIFactory.MakeText(topRow.transform, "BagCount", "Bag", 15, DiabloPalette.TrimGold);
         DiabloUIFactory.SetLayout(bagCountText.gameObject, prefH: 28f, flexW: 1f);
-        var potionBtn = DiabloUIFactory.MakeSmallButton(topRow.transform, "Drink Potion (1)", () =>
+        var potionBtn = DiabloUIFactory.MakeSmallButton(topRow.transform, Loc.T("inv.btn.potion"), () =>
         {
             if (Vendor.DrinkPotion(gameObject)) Refresh();
         }, 28f, 150f);
@@ -613,11 +613,11 @@ public sealed class DiabloInventoryUI : MonoBehaviour
 
         // S5: visible separate actions for the selected (last) bag item.
         var actionRow = DiabloUIFactory.MakeHorizontalRow(bagPage.transform, "BagActions", 8f, 34f);
-        DiabloUIFactory.MakeSmallButton(actionRow.transform, "Equip selected", () =>
+        DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.btn.equip"), () =>
         {
             if (inventory != null && inventory.Count > 0) EquipIndex(inventory.Count - 1);
         });
-        DiabloUIFactory.MakeSmallButton(actionRow.transform, "Discard selected", () =>
+        DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.btn.discard"), () =>
         {
             if (inventory != null && inventory.Count > 0) DiscardIndex(inventory.Count - 1);
         });
@@ -642,7 +642,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         DiabloUIFactory.SetLayout(statsDetailText.gameObject, prefH: 390f, flexW: 1f);
 
         var controlsBox = DiabloUIFactory.MakeText(statsPage.transform, "ControlsHint",
-            "Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  1 Potion  •  I/B Inventory  •  C Character  •  Alt Loot names  •  Esc Pause",
+            Loc.T("inv.controls"),
             13, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(controlsBox.gameObject, prefH: 40f, flexW: 1f);
     }
@@ -674,8 +674,8 @@ public sealed class DiabloInventoryUI : MonoBehaviour
 
     /// <summary>Settings line for the difficulty row (test seam).</summary>
     public static string DifficultyText() =>
-        $"Difficulty: {DifficultyProfile.Current.name}" +
-        (RunProfile.DifficultyUnlocked ? "" : "  (Kindled locked: defeat the Hollow Abbot)");
+        Loc.F("inv.diff.current", Loc.Display(DifficultyProfile.Current.name)) +
+        (RunProfile.DifficultyUnlocked ? "" : Loc.T("inv.diff.locked"));
 
     void PaintTabs()
     {
@@ -778,7 +778,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     static string ShortLabel(ItemInstance item)
     {
         if (item == null) return "";
-        if (item.slot == ItemSlot.Consumable) return "Potion";
+        if (item.slot == ItemSlot.Consumable) return Loc.T("inv.potion");
         string full = LootDrop.ItemLabel(item);
         return full.Length > 13 ? full.Substring(0, 12) + "…" : full;
     }

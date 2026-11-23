@@ -1152,25 +1152,25 @@ public sealed class DiabloSkills : MonoBehaviour
         var parts = new System.Collections.Generic.List<string>();
         for (int i = 0; i < cls.skills.Length; i++)
             parts.Add(Slot(cls.keys[i], SkillName(cls.skills[i]), cls.skills[i]));
-        return string.Join("     ", parts.ToArray()) + "     RMB: Thrust";
+        return string.Join("     ", parts.ToArray()) + Loc.T("hud.skillbar.thrust");
     }
 
     public static string SkillName(Skill s)
     {
         switch (s)
         {
-            case Skill.Fireball: return "Fireball";
-            case Skill.Arrow: return "Bow";
-            case Skill.Cleave: return "Cleave";
-            case Skill.LanternBolt: return "Lantern Bolt";
-            case Skill.Wisps: return "Wisps";
-            case Skill.SearingHalo: return "Searing Halo";
-            case Skill.SeismicSlam: return "Seismic Slam";
-            case Skill.QuickShot: return "Quick Shot";
-            case Skill.BladeFlurry: return "Blade Flurry";
-            case Skill.MendingLight: return "Mending Light";
-            case Skill.RenewingCircle: return "Renewing Circle";
-            default: return "Veil Step";
+            case Skill.Fireball: return Loc.T("name.skill.fireball");
+            case Skill.Arrow: return Loc.T("name.skill.arrow");
+            case Skill.Cleave: return Loc.T("name.skill.cleave");
+            case Skill.LanternBolt: return Loc.T("name.skill.lanternbolt");
+            case Skill.Wisps: return Loc.T("name.skill.wisps");
+            case Skill.SearingHalo: return Loc.T("name.skill.searinghalo");
+            case Skill.SeismicSlam: return Loc.T("name.skill.seismicslam");
+            case Skill.QuickShot: return Loc.T("name.skill.quickshot");
+            case Skill.BladeFlurry: return Loc.T("name.skill.bladeflurry");
+            case Skill.MendingLight: return Loc.T("name.skill.mendinglight");
+            case Skill.RenewingCircle: return Loc.T("name.skill.renewingcircle");
+            default: return Loc.T("name.skill.veilstep");
         }
     }
 
@@ -1243,7 +1243,7 @@ public sealed class DiabloSkills : MonoBehaviour
         for (int i = 0; i < cls.skills.Length; i++)
         {
             var sk = cls.skills[i];
-            string key = cls.keys[i] == "Space" ? "Spc" : cls.keys[i];
+            string key = cls.keys[i] == "Space" ? Loc.T("key.space.short") : cls.keys[i];
 
             var slot = new GameObject($"SkillSlot_{sk}", typeof(RectTransform));
             slot.transform.SetParent(slotsContainer, false);

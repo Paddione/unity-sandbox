@@ -256,10 +256,10 @@ public sealed class ClassSelectUI : MonoBehaviour
         {
             var hero = Hero();
             var prog = hero != null ? hero.GetComponent<DiabloProgression>() : null;
-            return $"your current {RunProfile.Class.displayName} (level {(prog != null ? prog.Level : 1)}) and this run's world";
+            return Loc.F("menu.newhero.replaces_current", RunProfile.Class.displayName, (prog != null ? prog.Level : 1));
         }
         if (SaveService.TryPeek(out SaveGame save, path))
-            return $"your saved {ClassCatalog.Get(save.classId).displayName} (level {save.level}, {save.gold} gold)";
+            return Loc.F("menu.newhero.replaces_saved", ClassCatalog.Get(save.classId).displayName, save.level, save.gold);
         return null;
     }
 
@@ -271,8 +271,8 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloAudio.PlayUIClick();
         PendingNewClass = ClassCatalog.Get(classId).id;
         var cls = ClassCatalog.Get(PendingNewClass);
-        confirmBody.text = $"Begin a new {cls.displayName}?\n\nThis replaces {replaced} at the first autosave.";
-        confirmGoLabel.text = $"Begin as {cls.displayName}";
+        confirmBody.text = Loc.F("menu.newhero.body", cls.displayName, replaced);
+        confirmGoLabel.text = Loc.F("menu.newhero.go", cls.displayName);
         if (mainContent != null) mainContent.SetActive(false);
         confirmModal.SetActive(true);
     }
@@ -361,9 +361,9 @@ public sealed class ClassSelectUI : MonoBehaviour
     public static string ContinueLabel(string path = null)
     {
         if (!SaveService.TryPeek(out SaveGame save, path))
-            return "CONTINUE SAVED EXPEDITION";
+            return Loc.T("menu.continue.plain");
         var cls = ClassCatalog.Get(save.classId);
-        return $"CONTINUE  —  {cls.displayName.ToUpperInvariant()}  •  LEVEL {save.level}  •  {save.gold}G  •  {(save.difficulty ?? RunProfile.Normal).ToUpperInvariant()}";
+        return Loc.F("menu.continue.hero", cls.displayName.ToUpperInvariant(), save.level, save.gold, Loc.Display(save.difficulty ?? RunProfile.Normal).ToUpperInvariant());
     }
 
     void RefreshContinueAndDiff()
@@ -382,7 +382,7 @@ public sealed class ClassSelectUI : MonoBehaviour
             diffToggleBtn.gameObject.SetActive(RunProfile.DifficultyUnlocked);
             diffToggleBtn.interactable = RunProfile.DifficultyUnlocked;
             DiabloUIFactory.StyleButtonActive(diffToggleBtn, RunProfile.Difficulty == RunProfile.Kindled,
-                RunProfile.DifficultyUnlocked ? $"Mode: {RunProfile.Difficulty}" : "Mode: Normal (Kindled locked)");
+                RunProfile.DifficultyUnlocked ? Loc.F("menu.mode.current", Loc.Display(RunProfile.Difficulty)) : Loc.T("menu.mode.locked"));
         }
     }
 
@@ -458,7 +458,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         var mainTitle = DiabloUIFactory.MakeText(titleCol.transform, "GameTitle", "CINDERREACH", 40, DiabloPalette.GoldBright, TextAnchor.MiddleLeft);
         mainTitle.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(mainTitle.gameObject, prefH: 46f, flexW: 1f);
-        var subTitle = DiabloUIFactory.MakeText(titleCol.transform, "Subtitle", "THE ASHEN FEN  •  CHOOSE YOUR HERO", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
+        var subTitle = DiabloUIFactory.MakeText(titleCol.transform, "Subtitle", Loc.T("menu.start.subtitle"), 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
         DiabloUIFactory.SetLayout(subTitle.gameObject, prefH: 24f, flexW: 1f);
 
         // accounts S1: who other players will see; click to rename.
@@ -493,7 +493,7 @@ public sealed class ClassSelectUI : MonoBehaviour
             BuildClassCard(cardsRow.transform, cls);
 
         // Continue Expedition Button (shown when save file exists)
-        continueBtn = DiabloUIFactory.MakeButton(mainContent.transform, "ContinueButton", "Continue", 18, true, DiabloPalette.GoldBright, () => Continue());
+        continueBtn = DiabloUIFactory.MakeButton(mainContent.transform, "ContinueButton", Loc.T("menu.continue.button"), 18, true, DiabloPalette.GoldBright, () => Continue());
         DiabloUIFactory.SetLayout(continueBtn.gameObject, prefH: 48f, flexW: 1f);
         continueLabel = continueBtn.GetComponentInChildren<Text>();
 
@@ -502,7 +502,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         diffBadgeText = DiabloUIFactory.MakeText(footerRow.transform, "DiffLabel", DiabloInventoryUI.DifficultyText(), 14, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(diffBadgeText.gameObject, prefH: 38f, prefW: 260f, flexW: 1f);
 
-        diffToggleBtn = DiabloUIFactory.MakeSmallButton(footerRow.transform, "Mode: Normal", () =>
+        diffToggleBtn = DiabloUIFactory.MakeSmallButton(footerRow.transform, Loc.T("menu.mode.normal"), () =>
         {
             if (!RunProfile.DifficultyUnlocked) return;
             DiabloAudio.PlayUIClick();
@@ -511,7 +511,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         }, 38f, 220f);
 
         // coop-session S1: host or join before choosing (the panel keeps this overlay open).
-        var coopBtn = DiabloUIFactory.MakeButton(footerRow.transform, "CoopButton", "Co-op", 15, false, null, () =>
+        var coopBtn = DiabloUIFactory.MakeButton(footerRow.transform, "CoopButton", Loc.T("menu.coop"), 15, false, null, () =>
         {
             DiabloAudio.PlayUIClick();
             JoinPanel.Open();
@@ -519,7 +519,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.SetLayout(coopBtn.gameObject, prefH: 38f, prefW: 130f);
 
         // cinderreach-dedicated-server S2: one click into the always-on server (no code, no address).
-        var serverBtn = DiabloUIFactory.MakeButton(footerRow.transform, "JoinServerButton", "Join Server", 15, false, null, () =>
+        var serverBtn = DiabloUIFactory.MakeButton(footerRow.transform, "JoinServerButton", Loc.T("menu.joinserver"), 15, false, null, () =>
         {
             DiabloAudio.PlayUIClick();
             JoinPanel.JoinServer();
@@ -527,14 +527,14 @@ public sealed class ClassSelectUI : MonoBehaviour
         });
         DiabloUIFactory.SetLayout(serverBtn.gameObject, prefH: 38f, prefW: 150f);
 
-        var settingsBtn = DiabloUIFactory.MakeButton(footerRow.transform, "SettingsButton", "Settings", 15, false, null, () =>
+        var settingsBtn = DiabloUIFactory.MakeButton(footerRow.transform, "SettingsButton", Loc.T("menu.settings"), 15, false, null, () =>
         {
             DiabloAudio.PlayUIClick();
             ShowSettings(true);
         });
         DiabloUIFactory.SetLayout(settingsBtn.gameObject, prefH: 38f, prefW: 150f);
 
-        var quitBtn = DiabloUIFactory.MakeButton(footerRow.transform, "QuitButton", "Quit", 15, false, DiabloPalette.ParchmentDim, QuitGame);
+        var quitBtn = DiabloUIFactory.MakeButton(footerRow.transform, "QuitButton", Loc.T("menu.quit"), 15, false, DiabloPalette.ParchmentDim, QuitGame);
         DiabloUIFactory.SetLayout(quitBtn.gameObject, prefH: 38f, prefW: 120f);
 
         // Startup Settings Overlay Modal
@@ -544,7 +544,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         sv.spacing = 8f;
         sv.childControlWidth = true;
         sv.childControlHeight = false;
-        DiabloUIFactory.MakeHeader(settingsModal.transform, "SETTINGS", DiabloMenuArt.MenuArtSprite("SettingsCog"), () => ShowSettings(false));
+        DiabloUIFactory.MakeHeader(settingsModal.transform, Loc.T("menu.settings.title"), DiabloMenuArt.MenuArtSprite("SettingsCog"), () => ShowSettings(false));
         DiabloUIFactory.BuildSettingsWidgets(settingsModal.transform, settingsRefreshes, onBack: () => ShowSettings(false));
         settingsModal.SetActive(false);
 
@@ -555,14 +555,14 @@ public sealed class ClassSelectUI : MonoBehaviour
         cv.spacing = 12f;
         cv.childControlWidth = true;
         cv.childControlHeight = false;
-        DiabloUIFactory.MakeHeader(confirmModal.transform, "BEGIN ANEW?", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelNew);
+        DiabloUIFactory.MakeHeader(confirmModal.transform, Loc.T("menu.newhero.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelNew);
         confirmBody = DiabloUIFactory.MakeText(confirmModal.transform, "ConfirmBody", "", 17, DiabloPalette.Parchment, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(confirmBody.gameObject, prefH: 112f, flexW: 1f);
         var crow = DiabloUIFactory.MakeHorizontalRow(confirmModal.transform, "ConfirmButtons", 14f, 46f);
-        var goBtn = DiabloUIFactory.MakeButton(crow.transform, "ConfirmNewButton", "Begin", 17, true, DiabloPalette.GoldBright, ConfirmNew);
+        var goBtn = DiabloUIFactory.MakeButton(crow.transform, "ConfirmNewButton", Loc.T("menu.newhero.begin"), 17, true, DiabloPalette.GoldBright, ConfirmNew);
         DiabloUIFactory.SetLayout(goBtn.gameObject, prefH: 44f, flexW: 1f);
         confirmGoLabel = goBtn.GetComponentInChildren<Text>();
-        var backBtn = DiabloUIFactory.MakeButton(crow.transform, "CancelNewButton", "Back", 17, false, null, CancelNew);
+        var backBtn = DiabloUIFactory.MakeButton(crow.transform, "CancelNewButton", Loc.T("menu.back"), 17, false, null, CancelNew);
         DiabloUIFactory.SetLayout(backBtn.gameObject, prefH: 44f, flexW: 1f);
         confirmModal.SetActive(false);
         Account = AccountPanel.Build(canvasGo.transform);
@@ -594,10 +594,10 @@ public sealed class ClassSelectUI : MonoBehaviour
     /// <summary>Conflict prompt body (pure): both heroes with class and level.</summary>
     public static string HeroChoiceText(SaveGame cloud, SaveGame local)
     {
-        string Describe(SaveGame s) => s == null ? "unreadable"
-            : $"{ClassCatalog.Get(s.classId).displayName}, level {s.level}, {s.gold} gold";
-        return $"Your account has a hero ({Describe(cloud)}).\nThis PC has another one ({Describe(local)}).\n" +
-               "Keep which? The other one is backed up on this PC.";
+        string Describe(SaveGame s) => s == null ? Loc.T("menu.herochoice.unreadable")
+            : Loc.F("menu.herochoice.describe", ClassCatalog.Get(s.classId).displayName, s.level, s.gold);
+        return Loc.F("menu.herochoice.body", Describe(cloud), Describe(local)) +
+               Loc.T("menu.herochoice.ask");
     }
 
     void BuildHeroChoice(Transform canvas)
@@ -608,13 +608,13 @@ public sealed class ClassSelectUI : MonoBehaviour
         v.spacing = 12f;
         v.childControlWidth = true;
         v.childControlHeight = false;
-        DiabloUIFactory.MakeHeader(heroChoiceModal.transform, "WHICH HERO?", DiabloMenuArt.MenuArtSprite("CrestCinderreach"));
+        DiabloUIFactory.MakeHeader(heroChoiceModal.transform, Loc.T("menu.herochoice.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"));
         heroChoiceBody = DiabloUIFactory.MakeText(heroChoiceModal.transform, "HeroChoiceBody", "", 17, DiabloPalette.Parchment, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(heroChoiceBody.gameObject, prefH: 120f, flexW: 1f);
         var row = DiabloUIFactory.MakeHorizontalRow(heroChoiceModal.transform, "HeroChoiceButtons", 14f, 46f);
-        var cloudBtn = DiabloUIFactory.MakeButton(row.transform, "KeepCloudHeroButton", "Account hero", 17, true, DiabloPalette.GoldBright, () => ChooseHero(true));
+        var cloudBtn = DiabloUIFactory.MakeButton(row.transform, "KeepCloudHeroButton", Loc.T("menu.herochoice.cloud"), 17, true, DiabloPalette.GoldBright, () => ChooseHero(true));
         DiabloUIFactory.SetLayout(cloudBtn.gameObject, prefH: 44f, flexW: 1f);
-        var localBtn = DiabloUIFactory.MakeButton(row.transform, "KeepLocalHeroButton", "This PC's hero", 17, false, null, () => ChooseHero(false));
+        var localBtn = DiabloUIFactory.MakeButton(row.transform, "KeepLocalHeroButton", Loc.T("menu.herochoice.local"), 17, false, null, () => ChooseHero(false));
         DiabloUIFactory.SetLayout(localBtn.gameObject, prefH: 44f, flexW: 1f);
         heroChoiceModal.SetActive(false);
     }
@@ -627,7 +627,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     }
 
     /// <summary>Title-row label: the name this player shows online.</summary>
-    public static string AccountLabel(string name) => $"Playing as {name}";
+    public static string AccountLabel(string name) => Loc.F("menu.account.playingas", name);
 
     void RefreshAccountLabel()
     {
@@ -714,7 +714,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.MakeDivider(card.transform, 5f);
 
         // Skill Icon Rows
-        var skillsHdr = DiabloUIFactory.MakeText(card.transform, "SkillsHeader", "COMBAT SKILLS", 13, DiabloPalette.ParchmentDim);
+        var skillsHdr = DiabloUIFactory.MakeText(card.transform, "SkillsHeader", Loc.T("menu.class.skills"), 13, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(skillsLblHeight(skillsHdr.gameObject), prefH: 18f, flexW: 1f);
 
         for (int i = 0; i < cls.skills.Length; i++)
@@ -765,7 +765,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         ctaImg.sprite = DiabloMenuArt.ButtonBackground(true);
         ctaImg.type = Image.Type.Sliced;
         ctaImg.raycastTarget = false;
-        var ctaText = DiabloUIFactory.MakeText(ctaGo.transform, "CalloutText", $"BEGIN AS {cls.displayName.ToUpperInvariant()}", 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        var ctaText = DiabloUIFactory.MakeText(ctaGo.transform, "CalloutText", Loc.F("menu.class.cta", cls.displayName.ToUpperInvariant()), 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         ctaText.fontStyle = FontStyle.Bold;
         Stretch(ctaText.rectTransform);
     }
@@ -777,9 +777,9 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         switch (cls.role)
         {
-            case ClassDefinition.PartyRole.Healer: return "Healer  •  Keeper of the Iron Lantern";
-            case ClassDefinition.PartyRole.Dps: return "Damage  •  Blade of the Ashen Paths";
-            default: return "Tank  •  Oathbound Vanguard of the Fen";
+            case ClassDefinition.PartyRole.Healer: return Loc.T("menu.class.role.healer");
+            case ClassDefinition.PartyRole.Dps: return Loc.T("menu.class.role.dps");
+            default: return Loc.T("menu.class.role.tank");
         }
     }
 
@@ -789,7 +789,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         string starter = cls.id == ClassCatalog.LanternbearerId ? ItemDatabase.StarterLanternBase
             : cls.id == ClassCatalog.RogueId ? ItemDatabase.StarterBowBase
             : ItemDatabase.StarterSwordBase;
-        return $"Starter: {starter}  •  {cls.skills.Length} Skills";
+        return Loc.F("menu.class.stattag", starter, cls.skills.Length);
     }
 
     static void Stretch(RectTransform rt)

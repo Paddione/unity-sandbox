@@ -130,7 +130,7 @@ public static class DiabloSettings
         ResolutionIndex = ((ResolutionIndex % Resolutions.Length) + Resolutions.Length) % Resolutions.Length;
     }
 
-    public static string QualityName => QualityLevel == 0 ? "Low" : QualityLevel == 1 ? "Med" : "High";
+    public static string QualityName => QualityLevel == 0 ? Loc.T("settings.quality.low") : QualityLevel == 1 ? Loc.T("settings.quality.med") : Loc.T("settings.quality.high");
 
     public static (int w, int h) ResolutionSize
     {

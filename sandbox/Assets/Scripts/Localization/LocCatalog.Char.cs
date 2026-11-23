@@ -1,0 +1,39 @@
+/// <summary>Player text, domain 'char' (cinderreach-deutsch-story).</summary>
+public static partial class LocCatalog
+{
+    static readonly Entry[] Char =
+    {
+        E("char.variant.locked", "Varianten lassen sich nur allein in der Laternenwacht wechseln.", "Variants change only solo in Lantern Hold."),
+        E("char.variant.cone", "{0:0}°-Kegel", "{0:0}° cone"),
+        E("char.variant.stays", "bleibt {0:0} s", "stays {0:0} s"),
+        E("char.variant.moves", "wandert mit", "moves with you"),
+        E("char.skill.wisps", "({0} Irrlichter)", "({0} wisps)"),
+        E("char.header", "<b>{0}</b>  •  Stufe {1}\\n<size=13>Verteile die Punkte aus deinen Stufenaufstiegen.</size>", "<b>{0}</b>  •  Level {1}\\n<size=13>Invest points from leveling up.</size>"),
+        E("char.attrpoints.zero", "Attributpunkte: 0", "Attribute points: 0"),
+        E("char.attrpoints", "Attributpunkte: {0}", "Attribute points: {0}"),
+        E("char.title", "FIGUR UND FERTIGKEITEN (C)", "CHARACTER & SKILLS (C)"),
+        E("char.attr.str", "STÄ", "STR"),
+        E("char.attr.vit", "VIT", "VIT"),
+        E("char.attr.foc", "FOK", "FOC"),
+        E("char.focus.line", "Fokus  <b>{0}</b>  (+{1:0} % Fertigkeiten, -{2:0} % Abklingzeit)", "Focus  <b>{0}</b>  (+{1:0}% skill, -{2:0}% cd)"),
+        E("char.focus.tip", "Fokus verstärkt Fertigkeitsschaden und verkürzt alle Abklingzeiten.", "Focus amplifies skill damage and shortens all cooldowns."),
+        E("char.hint", "Attribut oder Fertigkeit überfahren für Details. C öffnet und schließt.", "Hover an attribute or skill for details. C toggles."),
+        E("char.variant.none", "Diese Klasse hat keine Fertigkeitsvarianten.", "No skill variants for this class."),
+        E("char.skillpoints.zero", "Fertigkeitspunkte: 0", "Skill points: 0"),
+        E("char.skillpoints", "Fertigkeitspunkte: {0}", "Skill points: {0}"),
+        E("char.strength.line", "Stärke  <b>{0}</b>  (+{1} Nahkampfschaden)", "Strength  <b>{0}</b>  (+{1} melee dmg)"),
+        E("char.strength.tip", "Stärke erhöht den Schaden von Schlag, Stoß und Spalten.", "Strength increases basic melee cleave & sword strike damage."),
+        E("char.vitality.line", "Vitalität  <b>{0}</b>  (+{1:0} Leben)", "Vitality  <b>{0}</b>  (+{1:0} max HP)"),
+        E("char.vitality.tip", "Vitalität erhöht das maximale Leben um 5 pro Punkt.", "Vitality increases maximum health by +5 per point."),
+        E("char.skill.tip", "[{0}] {1}: bis Rang {2} steigern, um sie zu verstärken.", "[{0}] {1} — Gain rank up to {2} to boost potency."),
+        E("char.variant.btn", "Variante", "Variant"),
+        E("char.variant.whirl", "Wirbel", "Whirl"),
+        E("char.variant.frontal", "Frontbogen", "Frontal Arc"),
+        E("char.variant.aura", "Wandernder Kranz", "Moving Aura"),
+        E("char.variant.ward", "Feuerwacht", "Fire Ward"),
+        E("char.variant.whirl.desc", "Wirbel: 360° um dich herum, {0:0.0} m.", "Whirl: 360° around you, {0:0.0} m."),
+        E("char.variant.frontal.desc", "Frontbogen: {0:0}°-Kegel, {1:0.0} m Reichweite (×{2:0.0}).", "Frontal Arc: {0:0}° cone, {1:0.0} m reach (x{2:0.0})."),
+        E("char.variant.aura.desc", "Wandernder Kranz: ein Ring, der sofort wirkt und mit dir wandert.", "Moving Aura: instant ring that travels with you."),
+        E("char.variant.ward.desc", "Feuerwacht: bleibt am Wirkort, {0:0} s, brennt alle {1:0.0} s, gleiche Fläche.", "Fire Ward: stays where cast, {0:0} s, ticks every {1:0.0} s, same area."),
+    };
+}

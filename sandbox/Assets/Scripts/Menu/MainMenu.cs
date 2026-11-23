@@ -125,29 +125,29 @@ public sealed class MainMenu : MonoBehaviour
 
         var panel = Panel(root.transform, "MenuPanel", new Vector2(560f, 640f), Vector2.zero);
         Label(panel.transform, "CINDERREACH", 56, new Vector2(0f, 200f), new Vector2(520f, 80f), DiabloPalette.TrimGold);
-        Label(panel.transform, "PRESS ANY KEY — LANTERN HOLD AWAITS", 14, new Vector2(0f, 140f), new Vector2(520f, 30f), new Color(0.85f, 0.8f, 0.7f, 0.7f));
+        Label(panel.transform, Loc.T("menu.main.press"), 14, new Vector2(0f, 140f), new Vector2(520f, 30f), new Color(0.85f, 0.8f, 0.7f, 0.7f));
 
         bool hasSave = false;
         try { hasSave = SaveService.HasSave(); } catch { }
         float y = 60f;
-        if (hasSave) { Button(panel.transform, "Continue", new Vector2(0f, y), () => ContinueGame()); y -= 64f; }
-        Button(panel.transform, hasSave ? "New Game (overwrite)" : "New Game", new Vector2(0f, y), () => NewGame(hasSave));
+        if (hasSave) { Button(panel.transform, Loc.T("menu.continue.button"), new Vector2(0f, y), () => ContinueGame()); y -= 64f; }
+        Button(panel.transform, hasSave ? Loc.T("menu.main.new_overwrite") : Loc.T("menu.main.new"), new Vector2(0f, y), () => NewGame(hasSave));
         y -= 64f;
-        Button(panel.transform, "Co-op: host / join", new Vector2(0f, y), () => HostOrJoin());
+        Button(panel.transform, Loc.T("menu.main.coop"), new Vector2(0f, y), () => HostOrJoin());
         y -= 64f;
-        Button(panel.transform, "Settings", new Vector2(0f, y), () => OpenSettings());
+        Button(panel.transform, Loc.T("menu.settings"), new Vector2(0f, y), () => OpenSettings());
         y -= 64f;
-        Button(panel.transform, "Quit", new Vector2(0f, y), () => Quit());
+        Button(panel.transform, Loc.T("menu.quit"), new Vector2(0f, y), () => Quit());
 
         settingsPanel = Panel(root.transform, "SettingsPanel", new Vector2(560f, 420f), Vector2.zero);
-        Label(settingsPanel.transform, "SETTINGS", 28, new Vector2(0f, 160f), new Vector2(520f, 50f), DiabloPalette.TrimGold);
+        Label(settingsPanel.transform, Loc.T("menu.settings.title"), 28, new Vector2(0f, 160f), new Vector2(520f, 50f), DiabloPalette.TrimGold);
         var s = GameSettings.Current;
-        SliderRow(settingsPanel.transform, "Master", new Vector2(0f, 90f), s.master, v => { GameSettings.Current.master = v; GameSettings.Current.Apply(); });
-        SliderRow(settingsPanel.transform, "Music", new Vector2(0f, 40f), s.music, v => { GameSettings.Current.music = v; GameSettings.Current.Apply(); });
-        SliderRow(settingsPanel.transform, "SFX", new Vector2(0f, -10f), s.sfx, v => { GameSettings.Current.sfx = v; GameSettings.Current.Apply(); });
-        ToggleRow(settingsPanel.transform, "Shake", new Vector2(-120f, -70f), s.shake, v => { GameSettings.Current.shake = v; GameSettings.Current.Apply(); });
-        ToggleRow(settingsPanel.transform, "Dmg Nums", new Vector2(120f, -70f), s.damageNumbers, v => { GameSettings.Current.damageNumbers = v; GameSettings.Current.Apply(); });
-        Button(settingsPanel.transform, "Back", new Vector2(0f, -140f), () => CloseSettings());
+        SliderRow(settingsPanel.transform, Loc.T("settings.master"), new Vector2(0f, 90f), s.master, v => { GameSettings.Current.master = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.music"), new Vector2(0f, 40f), s.music, v => { GameSettings.Current.music = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.sfx"), new Vector2(0f, -10f), s.sfx, v => { GameSettings.Current.sfx = v; GameSettings.Current.Apply(); });
+        ToggleRow(settingsPanel.transform, Loc.T("settings.shake"), new Vector2(-120f, -70f), s.shake, v => { GameSettings.Current.shake = v; GameSettings.Current.Apply(); });
+        ToggleRow(settingsPanel.transform, Loc.T("settings.dmgnums"), new Vector2(120f, -70f), s.damageNumbers, v => { GameSettings.Current.damageNumbers = v; GameSettings.Current.Apply(); });
+        Button(settingsPanel.transform, Loc.T("menu.back"), new Vector2(0f, -140f), () => CloseSettings());
         settingsPanel.SetActive(false);
         canvas.enabled = false;
     }

@@ -178,7 +178,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         EnsureBuilt();
         if (inventory == null) return false;
         int index = inventory.IndexOf(instanceId);
-        if (index < 0) { SetNotice("Item is no longer in the bag."); Refresh(); return false; }
+        if (index < 0) { SetNotice(Loc.T("inv.notice.gone")); Refresh(); return false; }
         SellBagIndex(index);
         return true;
     }
@@ -210,11 +210,11 @@ public sealed class DiabloVendorUI : MonoBehaviour
 
     string BuyRejection(int index)
     {
-        if (stock == null || index < 0 || index >= stock.offers.Count) return "That offer is gone.";
+        if (stock == null || index < 0 || index >= stock.offers.Count) return Loc.T("vendor.notice.gone");
         if (inventory != null && inventory.FreeSlots <= 0)
-            return $"Bag is full ({Inventory.Capacity}/{Inventory.Capacity}) — sell or discard first.";
-        if (wallet != null) return $"Need {stock.offers[index].price}g for that.";
-        return "Cannot buy right now.";
+            return Loc.F("vendor.notice.bagfull", Inventory.Capacity, Inventory.Capacity);
+        if (wallet != null) return Loc.F("vendor.notice.needgold", stock.offers[index].price);
+        return Loc.T("vendor.notice.cannotbuy");
     }
 
     /// <summary>Local funds/bag/row pre-check before asking the host.</summary>
@@ -238,7 +238,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (relay != null && relay.IsSpawned && CoopSessionRunning())
         {
             if (item != null) relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.Sell, item);
-            else SetNotice("Nothing to sell in that slot.");
+            else SetNotice(Loc.T("vendor.notice.nothing"));
             Refresh();
             return;
         }
@@ -247,7 +247,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
             DiabloAudio.PlayUIClick();
             SetNotice(item != null ? $"Sold {LootDrop.ItemLabel(item)}." : "Sold.");
         }
-        else SetNotice("That sale was rejected (stale row or missing item).");
+        else SetNotice(Loc.T("vendor.notice.salerejected"));
         Refresh();
     }
 
@@ -296,13 +296,13 @@ public sealed class DiabloVendorUI : MonoBehaviour
             else DestroyImmediate(child.gameObject);
         if (stock == null)
         {
-            if (vendorDetailText != null) vendorDetailText.text = "No stock.";
+            if (vendorDetailText != null) vendorDetailText.text = Loc.T("vendor.notice.nostock");
             return;
         }
         if (vendorDetailText != null)
             vendorDetailText.text = stock.offers.Count == 0
-                ? "Sold out. Leave Lantern Hold for fresh wares."
-                : $"{stock.offers.Count} wares available. Click to buy.";
+                ? Loc.T("vendor.soldout")
+                : Loc.F("vendor.offers.count", stock.offers.Count);
         int gold = wallet != null ? wallet.Gold : 0;
         for (int i = 0; i < stock.offers.Count; i++)
         {
@@ -311,8 +311,8 @@ public sealed class DiabloVendorUI : MonoBehaviour
             bool afford = gold >= offer.price;
             bool classFit = Equipment.CanEquip(offer.item, RunProfile.ClassId);
             string sub = afford
-                ? (classFit ? $"[{offer.item.rarity}]  {offer.item.slot}" : $"<color={DiabloInventoryUI.WorseColor}>Other class</color>")
-                : $"<color={DiabloInventoryUI.WorseColor}>Need {offer.price}g</color>";
+                ? (classFit ? $"[{ItemText.Rarity(offer.item.rarity)}]  {ItemText.Slot(offer.item.slot)}" : Loc.F("vendor.row.otherclass", DiabloInventoryUI.WorseColor))
+                : Loc.F("vendor.row.needgold", DiabloInventoryUI.WorseColor, offer.price);
             var btn = MakeItemRow(
                 vendorList,
                 offer.item.baseType,
@@ -323,7 +323,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
                 DiabloPalette.Rarity(offer.item.rarity),
                 afford ? DiabloPalette.GoldBright : DiabloPalette.Blood,
                 () => BuyOffer(index),
-                () => InspectItem(offer.item, $"Buy for {offer.price}g"));
+                () => InspectItem(offer.item, Loc.F("vendor.buy.offer", offer.price)));
             btn.interactable = true;
         }
         var potionItem = ItemDatabase.CreateHealingPotion();
@@ -332,13 +332,13 @@ public sealed class DiabloVendorUI : MonoBehaviour
             vendorList,
             potionItem.baseType,
             potionItem.rarity,
-            "Healing Potion",
-            $"Restores +{ItemDatabase.PotionHeal} HP (Key 1)",
+            Loc.T("item.name.healing-potion"),
+            Loc.F("vendor.potion.row", ItemDatabase.PotionHeal),
             $"{ItemDatabase.PotionPrice}g",
             DiabloPalette.Parchment,
             potionAfford ? DiabloPalette.GoldBright : DiabloPalette.Blood,
             BuyPotion,
-            () => InspectItem(potionItem, $"Buy for {ItemDatabase.PotionPrice}g"));
+            () => InspectItem(potionItem, Loc.F("vendor.buy.potion", ItemDatabase.PotionPrice)));
     }
 
     void RebuildBag()
@@ -349,13 +349,13 @@ public sealed class DiabloVendorUI : MonoBehaviour
             else DestroyImmediate(child.gameObject);
         if (inventory == null)
         {
-            if (bagDetailText != null) bagDetailText.text = "No bag.";
+            if (bagDetailText != null) bagDetailText.text = Loc.T("vendor.notice.nobag");
             return;
         }
         if (bagDetailText != null)
             bagDetailText.text = inventory.Count == 0
-                ? "Your bag is empty. Loot the fen to trade."
-                : $"Bag {inventory.Count}/{Inventory.Capacity}. Click item to sell (25%).";
+                ? Loc.T("vendor.bag.empty")
+                : Loc.F("vendor.bag.header", inventory.Count, Inventory.Capacity);
         for (int i = 0; i < inventory.Count; i++)
         {
             int index = i;
@@ -366,12 +366,12 @@ public sealed class DiabloVendorUI : MonoBehaviour
                 item.baseType,
                 item.rarity,
                 LootDrop.ItemLabel(item),
-                $"[{item.rarity}]  {item.slot}",
+                $"[{ItemText.Rarity(item.rarity)}]  {ItemText.Slot(item.slot)}",
                 $"+{price}g",
                 DiabloPalette.Rarity(item.rarity),
                 DiabloInventoryUI.BetterColor != null ? DiabloPalette.TrimGold : DiabloPalette.Parchment,
                 () => SellBagIndex(index),
-                () => InspectItem(item, $"Sell for +{price}g"));
+                () => InspectItem(item, Loc.F("vendor.sell", price)));
         }
         // S5 details: the newest bag item pre-fills the compare box until the hero hovers a row.
         if (inspectText != null && inventory.Count > 0)
@@ -387,11 +387,11 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (inspectText == null || item == null) return;
         if (item.slot == ItemSlot.Consumable)
         {
-            inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) — Restores +{ItemDatabase.PotionHeal} HP when consumed (Key 1).";
+            inspectText.text = Loc.F("vendor.potion.tip", LootDrop.ItemLabel(item), tradeTag, ItemDatabase.PotionHeal);
             return;
         }
         var eq = equipment != null ? equipment.GetEquipped(item.slot) : null;
-        string eqName = eq != null ? LootDrop.ItemLabel(eq) : "empty slot";
+        string eqName = eq != null ? LootDrop.ItemLabel(eq) : Loc.T("town.emptyslot");
         inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) vs {eqName}:\n{DiabloInventoryUI.CompareSummary(item, eq)}";
     }
 
@@ -410,7 +410,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panelGo.transform, "LANTERN HOLD MERCHANT", DiabloMenuArt.MenuArtSprite("PortraitVendor"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(panelGo.transform, Loc.T("vendor.title"), DiabloMenuArt.MenuArtSprite("PortraitVendor"), () => SetOpen(false));
 
         // Merchant Purse Bar
         var purseRow = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "PurseRow", 10f, 34f);
@@ -428,7 +428,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         goldText = DiabloUIFactory.MakeText(purseRow.transform, "GoldLabel", "Purse: —", 18, DiabloPalette.GoldBright);
         goldText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(goldText.gameObject, prefH: 30f, flexW: 1f);
-        var hintLbl = DiabloUIFactory.MakeText(purseRow.transform, "VendorHint", "V toggles  •  1 drinks potion  •  Esc / click outside closes", 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleRight);
+        var hintLbl = DiabloUIFactory.MakeText(purseRow.transform, "VendorHint", Loc.T("vendor.footer"), 13, DiabloPalette.ParchmentDim, TextAnchor.MiddleRight);
         DiabloUIFactory.SetLayout(hintLbl.gameObject, prefH: 30f, prefW: 340f);
 
         // Two cleanly aligned columns (Vendor Wares | Your Bag) with VerticalLayoutGroup!
@@ -442,8 +442,8 @@ public sealed class DiabloVendorUI : MonoBehaviour
         cols.childForceExpandWidth = true;
         cols.childForceExpandHeight = true;
 
-        vendorList = MakeColumn(colsGo.transform, "VendorColumn", "Wares for Sale", out vendorDetailText);
-        bagList = MakeColumn(colsGo.transform, "BagColumn", "Your Bag (Sell 25%)", out bagDetailText);
+        vendorList = MakeColumn(colsGo.transform, "VendorColumn", Loc.T("vendor.wares"), out vendorDetailText);
+        bagList = MakeColumn(colsGo.transform, "BagColumn", Loc.T("vendor.yourbag"), out bagDetailText);
 
         // Inspection comparison box
         var inspBox = new GameObject("InspectBox", typeof(RectTransform));
@@ -457,14 +457,14 @@ public sealed class DiabloVendorUI : MonoBehaviour
         iv.childControlWidth = true;
         iv.childControlHeight = false;
         inspectText = DiabloUIFactory.MakeText(inspBox.transform, "InspectText",
-            "Hover an item to compare stats against your equipped gear.", 14, DiabloPalette.Parchment);
+            Loc.T("vendor.hint"), 14, DiabloPalette.Parchment);
         DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 112f, flexW: 1f);
         DiabloUIFactory.FitToBox(inspectText, 14);
 
         noticeText = DiabloUIFactory.MakeText(panelGo.transform, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);
         // Explicit footer close (direct child "SmallButton": the save-on-close contract tests click it).
-        DiabloUIFactory.MakeSmallButton(panelGo.transform, "Close (saves)", () => SetOpen(false), 34f);
+        DiabloUIFactory.MakeSmallButton(panelGo.transform, Loc.T("town.close"), () => SetOpen(false), 34f);
     }
 
     Transform MakeColumn(Transform parent, string name, string heading, out Text subtitle)

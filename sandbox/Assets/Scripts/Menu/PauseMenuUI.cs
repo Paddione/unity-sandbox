@@ -170,7 +170,7 @@ public sealed class PauseMenuUI : MonoBehaviour
         var wallet = hero != null ? hero.GetComponent<Wallet>() : null;
         int lv = prog != null ? prog.Level : 1;
         int gold = wallet != null ? wallet.Gold : 0;
-        statusLabel.text = $"{RunProfile.Class.displayName}  •  Lv {lv}  •  {gold}g  •  {RunProfile.Difficulty}";
+        statusLabel.text = Loc.F("menu.pause.status", RunProfile.Class.displayName, lv, gold, Loc.Display(RunProfile.Difficulty));
     }
 
     void Build()
@@ -196,18 +196,18 @@ public sealed class PauseMenuUI : MonoBehaviour
         v.childControlWidth = true;
         v.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(mainCard.transform, "PAUSED", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(mainCard.transform, Loc.T("menu.pause.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
         statusLabel = DiabloUIFactory.MakeText(mainCard.transform, "HeroStatus", "", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(statusLabel.gameObject, prefH: 24f, flexW: 1f);
         DiabloUIFactory.MakeDivider(mainCard.transform);
 
-        AddMenuButton(mainCard.transform, "ResumeButton", "Resume Expedition", true, () => SetOpen(false));
-        AddMenuButton(mainCard.transform, "InventoryButton", "Inventory & Gear (I)", false, OpenInventory);
-        AddMenuButton(mainCard.transform, "CharacterButton", "Character & Skills (C)", false, OpenCharacter);
-        AddMenuButton(mainCard.transform, "SettingsButton", "Settings & Audio", false, ShowSettings);
+        AddMenuButton(mainCard.transform, "ResumeButton", Loc.T("menu.pause.resume"), true, () => SetOpen(false));
+        AddMenuButton(mainCard.transform, "InventoryButton", Loc.T("menu.pause.inventory"), false, OpenInventory);
+        AddMenuButton(mainCard.transform, "CharacterButton", Loc.T("menu.pause.character"), false, OpenCharacter);
+        AddMenuButton(mainCard.transform, "SettingsButton", Loc.T("menu.pause.settings"), false, ShowSettings);
         DiabloUIFactory.MakeDivider(mainCard.transform);
-        AddMenuButton(mainCard.transform, "SaveMenuButton", "Save & Main Menu", false, ReturnToMainMenu);
-        AddMenuButton(mainCard.transform, "QuitButton", "Save & Quit", false, QuitGame);
+        AddMenuButton(mainCard.transform, "SaveMenuButton", Loc.T("menu.pause.mainmenu"), false, ReturnToMainMenu);
+        AddMenuButton(mainCard.transform, "QuitButton", Loc.T("menu.pause.quit"), false, QuitGame);
 
         // Embedded settings modal card
         settingsCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PauseSettingsPanel", new Vector2(560f, 600f), Vector2.zero);
@@ -216,7 +216,7 @@ public sealed class PauseMenuUI : MonoBehaviour
         sv.spacing = 8f;
         sv.childControlWidth = true;
         sv.childControlHeight = false;
-        DiabloUIFactory.MakeHeader(settingsCard.transform, "SETTINGS", DiabloMenuArt.MenuArtSprite("SettingsCog"), ShowMain);
+        DiabloUIFactory.MakeHeader(settingsCard.transform, Loc.T("menu.settings.title"), DiabloMenuArt.MenuArtSprite("SettingsCog"), ShowMain);
         DiabloUIFactory.BuildSettingsWidgets(settingsCard.transform, settingsRefreshes, onBack: ShowMain);
         settingsCard.SetActive(false);
         canvas.enabled = false;

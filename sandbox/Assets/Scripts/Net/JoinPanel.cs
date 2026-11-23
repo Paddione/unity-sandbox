@@ -106,33 +106,33 @@ public sealed class JoinPanel : MonoBehaviour
     /// <summary>One-line session state for the window.</summary>
     public static string StatusText(NetworkManager nm, JoinArgs current)
     {
-        if (nm == null) return "Offline (no NetworkManager)";
-        if (nm.ShutdownInProgress) return "Leaving session…";
+        if (nm == null) return Loc.T("join.status.offline");
+        if (nm.ShutdownInProgress) return Loc.T("join.status.leaving");
         if (current.JoinServer && !nm.IsListening)
             return MultiplayerAutoStarter.ServerJoinError != null
-                ? $"Server: {MultiplayerAutoStarter.ServerJoinError}" : "Server: searching…";
-        if (current.JoinServer && nm.IsConnectedClient) return "Connected to the Cinderreach server";
+                ? Loc.F("join.status.servererror", MultiplayerAutoStarter.ServerJoinError) : Loc.T("join.status.searching");
+        if (current.JoinServer && nm.IsConnectedClient) return Loc.T("join.status.serverconnected");
         if (MultiplayerAutoStarter.ServerJoinError != null && nm.IsHost && nm.ConnectedClientsIds.Count <= 1)
-            return $"Server unavailable ({MultiplayerAutoStarter.ServerJoinError}), playing solo";
+            return Loc.F("join.status.serverdown", MultiplayerAutoStarter.ServerJoinError);
         if (!nm.IsListening)
-            return current.JoinCode != null ? $"Relay code {current.JoinCode}: connecting…"
-                : current.RelayHost ? "Relay: creating session…"
-                : "Not connected";
+            return current.JoinCode != null ? Loc.F("join.status.relayconnecting", current.JoinCode)
+                : current.RelayHost ? Loc.T("join.status.relaycreating")
+                : Loc.T("join.status.notconnected");
         if (nm.IsHost)
         {
             int others = Mathf.Max(0, nm.ConnectedClientsIds.Count - 1);
             if (current.RelayHost && RelayJoin.LastJoinCode != null)
                 return others == 0
-                    ? $"Relay code {RelayJoin.LastJoinCode}, waiting for players"
-                    : $"Relay code {RelayJoin.LastJoinCode}, {others} joined";
+                    ? Loc.F("join.status.relaywaiting", RelayJoin.LastJoinCode)
+                    : Loc.F("join.status.relayjoined", RelayJoin.LastJoinCode, others);
             return others == 0
-                ? $"Hosting on port {current.Port}, waiting for players"
-                : $"Hosting on port {current.Port}, {others} joined";
+                ? Loc.F("join.status.hostwaiting", current.Port)
+                : Loc.F("join.status.hostjoined", current.Port, others);
         }
         if (nm.IsConnectedClient)
-            return current.JoinCode != null ? $"Joined via relay {current.JoinCode}"
-                : $"Joined {current.Address}:{current.Port}";
-        return $"Connecting to {current.Address}:{current.Port}…";
+            return current.JoinCode != null ? Loc.F("join.status.joinedrelay", current.JoinCode)
+                : Loc.F("join.status.joined", current.Address, current.Port);
+        return Loc.F("join.status.connecting", current.Address, current.Port);
     }
 
     void Build()
@@ -150,17 +150,17 @@ public sealed class JoinPanel : MonoBehaviour
         canvasGo.AddComponent<GraphicRaycaster>();
 
         var panel = Panel(canvasGo.transform, "Panel", new Vector2(620f, 560f), Vector2.zero);
-        Label(panel.transform, "Co-op", 28, new Vector2(0f, 235f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
-        Button(panel.transform, "Join server", new Vector2(0f, 185f), () => JoinServer());
-        Label(panel.transform, "Host on a port, join ip:port — or use a relay code", 16, new Vector2(0f, 150f), new Vector2(560f, 30f));
+        Label(panel.transform, Loc.T("menu.coop"), 28, new Vector2(0f, 235f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
+        Button(panel.transform, "Join server", Loc.T("join.btn.server"), new Vector2(0f, 185f), () => JoinServer());
+        Label(panel.transform, Loc.T("join.hint"), 16, new Vector2(0f, 150f), new Vector2(560f, 30f));
         AddressField = Field(panel.transform, "AddressField", $"{JoinArgs.DefaultAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 100f));
-        Button(panel.transform, "Host", new Vector2(-190f, 35f), () => Host());
-        Button(panel.transform, "Join", new Vector2(0f, 35f), () => Join());
-        Button(panel.transform, "Close", new Vector2(190f, 35f), () => SetOpen(false));
-        Label(panel.transform, "Relay join code", 16, new Vector2(0f, -25f), new Vector2(560f, 30f));
+        Button(panel.transform, "Host", Loc.T("join.btn.host"), new Vector2(-190f, 35f), () => Host());
+        Button(panel.transform, "Join", Loc.T("join.btn.join"), new Vector2(0f, 35f), () => Join());
+        Button(panel.transform, "Close", Loc.T("join.btn.close"), new Vector2(190f, 35f), () => SetOpen(false));
+        Label(panel.transform, Loc.T("join.codelabel"), 16, new Vector2(0f, -25f), new Vector2(560f, 30f));
         CodeField = Field(panel.transform, "CodeField", "", new Vector2(0f, -70f));
-        Button(panel.transform, "HostRelay", new Vector2(-95f, -135f), () => HostRelay());
-        Button(panel.transform, "JoinByCode", new Vector2(95f, -135f), () => JoinByCode());
+        Button(panel.transform, "HostRelay", Loc.T("join.btn.hostrelay"), new Vector2(-95f, -135f), () => HostRelay());
+        Button(panel.transform, "JoinByCode", Loc.T("join.btn.joincode"), new Vector2(95f, -135f), () => JoinByCode());
         Status = Label(panel.transform, "", 16, new Vector2(0f, -195f), new Vector2(560f, 40f));
     }
 
@@ -212,9 +212,9 @@ public sealed class JoinPanel : MonoBehaviour
         return field;
     }
 
-    static void Button(Transform parent, string text, Vector2 pos, UnityEngine.Events.UnityAction onClick)
+    static void Button(Transform parent, string id, string text, Vector2 pos, UnityEngine.Events.UnityAction onClick)
     {
-        var go = new GameObject("Button_" + text, typeof(RectTransform));
+        var go = new GameObject("Button_" + id, typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var img = go.AddComponent<Image>();
         img.sprite = DiabloMenuArt.TabBackground(false);

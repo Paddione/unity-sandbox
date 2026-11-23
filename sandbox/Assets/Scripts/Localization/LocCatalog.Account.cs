@@ -1,0 +1,39 @@
+/// <summary>Player text, domain 'account' (cinderreach-deutsch-story).</summary>
+public static partial class LocCatalog
+{
+    static readonly Entry[] Account =
+    {
+        E("account.title", "SPIELER", "PLAYER"),
+        E("account.namehint", "Mitspieler sehen diesen Namen über deiner Figur.", "Other players see this name above your hero."),
+        E("account.savename", "Namen speichern", "Save name"),
+        E("account.accounthint", "Ein Konto bewahrt Namen und Figur auf jedem PC.", "An account keeps your name and hero on every PC."),
+        E("account.username", "Benutzername", "Username"),
+        E("account.password", "Passwort", "Password"),
+        E("account.signin", "Anmelden", "Sign in"),
+        E("account.signup", "Konto erstellen", "Create account"),
+        E("account.signout", "Abmelden", "Sign out"),
+        E("account.signingin", "Anmeldung läuft …", "Signing in…"),
+        E("account.creating", "Konto wird erstellt …", "Creating account…"),
+        E("account.signingout", "Abmeldung läuft …", "Signing out…"),
+        E("account.status.offline", "Offline: Der Name bleibt auf diesem PC und erscheint, sobald du online spielst.", "Offline: the name is kept on this PC and shown once you play online."),
+        E("account.status.guest", "Als Gast auf diesem PC angemeldet.", "Signed in as a guest on this PC."),
+        E("account.status.user", "Angemeldet als {0}.", "Signed in as {0}."),
+        E("account.name.rule", "{0} bis {1} Buchstaben, Ziffern, „-“ oder „_“.", "Use {0}–{1} letters, digits, '-' or '_'."),
+        E("account.saving", "Wird gespeichert …", "Saving…"),
+        E("account.name.done", "Du heißt jetzt {0}.", "You are now {0}."),
+        E("account.name.failed", "Dieser Name hat nicht funktioniert.", "That name did not work."),
+        E("account.rule.userlen", "Benutzername: {0} bis {1} Zeichen.", "Username: {0}–{1} characters."),
+        E("account.rule.userchars", "Benutzername: nur Buchstaben, Ziffern und . - @ _", "Username: letters, digits and . - @ _ only."),
+        E("account.rule.passlen", "Passwort: {0} bis {1} Zeichen.", "Password: {0}–{1} characters."),
+        E("account.rule.passmix", "Das Passwort braucht einen Klein- und einen Großbuchstaben, eine Ziffer und ein Sonderzeichen.", "Password needs a lower-case and an upper-case letter, a digit and a symbol."),
+        E("account.err.wrong", "Benutzername oder Passwort falsch.", "Wrong username or password."),
+        E("account.err.taken", "Dieser Benutzername ist vergeben.", "That username is taken."),
+        E("account.err.linked", "Dieses Konto ist bereits verknüpft.", "This account is already linked."),
+        E("account.err.banned", "Dieses Konto ist gesperrt.", "This account is banned."),
+        E("account.err.toomany", "Zu viele Versuche. Warte eine Minute und versuche es erneut.", "Too many attempts. Wait a minute and try again."),
+        E("account.err.noconn", "Keine Verbindung zum Kontodienst.", "No connection to the account service."),
+        E("account.err.rejected", "Der Kontodienst hat diese Angaben abgelehnt.", "The account service rejected these details."),
+        E("account.err.create", "Das Konto konnte nicht erstellt werden.", "Could not create the account."),
+        E("account.err.signin", "Anmeldung fehlgeschlagen.", "Could not sign in."),
+    };
+}

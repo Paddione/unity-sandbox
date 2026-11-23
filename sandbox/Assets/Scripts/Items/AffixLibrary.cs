@@ -34,26 +34,26 @@ public static class AffixLibrary
 
     public static readonly AffixDef[] All =
     {
-        new AffixDef(Damage, W, 1, 5, 4, 9, true, "+{0} Damage"),
-        new AffixDef(AttackSpeed, W, 5, 15, 12, 25, true, "+{0}% Attack Speed"),
-        new AffixDef(Crit, WH, 2, 10, 6, 15, true, "+{0}% Crit"),
-        new AffixDef(MaxHP, AH, 5, 20, 15, 35, true, "+{0} Life"),
-        new AffixDef(Armor, A, 1, 3, 3, 6, true, "+{0} Armor"),
-        new AffixDef(MoveSpeed, A, 0.1f, 0.3f, 0.25f, 0.5f, false, "+{0} Move Speed"),
-        new AffixDef(XPMul, H, 5, 15, 10, 25, true, "+{0}% Experience"),
-        new AffixDef(LifeSteal, W, 2, 6, 5, 10, true, "{0}% Life Steal"),
-        new AffixDef(GoldFind, AH, 10, 30, 25, 60, true, "+{0}% Gold Find"),
-        new AffixDef(SkillRank, H, 1, 1, 1, 2, true, "+{0} to all Skills"),
-        new AffixDef(CooldownReduction, H, 3, 8, 6, 15, true, "-{0}% Cooldowns"),
-        new AffixDef(FireDamage, W, 1, 4, 3, 8, true, "+{0} Fire Damage"),
-        new AffixDef(Thorns, A, 1, 2, 2, 4, true, "{0} Thorns"),
-        new AffixDef(MagicFind, AH, 5, 20, 15, 40, true, "+{0}% Magic Find"),
+        new AffixDef(Damage, W, 1, 5, 4, 9, true),
+        new AffixDef(AttackSpeed, W, 5, 15, 12, 25, true),
+        new AffixDef(Crit, WH, 2, 10, 6, 15, true),
+        new AffixDef(MaxHP, AH, 5, 20, 15, 35, true),
+        new AffixDef(Armor, A, 1, 3, 3, 6, true),
+        new AffixDef(MoveSpeed, A, 0.1f, 0.3f, 0.25f, 0.5f, false),
+        new AffixDef(XPMul, H, 5, 15, 10, 25, true),
+        new AffixDef(LifeSteal, W, 2, 6, 5, 10, true),
+        new AffixDef(GoldFind, AH, 10, 30, 25, 60, true),
+        new AffixDef(SkillRank, H, 1, 1, 1, 2, true),
+        new AffixDef(CooldownReduction, H, 3, 8, 6, 15, true),
+        new AffixDef(FireDamage, W, 1, 4, 3, 8, true),
+        new AffixDef(Thorns, A, 1, 2, 2, 4, true),
+        new AffixDef(MagicFind, AH, 5, 20, 15, 40, true),
         // S3: CritRating rides the Crit slots (WH) at 10 rating = 1 crit point;
         // IncreasedArea is utility, so it rides Armor/Helmet (AH) and stays off
         // weapons to keep the weapon pool damage-focused. Both integer, save
         // keys are plain strings like every other affix.
-        new AffixDef(CritRating, WH, 5, 20, 15, 40, true, "+{0} Crit Rating"),
-        new AffixDef(IncreasedArea, AH, 5, 20, 15, 40, true, "+{0}% Area"),
+        new AffixDef(CritRating, WH, 5, 20, 15, 40, true),
+        new AffixDef(IncreasedArea, AH, 5, 20, 15, 40, true),
     };
 
     public static int MagicAffixCount(System.Random rng) => rng.Next(1, 3); // 1-2
@@ -108,6 +108,9 @@ public static class AffixLibrary
         }
         return result;
     }
+
+    /// <summary>Short stat name of an affix key ("MaxHP" → "Leben"), catalog <c>stat.&lt;key&gt;</c>.</summary>
+    public static string StatName(string key) => Loc.T("stat." + (key ?? "").ToLowerInvariant());
 
     /// <summary>Player-facing text of one affix (falls back to "+v key").</summary>
     public static string Describe(Affix a)

@@ -10,10 +10,11 @@ public sealed class AffixDef
     public readonly float t1Min, t1Max, t2Min, t2Max;
     public readonly bool integer;
     /// <summary>Player-facing line, {0} = value (e.g. "+{0} Damage").</summary>
-    public readonly string format;
+    /// <summary>Display template from the catalog (<c>affix.&lt;key&gt;</c>, cinderreach-deutsch-story).</summary>
+    public string format => Loc.T("affix." + key.ToLowerInvariant());
 
     public AffixDef(string key, ItemSlot[] slots, float t1Min, float t1Max, float t2Min, float t2Max,
-        bool integer, string format)
+        bool integer)
     {
         this.key = key;
         this.slots = slots;
@@ -22,7 +23,6 @@ public sealed class AffixDef
         this.t2Min = t2Min;
         this.t2Max = t2Max;
         this.integer = integer;
-        this.format = format;
     }
 
     public bool AllowedOn(ItemSlot slot) => System.Array.IndexOf(slots, slot) >= 0;
@@ -57,5 +57,5 @@ public sealed class AffixDef
     }
 
     public string Describe(float value) =>
-        string.Format(format, integer ? value.ToString("0") : value.ToString("0.##"));
+        string.Format(Loc.Culture, format, integer ? value.ToString("0", Loc.Culture) : value.ToString("0.##", Loc.Culture));
 }

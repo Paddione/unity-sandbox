@@ -1,2 +1,21 @@
 # Literals the lint flags that are not player text (ids, object names, log lines).
 # Format: <path under Assets/Scripts><TAB><literal>.
+Menu/ClassSelectUI.cs	[Class] Reload continue found no readable save.
+Menu/ClassSelectUI.cs	CINDERREACH
+Menu/MainMenu.cs	CINDERREACH
+Net/JoinPanel.cs	Join server
+Net/AccountRules.cs	Invalid username or password
+Net/AccountRules.cs	already exists
+Items/ItemDatabase.cs	Cryptwarden Plate
+Items/ItemDatabase.cs	Emberbrand Blade
+Items/ItemDatabase.cs	Healing Potion
+Items/ItemDatabase.cs	Lantern of the Hold
+Items/ItemDatabase.cs	Rogue's Keepsake
+Items/ItemDatabase.cs	Seer's Circlet
+Items/ItemDatabase.cs	Worn Lantern
+Items/ItemDatabase.cs	Worn Short Bow
+Items/ItemDatabase.cs	Worn Short Sword
+Items/Equipment.cs	(dmg={GetDamage()}, hp={GetMaxHP()}).
+Loot/KindledFinaleReward.cs	forced save failure
+DiabloInventoryUI.cs	<size=13>{AffixSummary(item)}</size>
+DiabloInventoryUI.cs	{text} <color={color}>({sign}{delta:0.#})</color>

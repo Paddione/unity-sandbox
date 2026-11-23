@@ -60,3 +60,28 @@ public sealed class ItemInstance
         return total;
     }
 }
+
+/// <summary>Display names of item enums (cinderreach-deutsch-story); enum names stay save/net ids.</summary>
+public static class ItemText
+{
+    public static string Rarity(ItemRarity r)
+    {
+        switch (r)
+        {
+            case ItemRarity.Magic: return Loc.T("item.rarity.magic");
+            case ItemRarity.Rare: return Loc.T("item.rarity.rare");
+            default: return Loc.T("item.rarity.unique");
+        }
+    }
+
+    public static string Slot(ItemSlot s)
+    {
+        switch (s)
+        {
+            case ItemSlot.Armor: return Loc.T("item.slot.armor");
+            case ItemSlot.Weapon: return Loc.T("item.slot.weapon");
+            case ItemSlot.Helmet: return Loc.T("item.slot.helmet");
+            default: return Loc.T("item.slot.consumable");
+        }
+    }
+}

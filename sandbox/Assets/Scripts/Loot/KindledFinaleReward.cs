@@ -43,7 +43,7 @@ public static class KindledFinaleReward
         if (inv == null || inv.FreeSlots <= 0)
         {
             PersistPending(path);
-            LastOfferLine = "Kindled-Belohnung wartet (Tasche voll).";
+            LastOfferLine = Loc.T("reward.kindled.bagfull");
             return false;
         }
         inv.Add(weapon);
@@ -52,10 +52,10 @@ public static class KindledFinaleReward
             // Rollback: payout and consumption saved together or not at all.
             for (int i = inv.Count - 1; i >= 0; i--)
                 if (ReferenceEquals(inv.Get(i), weapon)) { inv.RemoveAt(i); break; }
-            LastOfferLine = "Kindled-Belohnung wartet (Speichern fehlgeschlagen).";
+            LastOfferLine = Loc.T("reward.kindled.savefail");
             return false;
         }
-        LastOfferLine = $"Kindled-Belohnung: Rare {weapon.baseType} (+{weapon.GetAffix("Damage"):0} Schaden).";
+        LastOfferLine = Loc.F("reward.kindled.line", LootDrop.PrettyName(weapon.baseType), weapon.GetAffix("Damage"));
         return true;
     }
 

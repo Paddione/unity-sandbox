@@ -20,10 +20,10 @@ public static class AccountRules
     public static string CheckUsername(string user)
     {
         if (string.IsNullOrEmpty(user) || user.Length < UserMin || user.Length > UserMax)
-            return $"Username: {UserMin}–{UserMax} characters.";
+            return Loc.F("account.rule.userlen", UserMin, UserMax);
         foreach (char c in user)
             if (!(c < 128 && char.IsLetterOrDigit(c)) && c != '.' && c != '-' && c != '@' && c != '_')
-                return "Username: letters, digits and . - @ _ only.";
+                return Loc.T("account.rule.userchars");
         return null;
     }
 
@@ -31,7 +31,7 @@ public static class AccountRules
     public static string CheckPassword(string pass)
     {
         if (string.IsNullOrEmpty(pass) || pass.Length < PassMin || pass.Length > PassMax)
-            return $"Password: {PassMin}–{PassMax} characters.";
+            return Loc.F("account.rule.passlen", PassMin, PassMax);
         bool lower = false, upper = false, digit = false, symbol = false;
         foreach (char c in pass)
         {
@@ -41,7 +41,7 @@ public static class AccountRules
             else symbol = true;
         }
         if (!(lower && upper && digit && symbol))
-            return "Password needs a lower-case and an upper-case letter, a digit and a symbol.";
+            return Loc.T("account.rule.passmix");
         return null;
     }
 
@@ -54,14 +54,14 @@ public static class AccountRules
         string m = message ?? "";
         if (m.IndexOf("Invalid username or password", System.StringComparison.OrdinalIgnoreCase) >= 0
             || m.IndexOf("WRONG_USERNAME_PASSWORD", System.StringComparison.OrdinalIgnoreCase) >= 0)
-            return "Wrong username or password.";
+            return Loc.T("account.err.wrong");
         if (code == CodeAccountAlreadyLinked || m.IndexOf("ENTITY_EXISTS", System.StringComparison.OrdinalIgnoreCase) >= 0
             || m.IndexOf("already exists", System.StringComparison.OrdinalIgnoreCase) >= 0)
-            return signUp ? "That username is taken." : "This account is already linked.";
-        if (code == CodeBannedUser) return "This account is banned.";
-        if (code == CodeTooManyRequests) return "Too many attempts. Wait a minute and try again.";
-        if (code == CodeTransportError) return "No connection to the account service.";
-        if (code == CodeInvalidParameters) return signUp ? "The account service rejected these details." : "Wrong username or password.";
-        return signUp ? "Could not create the account." : "Could not sign in.";
+            return signUp ? Loc.T("account.err.taken") : Loc.T("account.err.linked");
+        if (code == CodeBannedUser) return Loc.T("account.err.banned");
+        if (code == CodeTooManyRequests) return Loc.T("account.err.toomany");
+        if (code == CodeTransportError) return Loc.T("account.err.noconn");
+        if (code == CodeInvalidParameters) return signUp ? Loc.T("account.err.rejected") : Loc.T("account.err.wrong");
+        return signUp ? Loc.T("account.err.create") : Loc.T("account.err.signin");
     }
 }

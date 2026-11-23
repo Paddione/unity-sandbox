@@ -31,43 +31,43 @@ public sealed class ItemDetailsView : MonoBehaviour
     /// <summary>Full card text. Prefix +/- marks gains/losses (no color needed for tests).</summary>
     public static string Render(ItemInstance item, ItemInstance equipped)
     {
-        if (item == null) return "Empty slot — no item here.";
+        if (item == null) return Loc.T("item.card.empty");
         var sb = new System.Text.StringBuilder();
         string name = LootDrop.PrettyName(item.rarity == ItemRarity.Unique && !string.IsNullOrEmpty(item.uniqueId)
             ? item.uniqueId : item.baseType);
-        sb.AppendLine($"{name} [{item.rarity}] ({item.slot})");
+        sb.AppendLine(Loc.F("item.card.title", name, ItemText.Rarity(item.rarity), ItemText.Slot(item.slot)));
         sb.AppendLine(item.itemLevel <= 0
-            ? "Item level: legacy stock (Altbestand, pre-level scaling)"
-            : $"Item level: {item.itemLevel}");
+            ? Loc.T("item.card.ilvl_legacy")
+            : Loc.F("item.card.ilvl", item.itemLevel));
         if (item.slot == ItemSlot.Consumable)
         {
-            sb.AppendLine("Use: drink to restore +10 HP (key 1).");
+            sb.AppendLine(Loc.T("item.card.potion"));
             return sb.ToString().TrimEnd();
         }
         if (!Equipment.CanEquip(item, RunProfile.ClassId))
         {
             string who = ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName;
-            sb.AppendLine($"Cannot equip: {who} only. You may still sell or discard it.");
+            sb.AppendLine(Loc.F("item.card.classlock", who));
         }
         if (item.affixes == null || item.affixes.Count == 0)
-            sb.AppendLine("Rolls: none");
+            sb.AppendLine(Loc.T("item.card.norolls"));
         else
         {
-            sb.AppendLine("Rolls:");
+            sb.AppendLine(Loc.T("item.card.rolls"));
             foreach (var a in item.affixes)
                 sb.AppendLine($"  {AffixLibrary.Describe(a)}");
         }
-        sb.AppendLine("vs. equipped:");
+        sb.AppendLine(Loc.T("item.card.vs"));
         sb.AppendLine(DeltaLines(item, equipped));
         string effect = BuildUniqueEffects.EffectTextFor(item);
-        if (!string.IsNullOrEmpty(effect)) sb.AppendLine($"Unique: {effect}");
+        if (!string.IsNullOrEmpty(effect)) sb.AppendLine(Loc.F("item.card.unique", effect));
         return sb.ToString().TrimEnd();
     }
 
     /// <summary>Per-affix delta lines with explicit +/- prefixes.</summary>
     public static string DeltaLines(ItemInstance item, ItemInstance equipped)
     {
-        if (item == null) return "no item";
+        if (item == null) return Loc.T("item.card.noitem");
         var keys = new System.Collections.Generic.List<string>();
         void Collect(ItemInstance it)
         {
@@ -77,7 +77,7 @@ public sealed class ItemDetailsView : MonoBehaviour
         }
         Collect(item);
         Collect(equipped);
-        if (keys.Count == 0) return "  no bonuses";
+        if (keys.Count == 0) return Loc.T("item.card.nobonus");
         var lines = new System.Collections.Generic.List<string>();
         foreach (var key in keys)
         {
@@ -86,7 +86,7 @@ public sealed class ItemDetailsView : MonoBehaviour
             float delta = mine - theirs;
             string text = AffixLibrary.Describe(new Affix(key, mine));
             if (Mathf.Abs(delta) < 0.0001f) lines.Add($"  = {text}");
-            else lines.Add($"  {(delta > 0f ? "+" : "")}{delta:0.##} {key} ({text})");
+            else lines.Add($"  {(delta > 0f ? "+" : "")}{delta:0.##} {AffixLibrary.StatName(key)} ({text})");
         }
         return string.Join("\n", lines.ToArray());
     }

@@ -76,15 +76,15 @@ public sealed class PauseMenu : MonoBehaviour
         pr.sizeDelta = new Vector2(440f, 420f);
         pr.anchoredPosition = Vector2.zero;
 
-        Label(panel.transform, "PAUSED", 32, new Vector2(0f, 150f), new Vector2(400f, 50f));
-        Btn(panel.transform, "Resume", new Vector2(0f, 70f), () => Resume());
-        Btn(panel.transform, "Settings: shake on/off", new Vector2(0f, 0f), () =>
+        Label(panel.transform, Loc.T("menu.pause.title"), 32, new Vector2(0f, 150f), new Vector2(400f, 50f));
+        Btn(panel.transform, Loc.T("menu.pause.resume.short"), new Vector2(0f, 70f), () => Resume());
+        Btn(panel.transform, Loc.T("menu.pause.shake"), new Vector2(0f, 0f), () =>
         {
             GameSettings.Current.shake = !GameSettings.Current.shake;
             GameSettings.Current.Apply();
             GameSettings.Save();
         });
-        Btn(panel.transform, "Menu", new Vector2(0f, -70f), () => BackToMenu());
+        Btn(panel.transform, Loc.T("menu.pause.menu"), new Vector2(0f, -70f), () => BackToMenu());
         canvas.enabled = false;
     }
 

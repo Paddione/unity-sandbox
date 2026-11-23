@@ -79,6 +79,24 @@ public static class Loc
         }
     }
 
+    static Dictionary<string, string> nameKeys;
+
+    /// <summary>Display form of an internal English proper name (scene object names,
+    /// serialized shrine names, difficulty ids): "Ash Elite" → "Aschenhüne". Looks the
+    /// name up among the English texts of the <c>name.*</c> keys; unknown names pass through.</summary>
+    public static string Display(string internalName)
+    {
+        if (string.IsNullOrEmpty(internalName)) return internalName;
+        if (nameKeys == null)
+        {
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var e in LocCatalog.All())
+                if (e.key.StartsWith("name.", StringComparison.Ordinal) && !map.ContainsKey(e.en)) map[e.en] = e.key;
+            nameKeys = map;
+        }
+        return nameKeys.TryGetValue(internalName.Trim(), out var key) ? T(key) : internalName;
+    }
+
     /// <summary>True when the catalog holds <paramref name="key"/>.</summary>
     public static bool Has(string key) => LocCatalog.TryGet(key, English, out _);
 

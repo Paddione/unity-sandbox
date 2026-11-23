@@ -81,10 +81,10 @@ public static class SkillVariantCatalog
         string id = Resolve(classId, skill, variantId);
         switch (id)
         {
-            case CleaveRoundId: return "Whirl";
-            case CleaveFrontalId: return "Frontal Arc";
-            case HaloFollowId: return "Moving Aura";
-            case HaloWardId: return "Fire Ward";
+            case CleaveRoundId: return Loc.T("char.variant.whirl");
+            case CleaveFrontalId: return Loc.T("char.variant.frontal");
+            case HaloFollowId: return Loc.T("char.variant.aura");
+            case HaloWardId: return Loc.T("char.variant.ward");
             default: return DiabloSkills.SkillName(skill);
         }
     }
@@ -111,13 +111,13 @@ public static class SkillVariantCatalog
         switch (id)
         {
             case CleaveRoundId:
-                return $"Whirl: 360° around you, {CleaveRadiusFor(skills, id):0.0} m.";
+                return Loc.F("char.variant.whirl.desc", CleaveRadiusFor(skills, id));
             case CleaveFrontalId:
-                return $"Frontal Arc: {FrontalArcDegrees:0}° cone, {CleaveRadiusFor(skills, id):0.0} m reach (x{FrontalRangeFactor:0.0}).";
+                return Loc.F("char.variant.frontal.desc", FrontalArcDegrees, CleaveRadiusFor(skills, id), FrontalRangeFactor);
             case HaloFollowId:
-                return "Moving Aura: instant ring that travels with you.";
+                return Loc.T("char.variant.aura.desc");
             case HaloWardId:
-                return $"Fire Ward: stays where cast, {HaloWardDuration:0} s, ticks every {HaloTickInterval:0.0} s, same area.";
+                return Loc.F("char.variant.ward.desc", HaloWardDuration, HaloTickInterval);
             default:
                 return string.Empty;
         }

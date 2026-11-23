@@ -33,7 +33,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     Text variantText;
     readonly List<(DiabloSkills.Skill skill, Button button, Text label)> variantButtons =
         new List<(DiabloSkills.Skill, Button, Text)>();
-    public const string VariantLockedHint = "Variants change only solo in Lantern Hold.";
+    public static string VariantLockedHint => Loc.T("char.variant.locked");
     bool building;
 
     /// <summary>Skills currently displayed on the sheet (class-reactive; test seam).</summary>
@@ -113,11 +113,11 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         if (portraitImg != null) portraitImg.sprite = DiabloMenuArt.ClassPortrait(RunProfile.ClassId);
         int lv = prog != null ? prog.Level : 1;
         if (headerSubText != null)
-            headerSubText.text = $"<b>{RunProfile.Class.displayName}</b>  •  Level {lv}\n<size=13>Invest points from leveling up.</size>";
+            headerSubText.text = Loc.F("char.header", RunProfile.Class.displayName, lv);
 
-        attrPointsText.text = $"Attribute points: {sheet.freeAttributePoints}";
+        attrPointsText.text = Loc.F("char.attrpoints", sheet.freeAttributePoints);
         attrPointsText.color = sheet.freeAttributePoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
-        skillPointsText.text = $"Skill points: {sheet.freeSkillPoints}";
+        skillPointsText.text = Loc.F("char.skillpoints", sheet.freeSkillPoints);
         skillPointsText.color = sheet.freeSkillPoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
 
         bool canAttr = sheet.freeAttributePoints > 0;
@@ -125,10 +125,10 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         if (vitPlusBtn != null) vitPlusBtn.interactable = canAttr;
         if (focPlusBtn != null) focPlusBtn.interactable = canAttr;
 
-        strengthText.text = $"Strength  <b>{sheet.strength}</b>  (+{sheet.strength * CharacterSheet.StrengthMeleePerPoint} melee dmg)";
-        vitalityText.text = $"Vitality  <b>{sheet.vitality}</b>  (+{sheet.VitalityLife():0} max HP)";
+        strengthText.text = Loc.F("char.strength.line", sheet.strength, sheet.strength * CharacterSheet.StrengthMeleePerPoint);
+        vitalityText.text = Loc.F("char.vitality.line", sheet.vitality, sheet.VitalityLife());
         float factor = RunProfile.Class.focusSkillFactor;
-        focusText.text = $"Focus  <b>{sheet.focus}</b>  (+{(sheet.FocusSkillMultiplier(factor) - 1f) * 100f:0}% skill, -{(1f - sheet.CooldownMultiplier()) * 100f:0}% cd)";
+        focusText.text = Loc.F("char.focus.line", sheet.focus, (sheet.FocusSkillMultiplier(factor) - 1f) * 100f, (1f - sheet.CooldownMultiplier()) * 100f);
 
         foreach (var (skill, text, plus) in skillRows)
         {
@@ -153,18 +153,18 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
             float radius = SkillVariantCatalog.CleaveRadiusFor(skills, variant);
             float arc = SkillVariantCatalog.CleaveArcFor(variant);
-            string shape = arc >= 360f ? "360°" : $"{arc:0}° cone";
+            string shape = arc >= 360f ? "360°" : Loc.F("char.variant.cone", arc);
             line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {shape}, {radius:0.0} m)";
         }
         else if (skill == DiabloSkills.Skill.SearingHalo)
         {
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
             float dur = SkillVariantCatalog.HaloDurationFor(variant);
-            string mode = dur > 0f ? $"stays {dur:0} s" : "moves with you";
+            string mode = dur > 0f ? Loc.F("char.variant.stays", dur) : Loc.T("char.variant.moves");
             line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {mode})";
         }
         else if (skill == DiabloSkills.Skill.Wisps && skills != null)
-            line += $"  ({skills.WispCountFor(sheet.wispsRank)} wisps)";
+            line += Loc.F("char.skill.wisps", skills.WispCountFor(sheet.wispsRank));
         return line;
     }
 
@@ -268,7 +268,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             sb.Append($"{DiabloSkills.SkillName(skill)}: ");
             sb.Append(SkillVariantCatalog.Describe(cls.id, skill, current, skills));
         }
-        if (sb.Length == 0) sb.Append("No skill variants for this class.");
+        if (sb.Length == 0) sb.Append(Loc.T("char.variant.none"));
         else if (!CanChangeVariant())
         {
             sb.AppendLine();
@@ -301,7 +301,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panelGo.transform, "CHARACTER & SKILLS (C)", DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
+        DiabloUIFactory.MakeHeader(panelGo.transform, Loc.T("char.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
 
         // Portrait + Hero Class card
         var topRow = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "HeroIdentityRow", 12f, 68f);
@@ -329,20 +329,20 @@ public sealed class DiabloCharacterUI : MonoBehaviour
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
 
-        attrPointsText = DiabloUIFactory.MakeText(panelGo.transform, "AttrPoints", "Attribute points: 0", 16, DiabloPalette.GoldBright);
+        attrPointsText = DiabloUIFactory.MakeText(panelGo.transform, "AttrPoints", Loc.T("char.attrpoints.zero"), 16, DiabloPalette.GoldBright);
         attrPointsText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(attrPointsText.gameObject, prefH: 24f, flexW: 1f);
 
-        AddRow(panelGo.transform, "STR", null, out strengthText, out strPlusBtn, SpendStrength,
-            "Strength increases basic melee cleave & sword strike damage.");
-        AddRow(panelGo.transform, "VIT", null, out vitalityText, out vitPlusBtn, SpendVitality,
-            "Vitality increases maximum health by +5 per point.");
-        AddRow(panelGo.transform, "FOC", null, out focusText, out focPlusBtn, SpendFocus,
-            "Focus amplifies skill damage and shortens all cooldowns.");
+        AddRow(panelGo.transform, Loc.T("char.attr.str"), null, out strengthText, out strPlusBtn, SpendStrength,
+            Loc.T("char.strength.tip"));
+        AddRow(panelGo.transform, Loc.T("char.attr.vit"), null, out vitalityText, out vitPlusBtn, SpendVitality,
+            Loc.T("char.vitality.tip"));
+        AddRow(panelGo.transform, Loc.T("char.attr.foc"), null, out focusText, out focPlusBtn, SpendFocus,
+            Loc.T("char.focus.tip"));
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
 
-        skillPointsText = DiabloUIFactory.MakeText(panelGo.transform, "SkillPoints", "Skill points: 0", 16, DiabloPalette.GoldBright);
+        skillPointsText = DiabloUIFactory.MakeText(panelGo.transform, "SkillPoints", Loc.T("char.skillpoints.zero"), 16, DiabloPalette.GoldBright);
         skillPointsText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(skillPointsText.gameObject, prefH: 24f, flexW: 1f);
 
@@ -368,7 +368,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         tcBg.type = Image.Type.Sliced;
         var tv = tipCard.AddComponent<VerticalLayoutGroup>();
         tv.padding = new RectOffset(10, 10, 6, 6);
-        detailText = DiabloUIFactory.MakeText(tipCard.transform, "Detail", "Hover an attribute or skill for details. C toggles.", 13, DiabloPalette.ParchmentDim);
+        detailText = DiabloUIFactory.MakeText(tipCard.transform, "Detail", Loc.T("char.hint"), 13, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(detailText.gameObject, prefH: 38f, flexW: 1f);
 
         building = false;
@@ -392,12 +392,12 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             var skill = cls.skills[i];
             var spr = DiabloMenuArt.SkillIcon(skill);
             AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
-                $"[{cls.keys[i]}] {DiabloSkills.SkillName(skill)} — Gain rank up to {CharacterSheet.MaxSkillRank} to boost potency.", 44f);
+                Loc.F("char.skill.tip", cls.keys[i], DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank), 44f);
             skillRows.Add((skill, text, plus));
             if (SkillVariantCatalog.VariantIds(cls.id, skill).Length >= 2)
             {
                 var sk = skill;
-                var vBtn = DiabloUIFactory.MakeSmallButton(text.transform.parent, "Variant", () => CycleVariant(sk), 30f, 118f);
+                var vBtn = DiabloUIFactory.MakeSmallButton(text.transform.parent, Loc.T("char.variant.btn"), () => CycleVariant(sk), 30f, 118f);
                 vBtn.gameObject.name = "VariantButton";
                 vBtn.transform.SetSiblingIndex(plus.transform.GetSiblingIndex());
                 variantButtons.Add((skill, vBtn, vBtn.GetComponentInChildren<Text>()));
