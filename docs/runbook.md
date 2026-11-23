@@ -45,3 +45,23 @@ python3 ~/scripts/unity_ops.py rebuild --scene greybox
 - `-serverScene diablo` wählt `Assets/Scenes/Diablo.unity`, jeder andere Wert
   oder kein Argument die Greybox. Die Szene steht in der Logzeile
   `Server build result: … (scene <Datei>)`.
+
+## Dedizierter Server (devmesh)
+
+Spieler klicken auf dem Startbildschirm „Join Server“. Der Client sucht die öffentliche Lobby „Cinderreach Server“
+und tritt über deren Relay-Code bei. Der Server läuft als Pod `workspace/cinderreach-server` im devmesh-Heimcluster,
+nur mit ausgehenden Verbindungen (Unity Relay/Lobby, Projekt „Cinderreach“). Kein Port, kein Service, kein DNS.
+
+- Update: `bash scripts/publish-server-image.sh` (Server-Build, Image `ghcr.io/paddione/cinderreach-server:<commit>`,
+  gibt den Digest aus). Digest in dotfiles `apps/cinderreach-server/k8s/deployment.yaml` eintragen, dotfiles landen;
+  Flux (`cinderreach-server`, Quelle dotfiles, Definition in Bachelorprojekt `flux/clusters/devmesh/`) rollt aus.
+  Client und Server sollten aus demselben Commit stammen (NGO prüft Netzwerk-Hashes). Danach Installer neu bauen.
+- Status: `kubectl --context devmesh -n workspace get pod -l app=cinderreach-server`, Logs mit
+  `kubectl --context devmesh -n workspace logs deploy/cinderreach-server | grep '\[Server\]'`.
+- Neustart (frischer Run): `kubectl --context devmesh -n workspace rollout restart deploy/cinderreach-server`.
+  Ein Server beendet sich 20 s nach dem letzten Spieler selbst. Kubernetes startet ihn neu (kurzer Backoff).
+- Proben: `/tmp/cinderreach-ready` wird alle 5 s erneuert, solange NGO lauscht und der Lobby-Heartbeat frisch ist.
+  Älter als 5 min → Liveness startet den Container neu.
+- Lokal testen ohne Cluster: `COOP_SERVER=1 COOP_RELAY=1 COOP_CLIENTS=2 bash scripts/run-coop-pair.sh <out>`
+  (eigener Lobby-Name, berührt den echten Server nicht).
+- Server-Build = Server-Subtarget ohne Shader: Laufzeit-Material-Code muss `Shader.Find` = null tolerieren.

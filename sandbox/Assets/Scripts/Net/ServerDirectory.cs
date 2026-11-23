@@ -52,6 +52,9 @@ public static class ServerDirectory
 
     static string lobbyId;
 
+    /// <summary>Realtime of the last successful lobby heartbeat (publish counts), -1 before.</summary>
+    public static float LastHeartbeatAt { get; private set; } = -1f;
+
     /// <summary>True while this server's lobby is listed.</summary>
     public static bool Published => !string.IsNullOrEmpty(lobbyId);
 
@@ -113,6 +116,7 @@ public static class ServerDirectory
             var lobby = await LobbyService.Instance.CreateLobbyAsync(Name, RelayJoin.MaxPlayers + 1,
                 LobbyOptions(code, build));
             lobbyId = lobby.Id;
+            LastHeartbeatAt = Time.realtimeSinceStartup;
             Debug.Log($"{PublishedLog} '{Name}' relay region {allocation.Region}, lobby {lobby.Id}, code {code}");
             return true;
         }
@@ -130,6 +134,7 @@ public static class ServerDirectory
         try
         {
             await LobbyService.Instance.SendHeartbeatPingAsync(lobbyId);
+            LastHeartbeatAt = Time.realtimeSinceStartup;
             return true;
         }
         catch (System.Exception e)

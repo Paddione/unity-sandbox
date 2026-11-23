@@ -84,8 +84,9 @@ public static class ToyTriggerShared
     public static void PaintGoal(GameObject goal, bool open)
     {
         var rend = goal.GetComponent<Renderer>();
-        if (rend == null) return;
-        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+        var shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (rend == null || shader == null) return; // dedicated server builds ship no shaders
+        var mat = new Material(shader)
         {
             color = open ? new Color(0.2f, 0.8f, 0.3f) : new Color(0.8f, 0.25f, 0.25f)
         };

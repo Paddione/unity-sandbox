@@ -2,7 +2,7 @@
 goal: cinderreach-dedicated-server
 slug: cinderreach-dedicated-server
 health_goals: [G-DIABLO02, G-DIABLO03]
-health_probe: {"id":"G-CRSERVER01","title":"Cinderreach-Server-Pod im devmesh bereit","cmd":"kubectl --context devmesh -n cinderreach get deploy cinderreach-server -o jsonpath='{.status.readyReplicas}' | grep -qx 1; echo $?","target":0}
+health_probe: {"id":"G-CRSERVER01","title":"Cinderreach-Server-Pod im devmesh bereit","cmd":"kubectl --context devmesh -n workspace get deploy cinderreach-server -o jsonpath='{.status.readyReplicas}' | grep -qx 1; echo $?","target":0}
 plan_refs: [.agents/plans/cinderreach-dedicated-server/tasks.md]
 ---
 

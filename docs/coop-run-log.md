@@ -145,3 +145,14 @@ Prozess würde Host. Deshalb direkt Relay + Lobby (`ServerDirectory`): Allokatio
 | Lauf | Ergebnis |
 |---|---|
 | s2-relay-1 | `[Server] published … relay region europe-west4`, beide Clients `joining Cinderreach server via relay`, Lead 4/4, Follow 3/3, Server Exit 0, 0 Exceptions, keine Heartbeat-/Löschfehler |
+
+### Container (S3)
+
+Image aus `scripts/publish-server-image.sh` lokal per `docker run … -server-name "<test>"`, zwei Linux-Clients
+`-join-server` über Relay.
+
+| Lauf | Ergebnis |
+|---|---|
+| s3-docker-2 | Server-Subtarget: Lead/Follow grün, aber 32 Server-Exceptions (`Material..ctor` ohne Shader in `EnemyHealth.DropOrb`, `GoldDrop`, `ToyTrigger.PaintGoal`, mitten in `Die()`) |
+| Player-Subtarget im Container | Segfault in `PlayerMain` nach dem Szenenstart, auch mit X11/GL/GTK-Bibliotheken: verworfen |
+| s3-docker-4 | Server-Subtarget mit Shader-Null-Schutz: Lead 4/4, Follow 3/3 (+ `boss`), Container-Exit 0, 0 Server-Exceptions |

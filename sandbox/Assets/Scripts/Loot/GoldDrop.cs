@@ -59,11 +59,9 @@ public sealed class GoldDrop : MonoBehaviour
         pile.name = $"GoldPile_{PilesDropped}";
         pile.transform.position = pos;
         pile.transform.localScale = new Vector3(0.35f, 0.22f, 0.35f);
-        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"))
-        {
-            color = new Color(1f, 0.8f, 0.2f)
-        };
-        pile.GetComponent<Renderer>().sharedMaterial = mat;
+        var shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader != null) // dedicated server builds ship no shaders
+            pile.GetComponent<Renderer>().sharedMaterial = new Material(shader) { color = new Color(1f, 0.8f, 0.2f) };
         pile.GetComponent<BoxCollider>().isTrigger = true;
         var drop = pile.AddComponent<GoldDrop>();
         drop.amount = Mathf.Max(0, amount);

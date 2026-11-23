@@ -219,11 +219,9 @@ public sealed class EnemyHealth : NetworkBehaviour
         orb.name = $"DiabloOrb_{OrbsDropped}";
         orb.transform.position = transform.position + Vector3.up * 0.8f;
         orb.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"))
-        {
-            color = new Color(1f, 0.85f, 0.2f)
-        };
-        orb.GetComponent<Renderer>().sharedMaterial = mat;
+        var shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader != null) // dedicated server builds ship no shaders
+            orb.GetComponent<Renderer>().sharedMaterial = new Material(shader) { color = new Color(1f, 0.85f, 0.2f) };
         orb.GetComponent<SphereCollider>().isTrigger = true;
         orb.AddComponent<ToyTrigger>().mode = ToyTrigger.Mode.Pickup;
     }

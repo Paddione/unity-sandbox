@@ -498,7 +498,14 @@ public static class SandboxBuilder
             subtarget = (int)StandaloneBuildSubtarget.Server,
             options = BuildOptions.None,
         };
-        var report = BuildPipeline.BuildPlayer(opts);
+        // Gameplay code builds materials at runtime (loot orbs, goal paint) via Shader.Find;
+        // the server optimizations strip every shader and those paths throw mid-kill.
+        // Ship the server with the same content as the tested player.
+        bool optimizations = PlayerSettings.dedicatedServerOptimizations;
+        PlayerSettings.dedicatedServerOptimizations = false;
+        UnityEditor.Build.Reporting.BuildReport report;
+        try { report = BuildPipeline.BuildPlayer(opts); }
+        finally { PlayerSettings.dedicatedServerOptimizations = optimizations; }
         Debug.Log($"[SandboxBuilder] DiabloZone server build result: {report.summary.result} " +
                   $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
                   $"{report.summary.totalSize / 1048576} MB");
@@ -1368,6 +1375,29 @@ public static class SandboxBuilder
                   $"{report.summary.totalSize / 1048576} MB");
         if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             throw new System.Exception("DiabloZone Windows build failed; see log.");
+    }
+
+    /// <summary>
+    /// Linux dedicated server (cinderreach-dedicated-server S3) for the container image
+    /// (scripts/publish-server-image.sh), Server subtarget. Its optimizations strip every
+    /// shader, so runtime material code must tolerate Shader.Find returning null (the regular
+    /// Player build segfaults headless in a slim container). -buildOut overrides the path.
+    /// </summary>
+    public static void BuildDiabloZoneLinuxServer()
+    {
+        var opts = new BuildPlayerOptions
+        {
+            scenes = new[] { DiabloZoneScenePath },
+            locationPathName = BuildOutArg() ?? "/home/patrick/unity-sandbox/builds/cinderreach-server/cinderreach-server",
+            target = BuildTarget.StandaloneLinux64,
+            subtarget = (int)StandaloneBuildSubtarget.Server,
+            options = BuildOptions.None,
+        };
+        var report = BuildPipeline.BuildPlayer(opts);
+        Debug.Log($"[SandboxBuilder] DiabloZone server build result: {report.summary.result} " +
+                  $"in {report.summary.totalTime.TotalSeconds:F1}s, {report.summary.totalSize / 1048576} MB");
+        if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
+            throw new System.Exception("DiabloZone server build failed; see log.");
     }
 
     public static void BuildDiabloZoneBuild()

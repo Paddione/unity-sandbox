@@ -83,5 +83,14 @@ public class DedicatedServerTests
         var args = new JoinArgs(JoinArgs.NetMode.Client, null, 0, joinServer: true);
         Assert.AreEqual("Offline (no NetworkManager)", JoinPanel.StatusText(null, args));
     }
-}
 
+    [Test]
+    public void Reachable_NeedsListening_AndAFreshHeartbeatInRelayMode()
+    {
+        Assert.IsFalse(DedicatedServerHost.Reachable(false, false, -1f, 10f));
+        Assert.IsTrue(DedicatedServerHost.Reachable(true, false, -1f, 10f), "direct mode: listening is enough");
+        Assert.IsFalse(DedicatedServerHost.Reachable(true, true, -1f, 10f), "relay mode before publish");
+        Assert.IsTrue(DedicatedServerHost.Reachable(true, true, 100f, 100f + DedicatedServerHost.StaleHeartbeatSeconds));
+        Assert.IsFalse(DedicatedServerHost.Reachable(true, true, 100f, 101f + DedicatedServerHost.StaleHeartbeatSeconds));
+    }
+}
