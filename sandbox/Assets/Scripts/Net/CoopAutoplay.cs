@@ -356,18 +356,20 @@ public sealed class CoopAutoplay : MonoBehaviour
         result.Reach(AutoplayResult.PhaseTown);
 
         yield return LeadFight(hero, god, ActProgress.Town, deadline);
+        if (hero == null || !Connected()) { Log("FAIL lead: lost the server during the Fen fight"); yield break; }
         if (lastLeadHits >= LeadZoneHits) Reach(AutoplayResult.PhaseZone1);
 
         var gate = GameObject.Find(ZoneGate.FenGateName);
         if (gate == null) { Log("FAIL lead: Fen Gate missing"); yield break; }
         float gateBy = Time.realtimeSinceStartup + 120f;
-        while (Time.realtimeSinceStartup < gateBy && Connected()
+        while (Time.realtimeSinceStartup < gateBy && Connected() && hero != null
                && EncounterLayout.CurrentZone(hero.transform.position) != ActProgress.Ossuary)
         {
             Refill(hero, god);
             hero.SetDestination(gate.transform.position);
             yield return null;
         }
+        if (hero == null || !Connected()) { Log("FAIL lead: lost the server on the way to the gate"); yield break; }
         if (EncounterLayout.CurrentZone(hero.transform.position) != ActProgress.Ossuary)
         {
             Log($"FAIL lead: no group travel into the Ossuary, hero at {Fmt(hero.transform.position)}");
@@ -389,7 +391,7 @@ public sealed class CoopAutoplay : MonoBehaviour
         var skills = hero.GetComponent<DiabloSkills>();
         float until = Time.realtimeSinceStartup + LeadZoneSeconds;
         float hardStop = Time.realtimeSinceStartup + 180f;
-        while (Connected() && Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < hardStop
+        while (Connected() && hero != null && Time.realtimeSinceStartup < deadline && Time.realtimeSinceStartup < hardStop
                && (lastLeadHits < LeadZoneHits || Time.realtimeSinceStartup < until))
         {
             Refill(hero, god);

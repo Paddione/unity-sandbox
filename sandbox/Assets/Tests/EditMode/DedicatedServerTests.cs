@@ -1,3 +1,4 @@
+using Unity.Networking.Transport;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -93,4 +94,16 @@ public class DedicatedServerTests
         Assert.IsTrue(DedicatedServerHost.Reachable(true, true, 100f, 100f + DedicatedServerHost.StaleHeartbeatSeconds));
         Assert.IsFalse(DedicatedServerHost.Reachable(true, true, 100f, 101f + DedicatedServerHost.StaleHeartbeatSeconds));
     }
+
+    [Test]
+    public void PacketCeiling_StaysUnderTheOverlayMtu()
+    {
+        // devmesh pods: Flannel WireGuard MTU 1420 minus IPv4 (20) and UDP (8) headers.
+        Assert.LessOrEqual(CompactPacketDriver.MaxPacketBytes, 1420 - 28);
+        var settings = new Unity.Networking.Transport.NetworkSettings(Unity.Collections.Allocator.Temp);
+        CompactPacketDriver.ApplyPacketLimit(ref settings);
+        Assert.AreEqual(CompactPacketDriver.MaxPacketBytes, settings.GetNetworkConfigParameters().maxMessageSize);
+        settings.Dispose();
+    }
 }
+

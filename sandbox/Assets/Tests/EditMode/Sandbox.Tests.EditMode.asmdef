@@ -8,7 +8,9 @@
     "Sandbox.Runtime",
     "Unity.Netcode.Runtime",
     "Unity.InputSystem",
-    "Unity.Services.Multiplayer"
+    "Unity.Services.Multiplayer",
+    "Unity.Networking.Transport",
+    "Unity.Collections"
   ],
   "includePlatforms": [
     "Editor"
