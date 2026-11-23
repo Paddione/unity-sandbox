@@ -190,6 +190,24 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   die WireGuard-MTU 1420 des Clusters verwarf volle UTP-Pakete. Server-Build = Server-Subtarget ohne Shader,
   Laufzeit-Material-Code muss `Shader.Find` = null tolerieren. Belege: `docs/coop-run-log.md` (s1-1 bis s4-prod-1).
 
+### Konten, Namen und Cloud-Held (cinderreach-accounts, 2026-11-23)
+
+- Identität `Net/PlayerAccount`: UGS-Anmeldung mit Auth-Profil statt Cache-Löschen (normal `main` oder `-profile`,
+  Automation/Server Wegwerf-Profil `auto<pid>`). Gäste behalten ihre anonyme Identität. `RelayJoin.EnsureUgsAsync`
+  delegiert hierher.
+- Namen: UGS Player Names, `PlayerNames.Sanitize` (3–16 Zeichen, Leerzeichen → `_`, `#1234` intern),
+  `-player-name` für Läufe. `DiabloNetworkPlayer.playerName` (Server bereinigt, Fallback `Wanderer_<id>`),
+  `Net/HeroNameplates` über allen Netz-Helden (eigener gold, tote gedimmt), Beitritts-/Abgangszeilen. Startbildschirm
+  „Playing as <Name>“ öffnet `Menu/AccountPanel`.
+- Konto: Benutzername + Passwort (Provider im UGS-Projekt aktiv), `SignUpAsync` hängt an einen Gast an (Spieler-ID
+  bleibt), `SignInAsync`, `SignOutAsync` (weiter als neuer Gast), Regeln und Fehlertexte in `AccountRules`.
+- Cloud-Held `Save/CloudHeroSync`: nur angemeldete Konten (nie Gäste, Automation, Server), Cloud-Save-Schlüssel `hero`
+  mit Hülle `{v, savedTicks, owner, save}`, Side-Car `<save>.meta.json`, Upload 2 s nach jedem lokalen Schreiben,
+  Abgleich bei jedem Kontowechsel über `CloudHeroResolver` (Upload/Download/Ask/StartFresh), Dialog „WHICH HERO?“,
+  ersetzte Helden als `.bak`. Quit-Autosave lädt erst beim nächsten Anmelden hoch.
+- Live-Probe `scripts/account-smoke.sh` (Wegwerf-Konto, wird gelöscht), Betrieb im Runbook „Konten, Namen und
+  Cloud-Held“. Nicht-Ziele: Server-Validierung des Cloud-Helden, Passwort-Reset, Freunde, Steam, Konto-Löschung im Spiel.
+
 ### Präsentation
 
 - Welt-Oberflächen (2026-11-23): 16 kachelbare Textursätze aus `docs/world-art/build_zone_textures.py`
@@ -228,7 +246,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ### Spielstand
 
-`SaveService` schreibt `cinderreach-save.json` (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
+`SaveService` schreibt `cinderreach-save.json` (für Konten zusätzlich Cloud Save, siehe oben) (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
 Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 12` (v11: `actTwoBossDefeated`, Migration öffnet die
 Barrens für Kilnmother-Bezwinger; v12: Magic-Items werden Rare), Migrationskette v1 → … → v12 in
 `SaveMigrations` mit Backup `*.vN.bak`. Neuere Versionen werden nicht geladen und bleiben unberührt.
@@ -325,4 +343,4 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-menu-flow-polish` | Ein Startbildschirm, Layout-Fix, Rogue-Art, Pause/Tod/Flow, Boot-Perf-Fix | `722c8cf` |
 | `cinderreach-act-two-opening` | Akt II: Glass Barrens, Shardback/Augur/Elite, The Glasswright, Bracket 4 + 2 Zonen-Uniques, Save v11, Autoplay bis `boss3` | `c89dc40` |
 | `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
-| `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
+| `cinderreach-accounts` | Auth-Profile, Spielernamen + Namensschilder, Konto mit Benutzer/Passwort, Cloud-Held | `02ece6d` |
