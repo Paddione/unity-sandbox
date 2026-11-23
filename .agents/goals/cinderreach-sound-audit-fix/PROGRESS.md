@@ -13,7 +13,7 @@ Prozent: 85 %
 
 ## Nächste Schritte
 
-- Windows-Build bauen und stagen (`SandboxBuilder.BuildDiabloZoneWindows` + `scripts/stage-windows.sh`), Eigner-Hörabnahme je Zone/Cue.
+- Windows-Build gebaut und gestaged: `SandboxBuilder.BuildDiabloZoneWindows` (Commit `5f25105`, 180 MB) per `scripts/stage-windows.sh` nach `C:\Users\PatrickKorczewski\Games\cinderreach` (Beleg `BUILD_INFO.json`, 2026-11-23). Jetzt Eigner-Hörabnahme je Zone/Cue.
 - Nach Hörabnahme: Prozent auf 100 %, Offene Punkte auf `Keine.`, Goal in CINDERREACH.md abschließen.
 
 ## Offene Punkte
