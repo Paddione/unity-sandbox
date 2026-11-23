@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 11;
+    public const int CurrentVersion = 12;
 
     public int v = CurrentVersion;
     public int level = 1;

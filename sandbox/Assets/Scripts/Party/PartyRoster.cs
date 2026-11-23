@@ -258,6 +258,7 @@ public sealed class PartyRoster : MonoBehaviour
         var comp = go.AddComponent<PartyCompanion>();
         comp.classId = cls.id;
         comp.leader = leader;
+        comp.slot = FreeSlot();
         go.AddComponent<PlayerHealth>();
         go.AddComponent<DiabloProgression>(); // class scaling for its kit; XP still flows to "Player" only
         go.AddComponent<DiabloSkills>();
@@ -268,6 +269,39 @@ public sealed class PartyRoster : MonoBehaviour
         if (heroProg != null) go.GetComponent<DiabloProgression>().MirrorHeroProgress(heroProg);
         Debug.Log($"[Party] {cls.displayName} joins the party ({cls.role}).");
         return comp;
+    }
+
+    /// <summary>Lowest formation slot no live companion holds.</summary>
+    int FreeSlot()
+    {
+        for (int s = 0; ; s++)
+        {
+            bool taken = false;
+            foreach (var c in companions)
+                if (c != null && c.slot == s) { taken = true; break; }
+            if (!taken) return s;
+        }
+    }
+
+    /// <summary>
+    /// Zone travel hook (playtest feedback 2026-11-23): when the party leader
+    /// ports through a gate or waypoint, every living companion arrives with
+    /// it on its formation slot instead of walking (or leashing) after it.
+    /// No-op for anyone but the roster's leader.
+    /// </summary>
+    public static int PortWithLeader(GameObject traveller, Vector3 arrival)
+    {
+        var roster = Instance;
+        if (roster == null || traveller == null || roster.leader != traveller.transform) return 0;
+        int ported = 0;
+        foreach (var c in roster.companions)
+        {
+            if (c == null || c.IsDead) continue;
+            c.PortTo(arrival, traveller.transform.rotation);
+            ported++;
+        }
+        if (ported > 0) Debug.Log($"[Party] {ported} companion(s) travel with the leader.");
+        return ported;
     }
 
     /// <summary>Keep AI companions on the protagonist's level (party-team).</summary>

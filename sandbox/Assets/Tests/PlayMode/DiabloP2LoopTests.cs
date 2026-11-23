@@ -108,8 +108,8 @@ public class DiabloP2LoopTests
         }
         Assert.Greater(drops, 1000, "Normal tier must drop often enough to measure.");
         float m = (float)magic / drops, r2 = (float)rare / drops, u = (float)unique / drops;
-        Assert.That(m, Is.InRange(0.70f, 0.90f), $"Magic share {m} off 0.80.");
-        Assert.That(r2, Is.InRange(0.10f, 0.26f), $"Rare share {r2} off 0.18.");
+        Assert.AreEqual(0f, m, "Magic is retired (playtest 2026-11-23).");
+        Assert.That(r2, Is.InRange(0.94f, 1.0f), $"Rare share {r2} off 0.98.");
         Assert.That(u, Is.InRange(0.0f, 0.06f), $"Unique share {u} off 0.02.");
     }
 

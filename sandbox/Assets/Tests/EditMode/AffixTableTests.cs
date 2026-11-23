@@ -286,7 +286,7 @@ public class AffixTableTests
         Assert.AreEqual(100f, m0 + r0 + u0, 0.001f, "mf 0 keeps the pinned 100-sum table");
         LootTable.WeightsWithMagicFind(LootTier.Normal, 100f, out float m1, out float r1, out float u1);
         Assert.AreEqual(m0, m1, 0.001f);
-        Assert.AreEqual(r0 * 1.5f, r1, 0.001f);
+        Assert.AreEqual(r0, r1, 0.001f, "rare is the floor tier and keeps its weight");
         Assert.AreEqual(u0 * 2f, u1, 0.001f);
 
         int Uniques(float mf)

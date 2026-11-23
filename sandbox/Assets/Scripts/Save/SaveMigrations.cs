@@ -53,6 +53,7 @@ public static class SaveMigrations
         if (save.v == 8) V8ToV9(save);
         if (save.v == 9) V9ToV10(save, json);
         if (save.v == 10) V10ToV11(save);
+        if (save.v == 11) V11ToV12(save);
         return Outcome.Migrated;
     }
 
@@ -189,6 +190,16 @@ public static class SaveMigrations
             save.highestUnlockedZone = ActProgress.Barrens;
         save.actTwoBossDefeated = false;
         save.v = 11;
+    }
+
+    /// <summary>
+    /// v11 → v12 (playtest feedback 2026-11-23): Magic items are retired, every
+    /// stored one (gear, bag, stash, shrine reward) becomes Rare with its affixes.
+    /// </summary>
+    static void V11ToV12(SaveGame save)
+    {
+        foreach (var item in StoredItems(save)) ItemDatabase.RetireMagic(item);
+        save.v = 12;
     }
 
     internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)

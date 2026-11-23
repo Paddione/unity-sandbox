@@ -174,6 +174,7 @@ public class DiabloP2ConfigTests
             DroptableDatabase.GetTable(tier, out int chance, out int magic, out int rare, out int unique);
             Assert.AreEqual(100, magic + rare + unique, $"Tier {tier}: weights must sum to 100.");
             Assert.Greater(chance, 0, $"Tier {tier}: drop chance must be positive.");
+            Assert.AreEqual(0, magic, $"Tier {tier}: no blue Magic drops (playtest 2026-11-23).");
         }
     }
 

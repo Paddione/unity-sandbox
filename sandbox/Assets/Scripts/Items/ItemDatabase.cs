@@ -230,6 +230,20 @@ public static class ItemDatabase
         }
     }
 
+    /// <summary>
+    /// Playtest feedback 2026-11-23: the game carries only Rare and Unique
+    /// items. <see cref="ItemRarity.Magic"/> stays in the enum (save and net
+    /// int contract) but is never created; items that still carry it (old
+    /// saves, join reports) are promoted to Rare with their affixes intact.
+    /// True when the item changed.
+    /// </summary>
+    public static bool RetireMagic(ItemInstance item)
+    {
+        if (item == null || item.rarity != ItemRarity.Magic) return false;
+        item.rarity = ItemRarity.Rare;
+        return true;
+    }
+
     /// <summary>Healing potion (S3 vendor consumable, slot Consumable, drunk with key 1).</summary>
     public const int PotionPrice = 10;
 
@@ -242,7 +256,7 @@ public static class ItemDatabase
         return new ItemInstance
         {
             slot = ItemSlot.Consumable,
-            rarity = ItemRarity.Magic,
+            rarity = ItemRarity.Rare,
             baseType = "Healing Potion",
             affixes = new List<Affix>(),
         };
@@ -254,7 +268,7 @@ public static class ItemDatabase
         return new ItemInstance
         {
             slot = ItemSlot.Weapon,
-            rarity = ItemRarity.Magic,
+            rarity = ItemRarity.Rare,
             baseType = StarterSwordBase,
             affixes = new List<Affix> { new Affix("Damage", 2f) },
         };
@@ -266,7 +280,7 @@ public static class ItemDatabase
         return new ItemInstance
         {
             slot = ItemSlot.Weapon,
-            rarity = ItemRarity.Magic,
+            rarity = ItemRarity.Rare,
             baseType = StarterLanternBase,
             affixes = new List<Affix> { new Affix("Damage", 2f) },
         };
@@ -278,7 +292,7 @@ public static class ItemDatabase
         return new ItemInstance
         {
             slot = ItemSlot.Weapon,
-            rarity = ItemRarity.Magic,
+            rarity = ItemRarity.Rare,
             baseType = StarterBowBase,
             affixes = new List<Affix> { new Affix("Damage", 2f) },
         };

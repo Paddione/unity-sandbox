@@ -623,6 +623,7 @@ public static class SandboxBuilder
         KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)
         BarrensBuilder.BuildBarrens(); // act-two-opening S1: Glass Barrens (+600 m X)
         KilnBuilder.BuildWaypoints(); // act-one S5: one shrine per zone
+        ZoneEdgeBuilder.BuildZoneEdges(); // playtest 2026-11-23: annex zones walled, no falling off
 
         // South stairs (entry).
         for (int i = 0; i < 3; i++)
@@ -1208,6 +1209,7 @@ public static class SandboxBuilder
         KilnBuilder.VerifyKiln(scene); // act-one S2: zone 3, locked gate
         BarrensBuilder.VerifyBarrens(scene); // act-two-opening S1: zone 4, sealed gate
         RiskShrineBuilder.VerifyRiskShrine(scene); // risk-shrines S2: solo shrine
+        ZoneEdgeBuilder.VerifyZoneEdges(scene); // playtest 2026-11-23: annex edge walls
         bool player = false, clicker = false, melee = false, equip = false;
         bool inv = false, wallet = false, health = false, ui = false, starterSword = false;
         bool vendor = false, vui = false;

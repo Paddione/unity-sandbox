@@ -52,7 +52,9 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 - Click-to-Move mit isometrischer Kamera (`DiabloClickController`), WASD vorhanden.
 - LMB: ortsfester Kegelschlag, alle Gegner im 120°-Kegel bis 2,2 m (`DiabloMelee.TryConeAttack`),
-  keine Positionsänderung, kein Chase.
+  keine Positionsänderung, kein Chase. Jeder Schlag und Stoß malt seinen echten Kegel auf den Boden
+  (`Vfx/MeleeConeVfx`, gold = Treffer, blass = Fehlschlag, im Schlagtakt), jeder getroffene Gegner bekommt
+  einen Aufprallring (`DiabloJuice.OnEnemyHit`, auch für Skill-Treffer).
 - RMB: Stoß 3,2 m im 25°-Kegel, Cooldown 1,2 s (`TryThrust`), reicht weiter als `EnemyAttack.Range` 2,0 m.
 - Shift halten: Block (`DiabloBlock`), frontal 120°, 50 % Schadensreduktion, 40 % Lauftempo, LMB/RMB
   gesperrt. Frontal geblockte feindliche Projektile kehren um und schädigen Gegner.
@@ -108,7 +110,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 - Level-Up: 1 Attributpunkt (Strength/Vitality/Focus) + 1 Skillpunkt (Rang 1–5, +20 %/Rang),
   `DiabloCharacterUI` (C).
-- Beute: Seltenheiten Normal/Magic/Rare/Unique, `AffixLibrary` mit 14 Affixen in Tier 1/2 (u. a.
+- Beute: nur Rare und Unique (seit 2026-11-23). `ItemRarity.Magic` bleibt als Enum-Wert (Netz-/Save-Vertrag),
+  wird aber nie erzeugt: Magic-Gewicht der Droptabellen ging an Rare (Normal 0/98/2, Elite 0/90/10, Unique-Raten
+  unverändert, Magic Find skaliert nur noch Unique), Händler 5 Rare + 1 Unique, Startwaffen und Heiltrank Rare, `ItemDatabase.RetireMagic` hebt
+  Altbestände (Save v12, Join-Berichte) auf Rare. `AffixLibrary` mit 14 Affixen in Tier 1/2 (u. a.
   Lebensraub ≤ 25 %, Gold Find, Magic Find, Skill-Rang, Cooldown-Reduktion ≤ 40 %, Feuerschaden,
   Dornen), Rare 3–6 Affixe, Vergleichs-Tooltip.
 - Itemlevel aus der Dropquelle (Fen 1, Ossuary 5, Kiln 10, Barrens 15; Elite +1, Boss +2), Roll-Brackets
@@ -129,6 +134,9 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Akt-Kette `ActProgress`: Abbot-Kill öffnet den Kiln, Kilnmother-Kill setzt „Akt I abgeschlossen“
   und öffnet die Glass Barrens (`ActProgress.Barrens = 4`, Tor südlich des Kuppelrings), der
   Glasswright-Kill setzt `ZoneBossDefeated`. Keine Aufträge für Zone 4.
+- Weltränder: jede Zone ist ummauert. Der Fen hat die `MoorEdge_*`-Erdwälle, Ossuary, Kiln und Barrens je vier
+  `ZoneEdge_<Zone>_<Seite>`-Mauern (1,6 m, `ZoneEdgeBuilder`, Zonen-Texturen). Die begehbaren Rechtecke stehen
+  in `Zones/WorldBounds` (SSOT für Builder, Begleiter-Clamp und `WorldEdgeTests`).
 - `ZoneGate`/`ZoneTravel`, Wegpunkt-Schreine in allen Zonen inkl. „Glass Barrens“ (`KilnLayout.Shrines`,
   Index 3 bleibt Kiln) (`DiabloWaypointUI`).
 - `LayoutSeeder`: je 3 Varianten für Fen-Gruppen, Elites, Props, Kiln- und Barrens-Anker, Seed aus `-seed N`
@@ -141,7 +149,9 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 ### Gruppe und Koop
 
 - Solo-KI (`Party/PartyCompanion`, `PartyRoster`) füllt fehlende Rollen auf drei auf, folgt, kämpft,
-  heilt. Koop-Spieler ersetzen die KI ihrer Rolle 1:1 (max. drei Rollen).
+  heilt. Begleiter laufen in Formation hinter dem Anführer (Slots links/rechts/hinten, Aufholen ×1,6 ab 4 m),
+  brechen Kämpfe ab 8 m Abstand zum Anführer ab, bleiben auf dem Zonenboden (`WorldBounds.Clamp`) und reisen
+  bei jedem `ZoneTravel.TeleportHero` des Anführers mit (`PartyRoster.PortWithLeader`). Koop-Spieler ersetzen die KI ihrer Rolle 1:1 (max. drei Rollen).
 - Dreiergruppe (coop-trio, 2026-11-23): Host + zwei Clients spielen Akt I und die Glass Barrens
   komplett durch (`COOP_CLIENTS=2 bash scripts/run-coop-pair.sh`, Host wartet per `-coop-peers 3`).
   Clients buchen die Boss-Kills des Hosts in ihren eigenen Akt-Stand und Save (Abbot → Kindled + Kiln,
@@ -219,8 +229,8 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 ### Spielstand
 
 `SaveService` schreibt `cinderreach-save.json` (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
-Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 11` (v11: `actTwoBossDefeated`, Migration öffnet die
-Barrens für Kilnmother-Bezwinger), Migrationskette v1 → … → v11 in
+Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 12` (v11: `actTwoBossDefeated`, Migration öffnet die
+Barrens für Kilnmother-Bezwinger; v12: Magic-Items werden Rare), Migrationskette v1 → … → v12 in
 `SaveMigrations` mit Backup `*.vN.bak`. Neuere Versionen werden nicht geladen und bleiben unberührt.
 Neue Felder additiv anhängen, eine Migration schreiben und `SaveMigrationTests` auf `CurrentVersion`
 prüfen lassen.

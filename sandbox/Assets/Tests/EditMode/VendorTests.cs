@@ -59,6 +59,17 @@ public class VendorTests
     }
 
     [Test]
+    public void Stock_CarriesOnlyRareAndUnique()
+    {
+        for (int seed = 0; seed < 20; seed++)
+            foreach (var offer in VendorStock.Roll(seed).offers)
+                Assert.AreNotEqual(ItemRarity.Magic, offer.item.rarity, $"Seed {seed}: no blue stock (playtest 2026-11-23).");
+        Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateHealingPotion().rarity);
+        Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateStarterBow().rarity);
+        Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateStarterLantern().rarity);
+    }
+
+    [Test]
     public void Buy_WithoutGold_FailsWithoutSpending()
     {
         var stock = VendorStock.Roll(7);

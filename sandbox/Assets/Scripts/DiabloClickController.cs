@@ -33,6 +33,8 @@ public sealed class DiabloClickController : MonoBehaviour
     float verticalVelocity;
     float lastNetSwing = float.NegativeInfinity;
     float lastNetThrust = float.NegativeInfinity;
+    float lastWhiffCone = float.NegativeInfinity;
+    float lastWhiffThrust = float.NegativeInfinity;
     Vector3 destination;
     bool hasDestination;
     GameObject attackTarget;
@@ -174,13 +176,25 @@ public sealed class DiabloClickController : MonoBehaviour
         var targets = melee != null
             ? DiabloMelee.FindArcTargets(transform, AimDirection, melee.attackRange, DiabloMelee.ArcHalfAngle)
             : new System.Collections.Generic.List<GameObject>();
-        if (targets.Count == 0) return false;
+        float range = melee != null ? melee.attackRange : 0f;
+        if (targets.Count == 0)
+        {
+            // Whiffs still show the reach, paced like real swings (no cone spam).
+            float swingCd = melee != null ? melee.cooldown : 0.5f;
+            if (melee != null && melee.SwingReady && Time.time - lastWhiffCone >= swingCd)
+            {
+                lastWhiffCone = Time.time;
+                MeleeConeVfx.ShowCone(transform.position, AimDirection, range, DiabloMelee.ArcHalfAngle, false);
+            }
+            return false;
+        }
         var nm = NetworkManager.Singleton;
         if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
         {
             float cd = melee != null ? melee.cooldown : 0.5f;
             if (Time.time - lastNetSwing < cd) return false;
             lastNetSwing = Time.time;
+            MeleeConeVfx.ShowCone(transform.position, AimDirection, range, DiabloMelee.ArcHalfAngle, true);
             foreach (var t in targets) netPlayer.Attack(t, melee, transform);
             return true;
         }
@@ -202,12 +216,23 @@ public sealed class DiabloClickController : MonoBehaviour
         DiabloAudio.PlaySwing();
         var targets = DiabloMelee.FindArcTargets(
             transform, AimDirection, DiabloMelee.OutreachRange, DiabloMelee.OutreachHalfAngle);
-        if (targets.Count == 0) return false;
+        if (targets.Count == 0)
+        {
+            if (melee != null && melee.ThrustReady && Time.time - lastWhiffThrust >= DiabloMelee.OutreachCooldown)
+            {
+                lastWhiffThrust = Time.time;
+                MeleeConeVfx.ShowCone(transform.position, AimDirection,
+                    DiabloMelee.OutreachRange, DiabloMelee.OutreachHalfAngle, false);
+            }
+            return false;
+        }
         var nm = NetworkManager.Singleton;
         if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
         {
             if (Time.time - lastNetThrust < DiabloMelee.OutreachCooldown) return false;
             lastNetThrust = Time.time;
+            MeleeConeVfx.ShowCone(transform.position, AimDirection,
+                DiabloMelee.OutreachRange, DiabloMelee.OutreachHalfAngle, true);
             foreach (var t in targets) netPlayer.Attack(t, melee, transform);
             return true;
         }

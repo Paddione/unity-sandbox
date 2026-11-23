@@ -12,7 +12,7 @@ public class DiabloAshenFenTests
     {
         var sword = ItemDatabase.CreateStarterSword();
         Assert.AreEqual(ItemSlot.Weapon, sword.slot);
-        Assert.AreEqual(ItemRarity.Magic, sword.rarity);
+        Assert.AreEqual(ItemRarity.Rare, sword.rarity, "No blue items (playtest 2026-11-23).");
         Assert.AreEqual("Worn Short Sword", sword.baseType);
         Assert.AreEqual(2f, sword.GetAffix("Damage"));
     }
@@ -155,11 +155,11 @@ public class DiabloAshenFenTests
     }
 
     [Test]
-    public void LootWeights_UnchangedByAshenFen()
+    public void LootWeights_NormalTierIsRarePlus()
     {
         LootTable.WeightsFor(LootTier.Normal, out int magic, out int rare, out int unique);
-        Assert.AreEqual(80, magic);
-        Assert.AreEqual(18, rare);
+        Assert.AreEqual(0, magic, "No blue drops (playtest 2026-11-23).");
+        Assert.AreEqual(98, rare);
         Assert.AreEqual(2, unique);
         Assert.AreEqual(70, LootTable.DropChanceFor(LootTier.Normal));
     }

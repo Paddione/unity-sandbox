@@ -311,7 +311,8 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     static ItemInstance SanitizeGearItem(ItemInstance item, ItemSlot slot)
     {
         if (item == null || item.slot != slot) return null;
-        if (!System.Enum.IsDefined(typeof(ItemRarity), item.rarity)) item.rarity = ItemRarity.Magic;
+        if (!System.Enum.IsDefined(typeof(ItemRarity), item.rarity)) item.rarity = ItemRarity.Rare;
+        ItemDatabase.RetireMagic(item);
         if (item.rarity == ItemRarity.Unique)
         {
             // S4 host catalog: known uniques (legacy, build, matrix) pass,

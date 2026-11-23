@@ -14,7 +14,10 @@ public struct LootRoll
 /// <summary>Weighted drop tables per tier, seeded RNG for tests.</summary>
 public static class LootTable
 {
-    // Weights sum to 100 per tier (pinned by DiabloP2ConfigTests).
+    // Weights sum to 100 per tier (pinned by DiabloP2ConfigTests). Playtest
+    // feedback 2026-11-23: no blue (Magic) drops any more; the old Magic share
+    // folded into Rare, Unique odds unchanged. The magic out-param stays 0 so
+    // callers and the Magic Find formula keep their shape.
     public static void WeightsFor(LootTier tier, out int magic, out int rare, out int unique)
     {
         switch (tier)
@@ -25,11 +28,11 @@ public static class LootTable
                 // act-one S4: Kilnmother, Rare+ with a heavier unique roll.
                 magic = 0; rare = 60; unique = 40; return;
             case LootTier.Elite:
-                magic = 50; rare = 40; unique = 10; return;
+                magic = 0; rare = 90; unique = 10; return;
             case LootTier.Chest:
                 magic = 0; rare = 80; unique = 20; return;
             default:
-                magic = 80; rare = 18; unique = 2; return;
+                magic = 0; rare = 98; unique = 2; return;
         }
     }
 
@@ -41,9 +44,10 @@ public static class LootTable
     public static LootRoll Roll(LootTier tier, System.Random rng) => Roll(tier, rng, 0f);
 
     /// <summary>
-    /// Magic Find (replayability S2) scales the rare weight by (1 + mf/200) and
-    /// the unique weight by (1 + mf/100); magic keeps its weight, the pick runs
-    /// over the new total. mf = 0 is exactly the P2 table.
+    /// Magic Find (replayability S2) scales the unique weight by (1 + mf/100);
+    /// rare is the floor since Magic was retired (2026-11-23) and keeps its
+    /// weight, so Magic Find still shifts drops toward Uniques. The pick runs
+    /// over the new total. mf = 0 is exactly the base table.
     /// </summary>
     public static void WeightsWithMagicFind(LootTier tier, float magicFind,
         out float magic, out float rare, out float unique)
@@ -51,7 +55,7 @@ public static class LootTable
         WeightsFor(tier, out int m, out int r, out int u);
         float mf = magicFind > 0f ? magicFind : 0f;
         magic = m;
-        rare = r * (1f + mf / 200f);
+        rare = r;
         unique = u * (1f + mf / 100f);
     }
 

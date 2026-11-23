@@ -123,6 +123,47 @@ public class SoloPartyTests
     }
 
     [UnityTest]
+    public IEnumerator Companions_PortWithLeaderThroughZoneTravel()
+    {
+        RunProfile.ClassId = ClassCatalog.RogueId;
+        var roster = PartyRoster.EnsureSoloParty(leader.transform);
+        yield return null;
+        var arrival = new Vector3(200f, 0.05f, 2f);
+        ZoneTravel.TeleportHero(leader, arrival);
+        foreach (var c in roster.Companions)
+        {
+            var d = c.transform.position - arrival;
+            d.y = 0f;
+            Assert.Less(d.magnitude, 4f, $"{c.name} arrives with the leader (playtest 2026-11-23)");
+        }
+        Assert.AreNotEqual(roster.Companions[0].transform.position, roster.Companions[1].transform.position,
+            "each companion takes its own formation slot");
+    }
+
+    [UnityTest]
+    public IEnumerator Companions_WalkWithTheLeader()
+    {
+        RunProfile.ClassId = ClassCatalog.RogueId;
+        var roster = PartyRoster.EnsureSoloParty(leader.transform);
+        yield return null;
+        // Hero walks 9 m north at hero speed; the party must keep formation, never leash-teleport.
+        float t = 0f;
+        while (t < 1.8f)
+        {
+            leader.transform.position += Vector3.forward * PartyCompanion.MoveSpeed * Time.deltaTime;
+            t += Time.deltaTime;
+            yield return null;
+        }
+        yield return DiabloTestFixture.WaitSeconds(0.8f);
+        foreach (var c in roster.Companions)
+        {
+            var d = c.transform.position - c.FollowPoint;
+            d.y = 0f;
+            Assert.Less(d.magnitude, 1.0f, $"{c.name} walks back into its formation slot");
+        }
+    }
+
+    [UnityTest]
     public IEnumerator Enemies_TargetCompanionsThroughThreat()
     {
         RunProfile.ClassId = ClassCatalog.RogueId;

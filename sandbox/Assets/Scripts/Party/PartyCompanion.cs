@@ -12,14 +12,59 @@ using UnityEngine;
 /// </summary>
 public sealed class PartyCompanion : MonoBehaviour
 {
-    /// <summary>Follow distance to the leader.</summary>
-    public const float FollowRange = 3f;
     /// <summary>Husks near the leader (not the companion) are engaged, so the party stays together.</summary>
     public const float EngageRange = 12f;
     /// <summary>Further than this from the leader, the companion catches up by teleport.</summary>
     public const float LeashRange = 15f;
-    /// <summary>Companion foot speed.</summary>
+    /// <summary>Companion foot speed (the hero's <see cref="DiabloClickController.walkSpeed"/>).</summary>
     public const float MoveSpeed = 5f;
+    /// <summary>Beyond this distance from its formation slot the companion runs to catch up.</summary>
+    public const float CatchUpRange = 4f;
+    /// <summary>Catch-up speed factor, so a trailing companion closes on a walking hero.</summary>
+    public const float CatchUpFactor = 1.6f;
+    /// <summary>Further than this from the leader, the companion breaks off its fight and regroups.</summary>
+    public const float RegroupRange = 8f;
+    /// <summary>Slot arrival tolerance (no jitter around the formation point).</summary>
+    public const float SlotTolerance = 0.35f;
+
+    /// <summary>
+    /// Formation slots behind the leader, in the leader's local frame
+    /// (playtest feedback 2026-11-23: the party walks with the hero).
+    /// </summary>
+    static readonly Vector3[] FormationSlots =
+    {
+        new Vector3(-1.8f, 0f, -1.6f),
+        new Vector3(1.8f, 0f, -1.6f),
+        new Vector3(0f, 0f, -2.8f),
+    };
+
+    /// <summary>Formation slot index (set by <see cref="PartyRoster"/> at spawn).</summary>
+    public int slot;
+
+    /// <summary>World point of formation slot <paramref name="index"/> around a leader pose.</summary>
+    public static Vector3 SlotPosition(Vector3 leaderPos, Quaternion leaderRot, int index)
+    {
+        var flatFwd = leaderRot * Vector3.forward;
+        flatFwd.y = 0f;
+        var rot = flatFwd.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(flatFwd) : Quaternion.identity;
+        var local = FormationSlots[((index % FormationSlots.Length) + FormationSlots.Length) % FormationSlots.Length];
+        return leaderPos + rot * local;
+    }
+
+    /// <summary>This companion's formation point around the current leader.</summary>
+    public Vector3 FollowPoint => leader != null ? SlotPosition(leader.position, leader.rotation, slot) : transform.position;
+
+    /// <summary>
+    /// Zone travel (gate, waypoint, group travel): the companion arrives with
+    /// the leader on its formation slot around the arrival point. Dead
+    /// companions stay at camp; their rejoin lands at the leader anyway.
+    /// </summary>
+    public void PortTo(Vector3 leaderArrival, Quaternion leaderRot)
+    {
+        if (IsDead) return;
+        transform.position = Bounded(SlotPosition(leaderArrival, leaderRot, slot), leaderArrival);
+        transform.rotation = leaderRot;
+    }
     /// <summary>Group heal fires when this many allies (caster included) are hurt.</summary>
     public const int GroupHealNeed = 2;
     /// <summary>Seconds a dead companion waits at camp before rejoining.</summary>
@@ -77,23 +122,38 @@ public sealed class PartyCompanion : MonoBehaviour
         toLeader.y = 0f;
         if (toLeader.magnitude > LeashRange)
         {
-            transform.position = leader.position;
+            transform.position = Bounded(FollowPoint, leader.position);
             transform.rotation = leader.rotation;
             return;
         }
-        var target = NearestHuskNearLeader();
+        // A leader walking away wins over the fight: regroup first.
+        var target = toLeader.magnitude > RegroupRange ? null : NearestHuskNearLeader();
         bool acted = target != null && ActByRole(target);
-        if (!acted && toLeader.magnitude > FollowRange)
+        if (!acted) FollowStep();
+        else if (target != null) Face(target.transform.position);
+    }
+
+    /// <summary>Walk toward the formation slot, running when it trails far behind.</summary>
+    void FollowStep()
+    {
+        var toSlot = FollowPoint - transform.position;
+        toSlot.y = 0f;
+        float dist = toSlot.magnitude;
+        if (dist <= SlotTolerance)
         {
-            var step = toLeader.normalized * Mathf.Min(MoveSpeed * Time.deltaTime, toLeader.magnitude - FollowRange);
-            transform.position += step;
-            if (step.sqrMagnitude > 0.0001f)
-                transform.rotation = Quaternion.LookRotation(new Vector3(step.x, 0f, step.z));
+            // Idle in formation: look where the leader looks.
+            var fwd = leader.forward;
+            fwd.y = 0f;
+            if (fwd.sqrMagnitude > 0.0001f)
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(fwd), 8f * Time.deltaTime);
+            return;
         }
-        else if (target != null)
-        {
-            Face(target.transform.position);
-        }
+        float speed = MoveSpeed * (dist > CatchUpRange ? CatchUpFactor : 1f);
+        var step = toSlot / dist * Mathf.Min(speed * Time.deltaTime, dist);
+        var next = transform.position + step;
+        next.y = leader.position.y;
+        transform.position = Bounded(next, leader.position);
+        transform.rotation = Quaternion.LookRotation(new Vector3(step.x, 0f, step.z));
     }
 
     /// <summary>Nearest living husk within engage range of the leader.</summary>
@@ -162,10 +222,19 @@ public sealed class PartyCompanion : MonoBehaviour
         var next = transform.position + dir * step;
         var fromLeader = next - leader.position;
         fromLeader.y = 0f;
-        if (fromLeader.magnitude > LeashRange) return; // never outrun the party
-        transform.position = next;
+        // Never chase past the regroup line, or fight and regroup would flip-flop.
+        if (fromLeader.magnitude > RegroupRange - 0.5f) return;
+        transform.position = Bounded(next, leader.position);
         Face(target.transform.position);
     }
+
+    /// <summary>
+    /// Companions move without a collider, so they clamp to the zone floor
+    /// (<see cref="WorldBounds"/>) whenever the leader stands on one; a slot
+    /// behind a hero at the wall stays inside the wall.
+    /// </summary>
+    static Vector3 Bounded(Vector3 p, Vector3 leaderPos) =>
+        WorldBounds.IsWalkable(leaderPos, -1f) ? WorldBounds.Clamp(p) : p;
 
     void Face(Vector3 at)
     {

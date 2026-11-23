@@ -967,3 +967,17 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   bis zu 1428 Byte große Pakete.
 - Fix: höchstens 1200 Byte pro Paket, für alle Netzmodi. Danach hielt die Verbindung über die volle Route.
 
+
+## 2026-11-23 — Playtest-Rückmeldungen: Ränder, Nahkampf-Lesbarkeit, Beute, Gruppe
+
+- Ossuary, Kiln und Glass Barrens hatten keine Randmauern, man konnte von der Bodenplatte fallen. Jetzt stehen dort
+  je vier texturierte Mauern (`ZoneEdgeBuilder`, Zonen-Rechtecke in `WorldBounds`). Der Fen hatte schon seine
+  Erdwälle. Ein Test prüft, dass alle Tore, Ankünfte, Schreine und Gegner innerhalb der Mauern liegen.
+- Jeder Schlag malt seinen echten Trefferkegel auf den Boden (`MeleeConeVfx`, gleiche Reichweite und gleicher Winkel
+  wie die Trefferprüfung): gold bei Treffer, blass bei Fehlschlag. Jeder getroffene Gegner bekommt einen Aufprallring.
+- Blaue (Magic) Gegenstände sind raus. Das Magic-Gewicht der Droptabellen ging an Rare, Uniques bleiben gleich
+  selten. Händler, Startwaffen und Heiltrank sind Rare. Save v12 hebt gespeicherte Magic-Items auf Rare.
+  Weiße Gegenstände gab es im Code nie als Stufe.
+- KI-Begleiter laufen in Formation hinter dem Helden, holen mit 1,6-facher Geschwindigkeit auf, brechen Kämpfe
+  ab 8 m Abstand zum Helden ab und reisen bei jedem Tor, Wegpunkt und Gruppensprung sofort mit
+  (`PartyRoster.PortWithLeader`). Vorher folgten sie nur per Leine ab 15 m.

@@ -134,6 +134,7 @@ public sealed class DiabloMelee : MonoBehaviour
         LastStruck = targets[0];
         LastStruckTime = Time.time;
         DiabloAudio.PlayHit();
+        MeleeConeVfx.ShowCone(attacker.position, dir, attackRange, ArcHalfAngle, true);
         Debug.Log($"[Diablo] Melee cone #{Swings} hit {targets.Count}.");
         return targets.Count;
     }
@@ -160,9 +161,16 @@ public sealed class DiabloMelee : MonoBehaviour
         LastStruck = targets[0];
         LastStruckTime = Time.time;
         DiabloAudio.PlayHit();
+        MeleeConeVfx.ShowCone(attacker.position, dir, OutreachRange, OutreachHalfAngle, true);
         Debug.Log($"[Diablo] Melee thrust #{Swings} hit {targets.Count}.");
         return targets.Count;
     }
+
+    /// <summary>True when the LMB swing is off cooldown (whiff cones pace on this).</summary>
+    public bool SwingReady => Time.time - lastSwing >= cooldown;
+
+    /// <summary>True when the RMB thrust is off cooldown.</summary>
+    public bool ThrustReady => Time.time - lastThrust >= OutreachCooldown;
 
     /// <summary>Swing toward a direction; hits every husk in the arc.</summary>
     public bool TryAttackDirection(Transform attacker, Vector3 dir)

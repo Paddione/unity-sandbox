@@ -404,7 +404,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
                 var equipped = new ItemInstance
                 {
                     slot = ItemSlot.Weapon,
-                    rarity = ItemRarity.Magic,
+                    rarity = ItemRarity.Rare,
                     baseType = "ShortSword",
                     itemLevel = 3,
                     affixes = new System.Collections.Generic.List<Affix>
@@ -417,10 +417,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
                 var magic = new ItemInstance
                 {
                     slot = ItemSlot.Armor,
-                    rarity = ItemRarity.Magic,
+                    rarity = ItemRarity.Rare,
                     baseType = "ClothTunic",
                     itemLevel = 3,
-                    affixes = AffixLibrary.RollAffixes(ItemSlot.Armor, ItemRarity.Magic, rng, 1, 3),
+                    affixes = AffixLibrary.RollAffixes(ItemSlot.Armor, ItemRarity.Rare, rng, 1, 3),
                 };
                 var rare = new ItemInstance
                 {

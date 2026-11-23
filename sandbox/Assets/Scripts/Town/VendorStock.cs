@@ -41,8 +41,8 @@ public sealed class VendorStock
     public static int SellPrice(ItemInstance item) => Mathf.Max(1, BuyPrice(item) / 4);
 
     /// <summary>
-    /// Roll the 6-offer assortment for a zone visit: 3 Magic, 2 Rare,
-    /// 1 Unique (slots/bases/affixes from the seed). Same seed, same stock.
+    /// Roll the 6-offer assortment for a zone visit: 5 Rare, 1 Unique
+    /// (no blue Magic stock since the 2026-11-23 playtest feedback) (slots/bases/affixes from the seed). Same seed, same stock.
     /// </summary>
     public static VendorStock Roll(int seed)
     {
@@ -50,7 +50,7 @@ public sealed class VendorStock
         var rng = new System.Random(seed);
         var rarities = new[]
         {
-            ItemRarity.Magic, ItemRarity.Magic, ItemRarity.Magic,
+            ItemRarity.Rare, ItemRarity.Rare, ItemRarity.Rare,
             ItemRarity.Rare, ItemRarity.Rare, ItemRarity.Unique,
         };
         var slots = new[] { ItemSlot.Weapon, ItemSlot.Armor, ItemSlot.Helmet };

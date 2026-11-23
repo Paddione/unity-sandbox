@@ -21,6 +21,7 @@ public class VfxSpawnTests
         EnemyHealth.ResetRun();
         DiabloJuice.ResetRun();
         PresentationVfx.ResetRun();
+        MeleeConeVfx.ResetRun();
         BossController.ResetRun();
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         hero.name = "Player";
@@ -44,6 +45,51 @@ public class VfxSpawnTests
         PresentationVfx.ResetRun();
         BossController.ResetRun();
         RunProfile.Reset();
+    }
+
+    [UnityTest]
+    public IEnumerator MeleeCone_ShowsTheRealReachAndRingsEveryHitHusk()
+    {
+        yield return null;
+        var a = MakeHusk(new Vector3(0.6f, 1.05f, 1.5f));
+        var b = MakeHusk(new Vector3(-0.6f, 1.05f, 1.5f));
+        var melee = hero.GetComponent<DiabloMelee>();
+        Assert.AreEqual(2, melee.TryConeAttack(hero.transform, Vector3.forward));
+        Assert.AreEqual(1, MeleeConeVfx.ConesShown, "a landed swing paints its cone");
+        Assert.IsTrue(MeleeConeVfx.LastConeLanded);
+        Assert.AreEqual(melee.attackRange, MeleeConeVfx.LastConeRange, 0.0001f, "the cone is the hit test's reach");
+        Assert.AreEqual(DiabloMelee.ArcHalfAngle, MeleeConeVfx.LastConeHalfAngle, 0.0001f);
+        Assert.AreEqual(2, MeleeConeVfx.RingsShown, "each struck husk gets an impact ring");
+        Assert.Less(a.HPFraction(), 1f);
+        Assert.Less(b.HPFraction(), 1f);
+        var mesh = MeleeConeVfx.ConeMesh(melee.attackRange, DiabloMelee.ArcHalfAngle);
+        Assert.AreEqual(melee.attackRange, mesh.bounds.max.z, 0.01f, "mesh rim sits on the reach");
+    }
+
+    [UnityTest]
+    public IEnumerator MeleeCone_WhiffShowsPaleConeOncePerSwing()
+    {
+        yield return null;
+        var click = hero.GetComponent<DiabloClickController>();
+        click.SetAimPoint(hero.transform.position + Vector3.forward * 3f);
+        Assert.IsFalse(click.Strike(), "nothing in reach");
+        Assert.AreEqual(1, MeleeConeVfx.ConesShown, "a whiff still shows the reach");
+        Assert.IsFalse(MeleeConeVfx.LastConeLanded);
+        Assert.IsFalse(click.Strike());
+        Assert.AreEqual(1, MeleeConeVfx.ConesShown, "click spam inside the swing cooldown paints no extra cones");
+        click.SetAimPoint(hero.transform.position + Vector3.right * 3f);
+        Assert.IsFalse(click.Thrust());
+        Assert.AreEqual(DiabloMelee.OutreachRange, MeleeConeVfx.LastConeRange, 0.0001f, "thrust shows its own longer reach");
+    }
+
+    static EnemyHealth MakeHusk(Vector3 pos)
+    {
+        var go = new GameObject("ConeHusk");
+        go.tag = "Husk";
+        go.transform.position = pos;
+        var h = go.AddComponent<EnemyHealth>();
+        h.SetTier(30, LootTier.Normal);
+        return h;
     }
 
     [UnityTest]

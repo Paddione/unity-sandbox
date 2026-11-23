@@ -58,6 +58,9 @@ public static class ZoneSurfaceBuilder
         (BarrensBuilder.DunePrefix, "BarrensSand", 10f),
         (BarrensBuilder.SpirePrefix, "BarrensStone", 2.5f),
         ("WaypointShrine_", "Stone", 1.5f),
+        (ZoneEdgeBuilder.Prefix + "Ossuary_", "CryptAshlar", 2.5f),
+        (ZoneEdgeBuilder.Prefix + "Kiln_", "KilnBrick", 3f),
+        (ZoneEdgeBuilder.Prefix + "Barrens_", "BarrensStone", 2.5f),
         (ContractBoard.BoardObjectName, "Planks", 1.5f),
         (SmithStation.SmithObjectName, "CryptAshlar", 2.5f),
     };

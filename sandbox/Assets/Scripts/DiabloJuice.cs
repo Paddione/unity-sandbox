@@ -60,6 +60,7 @@ public static class DiabloJuice
             ShowNumber(head, crit ? $"{amount}!" : amount.ToString(),
                 crit ? DiabloPalette.TrimGold : DiabloPalette.Parchment, crit ? 1.5f : 1f);
         Burst(at + Vector3.up * 1.0f, crit ? 30 : 18, BloodSpray, 3.4f, 0.65f);
+        MeleeConeVfx.ShowHitRing(at); // playtest 2026-11-23: see who got hit
         if (crit)
         {
             Burst(at + Vector3.up * 1.0f, 16, CritSparks, 5f, 0.45f);

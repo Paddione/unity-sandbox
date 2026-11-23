@@ -77,10 +77,29 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsEleven()
+    public void CurrentVersion_IsTwelve()
     {
-        Assert.AreEqual(11, SaveGame.CurrentVersion);
-        Assert.AreEqual(11, new SaveGame().v);
+        Assert.AreEqual(12, SaveGame.CurrentVersion);
+        Assert.AreEqual(12, new SaveGame().v);
+    }
+
+    [Test]
+    public void V11_PromotesEveryStoredMagicItemToRare()
+    {
+        const string json = @"{""v"":11,""level"":5,
+            ""equipmentWeapon"":{""slot"":1,""rarity"":0,""baseType"":""Worn Short Sword"",""affixes"":[{""key"":""Damage"",""value"":2.0}]},
+            ""bag"":[{""slot"":0,""rarity"":0,""baseType"":""ClothTunic""},{""slot"":2,""rarity"":2,""baseType"":""Helm"",""uniqueId"":""seers-circlet""}],
+            ""stash"":[{""slot"":3,""rarity"":0,""baseType"":""Healing Potion""}],
+            ""riskReward"":{""slot"":2,""rarity"":0,""baseType"":""Helm""}}";
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out SaveGame save, out int from));
+        Assert.AreEqual(11, from);
+        Assert.AreEqual(12, save.v);
+        Assert.AreEqual(ItemRarity.Rare, save.equipmentWeapon.rarity);
+        Assert.AreEqual(2f, save.equipmentWeapon.GetAffix("Damage"), "Affixes survive the promotion.");
+        Assert.AreEqual(ItemRarity.Rare, save.bag[0].rarity);
+        Assert.AreEqual(ItemRarity.Unique, save.bag[1].rarity, "Uniques stay Unique.");
+        Assert.AreEqual(ItemRarity.Rare, save.stash[0].rarity);
+        Assert.AreEqual(ItemRarity.Rare, save.riskReward.rarity);
     }
 
     [Test]
@@ -89,7 +108,7 @@ public class SaveMigrationTests
         const string slayerJson = @"{""v"":10,""level"":12,""actOneComplete"":true,""highestUnlockedZone"":3}";
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(slayerJson, out SaveGame slayer, out int from));
         Assert.AreEqual(10, from);
-        Assert.AreEqual(11, slayer.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, slayer.v);
         Assert.AreEqual(ActProgress.Barrens, slayer.highestUnlockedZone);
         Assert.IsFalse(slayer.actTwoBossDefeated);
 
