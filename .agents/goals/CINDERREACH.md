@@ -147,7 +147,9 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Clients buchen die Boss-Kills des Hosts in ihren eigenen Akt-Stand und Save (Abbot → Kindled + Kiln,
   Kilnmother → Akt I + Barrens, Glasswright). Gruppen-Tore verlangen wie solo 0,6 s Verweilzeit und
   senden nach einem Broadcast 2 s lang nicht erneut. Helden blockieren sich nicht gegenseitig
-  (`DiabloNetworkPlayer.IgnoreAllyCollisions`). Beleg `docs/coop-run-log.md`.
+  (`DiabloNetworkPlayer.IgnoreAllyCollisions`). Mitspieler-HP folgen dem Besitzer
+  (`DiabloNetworkPlayer.hpState` → `PlayerHealth.SetMirrored`), Heiler sehen verletzte Mitspieler auf
+  jedem Prozess. Beleg `docs/coop-run-log.md`.
 - NGO-Host-Modell: `-host [-port N]`, `-join ip[:port]`, `-host-relay`, `-join-code` (UGS Multiplayer
   Services 2.5.0, Relay), `JoinPanel` (F7). Host-autoritative Treffer (`Net/HitValidator`),
   Gegner-HP/Phasen/Summons repliziert, Gruppenreise über Tore (`ZoneTravelRelay`), Gold/Vendor/Loot

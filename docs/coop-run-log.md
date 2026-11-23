@@ -98,7 +98,24 @@ Behobene Fehler:
 
 Offen:
 
-- Mitspieler-HP werden nicht repliziert (Gegnerschaden bleibt pro Client, `EnemyAttack.AcquireHero`).
-  Heilziele richten sich nach lokalen Mirror-HP, ein Host-Heiler sieht verletzte Clients nicht verlässlich.
-- Host-Autoplay als Lanternbearer castet keine Heil-Skills (Treiberlücke, `SessionAutoplay.CastProfile`).
+- ~~Mitspieler-HP nicht repliziert~~ und ~~Host-Lanternbearer heilt nie~~: erledigt, siehe HP-Sync unten.
 - Boss-Overlays (`SessionComplete`) erscheinen nur beim Host, Clients sehen keinen Akt-Abschluss-Bildschirm.
+
+## HP-Sync der Mitspieler (coop-hp-sync, 2026-11-23)
+
+Gegnerschaden wird weiter auf jedem Prozess simuliert, maßgeblich sind aber nur die HP des Besitzers.
+`DiabloNetworkPlayer.hpState` (Owner-schreibend, `(current, max)`) wird bei echten Änderungen
+gesendet (`NeedsHpSync`: erste Meldung, > 0,05 HP, Tod oder Volle-HP-Wechsel). Mirrors übernehmen
+den Wert (`PlayerHealth.SetMirrored`), lokale Treffer, Heilungen und Tod/Respawn bleiben auf
+Mirrors wirkungslos. `PlayerHealth.Heal` gibt die (bei Mirrors vorhergesagte) Heilmenge zurück, die
+das Heil-Relay zum Besitzer trägt. Der Besitzer loggt `[Net] heal from <id>: +N → cur/max`.
+Host-Autoplay als Lanternbearer heilt jetzt zuerst (Renewing ab 2 Verletzten, sonst Mending).
+
+| Lauf | Klassen (Host/C1/C2) | Ergebnis | Heilung |
+|---|---|---|---|
+| hp1 | Lanternbearer/Fenwalker/Rogue, Clients sterblich | Host 10/10, C1 8/8, C2 8/8, 0 Exceptions | Host 21 Heals, beim Besitzer angekommen 14 + 11, Client-Tode 0 |
+| hp2 | Fenwalker/Rogue/Lanternbearer, Clients sterblich | Host 10/10, C1 8/8, C2 8/8, 0 Exceptions | Client-Heiler → Rogue 10 Heals angekommen |
+
+Vorher (Lauf 5 oben, gleicher Host-Heiler ohne Sync): `heals=0`, ein Client-Tod.
+Solo-Lanternbearer Seeds 0 und 1: 10/10 (ein erster Seed-1-Lauf lief im Barrens-Budget mit 2 Shardbacks
+aus, die Wiederholung war grün). EditMode 417/417, PlayMode 280/280.

@@ -4,7 +4,10 @@ using UnityEngine;
 /// Hero hit points for the Ashen Fen (campfire heal target). Max tracks
 /// <see cref="Equipment"/> so armor still matters. Husk strikes
 /// (<see cref="EnemyAttack"/>) drain it; at 0 the hero respawns at camp.
-/// Local-only per client, like <see cref="Equipment"/>. Shown by
+/// Owned per client: the owner's hero holds the real HP. In co-op every other
+/// process shows that hero as a network mirror whose HP comes from the owner
+/// (<see cref="SetMirrored"/>, coop-hp-sync); local hits, heals and deaths on a
+/// mirror change nothing there. Shown by
 /// <see cref="DiabloLifeGlobe"/>, which the first hero brings up.
 /// </summary>
 public sealed class PlayerHealth : MonoBehaviour
@@ -23,15 +26,37 @@ public sealed class PlayerHealth : MonoBehaviour
         if (Application.isPlaying) DiabloLifeGlobe.Ensure();
     }
 
-    public float MaxHP => equipment != null ? equipment.GetMaxHP() : Equipment.BaseMaxHP;
+    public float MaxHP => mirrored ? mirrorMax : (equipment != null ? equipment.GetMaxHP() : Equipment.BaseMaxHP);
 
     public float CurrentHP
     {
         get
         {
+            if (mirrored) return Mathf.Clamp(mirrorHP, 0f, mirrorMax);
             if (currentHP < 0f) currentHP = MaxHP;
             return Mathf.Min(currentHP, MaxHP);
         }
+    }
+
+    bool mirrored;
+    float mirrorHP;
+    float mirrorMax;
+
+    /// <summary>coop-hp-sync: this is another player's hero; HP follows its owner.</summary>
+    public bool IsMirror => mirrored;
+
+    /// <summary>
+    /// coop-hp-sync: show the owner's replicated HP on this mirror. Enemies on
+    /// every process still swing at the mirror, but only the owner's own
+    /// simulation decides its HP, so healers, threat and gate checks everywhere
+    /// read the same value. Ignored for a non-positive max (owner not reported yet).
+    /// </summary>
+    public void SetMirrored(float current, float max)
+    {
+        if (max <= 0f) return;
+        mirrored = true;
+        mirrorMax = max;
+        mirrorHP = Mathf.Clamp(current, 0f, max);
     }
 
     /// <summary>
@@ -65,15 +90,23 @@ public sealed class PlayerHealth : MonoBehaviour
         return amount - eaten;
     }
 
-    public void Heal(float amount)
+    /// <summary>
+    /// Heal and return the HP restored. On a mirror nothing changes locally and
+    /// the return is the predicted gain: the heal relay carries it to the owner,
+    /// whose replicated HP then updates the mirror.
+    /// </summary>
+    public float Heal(float amount)
     {
-        if (amount <= 0f) return;
-        currentHP = Mathf.Clamp(CurrentHP + amount, 0f, MaxHP);
+        if (amount <= 0f) return 0f;
+        float before = CurrentHP;
+        float after = Mathf.Clamp(before + amount, 0f, MaxHP);
+        if (!mirrored) currentHP = after;
+        return after - before;
     }
 
     public void TakeDamage(float amount)
     {
-        if (amount <= 0f) return;
+        if (amount <= 0f || mirrored) return;
         amount = AbsorbShield(amount);
         if (amount <= 0f) return;
         currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
@@ -90,7 +123,7 @@ public sealed class PlayerHealth : MonoBehaviour
     /// </summary>
     public void TakeDamage(float amount, Vector3 fromPos)
     {
-        if (amount <= 0f) return;
+        if (amount <= 0f || mirrored) return;
         var block = GetComponent<DiabloBlock>();
         bool blocked = block != null && block.BlocksFrom(fromPos);
         if (blocked)
@@ -143,6 +176,7 @@ public sealed class PlayerHealth : MonoBehaviour
     /// </summary>
     public void DieAndRespawn()
     {
+        if (mirrored) return; // the owner respawns its hero, the transform follows
         var spawn = GameObject.Find("CoopSpawn_0");
         Vector3 pos = spawn != null ? spawn.transform.position : new Vector3(0f, 0.1f, 11f);
         var cc = GetComponent<CharacterController>();

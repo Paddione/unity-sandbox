@@ -793,9 +793,7 @@ public sealed class DiabloSkills : MonoBehaviour
         var target = FindHealTarget(targetHealRange);
         if (!cosmetic && target != null)
         {
-            float before = target.CurrentHP;
-            target.Heal(EffectiveHeal(Skill.MendingLight));
-            restored = target.CurrentHP - before;
+            restored = target.Heal(EffectiveHeal(Skill.MendingLight));
             ThreatTable.BookHeal(transform, restored);
             RelayHeal(target.gameObject, restored, Skill.MendingLight);
             // S4 mercy-shroud: the healed ally keeps a short absorb shield.
@@ -828,9 +826,7 @@ public sealed class DiabloSkills : MonoBehaviour
                 var to = hp.transform.position - transform.position;
                 to.y = 0f;
                 if (to.magnitude > radius) continue;
-                float before = hp.CurrentHP;
-                hp.Heal(amount);
-                float got = hp.CurrentHP - before;
+                float got = hp.Heal(amount);
                 restored += got;
                 if (got > 0f) healed.Add(hp.gameObject);
             }
@@ -842,9 +838,7 @@ public sealed class DiabloSkills : MonoBehaviour
                 var weakest = BuildUniqueEffects.WeakestAlly(transform, radius);
                 if (weakest != null)
                 {
-                    float wb = weakest.CurrentHP;
-                    weakest.Heal(amount);
-                    float bonus = weakest.CurrentHP - wb;
+                    float bonus = weakest.Heal(amount);
                     restored += bonus;
                     ThreatTable.BookHeal(transform, bonus);
                     RelayHeal(weakest.gameObject, bonus, Skill.RenewingCircle);

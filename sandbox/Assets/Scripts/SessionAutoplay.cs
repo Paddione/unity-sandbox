@@ -442,6 +442,10 @@ public sealed class SessionAutoplay : MonoBehaviour
         }
         if (RunProfile.ClassId == ClassCatalog.LanternbearerId)
         {
+            // coop-hp-sync: mend hurt allies first (co-op mirrors show their owner's HP).
+            if (Ready(DiabloSkills.Skill.RenewingCircle) && HurtAllies(skills) >= 2
+                && skills.CastToward(DiabloSkills.Skill.RenewingCircle, toTarget)) return;
+            if (Ready(DiabloSkills.Skill.MendingLight) && skills.CastToward(DiabloSkills.Skill.MendingLight, toTarget)) return;
             if (Ready(DiabloSkills.Skill.Wisps)) { skills.CastToward(DiabloSkills.Skill.Wisps, toTarget); return; }
             int near = 0;
             foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
@@ -468,6 +472,21 @@ public sealed class SessionAutoplay : MonoBehaviour
         }
         if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
         else if (Ready(DiabloSkills.Skill.Arrow)) skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
+    }
+
+    /// <summary>Hurt living allies (not the caster) inside the group-heal radius.</summary>
+    static int HurtAllies(DiabloSkills skills)
+    {
+        int n = 0;
+        foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
+        {
+            if (hp == null || hp.transform == skills.transform || !hp.gameObject.activeInHierarchy) continue;
+            if (hp.CurrentHP <= 0f || hp.CurrentHP >= hp.MaxHP) continue;
+            var d = hp.transform.position - skills.transform.position;
+            d.y = 0f;
+            if (d.magnitude <= skills.groupHealRadius) n++;
+        }
+        return n;
     }
 
     void TickGod(DiabloClickController hero)

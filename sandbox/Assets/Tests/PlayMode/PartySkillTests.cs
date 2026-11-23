@@ -105,6 +105,28 @@ public class PartySkillTests
     }
 
     [UnityTest]
+    public IEnumerator TargetHeal_FindsHurtMirror_ReportsGainWithoutLocalChange()
+    {
+        // coop-hp-sync: another player's hero shows its owner's HP; the healer
+        // sees the hurt mirror, and the predicted gain is what the relay sends.
+        RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        yield return null;
+        var ally = Ally("Mirror", new Vector3(0f, 0.05f, 5f));
+        var allyHp = ally.GetComponent<PlayerHealth>();
+        allyHp.SetMirrored(8f, 20f);
+        allyHp.TakeDamage(5f);
+        Assert.AreEqual(8f, allyHp.CurrentHP, 0.0001f, "local hits never touch a mirror");
+        Assert.AreSame(allyHp, skills.FindHealTarget(skills.targetHealRange));
+        float restored = skills.DoTargetHeal(cosmetic: false);
+        Assert.AreEqual(12f, restored, 0.0001f, "12 heal on 12 missing HP");
+        Assert.AreEqual(8f, allyHp.CurrentHP, 0.0001f, "the owner applies it, the mirror waits for the sync");
+        allyHp.SetMirrored(20f, 20f);
+        Assert.IsNull(skills.FindHealTarget(skills.targetHealRange), "whole again after the owner's update");
+        Object.DestroyImmediate(ally);
+        yield return null;
+    }
+
+    [UnityTest]
     public IEnumerator TargetHeal_BooksThreatOnEngagedEnemies()
     {
         RunProfile.ClassId = ClassCatalog.LanternbearerId;

@@ -18,10 +18,49 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     public readonly NetworkVariable<int> classIndex = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    /// <summary>
+    /// coop-hp-sync: the owner's (current, max) HP. Enemy hits stay simulated
+    /// per process, so only the owner's value is real; mirrors show it
+    /// (<see cref="PlayerHealth.SetMirrored"/>), which lets healers find hurt
+    /// allies and keeps living/dead checks the same on every process.
+    /// </summary>
+    public readonly NetworkVariable<Vector2> hpState = new NetworkVariable<Vector2>(Vector2.zero,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    /// <summary>HP change below this is not re-sent (float noise from regen ticks).</summary>
+    public const float HpSyncEpsilon = 0.05f;
+
+    PlayerHealth ownHealth;
+
+    void Update()
+    {
+        if (!IsSpawned || !IsOwner) return;
+        if (ownHealth == null) ownHealth = GetComponent<PlayerHealth>();
+        if (ownHealth == null) return;
+        var now = new Vector2(ownHealth.CurrentHP, ownHealth.MaxHP);
+        if (NeedsHpSync(hpState.Value, now)) hpState.Value = now;
+    }
+
+    /// <summary>Owner-side send rule (pure): first report, or a change beyond <see cref="HpSyncEpsilon"/>.</summary>
+    public static bool NeedsHpSync(Vector2 sent, Vector2 now) =>
+        sent.y <= 0f || Mathf.Abs(sent.x - now.x) > HpSyncEpsilon || Mathf.Abs(sent.y - now.y) > HpSyncEpsilon
+        || (now.x <= 0f) != (sent.x <= 0f) || (now.x >= now.y) != (sent.x >= sent.y);
+
+    void ApplyMirroredHp(Vector2 v)
+    {
+        var hp = GetComponent<PlayerHealth>();
+        if (hp != null) hp.SetMirrored(v.x, v.y);
+    }
+
     public override void OnNetworkSpawn()
     {
         itemSessionReady = false;
         IgnoreAllyCollisions(gameObject);
+        if (!IsOwner)
+        {
+            hpState.OnValueChanged += (_, now) => ApplyMirroredHp(now);
+            ApplyMirroredHp(hpState.Value);
+        }
         if (IsOwner)
         {
             TakeOverSoloHero(gameObject);
@@ -690,7 +729,11 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         if (!nm.SpawnManager.SpawnedObjects.TryGetValue(targetNetId, out var targetNb)) return;
         var hp = targetNb.GetComponent<PlayerHealth>();
         if (hp == null || hp.CurrentHP <= 0f) return;
-        if (targetNb.IsOwner) hp.Heal(amount);
+        if (targetNb.IsOwner)
+        {
+            float got = hp.Heal(amount);
+            Debug.Log($"[Net] heal from {senderClientId}: +{got:0.#} → {hp.CurrentHP:0.#}/{hp.MaxHP:0.#}.");
+        }
         if (nm.LocalClientId == senderClientId) return; // sender already booked its own threat
         foreach (var kv in nm.SpawnManager.SpawnedObjects)
         {
