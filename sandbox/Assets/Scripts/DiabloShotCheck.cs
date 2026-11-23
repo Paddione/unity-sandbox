@@ -123,6 +123,27 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.15f);
         yield return Shot("death_burst_xp");
 
+        // 5b) Melee readability (playtest 2026-11-23): the swing's real damage
+        // cone with impact rings on two struck spots, then a pale thrust whiff.
+        var heroMelee = hero.GetComponent<DiabloMelee>();
+        float swingRange = heroMelee != null ? heroMelee.attackRange : 2.2f;
+        Face(hero, -camRight);
+        yield return Wait(0.3f);
+        var heroAt = hero.transform.position;
+        MeleeConeVfx.ShowCone(heroAt, -camRight, swingRange, DiabloMelee.ArcHalfAngle, true);
+        MeleeConeVfx.ShowHitRing(heroAt - camRight * 1.5f + camFwd * 0.6f);
+        MeleeConeVfx.ShowHitRing(heroAt - camRight * 1.6f - camFwd * 0.5f);
+        yield return Wait(0.06f);
+        yield return Shot("melee_cone_hit");
+        yield return Wait(0.4f);
+        Face(hero, camRight);
+        yield return Wait(0.2f);
+        MeleeConeVfx.ShowCone(hero.transform.position, camRight,
+            DiabloMelee.OutreachRange, DiabloMelee.OutreachHalfAngle, false);
+        yield return Wait(0.06f);
+        yield return Shot("melee_thrust_whiff");
+        yield return Wait(0.4f);
+
         // 6) Level-up moment (banner at its overshoot, pillar rising).
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog != null)
@@ -221,6 +242,17 @@ public sealed class DiabloShotCheck : MonoBehaviour
         hero.distance = 18f;
         yield return Wait(1.0f);
         yield return Shot("ossuary_arrival");
+
+        // 10b) Edge wall (playtest 2026-11-23): hero near the far Ossuary corner,
+        // the two rim walls in front of the camera, companions in formation.
+        var ossuaryArrival = ossuaryGate.GetComponent<ZoneGate>().destination;
+        TeleportHero(hero, KilnLayout.OssuaryOffset + camFwd * 15f + Vector3.up);
+        Face(hero, camFwd);
+        hero.distance = 14f;
+        yield return Wait(1.2f);
+        yield return Shot("ossuary_edge_wall");
+        TeleportHero(hero, ossuaryArrival);
+        yield return Wait(0.5f);
 
         // 11) Bone Warden at range (S5 RangedCaster, hold band 6-8 m).
         var warden = GameObject.Find("Bone Warden");
@@ -535,6 +567,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
         hero.transform.position = pos;
         if (cc != null) cc.enabled = true;
         hero.SetDestination(pos);
+        PartyRoster.PortWithLeader(hero.gameObject, pos); // companions travel along, like ZoneTravel
     }
 
     static void Face(DiabloClickController hero, Vector3 dir)
