@@ -35,6 +35,9 @@ public static class RunProfile
     /// <summary>Risk-shrine choice (risk-shrines S1, save v8).</summary>
     public static RiskShrineProgress RiskShrine = new RiskShrineProgress();
 
+    /// <summary>Story quest progress (cinderreach-deutsch-story S4, save v13).</summary>
+    public static StoryState Story = new StoryState();
+
     /// <summary>Fresh-run defaults (New Game, headless tests).</summary>
     public static void Reset()
     {
@@ -48,6 +51,7 @@ public static class RunProfile
         KilnLayout.ResetPlaza(); // fair-fights: fresh run re-arms arrival safety
         BarrensLayout.ResetPlaza();
         ContractProgress.Reset();
+        Story = new StoryState();
         SmithingMaterial = 0;
         RiskShrine.Reset();
         KindledRewardPending = false;

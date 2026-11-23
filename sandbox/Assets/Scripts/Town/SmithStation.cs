@@ -37,6 +37,7 @@ public sealed class SmithStation : MonoBehaviour
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
+        if (StoryDirector.TryOpenTalk(hero, StoryIds.Jorin)) return; // story talk first, forge on the next click
         if (heroUI == null) heroUI = hero.AddComponent<DiabloSmithUI>();
         heroUI.SetOpen(true);
         Debug.Log("[Smith] Forge window opened.");

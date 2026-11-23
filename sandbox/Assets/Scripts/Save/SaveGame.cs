@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 12;
+    public const int CurrentVersion = 13;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -65,6 +65,10 @@ public sealed class SaveGame
 
     // v11 (act-two-opening S1): Glass Barrens zone boss; the zone itself rides on highestUnlockedZone.
     public bool actTwoBossDefeated;
+
+    // v13 (cinderreach-deutsch-story S4): story quest state, see StoryState.
+    public List<StoryQuestEntry> storyQuests = new List<StoryQuestEntry>();
+    public List<string> storyFlags = new List<string>();
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

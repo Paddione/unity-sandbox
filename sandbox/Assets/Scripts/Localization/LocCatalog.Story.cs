@@ -1,0 +1,97 @@
+/// <summary>
+/// Story text (cinderreach-deutsch-story S4): NPC names, quest titles,
+/// summaries and objectives, quest-log chrome, toasts and rewards.
+/// Facts and titles follow docs/story-bible.md.
+/// </summary>
+public static partial class LocCatalog
+{
+    static readonly Entry[] Story =
+    {
+        E("npc.ottilie.name", "Ottilie Wachs", "Ottilie Wachs"),
+        E("npc.ilsabe.name", "Ilsabe Krumm", "Ilsabe Krumm"),
+        E("npc.jorin.name", "Jorin Hagedorn", "Jorin Hagedorn"),
+        E("npc.merle.name", "Merle Sandkamp", "Merle Sandkamp"),
+        E("npc.ottilie.role", "Lampenwärterin", "Lantern keeper"),
+        E("npc.ilsabe.role", "Händlerin", "Trader"),
+        E("npc.jorin.role", "Schmied", "Smith"),
+        E("npc.merle.role", "Karrnerin", "Carter"),
+
+        E("story.item.fuhrbrief", "Fuhrbrief", "Cart letter"),
+        E("story.item.lieferbuch", "Ilsabes Lieferbuch", "Ilsabe's ledger"),
+        E("story.item.grabtafel", "Grabtafel", "Grave tablet"),
+        E("story.pickup", "Aufgehoben: {0}", "Picked up: {0}"),
+        E("story.talk", "Sprechen: {0}", "Talk: {0}"),
+
+        E("story.log.title", "FUHRBUCH", "EXPEDITION LOG"),
+        E("story.log.main", "Hauptaufgaben", "Main tasks"),
+        E("story.log.side", "Nebenaufgaben", "Side tasks"),
+        E("story.log.empty", "Noch keine Aufgabe. Sprich mit Ottilie Wachs in der Laternenwacht.", "No task yet. Talk to Ottilie Wachs in Lantern Hold."),
+        E("story.log.act", "Akt {0}", "Act {0}"),
+        E("story.status.done", "erledigt", "done"),
+        E("story.status.ready", "abgabebereit", "ready to hand in"),
+        E("story.quest.new", "Neue Aufgabe: {0}", "New task: {0}"),
+        E("story.quest.ready", "Abgabebereit: {0}", "Ready to hand in: {0}"),
+        E("story.quest.done", "Aufgabe erledigt: {0}", "Task done: {0}"),
+        E("story.tracker.ready", "{0} — bei {1} abgeben", "{0} — hand in to {1}"),
+        E("story.reward.gold", "+{0} Gold", "+{0} gold"),
+        E("story.reward.item", "Erhalten: {0}", "Received: {0}"),
+        E("story.reward.material", "+{0} Material", "+{0} material"),
+        E("story.dialog.continue", "Weiter", "Continue"),
+        E("story.dialog.end", "Schließen", "Close"),
+
+        // ---- Akt I Hauptaufgaben ----
+        E("quest.h1.title", "Die dunkle Tür", "The dark door"),
+        E("quest.h1.summary", "Seit vierzig Tagen kommt kein Totenkarren. Der letzte steckt im Aschenmoor, und eine Laterne ist schon dunkel.", "No death cart for forty days. The last one is stuck in the Ashen Fen, and one lantern is already dark."),
+        E("quest.h1.obj.letter", "Den Fuhrbrief am Totenkarren im Aschenmoor finden", "Find the cart letter on the death cart in the Ashen Fen"),
+        E("quest.h1.obj.brute", "Den Moorschläger am Karren erschlagen", "Slay the Fen Brute at the cart"),
+        E("quest.h2.title", "Die Siegel vom Stillen Grund", "The seals of the Still Ground"),
+        E("quest.h2.summary", "Die Brüder geben keine Toten mehr heraus. Der Abt soll seine Brüder aufgestellt haben.", "The brothers give up no more dead. The abbot is said to have raised his brothers."),
+        E("quest.h2.obj.enter", "Das Versunkene Beinhaus betreten", "Enter the Sunken Ossuary"),
+        E("quest.h2.obj.wardens", "Knochenwächter zerschlagen", "Shatter Bone Wardens"),
+        E("quest.h2.obj.abbot", "Den Hohlen Abt bezwingen", "Defeat the Hollow Abbot"),
+        E("quest.h3.title", "Lest die Namen", "Read the names"),
+        E("quest.h3.summary", "Das Brevier des Abts: Der Ofen hat Namen bestellt, hinter denen kein Todestag steht.", "The abbot's breviary: the kiln ordered names with no date of death behind them."),
+        E("quest.h3.obj.jorin", "Mit Jorin Hagedorn an der Schmiede sprechen", "Talk to Jorin Hagedorn at the smithy"),
+        E("quest.h3.obj.enter", "Den Glutofen betreten", "Enter the Cinder Kiln"),
+        E("quest.h4.title", "Asche schuldet niemand", "Ash owes no one"),
+        E("quest.h4.summary", "Solange der Ofen brennt, hört die Ofenmutter nicht auf. Ihr Rußbuch fällt mit ihr.", "As long as the kiln burns, the Kilnmother will not stop. Her soot book falls with her."),
+        E("quest.h4.obj.kilnmother", "Die Ofenmutter bezwingen", "Defeat the Kilnmother"),
+        E("quest.h5.title", "Siebenundvierzig", "Forty-seven"),
+        E("quest.h5.summary", "Im Rußbuch stehen Spenden aus der Wacht, mit Preis und Siegel. Ilsabe soll es selbst sagen.", "The soot book lists donations from the Hold, with price and seal. Ilsabe shall say it herself."),
+        E("quest.h5.obj.ilsabe", "Mit Ilsabe Krumm an ihrem Stand sprechen", "Talk to Ilsabe Krumm at her stall"),
+
+        // ---- Akt I Nebenaufgaben ----
+        E("quest.n1.title", "Ilsabes Lieferbuch", "Ilsabe's ledger"),
+        E("quest.n1.summary", "Bei der Kiste im Moor liegt ein Lieferbuch in Wachstuch. Ungelesen zurückbringen, sagt sie.", "A ledger in oilcloth lies by the chest in the fen. Bring it back unread, she says."),
+        E("quest.n1.obj.ledger", "Ilsabes Lieferbuch bei der Kiste im Aschenmoor bergen", "Recover Ilsabe's ledger by the chest in the Ashen Fen"),
+        E("quest.n2.title", "Die stillen Brüder", "The still brothers"),
+        E("quest.n2.summary", "An den Sarkophagen hängen Grabtafeln. Ottilie will wissen, wer unten noch steht.", "Grave tablets hang on the sarcophagi. Ottilie wants to know who is still standing below."),
+        E("quest.n2.obj.tablets", "Grabtafeln im Beinhaus lesen", "Read grave tablets in the ossuary"),
+        E("quest.n3.title", "Hagedorns Spitzen", "Hagedorn's points"),
+        E("quest.n3.summary", "Die Aschenlanzer tragen Spitzen aus Jorins Hand. Er will sie zurück, zum Einschmelzen.", "The Ash Lancers carry points from Jorin's hand. He wants them back, to melt down."),
+        E("quest.n3.obj.lancers", "Aschenlanzer im Glutofen erschlagen", "Slay Ash Lancers in the Cinder Kiln"),
+
+        // ---- Akt II Hauptaufgaben ----
+        E("quest.h6.title", "Die letzte Fuhre", "The last cart"),
+        E("quest.h6.summary", "Merle Sandkamp kam mit leerem Karren aus der Glasbrache. Ihr Bruder ist dort geblieben.", "Merle Sandkamp came from the Glass Barrens with an empty cart. Her brother stayed there."),
+        E("quest.h6.obj.enter", "Die Glasbrache betreten", "Enter the Glass Barrens"),
+        E("quest.h7.title", "Scherben lesen", "Reading shards"),
+        E("quest.h7.summary", "Die Dünenseher lesen in Sehgläsern. Was sie sehen, zeigt die Wacht von außen.", "The Dune Augurs read seeing glasses. What they see shows the Hold from outside."),
+        E("quest.h7.obj.augurs", "Dünenseher erschlagen", "Slay Dune Augurs"),
+        E("quest.h8.title", "Nicht loslassen", "Not letting go"),
+        E("quest.h8.summary", "Der Glasmacher schmilzt seit vierzig Jahren, was die Fuhren bringen. Sein Prisma ist noch warm.", "The Glasswright has melted what the carts bring for forty years. His prism is still warm."),
+        E("quest.h8.obj.glasswright", "Den Glasmacher bezwingen", "Defeat the Glasswright"),
+        E("quest.h9.title", "Wessen Licht", "Whose light"),
+        E("quest.h9.summary", "Die Sehgläser zeigen Hüllen, die zum Licht ziehen. Ottilie muss es von euch hören.", "The seeing glasses show husks drawn to the light. Ottilie must hear it from you."),
+        E("quest.h9.obj.merle", "Mit Merle Sandkamp sprechen", "Talk to Merle Sandkamp"),
+        E("quest.h9.obj.ottilie", "Mit Ottilie Wachs sprechen", "Talk to Ottilie Wachs"),
+
+        // ---- Akt II Nebenaufgaben ----
+        E("quest.n4.title", "Tamm", "Tamm"),
+        E("quest.n4.summary", "Merles Bruder trägt seine Karrnermarke noch. Sie will, dass er aufhört.", "Merle's brother still wears his carter's tag. She wants him to stop."),
+        E("quest.n4.obj.tamm", "Einen Glasvogt in der Glasbrache bezwingen", "Defeat a Glass Elite in the Glass Barrens"),
+        E("quest.n5.title", "Was die Seher sahen", "What the augurs saw"),
+        E("quest.n5.summary", "Ilsabe hätte gern zwei Sehgläser. Wer weiß, wann die Hüllen kommen, weiß, wann die nächste Abgabe fällig ist.", "Ilsabe would like two seeing glasses. Who knows when the husks come knows when the next levy is due."),
+        E("quest.n5.obj.augurs", "Dünenseher in der Glasbrache erschlagen", "Slay Dune Augurs in the Glass Barrens"),
+    };
+}

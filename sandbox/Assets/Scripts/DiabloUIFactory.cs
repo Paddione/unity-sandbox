@@ -58,6 +58,7 @@ public static class DiabloUIFactory
         if (DiabloClickController.ExternalDrive) return true;
         if (ClassSelectUI.AnyOpen) return true;
         if (PauseMenuUI.AnyOpen) return true;
+        if (StoryDialogUI.AnyOpen) return true;
         if (hero == null) hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         if (hero != null)
         {
@@ -65,6 +66,8 @@ public static class DiabloUIFactory
             if (inv != null && inv.IsOpen) return true;
             var ch = hero.GetComponent<DiabloCharacterUI>();
             if (ch != null && ch.IsOpen) return true;
+            var log = hero.GetComponent<StoryQuestUI>();
+            if (log != null && log.IsOpen) return true;
             var ven = hero.GetComponent<DiabloVendorUI>();
             if (ven != null && ven.IsOpen) return true;
             var st = hero.GetComponent<DiabloStashUI>();
@@ -109,6 +112,10 @@ public static class DiabloUIFactory
         if (st != null && st != except && st.IsOpen) st.SetOpen(false);
         var wp = hero.GetComponent<DiabloWaypointUI>();
         if (wp != null && wp != except && wp.IsOpen) wp.SetOpen(false);
+        var log = hero.GetComponent<StoryQuestUI>();
+        if (log != null && log != except && log.IsOpen) log.SetOpen(false);
+        var dlg = hero.GetComponent<StoryDialogUI>();
+        if (dlg != null && dlg != except && dlg.IsOpen) dlg.SetOpen(false);
     }
 
     public static LayoutElement SetLayout(GameObject go, float prefH = -1f, float prefW = -1f, float flexW = -1f, float flexH = -1f)

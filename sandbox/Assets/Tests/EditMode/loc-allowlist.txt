@@ -234,3 +234,12 @@ SessionComplete.cs	Best Relic
 Progression/DiabloCharacterUI.cs	STR
 Progression/DiabloCharacterUI.cs	VIT
 Progression/DiabloCharacterUI.cs	FOC
+Story/StoryDirector.cs	Seer's Circlet
+Story/StoryModel.cs	Ash Lancer
+Story/StoryModel.cs	Bone Warden
+Story/StoryModel.cs	Cinder Thrall
+Story/StoryModel.cs	Dune Augur
+Story/StoryModel.cs	Fen Brute
+Story/StoryModel.cs	Glass Elite
+Story/StoryModel.cs	Hollow Abbot
+Story/StoryModel.cs	Kiln Summon

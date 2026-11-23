@@ -24,6 +24,7 @@ public static partial class LocCatalog
     {
         yield return Names;
         yield return Dialog;
+        yield return Story;
         yield return Session;
         yield return Shrine;
         yield return Waypoint;

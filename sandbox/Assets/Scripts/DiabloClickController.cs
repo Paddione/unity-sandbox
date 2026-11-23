@@ -62,6 +62,8 @@ public sealed class DiabloClickController : MonoBehaviour
         if (GetComponent<DiabloProgression>() == null) gameObject.AddComponent<DiabloProgression>();
         // S4 character sheet rides along too (runtime-built UI, C to open).
         if (GetComponent<DiabloCharacterUI>() == null) gameObject.AddComponent<DiabloCharacterUI>();
+        // cinderreach-deutsch-story S4: story director, dialog and expedition log (J).
+        if (GetComponent<StoryDirector>() == null) gameObject.AddComponent<StoryDirector>();
         // P2 zone scenes run netcode: the solo hero would double-drive clicks
         // and fight the network player over the camera. Yield in that case.
         if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))

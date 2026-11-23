@@ -618,6 +618,8 @@ public static class SandboxBuilder
         TownBuilder.SpawnStashChest();
         TownBuilder.SpawnContractBoard();
         TownBuilder.SpawnSmithStation();
+        TownBuilder.SpawnStoryNpcs();
+        TownBuilder.SpawnStoryPickups();
         RiskShrineBuilder.BuildRiskShrine(); // risk-shrines S2: solo shrine on a free fen anchor
         OssuaryBuilder.BuildOssuary(); // S5: Sunken Ossuary annex (+200 m X)
         KilnBuilder.BuildKiln(); // act-one S2: Cinder Kiln (+400 m X)

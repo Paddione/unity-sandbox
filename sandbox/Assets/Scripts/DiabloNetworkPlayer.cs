@@ -453,6 +453,29 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         SaveLocalHero();
     }
 
+    /// <summary>cinderreach-deutsch-story S4: host broadcasts its story snapshot; clients max-merge it into their own save.</summary>
+    public void BroadcastStory(string snapshot)
+    {
+        if (!IsServer || !IsSpawned) return;
+        NotifyStoryClientRpc(snapshot ?? "");
+    }
+
+    [ClientRpc]
+    void NotifyStoryClientRpc(string snapshot)
+    {
+        if (IsServer) return; // the host books its own talks and kills directly
+        bool moved = RunProfile.Story.Merge(snapshot);
+        if (moved) { RunProfile.Story.Refresh(RunProfile.Act); SaveLocalHero(); }
+    }
+
+    /// <summary>Client asks the host to book a finished story talk (host state counts).</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitStoryTalkServerRpc(string npc, ServerRpcParams rpcParams = default)
+    {
+        StoryDirector.BookTalkLocal(npc);
+        BroadcastStory(RunProfile.Story.Snapshot());
+    }
+
     static void SaveLocalHero()
     {
         var nm = NetworkManager.Singleton;

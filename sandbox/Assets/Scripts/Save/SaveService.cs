@@ -140,6 +140,8 @@ public static class SaveService
             kindledRewardPending = RunProfile.KindledRewardPending,
             kindledRewardClass = RunProfile.KindledRewardClass ?? "",
             kindledRewardGranted = RunProfile.KindledRewardGranted,
+            storyQuests = RunProfile.Story.ToSave(),
+            storyFlags = new System.Collections.Generic.List<string>(RunProfile.Story.Flags),
         };
         ContractProgress.ToSnapshot(save.contract);
         if (hero == null) return save;
@@ -212,6 +214,9 @@ public static class SaveService
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.actTwoBossDefeated, save.waypoints);
+        RunProfile.Story = StoryState.FromSave(save.storyQuests, save.storyFlags);
+        RunProfile.Story.Refresh(RunProfile.Act);
+        RunProfile.Story.TakeChanges();
         ContractProgress.FromSnapshot(save.contract);
         RunProfile.SmithingMaterial = System.Math.Max(0, save.smithingMaterial);
         ApplyVariants(save);

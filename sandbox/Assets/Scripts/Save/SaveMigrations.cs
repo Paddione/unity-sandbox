@@ -54,6 +54,7 @@ public static class SaveMigrations
         if (save.v == 9) V9ToV10(save, json);
         if (save.v == 10) V10ToV11(save);
         if (save.v == 11) V11ToV12(save);
+        if (save.v == 12) V12ToV13(save);
         return Outcome.Migrated;
     }
 
@@ -200,6 +201,17 @@ public static class SaveMigrations
     {
         foreach (var item in StoredItems(save)) ItemDatabase.RetireMagic(item);
         save.v = 12;
+    }
+
+    /// <summary>
+    /// v12 → v13 (cinderreach-deutsch-story S4): no story progress yet; the
+    /// act state already in the save drives StoryState catch-up on first load.
+    /// </summary>
+    static void V12ToV13(SaveGame save)
+    {
+        if (save.storyQuests == null) save.storyQuests = new System.Collections.Generic.List<StoryQuestEntry>();
+        if (save.storyFlags == null) save.storyFlags = new System.Collections.Generic.List<string>();
+        save.v = 13;
     }
 
     internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)

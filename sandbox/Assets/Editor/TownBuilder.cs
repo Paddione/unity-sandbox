@@ -101,7 +101,65 @@ public static class TownBuilder
         col.radius = 0.4f;
         col.center = new Vector3(0f, 0.9f, 0f);
         vendor.AddComponent<Vendor>().zoneSeed = 7;
+        var npc = vendor.AddComponent<StoryNpc>();
+        npc.npcId = StoryIds.Ilsabe;
+        npc.shopNpc = true;
         WireVendorIdle(vendor);
+    }
+
+    /// <summary>
+    /// cinderreach-deutsch-story S5: Ottilie Wachs by the campfire; Merle
+    /// Sandkamp at the north gate (visible only once Act I is done, see
+    /// <see cref="StoryNpc"/>).
+    /// </summary>
+    public static void SpawnStoryNpcs()
+    {
+        SpawnStoryNpc("Mage.fbx", StoryIds.Ottilie, new Vector3(1.5f, 0f, 14.5f), false);
+        SpawnStoryNpc("Rogue.fbx", StoryIds.Merle, new Vector3(-2f, 0f, 16f), false);
+    }
+
+    static void SpawnStoryNpc(string model, string npcId, Vector3 pos, bool shop)
+    {
+        var prefab = LoadModel("Adventurers/Characters/" + model);
+        var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        go.name = "StoryNpc_" + npcId;
+        go.transform.position = pos;
+        var col = go.AddComponent<CapsuleCollider>();
+        col.height = 1.8f;
+        col.radius = 0.4f;
+        col.center = new Vector3(0f, 0.9f, 0f);
+        var npc = go.AddComponent<StoryNpc>();
+        npc.npcId = npcId;
+        npc.shopNpc = shop;
+        WireVendorIdle(go);
+    }
+
+    /// <summary>
+    /// cinderreach-deutsch-story S5: story finds — cart letter and ledger by
+    /// the fen chest, three grave tablets on the ossuary sarcophagi.
+    /// </summary>
+    public static void SpawnStoryPickups()
+    {
+        SpawnStoryPickup(StoryIds.Fuhrbrief, new Vector3(-10.6f, 0.5f, 1.6f), 0);
+        SpawnStoryPickup(StoryIds.Lieferbuch, new Vector3(-13.4f, 0.5f, -1.6f), 0);
+        var o = KilnLayout.OssuaryOffset;
+        SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(-6.8f, 0.7f, -6f), 0);
+        SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(9.2f, 0.7f, -3f), 1);
+        SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(-6.8f, 0.7f, 0f), 2);
+    }
+
+    static void SpawnStoryPickup(string itemId, Vector3 pos, int index)
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = $"StoryPickup_{itemId}_{index}";
+        go.transform.position = pos;
+        go.transform.localScale = new Vector3(0.45f, 0.12f, 0.6f);
+        go.transform.rotation = Quaternion.Euler(0f, 25f, 0f);
+        Paint(go, new Color(0.85f, 0.68f, 0.30f));
+        var col = go.GetComponent<BoxCollider>();
+        col.isTrigger = true;
+        col.size = new Vector3(2.4f, 2f, 2.4f);
+        go.AddComponent<StoryPickup>().itemId = itemId;
     }
 
     /// <summary>
@@ -151,6 +209,9 @@ public static class TownBuilder
         var col = post.GetComponent<BoxCollider>();
         col.isTrigger = false;
         post.AddComponent<SmithStation>();
+        var npc = post.AddComponent<StoryNpc>();
+        npc.npcId = StoryIds.Jorin;
+        npc.shopNpc = true;
     }
 
     /// <summary>Idle-only Mecanim rig (shared controller, built once per session).</summary>

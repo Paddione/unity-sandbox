@@ -183,6 +183,7 @@ public sealed class EnemyHealth : NetworkBehaviour
         DiabloAudio.PlayDeath();
         DiabloJuice.OnEnemyDeath(transform.position);
         DiabloProgression.AwardKill(tier, transform.position);
+        StoryDirector.BookKill(gameObject.name);
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();
         // Bosses must bookkeep on death, not on the next Update poll: the

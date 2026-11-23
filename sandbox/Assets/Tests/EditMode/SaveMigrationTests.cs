@@ -77,10 +77,22 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsTwelve()
+    public void CurrentVersion_IsThirteen()
     {
-        Assert.AreEqual(12, SaveGame.CurrentVersion);
-        Assert.AreEqual(12, new SaveGame().v);
+        Assert.AreEqual(13, SaveGame.CurrentVersion);
+        Assert.AreEqual(13, new SaveGame().v);
+    }
+
+    [Test]
+    public void V12_GetsEmptyStoryState()
+    {
+        const string json = @"{""v"":12,""level"":5,""gold"":40}";
+        var outcome = SaveMigrations.Migrate(json, out var save, out _);
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
+        Assert.AreEqual(13, save.v);
+        Assert.IsNotNull(save.storyQuests);
+        Assert.IsEmpty(save.storyQuests);
+        Assert.IsNotNull(save.storyFlags);
     }
 
     [Test]
@@ -93,7 +105,7 @@ public class SaveMigrationTests
             ""riskReward"":{""slot"":2,""rarity"":0,""baseType"":""Helm""}}";
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out SaveGame save, out int from));
         Assert.AreEqual(11, from);
-        Assert.AreEqual(12, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v, "v11 lifts through v12 to current");
         Assert.AreEqual(ItemRarity.Rare, save.equipmentWeapon.rarity);
         Assert.AreEqual(2f, save.equipmentWeapon.GetAffix("Damage"), "Affixes survive the promotion.");
         Assert.AreEqual(ItemRarity.Rare, save.bag[0].rarity);
