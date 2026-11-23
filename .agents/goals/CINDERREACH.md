@@ -157,6 +157,28 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   vollständigem Item-Snapshot. Jeder Client speichert seinen eigenen Charakter, Join meldet Level und
   Gear (`SanitizeJoinReport`).
 - Broadcasts laufen über das Player-Objekt: dynamisch gespawnte Relay-Objekte replizieren nicht.
+- Dedizierter Server (cinderreach-dedicated-server, 2026-11-23): `-server` startet NGO ohne eigenen Helden
+  (`Net/DedicatedServer`, `DedicatedServerHost`): Solo-Held abgestellt, Leader = lebender Spieler mit kleinster
+  ClientId (Gruppenreise), Broadcasts über ein beliebiges Spielerobjekt, kein Speichern, keine KI-Begleiter,
+  60-fps-Deckel, Exit 0 nach 20 s Leere (Neustart = frischer Run). `-server-relay` veröffentlicht über Relay +
+  Lobby (`Net/ServerDirectory`, Lobby „Cinderreach Server“ mit Join-Code, Heartbeat 15 s), Clients treten per
+  „Join Server“ (Startbildschirm, F7-Panel) oder `-join-server` ohne Code bei, Fehlschlag spielt solo weiter.
+  `-server-name` trennt Testläufe. Betrieb: Pod `workspace/cinderreach-server` im devmesh (dotfiles
+  `apps/cinderreach-server/k8s`, Flux `ks-cinderreach-server` in Bachelorprojekt), Image per
+  `scripts/publish-server-image.sh`, Ablauf in `docs/runbook.md`. Paketlimit 1200 Byte (`CompactPacketDriver`):
+  die WireGuard-MTU 1420 des Clusters verwarf volle UTP-Pakete. Server-Build = Server-Subtarget ohne Shader,
+  Laufzeit-Material-Code muss `Shader.Find` = null tolerieren. Belege: `docs/coop-run-log.md` (s1-1 bis s4-prod-1).
+- Dedizierter Server (cinderreach-dedicated-server, 2026-11-23): `-server` startet NGO ohne eigenen Helden
+  (`Net/DedicatedServer`, `DedicatedServerHost`): Solo-Held abgestellt, Leader = lebender Spieler mit kleinster
+  ClientId (Gruppenreise), Broadcasts über ein beliebiges Spielerobjekt, kein Speichern, keine KI-Begleiter,
+  60-fps-Deckel, Exit 0 nach 20 s Leere (Neustart = frischer Run). `-server-relay` veröffentlicht über Relay +
+  Lobby (`Net/ServerDirectory`, Lobby „Cinderreach Server“ mit Join-Code, Heartbeat 15 s), Clients treten per
+  „Join Server“ (Startbildschirm, F7-Panel) oder `-join-server` ohne Code bei, Fehlschlag spielt solo weiter.
+  `-server-name` trennt Testläufe. Betrieb: Pod `workspace/cinderreach-server` im devmesh (dotfiles
+  `apps/cinderreach-server/k8s`, Flux `ks-cinderreach-server` in Bachelorprojekt), Image per
+  `scripts/publish-server-image.sh`, Ablauf in `docs/runbook.md`. Paketlimit 1200 Byte (`CompactPacketDriver`):
+  die WireGuard-MTU 1420 des Clusters verwarf volle UTP-Pakete. Server-Build = Server-Subtarget ohne Shader,
+  Laufzeit-Material-Code muss `Shader.Find` = null tolerieren. Belege: `docs/coop-run-log.md` (s1-1 bis s4-prod-1).
 
 ### Präsentation
 
@@ -292,3 +314,5 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-presentation` | Licht, Audio, VFX, Menü, 60 FPS | `6325e7d` |
 | `cinderreach-menu-flow-polish` | Ein Startbildschirm, Layout-Fix, Rogue-Art, Pause/Tod/Flow, Boot-Perf-Fix | `722c8cf` |
 | `cinderreach-act-two-opening` | Akt II: Glass Barrens, Shardback/Augur/Elite, The Glasswright, Bracket 4 + 2 Zonen-Uniques, Save v11, Autoplay bis `boss3` | `c89dc40` |
+| `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
+| `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
