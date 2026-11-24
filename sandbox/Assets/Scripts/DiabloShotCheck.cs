@@ -683,6 +683,23 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.8f);
         LogBones(hero, "loco_stop_settled");
         yield return Shot("loco_stop_settled");
+
+        // A/B: the same forward run with the twist component off, then on again.
+        var twist = hero.GetComponent<LocomotionTwist>();
+        foreach (bool on in new[] { false, true })
+        {
+            if (twist != null) twist.enabled = on;
+            Face(hero, camRight);
+            hero.SetMoveInput(camRight);
+            for (int i = 0; i < 4; i++)
+            {
+                Face(hero, camRight);
+                yield return Wait(i == 0 ? 0.6f : 0.12f);
+                LogBones(hero, $"loco_ab_twist{(on ? "On" : "Off")}_{i}");
+            }
+            hero.SetMoveInput(Vector3.zero);
+            yield return Wait(0.6f);
+        }
         hero.distance = 11f;
         hero.pitch = 55f;
     }
@@ -710,7 +727,35 @@ public sealed class DiabloShotCheck : MonoBehaviour
         Log($"bones {tag}: state={state} t={nt:F2} speed={(anim != null ? anim.GetFloat(LocomotionTwist.MoveSpeedParam) : 0f):F1} " +
             $"twist={(twist != null ? twist.Twist : 0f):F0} back={(twist != null && twist.Backpedaling)} " +
             $"vel={(twist != null ? twist.Velocity.magnitude : 0f):F1} hips={H("hips")} " +
-            $"footL={H("foot.l")} footR={H("foot.r")} lowL={H("lowerleg.l")} lowR={H("lowerleg.r")}");
+            $"footL={H("foot.l")} footR={H("foot.r")} lowL={H("lowerleg.l")} lowR={H("lowerleg.r")} " +
+            $"upL={E(hero, "upperleg.l")} hipsRot={E(hero, "hips")} animOn={(anim != null && anim.isActiveAndEnabled)} " +
+            $"cull={(anim != null ? anim.cullingMode.ToString() : "-")} avatar={(anim != null && anim.avatar != null)} " +
+            $"vis={Visible(hero)} hipsPath={BonePath(FindBone(hero.transform, "hips"), hero.transform)}");
+    }
+
+    static string E(DiabloClickController hero, string bone)
+    {
+        var b = FindBone(hero.transform, bone);
+        return b == null ? "-" : b.localEulerAngles.ToString("F0");
+    }
+
+    static string Visible(DiabloClickController hero)
+    {
+        int vis = 0, all = 0;
+        foreach (var r in hero.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            all++;
+            if (r.enabled && r.isVisible) vis++;
+        }
+        return $"{vis}/{all}";
+    }
+
+    static string BonePath(Transform t, Transform root)
+    {
+        if (t == null) return "-";
+        string s = t.name;
+        while (t.parent != null && t.parent != root) { t = t.parent; s = t.name + "/" + s; }
+        return s;
     }
 
     static Transform FindBone(Transform t, string name)
