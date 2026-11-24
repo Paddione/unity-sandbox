@@ -23,7 +23,7 @@ public static partial class LocCatalog
         E("inv.title", "AUSRÜSTUNG UND TASCHE", "CINDERREACH INVENTORY"),
         E("inv.notice.nodrop", "{0} kann hier nicht abgelegt werden.", "Cannot drop {0} here."),
         E("inv.notice.noequip", "Dieser Gegenstand lässt sich nicht anlegen.", "Cannot equip that item."),
-        E("inv.controls", "Steuerung: WASD Laufen  •  LMT Schlagen/Laufen  •  Q/E/R/Leertaste Fertigkeiten  •  1 Heiltrank  •  I/B Tasche  •  C Figur  •  J Fuhrbuch  •  Alt Beutenamen  •  Esc Pause", "Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  1 Potion  •  I/B Inventory  •  C Character  •  Alt Loot names  •  Esc Pause"),
+        E("inv.controls", "Steuerung: WASD Laufen  •  LMT Schlagen/Laufen  •  Q/E/R/Leertaste Fertigkeiten  •  T Benutzen  •  1 Heiltrank  •  I/B Tasche  •  C Figur  •  J Fuhrbuch  •  Alt Beutenamen  •  Esc Pause", "Controls: WASD Move  •  LMB Strike/Move  •  Q/E/R/Space Skills  •  T Use  •  1 Potion  •  I/B Inventory  •  C Character  •  Alt Loot names  •  Esc Pause"),
         E("inv.stats.dmg", "SCH <color={0}>{1:0.#}</color>   •   ", "DMG <color={0}>{1:0.#}</color>   •   "),
         E("inv.notice.discardrejected", "Wegwerfen abgelehnt: {0}.", "Discard rejected: {0}."),
         E("inv.btn.discard", "Auswahl wegwerfen", "Discard selected"),

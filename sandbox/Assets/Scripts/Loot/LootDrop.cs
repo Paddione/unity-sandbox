@@ -7,7 +7,7 @@ using Unity.Netcode;
 /// the goal pad). Solo/host applies the equip directly; a client forwards it
 /// to the server via <see cref="LootNetRelay"/> (host is source of truth).
 /// </summary>
-public sealed class LootDrop : MonoBehaviour
+public sealed class LootDrop : MonoBehaviour, IUsable
 {
     public ItemInstance item;
     public bool isChest;
@@ -15,9 +15,28 @@ public sealed class LootDrop : MonoBehaviour
     /// <summary>Drops in the world (ground labels read this instead of scanning the scene).</summary>
     public static readonly System.Collections.Generic.List<LootDrop> Live = new System.Collections.Generic.List<LootDrop>();
 
-    void OnEnable() { if (!Live.Contains(this)) Live.Add(this); }
+    void OnEnable()
+    {
+        if (!Live.Contains(this)) Live.Add(this);
+        if (isChest) Usables.Register(this);
+    }
 
-    void OnDisable() => Live.Remove(this);
+    void OnDisable()
+    {
+        Live.Remove(this);
+        Usables.Unregister(this);
+    }
+
+    /// <summary>Use key: chests open like walking into them; item orbs stay walk-over.</summary>
+    public float UseRadius => 2.5f;
+    public string UseLabel => isChest && !collected ? Loc.T("use.chest") : null;
+
+    public void Use(GameObject hero)
+    {
+        if (!isChest || collected) return;
+        var col = hero != null ? hero.GetComponent<Collider>() : null;
+        if (col != null) OnTriggerEnter(col);
+    }
     public bool collected;
 
     /// <summary>Roll the tier table and spawn loot; null when nothing drops.</summary>

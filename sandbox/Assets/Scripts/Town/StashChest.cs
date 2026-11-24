@@ -7,7 +7,7 @@ using UnityEngine;
 /// <see cref="RunProfile.Stash"/> (40 slots, persisted in save v2).
 /// Item moves are pure statics so tests need no scene.
 /// </summary>
-public sealed class StashChest : MonoBehaviour
+public sealed class StashChest : MonoBehaviour, IUsable
 {
     public const float InteractRadius = 3.5f;
     /// <summary>Scene object name (pinned by VerifyDiabloZone).</summary>
@@ -53,6 +53,18 @@ public sealed class StashChest : MonoBehaviour
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
+        Use(hero);
+    }
+
+    public float UseRadius => InteractRadius;
+    public string UseLabel => Loc.T("use.stash");
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
+        var heroUI = hero.GetComponent<DiabloStashUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloStashUI>();
         heroUI.SetOpen(true);
         Debug.Log("[Stash] Chest opened.");

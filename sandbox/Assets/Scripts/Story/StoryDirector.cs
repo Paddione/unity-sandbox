@@ -28,6 +28,7 @@ public sealed class StoryDirector : MonoBehaviour
     {
         if (GetComponent<StoryDialogUI>() == null) gameObject.AddComponent<StoryDialogUI>();
         if (GetComponent<StoryQuestUI>() == null) gameObject.AddComponent<StoryQuestUI>();
+        if (GetComponent<UseKey>() == null) gameObject.AddComponent<UseKey>();
     }
 
     void Start()

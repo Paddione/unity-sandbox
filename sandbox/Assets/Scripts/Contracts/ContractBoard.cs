@@ -10,7 +10,7 @@ using UnityEngine;
 /// frozen gold and flips to Claimed in the same save; on a write failure both
 /// live values roll back so the reward stays available.
 /// </summary>
-public sealed class ContractBoard : MonoBehaviour
+public sealed class ContractBoard : MonoBehaviour, IUsable
 {
     /// <summary>Trade reach around the board (click opens only inside).</summary>
     public const float InteractRadius = 3.5f;
@@ -93,6 +93,18 @@ public sealed class ContractBoard : MonoBehaviour
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!Vendor.CanInteract(hero.transform.position, transform.position, InteractRadius)) return;
+        Use(hero);
+    }
+
+    public float UseRadius => InteractRadius;
+    public string UseLabel => Loc.T("use.contract");
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
+        var heroUI = hero.GetComponent<DiabloContractUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloContractUI>();
         heroUI.SetOpen(true);
         Debug.Log("[Contract] Board opened.");

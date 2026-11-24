@@ -6,7 +6,7 @@ using UnityEngine;
 /// Merle only stands in the Hold once Act I is done. Shops (Ilsabe, Jorin)
 /// keep their own click handling and call the director first.
 /// </summary>
-public sealed class StoryNpc : MonoBehaviour
+public sealed class StoryNpc : MonoBehaviour, IUsable
 {
     public string npcId;
     public bool shopNpc;
@@ -61,4 +61,12 @@ public sealed class StoryNpc : MonoBehaviour
         if (!Vendor.CanInteract(hero.transform.position, transform.position)) return;
         StoryDirector.TryOpenTalk(hero, npcId);
     }
+
+    // Shop NPCs (Ilsabe, Jorin) are used through Vendor/SmithStation, so they never register.
+    public float UseRadius => Vendor.InteractRadius;
+    public string UseLabel => body != null && !body.enabled ? null : Loc.F("story.talk", Loc.T("npc." + npcId + ".name"));
+    void OnEnable() { if (!shopNpc) Usables.Register(this); }
+    void OnDisable() => Usables.Unregister(this);
+
+    public void Use(GameObject hero) => StoryDirector.TryOpenTalk(hero, npcId);
 }

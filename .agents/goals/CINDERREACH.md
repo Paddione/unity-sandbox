@@ -38,6 +38,11 @@ Clips unter `Resources/Voice/<key>.ogg`, Wiedergabe `StoryVoice` mit Regler „S
 Verständlichkeit `scripts/voice/qa_transcribe.py`. Koop: Boss-Zurufe hört sicher nur, wer Phase-2-/Todesereignis
 lokal erhält (Host, Abt- und Glasmacher-Phase auch Clients).
 
+Benutzen-Taste `T` (2026-11-24, `UseKey`): Zeigt „[T] …“ für das nächste nutzbare Objekt in Reichweite und
+benutzt es wie ein Klick: Story-NPCs, Ilsabe (Gespräch, sonst Handel), Jorin (Gespräch, sonst Schmiede), Truhe,
+Wegschrein, Wagnisschrein, Auftragsbrett, Beutekisten. Objekte implementieren `IUsable` und melden sich in
+`Usables` an. Q/E/R/Leertaste/F/G bleiben Fertigkeitsplätze.
+
 ## Spiel in einem Absatz
 
 Cinderreach ist ein isometrisches Co-op-ARPG (Unity 6000.0.85f2, URP, `sandbox/`), Arbeitstitel und

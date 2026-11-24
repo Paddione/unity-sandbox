@@ -8,7 +8,7 @@ using UnityEngine;
 /// <see cref="DiabloWaypointUI"/>, which lists every discovered shrine whose
 /// zone is unlocked and travels through <see cref="ZoneTravel"/>.
 /// </summary>
-public sealed class WaypointShrine : MonoBehaviour
+public sealed class WaypointShrine : MonoBehaviour, IUsable
 {
     public const float DiscoverRadius = 2.5f;
     public const float ArrivalOffset = 2f;
@@ -34,6 +34,18 @@ public sealed class WaypointShrine : MonoBehaviour
         var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, 200f) || hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!Vendor.CanInteract(hero.transform.position, transform.position, DiscoverRadius + 1f)) return;
+        Use(hero);
+    }
+
+    public float UseRadius => DiscoverRadius + 1f;
+    public string UseLabel => Loc.F("use.waypoint", Loc.Display(displayName));
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
+        TryDiscover(hero);
         var ui = hero.GetComponent<DiabloWaypointUI>();
         if (ui == null) ui = hero.AddComponent<DiabloWaypointUI>();
         ui.SetOpen(true);

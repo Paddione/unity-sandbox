@@ -9,7 +9,7 @@ using UnityEngine;
 /// never consumes the challenge; only the active challenge spawns its elite.
 /// Waypoints and quests stay untouched (no coupling to #7/#10 systems).
 /// </summary>
-public sealed class RiskShrine : MonoBehaviour
+public sealed class RiskShrine : MonoBehaviour, IUsable
 {
     /// <summary>Scene object name (pinned by RiskShrineBuilder verify).</summary>
     public const string ShrineObjectName = "RiskShrine";
@@ -139,6 +139,17 @@ public sealed class RiskShrine : MonoBehaviour
         var ray = s_main.ScreenPointToRay(mouse.position.ReadValue());
         if (!Physics.Raycast(ray, out var hit, 200f) || hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
+        Use(hero);
+    }
+
+    public float UseRadius => InteractRadius;
+    public string UseLabel => Loc.T("use.risk");
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
         var ui = hero.GetComponent<DiabloRiskShrineUI>();
         if (ui == null) ui = hero.AddComponent<DiabloRiskShrineUI>();
         ui.SetOpen(true);

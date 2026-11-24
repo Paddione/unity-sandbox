@@ -7,7 +7,7 @@ using UnityEngine;
 /// the vendor UI) lives here as a static so the consumable never passes
 /// through <see cref="Equipment"/> (S4-owned): potions are bag-only.
 /// </summary>
-public sealed class Vendor : MonoBehaviour
+public sealed class Vendor : MonoBehaviour, IUsable
 {
     /// <summary>Trade reach around the stall (click opens only inside).</summary>
     public const float InteractRadius = 3.5f;
@@ -66,7 +66,22 @@ public sealed class Vendor : MonoBehaviour
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
-        if (StoryDirector.TryOpenTalk(hero, StoryIds.Ilsabe)) return; // story talk first, shop on the next click
+        Use(hero);
+    }
+
+    public float UseRadius => InteractRadius;
+    public string UseLabel => StoryDialogs.Plan(StoryDirector.State, StoryIds.Ilsabe).IsPending
+        ? Loc.F("story.talk", Loc.T("npc.ilsabe.name"))
+        : Loc.F("use.trade", Loc.T("npc.ilsabe.name"));
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    /// <summary>Click or use key: story talk first, shop on the next use.</summary>
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
+        if (StoryDirector.TryOpenTalk(hero, StoryIds.Ilsabe)) return;
+        var heroUI = hero.GetComponent<DiabloVendorUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloVendorUI>();
         heroUI.BindStock(stock);
         heroUI.SetOpen(true);

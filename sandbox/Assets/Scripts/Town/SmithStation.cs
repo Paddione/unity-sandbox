@@ -6,7 +6,7 @@ using UnityEngine;
 /// <see cref="InteractRadius"/>. Reine Interaktion; Transaktionen und Regeln
 /// leben in <see cref="SmithingService"/> (EditMode-testbar ohne Szene).
 /// </summary>
-public sealed class SmithStation : MonoBehaviour
+public sealed class SmithStation : MonoBehaviour, IUsable
 {
     /// <summary>Scene object name.</summary>
     public const string SmithObjectName = "Smith";
@@ -37,7 +37,22 @@ public sealed class SmithStation : MonoBehaviour
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!CanInteract(hero.transform.position, transform.position)) return;
-        if (StoryDirector.TryOpenTalk(hero, StoryIds.Jorin)) return; // story talk first, forge on the next click
+        Use(hero);
+    }
+
+    public float UseRadius => InteractRadius;
+    public string UseLabel => StoryDialogs.Plan(StoryDirector.State, StoryIds.Jorin).IsPending
+        ? Loc.F("story.talk", Loc.T("npc.jorin.name"))
+        : Loc.F("use.smith", Loc.T("npc.jorin.name"));
+    void OnEnable() => Usables.Register(this);
+    void OnDisable() => Usables.Unregister(this);
+
+    /// <summary>Click or use key: story talk first, forge on the next use.</summary>
+    public void Use(GameObject hero)
+    {
+        if (hero == null) return;
+        if (StoryDirector.TryOpenTalk(hero, StoryIds.Jorin)) return;
+        var heroUI = hero.GetComponent<DiabloSmithUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloSmithUI>();
         heroUI.SetOpen(true);
         Debug.Log("[Smith] Forge window opened.");
