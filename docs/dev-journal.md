@@ -1006,3 +1006,15 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   und letzten Abgleich. Nur ein echter Konflikt (beide Seiten geändert, oder Gast-Held trifft Konto-Held) fragt.
 - Gelernt: Der Abgleich hing anfangs nur am Startbildschirm. Ohne ihn (Batch-Lauf, Beitritt per Kommandozeile)
   lief nach dem Anmelden kein Abgleich. Jetzt hängt er sich beim Spielstart an die Kontowechsel.
+
+## 2026-11-24 — Voice-Batch (cinderreach-voice-batch, S2 von sprache-voice)
+
+- B1-Preflight: 115 Lines, 0 stale — Lock sauber, Inkling `:1919` healthy, VRAM ~92 % durch Inkling.
+  Qwen-TTS liegt lokal (voice-tts-venv + HF-Cache 0.6B-Base/1.7B-VoiceDesign), kein Cloud-TTS nötig.
+- B2-Fenster auf Eigner-Go: Inkling gestoppt (VRAM 15075 → 1712 MiB), `TTS_DEVICE=cuda:0`-Render
+  meldet `0 of 115 lines` (alle Refs da, nichts zu tun), Inkling restartet + healthy, VRAM 14167 MiB.
+- B3: QA mean CER 0.007 (0 über 0.25), Gates grün (115/0, meta ok, Manifest 35 cues/8 tracks),
+  EditMode 539/539 + PlayMode 303/303.
+- Gelernt: vLLM-Forward (`:8123`) war down — TTS-Render braucht ihn nicht (eigene venv, torch+CUDA).
+  Health-Wait-Loop per `grep -q … && break` in Pipe läuft weiter (Subshell) — Fail ins Gewicht fiel es
+  nicht, aber Loop besser ohne Pipe bauen.

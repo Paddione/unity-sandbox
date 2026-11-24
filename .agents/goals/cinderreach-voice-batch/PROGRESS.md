@@ -1,6 +1,6 @@
 # Progress: cinderreach-voice-batch
 
-Prozent: 0 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -28,11 +28,12 @@ Prozent: 0 %
 
 - B1: erledigt/verifiziert. B2: ausgeführt am 2026-11-24 (`0 of 115`, Inkling
   restoret + healthy) — bei künftigen S2-Neutexte (Stale > 0) neues Fenster nötig.
-- B3: Abnahme läuft (QA-Transkription, Voice-Gates, Suiten, Run-Log + Doku).
+- B3: Abnahme grün am 2026-11-24 — QA `clips 115, mean CER 0.007, above 0.25: 0`
+  (schlechteste: `bark.abbot.death` 0.14); Gates `check-voice-lines` 115/0,
+  `check-meta` OK, `check-audio-manifest` OK (35 cues, 8 tracks); Suiten EditMode
+  539/539 + PlayMode 303/303 (Unity 6000.0.85f2). Belege: `docs/voice-batch-run-log.md`,
+  `docs/dev-journal.md` (Eintrag 2026-11-24).
 
 ## Offene Punkte
 
-- Eigner-Go für dieses GPU-Fenster am 2026-11-24 erteilt + verbraucht („now gpu fenster").
-  Neues Fenster erst bei Stale > 0 aus S2-Neutexte (`sprache-voice` S2 nach Akt-S1).
-- Textstände aus Akt-I/II/III-S1 stehen weiter aus (gestaffelt via `sprache-voice` S2) —
-  künftige Batches rendern dann nur die geänderten Zeilen.
+Keine.
