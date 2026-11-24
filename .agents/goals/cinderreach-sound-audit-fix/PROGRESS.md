@@ -1,6 +1,6 @@
 # Progress – cinderreach-sound-audit-fix
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -16,12 +16,12 @@ Prozent: 90 %
   - `MusicDirector`: Alle 8 Tracks auf 16-s-Kreispuffer mit 4-Takt-Akkordprogression, ruhiger thematischer Melodie (Lute/Cello/BronzeBell/GlassMarimba/LowHorn), gedämpftem Forge-/Boss-Puls, 2-Pass-Tiefpass (950–1250 Hz) und nahtlosem Loop-Wrap ohne Klicks oder 5-ms-Endfade umgestellt; Live-Volume-Nachführung in `Update()` korrigiert; `ClassSelectUI.SetOpen(true)` startet `MenuTheme` und `DiabloAmbience` skaliert per `EffectiveMusic`.
   - Manifest auf `S4-audio-warmth-melody` aktualisiert; Spektral-/Naht-/Melodie-Tests in `AudioRoutingTests` ergänzt (EditMode 512/512, PlayMode 293/293 inkl. `AudioRoutingTests` 12/12, `check-audio-manifest` 35 Cues / 8 Tracks OK, `pytest scripts` 10/10, `check-meta` OK).
   - Nachbesserung 2026-11-24 (Varianz & Materialtreffer): Nicht-wiederholende 3-Clip-Variantenpools plus ±7 % Pitch/Mikro-Volume für `Swing`, alle 5 Treffer-Materialien (`FleshBone`, `ArmorMetal`, `StoneAsh`, `Glass`, `GlassShield` über `PlayHitFor`) und alle 4 Zonenböden (`Moor`, `Stone`, `Basalt`, `Sand` über `PlayFootstep(Vector3)`), redundante Doppel-`PlayHit`-Aufrufe in `DiabloMelee`/`DiabloProjectile.Reflect` bereinigt; EditMode 512/512, PlayMode 296/296 (`AudioRoutingTests` 15/15), `check-audio-manifest` OK, `pytest scripts` 10/10, `check-meta` OK.
+- 2026-11-24: Eigner-Hörabnahme auf Windows-Build (Commit `ea59d7b`) bestanden („zufrieden“).
 
 ## Nächste Schritte
 
-- Frischen Windows-Build (`SandboxBuilder.BuildDiabloZoneWindows`) bauen und nach `C:\Users\PatrickKorczewski\Games\cinderreach` stagen für die finale Eigner-Hörabnahme.
-- Nach Hörabnahme: Prozent auf 100 %, Offene Punkte auf `Keine.`, Goal in CINDERREACH.md abschließen.
+Keine.
 
 ## Offene Punkte
 
-- Eigner-Hörabnahme nach der Klang- und Melodie-Überarbeitung steht aus — echter Blocker für 100 %, braucht Eigner-Ohren; Klangpassung zum Setting ist per Unit-Test nicht beweisbar.
+Keine.

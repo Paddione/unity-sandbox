@@ -15,7 +15,6 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 |---|---|---|
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
-| [`cinderreach-sound-audit-fix`](cinderreach-sound-audit-fix/GOAL.md) | Audit + Fix gelandet: 35 Cues, eigenes Kiln-Thema, Menü-/Boss-Musik verdrahtet, Probe `G-DIABLO07` grün | Eigner-Hörabnahme auf Windows-Build, dann 100 % |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
 Abgeschlossen: `cinderreach-character-creation` (2026-11-23): Charaktererstellung im `ClassSelectUI`
@@ -256,10 +255,11 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Knochen, Eisen, Tuch die Zonen-Materialien. Spielmechanisch lesbare Flächen (Tore, Glasnarbe, Glaspfeiler,
   Risiko-Schrein, Emissions-Marker) bleiben einfarbig. Kiln-Adern bewusst gedimmt, damit Telegraphen dominieren.
 - Zonen-Licht per URP-Volumes (`Settings/Volumes/*`, `ZoneAtmosphere`), Musik pro Zone + Boss
-  (`MusicDirector`, Crossfade; jedes Gebiet eigener Synth-Charakter inkl. `KilnLoop`, Menü-Thema
-  ab Startbildschirm, Boss-Thema ab Phase 2 bzw. Glasswright), 35 Audio-Cues (`DiabloAudio`, Synth
-  als Fallback, `docs/audio/manifest.json`; Heal/Quest/Shrine/Block/Footstep seit
-  `cinderreach-sound-audit-fix`, Vertrag `scripts/check-audio-manifest.py` = Probe `G-DIABLO07`),
+  (`MusicDirector`, Crossfade; 8 eigene 16-s-Kreispuffer-Melodiethemen inkl. `KilnLoop`, Menü-Thema
+  ab Startbildschirm, Boss-Thema ab Phase 2 bzw. Glasswright), 35 warme Audio-Cues (`DiabloAudio`,
+  3-Varianten-Pools ohne Direktwiederholung für `Swing`/`Hit`/`Footstep`, materialabhängiges
+  `PlayHitFor` über 5 Oberflächen, zonenbodenabhängige Schritte, Synth als Fallback,
+  `docs/audio/manifest.json`; Vertrag `scripts/check-audio-manifest.py` = Probe `G-DIABLO07`),
   gepoolte VFX (`PresentationVfx`).
 - Menüs (`Menu/`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
   Rolle/Starter/Skillzahl, Continue mit Spielstand-Info über `SaveService.TryPeek`, Co-op, Settings,
@@ -385,3 +385,4 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-act-two-opening` | Akt II: Glass Barrens, Shardback/Augur/Elite, The Glasswright, Bracket 4 + 2 Zonen-Uniques, Save v11, Autoplay bis `boss3` | `c89dc40` |
 | `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
 | `cinderreach-accounts` | Auth-Profile, Spielernamen + Namensschilder, Konto mit Benutzer/Passwort, Cloud-Held | `02ece6d` |
+| `cinderreach-sound-audit-fix` | 35 warme SFX mit Varianten-/Material-Routing, 8 melodische 16-s-Zonenthemen, `G-DIABLO07`, Hörabnahme | `ea59d7b` |
