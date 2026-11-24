@@ -51,6 +51,7 @@ public sealed class SmithStation : MonoBehaviour, IUsable
     public void Use(GameObject hero)
     {
         if (hero == null) return;
+        StoryNpc.TurnToward(this, hero);
         if (StoryDirector.TryOpenTalk(hero, StoryIds.Jorin)) return;
         var heroUI = hero.GetComponent<DiabloSmithUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloSmithUI>();

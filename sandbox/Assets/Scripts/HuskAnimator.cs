@@ -4,7 +4,10 @@ using UnityEngine;
 /// Drives the husk Mecanim controller (KayKit Rig_Medium takes on the
 /// Skeletons rig): "Moving" while approaching, "Attack" on the wind-up,
 /// "Hit" when struck. Null-safe: primitive test husks have no Animator and
-/// only bump the counters, so feedback is provable headless.
+/// only bump the counters, so feedback is provable headless. Animated husks
+/// also walk while measurably moving (scripted movers such as lancers and
+/// casters never call <see cref="SetMoving"/>) and get <see cref="LocomotionTwist"/>, so their legs
+/// follow detours and sidesteps while the body keeps facing the hero.
 /// </summary>
 public sealed class HuskAnimator : MonoBehaviour
 {
@@ -18,10 +21,21 @@ public sealed class HuskAnimator : MonoBehaviour
     public bool moving;
 
     Animator animator;
+    LocomotionTwist twist;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            twist = GetComponent<LocomotionTwist>();
+            if (twist == null) twist = gameObject.AddComponent<LocomotionTwist>();
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (Driven) animator.SetBool(MoveParam, moving || (twist != null && twist.MovingMeasured));
     }
 
     bool Driven => animator != null && animator.runtimeAnimatorController != null;

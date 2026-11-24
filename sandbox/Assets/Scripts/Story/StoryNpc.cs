@@ -4,7 +4,9 @@ using UnityEngine;
 /// A named story figure in the Hold (cinderreach-deutsch-story S4/S5): click
 /// opens its scripted talk, a floating mark shows an offer or a hand-in.
 /// Merle only stands in the Hold once Act I is done. Shops (Ilsabe, Jorin)
-/// keep their own click handling and call the director first.
+/// keep their own click handling and call the director first. Every use
+/// (click, use key, shop) turns an animated figure toward the hero
+/// (<see cref="FaceHero"/>); prop stand-ins without an Animator stay put.
 /// </summary>
 public sealed class StoryNpc : MonoBehaviour, IUsable
 {
@@ -14,6 +16,36 @@ public sealed class StoryNpc : MonoBehaviour, IUsable
     Renderer[] renderers;
     Collider body;
     float poll;
+    bool turning;
+    Quaternion turnTarget;
+
+    /// <summary>Turn rate toward the hero, degrees per second.</summary>
+    public const float TurnSpeed = 540f;
+
+    /// <summary>True while the figure is still turning toward the hero.</summary>
+    public bool IsTurning => turning;
+
+    /// <summary>
+    /// Turn this figure toward <paramref name="hero"/> (yaw only). Figures
+    /// without an Animator (the smith's anvil block) are props and keep their pose.
+    /// </summary>
+    public void FaceHero(GameObject hero)
+    {
+        if (hero == null || GetComponent<Animator>() == null) return;
+        var d = hero.transform.position - transform.position;
+        d.y = 0f;
+        if (d.sqrMagnitude < 0.0001f) return;
+        turnTarget = Quaternion.LookRotation(d.normalized);
+        turning = true;
+    }
+
+    /// <summary>Use helper for shops: turns the StoryNpc on <paramref name="npc"/>'s object, if any.</summary>
+    public static void TurnToward(Component npc, GameObject hero)
+    {
+        if (npc == null) return;
+        var s = npc.GetComponent<StoryNpc>();
+        if (s != null) s.FaceHero(hero);
+    }
 
     void Awake()
     {
@@ -33,6 +65,15 @@ public sealed class StoryNpc : MonoBehaviour, IUsable
 
     void Update()
     {
+        if (turning)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, turnTarget, TurnSpeed * Time.deltaTime);
+            if (Quaternion.Angle(transform.rotation, turnTarget) < 0.5f)
+            {
+                transform.rotation = turnTarget;
+                turning = false;
+            }
+        }
         if (npcId == StoryIds.Merle)
         {
             bool here = RunProfile.Act.ActOneComplete;
@@ -59,7 +100,7 @@ public sealed class StoryNpc : MonoBehaviour, IUsable
         if (!Physics.Raycast(ray, out var hit, 200f)) return;
         if (hit.collider == null || hit.collider.gameObject != gameObject) return;
         if (!Vendor.CanInteract(hero.transform.position, transform.position)) return;
-        StoryDirector.TryOpenTalk(hero, npcId);
+        Use(hero);
     }
 
     // Shop NPCs (Ilsabe, Jorin) are used through Vendor/SmithStation, so they never register.
@@ -68,5 +109,9 @@ public sealed class StoryNpc : MonoBehaviour, IUsable
     void OnEnable() { if (!shopNpc) Usables.Register(this); }
     void OnDisable() => Usables.Unregister(this);
 
-    public void Use(GameObject hero) => StoryDirector.TryOpenTalk(hero, npcId);
+    public void Use(GameObject hero)
+    {
+        FaceHero(hero);
+        StoryDirector.TryOpenTalk(hero, npcId);
+    }
 }

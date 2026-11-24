@@ -43,6 +43,12 @@ benutzt es wie ein Klick: Story-NPCs, Ilsabe (Gespräch, sonst Handel), Jorin (G
 Wegschrein, Wagnisschrein, Auftragsbrett, Beutekisten. Objekte implementieren `IUsable` und melden sich in
 `Usables` an. Q/E/R/Leertaste/F/G bleiben Fertigkeitsplätze.
 
+Geteilte Fortbewegung (2026-11-24, `LocomotionTwist`): Held, Koop-Spiegel und animierte Gegner drehen nach der
+Animation die Hüfte (`hips`) in die gemessene Laufrichtung, `spine`/`chest` drehen zurück, sodass der Oberkörper
+die Root-Ausrichtung behält (Held: Maus, Gegner: Held). Mehr als 100° gegen die Blickrichtung läuft rückwärts
+(Float `MoveSpeed` = −1 als Zustands-Speed auf `Run`/`Walk`, Hysterese 80°). `Moving` gilt auch bei gemessener
+Bewegung (Koop-Spiegel, Lanzer, Wirker). NPCs (`StoryNpc` mit Animator) drehen sich bei Klick oder `T` zum Helden.
+
 ## Spiel in einem Absatz
 
 Cinderreach ist ein isometrisches Co-op-ARPG (Unity 6000.0.85f2, URP, `sandbox/`), Arbeitstitel und

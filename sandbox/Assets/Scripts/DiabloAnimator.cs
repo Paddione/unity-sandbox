@@ -3,7 +3,10 @@ using UnityEngine;
 /// <summary>
 /// Drives the Mecanim locomotion controller (KayKit Rig_Medium takes,
 /// retargeted onto the Adventurers hero) from the click-to-move state:
-/// sets the "Moving" bool while the hero has an order.
+/// sets the "Moving" bool while the hero has an order or is measurably
+/// moving (remote co-op mirrors carry no input, only synced positions).
+/// <see cref="LocomotionTwist"/> points the legs along the travel direction
+/// while the upper body keeps the mouse aim.
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public sealed class DiabloAnimator : MonoBehaviour
@@ -24,6 +27,7 @@ public sealed class DiabloAnimator : MonoBehaviour
     Animator animator;
     DiabloClickController controller;
     DiabloSkills skills;
+    LocomotionTwist twist;
 
     /// <summary>True while the hero works an order (click or WASD).</summary>
     public static bool IsMoving(DiabloClickController c) =>
@@ -35,6 +39,8 @@ public sealed class DiabloAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
         controller = GetComponent<DiabloClickController>();
         skills = GetComponent<DiabloSkills>();
+        twist = GetComponent<LocomotionTwist>();
+        if (twist == null && animator != null) twist = gameObject.AddComponent<LocomotionTwist>();
     }
 
     /// <summary>Controllers built before the bow states lack these params: skip silently.</summary>
@@ -49,7 +55,7 @@ public sealed class DiabloAnimator : MonoBehaviour
     void Update()
     {
         if (animator == null || controller == null) return;
-        animator.SetBool(moveParam, IsMoving(controller));
+        animator.SetBool(moveParam, IsMoving(controller) || (twist != null && twist.MovingMeasured));
         if (skills == null) skills = GetComponent<DiabloSkills>();
         if (skills != null && HasParam(bowParam)) animator.SetBool(bowParam, skills.BowDrawn);
     }

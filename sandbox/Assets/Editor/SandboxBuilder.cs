@@ -973,12 +973,15 @@ public static class SandboxBuilder
         var controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
         controller.AddParameter("Moving", AnimatorControllerParameterType.Bool);
         controller.AddParameter("Strike", AnimatorControllerParameterType.Trigger);
+        AddMoveSpeedParam(controller);
         var sm = controller.layers[0].stateMachine;
         foreach (var s in sm.states) sm.RemoveState(s.state);
         var idleState = sm.AddState("Idle");
         idleState.motion = idle;
         var runState = sm.AddState("Run");
         runState.motion = run;
+        runState.speedParameterActive = true;
+        runState.speedParameter = LocomotionTwist.MoveSpeedParam;
         sm.defaultState = idleState;
         var strikeState = sm.AddState("Strike");
         strikeState.motion = strike;
@@ -1000,6 +1003,17 @@ public static class SandboxBuilder
         SkillArtBuilder.AddBowStates(controller);
         AssetDatabase.SaveAssets();
         return controller;
+    }
+
+    /// <summary>Signed run/walk playback rate (negative = backpedal, see <see cref="LocomotionTwist"/>).</summary>
+    static void AddMoveSpeedParam(UnityEditor.Animations.AnimatorController c)
+    {
+        c.AddParameter(new AnimatorControllerParameter
+        {
+            name = LocomotionTwist.MoveSpeedParam,
+            type = AnimatorControllerParameterType.Float,
+            defaultFloat = 1f,
+        });
     }
 
     const string RigPath = "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/";
@@ -1042,12 +1056,15 @@ public static class SandboxBuilder
         c.AddParameter(HuskAnimator.MoveParam, AnimatorControllerParameterType.Bool);
         c.AddParameter(HuskAnimator.AttackParam, AnimatorControllerParameterType.Trigger);
         c.AddParameter(HuskAnimator.HitParam, AnimatorControllerParameterType.Trigger);
+        AddMoveSpeedParam(c);
         var sm = c.layers[0].stateMachine;
         foreach (var st in sm.states) sm.RemoveState(st.state);
         var idleS = sm.AddState("Idle");
         idleS.motion = idle;
         var walkS = sm.AddState("Walk");
         walkS.motion = walk;
+        walkS.speedParameterActive = true;
+        walkS.speedParameter = LocomotionTwist.MoveSpeedParam;
         var attackS = sm.AddState("Attack");
         attackS.motion = attack;
         var hitS = sm.AddState("Hit");

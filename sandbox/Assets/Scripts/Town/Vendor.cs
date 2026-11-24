@@ -80,6 +80,7 @@ public sealed class Vendor : MonoBehaviour, IUsable
     public void Use(GameObject hero)
     {
         if (hero == null) return;
+        StoryNpc.TurnToward(this, hero);
         if (StoryDirector.TryOpenTalk(hero, StoryIds.Ilsabe)) return;
         var heroUI = hero.GetComponent<DiabloVendorUI>();
         if (heroUI == null) heroUI = hero.AddComponent<DiabloVendorUI>();
