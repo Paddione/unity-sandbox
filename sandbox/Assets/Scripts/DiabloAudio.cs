@@ -2,10 +2,10 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// D2 combat sounds, fully synthesized at runtime (Ashen Fen has no audio
-/// pipeline and the repo bans binary assets). 22050 Hz mono clips built once
-/// from decaying sine/noise shapes; playback is a silent no-op headless.
-/// Static counters (strikeCount precedent) prove sounds fired in tests.
+/// Cinderreach combat & world SFX, fully synthesized at runtime (no third-party
+/// binary assets). 22050 Hz mono clips built once from phase-integrated,
+/// band-limited shapes; playback is a silent no-op headless.
+/// Static counters prove sounds fired in tests.
 /// Play methods never log, so LogAssert suites stay clean.
 /// </summary>
 public static class DiabloAudio
@@ -92,7 +92,7 @@ public static class DiabloAudio
     public static AudioClip TwangClip { get { EnsureBuilt(); return twangClip; } }
     public static AudioClip CritClip { get { EnsureBuilt(); return critClip; } }
     public static AudioClip LevelUpClip { get { EnsureBuilt(); return levelUpClip; } }
-    /// <summary>Seamless 6 s moor wind + low drone loop (ambient bed).</summary>
+    /// <summary>Seamless moor wind + subtle sub floor loop (ambient bed).</summary>
     public static AudioClip AmbientClip { get { EnsureBuilt(); return ambientClip; } }
 
     static readonly System.Collections.Generic.Dictionary<string, AudioClip> overrides =
@@ -115,10 +115,7 @@ public static class DiabloAudio
         return synth;
     }
 
-    /// <summary>SFX gain layer via DiabloSettings (mixer authoring is a TODO
-    /// for the human session: create CinderreachMixer with Master/Music/SFX/UI
-    /// groups per craft-game-floors game-audio headless floor, then route the
-    /// sources below via AudioSource.outputAudioMixerGroup).</summary>
+    /// <summary>SFX gain layer via DiabloSettings.</summary>
     public static float SfxGain => DiabloSettings.EffectiveSFX;
     public static float MusicGain => DiabloSettings.MasterVol * DiabloSettings.MusicVol;
 
@@ -131,30 +128,33 @@ public static class DiabloAudio
         catch { soundedFallbacks++; }
     }
 
-    static void PlayRaw(AudioClip clip)
+    static void PlayUiSfx(AudioClip synth, string cueName, float volume)
     {
+        EnsureBuilt();
+        var clip = Resolve(cueName, synth);
         if (PlaybackMuted) return;
-        try { source.PlayOneShot(clip); } catch { }
+        try { source.PlayOneShot(clip, volume * DiabloSettings.EffectiveUI); }
+        catch { soundedFallbacks++; }
     }
 
-    public static void PlaySwing() { EnsureBuilt(); soundedSwings++; PlayRaw(swingClip); }
-    public static void PlayHit() { EnsureBuilt(); soundedHits++; PlayRaw(hitClip); }
-    public static void PlayDeath() { EnsureBuilt(); soundedDeaths++; PlayRaw(deathClip); }
-    public static void PlayLoot() { EnsureBuilt(); soundedLoot++; PlayRaw(lootClip); }
-    /// <summary>Menu tick: deep + quiet (presentation tuning) — routes gain + fallback like all SFX.</summary>
-    public static void PlayUIClick() { EnsureBuilt(); PlaySfx(uiClickClip, "UIClick", UIClickVolume * (SfxGain > 0f ? DiabloSettings.EffectiveUI / SfxGain : 0f)); }
-    public static void PlayHurt() { EnsureBuilt(); PlayRaw(hurtClip); }
-    public static void PlayPlayerDeath() { EnsureBuilt(); PlayRaw(playerDeathClip); }
+    public static void PlaySwing() { EnsureBuilt(); soundedSwings++; Varied(Resolve("Swing", swingClip), 0.55f); }
+    public static void PlayHit() { EnsureBuilt(); soundedHits++; Varied(Resolve("Hit", hitClip), 0.68f); }
+    public static void PlayDeath() { EnsureBuilt(); soundedDeaths++; Varied(Resolve("Death", deathClip), 0.60f); }
+    public static void PlayLoot() { EnsureBuilt(); soundedLoot++; Varied(Resolve("Loot", lootClip), 0.50f); }
+    /// <summary>Menu tick: muted wood/leather tap routed through EffectiveUI.</summary>
+    public static void PlayUIClick() { EnsureBuilt(); PlayUiSfx(uiClickClip, "UIClick", UIClickVolume); }
+    public static void PlayHurt() { EnsureBuilt(); Varied(Resolve("Hurt", hurtClip), 0.65f); }
+    public static void PlayPlayerDeath() { EnsureBuilt(); PlaySfx(playerDeathClip, "PlayerDeath", 0.72f); }
     /// <summary>Fireball leaving the hand.</summary>
-    public static void PlayWhoosh() { EnsureBuilt(); Varied(whooshClip, 0.9f); soundedCasts++; }
+    public static void PlayWhoosh() { EnsureBuilt(); Varied(Resolve("Whoosh", whooshClip), 0.62f); soundedCasts++; }
     /// <summary>Bowstring release.</summary>
-    public static void PlayTwang() { EnsureBuilt(); Varied(twangClip, 0.8f); soundedCasts++; }
-    public static void PlayBlast() { EnsureBuilt(); Varied(blastClip, 1f); soundedBlasts++; }
-    public static void PlayCrit() { EnsureBuilt(); Varied(critClip, 0.9f); soundedCrits++; }
-    // Lanternbearer (second-class S2): bell chime, rising hum, falling shimmer.
-    public static void PlayLantern() { EnsureBuilt(); Varied(lanternClip, 0.7f); soundedCasts++; }
-    public static void PlayHalo() { EnsureBuilt(); Varied(haloClip, 0.8f); soundedCasts++; }
-    public static void PlayVeil() { EnsureBuilt(); Varied(veilClip, 0.6f); soundedCasts++; }
+    public static void PlayTwang() { EnsureBuilt(); Varied(Resolve("Twang", twangClip), 0.60f); soundedCasts++; }
+    public static void PlayBlast() { EnsureBuilt(); Varied(Resolve("Blast", blastClip), 0.78f); soundedBlasts++; }
+    public static void PlayCrit() { EnsureBuilt(); Varied(Resolve("Crit", critClip), 0.75f); soundedCrits++; }
+    // Lanternbearer: warm bronze chime, rising radiant swell, shadow mist whisper.
+    public static void PlayLantern() { EnsureBuilt(); Varied(Resolve("Lantern", lanternClip), 0.58f); soundedCasts++; }
+    public static void PlayHalo() { EnsureBuilt(); Varied(Resolve("Halo", haloClip), 0.62f); soundedCasts++; }
+    public static void PlayVeil() { EnsureBuilt(); Varied(Resolve("Veil", veilClip), 0.55f); soundedCasts++; }
     public static AudioClip LanternClip { get { EnsureBuilt(); return lanternClip; } }
     public static AudioClip HaloClip { get { EnsureBuilt(); return haloClip; } }
     public static AudioClip VeilClip { get { EnsureBuilt(); return veilClip; } }
@@ -222,44 +222,39 @@ public static class DiabloAudio
         }
     }
 
-    public static void PlaySwordHit1() { EnsureBuilt(); Varied(Resolve("SwordHit1", swordHit1Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
-    public static void PlaySwordHit2() { EnsureBuilt(); Varied(Resolve("SwordHit2", swordHit2Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
-    public static void PlaySwordHit3() { EnsureBuilt(); Varied(Resolve("SwordHit3", swordHit3Clip), 0.9f * SfxGain); soundedSwordHits++; soundedHits++; }
-    public static void PlayFireball() { EnsureBuilt(); Varied(Resolve("Fireball", fireballClip), 0.9f * SfxGain); soundedSkillShots++; soundedCasts++; }
-    public static void PlayArrow() { EnsureBuilt(); Varied(Resolve("Arrow", arrowClip), 0.8f * SfxGain); soundedSkillShots++; soundedCasts++; }
-    public static void PlayCleave() { EnsureBuilt(); Varied(Resolve("Cleave", cleaveClip), 1f * SfxGain); soundedSkillShots++; soundedCasts++; }
-    public static void PlayHuskGrowl() { EnsureBuilt(); Varied(Resolve("HuskGrowl", huskGrowlClip), 0.7f * SfxGain); soundedEnemyVox++; }
-    public static void PlayWardenTaunt() { EnsureBuilt(); Varied(Resolve("WardenTaunt", wardenTauntClip), 0.8f * SfxGain); soundedEnemyVox++; }
-    public static void PlayBossRoar() { EnsureBuilt(); Varied(Resolve("BossRoar", bossRoarClip), 1f * SfxGain); soundedEnemyVox++; }
-    public static void PlayGold() { EnsureBuilt(); PlaySfx(goldClip, "Gold", 0.8f); soundedGold++; soundedLoot++; }
-    public static void PlayRareDrop() { EnsureBuilt(); PlaySfx(rareDropClip, "RareDrop", 0.9f); soundedRare++; soundedLoot++; }
+    public static void PlaySwordHit1() { EnsureBuilt(); Varied(Resolve("SwordHit1", swordHit1Clip), 0.65f); soundedSwordHits++; soundedHits++; }
+    public static void PlaySwordHit2() { EnsureBuilt(); Varied(Resolve("SwordHit2", swordHit2Clip), 0.65f); soundedSwordHits++; soundedHits++; }
+    public static void PlaySwordHit3() { EnsureBuilt(); Varied(Resolve("SwordHit3", swordHit3Clip), 0.72f); soundedSwordHits++; soundedHits++; }
+    public static void PlayFireball() { EnsureBuilt(); Varied(Resolve("Fireball", fireballClip), 0.68f); soundedSkillShots++; soundedCasts++; }
+    public static void PlayArrow() { EnsureBuilt(); Varied(Resolve("Arrow", arrowClip), 0.55f); soundedSkillShots++; soundedCasts++; }
+    public static void PlayCleave() { EnsureBuilt(); Varied(Resolve("Cleave", cleaveClip), 0.70f); soundedSkillShots++; soundedCasts++; }
+    public static void PlayHuskGrowl() { EnsureBuilt(); Varied(Resolve("HuskGrowl", huskGrowlClip), 0.60f); soundedEnemyVox++; }
+    public static void PlayWardenTaunt() { EnsureBuilt(); Varied(Resolve("WardenTaunt", wardenTauntClip), 0.62f); soundedEnemyVox++; }
+    public static void PlayBossRoar() { EnsureBuilt(); Varied(Resolve("BossRoar", bossRoarClip), 0.80f); soundedEnemyVox++; }
+    public static void PlayGold() { EnsureBuilt(); Varied(Resolve("Gold", goldClip), 0.48f); soundedGold++; soundedLoot++; }
+    public static void PlayRareDrop() { EnsureBuilt(); PlaySfx(rareDropClip, "RareDrop", 0.62f); soundedRare++; soundedLoot++; }
     public static void PlayVendorBuy() { EnsureBuilt(); PlaySfx(vendorBuyClip, "VendorBuy", VendorVolume); soundedVendor++; }
     public static void PlayVendorSell() { EnsureBuilt(); PlaySfx(vendorSellClip, "VendorSell", VendorVolume); soundedVendor++; }
-    public static void PlayGate() { EnsureBuilt(); PlaySfx(gateClip, "Gate", 1f); soundedGate++; }
-    public static void PlayHeal() { EnsureBuilt(); PlaySfx(healClip, "Heal", 0.8f); soundedHeals++; }
-    public static void PlayQuest() { EnsureBuilt(); PlaySfx(questClip, "Quest", 0.9f); soundedQuests++; }
-    public static void PlayShrine() { EnsureBuilt(); PlaySfx(shrineClip, "Shrine", 0.85f); soundedShrines++; }
-    public static void PlayBlock() { EnsureBuilt(); PlaySfx(blockClip, "Block", 0.9f); soundedBlocks++; }
-    public static void PlayFootstep() { EnsureBuilt(); PlaySfx(footstepClip, "Footstep", 0.22f); soundedSteps++; }
+    public static void PlayGate() { EnsureBuilt(); PlaySfx(gateClip, "Gate", 0.68f); soundedGate++; }
+    public static void PlayHeal() { EnsureBuilt(); PlaySfx(healClip, "Heal", 0.60f); soundedHeals++; }
+    public static void PlayQuest() { EnsureBuilt(); PlaySfx(questClip, "Quest", 0.60f); soundedQuests++; }
+    public static void PlayShrine() { EnsureBuilt(); PlaySfx(shrineClip, "Shrine", 0.62f); soundedShrines++; }
+    public static void PlayBlock() { EnsureBuilt(); Varied(Resolve("Block", blockClip), 0.68f); soundedBlocks++; }
+    public static void PlayFootstep() { EnsureBuilt(); Varied(Resolve("Footstep", footstepClip), 0.24f); soundedSteps++; }
 
-    public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlayRawWithVolume(levelUpClip, 0.9f); }
-
-    static void PlayRawWithVolume(AudioClip clip, float volume)
-    {
-        if (PlaybackMuted) return;
-        try { source.PlayOneShot(clip, volume); } catch { }
-    }
+    public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlaySfx(levelUpClip, "LevelUp", 0.68f); }
 
     /// <summary>
-    /// Repeats must not grate: a pooled pitched source per call (±8 %).
+    /// Repeats must not grate: a pooled pitched source per call (±7 %).
     /// PlayOneShot cannot pitch, so rotate through a few extra sources.
+    /// Multiplies by SfxGain once.
     /// </summary>
     static void Varied(AudioClip clip, float volume)
     {
         if (PlaybackMuted) return;
         var s = pitched[pitchedNext];
         pitchedNext = (pitchedNext + 1) % pitched.Length;
-        s.pitch = 0.92f + (float)pitchRng.NextDouble() * 0.16f;
+        s.pitch = 0.93f + (float)pitchRng.NextDouble() * 0.14f;
         try { s.PlayOneShot(clip, volume * SfxGain); } catch { }
     }
 
@@ -304,41 +299,43 @@ public static class DiabloAudio
         source = go.AddComponent<AudioSource>();
         EnsureListener();
         var rng = new System.Random(1234); // deterministic clips
-        swingClip = NoiseBurst("Swing", 0.12f, rng);
-        hitClip = Thump("Hit", 0.15f, 180f, 90f);
-        deathClip = Rattle("Death", 0.4f, 300f, 60f, rng);
-        lootClip = Sweep("Loot", 0.09f, 880f, 1320f);
-        uiClickClip = Sweep("UIClick", 0.07f, 520f, 380f);
-        hurtClip = Thump("Hurt", 0.2f, 150f, 100f);
-        playerDeathClip = Sweep("PlayerDeath", 0.6f, 400f, 70f);
-        whooshClip = Whoosh("Whoosh", 0.38f, rng);
-        blastClip = Boom("Blast", 0.7f, rng);
-        twangClip = Pluck("Twang", 0.28f, 196f, rng);
-        critClip = Crit("Crit", 0.18f);
-        levelUpClip = Sting("LevelUp");
+
+        swingClip = FilteredNoise("Swing", 0.14f, 240f, 1050f, 140f, 80f, 0.15f, 0.55f, rng);
+        hitClip = MetallicImpact("Hit", 0.14f, 155f, 60f, 260f, 390f, 0.12f, 1050f, 0.65f, rng);
+        deathClip = SynthDeathRattle("Death", 0.38f, rng);
+        lootClip = SynthLoot(rng);
+        uiClickClip = FilteredNoise("UIClick", 0.055f, 200f, 920f, 185f, 115f, 0.45f, 0.45f, rng);
+        hurtClip = FilteredNoise("Hurt", 0.18f, 90f, 520f, 135f, 58f, 0.65f, 0.62f, rng);
+        playerDeathClip = SynthPlayerDeath("PlayerDeath", 0.70f);
+        whooshClip = Whoosh("Whoosh", 0.34f, 220f, 900f, 200f, 125f, 0.16f, 0.58f, rng);
+        blastClip = Boom("Blast", 0.66f, 85f, 34f, 460f, 0.78f, rng);
+        twangClip = SynthTwang("Twang", 0.24f, 165f, rng);
+        critClip = MetallicImpact("Crit", 0.22f, 170f, 52f, 330f, 495f, 0.35f, 1650f, 0.72f, rng);
+        levelUpClip = ChordSting("LevelUp", new[] { 146.83f, 220f, 293.66f, 369.99f }, 0.11f, 0.72f, 1300f, 0.65f, 0.60f);
         ambientClip = Ambient("MoorWind", 6f, rng);
-        swordHit1Clip = Crit("SwordHit1", 0.14f);
-        swordHit2Clip = Crit("SwordHit2", 0.16f);
-        swordHit3Clip = Crit("SwordHit3", 0.2f);
-        fireballClip = Whoosh("Fireball", 0.42f, rng);
-        arrowClip = Sweep("Arrow", 0.12f, 2400f, 900f);
-        cleaveClip = NoiseBurst("Cleave", 0.22f, rng);
-        huskGrowlClip = Rattle("HuskGrowl", 0.5f, 140f, 70f, rng);
-        wardenTauntClip = Sweep("WardenTaunt", 0.6f, 110f, 330f);
-        bossRoarClip = Boom("BossRoar", 1.1f, rng);
-        goldClip = Sweep("Gold", 0.12f, 1568f, 2093f);
-        rareDropClip = Sting("RareDrop");
-        vendorBuyClip = Sweep("VendorBuy", 0.18f, 330f, 495f);
-        vendorSellClip = Sweep("VendorSell", 0.18f, 495f, 330f);
-        gateClip = Sweep("Gate", 0.8f, 180f, 720f);
-        healClip = Chime("Heal", 0.55f, 523.25f);
-        questClip = Sting("Quest");
-        shrineClip = Chime("Shrine", 0.7f, 392f);
-        blockClip = Crit("Block", 0.12f);
-        footstepClip = NoiseBurst("Footstep", 0.06f, rng);
-        lanternClip = Chime("LanternBolt", 0.45f, 660f);
-        haloClip = Sweep("SearingHalo", 0.4f, 220f, 880f);
-        veilClip = Sweep("VeilStep", 0.25f, 1400f, 480f);
+        swordHit1Clip = MetallicImpact("SwordHit1", 0.14f, 160f, 68f, 440f, 700f, 0.25f, 1550f, 0.62f, rng);
+        swordHit2Clip = MetallicImpact("SwordHit2", 0.16f, 145f, 60f, 390f, 630f, 0.26f, 1450f, 0.62f, rng);
+        swordHit3Clip = MetallicImpact("SwordHit3", 0.19f, 130f, 52f, 330f, 540f, 0.28f, 1350f, 0.68f, rng);
+        fireballClip = Whoosh("Fireball", 0.38f, 170f, 780f, 170f, 98f, 0.24f, 0.65f, rng);
+        arrowClip = SynthArrow("Arrow", 0.12f, rng);
+        cleaveClip = FilteredNoise("Cleave", 0.24f, 150f, 850f, 130f, 65f, 0.35f, 0.65f, rng);
+        huskGrowlClip = SynthHuskGrowl("HuskGrowl", 0.46f, rng);
+        wardenTauntClip = SynthWardenTaunt("WardenTaunt", 0.58f, rng);
+        bossRoarClip = SynthBossRoar("BossRoar", 1.05f, rng);
+        goldClip = SynthGold(rng);
+        rareDropClip = ChordSting("RareDrop", new[] { 220f, 293.66f, 329.63f, 440f }, 0.09f, 0.52f, 1300f, 0.58f, 0.65f);
+        vendorBuyClip = ChordSting("VendorBuy", new[] { 220f, 329.63f }, 0.06f, 0.15f, 1050f, 0.48f, 0.45f);
+        vendorSellClip = ChordSting("VendorSell", new[] { 329.63f, 246.94f }, 0.06f, 0.15f, 1050f, 0.48f, 0.45f);
+        gateClip = SynthGate("Gate", 0.85f, rng);
+        healClip = ChordSting("Heal", new[] { 293.66f, 369.99f, 440f }, 0.07f, 0.45f, 1200f, 0.56f, 0.55f);
+        questClip = ChordSting("Quest", new[] { 220f, 293.66f, 329.63f, 293.66f }, 0.10f, 0.50f, 1200f, 0.56f, 0.55f);
+        shrineClip = WarmBell("Shrine", 0.75f, 261.63f, 1100f, 0.58f);
+        blockClip = MetallicImpact("Block", 0.16f, 175f, 72f, 310f, 470f, 0.38f, 1450f, 0.66f, rng);
+        footstepClip = FilteredNoise("Footstep", 0.065f, 110f, 580f, 95f, 55f, 0.35f, 0.45f, rng);
+        lanternClip = WarmBell("LanternBolt", 0.44f, 329.63f, 1250f, 0.55f);
+        haloClip = SynthHalo("SearingHalo", 0.42f);
+        veilClip = SynthVeil("VeilStep", 0.28f, rng);
+
         pitched = new AudioSource[4];
         for (int i = 0; i < pitched.Length; i++) pitched[i] = go.AddComponent<AudioSource>();
     }
@@ -357,101 +354,509 @@ public static class DiabloAudio
         catch { }
     }
 
-    /// <summary>Noise through a one-pole lowpass whose cutoff rises then falls.</summary>
-    static AudioClip Whoosh(string name, float seconds, System.Random rng)
-    {
-        int n = Samples(seconds);
-        var data = new float[n];
-        float lp = 0f;
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            float a = Mathf.Lerp(0.02f, 0.35f, Mathf.Sin(Mathf.PI * t));
-            lp += a * ((float)(rng.NextDouble() * 2.0 - 1.0) - lp);
-            data[i] = lp * Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.6f)) * 1.4f;
-        }
-        return Bake(name, data);
-    }
+    // ---- DSP Primitives ----
 
-    /// <summary>Falling sub thump + lowpassed rumble, exponential tail.</summary>
-    static AudioClip Boom(string name, float seconds, System.Random rng)
-    {
-        int n = Samples(seconds);
-        var data = new float[n];
-        float lp = 0f, phase = 0f;
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            phase += 2f * Mathf.PI * Mathf.Lerp(80f, 32f, t) / SampleRate;
-            lp += 0.06f * ((float)(rng.NextDouble() * 2.0 - 1.0) - lp);
-            float env = Mathf.Exp(-5f * t);
-            data[i] = (Mathf.Sin(phase) * 0.7f + lp * 2.2f) * env * 0.8f;
-        }
-        return Bake(name, data);
-    }
+    static int Samples(float seconds) => Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
 
-    /// <summary>Plucked string: fundamental + octave, noise attack, fast decay.</summary>
-    static AudioClip Pluck(string name, float seconds, float f, System.Random rng)
+    static void LowPass(float[] data, float cutoffHz, int passes = 2)
     {
-        int n = Samples(seconds);
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
+        float a = Mathf.Clamp01(1f - Mathf.Exp(-2f * Mathf.PI * cutoffHz / SampleRate));
+        for (int p = 0; p < passes; p++)
         {
-            float time = i / (float)SampleRate;
-            float t = (float)i / n;
-            float tone = Mathf.Sin(2f * Mathf.PI * f * time) + 0.5f * Mathf.Sin(2f * Mathf.PI * f * 2.01f * time)
-                + 0.25f * Mathf.Sin(2f * Mathf.PI * f * 3.02f * time);
-            float attack = t < 0.04f ? (float)(rng.NextDouble() * 2.0 - 1.0) * (1f - t / 0.04f) : 0f;
-            data[i] = (tone * 0.35f + attack * 0.5f) * Mathf.Exp(-9f * t);
-        }
-        return Bake(name, data);
-    }
-
-    /// <summary>Heavy thump with a bright metallic ping on top.</summary>
-    static AudioClip Crit(string name, float seconds)
-    {
-        int n = Samples(seconds);
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float time = i / (float)SampleRate;
-            float t = (float)i / n;
-            float thump = Mathf.Sin(2f * Mathf.PI * Mathf.Lerp(150f, 70f, t) * time) * (1f - t) * (1f - t);
-            float ping = Mathf.Sin(2f * Mathf.PI * 1760f * time) * Mathf.Exp(-14f * t);
-            data[i] = thump * 0.7f + ping * 0.3f;
-        }
-        return Bake(name, data);
-    }
-
-    /// <summary>Three ascending notes of a major triad, then the octave held.</summary>
-    static AudioClip Sting(string name)
-    {
-        float[] notes = { 523.25f, 659.25f, 783.99f, 1046.5f };
-        const float step = 0.12f;
-        float seconds = step * 3f + 0.6f;
-        int n = Samples(seconds);
-        var data = new float[n];
-        for (int k = 0; k < notes.Length; k++)
-        {
-            int start = Samples(step * k);
-            float len = k == notes.Length - 1 ? 0.6f : step * 1.6f;
-            int count = Mathf.Min(Samples(len), n - start);
-            for (int i = 0; i < count; i++)
+            float y = 0f;
+            for (int i = 0; i < data.Length; i++)
             {
-                float time = i / (float)SampleRate;
-                float t = (float)i / count;
-                float tone = Mathf.Sin(2f * Mathf.PI * notes[k] * time)
-                    + 0.3f * Mathf.Sin(2f * Mathf.PI * notes[k] * 2f * time);
-                data[start + i] += tone * Mathf.Exp(-3f * t) * 0.22f;
+                y += a * (data[i] - y);
+                data[i] = y;
             }
         }
-        return Bake(name, data);
+    }
+
+    static void HighPass(float[] data, float cutoffHz)
+    {
+        float rc = 1f / (2f * Mathf.PI * Mathf.Max(10f, cutoffHz));
+        float dt = 1f / SampleRate;
+        float a = rc / (rc + dt);
+        float y = 0f;
+        float prevX = 0f;
+        for (int i = 0; i < data.Length; i++)
+        {
+            float x = data[i];
+            y = a * (y + x - prevX);
+            prevX = x;
+            data[i] = y;
+        }
+    }
+
+    static void BandPass(float[] data, float lowHz, float highHz)
+    {
+        HighPass(data, lowHz);
+        LowPass(data, highHz, 2);
+    }
+
+    static AudioClip FinishClip(string name, float[] data, float targetPeak)
+    {
+        double sum = 0.0;
+        for (int i = 0; i < data.Length; i++) sum += data[i];
+        float mean = (float)(sum / data.Length);
+        float peak = 0f;
+        for (int i = 0; i < data.Length; i++)
+        {
+            float x = data[i] - mean;
+            x = x / (1f + Mathf.Abs(x) * 0.25f);
+            data[i] = x;
+            float ax = Mathf.Abs(x);
+            if (ax > peak) peak = ax;
+        }
+        if (peak > 1e-5f)
+        {
+            float scale = targetPeak / peak;
+            for (int i = 0; i < data.Length; i++) data[i] *= scale;
+        }
+        int edge = Mathf.Min(data.Length / 2, Samples(0.005f));
+        for (int i = 0; i < edge; i++)
+        {
+            float w = (float)i / edge;
+            data[i] *= w;
+            data[data.Length - 1 - i] *= w;
+        }
+        var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    static void AddPluck(float[] data, int start, float seconds, float freq, float amp, float brightness)
+    {
+        int count = Mathf.Min(Samples(seconds), data.Length - start);
+        if (count <= 0) return;
+        float attackSec = 0.004f;
+        for (int i = 0; i < count; i++)
+        {
+            float time = i / (float)SampleRate;
+            float env = (time < attackSec ? time / attackSec : 1f) * Mathf.Exp(-time * (2.6f / Mathf.Max(0.12f, seconds)));
+            float h2Env = Mathf.Exp(-time * (5.8f / Mathf.Max(0.12f, seconds)));
+            float h3Env = Mathf.Exp(-time * (9.2f / Mathf.Max(0.12f, seconds)));
+            float s1 = Mathf.Sin(2f * Mathf.PI * freq * time);
+            float s2 = 0.32f * brightness * h2Env * Mathf.Sin(2f * Mathf.PI * freq * 2f * time);
+            float s3 = 0.12f * brightness * h3Env * Mathf.Sin(2f * Mathf.PI * freq * 3f * time);
+            data[start + i] += amp * env * (s1 + s2 + s3);
+        }
+    }
+
+    static AudioClip WarmBell(string name, float seconds, float f0, float cutoffHz, float peak)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float time = i / (float)SampleRate;
+            float att = Mathf.Clamp01(time / 0.006f);
+            float env1 = att * Mathf.Exp(-time * (4.5f / seconds));
+            float envHi = att * Mathf.Exp(-time * (14f / seconds));
+            float hum = 0.38f * Mathf.Sin(2f * Mathf.PI * (f0 * 0.5f) * time);
+            float fund = 0.55f * Mathf.Sin(2f * Mathf.PI * f0 * time);
+            float fifth = 0.24f * Mathf.Sin(2f * Mathf.PI * (f0 * 1.5f) * time) * envHi;
+            float oct = 0.14f * Mathf.Sin(2f * Mathf.PI * (f0 * 2.0f) * time) * envHi;
+            float shimmer = 0.06f * Mathf.Sin(2f * Mathf.PI * (f0 * 2.4f) * time) * Mathf.Exp(-time * 24f);
+            data[i] = (hum + fund) * env1 + fifth + oct + shimmer;
+        }
+        LowPass(data, cutoffHz, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip MetallicImpact(
+        string name, float seconds, float thumpF0, float thumpF1,
+        float ringA, float ringB, float ringMix, float cutoffHz, float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        var noise = new float[n];
+        for (int i = 0; i < n; i++)
+            noise[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-26f * ((float)i / n));
+        BandPass(noise, 180f, cutoffHz);
+
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = thumpF0 * Mathf.Pow(Mathf.Max(20f, thumpF1) / Mathf.Max(20f, thumpF0), t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float thump = Mathf.Sin(phase) * Mathf.Exp(-10f * t);
+            float ringEnv = Mathf.Exp(-28f * time);
+            float ring = (Mathf.Sin(2f * Mathf.PI * ringA * time) + 0.65f * Mathf.Sin(2f * Mathf.PI * ringB * time)) * ringEnv;
+            data[i] = thump * 0.72f + noise[i] * 0.45f + ring * ringMix;
+        }
+        LowPass(data, cutoffHz, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip FilteredNoise(
+        string name, float seconds, float lowHz, float highHz,
+        float bodyF0, float bodyF1, float bodyMix, float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var noise = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float env = Mathf.Clamp01(t / 0.08f) * Mathf.Exp(-4.5f * t);
+            noise[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * env;
+        }
+        BandPass(noise, lowHz, highHz);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = bodyF0 * Mathf.Pow(Mathf.Max(20f, bodyF1) / Mathf.Max(20f, bodyF0), t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float body = Mathf.Sin(phase) * Mathf.Exp(-7f * t);
+            data[i] = noise[i] + body * bodyMix;
+        }
+        LowPass(data, highHz, 1);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip Whoosh(
+        string name, float seconds, float cutLow, float cutHigh, float cutEnd,
+        float bodyHz, float bodyMix, float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        float lp1 = 0f, lp2 = 0f;
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float swell = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.75f));
+            float cut = t < 0.4f
+                ? Mathf.Lerp(cutLow, cutHigh, t / 0.4f)
+                : Mathf.Lerp(cutHigh, cutEnd, (t - 0.4f) / 0.6f);
+            float a = Mathf.Clamp01(1f - Mathf.Exp(-2f * Mathf.PI * cut / SampleRate));
+            float white = (float)(rng.NextDouble() * 2.0 - 1.0);
+            lp1 += a * (white - lp1);
+            lp2 += a * (lp1 - lp2);
+            phase += 2f * Mathf.PI * Mathf.Lerp(bodyHz, bodyHz * 0.68f, t) / SampleRate;
+            float body = Mathf.Sin(phase) * swell;
+            data[i] = (lp2 * 1.6f + body * bodyMix) * swell;
+        }
+        HighPass(data, 90f);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip Boom(string name, float seconds, float f0, float f1, float cutoffHz, float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var rumble = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            rumble[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-4.2f * t);
+        }
+        BandPass(rumble, 45f, cutoffHz);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = f0 * Mathf.Pow(f1 / f0, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float sub = Mathf.Sin(phase) * Mathf.Exp(-5.2f * t);
+            data[i] = sub * 0.75f + rumble[i] * 0.85f;
+        }
+        LowPass(data, cutoffHz, 1);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip ChordSting(
+        string name, float[] freqs, float stepSec, float holdSec,
+        float cutoffHz, float peak, float brightness)
+    {
+        float total = stepSec * Mathf.Max(0, freqs.Length - 1) + holdSec;
+        int n = Samples(total);
+        var data = new float[n];
+        for (int k = 0; k < freqs.Length; k++)
+        {
+            int start = Samples(stepSec * k);
+            float dur = (k == freqs.Length - 1) ? holdSec : Mathf.Max(holdSec * 0.65f, stepSec * 2.2f);
+            AddPluck(data, start, dur, freqs[k], 0.55f, brightness);
+            if (k == 0)
+                AddPluck(data, start, total, freqs[0] * 0.5f, 0.25f, 0.25f);
+        }
+        LowPass(data, cutoffHz, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    // ---- Cue-Specific Sculpted Recipes ----
+
+    static AudioClip SynthDeathRattle(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var noise = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            noise[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * (1f - t);
+        }
+        BandPass(noise, 180f, 750f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = 175f * Mathf.Pow(55f / 175f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float flutter = 0.65f + 0.35f * Mathf.Sin(2f * Mathf.PI * 24f * time);
+            float env = Mathf.Clamp01(t / 0.04f) * Mathf.Exp(-3.8f * t);
+            data[i] = (Mathf.Sin(phase) * 0.55f + noise[i] * 0.65f) * flutter * env;
+        }
+        LowPass(data, 850f, 2);
+        return FinishClip(name, data, 0.58f);
+    }
+
+    static AudioClip SynthPlayerDeath(string name, float seconds)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = 165f * Mathf.Pow(62f / 165f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float env = Mathf.Clamp01(t / 0.03f) * Mathf.Exp(-3.2f * t);
+            float toll = Mathf.Sin(phase) + 0.45f * Mathf.Sin(2f * Mathf.PI * 110f * time) * Mathf.Exp(-4f * t);
+            data[i] = toll * env;
+        }
+        LowPass(data, 720f, 2);
+        return FinishClip(name, data, 0.68f);
+    }
+
+    static AudioClip SynthTwang(string name, float seconds, float f0, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        AddPluck(data, 0, seconds, f0, 0.7f, 0.65f);
+        var click = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            click[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-35f * t);
+        }
+        BandPass(click, 260f, 1100f);
+        for (int i = 0; i < n; i++) data[i] += click[i] * 0.35f;
+        LowPass(data, 1100f, 2);
+        return FinishClip(name, data, 0.58f);
+    }
+
+    static AudioClip SynthArrow(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var air = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            air[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Sin(Mathf.PI * t);
+        }
+        BandPass(air, 420f, 1400f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = 480f * Mathf.Pow(240f / 480f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            data[i] = air[i] * 0.85f + Mathf.Sin(phase) * Mathf.Sin(Mathf.PI * t) * 0.2f;
+        }
+        LowPass(data, 1400f, 1);
+        return FinishClip(name, data, 0.52f);
+    }
+
+    static AudioClip SynthHuskGrowl(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var rasp = new float[n];
+        for (int i = 0; i < n; i++) rasp[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+        BandPass(rasp, 110f, 460f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = 115f * Mathf.Pow(60f / 115f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float mod = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * 18f * time);
+            float env = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.65f));
+            data[i] = (Mathf.Sin(phase) * 0.6f + 0.35f * Mathf.Sin(phase * 2f) + rasp[i] * 0.5f) * mod * env;
+        }
+        LowPass(data, 520f, 2);
+        return FinishClip(name, data, 0.58f);
+    }
+
+    static AudioClip SynthWardenTaunt(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var breath = new float[n];
+        for (int i = 0; i < n; i++) breath[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+        BandPass(breath, 220f, 620f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = t < 0.45f ? Mathf.Lerp(110f, 160f, t / 0.45f) : Mathf.Lerp(160f, 130f, (t - 0.45f) / 0.55f);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float env = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.7f));
+            data[i] = (Mathf.Sin(phase) * 0.55f + 0.3f * Mathf.Sin(phase * 1.5f) + breath[i] * 0.55f) * env;
+        }
+        LowPass(data, 680f, 2);
+        return FinishClip(name, data, 0.60f);
+    }
+
+    static AudioClip SynthBossRoar(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var roarNoise = new float[n];
+        for (int i = 0; i < n; i++) roarNoise[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+        BandPass(roarNoise, 80f, 520f);
+
+        var data = new float[n];
+        float p1 = 0f, p2 = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f1 = 95f * Mathf.Pow(38f / 95f, t);
+            float f2 = 142f * Mathf.Pow(70f / 142f, t);
+            p1 += 2f * Mathf.PI * f1 / SampleRate;
+            p2 += 2f * Mathf.PI * f2 / SampleRate;
+            float env = Mathf.Clamp01(t / 0.08f) * Mathf.Exp(-2.2f * t);
+            float grit = 0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * 21f * time);
+            data[i] = (Mathf.Sin(p1) * 0.6f + Mathf.Sin(p2) * 0.35f + roarNoise[i] * 0.8f) * grit * env;
+        }
+        LowPass(data, 560f, 2);
+        return FinishClip(name, data, 0.78f);
+    }
+
+    static AudioClip SynthLoot(System.Random rng)
+    {
+        int n = Samples(0.18f);
+        var data = new float[n];
+        var rustle = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            rustle[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-18f * t);
+        }
+        BandPass(rustle, 220f, 900f);
+        for (int i = 0; i < n; i++) data[i] += rustle[i] * 0.35f;
+        AddPluck(data, 0, 0.11f, 293.66f, 0.45f, 0.45f);
+        AddPluck(data, Samples(0.045f), 0.13f, 440f, 0.50f, 0.50f);
+        LowPass(data, 1150f, 2);
+        return FinishClip("Loot", data, 0.50f);
+    }
+
+    static AudioClip SynthGold(System.Random rng)
+    {
+        int n = Samples(0.14f);
+        var data = new float[n];
+        int t2 = Samples(0.042f);
+        for (int i = 0; i < n; i++)
+        {
+            float time = i / (float)SampleRate;
+            float env1 = Mathf.Clamp01(time / 0.002f) * Mathf.Exp(-time * 52f);
+            float c1 = (Mathf.Sin(2f * Mathf.PI * 587.33f * time) + 0.35f * Mathf.Sin(2f * Mathf.PI * 880f * time)) * env1;
+            float c2 = 0f;
+            if (i >= t2)
+            {
+                float dt = (i - t2) / (float)SampleRate;
+                float env2 = Mathf.Clamp01(dt / 0.002f) * Mathf.Exp(-dt * 44f);
+                c2 = (Mathf.Sin(2f * Mathf.PI * 783.99f * dt) + 0.30f * Mathf.Sin(2f * Mathf.PI * 1174.66f * dt)) * env2;
+            }
+            float tick = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-time * 75f) * 0.12f;
+            data[i] = c1 * 0.65f + c2 * 0.75f + tick;
+        }
+        LowPass(data, 1550f, 2);
+        return FinishClip("Gold", data, 0.48f);
+    }
+
+    static AudioClip SynthGate(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var air = new float[n];
+        for (int i = 0; i < n; i++) air[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+        BandPass(air, 90f, 480f);
+
+        var data = new float[n];
+        float pRumble = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = Mathf.Lerp(65f, 98f, t);
+            pRumble += 2f * Mathf.PI * f / SampleRate;
+            float env = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.75f));
+            float chord = 0.45f * Mathf.Sin(2f * Mathf.PI * 146.83f * time)
+                        + 0.35f * Mathf.Sin(2f * Mathf.PI * 220f * time);
+            data[i] = (Mathf.Sin(pRumble) * 0.65f + chord + air[i] * 0.45f) * env;
+        }
+        LowPass(data, 850f, 2);
+        return FinishClip(name, data, 0.65f);
+    }
+
+    static AudioClip SynthHalo(string name, float seconds)
+    {
+        int n = Samples(seconds);
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = 196f * Mathf.Pow(2f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float env = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.75f));
+            float fifth = 0.4f * Mathf.Sin(2f * Mathf.PI * 293.66f * time);
+            data[i] = (Mathf.Sin(phase) * 0.7f + fifth) * env;
+        }
+        LowPass(data, 1100f, 2);
+        return FinishClip(name, data, 0.58f);
+    }
+
+    static AudioClip SynthVeil(string name, float seconds, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var mist = new float[n];
+        for (int i = 0; i < n; i++) mist[i] = (float)(rng.NextDouble() * 2.0 - 1.0);
+        BandPass(mist, 280f, 1050f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = 370f * Mathf.Pow(185f / 370f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float env = Mathf.Sin(Mathf.PI * Mathf.Pow(t, 0.65f));
+            data[i] = (mist[i] * 0.75f + Mathf.Sin(phase) * 0.3f) * env;
+        }
+        LowPass(data, 1050f, 1);
+        return FinishClip(name, data, 0.52f);
     }
 
     /// <summary>
-    /// Room tone for the moor: brown noise with slow gusts plus a 55 Hz drone.
-    /// Every periodic term completes whole cycles in the clip and the noise
-    /// tail is crossfaded into the head, so the loop has no seam.
+    /// Room tone for the moor: warm lowpassed breeze with slow gusts plus a very subtle 55 Hz floor.
+    /// Tail crossfaded into head so the loop has no seam.
     /// </summary>
     static AudioClip Ambient(string name, float seconds, System.Random rng)
     {
@@ -460,9 +865,10 @@ public static class DiabloAudio
         float brown = 0f;
         for (int i = 0; i < n; i++)
         {
-            brown = Mathf.Clamp(brown + (float)(rng.NextDouble() * 2.0 - 1.0) * 0.04f, -1f, 1f) * 0.998f;
+            brown = Mathf.Clamp(brown + (float)(rng.NextDouble() * 2.0 - 1.0) * 0.035f, -1f, 1f) * 0.997f;
             data[i] = brown;
         }
+        LowPass(data, 360f, 2);
         int fade = Samples(0.8f);
         for (int i = 0; i < fade; i++)
         {
@@ -473,101 +879,13 @@ public static class DiabloAudio
         for (int i = 0; i < loop.Length; i++)
         {
             float time = i / (float)SampleRate;
-            float cycle = (float)i / loop.Length; // 0..1 across the loop
+            float cycle = (float)i / loop.Length;
             float gust = 0.55f + 0.45f * Mathf.Sin(2f * Mathf.PI * cycle * 2f) * Mathf.Sin(2f * Mathf.PI * cycle);
             float drone = Mathf.Sin(2f * Mathf.PI * 55f * time) * (0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * cycle));
-            loop[i] = data[i] * gust * 0.9f + drone * 0.12f;
+            loop[i] = data[i] * gust * 0.85f + drone * 0.04f;
         }
         var clip = AudioClip.Create(name, loop.Length, 1, SampleRate, false);
         clip.SetData(loop, 0);
-        return clip;
-    }
-
-    /// <summary>Bell: inharmonic partials (1, 2.76, 5.4) with exponential decay.</summary>
-    static AudioClip Chime(string name, float seconds, float f0)
-    {
-        int n = Samples(seconds);
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / SampleRate;
-            float env = Mathf.Exp(-t * 9f);
-            data[i] = env * (0.6f * Mathf.Sin(2f * Mathf.PI * f0 * t)
-                             + 0.25f * Mathf.Sin(2f * Mathf.PI * f0 * 2.76f * t)
-                             + 0.12f * Mathf.Sin(2f * Mathf.PI * f0 * 5.4f * t));
-        }
-        return Bake(name, data);
-    }
-
-    static int Samples(float seconds) => Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
-
-    static AudioClip NoiseBurst(string name, float seconds, System.Random rng)
-    {
-        int n = Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            data[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * (1f - t) * 0.6f;
-        }
-        return Bake(name, data);
-    }
-
-    static AudioClip Thump(string name, float seconds, float f0, float f1)
-    {
-        int n = Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            float f = Mathf.Lerp(f0, f1, t);
-            data[i] = Mathf.Sin(2f * Mathf.PI * f * (i / (float)SampleRate))
-                * (1f - t) * (1f - t) * 0.8f;
-        }
-        return Bake(name, data);
-    }
-
-    static AudioClip Rattle(string name, float seconds, float f0, float f1, System.Random rng)
-    {
-        int n = Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            float f = Mathf.Lerp(f0, f1, t);
-            float tone = Mathf.Sin(2f * Mathf.PI * f * (i / (float)SampleRate));
-            float noise = (float)(rng.NextDouble() * 2.0 - 1.0) * 0.4f;
-            data[i] = (tone + noise) * (1f - t) * 0.5f;
-        }
-        return Bake(name, data);
-    }
-
-    static AudioClip Sweep(string name, float seconds, float f0, float f1)
-    {
-        int n = Mathf.Max(1, Mathf.RoundToInt(seconds * SampleRate));
-        var data = new float[n];
-        for (int i = 0; i < n; i++)
-        {
-            float t = (float)i / n;
-            float f = Mathf.Lerp(f0, f1, t);
-            data[i] = Mathf.Sin(2f * Mathf.PI * f * (i / (float)SampleRate))
-                * Mathf.Sin(Mathf.PI * t) * 0.5f;
-        }
-        return Bake(name, data);
-    }
-
-    static AudioClip Bake(string name, float[] data)
-    {
-        // 5 ms fade at both edges: raw edges click.
-        int edge = Mathf.Min(data.Length / 2, Samples(0.005f));
-        for (int i = 0; i < edge; i++)
-        {
-            float w = (float)i / edge;
-            data[i] *= w;
-            data[data.Length - 1 - i] *= w;
-        }
-        var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);
-        clip.SetData(data, 0);
         return clip;
     }
 }

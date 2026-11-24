@@ -105,7 +105,7 @@ public sealed class GoldDrop : MonoBehaviour
         var wallet = Wallet.EnsureWallet(go);
         var eq = go.GetComponent<Equipment>();
         if (wallet != null) wallet.Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
-        DiabloAudio.PlayLoot();
+        DiabloAudio.PlayGold();
         var netObj = GetComponent<NetworkObject>();
         var nm = NetworkManager.Singleton;
         if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer) netObj.Despawn();

@@ -17,6 +17,7 @@ public sealed class DiabloAmbience : MonoBehaviour
     AudioSource bed;
     ParticleSystem motes;
     ParticleSystem pillar;
+    int currentZone = ActProgress.Town;
 
     public static DiabloAmbience Instance => instance;
     public AudioSource Bed => bed;
@@ -139,8 +140,12 @@ public sealed class DiabloAmbience : MonoBehaviour
     /// <summary>S1 light: retune the bed for a zone and start the atmosphere cross-fade (headless-callable).</summary>
     public static void ApplyZone(int zone)
     {
-        if (instance != null && instance.bed != null)
-            instance.bed.volume = BedVolumeForZone(zone);
+        if (instance != null)
+        {
+            instance.currentZone = zone;
+            if (instance.bed != null)
+                instance.bed.volume = BedVolumeForZone(zone) * DiabloSettings.EffectiveMusic;
+        }
         var atmo = ZoneAtmosphere.Instance;
         if (atmo != null) atmo.ShowZone(zone);
         else if (Application.isPlaying) ZoneAtmosphere.Ensure().ShowZone(zone);
@@ -178,7 +183,7 @@ public sealed class DiabloAmbience : MonoBehaviour
     public static void ApplySettings()
     {
         if (instance != null && instance.bed != null)
-            instance.bed.volume = BedVolume * DiabloSettings.EffectiveMusic;
+            instance.bed.volume = BedVolumeForZone(instance.currentZone) * DiabloSettings.EffectiveMusic;
     }
 
     void OnDestroy()

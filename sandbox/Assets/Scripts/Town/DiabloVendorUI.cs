@@ -201,7 +201,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         if (stock != null && stock.TryBuy(index, wallet, inventory))
         {
-            DiabloAudio.PlayLoot();
+            DiabloAudio.PlayVendorBuy();
             SetNotice(Loc.F("vendor.notice.bought", LootDrop.ItemLabel(stock.offers[index].item)));
         }
         else SetNotice(BuyRejection(index));
@@ -244,7 +244,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         if (VendorStock.TrySell(index, wallet, inventory))
         {
-            DiabloAudio.PlayUIClick();
+            DiabloAudio.PlayVendorSell();
             SetNotice(item != null ? Loc.F("vendor.notice.sold", LootDrop.ItemLabel(item)) : Loc.T("vendor.notice.sold.plain"));
         }
         else SetNotice(Loc.T("vendor.notice.salerejected"));
@@ -272,7 +272,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         if (VendorStock.BuyPotion(wallet, inventory))
         {
-            DiabloAudio.PlayLoot();
+            DiabloAudio.PlayVendorBuy();
             Refresh();
         }
     }

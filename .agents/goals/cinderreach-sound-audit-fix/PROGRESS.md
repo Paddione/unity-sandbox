@@ -1,6 +1,6 @@
 # Progress – cinderreach-sound-audit-fix
 
-Prozent: 85 %
+Prozent: 90 %
 
 ## Erledigt
 
@@ -10,13 +10,17 @@ Prozent: 85 %
 - Fix: 5 neue Cues (`Heal`, `Quest`, `Shrine`, `Block`, `Footstep`) inkl. Counter, Clips und Verdrahtung (Skills-Heals, Story-TurnIn, WaypointShrine, PlayerHealth/Projectile-Block, ClickController-Schrittweite 1,9 m); `PlayCue(Ambient)` expliziter No-Op; `KilnLoop` (Zone3) + `ZoneTrack`-Mapping, `PlayTown` für Lantern Hold per Wegpunkt, Menü-Thema in `MainMenu.Open`, Zonen-Thema beim Verlassen des Startbildschirms, Boss-Thema + Roar in `BossController.EnterPhaseTwo`; per-Track-Synth-Charakter in `MusicDirector.SpecFor` (Dur/Moll, Sub, Glocken-/Glas-Partiale, Wind, Puls).
 - Manifest auf 35 Cues / 8 Tracks nachgezogen (Version `S3-sound-audit`); Probe `scripts/check-audio-manifest.py` (G-DIABLO07) + Pytest grün.
 - Tests: PlayMode voll 286/286, EditMode nach Allowlist-Bereinigung grün (volle Zahl im Land-Lauf), `AudioRoutingTests` 8/8 inkl. neuer Vertrags-Tests, `check-meta` OK, `pytest scripts` 6/6.
+- Nachtrag 2026-11-23: Erste Hörabnahme meldete totale Stille. Ursache: Builder-Kamera ohne `AudioListener` (0 Treffer in der Szene), behoben und verifiziert (EditMode 496/496, PlayMode 287/287).
+- Nachbesserung 2026-11-24 (Hör-Review „unharmonisch / zu schrill / Musik ohne Melodie"):
+  - `DiabloAudio`: Phasen-integrierte Sweeps (beseitigt Frequenzverdopplung und Negativ-Frequenz-Artefakte), 2-polige Tiefpass-/Bandpass-Filter auf alle 35 Cues, warme Bronze-Glocken/Harp-Stings statt 1760-Hz-Pings, 5,4x-Teiltönen und ungefiltertem Weißem Rauschen; doppelte `SfxGain`-Multiplikation in `Varied`-Aufrufen sowie `SfxGain`-Umgehung in Legacy-Cues und UI-Click-Mute-Kopplung behoben; `GoldDrop` auf `PlayGold`, `DiabloVendorUI` auf `PlayVendorBuy`/`PlayVendorSell` verdrahtet.
+  - `MusicDirector`: Alle 8 Tracks auf 16-s-Kreispuffer mit 4-Takt-Akkordprogression, ruhiger thematischer Melodie (Lute/Cello/BronzeBell/GlassMarimba/LowHorn), gedämpftem Forge-/Boss-Puls, 2-Pass-Tiefpass (950–1250 Hz) und nahtlosem Loop-Wrap ohne Klicks oder 5-ms-Endfade umgestellt; Live-Volume-Nachführung in `Update()` korrigiert; `ClassSelectUI.SetOpen(true)` startet `MenuTheme` und `DiabloAmbience` skaliert per `EffectiveMusic`.
+  - Manifest auf `S4-audio-warmth-melody` aktualisiert; Spektral-/Naht-/Melodie-Tests in `AudioRoutingTests` ergänzt (EditMode 512/512, PlayMode 293/293 inkl. `AudioRoutingTests` 12/12, `check-audio-manifest` 35 Cues / 8 Tracks OK, `pytest scripts` 10/10, `check-meta` OK).
 
 ## Nächste Schritte
 
-- Windows-Build gebaut und gestaged: `SandboxBuilder.BuildDiabloZoneWindows` (Commit `5f25105`, 180 MB) per `scripts/stage-windows.sh` nach `C:\Users\PatrickKorczewski\Games\cinderreach` (Beleg `BUILD_INFO.json`, 2026-11-23). Jetzt Eigner-Hörabnahme je Zone/Cue.
+- Frischen Windows-Build (`SandboxBuilder.BuildDiabloZoneWindows`) bauen und nach `C:\Users\PatrickKorczewski\Games\cinderreach` stagen für die finale Eigner-Hörabnahme.
 - Nach Hörabnahme: Prozent auf 100 %, Offene Punkte auf `Keine.`, Goal in CINDERREACH.md abschließen.
 
 ## Offene Punkte
 
-- Eigner-Hörabnahme nach dem Listener-Fix (erneut gebaut/gestaged) steht aus — echter Blocker für 100 %, braucht Eigner-Ohren; Klangpassung zum Setting ist per Unit-Test nicht beweisbar.
-- Nachtrag 2026-11-23: Erste Hörabnahme meldete totale Stille. Ursache: Builder-Kamera ohne `AudioListener` (0 Treffer in der Szene), Unity gibt ohne Listener nichts aus; Tests liefen stumm/ mit Fallback-Listener und konnten das nicht sehen. Behoben: Listener an allen Builder-Kameras + Verify-Gate (`listener=`), Runtime-Garantie in `DiabloAudio.EnsureListener`, Szene per Builder regeneriert (1 Listener), neuer PlayMode-Test; EditMode 496/496, PlayMode 287/287.
+- Eigner-Hörabnahme nach der Klang- und Melodie-Überarbeitung steht aus — echter Blocker für 100 %, braucht Eigner-Ohren; Klangpassung zum Setting ist per Unit-Test nicht beweisbar.

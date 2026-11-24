@@ -1,5 +1,5 @@
 {
- "version": "S3-sound-audit",
+ "version": "S4-audio-warmth-melody",
  "license": "All entries are locally synthesized recipes (no third-party assets, license: free). Future studio .ogg renders replace the synth clips 1:1 by cue name.",
  "budget": "<= 60MB total audio, .ogg quality 0.6 target",
  "format": {
@@ -11,314 +11,314 @@
  "sfx": [
   {
    "cue": "Swing",
-   "prompt": "short whooshy melee swing, airy noise burst",
+   "prompt": "warm airy melee swing, band-passed brush + low body",
    "seed": 1234,
-   "synth": "NoiseBurst 0.12s",
+   "synth": "FilteredNoise 0.14s (240..1050Hz) + 140->80Hz body",
    "license": "free"
   },
   {
    "cue": "Hit",
-   "prompt": "meaty thump with fast pitch drop",
+   "prompt": "meaty thump with phase-integrated pitch drop and muted iron body",
    "seed": 1234,
-   "synth": "Thump 0.15s 180->90Hz",
+   "synth": "MetallicImpact 0.14s (155->60Hz, LP 1050Hz)",
    "license": "free"
   },
   {
    "cue": "Death",
-   "prompt": "creature death rattle, tone plus noise",
+   "prompt": "creature death rattle, low phase-integrated drop + band-passed bone rasp",
    "seed": 1234,
-   "synth": "Rattle 0.4s 300->60Hz",
+   "synth": "SynthDeathRattle 0.38s (175->55Hz, BP 180..750Hz, LP 850Hz)",
    "license": "free"
   },
   {
    "cue": "Loot",
-   "prompt": "bright pickup shimmer, rising sweep",
+   "prompt": "warm leather pickup rustle + soft D4-A4 pluck",
    "seed": 1234,
-   "synth": "Sweep 0.09s 880->1320Hz",
+   "synth": "SynthLoot 0.18s (BP 220..900Hz + D4/A4 pluck, LP 1150Hz)",
    "license": "free"
   },
   {
    "cue": "UIClick",
-   "prompt": "deep soft UI tick",
+   "prompt": "muted wood/leather UI tap routed through EffectiveUI",
    "seed": 1234,
-   "synth": "Sweep 0.07s 520->380Hz, vol 0.35 via gain layer",
+   "synth": "FilteredNoise 0.055s (200..920Hz, 185->115Hz body)",
    "license": "free"
   },
   {
    "cue": "Hurt",
-   "prompt": "player hurt thud",
+   "prompt": "player hurt thud, low body + damped impact",
    "seed": 1234,
-   "synth": "Thump 0.2s 150->100Hz",
+   "synth": "FilteredNoise 0.18s (90..520Hz, 135->58Hz body)",
    "license": "free"
   },
   {
    "cue": "PlayerDeath",
-   "prompt": "low falling death sweep",
+   "prompt": "somber low toll + falling fifth",
    "seed": 1234,
-   "synth": "Sweep 0.6s 400->70Hz",
+   "synth": "SynthPlayerDeath 0.70s (165->62Hz + 110Hz toll, LP 720Hz)",
    "license": "free"
   },
   {
    "cue": "Whoosh",
-   "prompt": "fireball launch whoosh, filtered noise swell",
+   "prompt": "warm spell whoosh, sweeping 2-pole lowpass noise + soft 125Hz core",
    "seed": 1234,
-   "synth": "Whoosh 0.38s",
+   "synth": "Whoosh 0.34s (220->900->200Hz LP sweep)",
    "license": "free"
   },
   {
    "cue": "Blast",
-   "prompt": "explosion boom, sub thump plus rumble",
+   "prompt": "deep explosion boom, phase-integrated sub + lowpass rumble",
    "seed": 1234,
-   "synth": "Boom 0.7s",
+   "synth": "Boom 0.66s (85->34Hz, LP 460Hz)",
    "license": "free"
   },
   {
    "cue": "Twang",
-   "prompt": "bowstring pluck, bright attack",
+   "prompt": "warm wooden bowstring pluck",
    "seed": 1234,
-   "synth": "Pluck 0.28s 196Hz",
+   "synth": "SynthTwang 0.24s (165Hz pluck + damped woody click, LP 1100Hz)",
    "license": "free"
   },
   {
    "cue": "Crit",
-   "prompt": "heavy crit thump with metallic ping",
-   "seed": 77,
-   "synth": "Crit 0.18s + 1760Hz ping",
+   "prompt": "heavy crit thump with dark-iron fifth ring",
+   "seed": 1234,
+   "synth": "MetallicImpact 0.22s (170->52Hz + 330/495Hz ring, LP 1650Hz)",
    "license": "free"
   },
   {
    "cue": "LevelUp",
-   "prompt": "triumphant major-triad sting with octave",
-   "seed": 99,
-   "synth": "Sting C-E-G-C",
+   "prompt": "solemn heroic D-major horn/harp cadence",
+   "seed": 1234,
+   "synth": "ChordSting D3-A3-D4-F#4 (LP 1300Hz)",
    "license": "free"
   },
   {
    "cue": "Lantern",
-   "prompt": "holy bell chime, inharmonic partials",
-   "seed": 7,
-   "synth": "Chime 0.45s 660Hz (1/2.76/5.4)",
+   "prompt": "warm bronze lantern bell chime",
+   "seed": 1234,
+   "synth": "WarmBell 0.44s E4 (329.6Hz + hum/fifth/oct, LP 1250Hz)",
    "license": "free"
   },
   {
    "cue": "Halo",
-   "prompt": "rising warm halo sweep",
-   "seed": 7,
-   "synth": "Sweep 0.4s 220->880Hz",
+   "prompt": "warm radiant halo swell with soft fifth",
+   "seed": 1234,
+   "synth": "SynthHalo 0.42s (196->392Hz phase sweep + 293.7Hz fifth, LP 1100Hz)",
    "license": "free"
   },
   {
    "cue": "Veil",
-   "prompt": "falling shadowstep shimmer",
-   "seed": 7,
-   "synth": "Sweep 0.25s 1400->480Hz",
+   "prompt": "shadowstep mist whisper, soft falling breath",
+   "seed": 1234,
+   "synth": "SynthVeil 0.28s (BP 280..1050Hz + 370->185Hz sigh)",
    "license": "free"
   },
   {
    "cue": "SwordHit1",
-   "prompt": "sword impact variant 1, bright slash",
-   "seed": 201,
-   "synth": "Crit 0.14s",
+   "prompt": "sword impact variant 1, crisp dark steel",
+   "seed": 1234,
+   "synth": "MetallicImpact 0.14s (160->68Hz + 440/700Hz ring, LP 1550Hz)",
    "license": "free"
   },
   {
    "cue": "SwordHit2",
-   "prompt": "sword impact variant 2, mid slash",
-   "seed": 202,
-   "synth": "Crit 0.16s",
+   "prompt": "sword impact variant 2, mid steel",
+   "seed": 1234,
+   "synth": "MetallicImpact 0.16s (145->60Hz + 390/630Hz ring, LP 1450Hz)",
    "license": "free"
   },
   {
    "cue": "SwordHit3",
-   "prompt": "sword impact variant 3, heavy slash",
-   "seed": 203,
-   "synth": "Crit 0.2s",
+   "prompt": "sword impact variant 3, heavy cleave steel",
+   "seed": 1234,
+   "synth": "MetallicImpact 0.19s (130->52Hz + 330/540Hz ring, LP 1350Hz)",
    "license": "free"
   },
   {
    "cue": "Fireball",
-   "prompt": "fireball cast whoosh",
-   "seed": 204,
-   "synth": "Whoosh 0.42s",
+   "prompt": "fireball cast whoosh with ember ignition thump",
+   "seed": 1234,
+   "synth": "Whoosh 0.38s (170->780->170Hz LP sweep + 98Hz core)",
    "license": "free"
   },
   {
    "cue": "Arrow",
-   "prompt": "arrow release zip, fast falling sweep",
-   "seed": 205,
-   "synth": "Sweep 0.12s 2400->900Hz",
+   "prompt": "soft fletched arrow air-zip",
+   "seed": 1234,
+   "synth": "SynthArrow 0.12s (BP 420..1400Hz + 480->240Hz breath)",
    "license": "free"
   },
   {
    "cue": "Cleave",
-   "prompt": "wide cleave slash, noise burst",
-   "seed": 206,
-   "synth": "NoiseBurst 0.22s",
+   "prompt": "wide heavy cleave slash",
+   "seed": 1234,
+   "synth": "FilteredNoise 0.24s (150..850Hz + 130->65Hz body)",
    "license": "free"
   },
   {
    "cue": "HuskGrowl",
-   "prompt": "husk growl, low rattle",
-   "seed": 207,
-   "synth": "Rattle 0.5s 140->70Hz",
+   "prompt": "guttural husk growl, low phase-integrated rasp",
+   "seed": 1234,
+   "synth": "SynthHuskGrowl 0.46s (115->60Hz + 18Hz AM rasp, LP 520Hz)",
    "license": "free"
   },
   {
    "cue": "WardenTaunt",
-   "prompt": "bone warden taunt, rising hollow sweep",
-   "seed": 208,
-   "synth": "Sweep 0.6s 110->330Hz",
+   "prompt": "bone warden hollow crypt groan",
+   "seed": 1234,
+   "synth": "SynthWardenTaunt 0.58s (110->160->130Hz + BP 220..620Hz breath)",
    "license": "free"
   },
   {
    "cue": "BossRoar",
-   "prompt": "boss roar, deep boom",
-   "seed": 209,
-   "synth": "Boom 1.1s",
+   "prompt": "deep resonant boss bellow",
+   "seed": 1234,
+   "synth": "SynthBossRoar 1.05s (95->38Hz + 142->70Hz + BP 80..520Hz roar)",
    "license": "free"
   },
   {
    "cue": "Gold",
-   "prompt": "coin clink, bright double ping",
-   "seed": 210,
-   "synth": "Sweep 0.12s 1568->2093Hz",
+   "prompt": "muted bronze double coin clink",
+   "seed": 1234,
+   "synth": "SynthGold 0.14s (587Hz/784Hz damped taps, LP 1550Hz)",
    "license": "free"
   },
   {
    "cue": "RareDrop",
-   "prompt": "rare drop fanfare sting",
-   "seed": 211,
-   "synth": "Sting C-E-G-C",
+   "prompt": "D-Dorian resonant rare drop harp cadence",
+   "seed": 1234,
+   "synth": "ChordSting A3-D4-E4-A4 (LP 1300Hz)",
    "license": "free"
   },
   {
    "cue": "VendorBuy",
-   "prompt": "vendor buy chime, low rising fourth",
-   "seed": 212,
-   "synth": "Sweep 0.18s 330->495Hz, vol 0.5 via gain layer",
+   "prompt": "vendor buy warm rising fifth pluck",
+   "seed": 1234,
+   "synth": "ChordSting A3-E4 (LP 1050Hz)",
    "license": "free"
   },
   {
    "cue": "VendorSell",
-   "prompt": "vendor sell chime, low falling fourth",
-   "seed": 213,
-   "synth": "Sweep 0.18s 495->330Hz, vol 0.5 via gain layer",
+   "prompt": "vendor sell warm falling fourth pluck",
+   "seed": 1234,
+   "synth": "ChordSting E4-B3 (LP 1050Hz)",
    "license": "free"
   },
   {
    "cue": "Gate",
-   "prompt": "zone gate swell, low riser",
-   "seed": 214,
-   "synth": "Sweep 0.8s 180->720Hz",
+   "prompt": "ancient stone portal swell + low fifth bloom",
+   "seed": 1234,
+   "synth": "SynthGate 0.85s (65->98Hz rumble + D3/A3 chord, LP 850Hz)",
    "license": "free"
   },
   {
    "cue": "Ambient",
-   "prompt": "seamless moor wind + low drone loop (DiabloAmbience bed, PlayCue no-op)",
+   "prompt": "seamless warm moor breeze + subtle 55Hz air floor (DiabloAmbience bed, PlayCue no-op)",
    "seed": 1234,
-   "synth": "Ambient 6s loop",
+   "synth": "Ambient 6s loop (LP 360Hz brown breeze + 0.04 sub floor)",
    "license": "free"
   },
   {
    "cue": "Heal",
-   "prompt": "warm healing chime, inharmonic partials",
+   "prompt": "warm D-major healing harp bloom",
    "seed": 1234,
-   "synth": "Chime 0.55s 523Hz (1/2.76/5.4)",
+   "synth": "ChordSting D4-F#4-A4 (LP 1200Hz)",
    "license": "free"
   },
   {
    "cue": "Quest",
-   "prompt": "quest turn-in sting, major triad + octave",
+   "prompt": "warm chronicle lute turn-in cadence",
    "seed": 1234,
-   "synth": "Sting C-E-G-C",
+   "synth": "ChordSting A3-D4-E4-D4 (LP 1200Hz)",
    "license": "free"
   },
   {
    "cue": "Shrine",
-   "prompt": "waypoint shrine bell, low chime",
+   "prompt": "deep bronze waypoint shrine bell",
    "seed": 1234,
-   "synth": "Chime 0.7s 392Hz (1/2.76/5.4)",
+   "synth": "WarmBell 0.75s C4 (261.6Hz + G3 hum, LP 1100Hz)",
    "license": "free"
   },
   {
    "cue": "Block",
-   "prompt": "blocked hit clang, thump + metallic ping",
+   "prompt": "shield block thump + damped iron clang",
    "seed": 1234,
-   "synth": "Crit 0.12s + 1760Hz ping",
+   "synth": "MetallicImpact 0.16s (175->72Hz + 310/470Hz ring, LP 1450Hz)",
    "license": "free"
   },
   {
    "cue": "Footstep",
-   "prompt": "soft footstep tick, short noise burst, low gain",
+   "prompt": "soft earthy boot step on gravel/mud",
    "seed": 1234,
-   "synth": "NoiseBurst 0.06s vol 0.22",
+   "synth": "FilteredNoise 0.065s (110..580Hz + 95->55Hz step thud)",
    "license": "free"
   }
  ],
  "music": [
   {
    "track": "MenuTheme",
-   "prompt": "dark devotional menu theme, slow minor pads 60s seamless loop",
+   "prompt": "dark devotional menu theme, calm D Aeolian lute motif over Dm-C-Bb-Am pads 16s circular loop",
    "seed": 101,
-   "synth": "SynthLoop root 220Hz, devotional fifth pad, slow pulse (character per MusicDirector.SpecFor)",
+   "synth": "16s circular SynthLoop (Lute melody + Dm-C-Bb-Am pad, LP 1150Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "LanternHoldLoop",
-   "prompt": "warm hearth zone loop, soft strings plus fire crackle 60-90s seamless",
+   "prompt": "warm hearth town loop, gentle F-major acoustic lute motif over F-Dm-Bb-C pads 16s circular loop",
    "seed": 102,
-   "synth": "SynthLoop root 174.6Hz, warm major-third hearth pad, low noise",
+   "synth": "16s circular SynthLoop (Lute melody + F-Dm-Bb-C hearth pad, LP 1200Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "AshenFenLoop",
-   "prompt": "cold moor zone loop, low drone plus wind gusts 60-90s seamless",
+   "prompt": "cold moor loop, mournful D-Aeolian cello line over D-pedal pads + moor breeze 16s circular loop",
    "seed": 103,
-   "synth": "SynthLoop root 146.8Hz, minor wind-heavy moor drone, high noise",
+   "synth": "16s circular SynthLoop (Cello melody + D-pedal pad + LP breeze, LP 1000Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "OssuaryLoop",
-   "prompt": "crypt zone loop, deep bells plus whispers 60-90s seamless",
+   "prompt": "crypt zone loop, sparse B-Phrygian bronze bell chant over dark pads 16s circular loop",
    "seed": 104,
-   "synth": "SynthLoop root 123.5Hz, crypt bell partials 2.76x, sub weight",
+   "synth": "16s circular SynthLoop (BronzeBell melody + Bm-C/B-Em/B-F#5/B pad, LP 950Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "BossTrack",
-   "prompt": "boss battle track, driving percussion plus choir stabs",
+   "prompt": "boss battle track, focused G-minor low horn motif + muted war-drum pulse 16s circular loop",
    "seed": 105,
-   "synth": "SynthLoop root 98Hz, driving sub pulse 1Hz, bell stab",
+   "synth": "16s circular SynthLoop (LowHorn melody + Gm-Ab-Fm-D5 pad + muted drum, LP 1100Hz)",
    "license": "free",
-   "length": "boss loop"
+   "length": "16s circular boss loop"
   },
   {
    "track": "KilnLoop",
-   "prompt": "cinder kiln forge loop, deep sub pulse plus metallic bell 60-90s seamless",
+   "prompt": "cinder kiln forge loop, brooding C-Phrygian horn motif + slow muted forge pulse 16s circular loop",
    "seed": 108,
-   "synth": "SynthLoop root 130.8Hz, forge sub + 0.5Hz pulse, metallic bell",
+   "synth": "16s circular SynthLoop (LowHorn melody + Cm-Db/C-Ab-G5 pad + 2s forge pulse, LP 950Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "GlassBarrensLoop",
-   "prompt": "glass barrens loop, high glass partials plus sparse wind 60-90s seamless",
+   "prompt": "glass barrens loop, airy A-Dorian glass marimba motif over shifting pedal pads 16s circular loop",
    "seed": 106,
-   "synth": "SynthLoop root 110Hz, glass partials 3.98x, sparse pulse",
+   "synth": "16s circular SynthLoop (GlassMarimba melody + Am-G/A-F#m7/A-Em/A pad, LP 1250Hz)",
    "license": "free",
-   "length": "60-90s loop"
+   "length": "16s circular loop"
   },
   {
    "track": "GlasswrightTrack",
-   "prompt": "glasswright boss track, glass stabs plus driving sub pulse",
+   "prompt": "glasswright boss track, tense F#-Phrygian marimba motif + muted battle pulse 16s circular loop",
    "seed": 107,
-   "synth": "SynthLoop root 92.5Hz, glass + sub boss pulse 0.8Hz",
+   "synth": "16s circular SynthLoop (GlassMarimba melody + F#m-G-Em-C#5 pad + muted pulse, LP 1200Hz)",
    "license": "free",
-   "length": "boss loop"
+   "length": "16s circular boss loop"
   }
  ]
 }

@@ -204,6 +204,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         if (fadeRoutine != null) { StopCoroutine(fadeRoutine); fadeRoutine = null; }
         if (fadeGroup != null) { fadeGroup.alpha = 1f; fadeGroup.blocksRaycasts = open; }
         if (!open && wasOpen) { try { MusicDirector.Ensure().PlayZone(ActProgress.Town); } catch { } }
+        else if (open && !wasOpen && Application.isPlaying) { try { MusicDirector.Ensure().PlayMenu(); } catch { } }
         // Leaving the start screen for the world: a short fade instead of a hard cut
         // (input is released at once; only the picture lingers).
         if (!open && wasOpen && canvas != null && fadeGroup != null && Application.isPlaying && isActiveAndEnabled)
