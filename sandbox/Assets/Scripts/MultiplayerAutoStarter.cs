@@ -90,7 +90,7 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
             // Host/server must listen on all interfaces (0.0.0.0), otherwise only
             // loopback clients can connect. Clients ignore the listen address.
             if (args.IsClient)
-                transport.SetConnectionData(args.Address, args.Port);
+                transport.SetConnectionData(JoinArgs.ResolveAddress(args.Address), args.Port);
             else
                 transport.SetConnectionData(args.Address, args.Port, "0.0.0.0");
             if (manager.NetworkConfig.NetworkTransport == null)

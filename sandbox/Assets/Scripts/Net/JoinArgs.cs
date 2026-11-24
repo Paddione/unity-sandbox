@@ -1,3 +1,5 @@
+using UnityEngine;
+
 /// <summary>
 /// Co-op start parameters (coop-session S1), parsed from the command line.
 /// <c>-host [-port N]</c> hosts (listening on all interfaces), <c>-join ip[:port]</c>
@@ -19,6 +21,30 @@ public readonly struct JoinArgs
     public const string HostRelayFlag = "-host-relay";
     public const string DefaultAddress = "127.0.0.1";
     public const ushort DefaultPort = 7777;
+    /// <summary>
+    /// Resolve a hostname to an IP for UnityTransport (it rejects DNS names with
+    /// "Invalid server address"). IPs pass through untouched, so headless tests
+    /// never touch DNS; unresolvable names come back unchanged and fail loudly
+    /// at transport start instead of hanging a lookup.
+    /// </summary>
+    public static string ResolveAddress(string host)
+    {
+        if (string.IsNullOrEmpty(host)) return host;
+        if (System.Net.IPAddress.TryParse(host?.Trim(), out _)) return host.Trim();
+        try
+        {
+            var entry = System.Net.Dns.GetHostEntry(host);
+            foreach (var ip in entry.AddressList)
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    return ip.ToString();
+            if (entry.AddressList.Length > 0) return entry.AddressList[0].ToString();
+        }
+        catch (System.Exception e)
+        {
+            UnityEngine.Debug.LogWarning($"[Net] DNS resolve failed for '{host}': {e.Message}.");
+        }
+        return host;
+    }
     /// <summary>Public direct-connect address of the cluster server (unity.korczewski.de),
     /// baked into the Windows installer so a fresh client finds it straight away.</summary>
     public const string PublicServerAddress = "unity.korczewski.de";

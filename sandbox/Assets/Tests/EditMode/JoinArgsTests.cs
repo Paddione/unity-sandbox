@@ -116,6 +116,15 @@ public class JoinArgsTests
     }
 
     [Test]
+    public void ResolveAddress_PassesIpsAndResolvesLocalhost()
+    {
+        Assert.AreEqual(JoinArgs.DefaultAddress, JoinArgs.ResolveAddress("127.0.0.1"));
+        Assert.AreEqual("unity.korczewski.de", JoinArgs.PublicServerAddress);
+        Assert.AreEqual("127.0.0.1", JoinArgs.ResolveAddress("localhost"),
+            "UnityTransport rejects DNS names, so the client resolves first");
+    }
+
+    [Test]
     public void JoinPanel_BuildsWithHdScalerAndDefaultAddress()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
