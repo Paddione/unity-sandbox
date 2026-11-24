@@ -40,7 +40,8 @@ public sealed class HeroNameplates : MonoBehaviour
     {
         ShownCount = 0;
         Shown.Clear();
-        if (DiabloNetworkPlayer.Live.Count == 0 || ClassSelectUI.AnyOpen || PauseMenuUI.AnyOpen) { HideFrom(0); return; }
+        if ((DiabloNetworkPlayer.Live.Count == 0 && PartyCompanion.Live.Count == 0)
+            || ClassSelectUI.AnyOpen || PauseMenuUI.AnyOpen) { HideFrom(0); return; }
         if (cam == null || !cam.isActiveAndEnabled) cam = Camera.main;
         if (cam == null) { HideFrom(0); return; }
         int n = 0;
@@ -60,6 +61,24 @@ public sealed class HeroNameplates : MonoBehaviour
             plate.anchoredPosition = local;
             if (!plate.gameObject.activeSelf) plate.gameObject.SetActive(true);
             Shown[p] = label.text;
+        }
+        // AI partners walk under their class name (parchment, never gold);
+        // dead companions keep a dimmed plate at their death spot.
+        foreach (var c in PartyCompanion.Live)
+        {
+            if (c == null) continue;
+            Vector3 sp = cam.WorldToScreenPoint(c.transform.position + Vector3.up * Lift);
+            if (sp.z <= 0f) continue;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(root, sp, null, out var local)) continue;
+            var hp = c.GetComponent<PlayerHealth>();
+            bool alive = c.isActiveAndEnabled && (hp == null || hp.CurrentHP > 0f);
+            var label = Get(n++);
+            label.text = c.DisplayName;
+            label.color = ColorFor(false, alive);
+            var plate = (RectTransform)label.transform.parent;
+            plate.sizeDelta = new Vector2(label.preferredWidth + 16f, 24f);
+            plate.anchoredPosition = local;
+            if (!plate.gameObject.activeSelf) plate.gameObject.SetActive(true);
         }
         ShownCount = n;
         HideFrom(n);

@@ -246,24 +246,21 @@ public sealed class PartyRoster : MonoBehaviour
     PartyCompanion SpawnCompanion(string companionClassId)
     {
         var cls = ClassCatalog.Get(companionClassId);
-        var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        go.name = "Companion_" + cls.id;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
-        go.transform.localScale = new Vector3(0.7f, 0.9f, 0.7f);
-        var spawn = leader != null ? leader.position : Vector3.zero;
-        float angle = companions.Count * 2.1f;
-        go.transform.position = spawn + new Vector3(Mathf.Cos(angle) * 2f, 0.1f, Mathf.Sin(angle) * 2f);
-        Tint(go, cls.role);
-        go.AddComponent<Equipment>(); // before PlayerHealth: MaxHP counts gear from the start
+        // Full hero body of the class (cinderreach-companion-rendering):
+        // the factory clones the live hero's visual rig, so companions show
+        // up with the same models, gear and hair as heroes instead of
+        // tinted capsule primitives.
+        var go = CompanionFactory.BuildBody(cls, CompanionFactory.CompanionProfile(cls, FreeSlot()), leader);
         var comp = go.AddComponent<PartyCompanion>();
         comp.classId = cls.id;
         comp.leader = leader;
         comp.slot = FreeSlot();
-        go.AddComponent<PlayerHealth>();
-        go.AddComponent<DiabloProgression>(); // class scaling for its kit; XP still flows to "Player" only
-        go.AddComponent<DiabloSkills>();
-        go.AddComponent<DiabloMelee>();
         companions.Add(comp);
+        if (leader != null)
+        {
+            go.transform.position = PartyCompanion.SlotPosition(leader.position, leader.rotation, comp.slot);
+            go.transform.rotation = leader.rotation;
+        }
         // New companions arrive on the protagonist's level (party-team).
         var heroProg = leader != null ? leader.GetComponent<DiabloProgression>() : null;
         if (heroProg != null) go.GetComponent<DiabloProgression>().MirrorHeroProgress(heroProg);
@@ -333,15 +330,4 @@ public sealed class PartyRoster : MonoBehaviour
         return h;
     }
 
-    static void Tint(GameObject go, ClassDefinition.PartyRole role)
-    {
-        var rend = go.GetComponent<Renderer>();
-        if (rend == null) return;
-        var shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader == null) return;
-        var color = role == ClassDefinition.PartyRole.Tank ? new Color(0.45f, 0.55f, 0.7f)
-            : role == ClassDefinition.PartyRole.Healer ? new Color(1f, 0.85f, 0.45f)
-            : new Color(0.45f, 0.75f, 0.5f);
-        rend.sharedMaterial = new Material(shader) { color = color };
-    }
 }

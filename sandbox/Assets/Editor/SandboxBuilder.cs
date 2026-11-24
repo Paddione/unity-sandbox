@@ -1121,6 +1121,9 @@ public static class SandboxBuilder
     {
         var look = hero.AddComponent<ClassAppearance>();
         look.lanternbearerModel = LoadModel(ClassCatalog.Lanternbearer.modelPath);
+        look.rogueModel = LoadModel(ClassCatalog.Rogue.modelPath);
+        look.rangerModel = LoadModel(ClassAppearance.RangerModelPath);
+        look.rogueHoodedModel = LoadModel(ClassAppearance.RogueHoodedModelPath);
     }
 
     static void AttachStarterSword(GameObject hero)

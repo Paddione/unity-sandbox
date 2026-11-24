@@ -165,7 +165,9 @@ public static class OssuaryBuilder
         var health = boss.AddComponent<EnemyHealth>();
         health.SetTier(BossController.BossMaxHP, LootTier.Boss);
         health.corpseModel = prefab; // host-safe corpse path (feel contract, like fen husks)
-        boss.AddComponent<BossController>();
+        var bossCtl = boss.AddComponent<BossController>();
+        bossCtl.summonModel = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Minion.fbx");
         boss.AddComponent<EnemyAttack>().damage = 3;
         SandboxBuilder.WireHuskAnimator(boss);
     }

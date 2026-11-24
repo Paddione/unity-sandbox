@@ -51,6 +51,13 @@ public sealed class PartyCompanion : MonoBehaviour
         return leaderPos + rot * local;
     }
 
+    /// <summary>Live companions (nameplates read this instead of scanning the scene).</summary>
+    public static readonly System.Collections.Generic.List<PartyCompanion> Live =
+        new System.Collections.Generic.List<PartyCompanion>();
+
+    /// <summary>Name over the companion (its class; companions carry no hero name).</summary>
+    public string DisplayName => Role.displayName;
+
     /// <summary>This companion's formation point around the current leader.</summary>
     public Vector3 FollowPoint => leader != null ? SlotPosition(leader.position, leader.rotation, slot) : transform.position;
 
@@ -64,6 +71,7 @@ public sealed class PartyCompanion : MonoBehaviour
         if (IsDead) return;
         transform.position = Bounded(SlotPosition(leaderArrival, leaderRot, slot), leaderArrival);
         transform.rotation = leaderRot;
+        SetMoving(false);
     }
     /// <summary>Group heal fires when this many allies (caster included) are hurt.</summary>
     public const int GroupHealNeed = 2;
@@ -99,6 +107,8 @@ public sealed class PartyCompanion : MonoBehaviour
     DiabloSkills skills;
     DiabloMelee melee;
     PlayerHealth hp;
+    Animator animator;
+    DiabloAnimator animDriver;
 
     /// <summary>Time.time when a dead companion may rejoin; negative while alive.</summary>
     float rejoinAt = float.NegativeInfinity;
@@ -111,7 +121,22 @@ public sealed class PartyCompanion : MonoBehaviour
         skills = GetComponent<DiabloSkills>();
         melee = GetComponent<DiabloMelee>();
         hp = GetComponent<PlayerHealth>();
+        animator = GetComponent<Animator>();
+        animDriver = GetComponent<DiabloAnimator>();
         if (skills != null) skills.classOverride = Role;
+        if (!Live.Contains(this)) Live.Add(this);
+    }
+
+    void OnDestroy()
+    {
+        Live.Remove(this);
+    }
+
+    /// <summary>Locomotion bool the companion drives itself (DiabloAnimator has no click controller here).</summary>
+    void SetMoving(bool value)
+    {
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+        animator.SetBool(animDriver != null ? animDriver.moveParam : "Moving", value);
     }
 
     void Update()
@@ -124,6 +149,7 @@ public sealed class PartyCompanion : MonoBehaviour
         {
             transform.position = Bounded(FollowPoint, leader.position);
             transform.rotation = leader.rotation;
+            SetMoving(false);
             return;
         }
         // A leader walking away wins over the fight: regroup first.
@@ -146,6 +172,7 @@ public sealed class PartyCompanion : MonoBehaviour
             fwd.y = 0f;
             if (fwd.sqrMagnitude > 0.0001f)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(fwd), 8f * Time.deltaTime);
+            SetMoving(false);
             return;
         }
         float speed = MoveSpeed * (dist > CatchUpRange ? CatchUpFactor : 1f);
@@ -154,6 +181,7 @@ public sealed class PartyCompanion : MonoBehaviour
         next.y = leader.position.y;
         transform.position = Bounded(next, leader.position);
         transform.rotation = Quaternion.LookRotation(new Vector3(step.x, 0f, step.z));
+        SetMoving(true);
     }
 
     /// <summary>Nearest living husk within engage range of the leader.</summary>
@@ -226,6 +254,7 @@ public sealed class PartyCompanion : MonoBehaviour
         if (fromLeader.magnitude > RegroupRange - 0.5f) return;
         transform.position = Bounded(next, leader.position);
         Face(target.transform.position);
+        SetMoving(true);
     }
 
     /// <summary>

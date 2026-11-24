@@ -2,17 +2,57 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Class look of a hero (second-class S4). Fenwalker keeps the Knight body
-/// and the starter sword. Lanternbearer re-skins the Mage meshes onto the
-/// hero's own skeleton (KayKit Adventurers share one rig, bones match by
-/// name), hides the Knight meshes and the sword, and carries a lantern with a
-/// warm light on the right hand slot. One hero object and one network prefab
-/// serve both classes, so NGO prefab lists and the scene stay unchanged.
+/// Class look of a hero (second-class S4, gender bases S5). Male and
+/// non-binary Fenwalkers keep the Knight body and the starter sword;
+/// everyone else re-skins a stock KayKit model onto the hero's own skeleton
+/// (Adventurers share one rig, bones match by name): Lanternbearers the
+/// Mage, male/non-binary Rogues the Rogue, female Rogues the hooded Rogue,
+/// female Fenwalkers the Ranger. The healer hides the Knight meshes and the
+/// sword and carries a lantern with a warm light on the right hand slot.
+/// One hero object and one network prefab serve all classes, so NGO prefab
+/// lists and the scene stay unchanged.
 /// </summary>
 public sealed class ClassAppearance : MonoBehaviour
 {
     /// <summary>Mage model asset (assigned by the builder).</summary>
     public GameObject lanternbearerModel;
+
+    /// <summary>Rogue model asset (assigned by the builder).</summary>
+    public GameObject rogueModel;
+
+    /// <summary>Ranger model asset, the female Fenwalker base (assigned by the builder).</summary>
+    public GameObject rangerModel;
+
+    /// <summary>Hooded Rogue model asset, the female Rogue base (assigned by the builder).</summary>
+    public GameObject rogueHoodedModel;
+
+    /// <summary>Ranger base path (no ClassDefinition carries it).</summary>
+    public const string RangerModelPath = "Adventurers/Characters/Ranger.fbx";
+
+    /// <summary>Hooded Rogue base path (no ClassDefinition carries it).</summary>
+    public const string RogueHoodedModelPath = "Adventurers/Characters/Rogue_Hooded.fbx";
+
+    /// <summary>
+    /// Scene boot applies the run profile here (hero). Factory clones
+    /// (companions, creation preview) apply their own look and set this to
+    /// false, so the next-frame Start never snaps them back to the hero.
+    /// </summary>
+    public bool autoApply = true;
+
+    /// <summary>
+    /// Body model for a class+gender (pure): the Knight base stays for
+    /// male/non-binary Fenwalkers (null = no skin); everyone else re-skins
+    /// onto the hero rig. Female bases come from the KayKit stock pack, so
+    /// no new import is needed for distinct silhouettes.
+    /// </summary>
+    public static string SkinModelPath(ClassDefinition cls, HeroGender gender)
+    {
+        if (cls == null) cls = ClassCatalog.Fenwalker;
+        if (cls.id == ClassCatalog.LanternbearerId) return ClassCatalog.Lanternbearer.modelPath;
+        if (cls.id == ClassCatalog.RogueId)
+            return gender == HeroGender.Female ? RogueHoodedModelPath : ClassCatalog.Rogue.modelPath;
+        return gender == HeroGender.Female ? RangerModelPath : null;
+    }
 
     public const string SkinRootName = "ClassSkin";
     public const string LanternName = "HeldLantern";
@@ -26,6 +66,7 @@ public sealed class ClassAppearance : MonoBehaviour
     readonly List<Renderer> baseBody = new List<Renderer>();
     readonly Dictionary<Transform, Vector3> boneScales = new Dictionary<Transform, Vector3>();
     GameObject skinRoot;
+    GameObject builtSkin;
     GameObject lantern;
     GameObject hair;
     HeroEquipmentAppearance gear;
@@ -35,16 +76,31 @@ public sealed class ClassAppearance : MonoBehaviour
         // Mirrors follow the owner's network class; the local hero follows the run profile.
         var net = GetComponent<DiabloNetworkPlayer>();
         if (net != null && net.IsSpawned && !net.IsOwner) return;
+        if (!autoApply) return; // factory clones carry their own look already
         Apply(RunProfile.Class, RunProfile.Hero);
     }
 
     public void Apply(ClassDefinition cls) => Apply(cls, AppliedProfile);
 
+    /// <summary>Model asset for a skin path (null when the builder never assigned it).</summary>
+    GameObject SkinModelAsset(ClassDefinition cls, HeroGender gender)
+    {
+        string path = SkinModelPath(cls, gender);
+        if (path == null) return null;
+        if (path == ClassCatalog.Lanternbearer.modelPath) return lanternbearerModel;
+        if (path == ClassCatalog.Rogue.modelPath) return rogueModel;
+        if (path == RangerModelPath) return rangerModel;
+        if (path == RogueHoodedModelPath) return rogueHoodedModel;
+        return null;
+    }
+
     public void Apply(ClassDefinition cls, HeroProfile profile)
     {
         if (cls == null) cls = ClassCatalog.Fenwalker;
         CollectBaseBody();
-        bool lanternbearer = cls.id == ClassCatalog.LanternbearerId;
+        bool healer = cls.id == ClassCatalog.LanternbearerId;
+        var gender = (HeroGender)Mathf.Clamp(profile.gender, 0, 2);
+        var skin = SkinModelAsset(cls, gender);
         if (Application.isPlaying && gear == null)
         {
             var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
@@ -55,15 +111,27 @@ public sealed class ClassAppearance : MonoBehaviour
                 else Destroy(candidate);
             }
         }
-        foreach (var r in baseBody) if (r != null) r.enabled = gear == null && !lanternbearer;
-        SetSword(!lanternbearer);
-        if (lanternbearer)
+        foreach (var r in baseBody) if (r != null) r.enabled = gear == null && skin == null;
+        SetSword(!healer);
+        if (skin != builtSkin)
         {
-            if (gear == null && skinRoot == null) skinRoot = BuildSkin();
-            if (lantern == null) lantern = BuildLantern();
+            // The root stays stable across class switches (callers may hold
+            // it); only its mapped contents are rebuilt.
+            ClearSkin();
+            builtSkin = skin;
         }
-        if (skinRoot != null) skinRoot.SetActive(gear == null && lanternbearer);
-        if (lantern != null) lantern.SetActive(lanternbearer);
+        if (skin != null)
+        {
+            if (skinRoot == null)
+            {
+                skinRoot = new GameObject(SkinRootName);
+                skinRoot.transform.SetParent(transform, false);
+            }
+            if (skinRoot.transform.childCount == 0) MapSkin(skin, skinRoot);
+        }
+        if (healer && lantern == null) lantern = BuildLantern();
+        if (skinRoot != null) skinRoot.SetActive(gear == null && skin != null);
+        if (lantern != null) lantern.SetActive(healer);
         SwapStarterWeapon(cls);
         AppliedClassId = cls.id;
         AppliedProfile = HeroProfile.Sanitized(profile);
@@ -168,17 +236,29 @@ public sealed class ClassAppearance : MonoBehaviour
         foreach (var r in sword.GetComponentsInChildren<Renderer>(true)) r.enabled = visible;
     }
 
-    /// <summary>Mage skinned meshes bound to this hero's bones (by name). Null without a model.</summary>
-    GameObject BuildSkin()
+    /// <summary>Drop the mapped skin contents; the root itself stays.</summary>
+    void ClearSkin()
     {
-        if (lanternbearerModel == null) return null;
+        if (skinRoot == null) return;
+        // Collect first: destroying a child mid-iteration invalidates the walk.
+        var doomed = new System.Collections.Generic.List<GameObject>();
+        foreach (Transform child in skinRoot.transform) doomed.Add(child.gameObject);
+        foreach (var d in doomed)
+        {
+            if (Application.isPlaying) Destroy(d);
+            else DestroyImmediate(d);
+        }
+    }
+
+    /// <summary>Model skinned meshes bound to this hero's bones (by name) under <paramref name="root"/>.</summary>
+    void MapSkin(GameObject model, GameObject root)
+    {
+        if (model == null || root == null) return;
         var bones = new Dictionary<string, Transform>();
         foreach (var t in GetComponentsInChildren<Transform>(true))
             if (!bones.ContainsKey(t.name)) bones[t.name] = t;
 
-        var temp = Instantiate(lanternbearerModel);
-        var root = new GameObject(SkinRootName);
-        root.transform.SetParent(transform, false);
+        var temp = Instantiate(model);
         foreach (var smr in temp.GetComponentsInChildren<SkinnedMeshRenderer>(true))
         {
             var mapped = new Transform[smr.bones.Length];
@@ -199,7 +279,6 @@ public sealed class ClassAppearance : MonoBehaviour
                 mr.transform.SetParent(hb, false);
         }
         if (Application.isPlaying) Destroy(temp); else DestroyImmediate(temp);
-        return root;
     }
 
     GameObject BuildLantern()

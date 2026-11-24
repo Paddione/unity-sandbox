@@ -27,6 +27,9 @@ public sealed class BossController : NetworkBehaviour
     public readonly NetworkVariable<int> Phase = new NetworkVariable<int>(1,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    /// <summary>Skeleton model for phase-2 summons (assigned by the builder); scene template wins when null.</summary>
+    public GameObject summonModel;
+
     /// <summary>Boss kills this run (test seam).</summary>
     public static int BossesKilled;
     /// <summary>Phase-2 entries this run (test seam).</summary>
@@ -116,7 +119,7 @@ public sealed class BossController : NetworkBehaviour
         {
             float a = i * Mathf.PI * 2f / 3f;
             var pos = transform.position + new Vector3(Mathf.Cos(a) * 2.5f, 0.05f, Mathf.Sin(a) * 2.5f);
-            SpawnHusk($"Husk_Summon_{i}_{PhaseTwoEntries}", pos, netServer);
+            SpawnHusk($"Husk_Summon_{i}_{PhaseTwoEntries}", pos, netServer, summonModel);
         }
     }
 
@@ -215,25 +218,12 @@ public sealed class BossController : NetworkBehaviour
     /// <summary>Ash-grey summon colour (URP Lit).</summary>
     public static readonly Color SummonTint = new Color(0.32f, 0.29f, 0.27f);
 
-    static void SpawnHusk(string name, Vector3 pos, bool netServer)
+    static void SpawnHusk(string name, Vector3 pos, bool netServer, GameObject model)
     {
-        var husk = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        husk.name = name;
-        // The primitive's default material has no URP shader and renders magenta in
-        // the player (seen in shotcheck 21_abbot_phase2): give it a URP Lit ash tint.
-        var shader = Shader.Find("Universal Render Pipeline/Lit");
-        var rend = husk.GetComponent<Renderer>();
-        if (shader != null && rend != null)
-            rend.sharedMaterial = new Material(shader) { color = SummonTint };
-        husk.tag = "Husk";
-        husk.transform.position = pos;
-        husk.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);
-        husk.AddComponent<EnemyAttack>().damage = 1;
-        // Server spawn replicates to clients; solo stays local.
-        if (netServer)
-        {
-            husk.AddComponent<NetworkObject>().Spawn();
-        }
+        // Skeleton body (cinderreach-companion-rendering): explicit builder
+        // model wins, else the scene husk template, else a URP-tinted capsule
+        // (never the bare default material that renders magenta).
+        HuskModelLibrary.SpawnHusk(name, pos, 1f, 5, LootTier.Normal, 1, model, netServer);
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>

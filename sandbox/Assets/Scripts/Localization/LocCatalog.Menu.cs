@@ -83,5 +83,6 @@ public static partial class LocCatalog
         E("menu.create.random", "Würfeln", "Random"),
         E("menu.create.start", "Als {0} beginnen", "Begin as {0}"),
         E("menu.create.name.rule", "Name: 2–16 Zeichen, nur Buchstaben, Ziffern, - und _.", "Name: 2–16 characters, letters, digits, - and _ only."),
+        E("menu.create.preview", "VORSCHAU", "PREVIEW"),
     };
 }

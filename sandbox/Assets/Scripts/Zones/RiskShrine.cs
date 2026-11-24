@@ -32,6 +32,9 @@ public sealed class RiskShrine : MonoBehaviour, IUsable
     /// <summary>Name of the spawned challenge elite.</summary>
     public const string EliteName = "Shrine Elite";
 
+    /// <summary>Skeleton model for the elite (assigned by the builder); scene template wins when null.</summary>
+    public GameObject eliteModel;
+
     GameObject elite;
 
     public RiskShrineProgress Progress => RunProfile.RiskShrine;
@@ -96,18 +99,12 @@ public sealed class RiskShrine : MonoBehaviour, IUsable
             elite = found;
             return;
         }
-        elite = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        elite.name = EliteName;
-        elite.tag = "Husk";
-        elite.transform.position = transform.position + new Vector3(2f, 0.05f, 0f);
-        elite.transform.localScale = Vector3.one * 1.3f;
-        var col = elite.GetComponent<CapsuleCollider>();
-        col.height = 1.7f;
-        col.radius = 0.35f;
-        col.center = new Vector3(0f, 0.85f, 0f);
-        var health = elite.AddComponent<EnemyHealth>();
-        health.SetTier(EliteHP, LootTier.Elite);
-        elite.AddComponent<EnemyAttack>().damage = 2;
+        // Skeleton body (cinderreach-companion-rendering): the bare capsule
+        // rendered magenta in the URP player. Explicit builder model wins,
+        // else the scene husk template, else a URP-tinted capsule.
+        elite = HuskModelLibrary.SpawnHusk(EliteName,
+            transform.position + new Vector3(2f, 0.05f, 0f),
+            1.3f, EliteHP, LootTier.Elite, 2, eliteModel, netServer: false);
         var hook = elite.AddComponent<RiskShrineDeathRelay>();
         hook.shrine = this;
     }

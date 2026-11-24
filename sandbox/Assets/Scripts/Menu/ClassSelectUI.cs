@@ -211,6 +211,7 @@ public sealed class ClassSelectUI : MonoBehaviour
             fadeRoutine = StartCoroutine(FadeOut());
         else if (canvas != null) canvas.enabled = open;
         DiabloClickController.ExternalDrive = open;
+        if (!open && previewView != null) previewView.Hide();
         if (open)
         {
             PendingCustomizeClass = null;
@@ -260,6 +261,9 @@ public sealed class ClassSelectUI : MonoBehaviour
     // ---- character-creation step (after the class pick) ----
     GameObject customizeModal;
     Text customizeClassLabel;
+    HeroPreviewView previewView;
+    /// <summary>True while the embedded 3D draft preview stands (test seam).</summary>
+    public bool PreviewVisible => previewView != null && previewView.IsLive;
     Text genderValue, hairValue, hairColorValue, buildValue, customizeHint;
     Button customizeStartBtn;
     Text customizeStartLabel;
@@ -339,6 +343,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     public void CancelCustomize()
     {
         PendingCustomizeClass = null;
+        if (previewView != null) previewView.Hide();
         if (customizeModal != null) customizeModal.SetActive(false);
         if (mainContent != null) mainContent.SetActive(true);
         ApplyToHero();
@@ -348,8 +353,11 @@ public sealed class ClassSelectUI : MonoBehaviour
     {
         var target = Hero();
         if (target == null || PendingCustomizeClass == null) return;
+        var cls = ClassCatalog.Get(PendingCustomizeClass);
         var look = target.GetComponent<ClassAppearance>();
-        if (look != null) look.Apply(ClassCatalog.Get(PendingCustomizeClass), DraftProfile);
+        if (look != null) look.Apply(cls, DraftProfile);
+        // The embedded 3D preview mirrors the same draft on its own rig.
+        if (previewView != null) previewView.Show(cls, DraftProfile);
     }
 
     void RefreshCustomize()
@@ -424,6 +432,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         RunProfile.Hero = HeroProfile.Sanitized(p);
         string classId = PendingCustomizeClass;
         PendingCustomizeClass = null;
+        if (previewView != null) previewView.Hide();
         if (customizeModal != null) customizeModal.SetActive(false);
         BeginNew(classId);
     }
@@ -742,7 +751,7 @@ public sealed class ClassSelectUI : MonoBehaviour
 
     void BuildCustomize(Transform canvas)
     {
-        customizeModal = DiabloUIFactory.MakePanel(canvas, "HeroCustomizePanel", new Vector2(620f, 600f), Vector2.zero);
+        customizeModal = DiabloUIFactory.MakePanel(canvas, "HeroCustomizePanel", new Vector2(640f, 880f), Vector2.zero);
         var v = customizeModal.AddComponent<VerticalLayoutGroup>();
         v.padding = new RectOffset(24, 24, 18, 20);
         v.spacing = 10f;
@@ -751,6 +760,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.MakeHeader(customizeModal.transform, Loc.T("menu.create.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelCustomize);
         customizeClassLabel = DiabloUIFactory.MakeText(customizeModal.transform, "CustomizeClass", "", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(customizeClassLabel.gameObject, prefH: 24f, flexW: 1f);
+        previewView = HeroPreviewView.BuildInto(customizeModal.transform);
 
         genderValue = CycleRow(customizeModal.transform, "GenderRow", "menu.create.gender", CycleGender);
         hairValue = CycleRow(customizeModal.transform, "HairRow", "menu.create.hair", CycleHair);

@@ -102,15 +102,10 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
         {
             float a = i * Mathf.PI * 2f / SummonCount;
             var pos = transform.position + new Vector3(Mathf.Cos(a) * 3f, 0f, Mathf.Sin(a) * 3f);
-            var thrall = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            thrall.name = $"Kiln Summon_{i}_{PhaseTwoEntries}";
-            thrall.tag = "Husk";
-            thrall.transform.position = pos;
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            var r = thrall.GetComponent<Renderer>();
-            if (shader != null && r != null) r.sharedMaterial = new Material(shader) { color = new Color(0.45f, 0.2f, 0.12f) };
-            thrall.AddComponent<EnemyHealth>().SetTier(6, LootTier.Normal);
-            thrall.AddComponent<EnemyAttack>().damage = 1;
+            // Skeleton body (cinderreach-companion-rendering): scene husk
+            // template wins, else a URP-tinted capsule (never bare magenta).
+            var thrall = HuskModelLibrary.SpawnHusk($"Kiln Summon_{i}_{PhaseTwoEntries}",
+                pos, 1f, 6, LootTier.Normal, 1, model: null, netServer: false);
             thrall.AddComponent<CinderThrall>();
         }
         Debug.Log($"[Kilnmother] Phase 2: burning ground and {SummonCount} thralls.");
