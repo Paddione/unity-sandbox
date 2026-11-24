@@ -97,21 +97,23 @@ public sealed class ClassAppearance : MonoBehaviour
     public void Apply(ClassDefinition cls, HeroProfile profile)
     {
         if (cls == null) cls = ClassCatalog.Fenwalker;
+        AdoptClonedSkinRoot();
         CollectBaseBody();
         bool healer = cls.id == ClassCatalog.LanternbearerId;
         var gender = (HeroGender)Mathf.Clamp(profile.gender, 0, 2);
         var skin = SkinModelAsset(cls, gender);
         if (Application.isPlaying && gear == null)
         {
-            var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
-            if (source != null && source.LightClothing != null && GetComponent<Equipment>() != null)
+            if (GetComponent<Equipment>() != null)
             {
                 var candidate = gameObject.AddComponent<HeroEquipmentAppearance>();
-                if (candidate.Initialize(this, source.LightClothing)) gear = candidate;
+                if (candidate.Initialize(this)) gear = candidate;
                 else Destroy(candidate);
             }
         }
-        foreach (var r in baseBody) if (r != null) r.enabled = gear == null && skin == null;
+        // The class+gender body stays visible under gear: worn items mount on
+        // top of it, so every class keeps its own silhouette.
+        foreach (var r in baseBody) if (r != null) r.enabled = skin == null;
         SetSword(!healer);
         if (skin != builtSkin)
         {
@@ -130,7 +132,7 @@ public sealed class ClassAppearance : MonoBehaviour
             if (skinRoot.transform.childCount == 0) MapSkin(skin, skinRoot);
         }
         if (healer && lantern == null) lantern = BuildLantern();
-        if (skinRoot != null) skinRoot.SetActive(gear == null && skin != null);
+        if (skinRoot != null) skinRoot.SetActive(skin != null);
         if (lantern != null) lantern.SetActive(healer);
         SwapStarterWeapon(cls);
         AppliedClassId = cls.id;
@@ -166,9 +168,17 @@ public sealed class ClassAppearance : MonoBehaviour
     void RebuildHair()
     {
         if (hair != null) { if (Application.isPlaying) Destroy(hair); else DestroyImmediate(hair); hair = null; }
-        if (AppliedProfile.hairStyle == 4) return; // Glatze
         var head = FindDeep(transform, "head");
         if (head == null) return;
+        // Clones (creation preview, companions) copy the hero's hair; drop it so only the draft hair stands.
+        for (int i = head.childCount - 1; i >= 0; i--)
+        {
+            var old = head.GetChild(i).gameObject;
+            if (old.name != HeroAppearance.HairRootName) continue;
+            old.SetActive(false);
+            if (Application.isPlaying) Destroy(old); else DestroyImmediate(old);
+        }
+        if (AppliedProfile.hairStyle == 4) return; // Glatze
         hair = BuildHair(head, AppliedProfile);
     }
 
@@ -221,6 +231,18 @@ public sealed class ClassAppearance : MonoBehaviour
         if (lantern != null) lantern.SetActive(visible);
     }
 
+    /// <summary>
+    /// A clone (creation preview, companion) copies the hero's mapped skin
+    /// but not this component's private state: take the copied root over so
+    /// it is cleared instead of counted as base body.
+    /// </summary>
+    void AdoptClonedSkinRoot()
+    {
+        if (skinRoot != null) return;
+        var copied = transform.Find(SkinRootName);
+        if (copied != null) skinRoot = copied.gameObject;
+    }
+
     void CollectBaseBody()
     {
         if (baseBody.Count > 0) return;
@@ -245,6 +267,10 @@ public sealed class ClassAppearance : MonoBehaviour
         foreach (Transform child in skinRoot.transform) doomed.Add(child.gameObject);
         foreach (var d in doomed)
         {
+            // Destroy is deferred in play mode: detach now so the rebuild
+            // (childCount == 0) maps the new skin in the same Apply.
+            d.SetActive(false);
+            d.transform.SetParent(null, false);
             if (Application.isPlaying) Destroy(d);
             else DestroyImmediate(d);
         }

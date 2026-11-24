@@ -1,8 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Worn-gear art on top of the class body (<see cref="ClassAppearance"/>):
+/// visible Unique models per slot and the Fenwalker's starter chest guard.
+/// The body itself stays the class+gender model, so classes keep distinct
+/// silhouettes.
+/// </summary>
 public sealed class HeroEquipmentAppearance : MonoBehaviour
 {
+    /// <summary>Bone mounts this component adds (clones strip them, see CompanionFactory).</summary>
+    public static readonly string[] MountNames = { "Chest art", "Head art", "Right hand art", "Left hand art" };
+
     Equipment equipment;
     ClassAppearance appearance;
     DiabloNetworkPlayer networkPlayer;
@@ -22,7 +31,7 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
     string weaponId;
     string classId;
 
-    public bool Initialize(ClassAppearance owner, GameObject clothing)
+    public bool Initialize(ClassAppearance owner)
     {
         appearance = owner;
         equipment = GetComponent<Equipment>();
@@ -37,12 +46,11 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
             return false;
 
         baseSkin = GetComponentsInChildren<SkinnedMeshRenderer>(true);
-        chest = Mount("Chest art", chestBone);
-        head = Mount("Head art", headBone);
-        right = Mount("Right hand art", rightBone);
-        left = Mount("Left hand art", leftBone);
+        chest = Mount(MountNames[0], chestBone);
+        head = Mount(MountNames[1], headBone);
+        right = Mount(MountNames[2], rightBone);
+        left = Mount(MountNames[3], leftBone);
         bones.TryGetValue(DiabloSkills.SwordName, out sword);
-        BuildClothing(clothing, bones);
         return true;
     }
 
@@ -63,27 +71,6 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
         anchor.rotation = transform.rotation;
         anchor.localScale = Vector3.one / bone.lossyScale.x;
         return anchor;
-    }
-
-    void BuildClothing(GameObject clothing, Dictionary<string, Transform> bones)
-    {
-        var imported = Instantiate(clothing);
-        imported.SetActive(false);
-        var root = new GameObject("Light clothing");
-        root.transform.SetParent(transform, false);
-        foreach (var source in imported.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-        {
-            if (source.name.Contains("Cape") || source.name.Contains("Quiver")) continue;
-            var mapped = source.bones;
-            for (int i = 0; i < mapped.Length; i++)
-                if (mapped[i] != null && bones.TryGetValue(mapped[i].name, out var bone))
-                    mapped[i] = bone;
-            source.bones = mapped;
-            if (source.rootBone != null && bones.TryGetValue(source.rootBone.name, out var rootBone))
-                source.rootBone = rootBone;
-            source.transform.SetParent(root.transform, false);
-        }
-        Destroy(imported);
     }
 
     static string Id(ItemInstance item) => item?.rarity == ItemRarity.Unique ? item.uniqueId : null;
@@ -115,7 +102,8 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
 
         bool lanternbearer = classId == ClassCatalog.LanternbearerId;
         bool bowDrawn = skills != null && skills.BowDrawn;
-        starterGuard.SetActive(armor == null);
+        // Brass plate is the tank's starter look; robe and leathers stay bare.
+        starterGuard.SetActive(armor == null && classId == ClassCatalog.FenwalkerId);
         if (sword != null) sword.gameObject.SetActive(weapon == null && !lanternbearer && !bowDrawn);
         appearance.SetStarterLanternVisible(lanternbearer && weapon == null);
         if (skills != null) skills.SetStarterBowModelVisible(weaponId != ItemDatabase.NightfangId);

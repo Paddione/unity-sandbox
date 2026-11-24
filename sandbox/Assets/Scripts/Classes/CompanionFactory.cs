@@ -123,6 +123,9 @@ public static class CompanionFactory
         {
             if (tr != null && tr.gameObject != go && tr.name.Contains("Canvas"))
                 doomed.Add(tr.gameObject);
+            // The hero's worn-gear art belongs to the hero's class and items, not the clone's.
+            else if (tr != null && System.Array.IndexOf(HeroEquipmentAppearance.MountNames, tr.name) >= 0)
+                doomed.Add(tr.gameObject);
         }
         foreach (var d in doomed)
             if (d != null) Object.DestroyImmediate(d);

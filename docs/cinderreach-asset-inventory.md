@@ -22,7 +22,7 @@ Der Export folgt Unitys transitiven Asset-Referenzen. Ein `Resources`-Eintrag be
 
 ## Charaktere und Uniques
 
-Die Klassen teilen die leichte KayKit-Ranger-Kleidung ohne Umhang und Köcher. Sie verwenden gelbe Brustschützer mit klassenspezifischer Schließe sowie ihre bisherige Startwaffen-Darstellung. Das Slot-Modell wird für ein ausgerüstetes Unique anhand der stabilen Item-ID ausgewählt.
+Jede Klasse trägt ihr eigenes KayKit-Klassen- und Geschlechtsmodell (Knight, Ranger, Mage, Rogue, Rogue_Hooded). Nur der Fenwalker trägt den gelben Brustschutz als Startrüstung. Die Startwaffen-Darstellung bleibt. Das Slot-Modell wird für ein ausgerüstetes Unique anhand der stabilen Item-ID ausgewählt.
 
 | Slot | Eigenständige Modelle |
 | --- | --- |

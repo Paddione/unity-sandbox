@@ -616,12 +616,17 @@ public sealed class DiabloShotCheck : MonoBehaviour
         float distance = hero.distance;
         float pitch = hero.pitch;
         Face(hero, towardCamera);
+        var heroLook = appearance.AppliedProfile;
         foreach (var cls in ClassCatalog.All)
-        {
-            appearance.Apply(cls);
-            yield return Wait(.35f);
-            yield return Shot("base_" + cls.id);
-        }
+            foreach (HeroGender gender in System.Enum.GetValues(typeof(HeroGender)))
+            {
+                var look = heroLook;
+                look.gender = (int)gender;
+                appearance.Apply(cls, look);
+                yield return Wait(.35f);
+                yield return Shot($"base_{cls.id}_{gender.ToString().ToLowerInvariant()}");
+            }
+        appearance.Apply(ClassCatalog.Fenwalker, heroLook);
 
         hero.distance = 5f;
         hero.pitch = 33f;
