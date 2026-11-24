@@ -12,6 +12,7 @@ public static partial class LocCatalog
         E("settings.quality.med", "Mittel", "Med"),
         E("settings.quality.high", "Hoch", "High"),
         E("settings.ui", "Oberfläche", "UI"),
+        E("settings.voice", "Stimmen", "Voices"),
         E("settings.quality", "Qualität:", "Quality:"),
         E("settings.fullscreen", "Vollbild", "Fullscreen"),
         E("settings.hitstop", "Trefferstopp", "HitStop"),

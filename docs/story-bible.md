@@ -1,6 +1,6 @@
 # Cinderreach – Story-Bibel
 
-Stand: 2026-11-23 (Goal `cinderreach-deutsch-story`, S3). Diese Datei ist die SSOT für Welt, Figuren,
+Stand: 2026-11-23 (Goal `cinderreach-deutsch-story`, S3; Folgezeilen, Zurufe und Sprachausgabe aus `cinderreach-story-voice`). Diese Datei ist die SSOT für Welt, Figuren,
 Aufgaben und Begriffe. Spieltexte in `Localization/` und die Questdaten in `Story/` folgen ihr.
 Änderungen an Namen erst hier, dann im Code.
 
@@ -273,8 +273,8 @@ der weiterhin Akt I abschließt und die Brache öffnet. H5 ist rein erzählerisc
 | Nr | Titel | Auftraggeber | Ziele | Belohnung | Was sie an der Hauptgeschichte ändert |
 |---|---|---|---|---|---|
 | N1 | Ilsabes Lieferbuch | Ilsabe | Den Moorvorrat im Aschenmoor bergen (die Kiste). Das Lieferbuch zu Ilsabe bringen. | 150 Gold | Das Lieferbuch zeigt Mengen, die nie ein Totenkarren gefahren hat. Wer N1 erledigt hat, erkennt in H4 Ilsabes Handschrift wieder; der Abschluss-Dialog von H4 hat eine eigene Zeile. |
-| N2 | Die stillen Brüder | Ottilie | Im Beinhaus drei Grabtafeln lesen (Fundstücke an den Sarkophagen). | 1 Fertigkeitsrang-Gegenstand (Selten) | Die Knochenwächter haben Namen. Der Abt hat seine Brüder nicht missbraucht, sie haben ihm ihre Gebeine angeboten. |
-| N3 | Hagedorns Spitzen | Jorin | Sechs Aschenlanzer im Glutofen erschlagen. Zu Jorin zurückkehren. | Ein kostenloses Umschmieden | Jorin gesteht, dass er wusste, wofür die Lanzen gedacht waren: nicht gegen Plünderer, sondern gegen Knechte, die fliehen wollten. |
+| N2 | Die stillen Brüder | Ottilie | Im Beinhaus drei Grabtafeln lesen (Fundstücke an den Sarkophagen). | 1 Fertigkeitsrang-Gegenstand (Selten) | Die Knochenwächter haben Namen. Der Abt hat seine Brüder nicht missbraucht, sie haben ihm ihre Gebeine angeboten. Im H3-Angebot erinnert sich Ottilie an Thewes und an ihre eigene Rolle. Im Kampf ruft der Abt seine Brüder bei Namen. |
+| N3 | Hagedorns Spitzen | Jorin | Sechs Aschenlanzer im Glutofen erschlagen. Zu Jorin zurückkehren. | Ein kostenloses Umschmieden | Jorin gesteht, dass er wusste, wofür die Lanzen gedacht waren: nicht gegen Plünderer, sondern gegen Knechte, die fliehen wollten. Im H4-Abschluss erzählt Ottilie, dass Jorin die Spitzen eingeschmolzen hat. |
 
 ## Akt II – „Was im Glas wohnt“
 
@@ -294,8 +294,8 @@ Nachschub. Merle Sandkamp kommt mit einem leeren Karren aus der Glasbrache.
 
 | Nr | Titel | Auftraggeber | Ziele | Belohnung | Was sie an der Hauptgeschichte ändert |
 |---|---|---|---|---|---|
-| N4 | Tamm | Merle | Einen Glasvogt in der Glasbrache bezwingen. Seine Karrnermarke zu Merle bringen. | 250 Gold | Tamm war einer der Glasvögte. Merle legt die Marke nicht weg, sondern in ihren Sack mit dem Glutglas. Sie verkauft das Glas danach nicht mehr. |
-| N5 | Was die Seher sahen | Ilsabe | Zwei Sehgläser behalten statt sie Merle zu geben (vier Dünenseher erschlagen). Zu Ilsabe bringen. | 1 einzigartiger Gegenstand aus Ilsabes Bestand | Ilsabe will die Sehgläser, um zu wissen, wann die Hüllen kommen. Sie plant schon die nächste Spende. Die Wacht hat aus Akt I nichts gelernt. |
+| N4 | Tamm | Merle | Einen Glasvogt in der Glasbrache bezwingen. Seine Karrnermarke zu Merle bringen. | 250 Gold | Tamm war einer der Glasvögte. Merle legt die Marke nicht weg, sondern in ihren Sack mit dem Glutglas. In H9 sagt sie dann, dass sie das Glas nicht mehr verkauft. Ohne N4 verkauft sie es weiter („Irgendwer kauft immer Licht“). |
+| N5 | Was die Seher sahen | Ilsabe | Zwei Sehgläser behalten statt sie Merle zu geben (vier Dünenseher erschlagen). Zu Ilsabe bringen. | 1 einzigartiger Gegenstand aus Ilsabes Bestand | Ilsabe will die Sehgläser, um zu wissen, wann die Hüllen kommen. Sie plant schon die nächste Spende. Die Wacht hat aus Akt I nichts gelernt. In H9 spricht Ottilie es aus: „Sie wird ihnen etwas anbieten. Jemanden.“ |
 
 ## Ausblick nach Akt II
 
@@ -307,6 +307,36 @@ Kein Akt III in diesem Goal. Das Ende bleibt offen und unbequem:
 
 Die spätere Entscheidung (Laternen brechen oder halten) ist der Haken für Akt III und wird hier nicht
 aufgelöst.
+
+## Folgezeilen der Nebenaufgaben
+
+Dialogzeilen mit Sprecher `x|nK` erscheinen nur, wenn Nebenaufgabe `nK` erledigt ist, `x|!nK` nur, wenn nicht
+(`StoryDialog.Visible`). So ändert jede Nebenaufgabe eine Zeile der Hauptkette: N1 → H5-Angebot, N2 → H3-Angebot,
+N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie.
+
+## Zurufe
+
+Kurze vertonte Zeilen außerhalb des Dialogfensters, als Untertitel über der Aktionsleiste (`StoryBarks`).
+
+| Anlass | Sprecher | Zeile |
+|---|---|---|
+| Abt Phase 2 | Der Hohle Abt | „Bruder Benno. Bruder Kaspar. Bruder Thewes. Steht auf. Die Liste ist noch nicht zu Ende.“ |
+| Abt besiegt | Der Hohle Abt | „Lest die Namen. Lest sie laut.“ |
+| Ofenmutter Phase 2 | Die Ofenmutter | „Zwölf Körbe Asche für eine Laterne im Monat. Rechnet nach. Ich habe es jeden Tag getan.“ |
+| Ofenmutter besiegt | Die Ofenmutter | „Ich habe niemanden geholt. Sie wurden mir gebracht. Von euch.“ |
+| Glasmacher Phase 2 | Der Glasmacher | „Wendeline, hab keine Angst. Sie wollen dich nur ansehen. Ich halte dich.“ |
+| Glasmacher besiegt | Der Glasmacher | „Ihr nennt es Gefangenschaft. Ich nenne es: nicht loslassen.“ |
+| H4 beginnt (Glutofen betreten) | Erzähler | „Hinter dem Tor ist die Luft so heiß, dass der Ruß nicht fällt. Irgendwo zählt eine Stimme Körbe.“ |
+| H7 erledigt (Wendung 3) | Erzähler | „Im letzten Sehglas liegt die Laternenwacht, von außen gesehen. Um ihre Lichter steht der Nebel voller Gestalten, alle mit dem Gesicht zur Tür.“ |
+
+## Sprachausgabe
+
+Alle Dialog- und Zurufzeilen sind deutsch vertont, Erzählzeilen von einer Erzählerstimme. Jede Figur hat eine
+synthetische Stimme (keine reale Person), definiert in `docs/audio/voices.json`: Ottilie (leiser, müder Alt),
+Ilsabe (heller, schneller Händlerinnenton), Jorin (rauer Bass, wortkarg), Merle (heiser, erschöpft), Erzähler
+(ruhiger Bariton), Abt (hohl, flüsternd), Ofenmutter (hart, rauchig), Glasmacher (sanft, brüchig). Textänderung an
+einer Zeile macht ihren Clip ungültig (`scripts/check-voice-lines.py`), neu rendern mit
+`scripts/voice/render_voices.py`. Mit `-lang en` bleiben die Clips stumm.
 
 ## Zwischentexte
 

@@ -32,8 +32,7 @@ public sealed class StoryDialogUI : MonoBehaviour
         if (dialog != null)
             for (int i = 0; i < dialog.speakers.Length; i++)
             {
-                string flag = StoryDialog.Flag(dialog.speakers[i]);
-                if (flag != null && !StoryDirector.State.Flags.Contains(flag)) continue;
+                if (!StoryDialog.Visible(dialog.speakers[i], StoryDirector.State.Flags)) continue;
                 lines.Add(i);
             }
         index = 0;
@@ -68,6 +67,7 @@ public sealed class StoryDialogUI : MonoBehaviour
     {
         IsOpen = false;
         AnyOpen = false;
+        StoryVoice.Stop();
         if (canvas != null) canvas.enabled = false;
         if (book) StoryDirector.BookTalk(npc, gameObject);
     }
@@ -84,6 +84,7 @@ public sealed class StoryDialogUI : MonoBehaviour
         string speaker = StoryDialog.Speaker(dialog.speakers[i]);
         speakerText.text = speaker == "n" ? "" : Loc.T("npc." + speaker + ".name");
         bodyText.text = Loc.T(dialog.Key(i));
+        StoryVoice.Play(dialog.Key(i));
         bodyText.fontStyle = speaker == "n" ? FontStyle.Italic : FontStyle.Normal;
         buttonText.text = Loc.T(index + 1 < lines.Count ? "story.dialog.continue" : "story.dialog.end");
     }

@@ -78,7 +78,7 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
 
     void OnPhaseChanged(int oldV, int newV)
     {
-        if (!IsServer && newV == 2) PhaseTwo = true;
+        if (!IsServer && newV == 2 && !PhaseTwo) { PhaseTwo = true; StoryBarks.Say("glasswright.phase2"); }
     }
 
     bool Authority => !IsSpawned || IsServer;
@@ -155,6 +155,7 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
         if (PhaseTwo) return;
         PhaseTwo = true;
         PhaseTwoEntries++;
+        StoryBarks.Say("glasswright.phase2");
         DiabloJuice.OnBlast(transform.position);
         try { PresentationVfx.PhaseTwoBurst(transform.position); } catch { }
         if (IsSpawned && IsServer) Phase.Value = 2;

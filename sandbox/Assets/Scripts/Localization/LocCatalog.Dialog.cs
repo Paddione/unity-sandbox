@@ -34,7 +34,8 @@ public static partial class LocCatalog
         E("dlg.h3.offer.3", "Hinter manchen Namen steht kein Todestag. Hinter einem steht ‚hustet noch‘.", "Some names have no date of death. One says ‘still coughing’."),
         E("dlg.h3.offer.4", "Er hat aufgehört, Tote herauszugeben, weil der Ofen Lebende bestellt hat. Und ihr habt ihn dafür …", "He stopped giving up the dead because the kiln was ordering the living. And you killed him for …"),
         E("dlg.h3.offer.5", "Nein. Ich habe euch geschickt.", "No. I sent you."),
-        E("dlg.h3.offer.6", "Jorin Hagedorn war Lehrling am Ofen. Redet mit ihm, bevor ihr hingeht. Er sagt nicht viel, aber er lügt nicht.", "Jorin Hagedorn was an apprentice at the kiln. Talk to him before you go. He doesn't say much, but he doesn't lie."),
+        E("dlg.h3.offer.6", "Thewes stand auf einer der Tafeln. Er hat dem Abt seine Knochen gegeben, damit der Grund gehütet bleibt. Und ich habe euch hinterhergeschickt.", "Thewes was on one of the tablets. He gave the abbot his bones so the ground would stay guarded. And I sent you after them."),
+        E("dlg.h3.offer.7", "Jorin Hagedorn war Lehrling am Ofen. Redet mit ihm, bevor ihr hingeht. Er sagt nicht viel, aber er lügt nicht.", "Jorin Hagedorn was an apprentice at the kiln. Talk to him before you go. He doesn't say much, but he doesn't lie."),
         E("dlg.h3.hint.1", "Redet mit Jorin an der Schmiede. Dann in den Glutofen. Der Weg führt durch das Beinhaus.", "Talk to Jorin at the smithy. Then into the Cinder Kiln. The way leads through the ossuary."),
         E("dlg.h3.talk.jorin.1", "Ottilie schickt euch. Hab's mir gedacht.", "Ottilie sent you. Figured."),
         E("dlg.h3.talk.jorin.2", "Die Meisterin. Ihr nennt sie Ofenmutter. Wir haben sie nie so genannt, wenn sie zugehört hat.", "The master. You call her the Kilnmother. We never called her that when she could hear."),
@@ -45,7 +46,9 @@ public static partial class LocCatalog
         // ---- H4 Asche schuldet niemand ----
         E("dlg.h4.hint.1", "Der Ofen brennt noch. Solange er brennt, hört sie nicht auf.", "The kiln still burns. As long as it burns, she won't stop."),
         E("dlg.h4.done.1", "Das ist ihr Brennbuch? Schwer. Ruß an jeder Seite.", "That's her firing book? Heavy. Soot on every page."),
-        E("dlg.h4.done.2", "Gebt mir einen Abend damit.", "Give me an evening with it."),
+        E("dlg.h4.done.2", "Sie hat euch etwas gesagt, bevor sie fiel. Ich seh es euch an. Nein, sagt es mir nicht. Ich lese es selbst.", "She said something to you before she fell. I can see it on you. No, don't tell me. I'll read it myself."),
+        E("dlg.h4.done.3", "Jorin hat heute sechs Spitzen eingeschmolzen. Er sagt, das sei seit Jahren das erste Stück, das er gern macht.", "Jorin melted down six points today. He says it's the first piece in years he's been glad to make."),
+        E("dlg.h4.done.4", "Gebt mir einen Abend damit.", "Give me an evening with it."),
 
         // ---- H5 Siebenundvierzig (Wendung 2) ----
         E("dlg.h5.offer.1", "Ottilie steht vor der Laterne über Ilsabes Tür. Das Rußbuch liegt aufgeschlagen auf der Schwelle.", "Ottilie stands under the lantern above Ilsabe's door. The soot book lies open on the threshold."),
@@ -77,12 +80,15 @@ public static partial class LocCatalog
         E("dlg.h9.talk.merle.1", "Ihr habt das Prisma. Es ist warm, nicht wahr? Er hat gesagt, das sei seine Frau. Wendeline.", "You have the prism. It's warm, isn't it? He said that was his wife. Wendeline."),
         E("dlg.h9.talk.merle.2", "Die Sehgläser haben euch die Wacht gezeigt. Von außen. Die Hüllen im Nebel, alle mit dem Gesicht zum Licht.", "The seeing glasses showed you the Hold. From outside. The husks in the fog, all facing the light."),
         E("dlg.h9.talk.merle.3", "Sie kommen nicht trotz der Laternen. Sie kommen, weil ihre Glut darin steckt. Sie wollen nach Hause.", "They don't come despite the lanterns. They come because their ember is inside them. They want to go home."),
-        E("dlg.h9.talk.merle.4", "Ich verkaufe das Glas nicht mehr. Sagt Ottilie, was ihr gesehen habt. Sie ist die Einzige, die die Laternen zählt.", "I don't sell the glass any more. Tell Ottilie what you saw. She's the only one who counts the lanterns."),
+        E("dlg.h9.talk.merle.4", "Ich verkaufe das Glas nicht mehr. Tamm liegt jetzt mit drin.", "I don't sell the glass any more. Tamm is in there now too."),
+        E("dlg.h9.talk.merle.5", "Den Sack verkaufe ich trotzdem. Irgendwer kauft immer Licht, und ich muss essen.", "I'll sell the sack anyway. Someone always buys light, and I have to eat."),
+        E("dlg.h9.talk.merle.6", "Sagt Ottilie, was ihr gesehen habt. Sie ist die Einzige, die die Laternen zählt.", "Tell Ottilie what you saw. She's the only one who counts the lanterns."),
         E("dlg.h9.talk.ottilie.1", "Ottilie hält eine Scherbe gegen ihre Laterne. Das Licht darin flackert im Takt eines Atems.", "Ottilie holds a shard against her lantern. The light inside flickers like breathing."),
         E("dlg.h9.talk.ottilie.2", "Sechsundvierzig. Und jede ist jemand.", "Forty-six. And every one is someone."),
         E("dlg.h9.talk.ottilie.3", "Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter. Sie wollen nur nach Hause.", "If we smash them, it's dark. If we don't, they keep coming. They only want to go home."),
-        E("dlg.h9.talk.ottilie.4", "Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.", "Beyond the Fen Gate, husks stand in the fog and look across. None comes closer. Not yet."),
-        E("dlg.h9.talk.ottilie.5", "Geht schlafen. Ich zähle noch einmal.", "Go and sleep. I'll count once more."),
+        E("dlg.h9.talk.ottilie.4", "Und Ilsabe kauft schon Sehgläser, damit sie weiß, wann sie kommen. Sie wird ihnen etwas anbieten. Jemanden.", "And Ilsabe is already buying seeing glasses, so she knows when they come. She'll offer them something. Someone."),
+        E("dlg.h9.talk.ottilie.5", "Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.", "Beyond the Fen Gate, husks stand in the fog and look across. None comes closer. Not yet."),
+        E("dlg.h9.talk.ottilie.6", "Geht schlafen. Ich zähle noch einmal.", "Go and sleep. I'll count once more."),
 
         // ---- N1 Ilsabes Lieferbuch ----
         E("dlg.n1.offer.1", "Ihr geht ins Moor? Dann tut mir einen Gefallen. Gegen Bezahlung, natürlich.", "Going into the fen? Then do me a favour. Paid, of course."),
@@ -125,6 +131,16 @@ public static partial class LocCatalog
         E("dlg.n5.hint.1", "Vier Seher. Zwei heile Gläser. Ich habe etwas Schönes für euch zurückgelegt.", "Four augurs. Two whole glasses. I've put something nice aside for you."),
         E("dlg.n5.done.1", "Wunderbar. Seht ihr? Drei Hüllen im Nebel, links vom Moortor. Morgen vier.", "Wonderful. You see? Three husks in the fog, left of the Fen Gate. Four tomorrow."),
         E("dlg.n5.done.2", "Nehmt den Reif. Er hat einem Seher gehört, der zu viel gesehen hat. Ich habe ihn günstig bekommen.", "Take the circlet. It belonged to an augur who saw too much. I got it cheap."),
+
+        // ---- Barks (cinderreach-story-voice): Bosse im Kampf, Erzähler an Wendepunkten ----
+        E("bark.abbot.phase2", "Bruder Benno. Bruder Kaspar. Bruder Thewes. Steht auf. Die Liste ist noch nicht zu Ende.", "Brother Benno. Brother Kaspar. Brother Thewes. Stand up. The list isn't finished."),
+        E("bark.abbot.death", "Lest die Namen. Lest sie laut.", "Read the names. Read them aloud."),
+        E("bark.kilnmother.phase2", "Zwölf Körbe Asche für eine Laterne im Monat. Rechnet nach. Ich habe es jeden Tag getan.", "Twelve baskets of ash for one lantern a month. Do the sums. I did them every day."),
+        E("bark.kilnmother.death", "Ich habe niemanden geholt. Sie wurden mir gebracht. Von euch.", "I fetched no one. They were brought to me. By you."),
+        E("bark.glasswright.phase2", "Wendeline, hab keine Angst. Sie wollen dich nur ansehen. Ich halte dich.", "Wendeline, don't be afraid. They only want to look at you. I'm holding you."),
+        E("bark.glasswright.death", "Ihr nennt es Gefangenschaft. Ich nenne es: nicht loslassen.", "You call it captivity. I call it: not letting go."),
+        E("bark.h4.start", "Hinter dem Tor ist die Luft so heiß, dass der Ruß nicht fällt. Irgendwo zählt eine Stimme Körbe.", "Past the gate the air is so hot the soot doesn't fall. Somewhere a voice is counting baskets."),
+        E("bark.h7.done", "Im letzten Sehglas liegt die Laternenwacht, von außen gesehen. Um ihre Lichter steht der Nebel voller Gestalten, alle mit dem Gesicht zur Tür.", "In the last seeing glass lies Lantern Hold, seen from outside. Around its lights the fog is full of figures, all facing the door."),
 
         // ---- Idle ----
         E("dlg.idle.ottilie.1.1", "Ich zähle die Laternen, bevor es dunkel wird. Danach zählt sie keiner mehr.", "I count the lanterns before dark. After that nobody counts them."),

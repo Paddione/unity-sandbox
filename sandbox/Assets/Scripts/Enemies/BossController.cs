@@ -100,6 +100,7 @@ public sealed class BossController : NetworkBehaviour
         Debug.Log($"[Boss] {BossName} enters phase 2 (adds={PhaseTwoEntries}).");
         try { DiabloAudio.PlayBossRoar(); } catch { }
         try { MusicDirector.Ensure().PlayBoss(); } catch { }
+        StoryBarks.Say("abbot.phase2");
         PresentationVfx.PhaseTwoBurst(transform.position);
         if (IsSpawned)
         {
@@ -123,6 +124,7 @@ public sealed class BossController : NetworkBehaviour
     void PhaseTwoClientRpc()
     {
         if (IsServer) return;
+        StoryBarks.Say("abbot.phase2");
         DiabloJuice.OnBlast(transform.position);
         PresentationVfx.PhaseTwoBurst(transform.position);
     }

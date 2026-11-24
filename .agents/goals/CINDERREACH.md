@@ -29,6 +29,15 @@ Hauptaufgabenkette (H1–H9) mit Nebenaufgaben (N1–N5) über NPC-Dialoge (Otti
 Ilsabe Krumm, Jorin Hagedorn), Fuhrbuch (Taste J), HUD-Zielzeile und Fundstücke; Queststand im Save v13,
 im Koop per Host-Snapshot (Max-Merge) synchron.
 
+Seit `cinderreach-story-voice` (2026-11-23): Jede Nebenaufgabe ändert eine Zeile der Hauptkette (Sprecher `x|nK`
+bzw. `x|!nK`, `StoryDialog.Visible`), Bosse sprechen in Phase 2 und beim Tod, zwei Erzählzeilen markieren H4-Start
+und Wendung 3 (`StoryBarks`, Untertitel über der Aktionsleiste). Alle 115 Dialog- und Zurufzeilen sind deutsch
+vertont: acht synthetische Stimmen (`docs/audio/voices.json`, Qwen3-TTS VoiceDesign → Clone, lokal auf CPU),
+Clips unter `Resources/Voice/<key>.ogg`, Wiedergabe `StoryVoice` mit Regler „Stimmen“. Gate
+`scripts/check-voice-lines.py` (fehlende/veraltete Clips), Neurendern `scripts/voice/render_voices.py`,
+Verständlichkeit `scripts/voice/qa_transcribe.py`. Koop: Boss-Zurufe hört sicher nur, wer Phase-2-/Todesereignis
+lokal erhält (Host, Abt- und Glasmacher-Phase auch Clients).
+
 ## Spiel in einem Absatz
 
 Cinderreach ist ein isometrisches Co-op-ARPG (Unity 6000.0.85f2, URP, `sandbox/`), Arbeitstitel und

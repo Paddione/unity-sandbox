@@ -1,0 +1,59 @@
+{
+  "note": "Synthetic voices for Cinderreach story lines (cinderreach-story-voice). No real person: each reference is designed by Qwen3-TTS-12Hz-1.7B-VoiceDesign from 'instruct', then every line is cloned from that reference with Qwen3-TTS-12Hz-0.6B-Base. Render: scripts/voice/render_voices.py. License: model outputs, generated locally.",
+  "design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "clone_model": "Qwen/Qwen3-TTS-12Hz-0.6B-Base",
+  "pronounce": {
+    "Moortor": "Moor-Tor",
+    "Moortors": "Moor-Tors"
+  },
+  "voices": {
+    "ottilie": {
+      "role": "Ottilie Wachs, Lampenwärterin",
+      "instruct": "A woman around forty with a low, warm alto voice. Quiet and tired, speaks slowly and precisely like someone counting, restrained grief under a calm surface, devout from habit. Plain and unhurried, no theatrics.",
+      "ref_text": "Siebenundvierzig Laternen. Gestern achtundvierzig. Ich weiß, wessen Tür jetzt dunkel ist. Ich zähle sie jeden Abend, bevor es dunkel wird.",
+      "seed": 11
+    },
+    "ilsabe": {
+      "role": "Ilsabe Krumm, Händlerin",
+      "instruct": "A woman around fifty with a bright, mid-pitched voice. Friendly, quick and articulate, a self-assured merchant who is never embarrassed. Smooth, slightly amused, dry irony, talks a little fast.",
+      "ref_text": "Ich verkaufe nichts, was nicht vorher jemand hergegeben hat. Das ist der ganze Handel. Und für Ungelesenes zahle ich gut, das wisst ihr doch.",
+      "seed": 12
+    },
+    "jorin": {
+      "role": "Jorin Hagedorn, Schmied",
+      "instruct": "A man around fifty-five with a deep, rough, gravelly bass voice. A laconic blacksmith who speaks in short, heavy sentences with pauses. Weary and guilty, low volume, never dramatic.",
+      "ref_text": "Jede dieser Spitzen hab ich gehärtet. Bringt sie mir. Ich will sie einschmelzen, bevor sie noch wen findet.",
+      "seed": 13
+    },
+    "merle": {
+      "role": "Merle Sandkamp, Karrnerin",
+      "instruct": "A woman around thirty with a husky, slightly hoarse voice. Flat and exhausted, a cart driver who has not slept for days. Blunt, plain words, little emotion on the surface.",
+      "ref_text": "In der Brache wächst einem das Glas auf der Brust, wenn man zu lange in eine Richtung schaut. Tamm hat immer nach Hause geschaut.",
+      "seed": 14
+    },
+    "narrator": {
+      "role": "Erzähler",
+      "instruct": "A male narrator with a calm, deep baritone voice. Measured storyteller pace, dark and quiet, like reading an old chronicle aloud by candlelight. Clear diction, no excitement.",
+      "ref_text": "Ein leerer Karren rollt durch das Moortor. Die Frau darauf hat seit Tagen niemanden gesehen, der noch glüht.",
+      "seed": 15
+    },
+    "abbot": {
+      "role": "Der Hohle Abt",
+      "instruct": "A very old man with a hollow, breathy, half-whispered voice. Thin and dry, sounds empty and far away, like a monk reciting a list of names in a cold crypt. Slow.",
+      "ref_text": "Bruder Benno. Bruder Kaspar. Bruder Thewes. Lest die Namen. Lest sie laut, damit jemand sie hört.",
+      "seed": 16
+    },
+    "kilnmother": {
+      "role": "Die Ofenmutter",
+      "instruct": "A clearly female voice: an old woman around sixty-five with a low, dark, smoky alto, rasping from decades of kiln heat. Cold, slow and calculating, never raises her voice, every word a flat statement of fact.",
+      "ref_text": "Ich habe niemanden geholt. Sie wurden mir gebracht. Zwölf Körbe Asche für eine Laterne. Rechnet nach.",
+      "seed": 37
+    },
+    "glasswright": {
+      "role": "Der Glasmacher",
+      "instruct": "An old man around seventy with a soft, gentle, fragile voice. Tender and sorrowful, speaks lovingly and quietly, as if comforting someone right beside him.",
+      "ref_text": "Wendeline, hab keine Angst. Ihr nennt es Gefangenschaft. Ich nenne es: nicht loslassen.",
+      "seed": 18
+    }
+  }
+}

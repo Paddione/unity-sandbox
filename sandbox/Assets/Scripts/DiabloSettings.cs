@@ -10,6 +10,7 @@ public static class DiabloSettings
     public static float MusicVol = 0.8f;
     public static float SFXVol = 0.8f;
     public static float UIVol = 0.8f;
+    public static float VoiceVol = 0.9f;
     public static int QualityLevel = 2; // 0 Low, 1 Med, 2 High
     public static bool ShowFPS = false;
     public static bool ScreenShake = true;
@@ -67,6 +68,7 @@ public static class DiabloSettings
             MusicVol = PlayerPrefs.GetFloat(Prefix + "Music", 0.8f);
             SFXVol = PlayerPrefs.GetFloat(Prefix + "SFX", 0.8f);
             UIVol = PlayerPrefs.GetFloat(Prefix + "UI", 0.8f);
+            VoiceVol = PlayerPrefs.GetFloat(Prefix + "Voice", 0.9f);
             QualityLevel = PlayerPrefs.GetInt(Prefix + "Quality", 2);
             ShowFPS = PlayerPrefs.GetInt(Prefix + "FPS", 0) == 1;
             ScreenShake = PlayerPrefs.GetInt(Prefix + "Shake", 1) == 1;
@@ -89,6 +91,7 @@ public static class DiabloSettings
             PlayerPrefs.SetFloat(Prefix + "Music", MusicVol);
             PlayerPrefs.SetFloat(Prefix + "SFX", SFXVol);
             PlayerPrefs.SetFloat(Prefix + "UI", UIVol);
+            PlayerPrefs.SetFloat(Prefix + "Voice", VoiceVol);
             PlayerPrefs.SetInt(Prefix + "Quality", QualityLevel);
             PlayerPrefs.SetInt(Prefix + "FPS", ShowFPS ? 1 : 0);
             PlayerPrefs.SetInt(Prefix + "Shake", ScreenShake ? 1 : 0);
@@ -108,6 +111,7 @@ public static class DiabloSettings
         MusicVol = 0.8f;
         SFXVol = 0.8f;
         UIVol = 0.8f;
+        VoiceVol = 0.9f;
         QualityLevel = 2;
         ShowFPS = false;
         ScreenShake = true;
@@ -126,6 +130,7 @@ public static class DiabloSettings
         MusicVol = Mathf.Clamp01(MusicVol);
         SFXVol = Mathf.Clamp01(SFXVol);
         UIVol = Mathf.Clamp01(UIVol);
+        VoiceVol = Mathf.Clamp01(VoiceVol);
         QualityLevel = Mathf.Clamp(QualityLevel, 0, 2);
         ResolutionIndex = ((ResolutionIndex % Resolutions.Length) + Resolutions.Length) % Resolutions.Length;
     }
@@ -163,6 +168,9 @@ public static class DiabloSettings
 
     /// <summary>Effective UI click/chime gain (master × ui).</summary>
     public static float EffectiveUI => MasterVol * UIVol;
+
+    /// <summary>Effective dialog voice gain (master × voice).</summary>
+    public static float EffectiveVoice => MasterVol * VoiceVol;
 
     /// <summary>Menu "Apply": everything, including the chosen resolution.</summary>
     public static void Apply()

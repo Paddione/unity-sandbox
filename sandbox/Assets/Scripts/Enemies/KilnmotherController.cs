@@ -97,6 +97,7 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
         if (PhaseTwo) return;
         PhaseTwo = true;
         PhaseTwoEntries++;
+        StoryBarks.Say("kilnmother.phase2");
         for (int i = 0; i < SummonCount; i++)
         {
             float a = i * Mathf.PI * 2f / SummonCount;

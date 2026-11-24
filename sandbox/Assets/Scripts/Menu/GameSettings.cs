@@ -19,6 +19,7 @@ public sealed class GameSettings
     public float music = 0.8f;
     public float sfx = 0.8f;
     public float ui = 0.8f;
+    public float voice = 0.9f;
     public bool shake = true;
     public bool damageNumbers = true;
 
@@ -69,6 +70,7 @@ public sealed class GameSettings
         music = Mathf.Clamp01(music);
         sfx = Mathf.Clamp01(sfx);
         ui = Mathf.Clamp01(ui);
+        voice = Mathf.Clamp01(voice);
     }
 
     /// <summary>Push onto DiabloSettings + Screen + Quality (headless-safe).</summary>
@@ -78,6 +80,7 @@ public sealed class GameSettings
         DiabloSettings.MasterVol = master;
         DiabloSettings.MusicVol = music;
         DiabloSettings.SFXVol = sfx;
+        DiabloSettings.VoiceVol = voice;
         DiabloSettings.ScreenShake = shake;
         DiabloSettings.Apply();
         try { Screen.SetResolution(width, height, fullscreen); } catch { }

@@ -144,9 +144,10 @@ public sealed class MainMenu : MonoBehaviour
         settingsPanel = Panel(root.transform, "SettingsPanel", new Vector2(560f, 420f), Vector2.zero);
         Label(settingsPanel.transform, Loc.T("menu.settings.title"), 28, new Vector2(0f, 160f), new Vector2(520f, 50f), DiabloPalette.TrimGold);
         var s = GameSettings.Current;
-        SliderRow(settingsPanel.transform, Loc.T("settings.master"), new Vector2(0f, 90f), s.master, v => { GameSettings.Current.master = v; GameSettings.Current.Apply(); });
-        SliderRow(settingsPanel.transform, Loc.T("settings.music"), new Vector2(0f, 40f), s.music, v => { GameSettings.Current.music = v; GameSettings.Current.Apply(); });
-        SliderRow(settingsPanel.transform, Loc.T("settings.sfx"), new Vector2(0f, -10f), s.sfx, v => { GameSettings.Current.sfx = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.master"), new Vector2(0f, 110f), s.master, v => { GameSettings.Current.master = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.music"), new Vector2(0f, 66f), s.music, v => { GameSettings.Current.music = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.sfx"), new Vector2(0f, 22f), s.sfx, v => { GameSettings.Current.sfx = v; GameSettings.Current.Apply(); });
+        SliderRow(settingsPanel.transform, Loc.T("settings.voice"), new Vector2(0f, -22f), s.voice, v => { GameSettings.Current.voice = v; GameSettings.Current.Apply(); });
         ToggleRow(settingsPanel.transform, Loc.T("settings.shake"), new Vector2(-120f, -70f), s.shake, v => { GameSettings.Current.shake = v; GameSettings.Current.Apply(); });
         ToggleRow(settingsPanel.transform, Loc.T("settings.dmgnums"), new Vector2(120f, -70f), s.damageNumbers, v => { GameSettings.Current.damageNumbers = v; GameSettings.Current.Apply(); });
         Button(settingsPanel.transform, Loc.T("menu.back"), new Vector2(0f, -140f), () => CloseSettings());

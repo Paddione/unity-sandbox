@@ -21,6 +21,8 @@ public sealed class StoryDirector : MonoBehaviour
     Canvas canvas;
     UnityEngine.UI.Text toastText;
     UnityEngine.UI.Text trackerText;
+    UnityEngine.UI.Text barkText;
+    float barkLeft;
 
     void Awake()
     {
@@ -54,11 +56,39 @@ public sealed class StoryDirector : MonoBehaviour
         tr.anchorMin = new Vector2(0.5f, 1f); tr.anchorMax = new Vector2(0.5f, 1f); tr.pivot = new Vector2(0.5f, 1f);
         tr.anchoredPosition = new Vector2(0f, -64f); tr.sizeDelta = new Vector2(760f, 36f);
         toastText.enabled = false;
+        barkText = DiabloUIFactory.MakeText(canvasGo.transform, "StoryBark", "", 18,
+            DiabloPalette.Parchment, TextAnchor.MiddleCenter);
+        barkText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        var br = barkText.rectTransform;
+        br.anchorMin = new Vector2(0.5f, 0f); br.anchorMax = new Vector2(0.5f, 0f); br.pivot = new Vector2(0.5f, 0f);
+        br.anchoredPosition = new Vector2(0f, 190f); br.sizeDelta = new Vector2(860f, 60f);
+        barkText.enabled = false;
+    }
+
+    /// <summary>Shows queued barks as a subtitle with their voice clip, one at a time.</summary>
+    void TickBarks()
+    {
+        if (barkText == null) return;
+        if (barkLeft > 0f)
+        {
+            barkLeft -= Time.unscaledDeltaTime;
+            if (barkLeft > 0f) return;
+            barkText.enabled = false;
+        }
+        if (StoryDialogUI.AnyOpen || !StoryBarks.TryTake(out var bark)) return;
+        string who = bark.speaker == "n" ? "" : Loc.T("npc." + bark.speaker + ".name");
+        string line = Loc.T(bark.Key);
+        barkText.text = who.Length > 0 ? "<color=#d8b25a>" + who + ":</color> " + line : "<i>" + line + "</i>";
+        barkText.supportRichText = true;
+        barkText.enabled = true;
+        float len = StoryVoice.Play(bark.Key);
+        barkLeft = Mathf.Max(3.5f, len + 1f);
     }
 
     void Update()
     {
         if (DiabloUIFactory.IsRemoteMirror(this)) return;
+        TickBarks();
         if (toastLeft > 0f)
         {
             toastLeft -= Time.unscaledDeltaTime;
@@ -145,6 +175,8 @@ public sealed class StoryDirector : MonoBehaviour
         {
             var q = StoryCatalog.Get(c.questId);
             if (q == null) continue;
+            if (c.objective < 0 && c.status == StoryStatus.Active && q.id == "h4") StoryBarks.Say("h4.start");
+            if (c.objective < 0 && c.status == StoryStatus.Done && q.id == "h7") StoryBarks.Say("h7.done");
             if (c.objective < 0 && c.status == StoryStatus.Active) Toast(Loc.F("story.quest.new", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Ready) Toast(Loc.F("story.quest.ready", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Done) Toast(Loc.F("story.quest.done", Loc.T(q.TitleKey)));
@@ -193,7 +225,9 @@ public sealed class StoryDirector : MonoBehaviour
 
     public static void BookKill(string objectName)
     {
-        State.Apply(StoryObjectiveType.Kill, StoryIds.KillTarget(objectName ?? ""));
+        string target = StoryIds.KillTarget(objectName ?? "");
+        StoryBarks.OnKill(target);
+        State.Apply(StoryObjectiveType.Kill, target);
         State.Refresh(RunProfile.Act);
     }
 

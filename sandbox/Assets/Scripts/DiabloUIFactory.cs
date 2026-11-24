@@ -384,6 +384,7 @@ public static class DiabloUIFactory
         var sMusic = MakeSliderRow(parent, "Music", DiabloSettings.MusicVol, v => { DiabloSettings.MusicVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tMusic, Loc.T("settings.music"));
         var sSfx = MakeSliderRow(parent, "SFX", DiabloSettings.SFXVol, v => { DiabloSettings.SFXVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tSfx, Loc.T("settings.sfx"));
         var sUi = MakeSliderRow(parent, "UI", DiabloSettings.UIVol, v => { DiabloSettings.UIVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tUi, Loc.T("settings.ui"));
+        var sVoice = MakeSliderRow(parent, "Voice", DiabloSettings.VoiceVol, v => { DiabloSettings.VoiceVol = v; DiabloSettings.Save(); DiabloSettings.Apply(); }, out var tVoice, Loc.T("settings.voice"));
 
         MakeDivider(parent);
 
@@ -496,10 +497,12 @@ public static class DiabloUIFactory
             if (Mathf.Abs(sMusic.value - DiabloSettings.MusicVol) > 0.001f) sMusic.value = DiabloSettings.MusicVol;
             if (Mathf.Abs(sSfx.value - DiabloSettings.SFXVol) > 0.001f) sSfx.value = DiabloSettings.SFXVol;
             if (Mathf.Abs(sUi.value - DiabloSettings.UIVol) > 0.001f) sUi.value = DiabloSettings.UIVol;
+            if (Mathf.Abs(sVoice.value - DiabloSettings.VoiceVol) > 0.001f) sVoice.value = DiabloSettings.VoiceVol;
             tMaster.text = $"{Mathf.RoundToInt(DiabloSettings.MasterVol * 100f)}%";
             tMusic.text = $"{Mathf.RoundToInt(DiabloSettings.MusicVol * 100f)}%";
             tSfx.text = $"{Mathf.RoundToInt(DiabloSettings.SFXVol * 100f)}%";
             tUi.text = $"{Mathf.RoundToInt(DiabloSettings.UIVol * 100f)}%";
+            tVoice.text = $"{Mathf.RoundToInt(DiabloSettings.VoiceVol * 100f)}%";
 
             for (int i = 0; i < 3; i++) StyleButtonActive(qBtns[i], DiabloSettings.QualityLevel == i, qNames[i]);
             StyleButtonActive(resBtn, true, DiabloSettings.ResolutionLabel);

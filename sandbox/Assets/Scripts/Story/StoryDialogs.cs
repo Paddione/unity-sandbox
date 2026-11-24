@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public sealed class StoryDialog
 {
     public readonly string id;
-    /// <summary>Speaker per line: an NPC id or "n" for narration; "o|flag" shows the line only with that story flag.</summary>
+    /// <summary>Speaker per line: an NPC id or "n" for narration; "o|flag" shows the line only with that story flag, "o|!flag" only without.</summary>
     public readonly string[] speakers;
 
     public StoryDialog(string id, params string[] speakers)
@@ -25,6 +25,17 @@ public sealed class StoryDialog
     {
         int bar = code.IndexOf('|');
         return bar < 0 ? null : code.Substring(bar + 1);
+    }
+
+    /// <summary>Line filter: "o|flag" needs the flag, "o|!flag" needs it absent.</summary>
+    public static bool Visible(string code, ICollection<string> flags)
+    {
+        string flag = Flag(code);
+        if (string.IsNullOrEmpty(flag)) return true;
+        bool negate = flag[0] == '!';
+        if (negate) flag = flag.Substring(1);
+        bool has = flags != null && flags.Contains(flag);
+        return negate ? !has : has;
     }
 }
 
@@ -57,11 +68,11 @@ public static class StoryDialogs
         new StoryDialog("h2.offer", O, O, O, O),
         new StoryDialog("h2.hint", O),
         new StoryDialog("h2.done", O, O),
-        new StoryDialog("h3.offer", N, O, O, O, O, O),
+        new StoryDialog("h3.offer", N, O, O, O, O, O + "|n2", O),
         new StoryDialog("h3.hint", O),
         new StoryDialog("h3.talk.jorin", J, J, J, J, J),
         new StoryDialog("h4.hint", O),
-        new StoryDialog("h4.done", O, O),
+        new StoryDialog("h4.done", O, O, O + "|n3", O),
         new StoryDialog("h5.offer", N, O, O, O, O + "|n1", O),
         new StoryDialog("h5.hint", O),
         new StoryDialog("h5.talk.ilsabe", I, I, I, I),
@@ -70,8 +81,8 @@ public static class StoryDialogs
         new StoryDialog("h6.hint", M),
         new StoryDialog("h7.hint", M),
         new StoryDialog("h8.hint", M),
-        new StoryDialog("h9.talk.merle", M, M, M, M),
-        new StoryDialog("h9.talk.ottilie", N, O, O, N, O),
+        new StoryDialog("h9.talk.merle", M, M, M, M + "|n4", M + "|!n4", M),
+        new StoryDialog("h9.talk.ottilie", N, O, O, O + "|n5", N, O),
         new StoryDialog("n1.offer", I, I, I),
         new StoryDialog("n1.hint", I),
         new StoryDialog("n1.done", I, I, I),
