@@ -21,7 +21,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import voice_lines as vl  # noqa: E402
 
 
+NUMBERS = {str(i): w for i, w in enumerate("null eins zwei drei vier fünf sechs sieben acht neun zehn elf zwölf".split())}
+
+
 def norm(s: str) -> str:
+    s = re.sub(r"\b(\d{1,2})\b", lambda m: NUMBERS.get(m.group(1), m.group(1)), s)
     s = unicodedata.normalize("NFC", s.lower()).replace("ß", "ss")
     return re.sub(r"[^a-zäöü0-9 ]+", "", re.sub(r"\s+", " ", s)).strip()
 
@@ -55,7 +59,10 @@ def main() -> int:
         clip = vl.VOICE_DIR / f"{e['key']}.ogg"
         if not clip.exists():
             continue
-        segs, _ = model.transcribe(str(clip), language="de", beam_size=1, vad_filter=False)
+        # Short, clean TTS clips trip whisper's no-speech gate: loosen it, keep beam search.
+        segs, _ = model.transcribe(str(clip), language="de", beam_size=5, vad_filter=False,
+                                   condition_on_previous_text=False, no_speech_threshold=0.95,
+                                   log_prob_threshold=None)
         heard = " ".join(s.text for s in segs).strip()
         rows.append({"key": e["key"], "speaker": e["speaker"], "cer": round(cer(e["text"], heard), 3),
                      "text": e["text"], "heard": heard})
