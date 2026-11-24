@@ -2,7 +2,7 @@
 
 health_goals: [G-DIABLO01, G-DIABLO02]
 
-## Ziel
+## Objective
 
 Alle im Spiel verwendeten Unity-Assets inventarisieren. Spielbare Basischaraktere tragen leichte Kleidung und gelbe Rüstungsteile mit dezenten Klassenunterschieden. Jedes Unique in einem am Charakter sichtbaren Slot erhält ein eigenes 3D-Modell.
 
@@ -14,6 +14,6 @@ Alle im Spiel verwendeten Unity-Assets inventarisieren. Spielbare Basischarakter
 - Die Modellzuordnung im Unity-Verifikationspfad von G-DIABLO02 dauerhaft gegen den aktuellen Item-Katalog prüfen. Fehlende, ungültige und doppelt verwendete Modelle müssen den Check fehlschlagen lassen.
 - Asset-Metadatenprüfung und relevante EditMode- und PlayMode-Tests bestehen.
 
-## Umfang und Abhängigkeiten
+## Nicht-Ziele
 
 Das Audit umfasst alle verwendeten Assets. Welt- und Gegnerassets, UI, Itemwerte und Spiellogik liegen außerhalb der Umsetzung. Eigene oder bereits freigegebene Assets verwenden. Asset-Store-Käufe erfordern Freigabe. Bestehenden Item-Katalog und die Spielkamera für die Abnahme verwenden.
