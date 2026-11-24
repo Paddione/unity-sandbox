@@ -49,6 +49,12 @@ public static class DiabloAudio
     public static int soundedFallbacks;
     public static string lastFallbackCue;
 
+    public enum HitSurface { FleshBone, ArmorMetal, StoneAsh, Glass, GlassShield }
+    public enum GroundSurface { Moor, Stone, Basalt, Sand }
+    public static HitSurface lastHitSurface;
+    public static GroundSurface lastGroundSurface;
+    public static int lastVariantIndex;
+
     /// <summary>Menu base volumes (presentation tuning): UI sits under combat, vendor under loot.</summary>
     public const float UIClickVolume = 0.35f;
     public const float VendorVolume = 0.5f;
@@ -77,7 +83,19 @@ public static class DiabloAudio
     static AudioClip huskGrowlClip, wardenTauntClip, bossRoarClip;
     static AudioClip goldClip, rareDropClip, vendorBuyClip, vendorSellClip, gateClip;
     static AudioClip healClip, questClip, shrineClip, blockClip, footstepClip;
+    static AudioClip[] swingVariants;
+    static AudioClip[] hitFleshBoneVariants;
+    static AudioClip[] hitArmorMetalVariants;
+    static AudioClip[] hitStoneAshVariants;
+    static AudioClip[] hitGlassVariants;
+    static AudioClip[] hitGlassShieldVariants;
+    static AudioClip[] stepMoorVariants;
+    static AudioClip[] stepStoneVariants;
+    static AudioClip[] stepBasaltVariants;
+    static AudioClip[] stepSandVariants;
+    static int lastSwingIdx = -1, lastHitIdx = -1, lastStepIdx = -1;
     static readonly System.Random pitchRng = new System.Random(77);
+    static readonly System.Random variantRng = new System.Random(313);
     static bool built;
 
     public static AudioClip SwingClip { get { EnsureBuilt(); return swingClip; } }
@@ -137,8 +155,108 @@ public static class DiabloAudio
         catch { soundedFallbacks++; }
     }
 
-    public static void PlaySwing() { EnsureBuilt(); soundedSwings++; Varied(Resolve("Swing", swingClip), 0.55f); }
-    public static void PlayHit() { EnsureBuilt(); soundedHits++; Varied(Resolve("Hit", hitClip), 0.68f); }
+    static AudioClip PickVariant(AudioClip[] pool, ref int lastIdx)
+    {
+        if (pool == null || pool.Length == 0) return null;
+        if (pool.Length == 1) { lastIdx = 0; lastVariantIndex = 0; return pool[0]; }
+        int idx = lastIdx < 0 ? variantRng.Next(pool.Length) : variantRng.Next(pool.Length - 1);
+        if (lastIdx >= 0 && idx >= lastIdx) idx++;
+        lastIdx = idx;
+        lastVariantIndex = idx;
+        return pool[idx];
+    }
+
+    public static HitSurface SurfaceFor(GameObject target, Vector3 fromPos)
+    {
+        if (target == null) return HitSurface.FleshBone;
+        var sg = target.GetComponent<ShardGuard>();
+        if (sg != null)
+        {
+            var atk = target.GetComponent<EnemyAttack>();
+            bool stunned = atk != null && atk.IsStunned;
+            if (!stunned && ShardGuard.InArc(target.transform.position, target.transform.forward, fromPos, sg.arcDegrees))
+                return HitSurface.GlassShield;
+            return HitSurface.Glass;
+        }
+        if (target.GetComponent<GlassWard>() != null)
+        {
+            var gw = target.GetComponent<GlasswrightController>();
+            if (gw != null && gw.LivePillars > 0)
+                return HitSurface.GlassShield;
+            return HitSurface.Glass;
+        }
+        string n = (target.name ?? "").ToLowerInvariant();
+        if (n.Contains("glass") || n.Contains("shard") || n.Contains("pillar") || n.Contains("prism"))
+            return HitSurface.Glass;
+        if (target.GetComponent<AshLancer>() != null
+            || n.Contains("kiln") || n.Contains("cinder") || n.Contains("ash")
+            || n.Contains("thrall") || n.Contains("slag"))
+            return HitSurface.StoneAsh;
+        var eh = target.GetComponent<EnemyHealth>();
+        if (target.GetComponent<BossController>() != null || (eh != null && eh.tier != LootTier.Normal))
+            return HitSurface.ArmorMetal;
+        return HitSurface.FleshBone;
+    }
+
+    public static GroundSurface GroundFor(Vector3 worldPos)
+    {
+        switch (WorldBounds.ZoneAt(worldPos).name)
+        {
+            case "Ossuary": return GroundSurface.Stone;
+            case "Kiln": return GroundSurface.Basalt;
+            case "Barrens": return GroundSurface.Sand;
+            default: return GroundSurface.Moor;
+        }
+    }
+
+    static AudioClip[] PoolFor(HitSurface surface)
+    {
+        switch (surface)
+        {
+            case HitSurface.ArmorMetal: return hitArmorMetalVariants;
+            case HitSurface.StoneAsh: return hitStoneAshVariants;
+            case HitSurface.Glass: return hitGlassVariants;
+            case HitSurface.GlassShield: return hitGlassShieldVariants;
+            default: return hitFleshBoneVariants;
+        }
+    }
+
+    static AudioClip[] StepPoolFor(GroundSurface ground)
+    {
+        switch (ground)
+        {
+            case GroundSurface.Stone: return stepStoneVariants;
+            case GroundSurface.Basalt: return stepBasaltVariants;
+            case GroundSurface.Sand: return stepSandVariants;
+            default: return stepMoorVariants;
+        }
+    }
+
+    public static void PlaySwing()
+    {
+        EnsureBuilt();
+        soundedSwings++;
+        Varied(Resolve("Swing", PickVariant(swingVariants, ref lastSwingIdx)), 0.55f);
+    }
+
+    public static void PlayHit()
+    {
+        EnsureBuilt();
+        lastHitSurface = HitSurface.FleshBone;
+        soundedHits++;
+        Varied(Resolve("Hit", PickVariant(hitFleshBoneVariants, ref lastHitIdx)), 0.68f);
+    }
+
+    public static void PlayHitFor(GameObject target, Vector3 fromPos, bool melee = true)
+    {
+        EnsureBuilt();
+        var surface = SurfaceFor(target, fromPos);
+        lastHitSurface = surface;
+        var chosen = PickVariant(PoolFor(surface), ref lastHitIdx);
+        Varied(Resolve("Hit", chosen), surface == HitSurface.GlassShield ? 0.72f : 0.68f);
+        soundedHits++;
+        if (melee && surface == HitSurface.ArmorMetal) soundedSwordHits++;
+    }
     public static void PlayDeath() { EnsureBuilt(); soundedDeaths++; Varied(Resolve("Death", deathClip), 0.60f); }
     public static void PlayLoot() { EnsureBuilt(); soundedLoot++; Varied(Resolve("Loot", lootClip), 0.50f); }
     /// <summary>Menu tick: muted wood/leather tap routed through EffectiveUI.</summary>
@@ -240,12 +358,28 @@ public static class DiabloAudio
     public static void PlayQuest() { EnsureBuilt(); PlaySfx(questClip, "Quest", 0.60f); soundedQuests++; }
     public static void PlayShrine() { EnsureBuilt(); PlaySfx(shrineClip, "Shrine", 0.62f); soundedShrines++; }
     public static void PlayBlock() { EnsureBuilt(); Varied(Resolve("Block", blockClip), 0.68f); soundedBlocks++; }
-    public static void PlayFootstep() { EnsureBuilt(); Varied(Resolve("Footstep", footstepClip), 0.24f); soundedSteps++; }
+    public static void PlayFootstep()
+    {
+        EnsureBuilt();
+        lastGroundSurface = GroundSurface.Moor;
+        soundedSteps++;
+        Varied(Resolve("Footstep", PickVariant(stepMoorVariants, ref lastStepIdx)), 0.24f);
+    }
+
+    public static void PlayFootstep(Vector3 worldPos)
+    {
+        EnsureBuilt();
+        var ground = GroundFor(worldPos);
+        lastGroundSurface = ground;
+        soundedSteps++;
+        var chosen = PickVariant(StepPoolFor(ground), ref lastStepIdx);
+        Varied(Resolve("Footstep", chosen), ground == GroundSurface.Stone ? 0.26f : 0.24f);
+    }
 
     public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlaySfx(levelUpClip, "LevelUp", 0.68f); }
 
     /// <summary>
-    /// Repeats must not grate: a pooled pitched source per call (±7 %).
+    /// Repeats must not grate: a pooled pitched source per call (±7 % pitch and ±7 % micro-volume).
     /// PlayOneShot cannot pitch, so rotate through a few extra sources.
     /// Multiplies by SfxGain once.
     /// </summary>
@@ -255,7 +389,8 @@ public static class DiabloAudio
         var s = pitched[pitchedNext];
         pitchedNext = (pitchedNext + 1) % pitched.Length;
         s.pitch = 0.93f + (float)pitchRng.NextDouble() * 0.14f;
-        try { s.PlayOneShot(clip, volume * SfxGain); } catch { }
+        float microVol = 0.93f + (float)pitchRng.NextDouble() * 0.14f;
+        try { s.PlayOneShot(clip, Mathf.Clamp01(volume * microVol * SfxGain)); } catch { }
     }
 
     static AudioSource[] pitched;
@@ -286,6 +421,12 @@ public static class DiabloAudio
         soundedSteps = 0;
         soundedFallbacks = 0;
         lastFallbackCue = null;
+        lastHitSurface = HitSurface.FleshBone;
+        lastGroundSurface = GroundSurface.Moor;
+        lastVariantIndex = 0;
+        lastSwingIdx = -1;
+        lastHitIdx = -1;
+        lastStepIdx = -1;
     }
 
     static void EnsureBuilt()
@@ -335,6 +476,62 @@ public static class DiabloAudio
         lanternClip = WarmBell("LanternBolt", 0.44f, 329.63f, 1250f, 0.55f);
         haloClip = SynthHalo("SearingHalo", 0.42f);
         veilClip = SynthVeil("VeilStep", 0.28f, rng);
+
+        swingVariants = new[]
+        {
+            swingClip,
+            FilteredNoise("SwingVar2", 0.12f, 300f, 1180f, 155f, 88f, 0.14f, 0.54f, rng),
+            FilteredNoise("SwingVar3", 0.16f, 190f, 920f, 125f, 68f, 0.18f, 0.56f, rng),
+        };
+        hitFleshBoneVariants = new[]
+        {
+            hitClip,
+            SynthBoneHit("HitBone2", 0.13f, 145f, 55f, 340f, 1150f, 0.62f, rng),
+            SynthBoneHit("HitBone3", 0.15f, 135f, 50f, 300f, 1100f, 0.64f, rng),
+        };
+        hitArmorMetalVariants = new[] { swordHit1Clip, swordHit2Clip, swordHit3Clip };
+        hitStoneAshVariants = new[]
+        {
+            SynthStoneAshImpact("HitStone1", 0.16f, 120f, 44f, 0.64f, rng),
+            SynthStoneAshImpact("HitStone2", 0.17f, 110f, 40f, 0.62f, rng),
+            SynthStoneAshImpact("HitStone3", 0.15f, 132f, 48f, 0.65f, rng),
+        };
+        hitGlassVariants = new[]
+        {
+            SynthGlassImpact("HitGlass1", 0.15f, 620f, 930f, 0.58f, rng),
+            SynthGlassImpact("HitGlass2", 0.14f, 560f, 840f, 0.56f, rng),
+            SynthGlassImpact("HitGlass3", 0.16f, 680f, 1020f, 0.58f, rng),
+        };
+        hitGlassShieldVariants = new[]
+        {
+            SynthGlassShieldDeflect("HitGlassShield1", 0.18f, 190f, 520f, 780f, 0.66f, rng),
+            SynthGlassShieldDeflect("HitGlassShield2", 0.19f, 175f, 480f, 720f, 0.64f, rng),
+            SynthGlassShieldDeflect("HitGlassShield3", 0.17f, 205f, 555f, 832f, 0.66f, rng),
+        };
+        stepMoorVariants = new[]
+        {
+            footstepClip,
+            FilteredNoise("StepMoor2", 0.068f, 100f, 540f, 90f, 50f, 0.38f, 0.44f, rng),
+            FilteredNoise("StepMoor3", 0.062f, 120f, 600f, 102f, 58f, 0.32f, 0.45f, rng),
+        };
+        stepStoneVariants = new[]
+        {
+            FilteredNoise("StepStone1", 0.052f, 240f, 960f, 160f, 85f, 0.42f, 0.46f, rng),
+            FilteredNoise("StepStone2", 0.050f, 260f, 1000f, 175f, 90f, 0.40f, 0.45f, rng),
+            FilteredNoise("StepStone3", 0.055f, 220f, 920f, 148f, 80f, 0.44f, 0.46f, rng),
+        };
+        stepBasaltVariants = new[]
+        {
+            FilteredNoise("StepBasalt1", 0.075f, 170f, 820f, 110f, 52f, 0.36f, 0.46f, rng),
+            FilteredNoise("StepBasalt2", 0.072f, 185f, 850f, 100f, 48f, 0.38f, 0.45f, rng),
+            FilteredNoise("StepBasalt3", 0.078f, 160f, 790f, 118f, 56f, 0.35f, 0.46f, rng),
+        };
+        stepSandVariants = new[]
+        {
+            FilteredNoise("StepSand1", 0.082f, 300f, 1120f, 95f, 65f, 0.15f, 0.42f, rng),
+            FilteredNoise("StepSand2", 0.086f, 280f, 1060f, 90f, 60f, 0.14f, 0.41f, rng),
+            FilteredNoise("StepSand3", 0.078f, 320f, 1160f, 100f, 68f, 0.16f, 0.42f, rng),
+        };
 
         pitched = new AudioSource[4];
         for (int i = 0; i < pitched.Length; i++) pitched[i] = go.AddComponent<AudioSource>();
@@ -887,5 +1084,124 @@ public static class DiabloAudio
         var clip = AudioClip.Create(name, loop.Length, 1, SampleRate, false);
         clip.SetData(loop, 0);
         return clip;
+    }
+
+    public static AudioClip[] AllVariantClips()
+    {
+        EnsureBuilt();
+        var list = new System.Collections.Generic.List<AudioClip>(32);
+        list.AddRange(swingVariants);
+        list.AddRange(hitFleshBoneVariants);
+        list.AddRange(hitArmorMetalVariants);
+        list.AddRange(hitStoneAshVariants);
+        list.AddRange(hitGlassVariants);
+        list.AddRange(hitGlassShieldVariants);
+        list.AddRange(stepMoorVariants);
+        list.AddRange(stepStoneVariants);
+        list.AddRange(stepBasaltVariants);
+        list.AddRange(stepSandVariants);
+        return list.ToArray();
+    }
+
+    static AudioClip SynthBoneHit(
+        string name, float seconds, float thumpF0, float thumpF1,
+        float snapLow, float cutoffHz, float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var snap = new float[n];
+        for (int i = 0; i < n; i++)
+            snap[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-38f * ((float)i / n));
+        BandPass(snap, snapLow, cutoffHz);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = thumpF0 * Mathf.Pow(thumpF1 / thumpF0, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float thump = Mathf.Sin(phase) * Mathf.Exp(-9f * t);
+            data[i] = thump * 0.72f + snap[i] * 0.65f;
+        }
+        LowPass(data, cutoffHz, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip SynthStoneAshImpact(
+        string name, float seconds, float thumpF0, float thumpF1,
+        float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var gravel = new float[n];
+        for (int i = 0; i < n; i++)
+            gravel[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-11f * ((float)i / n));
+        BandPass(gravel, 160f, 820f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float f = thumpF0 * Mathf.Pow(thumpF1 / thumpF0, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float sub = Mathf.Sin(phase) * Mathf.Exp(-8f * t);
+            data[i] = sub * 0.78f + gravel[i] * 0.65f;
+        }
+        LowPass(data, 950f, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip SynthGlassImpact(
+        string name, float seconds, float p1, float p2,
+        float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var shard = new float[n];
+        for (int i = 0; i < n; i++)
+            shard[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-22f * ((float)i / n));
+        BandPass(shard, 360f, 1550f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = Mathf.Lerp(150f, 75f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float tap = Mathf.Sin(phase) * Mathf.Exp(-14f * t);
+            float crystalEnv = Mathf.Clamp01(time / 0.002f) * Mathf.Exp(-time * 36f);
+            float crystal = (Mathf.Sin(2f * Mathf.PI * p1 * time) + 0.55f * Mathf.Sin(2f * Mathf.PI * p2 * time)) * crystalEnv;
+            data[i] = tap * 0.45f + crystal * 0.65f + shard[i] * 0.40f;
+        }
+        LowPass(data, 1650f, 2);
+        return FinishClip(name, data, peak);
+    }
+
+    static AudioClip SynthGlassShieldDeflect(
+        string name, float seconds, float knockF0, float p1, float p2,
+        float peak, System.Random rng)
+    {
+        int n = Samples(seconds);
+        var clink = new float[n];
+        for (int i = 0; i < n; i++)
+            clink[i] = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-26f * ((float)i / n));
+        BandPass(clink, 320f, 1450f);
+
+        var data = new float[n];
+        float phase = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float t = (float)i / n;
+            float time = i / (float)SampleRate;
+            float f = Mathf.Lerp(knockF0, 95f, t);
+            phase += 2f * Mathf.PI * f / SampleRate;
+            float knock = Mathf.Sin(phase) * Mathf.Exp(-12f * t);
+            float bellEnv = Mathf.Clamp01(time / 0.002f) * Mathf.Exp(-time * 18f);
+            float bell = (Mathf.Sin(2f * Mathf.PI * p1 * time) + 0.55f * Mathf.Sin(2f * Mathf.PI * p2 * time)) * bellEnv;
+            data[i] = knock * 0.55f + bell * 0.72f + clink[i] * 0.30f;
+        }
+        LowPass(data, 1600f, 2);
+        return FinishClip(name, data, peak);
     }
 }

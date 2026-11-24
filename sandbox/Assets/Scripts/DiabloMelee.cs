@@ -133,7 +133,6 @@ public sealed class DiabloMelee : MonoBehaviour
         }
         LastStruck = targets[0];
         LastStruckTime = Time.time;
-        DiabloAudio.PlayHit();
         MeleeConeVfx.ShowCone(attacker.position, dir, attackRange, ArcHalfAngle, true);
         Debug.Log($"[Diablo] Melee cone #{Swings} hit {targets.Count}.");
         return targets.Count;
@@ -160,7 +159,6 @@ public sealed class DiabloMelee : MonoBehaviour
         }
         LastStruck = targets[0];
         LastStruckTime = Time.time;
-        DiabloAudio.PlayHit();
         MeleeConeVfx.ShowCone(attacker.position, dir, OutreachRange, OutreachHalfAngle, true);
         Debug.Log($"[Diablo] Melee thrust #{Swings} hit {targets.Count}.");
         return targets.Count;
@@ -190,7 +188,7 @@ public sealed class DiabloMelee : MonoBehaviour
         Equipment.ApplyLifeSteal(attacker, blow);
         health.ApplyKnockback(attacker.position,
             health.tier == LootTier.Normal ? KnockbackNormal : KnockbackElite);
-        DiabloAudio.PlayHit();
+        DiabloAudio.PlayHitFor(target, attacker.position, melee: true);
         HitStop.Trigger(crit ? HitStop.Duration * 1.6f : HitStop.Duration);
     }
 

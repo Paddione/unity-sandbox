@@ -1105,7 +1105,7 @@ public sealed class DiabloSkills : MonoBehaviour
         Equipment.ApplyLifeSteal(attacker, damage);
         if (health != null)
             health.ApplyKnockback(from, health.tier == LootTier.Normal ? knockback : knockback * 0.3f);
-        DiabloAudio.PlayHit();
+        DiabloAudio.PlayHitFor(target, from, melee: false);
         DiabloMelee.LastStruck = target;
         DiabloMelee.LastStruckTime = Time.time;
         return crit;

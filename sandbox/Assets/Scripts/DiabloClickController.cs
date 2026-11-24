@@ -388,7 +388,7 @@ public sealed class DiabloClickController : MonoBehaviour
         if (stepAccum >= StepStride)
         {
             stepAccum = 0f;
-            DiabloAudio.PlayFootstep();
+            DiabloAudio.PlayFootstep(transform.position);
         }
     }
 

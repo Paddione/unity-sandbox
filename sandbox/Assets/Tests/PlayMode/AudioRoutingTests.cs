@@ -303,6 +303,110 @@ public class AudioRoutingTests
     }
 
     [Test]
+    public void HitSurface_ResolvesPerEnemyTypeAndFrontalGuard()
+    {
+        var normal = new GameObject("Husk_0");
+        normal.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);
+        Assert.AreEqual(DiabloAudio.HitSurface.FleshBone, DiabloAudio.SurfaceFor(normal, Vector3.zero));
+
+        var elite = new GameObject("Husk_Elite");
+        elite.AddComponent<EnemyHealth>().SetTier(12, LootTier.Elite);
+        Assert.AreEqual(DiabloAudio.HitSurface.ArmorMetal, DiabloAudio.SurfaceFor(elite, Vector3.zero));
+
+        var thrall = new GameObject("Cinder Thrall_0");
+        thrall.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);
+        Assert.AreEqual(DiabloAudio.HitSurface.StoneAsh, DiabloAudio.SurfaceFor(thrall, Vector3.zero));
+
+        var shardback = new GameObject("Shardback_0");
+        shardback.transform.position = Vector3.zero;
+        shardback.transform.forward = Vector3.forward;
+        shardback.AddComponent<ShardGuard>();
+        Assert.AreEqual(DiabloAudio.HitSurface.GlassShield,
+            DiabloAudio.SurfaceFor(shardback, new Vector3(0f, 0f, 2f)), "Frontal hit must hit glass shield.");
+        Assert.AreEqual(DiabloAudio.HitSurface.Glass,
+            DiabloAudio.SurfaceFor(shardback, new Vector3(0f, 0f, -2f)), "Back hit bypasses shield.");
+
+        var pillar = new GameObject("GlassPillar_0");
+        Assert.AreEqual(DiabloAudio.HitSurface.Glass, DiabloAudio.SurfaceFor(pillar, Vector3.zero));
+
+        Object.DestroyImmediate(normal);
+        Object.DestroyImmediate(elite);
+        Object.DestroyImmediate(thrall);
+        Object.DestroyImmediate(shardback);
+        Object.DestroyImmediate(pillar);
+    }
+
+    [Test]
+    public void GroundSurface_ResolvesPerZoneFloor()
+    {
+        Assert.AreEqual(DiabloAudio.GroundSurface.Moor, DiabloAudio.GroundFor(Vector3.zero));
+        Assert.AreEqual(DiabloAudio.GroundSurface.Stone, DiabloAudio.GroundFor(KilnLayout.OssuaryOffset));
+        Assert.AreEqual(DiabloAudio.GroundSurface.Basalt, DiabloAudio.GroundFor(KilnLayout.KilnOffset));
+        Assert.AreEqual(DiabloAudio.GroundSurface.Sand, DiabloAudio.GroundFor(BarrensLayout.BarrensOffset));
+    }
+
+    [Test]
+    public void VariantPools_RotateWithoutImmediateRepeat_AndPassWarmthGate()
+    {
+        var husk = new GameObject("Husk_VarTest");
+        husk.AddComponent<EnemyHealth>().SetTier(5, LootTier.Normal);
+
+        int prev = -1;
+        for (int i = 0; i < 8; i++)
+        {
+            DiabloAudio.PlaySwing();
+            Assert.AreNotEqual(prev, DiabloAudio.lastVariantIndex, "Swing variant must not repeat consecutively.");
+            prev = DiabloAudio.lastVariantIndex;
+        }
+        prev = -1;
+        for (int i = 0; i < 8; i++)
+        {
+            DiabloAudio.PlayHitFor(husk, Vector3.zero, melee: true);
+            Assert.AreNotEqual(prev, DiabloAudio.lastVariantIndex, "Hit variant must not repeat consecutively.");
+            prev = DiabloAudio.lastVariantIndex;
+        }
+        prev = -1;
+        for (int i = 0; i < 8; i++)
+        {
+            DiabloAudio.PlayFootstep(KilnLayout.OssuaryOffset);
+            Assert.AreNotEqual(prev, DiabloAudio.lastVariantIndex, "Footstep variant must not repeat consecutively.");
+            Assert.AreEqual(DiabloAudio.GroundSurface.Stone, DiabloAudio.lastGroundSurface);
+            prev = DiabloAudio.lastVariantIndex;
+        }
+        Object.DestroyImmediate(husk);
+
+        float lpAlpha = 1f - Mathf.Exp(-2f * Mathf.PI * 2000f / DiabloAudio.SampleRate);
+        var variants = DiabloAudio.AllVariantClips();
+        Assert.GreaterOrEqual(variants.Length, 30);
+        foreach (var clip in variants)
+        {
+            Assert.IsNotNull(clip);
+            Assert.Greater(clip.samples, 0);
+            Assert.AreEqual(DiabloAudio.SampleRate, clip.frequency);
+            Assert.AreEqual(1, clip.channels);
+            var data = new float[clip.samples];
+            Assert.IsTrue(clip.GetData(data, 0));
+            float peak = 0f;
+            double totalE = 0.0, highE = 0.0;
+            float lp = 0f;
+            for (int i = 0; i < data.Length; i++)
+            {
+                float x = data[i];
+                float ax = Mathf.Abs(x);
+                if (ax > peak) peak = ax;
+                lp += lpAlpha * (x - lp);
+                float hp = x - lp;
+                totalE += x * x;
+                highE += hp * hp;
+            }
+            Assert.Greater(peak, 0.05f, $"{clip.name} too quiet");
+            Assert.LessOrEqual(peak, 0.95f, $"{clip.name} clips");
+            double hfFrac = totalE > 1e-9 ? highE / totalE : 0.0;
+            Assert.Less(hfFrac, 0.35, $"{clip.name} too harsh (HF>2kHz={hfFrac:F3})");
+        }
+    }
+
+    [Test]
     public void LegacySignatures_StillCallable()
     {
         // Compile-time + headless smoke proof that no existing Play* broke.

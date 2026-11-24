@@ -344,7 +344,6 @@ public sealed class DiabloProjectile : MonoBehaviour
         if (back.sqrMagnitude < 0.0001f) back = -direction;
         back.y = 0f;
         direction = back.normalized;
-        if (Application.isPlaying) DiabloAudio.PlayHit();
         Debug.Log($"[Diablo] {hero.name} blocked and reflected a projectile.");
     }
 

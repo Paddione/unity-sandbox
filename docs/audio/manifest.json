@@ -11,16 +11,16 @@
  "sfx": [
   {
    "cue": "Swing",
-   "prompt": "warm airy melee swing, band-passed brush + low body",
+   "prompt": "warm airy melee swing, band-passed brush + low body (3-variant rotation)",
    "seed": 1234,
-   "synth": "FilteredNoise 0.14s (240..1050Hz) + 140->80Hz body",
+   "synth": "FilteredNoise 3 variants (0.12-0.16s, 190..1180Hz) + body, non-repeating pool",
    "license": "free"
   },
   {
    "cue": "Hit",
-   "prompt": "meaty thump with phase-integrated pitch drop and muted iron body",
+   "prompt": "material-aware impact (FleshBone, ArmorMetal, StoneAsh, Glass, GlassShield)",
    "seed": 1234,
-   "synth": "MetallicImpact 0.14s (155->60Hz, LP 1050Hz)",
+   "synth": "Surface-routed 3-variant pools (bone/metal/stone-ash/glass/shield, LP 950-1650Hz)",
    "license": "free"
   },
   {
@@ -249,9 +249,9 @@
   },
   {
    "cue": "Footstep",
-   "prompt": "soft earthy boot step on gravel/mud",
+   "prompt": "zone-ground boot step (Moor, Stone, Basalt, Sand) with 3-variant rotation",
    "seed": 1234,
-   "synth": "FilteredNoise 0.065s (110..580Hz + 95->55Hz step thud)",
+   "synth": "FilteredNoise 4 ground pools x 3 variants (100..1160Hz, LP)",
    "license": "free"
   }
  ],
