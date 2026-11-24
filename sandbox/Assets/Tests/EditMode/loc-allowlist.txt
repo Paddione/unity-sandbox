@@ -283,3 +283,5 @@ Classes/HeroGearModels.cs	Tall shield breastplate
 Classes/HeroGearModels.cs	Tomb plate
 Classes/HeroGearModels.cs	Yellow chest guard
 DiabloShotCheck.cs	DONE {index} equipment shots
+DiabloShotCheck.cs	bones {tag}: state={state} t={nt:F2} speed={(anim != null ? anim.GetFloat(LocomotionTwist.MoveSpeedParam) : 0f):F1} twist={(twist != null ? twist.Twist : 0f):F0} back={(twist != null && twist.Backpedaling)} vel={(twist != null ? twist.Velocity.magnitude : 0f):F1} hips={H(
+DiabloShotCheck.cs	DONE {index} locomotion shots
