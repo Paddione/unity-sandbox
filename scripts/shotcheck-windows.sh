@@ -9,7 +9,7 @@
 # Usage (repo root, after stage-windows.sh): bash scripts/shotcheck-windows.sh [--autoplay]
 #   --autoplay: launch with -autoplay -autoplay-out <game>/autoplay (presentation S5
 #   perf proof) instead of -shotcheck; copies back autoplay/*.log for fps-gate.
-# Env: SHOTCHECK_GAME (default /mnt/c/Users/PatrickKorczewski/Games/cinderreach),
+# Env: SHOTCHECK_EXTRA_ARGS (extra game flags, e.g. -locomotion-shots), SHOTCHECK_GAME (default /mnt/c/Users/PatrickKorczewski/Games/cinderreach),
 #      SHOTCHECK_TIMEOUT_S (default 120, autoplay default 600), SHOTCHECK_SIZE (default 1600x900,
 #      S5 proof uses 1920x1080 via SHOTCHECK_SIZE=1920x1080).
 # Saves: automation writes automation-save.json, never the player's cinderreach-save.json
@@ -30,6 +30,9 @@ else
   TIMEOUT="${SHOTCHECK_TIMEOUT_S:-120}"
 fi
 SIZE="${SHOTCHECK_SIZE:-1600x900}"
+# Extra game flags (e.g. -locomotion-shots); spliced into cmd.exe, so only -word tokens.
+EXTRA="${SHOTCHECK_EXTRA_ARGS:-}"
+[[ -z "$EXTRA" || "$EXTRA" =~ ^(-[a-z][a-z-]*)( -[a-z][a-z-]*)*$ ]] || { echo "shotcheck: bad SHOTCHECK_EXTRA_ARGS '$EXTRA'" >&2; exit 1; }
 OUT="$PWD/artifacts/shotcheck"
 
 # SIZE is spliced into a cmd.exe command string: accept digits only.
@@ -63,7 +66,7 @@ echo "shotcheck: launching $EXE -shotcheck (${SIZE}, timeout ${TIMEOUT}s)"
 rc=0
 # drvfs copies carry no exec bit: start through cmd.exe, which inherits the
 # game folder as its working directory from this (cd).
-(cd "$GAME" && timeout "$TIMEOUT" cmd.exe /c "$EXE -shotcheck -save-file automation-save.json -screen-fullscreen 0 -screen-width ${SIZE%x*} -screen-height ${SIZE#*x} -logFile shotcheck.log" >/dev/null 2>&1) || rc=$?
+(cd "$GAME" && timeout "$TIMEOUT" cmd.exe /c "$EXE -shotcheck $EXTRA -save-file automation-save.json -screen-fullscreen 0 -screen-width ${SIZE%x*} -screen-height ${SIZE#*x} -logFile shotcheck.log" >/dev/null 2>&1) || rc=$?
 if [ "$rc" -eq 124 ]; then
   taskkill.exe /IM "$EXE" /F >/dev/null 2>&1 || true
   echo "shotcheck: timed out after ${TIMEOUT}s" >&2
