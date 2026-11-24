@@ -19,6 +19,11 @@ public readonly struct JoinArgs
     public const string HostRelayFlag = "-host-relay";
     public const string DefaultAddress = "127.0.0.1";
     public const ushort DefaultPort = 7777;
+    /// <summary>Public direct-connect address of the cluster server (unity.korczewski.de),
+    /// baked into the Windows installer so a fresh client finds it straight away.</summary>
+    public const string PublicServerAddress = "unity.korczewski.de";
+    /// <summary>Join argument baked into the installer shortcuts.</summary>
+    public const string PublicServerJoinArg = "-join unity.korczewski.de";
 
     public readonly NetMode Mode;
     public readonly string Address;

@@ -153,7 +153,7 @@ public sealed class JoinPanel : MonoBehaviour
         Label(panel.transform, Loc.T("menu.coop"), 28, new Vector2(0f, 235f), new Vector2(560f, 44f)).color = DiabloPalette.TrimGold;
         Button(panel.transform, "Join server", Loc.T("join.btn.server"), new Vector2(0f, 185f), () => JoinServer());
         Label(panel.transform, Loc.T("join.hint"), 16, new Vector2(0f, 150f), new Vector2(560f, 30f));
-        AddressField = Field(panel.transform, "AddressField", $"{JoinArgs.DefaultAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 100f));
+        AddressField = Field(panel.transform, "AddressField", $"{JoinArgs.PublicServerAddress}:{JoinArgs.DefaultPort}", new Vector2(0f, 100f));
         Button(panel.transform, "Host", Loc.T("join.btn.host"), new Vector2(-190f, 35f), () => Host());
         Button(panel.transform, "Join", Loc.T("join.btn.join"), new Vector2(0f, 35f), () => Join());
         Button(panel.transform, "Close", Loc.T("join.btn.close"), new Vector2(190f, 35f), () => SetOpen(false));

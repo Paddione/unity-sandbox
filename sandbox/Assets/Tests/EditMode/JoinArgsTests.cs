@@ -121,7 +121,7 @@ public class JoinArgsTests
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var panel = JoinPanel.Open();
         Assert.IsTrue(panel.IsOpen);
-        Assert.AreEqual("127.0.0.1:7777", panel.AddressField.text);
+        Assert.AreEqual("unity.korczewski.de:7777", panel.AddressField.text);
         var scaler = panel.GetComponentInChildren<CanvasScaler>();
         Assert.AreEqual(new Vector2(1920f, 1080f), scaler.referenceResolution);
         Assert.AreEqual(0.5f, scaler.matchWidthOrHeight);

@@ -12,6 +12,12 @@
 #ifndef Commit
   #define Commit "dev"
 #endif
+; Join argument baked into the shortcuts so a fresh client finds the live
+; cluster server (unity.korczewski.de) straight away. Override with
+; /DServerJoin="-join myhost:7777" when needed.
+#ifndef ServerJoin
+  #define ServerJoin "-join unity.korczewski.de"
+#endif
 
 [Setup]
 AppId={{8CAB378D-5F92-4EC2-A01E-A965255239A3}
@@ -56,9 +62,9 @@ Source: "{#IconFile}"; DestDir: "{app}"; DestName: "Cinderreach.ico"; Flags: ign
 Type: filesandordirs; Name: "{app}\cinderreach_Data"
 
 [Icons]
-Name: "{group}\Cinderreach"; Filename: "{app}\cinderreach.exe"; IconFilename: "{app}\Cinderreach.ico"
+Name: "{group}\Cinderreach"; Filename: "{app}\cinderreach.exe"; Parameters: "{#ServerJoin}"; IconFilename: "{app}\Cinderreach.ico"
 Name: "{group}\{cm:UninstallProgram,Cinderreach}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Cinderreach"; Filename: "{app}\cinderreach.exe"; IconFilename: "{app}\Cinderreach.ico"; Tasks: desktopicon
+Name: "{autodesktop}\Cinderreach"; Filename: "{app}\cinderreach.exe"; Parameters: "{#ServerJoin}"; IconFilename: "{app}\Cinderreach.ico"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\cinderreach.exe"; Description: "{cm:LaunchProgram,Cinderreach}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\cinderreach.exe"; Parameters: "{#ServerJoin}"; Description: "{cm:LaunchProgram,Cinderreach}"; Flags: nowait postinstall skipifsilent
