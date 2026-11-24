@@ -16,18 +16,23 @@ Prozent: 0 %
   mit `qwen_tts`, Modelle im HF-Cache (`Qwen3-TTS-12Hz-0.6B-Base` 2,4 G + `1.7B-VoiceDesign`
   4,3 G). B1-Korrektur: Workermeldung „Cloud-Fallback" gilt nicht für TTS — B2 rendert
   lokal mit `TTS_DEVICE=cuda:0` nach Inkling-Pause.
+- 2026-11-24: B2-GPU-Fenster auf explizites Eigner-Go („now gpu fenster") ausgeführt
+  (Stopp → Render → Restart + Probe): Inkling gestoppt (inactive dead), VRAM
+  15075 → 1712 MiB frei, `TTS_DEVICE=cuda:0`-Render mit lokalem Qwen-TTS (`voice-tts`-venv)
+  = `[render] 0 of 115 lines`, Exit 0 (alle 8 Refs vorhanden, kein Design-Modell nötig),
+  Inkling restartet + `/health` ok (`inkling-2-mini-sq-10`, `loaded true`), VRAM nachher
+  14167 MiB. Beleg: `docs/voice-batch-render.log`. (Loop-Schönheitsfehler: Health-Wait
+  lief alle 24 Tries trotz ok ab Try 3 — Service war durchgehend healthy.)
 
 ## Nächste Schritte
 
-- B1: erledigt/verifiziert (Stale 0 zum 2026-11-24-Stand) — kein weiterer B1-Lauf nötig,
-  vor B2 nochmals kurz re-verifizieren (Stale kann mit S2-Texten > 0 werden).
-- B2: HOLD — aktuell würde der Batch 0 Zeilen rendern (Stale 0); zudem Textstände aus
-  Akt-I/II/III-S1 via `cinderreach-sprache-voice` S2 noch offen. B2 erst wenn S2-Neutexte
-  im Lock als stale sichtbar sind, dann: Inkling pausieren, `TTS_DEVICE=cuda:0`-Render
-  mit lokalem Qwen-TTS, Restart + Probe.
-- B3: Abnahme (QA-Transkription, Voice-Gates, Suiten, Run-Log + Doku).
+- B1: erledigt/verifiziert. B2: ausgeführt am 2026-11-24 (`0 of 115`, Inkling
+  restoret + healthy) — bei künftigen S2-Neutexte (Stale > 0) neues Fenster nötig.
+- B3: Abnahme läuft (QA-Transkription, Voice-Gates, Suiten, Run-Log + Doku).
 
 ## Offene Punkte
 
-- Eigner-Go für das GPU-Fenster steht aus (Inkling-Pause auf der 5070 Ti) — Go erst
-  anfordern, wenn B2 tatsächlich Stale > 0 hat (sonst Inkling-Stopp für 0 Zeilen).
+- Eigner-Go für dieses GPU-Fenster am 2026-11-24 erteilt + verbraucht („now gpu fenster").
+  Neues Fenster erst bei Stale > 0 aus S2-Neutexte (`sprache-voice` S2 nach Akt-S1).
+- Textstände aus Akt-I/II/III-S1 stehen weiter aus (gestaffelt via `sprache-voice` S2) —
+  künftige Batches rendern dann nur die geänderten Zeilen.
