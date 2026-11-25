@@ -1,6 +1,6 @@
 # Fortschritt
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -15,11 +15,13 @@ Prozent: 90 %
 - K9/K11 (Teil): EditMode 572/572, PlayMode 345/345 (`bash scripts/run-unity-tests.sh`, 2026-11-25), `check-meta` OK.
 - K10: Windows-GPU-Shotcheck 1920x1080 (`docs/cinderreach-inventory-shots/`: `23_inventory_open`, `24_inventory_compare` mit ▲/▼, `20_vendor_compare` mit leerem Platz, `31_pause_menu`). Windows-Autoplay: 12 Phasen, 0 Exceptions, fps-gate PASS, schlechtestes Fenster 113,1 fps (Schwelle 60).
 
+- Gelandet auf `main` als `6ab5a17` (Fast-Forward, gepusht; `check` und `verify` grün).
+- K11: On-Demand-Autoplay Run `45684409673` (Normal, Kindled, Lanternbearer) grün; `/health` 2026-11-25: `G-DIABLO01`, `G-DIABLO02`, `G-DIABLO03` (EditMode 572/572, PlayMode 345/345) und `G-DIABLO06` achieved.
+
 ## Nächste Schritte
 
-- Branch landen (`agent-workspace.py land`).
-- Session-Autoplay (`G-DIABLO06`) aus dem Hauptcheckout laufen lassen und `/health`-Probe `G-DIABLO01/02/03/06` prüfen.
+Keine.
 
 ## Offene Punkte
 
-- Landen und `G-DIABLO06`-Nachweis aus dem Hauptcheckout.
+Keine.
