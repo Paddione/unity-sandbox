@@ -107,8 +107,9 @@ public sealed class HeroPaperdollPreview : MonoBehaviour, IDragHandler
         cam.nearClipPlane = 0.1f;
         cam.farClipPlane = 12f;
         cam.fieldOfView = 28f;
-        cam.transform.position = StagePos + new Vector3(0f, 1.05f, -4.1f);
-        cam.transform.LookAt(StagePos + new Vector3(0f, 0.92f, 0f));
+        // Full body with helmet and a little headroom (the KayKit hero stands ~2.4 m).
+        cam.transform.position = StagePos + new Vector3(0f, 1.45f, -5.6f);
+        cam.transform.LookAt(StagePos + new Vector3(0f, 1.25f, 0f));
         cam.targetTexture = rt;
         // Rim light so the model reads against the dark panel regardless of the zone's sun.
         var lightGo = new GameObject("HeroPaperdollLight");

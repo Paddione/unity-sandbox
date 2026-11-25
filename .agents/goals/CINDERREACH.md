@@ -14,6 +14,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | Goal | Stand | Nächster Schritt |
 |---|---|---|
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
+| [`cinderreach-inventory-paperdoll`](cinderreach-inventory-paperdoll/GOAL.md) | Code, Tests und Windows-Belege auf `feat/inventory-paperdoll` | Landen, `G-DIABLO06`-Autoplay aus dem Hauptcheckout |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
@@ -152,6 +153,12 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Altbestände (Save v12, Join-Berichte) auf Rare. `AffixLibrary` mit 14 Affixen in Tier 1/2 (u. a.
   Lebensraub ≤ 25 %, Gold Find, Magic Find, Skill-Rang, Cooldown-Reduktion ≤ 40 %, Feuerschaden,
   Dornen), Rare 3–6 Affixe, Vergleichs-Tooltip.
+- Inventar (I/B, `DiabloInventoryUI`, 2026-11-25): eine Seite zeigt den Live-3D-Helden
+  (`HeroPaperdollPreview`: Klon auf eigener Bühne, RenderTexture, spiegelt angelegte Gear über
+  `HeroEquipmentAppearance`, per Ziehen drehbar) mit Helm/Rüstung/Waffe neben der Tasche. Schwebender
+  `ItemTooltip` für Inventar, Truhe, Händler und Schmied; Umschalt zeigt die angelegte Karte daneben und je
+  abweichendem Wert grünes ▲ / rotes ▼ mit Delta (`ItemCompare`). Ziehen Tasche ↔ Platz bzw. auf den Helden
+  (falscher Platz blinkt rot), Rechtsklick tauscht sofort; alles über den autoritativen Equip-Pfad.
 - Itemlevel aus der Dropquelle (Fen 1, Ossuary 5, Kiln 10, Barrens 15; Elite +1, Boss +2), Roll-Brackets
   pro Itemlevel (Bracket 4 ab 15 mit ×1,75), Uniques an der Bracket-Obergrenze. Zonen-Uniques
   **Shardback Aegis** (Rüstung) und **Glasswright Prism** (Helm) nur aus Bracket-4-Quellen (50 % der

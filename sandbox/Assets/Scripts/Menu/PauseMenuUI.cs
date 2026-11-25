@@ -172,7 +172,8 @@ public sealed class PauseMenuUI : MonoBehaviour
         int lv = prog != null ? prog.Level : 1;
         int gold = wallet != null ? wallet.Gold : 0;
         string accent = DiabloPalette.ToHex(DiabloPalette.ClassAccent(RunProfile.ClassId));
-        statusLabel.text = Loc.F("menu.pause.banner", accent, RunProfile.Class.displayName) +
+        string heroName = string.IsNullOrEmpty(RunProfile.Hero.heroName) ? RunProfile.Class.displayName : RunProfile.Hero.heroName;
+        statusLabel.text = Loc.F("menu.pause.banner", accent, heroName) +
             Loc.F("menu.pause.status", RunProfile.Class.displayName, lv, gold, Loc.Display(RunProfile.Difficulty));
         if (portraitImage != null)
         {

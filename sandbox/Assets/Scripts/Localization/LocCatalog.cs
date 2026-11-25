@@ -15,7 +15,10 @@ public static partial class LocCatalog
         public Entry(string key, string de, string en) { this.key = key; this.de = de; this.en = en; }
     }
 
-    static Entry E(string key, string de, string en) => new Entry(key, de, en);
+    /// <summary>Catalog lines write a line break as the two characters \\n (escaped once more in C#); UI text needs a real one.</summary>
+    static Entry E(string key, string de, string en) => new Entry(key, Unescape(de), Unescape(en));
+
+    static string Unescape(string text) => text != null && text.Contains("\\n") ? text.Replace("\\n", "\n") : text;
 
     static Dictionary<string, Entry> index;
 
