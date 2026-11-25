@@ -329,6 +329,31 @@ public static class HeroGearModels
         return left;
     }
 
+    /// <summary>
+    /// Limb piece on a stand-in rig (editor verification): wrists, shins, feet
+    /// and hips as plain children of one root, so the whole look is one object.
+    /// </summary>
+    public static GameObject CreateLimbPreview(string key, ItemSlot slot)
+    {
+        if (!IsKnownLimb(key, slot)) return null;
+        var root = new GameObject(key + " preview");
+        Transform Bone(string name, Vector3 at)
+        {
+            var bone = new GameObject(name).transform;
+            bone.SetParent(root.transform, false);
+            bone.localPosition = at;
+            return bone;
+        }
+        if (slot == ItemSlot.Gloves)
+            CreateGlovePair(key, Bone("wrist.l", new Vector3(-.7f, 1.1f, 0f)), Bone("wrist.r", new Vector3(.7f, 1.1f, 0f)));
+        else if (slot == ItemSlot.Boots)
+            CreateBootPair(key, Bone("lowerleg.l", new Vector3(-.17f, .29f, 0f)), Bone("foot.l", new Vector3(-.17f, .15f, 0f)),
+                Bone("lowerleg.r", new Vector3(.17f, .29f, 0f)), Bone("foot.r", new Vector3(.17f, .15f, 0f)));
+        else
+            CreateBelt(key, Bone("hips", new Vector3(0f, .4f, 0f)), Vector3.forward);
+        return root;
+    }
+
     static void Link(GameObject owner, GameObject follower)
     {
         if (owner == null || follower == null) return;
@@ -522,5 +547,5 @@ public sealed class GearLink : MonoBehaviour
 
     void OnEnable() { if (follower != null) follower.SetActive(true); }
     void OnDisable() { if (follower != null) follower.SetActive(false); }
-    void OnDestroy() { if (follower != null) Destroy(follower); }
+    void OnDestroy() { if (follower != null && Application.isPlaying) Destroy(follower); }
 }
