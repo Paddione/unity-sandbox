@@ -34,10 +34,11 @@ windows on the desktop and failed whenever those were closed. It uses the same
 `builds/autoplay-player/` of the runner checkout, full session with
 `-autoplay -autoplay-god`, then the FPS gate (`--min-fps 30 --resolution 1280x720 --skip-first 1`).
 
-- Display: the runner shares `/tmp/.X11-unix/X0` and `/dev/dxg` with the WSL session, so
-  `run-autoplay.sh` renders through WSLg with `GALLIUM_DRIVER=d3d12` on the GPU. A window
-  shows on the desktop for about two minutes. Without WSLg it falls back to Xvfb (llvmpipe,
-  ~6 fps), which proves the session but fails the FPS gate.
+- Display: the job sets `AUTOPLAY_DISPLAY=xvfb`, so the player renders on llvmpipe (CPU,
+  ~8 fps, full route ~4 min) and opens no window on the desktop. The WSLg GPU path
+  (`AUTOPLAY_DISPLAY=wslg`, d3d12 through `/dev/dxg`) still exists for local runs, but crashes at
+  startup with SIGSEGV in `libnvidia-gpucomp.so` since the 2026-11-25 driver update
+  (KMD 621.40, WSL UMD 620.70). The FPS gate is advisory on Linux either way.
 - Results: artifact `autoplay-<run_id>` (14 days) and a host copy under
   `~/unity-sandbox-autoplay/<YYYY-MM-DD>/` (a second run on the same day gets a
   `-<run_id>` suffix). Host folders older than 30 days are deleted by the job.

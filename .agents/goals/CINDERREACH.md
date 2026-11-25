@@ -308,7 +308,7 @@ liest für Menüs ohne Nebenwirkung.
   complete` (Koop-Client siehe Koop-Paarlauf).
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Auf Abruf
   per Job `autoplay` in `.github/workflows/unity-tests.yml` (`gh workflow run unity-tests.yml -f autoplay=true`,
-  Runner `unity-licensed`, kein Zeitplan seit 2026-11-25) für Normal, Kindled und Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
+  Runner `unity-licensed`, Xvfb ohne Desktopfenster, kein Zeitplan seit 2026-11-25) für Normal, Kindled und Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
   Dreiergruppe, `COOP_CLIENT_GOD=0` für sterbliche Clients). Koop-Client-Phasen: `town, zone1, zone2,
   boss, zone3, actboss, zone4, boss3` (je Zone Treffer oder Angriffs-Casts, je Boss die gebuchte Kill-Meldung).
 - Installer: `scripts/build-installer.sh` (Inno Setup 6 per winget, `scripts/installer/cinderreach.iss`) packt

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       autoplay:
-        description: "Also run the session autoplay (Normal, Kindled, Lanternbearer; opens 3 game windows on the desktop)"
+        description: "Also run the session autoplay (Normal, Kindled, Lanternbearer; headless under Xvfb)"
         type: boolean
         default: false
 
@@ -61,10 +61,15 @@ jobs:
     # (no schedule since 2026-11-25: unattended runs popped 3 windows on the desktop and
     # were killed when they got closed). Result JSON goes to the artifact (14 days) and to
     # ~/unity-sandbox-autoplay/<YYYY-MM-DD>/ on the host, which dotfiles G-DIABLO06 reads.
-    name: Session autoplay (Linux player, WSLg GPU)
+    name: Session autoplay (Linux player, Xvfb)
     if: github.event_name == 'workflow_dispatch' && inputs.autoplay
     runs-on: [self-hosted, Linux, X64, unity-licensed]
     timeout-minutes: 60
+    env:
+      # Xvfb + llvmpipe instead of the WSLg GPU: no windows on the desktop, and the WSLg
+      # d3d12 path crashes at startup (SIGSEGV in libnvidia-gpucomp) since the 2026-11-25
+      # driver update. A full route takes ~4 min at ~8 fps; the Linux fps-gate is advisory.
+      AUTOPLAY_DISPLAY: xvfb
     concurrency:
       group: unity-autoplay
       cancel-in-progress: false
