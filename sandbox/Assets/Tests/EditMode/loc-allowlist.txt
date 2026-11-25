@@ -241,7 +241,6 @@ Story/StoryModel.cs	Kiln Summon
 # Cinderreach gear IDs, scene-object names and diagnostic output.
 Classes/HeroEquipmentAppearance.cs	Chest art
 Classes/HeroEquipmentAppearance.cs	Head art
-Classes/HeroEquipmentAppearance.cs	Lantern of the Hold
 Classes/HeroEquipmentAppearance.cs	Left hand art
 Classes/HeroEquipmentAppearance.cs	Right hand art
 Classes/HeroGearModels.cs	Asymmetric leather panels
@@ -298,3 +297,24 @@ Classes/HeroGearModels.cs	Boot top
 Classes/HeroGearModels.cs	Boot shoe
 Classes/HeroGearModels.cs	Belt strap
 Classes/HeroGearModels.cs	Sash tail
+Classes/HeroGearModels.cs	Cleaver blade
+Classes/HeroGearModels.cs	Cinder spine
+Classes/HeroGearModels.cs	Thurible chain
+Classes/HeroGearModels.cs	Bone cage
+Classes/HeroGearModels.cs	Grave ember
+Classes/HeroGearModels.cs	Glass limb
+Classes/HeroGearModels.cs	Reed wrap
+Classes/HeroGearModels.cs	Wrap band
+Classes/HeroGearModels.cs	Ash mail
+Classes/HeroGearModels.cs	Ash collar
+Classes/HeroGearModels.cs	Kiln plates
+Classes/HeroGearModels.cs	Kiln heart
+Classes/HeroGearModels.cs	Prospector cowl
+Classes/HeroGearModels.cs	Lamp stone
+Classes/HeroGearModels.cs	Bone visor
+Classes/HeroGearModels.cs	Eye slit
+Classes/HeroGearModels.cs	Ember leaf
+DiabloShotCheck.cs	FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges} cooldown={flask.CooldownRemaining:0.0}
+DiabloShotCheck.cs	gearset_{cls.id}_back
+DiabloShotCheck.cs	gearset_{cls.id}_front
+DiabloShotCheck.cs	gearset_{cls.id}_paperdoll

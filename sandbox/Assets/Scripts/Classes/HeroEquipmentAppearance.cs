@@ -136,7 +136,7 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
         Replace(ref armor, ref armorId, nextArmor, ItemSlot.Armor, chest);
         Replace(ref helmet, ref helmetId, nextHelmet, ItemSlot.Helmet, head);
         Replace(ref weapon, ref weaponId, nextWeapon, ItemSlot.Weapon,
-            nextWeapon == ItemDatabase.NightfangId ? left : right);
+            HeroGearModels.IsBowUnique(nextWeapon) ? left : right);
         string nextGloves = mirror ? networkPlayer.visualGloves.Value.ToString() : HeroGearModels.VisualKey(equipment.gloves);
         string nextBoots = mirror ? networkPlayer.visualBoots.Value.ToString() : HeroGearModels.VisualKey(equipment.boots);
         string nextBelt = mirror ? networkPlayer.visualBelt.Value.ToString() : HeroGearModels.VisualKey(equipment.belt);
@@ -153,11 +153,11 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
         starterGuard.SetActive(armor == null && classId == ClassCatalog.FenwalkerId);
         if (sword != null) sword.gameObject.SetActive(weapon == null && !lanternbearer && !bowDrawn);
         appearance.SetStarterLanternVisible(lanternbearer && weapon == null);
-        if (skills != null) skills.SetStarterBowModelVisible(weaponId != ItemDatabase.NightfangId);
+        if (skills != null) skills.SetStarterBowModelVisible(!HeroGearModels.IsBowUnique(weaponId));
         if (weapon != null)
         {
-            bool uniqueBow = weaponId == ItemDatabase.NightfangId;
-            bool hangingLantern = weaponId == "Lantern of the Hold" || weaponId == ItemDatabase.WickOfHaloId;
+            bool uniqueBow = HeroGearModels.IsBowUnique(weaponId);
+            bool hangingLantern = HeroGearModels.IsHangingLantern(weaponId);
             if (hangingLantern || (uniqueBow && !bowDrawn))
                 weapon.transform.rotation = transform.rotation;
             else

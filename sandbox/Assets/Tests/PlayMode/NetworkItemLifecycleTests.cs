@@ -142,4 +142,58 @@ public sealed class NetworkItemLifecycleTests
         unknown.baseType = "unknown base";
         Assert.That(NetworkItemOwnership.Validate(unknown, ids), Is.Null);
     }
+
+    [UnityTest]
+    public IEnumerator ClientFlaskDrink_IsGrantedByTheHostAndHealsTheOwner()
+    {
+        ushort port;
+        using (var socket = new System.Net.Sockets.UdpClient(0))
+            port = (ushort)((System.Net.IPEndPoint)socket.Client.LocalEndPoint).Port;
+        var playerPrefab = Resources.Load<GameObject>("NetworkPlayerDiablo");
+        var host = NewManager("flask host", port);
+        host.NetworkConfig.PlayerPrefab = playerPrefab;
+        Assert.That(host.StartHost(), Is.True);
+        yield return null;
+        var client = NewManager("flask client", port);
+        client.NetworkConfig.PlayerPrefab = playerPrefab;
+        Assert.That(client.StartClient(), Is.True);
+        float deadline = Time.realtimeSinceStartup + 10f;
+        NetworkObject owned = null;
+        while (Time.realtimeSinceStartup < deadline)
+        {
+            owned = client.SpawnManager?.GetLocalPlayerObject();
+            if (owned != null && client.IsConnectedClient) break;
+            yield return null;
+        }
+        Assert.That(owned, Is.Not.Null, "Client player spawned.");
+        NetworkObject mirror = null;
+        foreach (var kv in host.SpawnManager.SpawnedObjects)
+            if (kv.Value.IsPlayerObject && kv.Value.OwnerClientId == client.LocalClientId) mirror = kv.Value;
+        Assert.That(mirror, Is.Not.Null, "Host holds the client's mirror.");
+        // Out in the field: the Lantern Hold would refill at once.
+        owned.transform.position = new Vector3(200f, 0f, 0f);
+        deadline = Time.realtimeSinceStartup + 5f;
+        while (Time.realtimeSinceStartup < deadline && HealingFlask.AtRefillPoint(mirror.transform.position))
+        {
+            owned.transform.position = new Vector3(200f, 0f, 0f);
+            yield return null;
+        }
+        Assert.That(HealingFlask.AtRefillPoint(mirror.transform.position), Is.False, "The mirror left the hold.");
+
+        var health = owned.GetComponent<PlayerHealth>();
+        health.TakeDamage(10f);
+        float hurt = health.CurrentHP;
+        var ownerFlask = HealingFlask.For(owned.gameObject);
+        var hostFlask = HealingFlask.For(mirror.gameObject);
+        Assert.That(ownerFlask.TryDrink(), Is.True, "The client asks the host.");
+        deadline = Time.realtimeSinceStartup + 5f;
+        while (ownerFlask.Drinks == 0 && Time.realtimeSinceStartup < deadline) yield return null;
+        Assert.That(hostFlask.Granted, Is.EqualTo(1), "The host spent the charge.");
+        Assert.That(ownerFlask.Drinks, Is.EqualTo(1), "The owner started the heal on the host's word.");
+        Assert.That(ownerFlask.Charges, Is.EqualTo(0), "The owner mirrors the empty flask.");
+        Assert.That(ownerFlask.TryDrink(), Is.False, "An empty flask does not even ask.");
+        yield return new WaitForSeconds(HealingFlask.TickSeconds + 0.2f);
+        Assert.That(health.CurrentHP, Is.GreaterThan(hurt), "Ticks heal the owner's own HP.");
+        Assert.That(hostFlask.DrinkAuthoritative(), Is.False, "The host refuses a second drink within the cooldown.");
+    }
 }

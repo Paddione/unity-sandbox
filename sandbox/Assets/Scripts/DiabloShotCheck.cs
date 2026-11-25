@@ -313,6 +313,37 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(1.0f);
         yield return Shot("ossuary_arrival");
 
+        // 10a) gear-slots S7: flask HUD mid-cooldown (outside the hold, so no refill),
+        // then the new slots on the ground.
+        {
+            var flaskHp = hero.GetComponent<PlayerHealth>();
+            if (flaskHp != null) flaskHp.TakeDamage(flaskHp.MaxHP * 0.5f);
+            var flask = HealingFlask.For(hero.gameObject);
+            bool drank = flask.TryDrink();
+            hero.distance = 9f;
+            yield return Wait(1.5f);
+            Log($"FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges} cooldown={flask.CooldownRemaining:0.0}");
+            yield return Shot("flask_cooldown_hud");
+            var fwd2 = hero.transform.forward.sqrMagnitude > 0.01f ? hero.transform.forward.normalized : camFwd;
+            var at = hero.transform.position + fwd2 * 2.5f;
+            var drops = new[]
+            {
+                ItemDatabase.RollUnique(ItemDatabase.CreateUnique(ItemDatabase.IronboundGripsId), 5, 1),
+                GalleryItem("LeatherBoots", ItemRarity.Rare, (AffixLibrary.MoveSpeed, 0.2f)),
+                ItemDatabase.RollUnique(ItemDatabase.CreateUnique(ItemDatabase.QuickdrawBeltId), 5, 1),
+            };
+            for (int i = 0; i < drops.Length; i++)
+            {
+                drops[i].slot = i == 0 ? ItemSlot.Gloves : i == 1 ? ItemSlot.Boots : ItemSlot.Belt;
+                LootDrop.SpawnItem(at + Vector3.right * (i - 1) * 1.2f, drops[i], false);
+            }
+            DiabloLootLabels.ForceShow = true;
+            yield return Wait(0.8f);
+            yield return Shot("gear_slots_ground");
+            DiabloLootLabels.ForceShow = false;
+            hero.distance = 18f;
+        }
+
         // 10b) Edge wall (playtest 2026-11-23): hero near the far Ossuary corner,
         // the two rim walls in front of the camera, companions in formation.
         var ossuaryArrival = ossuaryGate.GetComponent<ZoneGate>().destination;
@@ -657,14 +688,42 @@ public sealed class DiabloShotCheck : MonoBehaviour
             var item = ItemDatabase.CreateUnique(id);
             appearance.Apply(ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)));
             var facing = item.slot == ItemSlot.Weapon
-                ? Quaternion.Euler(0, id == ItemDatabase.NightfangId ? 45f : -45f, 0) * towardCamera
+                ? Quaternion.Euler(0, HeroGearModels.IsBowUnique(id) ? 45f : -45f, 0) * towardCamera
                 : id == ItemDatabase.ShardbackAegisId ? -towardCamera : towardCamera;
             Face(hero, facing);
             equipment.Equip(item);
             yield return Wait(.35f);
             yield return Shot(id.Replace(' ', '-').Replace("'", ""));
-            equipment.UnequipTo(item.slot, inventory);
+            equipment.SetSlot(item.slot, null);
         }
+
+        // gear-slots S7: every class in a full six-slot role set, front and back, then the paperdoll.
+        foreach (var cls in ClassCatalog.All)
+        {
+            appearance.Apply(cls, heroLook);
+            foreach (var slot in Equipment.GearSlots)
+            {
+                string uid = slot == ItemSlot.Weapon ? ItemDatabase.ZoneWeaponFor(cls.id)
+                    : HeroGearModels.IsLimbSlot(slot) ? ItemDatabase.RoleUniquesFor(slot)[(int)cls.role]
+                    : ItemDatabase.UniqueForMatrix(cls.role, slot);
+                equipment.Equip(ItemDatabase.CreateUnique(uid));
+            }
+            Face(hero, towardCamera);
+            yield return Wait(.4f);
+            yield return Shot($"gearset_{cls.id}_front");
+            Face(hero, -towardCamera);
+            yield return Wait(.3f);
+            yield return Shot($"gearset_{cls.id}_back");
+            Face(hero, towardCamera);
+            var ui = hero.GetComponent<DiabloInventoryUI>() ?? hero.gameObject.AddComponent<DiabloInventoryUI>();
+            ui.SetOpen(true);
+            ui.Refresh();
+            yield return Wait(.5f);
+            yield return Shot($"gearset_{cls.id}_paperdoll");
+            ui.SetOpen(false);
+            foreach (var slot in Equipment.GearSlots) equipment.SetSlot(slot, null);
+        }
+        appearance.Apply(ClassCatalog.Fenwalker, heroLook);
         hero.distance = distance;
         hero.pitch = pitch;
     }

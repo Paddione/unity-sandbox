@@ -33,6 +33,8 @@ public sealed class HealingFlask : MonoBehaviour
 
     /// <summary>Drinks the owner confirmed (test and autoplay seam).</summary>
     public int Drinks { get; private set; }
+    /// <summary>Drinks this authority granted (host-side test seam).</summary>
+    public int Granted { get; private set; }
     /// <summary>HP restored by flask ticks on this hero (test seam).</summary>
     public float HealedTotal { get; private set; }
 
@@ -126,6 +128,7 @@ public sealed class HealingFlask : MonoBehaviour
         var health = GetComponent<PlayerHealth>();
         if (health == null || health.CurrentHP <= 0f || Charges <= 0) return false;
         charges = Charges - 1;
+        Granted++;
         if (float.IsPositiveInfinity(nextChargeAt)) nextChargeAt = Time.time + Cooldown;
         float amount = HealAmount(health, Gear);
         GearUniqueEffects.OnFlaskDrunk(gameObject, amount);

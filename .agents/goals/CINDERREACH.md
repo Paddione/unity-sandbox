@@ -152,13 +152,32 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `DiabloCharacterUI` (C).
 - Beute: nur Rare und Unique (seit 2026-11-23). `ItemRarity.Magic` bleibt als Enum-Wert (Netz-/Save-Vertrag),
   wird aber nie erzeugt: Magic-Gewicht der Droptabellen ging an Rare (Normal 0/98/2, Elite 0/90/10, Unique-Raten
-  unverändert, Magic Find skaliert nur noch Unique), Händler 5 Rare + 1 Unique, Startwaffen und Heiltrank Rare, `ItemDatabase.RetireMagic` hebt
-  Altbestände (Save v12, Join-Berichte) auf Rare. `AffixLibrary` mit 14 Affixen in Tier 1/2 (u. a.
+  unverändert, Magic Find skaliert nur noch Unique), Händler 5 Rare + 1 Unique, Startwaffen Rare, `ItemDatabase.RetireMagic` hebt
+  Altbestände (Save v12, Join-Berichte) auf Rare. `AffixLibrary` mit 17 Affixen in Tier 1/2 (u. a.
   Lebensraub ≤ 25 %, Gold Find, Magic Find, Skill-Rang, Cooldown-Reduktion ≤ 40 %, Feuerschaden,
-  Dornen), Rare 3–6 Affixe, Vergleichs-Tooltip.
+  Dornen, Flaschenheilung nur auf Gürteln), Rare 3–6 Affixe, Vergleichs-Tooltip.
+- Sechs Ausrüstungsplätze (gear-slots, 2026-11-25): Rüstung, Waffe, Helm plus Handschuhe, Stiefel,
+  Gürtel (`ItemSlot` 4–6, Consumable bleibt 3). Je drei Basen (leicht/mittel/schwer), eigene Affix-Pools
+  (Handschuhe offensiv, Stiefel Tempo/Verteidigung, Gürtel Leben/Cooldown/Fläche/Flasche), am Helden als
+  Bone-Space-Modelle an `wrist`, `lowerleg`/`foot` und `hips` (`HeroGearModels`, Netz-Keys
+  `visualGloves/Boots/Belt`). Save v15 ergänzt die Plätze und den Pity-Zähler und erstattet alte
+  Heiltränke mit 2 Gold.
+- Heilflasche (`HealingFlask`, Taste 1): 40 % der max. HP über 5 s in 10 Ticks, Schaden bricht nicht ab,
+  60 s Cooldown pro Ladung, 1 Ladung. Füllt sich in der Lantern Hold (`SkillVariantCatalog.IsInLanternHold`)
+  und an Risk-Shrines. Host entscheidet Ladung/Cooldown, der Besitzer tickt sein HP
+  (`DiabloNetworkPlayer.Flask`). HUD-Slot mit Cooldown-Sweep neben der Lebenskugel. Der Kauftrank ist entfernt.
+- 18 Gear-Slot-Uniques (`GearUniqueEffects`): je Rolle ein Stück für Handschuhe/Stiefel/Gürtel
+  (ironbound-grips, menders-touch, cutpurse-wraps, bastion-treads, pilgrim-steps, ghostwalk-boots,
+  wardens-girdle, vial-sash, quickdraw-belt) und je drei zonengebundene Stücke für Waffe (klassengebunden,
+  ab Ossuary), Rüstung und Helm (Fen/Ossuary/Kiln). Ein Drittel der Uniques alter Plätze kommt aus den
+  freigeschalteten Zonenstücken (`DroptableDatabase.ZonePieceShare`).
+- Dropbalance: Raritätsgewichte unverändert, Platzgewichte Waffe 25 / Rüstung 20 / Helm 15 /
+  Handschuhe 15 / Stiefel 15 / Gürtel 10 (`LootTable.SlotWeights`). Pity: nach 40 Item-Drops ohne Unique
+  ist der nächste Drop Unique (`UniquePity`, gespeichert). Effektive Unique-Quote normaler Gegner dadurch
+  rund 3,6 % statt 2 %.
 - Inventar (I/B, `DiabloInventoryUI`, 2026-11-25): eine Seite zeigt den Live-3D-Helden
   (`HeroPaperdollPreview`: Klon auf eigener Bühne, RenderTexture, spiegelt angelegte Gear über
-  `HeroEquipmentAppearance`, per Ziehen drehbar) mit Helm/Rüstung/Waffe neben der Tasche. Schwebender
+  `HeroEquipmentAppearance`, per Ziehen drehbar) mit sechs Plätzen in zwei Spalten neben der Tasche. Schwebender
   `ItemTooltip` für Inventar, Truhe, Händler und Schmied; Umschalt zeigt die angelegte Karte daneben und je
   abweichendem Wert grünes ▲ / rotes ▼ mit Delta (`ItemCompare`). Ziehen Tasche ↔ Platz bzw. auf den Helden
   (falscher Platz blinkt rot), Rechtsklick tauscht sofort; alles über den autoritativen Equip-Pfad.
@@ -171,7 +190,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Klassengebundene Waffen, Drops zu 70 % passend zur Klasse des Finders. Build-Uniques
   `lancer-ward` (Cleave unterbricht Lancer-Sturm) und `wick-of-the-halo` (Wisps priorisieren Halo-Ziele),
   dazu „Lantern of the Hold“.
-- Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %, Heiltrank Taste 1),
+- Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %),
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).
 

@@ -138,6 +138,65 @@ public static class HeroGearModels
             Crystal(root, "Left prism", Jade, new Vector3(-.24f,.42f,.13f), new Vector3(.13f,.25f,.16f));
             Crystal(root, "Right prism", Jade, new Vector3(.24f,.42f,.13f), new Vector3(.13f,.25f,.16f));
         }),
+        // ---- gear-slots S5 zone uniques ----
+        [ItemDatabase.CinderfangCleaverId] = new Model(ItemSlot.Weapon, root =>
+        {
+            Grip(root, .44f);
+            Plate(root, "Cleaver blade", Ember, .07f, 0,
+                -.06f,.34f, -.06f,.62f, .26f,.62f, .30f,.48f, .22f,.34f);
+            Box(root, "Cinder spine", Dark, new Vector3(.08f,.63f,0), new Vector3(.30f,.035f,.08f));
+        }),
+        [ItemDatabase.OssuaryThuribleId] = new Model(ItemSlot.Weapon, root =>
+        {
+            Beam(root, "Thurible chain", Iron, Vector3.zero, new Vector3(0,-.2f,0), .03f);
+            Crystal(root, "Bone cage", Pearl, new Vector3(0,-.36f,0), new Vector3(.26f,.26f,.26f));
+            Crystal(root, "Grave ember", Jade, new Vector3(0,-.36f,0), new Vector3(.12f,.16f,.12f));
+        }),
+        [ItemDatabase.GlassthornBowId] = new Model(ItemSlot.Weapon, root =>
+        {
+            for (int side = -1; side <= 1; side += 2)
+            {
+                Plate(root, "Glass limb", Jade, .05f, 0, -.025f,0, .035f,0, .10f,.22f*side,
+                    .05f,.40f*side, -.07f,.55f*side, -.03f,.38f*side, .03f,.2f*side);
+                Crystal(root, "Thorn", Pearl, new Vector3(.09f,.3f*side,0), new Vector3(.07f,.10f,.05f));
+                Beam(root, "String", Pearl, new Vector3(-.07f,.54f*side,0), new Vector3(-.07f,0,0), .009f);
+            }
+        }),
+        [ItemDatabase.FenWrapId] = new Model(ItemSlot.Armor, root =>
+        {
+            Plate(root, "Reed wrap", Jade, .06f, .36f, -.32f,.10f, .32f,.10f, .26f,-.30f, -.26f,-.30f);
+            for (int i = 0; i < 3; i++)
+                Box(root, "Wrap band", Leather, new Vector3(0,.02f-i*.12f,.395f), new Vector3(.58f,.035f,.03f));
+        }),
+        [ItemDatabase.AshenHauberkId] = new Model(ItemSlot.Armor, root =>
+        {
+            Plate(root, "Ash mail", Dark, .10f, .36f, -.34f,.12f, .34f,.12f, .30f,-.36f, -.30f,-.36f);
+            Plate(root, "Ash collar", Iron, .06f, .42f, -.20f,.16f, .20f,.16f, .12f,.04f, -.12f,.04f);
+        }),
+        [ItemDatabase.KilnheartMailId] = new Model(ItemSlot.Armor, root =>
+        {
+            Plate(root, "Kiln plates", Iron, .09f, .36f, -.31f,.11f, .31f,.11f, .24f,-.31f, -.24f,-.31f);
+            Crystal(root, "Kiln heart", Ember, new Vector3(0,-.06f,.42f), new Vector3(.16f,.20f,.06f));
+        }),
+        [ItemDatabase.ProspectorsHoodId] = new Model(ItemSlot.Helmet, root =>
+        {
+            Plate(root, "Prospector cowl", Leather, .10f, .24f, -.26f,.17f, -.25f,.38f, -.10f,.48f, .10f,.48f,
+                .25f,.38f, .26f,.17f);
+            Crystal(root, "Lamp stone", Brass, new Vector3(0,.36f,.30f), new Vector3(.10f,.12f,.06f));
+        }),
+        [ItemDatabase.BonewatchVisorId] = new Model(ItemSlot.Helmet, root =>
+        {
+            Band(root, Pearl, .28f, .20f, .54f);
+            Plate(root, "Bone visor", Pearl, .05f, .28f, -.22f,.30f, .22f,.30f, .18f,.16f, -.18f,.16f);
+            Box(root, "Eye slit", Dark, new Vector3(0,.235f,.31f), new Vector3(.30f,.03f,.02f));
+        }),
+        [ItemDatabase.EmberwreathCrownId] = new Model(ItemSlot.Helmet, root =>
+        {
+            Band(root, Brass, .26f, .20f, .52f);
+            for (int i = -2; i <= 2; i++)
+                Crystal(root, "Ember leaf", Ember, new Vector3(i*.11f,.32f-Mathf.Abs(i)*.03f,.24f),
+                    new Vector3(.09f,.18f,.06f));
+        }),
     };
 
     // ---- gear-slots S3: worn hands, feet and belt --------------------------------
@@ -305,6 +364,13 @@ public static class HeroGearModels
         id != null && Models.TryGetValue(id, out var model) && model.Slot == slot;
 
     public static IEnumerable<string> Ids => Models.Keys;
+
+    /// <summary>Unique bows held in the left hand and drawn like the starter bow.</summary>
+    public static bool IsBowUnique(string id) => id == ItemDatabase.NightfangId || id == ItemDatabase.GlassthornBowId;
+
+    /// <summary>Unique lanterns that hang straight down from the hand.</summary>
+    public static bool IsHangingLantern(string id) =>
+        id == "Lantern of the Hold" || id == ItemDatabase.WickOfHaloId || id == ItemDatabase.OssuaryThuribleId;
 
     public static GameObject Create(string id, ItemSlot slot, Transform parent)
     {
