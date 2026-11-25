@@ -111,6 +111,14 @@ public static class CompanionFactory
         typeof(PartyCompanion),
         typeof(ItemTooltip),
         typeof(HeroPaperdollPreview),
+        // cinderreach-group-quest-map: a clone must not run the story or its own
+        // tracker, minimap and zone map (M would open one map per companion).
+        typeof(StoryDirector),
+        typeof(StoryDialogUI),
+        typeof(StoryQuestUI),
+        typeof(UseKey),
+        typeof(MinimapHud),
+        typeof(WorldMapUI),
     };
 
     /// <summary>Remove gameplay state from a hero clone; visuals, Animator and ClassAppearance stay.</summary>

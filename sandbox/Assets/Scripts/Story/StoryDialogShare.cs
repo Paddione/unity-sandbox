@@ -83,6 +83,7 @@ public static class StoryDialogShare
         LastDialog = dialogId;
         LastIndex = index;
         LastSpeaker = speakerName;
+        Debug.Log($"[Story] shared dialog {op} {dialogId} line {index} from client {from}.");
         var hero = HeroLocator.Solo();
         if (hero == null) return;
         var ui = hero.GetComponent<StoryDialogUI>();

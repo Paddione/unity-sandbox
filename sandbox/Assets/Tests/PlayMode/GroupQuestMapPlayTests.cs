@@ -178,4 +178,20 @@ public sealed class GroupQuestMapPlayTests
         Assert.IsFalse(tracker.text.Contains(Loc.T("quest.h1.title")), "hidden from the tracker");
         log.SetOpen(false);
     }
+
+    [UnityTest]
+    public IEnumerator HeroClone_CarriesNoStoryHudOrMaps()
+    {
+        var hero = MakeHero(new Vector3(0f, 1f, 8f));
+        yield return null;
+        var clone = CompanionFactory.CloneHeroVisual(hero);
+        spawned.Add(clone);
+        Assert.IsNotNull(clone);
+        Assert.IsNull(clone.GetComponent<StoryDirector>(), "a companion or paperdoll clone runs no story");
+        Assert.IsNull(clone.GetComponent<MinimapHud>());
+        Assert.IsNull(clone.GetComponent<WorldMapUI>());
+        Assert.IsNull(clone.GetComponent<StoryQuestUI>());
+        yield return null;
+        Assert.AreEqual(1, Object.FindObjectsByType<StoryDirector>(FindObjectsSortMode.None).Length);
+    }
 }

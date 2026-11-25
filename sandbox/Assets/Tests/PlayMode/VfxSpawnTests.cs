@@ -173,6 +173,10 @@ public class VfxSpawnTests
                 sawRare = true;
             Object.DestroyImmediate(orb);
         }
+        // SpawnLoot also drops gold piles; left at the origin they were picked up by
+        // later tests' heroes (WorldInteractionTests.ContractBoard saw 8369 gold).
+        foreach (var gold in Object.FindObjectsByType<GoldDrop>(FindObjectsSortMode.None))
+            Object.DestroyImmediate(gold.gameObject);
         Assert.IsTrue(sawRare, "Seeded Boss rolls must include a Rare+ drop.");
         Assert.Greater(PresentationVfx.RareBeams, beams, "Rare+ drops must spawn a beam.");
         yield return null;

@@ -167,6 +167,15 @@ public sealed class StoryQuestUI : MonoBehaviour
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 24);
         canvas.enabled = false;
         var panel = DiabloUIFactory.MakePanel(canvasGo.transform, "LogPanel", new Vector2(720f, 820f), Vector2.zero);
+        var backing = new GameObject("LogBacking", typeof(RectTransform), typeof(LayoutElement));
+        backing.transform.SetParent(panel.transform, false);
+        backing.GetComponent<LayoutElement>().ignoreLayout = true;
+        var bimg = backing.AddComponent<Image>();
+        bimg.color = DiabloPalette.Abyss;
+        bimg.raycastTarget = false;
+        var brt = bimg.rectTransform;
+        brt.anchorMin = Vector2.zero; brt.anchorMax = Vector2.one;
+        brt.offsetMin = new Vector2(8f, 8f); brt.offsetMax = new Vector2(-8f, -8f);
         var v = panel.AddComponent<VerticalLayoutGroup>();
         v.padding = new RectOffset(20, 20, 16, 16);
         v.spacing = 8f;
@@ -180,6 +189,7 @@ public sealed class StoryQuestUI : MonoBehaviour
         lv.spacing = 4f;
         lv.childControlWidth = true;
         lv.childControlHeight = false;
+        lv.childForceExpandHeight = false;
         list = listGo.transform;
     }
 }

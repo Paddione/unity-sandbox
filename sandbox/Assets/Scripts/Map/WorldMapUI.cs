@@ -123,6 +123,15 @@ public sealed class WorldMapUI : MonoBehaviour
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 24);
         canvas.enabled = false;
         var panel = DiabloUIFactory.MakePanel(canvasGo.transform, "MapPanel", new Vector2(MapPx + 360f, MapPx + 110f), Vector2.zero);
+        // The framed panel sprite is see-through in the middle; world nameplates showed behind the legend.
+        var backing = new GameObject("MapBacking", typeof(RectTransform));
+        backing.transform.SetParent(panel.transform, false);
+        var bimg = backing.AddComponent<Image>();
+        bimg.color = DiabloPalette.Abyss;
+        bimg.raycastTarget = false;
+        var brt = bimg.rectTransform;
+        brt.anchorMin = Vector2.zero; brt.anchorMax = Vector2.one;
+        brt.offsetMin = new Vector2(8f, 8f); brt.offsetMax = new Vector2(-8f, -8f);
 
         var header = DiabloUIFactory.MakeHeader(panel.transform, "", null, () => SetOpen(false));
         var hr = (RectTransform)header.transform;

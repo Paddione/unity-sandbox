@@ -72,6 +72,7 @@ public static class StoryBarks
     public static bool SayRemote(string id)
     {
         relayed++;
+        Debug.Log($"[Story] bark {id} relayed by the host.");
         return Accept(id);
     }
 

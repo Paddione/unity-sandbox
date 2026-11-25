@@ -1,6 +1,6 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-22, `main` @ `c89dc40`. Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-26 (zuletzt `cinderreach-group-quest-map`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte `ROADMAP.md`. Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -16,6 +16,19 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
+
+Abgeschlossen: `cinderreach-group-quest-map` (2026-11-26): Koop-Story gemeinsam. Öffnet ein Held einen NPC-Dialog,
+sehen alle anderen dieselben Zeilen mit Stimme als Zuhörerfenster („<Held> spricht mit <NPC>“, nicht blockierend,
+ausblendbar, eigener Dialog hat Vorrang; `StoryDialogShare`, `DiabloNetworkPlayer.Story.cs`, Host prüft Dialog-ID und
+Zeilen). Jeder vom Host angenommene Bark geht an alle Clients (`StoryBarks.Relay`, 20-s-Sperre gegen Doppelungen).
+Quest-Tracking: alle aktiven/abgabebereiten Aufgaben verfolgt bis zum Abschalten im Fuhrbuch (Flag `untrack:<id>`,
+keine Save-Migration), HUD-Tracker mit bis zu 4 Aufgaben, Zielen, Zählern, Abgabe-NPC und Weg (Meter bzw. → Zone),
+Fortschritts-Toasts, Fuhrbuch mit Angeboten und Zielzone. Zielorte `QuestDestinations` (NPC, Fundstücke, 3 nächste
+Kill-Ziele, Zone; andere Zonen über das Tor zur Nachbarzone). Minimap oben rechts (`MinimapHud`, 28 m, kameragleich
+gedreht, Randpfeile) und Zonenkarte auf M (`WorldMapUI`, ◀/▶ über freigeschaltete Zonen, Legende); Zonenbild einmal
+pro Zone per Top-down-Render (`ZoneMap`). Heldenklone (Begleiter, Paperdoll) tragen keine Story-/Kartenkomponenten
+mehr (vorher liefen dort doppelte Story-HUDs). Belege `GroupQuestMapTests`, `GroupQuestMapPlayTests`,
+Windows-Shots `map_*`, `dialog_shared_listener`, `quest_log_tracking`.
 
 Abgeschlossen: `cinderreach-inventory-paperdoll` (2026-11-25, `6ab5a17`): Inventar mit Live-3D-Held neben der Tasche,
 Umschalt-Vergleich mit ▲/▼, Drag & Drop und Rechtsklick-Tausch, gemeinsamer Tooltip für Truhe, Händler und Schmied
