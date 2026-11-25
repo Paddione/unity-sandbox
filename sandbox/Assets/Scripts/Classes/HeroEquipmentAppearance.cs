@@ -31,10 +31,12 @@ public sealed class HeroEquipmentAppearance : MonoBehaviour
     string weaponId;
     string classId;
 
-    public bool Initialize(ClassAppearance owner)
+    /// <param name="source">Equipment to mirror; defaults to this object's own
+    /// (the inventory paperdoll passes the live hero's).</param>
+    public bool Initialize(ClassAppearance owner, Equipment source = null)
     {
         appearance = owner;
-        equipment = GetComponent<Equipment>();
+        equipment = source != null ? source : GetComponent<Equipment>();
         networkPlayer = GetComponent<DiabloNetworkPlayer>();
         skills = GetComponent<DiabloSkills>();
         var bones = new Dictionary<string, Transform>();

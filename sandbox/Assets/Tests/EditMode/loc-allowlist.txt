@@ -17,7 +17,6 @@ Items/ItemDatabase.cs	Worn Short Bow
 Items/ItemDatabase.cs	Worn Short Sword
 Items/Equipment.cs	(dmg={GetDamage()}, hp={GetMaxHP()}).
 Loot/KindledFinaleReward.cs	forced save failure
-DiabloInventoryUI.cs	<size=13>{AffixSummary(item)}</size>
 DiabloInventoryUI.cs	{text} <color={color}>({sign}{delta:0.#})</color>
 DiabloMenuArt.cs	Breastplate
 DiabloMenuArt.cs	Circlet

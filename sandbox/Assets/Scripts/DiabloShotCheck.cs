@@ -199,6 +199,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
         vendorUI.SetOpen(true);
         yield return Wait(0.4f);
         yield return Shot("vendor_open");
+        yield return CompareShot(hero.gameObject, "VendorCanvas", VendorCompareItem(hero.gameObject), "vendor_compare");
         vendorUI.SetOpen(false);
         yield return Wait(0.2f);
 
@@ -223,6 +224,27 @@ public sealed class DiabloShotCheck : MonoBehaviour
         invUI.SetOpen(true);
         yield return Wait(0.35f);
         yield return Shot("inventory_open");
+        {
+            // Shift-compare gallery: a worn weapon and a bag rival with gains and losses.
+            var eq = hero.GetComponent<Equipment>();
+            var bag = hero.GetComponent<Inventory>();
+            var prevWeapon = eq != null ? eq.weapon : null;
+            string baseType = prevWeapon != null ? prevWeapon.baseType : ItemDatabase.StarterSwordBase;
+            var worn = GalleryItem(baseType, ItemRarity.Magic, (AffixLibrary.Damage, 4f), (AffixLibrary.Crit, 6f), (AffixLibrary.MaxHP, 10f));
+            var rival = GalleryItem(baseType, ItemRarity.Rare, (AffixLibrary.Damage, 7f), (AffixLibrary.Crit, 2f), (AffixLibrary.MaxHP, 10f), (AffixLibrary.LifeSteal, 3f));
+            if (eq != null && bag != null && bag.Add(rival))
+            {
+                eq.Equip(worn);
+                invUI.Refresh();
+                yield return Wait(0.5f);
+                yield return CompareShot(hero.gameObject, "InventoryCanvas", rival, "inventory_compare", $"BagButton{bag.Count - 1}");
+                bag.RemoveAt(bag.Count - 1);
+                if (prevWeapon != null) eq.Equip(prevWeapon);
+                else if (eq.UnequipTo(ItemSlot.Weapon, bag)) bag.RemoveAt(bag.Count - 1);
+                invUI.Refresh();
+                yield return Wait(0.2f);
+            }
+        }
         invUI.ShowTab(DiabloInventoryUI.MenuTab.Bag);
         yield return Wait(0.35f);
         yield return Shot("bag_open");
@@ -780,5 +802,42 @@ public sealed class DiabloShotCheck : MonoBehaviour
         for (int i = 0; i + 1 < args.Length; i++)
             if (args[i] == flag) return args[i + 1];
         return null;
+    }
+
+    static ItemInstance GalleryItem(string baseType, ItemRarity rarity, params (string key, float value)[] affixes)
+    {
+        var item = new ItemInstance { slot = ItemSlot.Weapon, rarity = rarity, baseType = baseType, itemLevel = 6 };
+        foreach (var (k, v) in affixes) item.affixes.Add(new Affix(k, v));
+        return item;
+    }
+
+    static ItemInstance VendorCompareItem(GameObject hero)
+    {
+        var vendor = hero.GetComponent<DiabloVendorUI>();
+        var stock = vendor != null ? vendor.Stock : null;
+        if (stock != null)
+            foreach (var offer in stock.offers)
+                if (offer.item != null && offer.item.slot != ItemSlot.Consumable) return offer.item;
+        return null;
+    }
+
+    /// <summary>Hold Shift over an item: the shared tooltip with both cards and arrows.</summary>
+    IEnumerator CompareShot(GameObject hero, string canvasName, ItemInstance item, string shotName, string anchorName = null)
+    {
+        if (item == null) yield break;
+        var tip = ItemTooltip.For(hero);
+        Vector2 pin = new Vector2(Screen.width * 0.30f, Screen.height * 0.72f);
+        var canvasT = hero.transform.Find(canvasName);
+        if (canvasT != null && anchorName != null)
+            foreach (var t in canvasT.GetComponentsInChildren<RectTransform>())
+                if (t.name == anchorName) { pin = t.position; break; }
+        ItemTooltip.ShiftOverride = true;
+        tip.PinnedScreen = pin;
+        tip.Show(item, hero.GetComponent<Equipment>());
+        yield return Wait(0.35f);
+        yield return Shot(shotName);
+        tip.Hide();
+        tip.PinnedScreen = null;
+        ItemTooltip.ShiftOverride = null;
     }
 }

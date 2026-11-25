@@ -64,6 +64,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
         if (open) DiabloAudio.PlayUIClick();
         IsOpen = open;
         if (canvas != null) canvas.enabled = open;
+        if (!open) ItemTooltip.HideFor(gameObject);
         DiabloClickController.ExternalDrive = open;
         if (open) Refresh();
         else SaveService.SaveNow(gameObject);
@@ -162,6 +163,7 @@ public sealed class DiabloSmithUI : MonoBehaviour
                 (yield > 0 ? Loc.F("smith.bag.yield", yield) : Loc.T("smith.bag.noyield")),
                 DiabloPalette.Rarity(item.rarity));
             btn.onClick.AddListener(() => SelectBag(index));
+            ItemTooltip.AttachHover(btn.gameObject, gameObject, () => item);
         }
     }
 

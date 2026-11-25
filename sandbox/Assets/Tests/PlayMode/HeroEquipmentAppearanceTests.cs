@@ -23,6 +23,7 @@ public sealed class HeroEquipmentAppearanceTests
         altModel = Object.Instantiate(source.LightClothing);
         altModel.SetActive(false);
         appearance.rogueHoodedModel = altModel;
+        appearance.rogueModel = altModel; // the default profile is male: his Rogue body path needs the stand-in too
         yield return null;
 
         foreach (var cls in ClassCatalog.All)

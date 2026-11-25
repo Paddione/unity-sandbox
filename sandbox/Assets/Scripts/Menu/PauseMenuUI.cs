@@ -36,6 +36,7 @@ public sealed class PauseMenuUI : MonoBehaviour
     GameObject mainCard;
     GameObject settingsCard;
     Text statusLabel;
+    Image portraitImage;
     readonly List<UnityEngine.Events.UnityAction> settingsRefreshes = new List<UnityEngine.Events.UnityAction>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -170,7 +171,15 @@ public sealed class PauseMenuUI : MonoBehaviour
         var wallet = hero != null ? hero.GetComponent<Wallet>() : null;
         int lv = prog != null ? prog.Level : 1;
         int gold = wallet != null ? wallet.Gold : 0;
-        statusLabel.text = Loc.F("menu.pause.status", RunProfile.Class.displayName, lv, gold, Loc.Display(RunProfile.Difficulty));
+        string accent = DiabloPalette.ToHex(DiabloPalette.ClassAccent(RunProfile.ClassId));
+        statusLabel.text = Loc.F("menu.pause.banner", accent, RunProfile.Class.displayName) +
+            Loc.F("menu.pause.status", RunProfile.Class.displayName, lv, gold, Loc.Display(RunProfile.Difficulty));
+        if (portraitImage != null)
+        {
+            var portrait = DiabloMenuArt.ClassPortrait(RunProfile.ClassId);
+            portraitImage.sprite = portrait;
+            portraitImage.enabled = portrait != null;
+        }
     }
 
     void Build()
@@ -189,7 +198,7 @@ public sealed class PauseMenuUI : MonoBehaviour
         sr.offsetMin = sr.offsetMax = Vector2.zero;
 
         // Main pause card
-        mainCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PausePanel", new Vector2(440f, 520f), Vector2.zero);
+        mainCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PausePanel", new Vector2(460f, 600f), Vector2.zero);
         var v = mainCard.AddComponent<VerticalLayoutGroup>();
         v.padding = new RectOffset(22, 22, 18, 20);
         v.spacing = 10f;
@@ -197,8 +206,28 @@ public sealed class PauseMenuUI : MonoBehaviour
         v.childControlHeight = false;
 
         DiabloUIFactory.MakeHeader(mainCard.transform, Loc.T("menu.pause.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
-        statusLabel = DiabloUIFactory.MakeText(mainCard.transform, "HeroStatus", "", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
-        DiabloUIFactory.SetLayout(statusLabel.gameObject, prefH: 24f, flexW: 1f);
+        // Hero banner: class portrait in a rare frame next to class, level, gold and difficulty.
+        var banner = DiabloUIFactory.MakeHorizontalRow(mainCard.transform, "HeroBanner", 12f, 68f);
+        var bannerRow = banner.GetComponent<HorizontalLayoutGroup>();
+        if (bannerRow != null) bannerRow.childAlignment = TextAnchor.MiddleCenter;
+        var frame = new GameObject("PortraitFrame", typeof(RectTransform));
+        frame.transform.SetParent(banner.transform, false);
+        DiabloUIFactory.SetLayout(frame, prefH: 64f, prefW: 64f);
+        var frameImg = frame.AddComponent<Image>();
+        frameImg.sprite = DiabloMenuArt.SlotBackground(ItemRarity.Rare, 64);
+        frameImg.type = Image.Type.Sliced;
+        var pGo = new GameObject("Portrait", typeof(RectTransform));
+        pGo.transform.SetParent(frame.transform, false);
+        portraitImage = pGo.AddComponent<Image>();
+        portraitImage.preserveAspect = true;
+        portraitImage.raycastTarget = false;
+        var pr = pGo.GetComponent<RectTransform>();
+        pr.anchorMin = Vector2.zero;
+        pr.anchorMax = Vector2.one;
+        pr.offsetMin = new Vector2(5f, 5f);
+        pr.offsetMax = new Vector2(-5f, -5f);
+        statusLabel = DiabloUIFactory.MakeText(banner.transform, "HeroStatus", "", 15, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
+        DiabloUIFactory.SetLayout(statusLabel.gameObject, prefH: 60f, flexW: 1f);
         DiabloUIFactory.MakeDivider(mainCard.transform);
 
         AddMenuButton(mainCard.transform, "ResumeButton", Loc.T("menu.pause.resume"), true, () => SetOpen(false));
@@ -208,6 +237,8 @@ public sealed class PauseMenuUI : MonoBehaviour
         DiabloUIFactory.MakeDivider(mainCard.transform);
         AddMenuButton(mainCard.transform, "SaveMenuButton", Loc.T("menu.pause.mainmenu"), false, ReturnToMainMenu);
         AddMenuButton(mainCard.transform, "QuitButton", Loc.T("menu.pause.quit"), false, QuitGame);
+        var keys = DiabloUIFactory.MakeText(mainCard.transform, "PauseHotkeys", Loc.T("menu.pause.hotkeys"), 12, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(keys.gameObject, prefH: 22f, flexW: 1f);
 
         // Embedded settings modal card
         settingsCard = DiabloUIFactory.MakePanel(canvasGo.transform, "PauseSettingsPanel", new Vector2(560f, 600f), Vector2.zero);

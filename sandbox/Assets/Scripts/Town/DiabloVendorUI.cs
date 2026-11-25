@@ -27,6 +27,9 @@ public sealed class DiabloVendorUI : MonoBehaviour
     Transform bagList;
 
     VendorStock stock; // DO NOT rename: reflected by VendorLoopTests
+
+    /// <summary>Offers on display (automation seam for the shotcheck compare pose).</summary>
+    public VendorStock Stock => stock;
     Wallet wallet;
     Inventory inventory;
     Equipment equipment;
@@ -155,6 +158,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         IsOpen = open;
         if (open) openedFrame = Time.frameCount;
         canvas.gameObject.SetActive(open);
+        if (!open) ItemTooltip.HideFor(gameObject);
         // Same effect as the inventory click guard: while the window is open
         // no click reaches movement or strikes (ExternalDrive ignores mouse
         // + WASD; the camera keeps tracking the hero).
@@ -325,6 +329,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
                 () => BuyOffer(index),
                 () => InspectItem(offer.item, Loc.F("vendor.buy.offer", offer.price)));
             btn.interactable = true;
+            ItemTooltip.AttachHover(btn.gameObject, gameObject, () => offer.item, Loc.F("vendor.buy.offer", offer.price));
         }
         var potionItem = ItemDatabase.CreateHealingPotion();
         bool potionAfford = gold >= ItemDatabase.PotionPrice;
@@ -361,7 +366,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
             int index = i;
             var item = inventory.Get(i);
             int price = VendorStock.SellPrice(item);
-            MakeItemRow(
+            var sellRow = MakeItemRow(
                 bagList,
                 item.baseType,
                 item.rarity,
@@ -372,6 +377,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
                 DiabloInventoryUI.BetterColor != null ? DiabloPalette.TrimGold : DiabloPalette.Parchment,
                 () => SellBagIndex(index),
                 () => InspectItem(item, Loc.F("vendor.sell", price)));
+            ItemTooltip.AttachHover(sellRow.gameObject, gameObject, () => item, Loc.F("vendor.sell", price));
         }
         // S5 details: the newest bag item pre-fills the compare box until the hero hovers a row.
         if (inspectText != null && inventory.Count > 0)

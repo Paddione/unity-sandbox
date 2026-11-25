@@ -67,11 +67,17 @@ public static class CompanionFactory
     /// "Player" instantiated with every gameplay component, collider and
     /// built UI canvas stripped. Null when no hero stands (headless scenes).
     /// </summary>
-    public static GameObject CloneHeroVisual()
+    public static GameObject CloneHeroVisual() => CloneHeroVisual(GameObject.Find(DiabloNetworkPlayer.HeroName));
+
+    /// <summary>Visual-only clone of a specific hero (the inventory paperdoll clones its own owner).</summary>
+    public static GameObject CloneHeroVisual(GameObject hero)
     {
-        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         if (hero == null) return null;
         var go = Object.Instantiate(hero);
+        // Instantiate serializes the source, which turns its null [Serializable]
+        // slots into blank ItemInstances; restore the hero's real empty slots.
+        var heroEquipment = hero.GetComponent<Equipment>();
+        if (heroEquipment != null) heroEquipment.NormalizeEmptySlots();
         go.name = hero.name + "_Visual";
         StripGameplay(go);
         return go;
@@ -103,6 +109,8 @@ public static class CompanionFactory
         typeof(DiabloMelee),
         typeof(HeroEquipmentAppearance),
         typeof(PartyCompanion),
+        typeof(ItemTooltip),
+        typeof(HeroPaperdollPreview),
     };
 
     /// <summary>Remove gameplay state from a hero clone; visuals, Animator and ClassAppearance stay.</summary>

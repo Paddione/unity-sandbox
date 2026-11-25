@@ -57,6 +57,7 @@ public sealed class DiabloStashUI : MonoBehaviour
         }
         IsOpen = open;
         if (canvas != null) canvas.enabled = open;
+        if (!open) ItemTooltip.HideFor(gameObject);
         DiabloClickController.ExternalDrive = open;
         if (open) Refresh();
         else if (Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
@@ -281,6 +282,7 @@ public sealed class DiabloStashUI : MonoBehaviour
             entry.callback.AddListener(_ => InspectItem(item));
             trig.triggers.Add(entry);
         }
+        ItemTooltip.AttachHover(go, gameObject, () => item);
         return button;
     }
 }
