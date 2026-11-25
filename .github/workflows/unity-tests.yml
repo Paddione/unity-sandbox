@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      autoplay:
+        description: "Also run the session autoplay (Normal, Kindled, Lanternbearer; opens 3 game windows on the desktop)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -49,4 +54,72 @@ jobs:
             artifacts/EditMode.*
             artifacts/PlayMode.*
             artifacts/warmup-*.log
+          retention-days: 14
+
+  autoplay:
+    # cinderreach-loop-guard: full-session autoplay on the licensed runner, on demand only
+    # (no schedule since 2026-11-25: unattended runs popped 3 windows on the desktop and
+    # were killed when they got closed). Result JSON goes to the artifact (14 days) and to
+    # ~/unity-sandbox-autoplay/<YYYY-MM-DD>/ on the host, which dotfiles G-DIABLO06 reads.
+    name: Session autoplay (Linux player, WSLg GPU)
+    if: github.event_name == 'workflow_dispatch' && inputs.autoplay
+    runs-on: [self-hosted, Linux, X64, unity-licensed]
+    timeout-minutes: 60
+    concurrency:
+      group: unity-autoplay
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository with Git LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          persist-credentials: false
+          # Keep the Unity import cache; G-DIABLO03 reads artifacts/*.xml of this workspace.
+          clean: false
+
+      - name: Build and run autoplay (Normal + Kindled + Lanternbearer)
+        id: run
+        run: |
+          OUT="artifacts/autoplay/$(date +%F)-${GITHUB_RUN_ID}"
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          # replayability S3: rotate the Ashen Fen layout seed 0..2 by weekday.
+          SEED=$(( $(date +%u) % 3 ))
+          echo "layout seed $SEED"
+          set +e
+          bash scripts/run-autoplay.sh "$OUT/normal" -seed "$SEED"
+          RC_NORMAL=$?
+          # replayability S5: second run on Kindled, same build and seed.
+          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/kindled" -seed "$SEED" -difficulty kindled
+          RC_KINDLED=$?
+          # second-class S5: third run as the Lanternbearer (Normal, same seed).
+          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/lanternbearer" -seed "$SEED" -class lanternbearer
+          RC_LANTERN=$?
+          set -e
+          echo "normal exit $RC_NORMAL, kindled exit $RC_KINDLED, lanternbearer exit $RC_LANTERN"
+          [ "$RC_NORMAL" -eq 0 ] && [ "$RC_KINDLED" -eq 0 ] && [ "$RC_LANTERN" -eq 0 ]
+
+      - name: Copy results to host store
+        if: always() && steps.run.outputs.out != ''
+        env:
+          RUN_OUT: ${{ steps.run.outputs.out }}
+        run: |
+          # One folder per run kind: <date>[-<run_id>], ...-kindled, ...-lanternbearer.
+          BASE="$HOME/unity-sandbox-autoplay/$(date +%F)"
+          if [ -f "$BASE/autoplay-result.json" ]; then BASE="$BASE-${GITHUB_RUN_ID}"; fi
+          for kind in normal kindled lanternbearer; do
+            [ -d "$RUN_OUT/$kind" ] || continue
+            DEST="$BASE"
+            [ "$kind" != normal ] && DEST="$BASE-$kind"
+            mkdir -p "$DEST"
+            cp -a "$RUN_OUT/$kind/." "$DEST/" || true
+            ls -la "$DEST"
+          done
+          find "$HOME/unity-sandbox-autoplay" -mindepth 1 -maxdepth 1 -type d -mtime +30 -print -exec rm -rf {} +
+
+      - name: Upload autoplay artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: autoplay-${{ github.run_id }}
+          path: artifacts/autoplay
           retention-days: 14

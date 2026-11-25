@@ -301,14 +301,14 @@ liest für Menüs ohne Nebenwirkung.
 - Health Goals in dotfiles `scripts/health_probes/diablo_unity.py` (Goal `diablo-unity-health-goals`):
   `G-DIABLO01` `.meta`-Vollständigkeit, `G-DIABLO02` Szenen-/Asset-/Skript-Vertrag, `G-DIABLO03`
   neueste Testergebnisse, `G-DIABLO04` Runner- und Editor-Dienst, `G-DIABLO05` Windows-Stage-Parität,
-  `G-DIABLO06` nächtlicher Autoplay. Neue Prefabs, Skripte oder Pflichtphasen ziehen den Vertrag in
+  `G-DIABLO06` neuester Autoplay. Neue Prefabs, Skripte oder Pflichtphasen ziehen den Vertrag in
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   `autoplay-result.json` mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
   complete` (Koop-Client siehe Koop-Paarlauf).
-  `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Nightly
-  `.github/workflows/autoplay-nightly.yml` (02:30, Runner `unity-licensed`) für Normal, Kindled und
-  Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
+  `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Auf Abruf
+  per Job `autoplay` in `.github/workflows/unity-tests.yml` (`gh workflow run unity-tests.yml -f autoplay=true`,
+  Runner `unity-licensed`, kein Zeitplan seit 2026-11-25) für Normal, Kindled und Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
   Dreiergruppe, `COOP_CLIENT_GOD=0` für sterbliche Clients). Koop-Client-Phasen: `town, zone1, zone2,
   boss, zone3, actboss, zone4, boss3` (je Zone Treffer oder Angriffs-Casts, je Boss die gebuchte Kill-Meldung).
 - Installer: `scripts/build-installer.sh` (Inno Setup 6 per winget, `scripts/installer/cinderreach.iss`) packt
@@ -318,7 +318,7 @@ liest für Menüs ohne Nebenwirkung.
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
   (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
   WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 131,5 fps über die volle Route bis zum Glasswright, 2026-11-22). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.
-- CI: `unity-tests.yml`, `unity-scene-captures.yml` (GPU-Runner), `autoplay-nightly.yml`.
+- CI: `unity-tests.yml` (inkl. Autoplay auf Abruf), `unity-scene-captures.yml` (GPU-Runner).
 - Bekannte Grenze: Solo-Autoplay ohne `-seed` mit einem Save-Seed außerhalb 0–2 kann in einer
   seltenen Fen-Variante hängen. Der Nightly deckt nur Seeds 0–2 ab.
 

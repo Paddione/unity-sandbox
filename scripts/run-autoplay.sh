@@ -82,6 +82,10 @@ grep -a '\[Autoplay\]' "$LOG" | tail -n 25 || true
 
 if [ ! -f "$OUT/autoplay-result.json" ]; then
   echo "run-autoplay: no autoplay-result.json in $OUT (player exit $RC)" >&2
+  if [ "$RC" -eq 0 ]; then
+    echo "run-autoplay: the player shut down cleanly before the session finished;" \
+      "its window was most likely closed on the desktop" >&2
+  fi
   exit 1
 fi
 
