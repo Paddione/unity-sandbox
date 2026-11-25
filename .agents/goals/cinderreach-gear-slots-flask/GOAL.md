@@ -1,7 +1,7 @@
 # Cinderreach: Handschuhe/Stiefel/Gürtel, Heilflasche, Unique-Ausbau, Dropbalance
 
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
-plan_refs: [../../plans/cinderreach-gear-slots-flask/tasks.md]
+plan_refs: [.agents/plans/cinderreach-gear-slots-flask/tasks.md]
 
 ## Objective
 

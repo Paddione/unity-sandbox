@@ -1,7 +1,7 @@
 ---
 title: "Cinderreach Handschuhe/Stiefel/Gürtel, Heilflasche, Unique-Ausbau, Dropbalance"
 domains: [unity, gameplay, ui, networking]
-status: in_progress
+status: done
 goal: cinderreach-gear-slots-flask
 slug: cinderreach-gear-slots-flask
 branch: feature/cinderreach-gear-slots-flask

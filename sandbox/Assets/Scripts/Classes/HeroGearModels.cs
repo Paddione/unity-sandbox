@@ -263,9 +263,9 @@ public static class HeroGearModels
         var root = LimbRoot(key, wrist);
         Ring(root, "Glove cuff", look.Main, .082f + .008f * look.Weight, .082f + .008f * look.Weight, -.03f, .05f + .015f * look.Weight);
         Ring(root, "Cuff trim", look.Trim, .09f + .008f * look.Weight, .09f + .008f * look.Weight, -.065f - .01f * look.Weight, .025f);
-        Box(root, "Glove back", look.Main, new Vector3(0f, .075f, 0f), new Vector3(.15f, .11f, .14f));
+        Box(root, "Glove back", look.Main, new Vector3(0f, .08f, 0f), new Vector3(.20f, .15f, .19f));
         if (look.Weight >= 2)
-            Box(root, "Knuckle plate", look.Trim, new Vector3(0f, .11f, .075f), new Vector3(.15f, .045f, .03f));
+            Box(root, "Knuckle plate", look.Trim, new Vector3(0f, .12f, .1f), new Vector3(.2f, .05f, .03f));
         return root.gameObject;
     }
 
@@ -282,8 +282,8 @@ public static class HeroGearModels
         Ring(root, "Boot top", look.Trim, r + .01f, r + .01f, .14f - rings * .045f, .025f);
         var shoe = LimbRoot("Boot shoe", foot);
         Link(root.gameObject, shoe.gameObject);
-        Box(shoe, "Shoe", look.Main, new Vector3(0f, .07f, 0f), new Vector3(.15f + .01f * look.Weight, .19f, .12f));
-        Box(shoe, "Sole", look.Trim, new Vector3(0f, .075f, -.065f), new Vector3(.155f, .2f, .025f));
+        Box(shoe, "Shoe", look.Main, new Vector3(0f, .08f, 0f), new Vector3(.21f + .01f * look.Weight, .26f, .17f));
+        Box(shoe, "Sole", look.Trim, new Vector3(0f, .085f, -.09f), new Vector3(.22f, .27f, .03f));
         return root.gameObject;
     }
 
