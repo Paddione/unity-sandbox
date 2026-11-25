@@ -1,7 +1,7 @@
 # Goal: cinderreach-sound-audit-fix
 
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
-health_probe: {"id":"G-DIABLO07","title":"Cinderreach audio completeness: manifest cues/tracks match code, every zone has its own theme, no silent heal/quest/shrine/block event","cmd":"python3 scripts/check-audio-manifest.py","target":0}
+health_probe: {"id":"G-DIABLO07","title":"Cinderreach audio completeness: manifest cues/tracks match code, every zone has its own theme, no silent heal/quest/shrine/block event","cmd":"python3 scripts/check-audio-manifest.py >/dev/null 2>&1; echo $?","target":0}
 
 ## Objective
 
