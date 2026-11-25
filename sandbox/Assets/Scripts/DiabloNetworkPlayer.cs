@@ -68,7 +68,11 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         }
         if (IsOwner)
         {
-            TakeOverSoloHero(gameObject);
+            var solo = TakeOverSoloHero(gameObject);
+            // A hero created on the solo body before this client connected (-join at boot)
+            // is the character to bring along, not whatever the save held before.
+            if (!IsServer && solo != null && ShouldCarryHeroIntoJoin(ClassSelectUI.HeroInWorld, false))
+                SaveService.SaveNow(solo);
             // Only a joining client brings its saved character along. The host (and
             // solo, which is a host nobody joined) picks Continue or a new hero on the
             // start screen; loading here made "Begin as <class>" keep the old hero's
@@ -118,6 +122,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
 
     /// <summary>Spawn-time save load rule: joining clients only (pure, EditMode-pinnable).</summary>
     public static bool ShouldLoadSaveOnSpawn(bool isServer) => !isServer;
+
+    static bool ShouldCarryHeroIntoJoin(bool heroInWorld, bool alreadyClient) =>
+        MultiplayerAutoStarter.ShouldCarryHeroIntoJoin(heroInWorld, alreadyClient);
 
     /// <summary>Owner: push the run profile class and hero look to all mirrors.</summary>
     public void PublishClass()

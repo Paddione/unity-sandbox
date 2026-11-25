@@ -126,6 +126,7 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
     {
         var manager = NetworkManager.Singleton;
         if (manager == null) yield break;
+        if (args.IsClient) CarryHeroIntoJoin(manager.IsListening && !manager.IsServer);
         if (manager.IsListening || manager.ShutdownInProgress)
         {
             Debug.Log($"[Net] Leaving {Current} for {args}.");
@@ -134,6 +135,24 @@ public sealed class MultiplayerAutoStarter : MonoBehaviour
         }
         yield return null;
         Begin(args);
+    }
+
+    /// <summary>
+    /// A joining client loads the local save on spawn (DiabloNetworkPlayer.ShouldLoadSaveOnSpawn).
+    /// The hero played right now (often created this session and never saved) must be that
+    /// save, or the join brings back the previous or default character.
+    /// </summary>
+    public static bool ShouldCarryHeroIntoJoin(bool heroInWorld, bool alreadyClient) => heroInWorld && !alreadyClient;
+
+    /// <summary>Write the current hero to the save before leaving for a client session. True when saved.</summary>
+    public static bool CarryHeroIntoJoin(bool alreadyClient, string path = null)
+    {
+        if (!ShouldCarryHeroIntoJoin(ClassSelectUI.HeroInWorld, alreadyClient)) return false;
+        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (hero == null) return false;
+        SaveService.SaveNow(hero, -1, path);
+        Debug.Log($"[Net] carried {RunProfile.Class.displayName} '{RunProfile.Hero.heroName}' into the join.");
+        return true;
     }
 
     /// <summary>
