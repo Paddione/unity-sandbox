@@ -245,8 +245,9 @@ public sealed class SessionAutoplay : MonoBehaviour
         var flask = HealingFlask.For(hero.gameObject);
         bool drank = flask.TryDrink();
         Log($"phase flask: drank={drank} charges={flask.Charges}/{flask.MaxCharges}");
-        // The Lantern Hold refills a spent flask within one refill check.
-        float until = Time.time + 2f;
+        // Walk back into the Lantern Hold, which refills a spent flask within one check.
+        hero.SetDestination(SkillVariantCatalog.TownCenter);
+        float until = Time.time + 12f;
         while (Time.time < until && !flask.IsFull) yield return null;
         Log($"phase flask: refilled={flask.IsFull}");
         lastPhaseOk = drank && flask.IsFull;
