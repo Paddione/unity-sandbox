@@ -24,11 +24,19 @@ public sealed class StoryDirector : MonoBehaviour
     UnityEngine.UI.Text barkText;
     float barkLeft;
 
+    /// <summary>Places the tracked quests point at, refreshed with the 0.25 s poll (maps and tracker read them).</summary>
+    public readonly List<QuestMark> Marks = new List<QuestMark>();
+    /// <summary>Scene lookups behind <see cref="Marks"/>.</summary>
+    public readonly SceneQuestWorld World = new SceneQuestWorld();
+
     void Awake()
     {
         if (GetComponent<StoryDialogUI>() == null) gameObject.AddComponent<StoryDialogUI>();
         if (GetComponent<StoryQuestUI>() == null) gameObject.AddComponent<StoryQuestUI>();
         if (GetComponent<UseKey>() == null) gameObject.AddComponent<UseKey>();
+        // cinderreach-group-quest-map: minimap (top right) and zone map (M).
+        if (GetComponent<MinimapHud>() == null) gameObject.AddComponent<MinimapHud>();
+        if (GetComponent<WorldMapUI>() == null) gameObject.AddComponent<WorldMapUI>();
     }
 
     void Start()
@@ -50,7 +58,8 @@ public sealed class StoryDirector : MonoBehaviour
             DiabloPalette.GoldBright, TextAnchor.UpperLeft);
         var rt = trackerText.rectTransform;
         rt.anchorMin = new Vector2(0f, 1f); rt.anchorMax = new Vector2(0f, 1f); rt.pivot = new Vector2(0f, 1f);
-        rt.anchoredPosition = new Vector2(18f, -14f); rt.sizeDelta = new Vector2(620f, 48f);
+        rt.anchoredPosition = new Vector2(18f, -14f); rt.sizeDelta = new Vector2(560f, 320f);
+        trackerText.supportRichText = true;
         toastText = DiabloUIFactory.MakeText(canvasGo.transform, "StoryToast", "", 19,
             DiabloPalette.Parchment, TextAnchor.MiddleCenter);
         var tr = toastText.rectTransform;
@@ -76,7 +85,7 @@ public sealed class StoryDirector : MonoBehaviour
             if (barkLeft > 0f) return;
             barkText.enabled = false;
         }
-        if (StoryDialogUI.AnyOpen || !StoryBarks.TryTake(out var bark)) return;
+        if (StoryDialogUI.AnyOpen || StoryDialogUI.AnyShared || !StoryBarks.TryTake(out var bark)) return;
         string who = bark.speaker == "n" ? "" : Loc.T("npc." + bark.speaker + ".name");
         string line = Loc.T(bark.Key);
         barkText.text = who.Length > 0 ? "<color=#d8b25a>" + who + ":</color> " + line : "<i>" + line + "</i>";
@@ -106,6 +115,7 @@ public sealed class StoryDirector : MonoBehaviour
         SyncDoneFlags();
         GrantRewards();
         DrainToasts();
+        QuestDestinations.Collect(State, World, transform.position, Marks);
         RefreshTracker();
 
         if (lastRevision >= 0 && State.Revision != lastRevision)
@@ -181,6 +191,7 @@ public sealed class StoryDirector : MonoBehaviour
             if (c.objective < 0 && c.status == StoryStatus.Active) Toast(Loc.F("story.quest.new", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Ready) Toast(Loc.F("story.quest.ready", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Done) Toast(Loc.F("story.quest.done", Loc.T(q.TitleKey)));
+            else if (c.objective >= 0 && c.objective < q.objectives.Length) Toast(ProgressToast(q, c));
         }
         ShowNextToast();
     }
@@ -200,27 +211,58 @@ public sealed class StoryDirector : MonoBehaviour
         ShowNextToast();
     }
 
+    /// <summary>Objective progress line: "Knochenwächter besiegen  2/4", or "… ✓" once done.</summary>
+    public static string ProgressToast(StoryQuest q, StoryChange c)
+    {
+        var o = q.objectives[c.objective];
+        string text = Loc.T(o.textKey);
+        if (c.count >= o.count) return o.count > 1 ? text + "  " + o.count + "/" + o.count + " ✓" : text + " ✓";
+        return text + "  " + c.count + "/" + o.count;
+    }
+
     void RefreshTracker()
     {
         if (trackerText == null) return;
-        var q = State.Tracked();
-        if (q == null) { trackerText.text = ""; return; }
-        if (State.Status(q.id) == StoryStatus.Ready)
-        {
-            trackerText.text = Loc.F("story.tracker.ready", Loc.T(q.TitleKey), Loc.T("npc." + q.giver + ".name"));
-            return;
-        }
-        for (int i = 0; i < q.objectives.Length; i++)
-        {
-            if (State.ObjectiveDone(q, i)) continue;
-            var o = q.objectives[i];
-            trackerText.text = o.count > 1
-                ? Loc.T(q.TitleKey) + " — " + Loc.T(o.textKey) + "  " + State.Count(q.id, i) + "/" + o.count
-                : Loc.T(q.TitleKey) + " — " + Loc.T(o.textKey);
-            return;
-        }
-        trackerText.text = Loc.T(q.TitleKey);
+        trackerText.text = TrackerText(State, World, Marks, transform.position);
     }
+
+    /// <summary>
+    /// HUD tracker (cinderreach-group-quest-map): every tracked quest with its
+    /// open objectives and counts, finished ones ticked, hand-ins naming the
+    /// giver, and the way to the next place: metres in this zone, else the zone
+    /// it lies in. Rich text; test seam.
+    /// </summary>
+    public static string TrackerText(StoryState s, IQuestWorld world, List<QuestMark> marks, Vector3 hero)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var q in StoryTracking.Tracked(s))
+        {
+            if (sb.Length > 0) sb.Append('\n');
+            sb.Append(q.main ? "<color=#f9cc47><b>" : "<color=#dbd5c4><b>").Append(Loc.T(q.TitleKey)).Append("</b></color>");
+            if (marks != null && QuestDestinations.NearestStep(world, marks, q.id, hero, out var step, out int zone))
+            {
+                int here = ZoneMap.IndexAt(hero);
+                string way = zone == here
+                    ? Loc.F("story.tracker.meters", Mathf.RoundToInt(Vector3.Distance(Flat(step), Flat(hero))))
+                    : Loc.F("story.tracker.zone", ActProgress.ZoneName(zone));
+                sb.Append("  <color=#a69985>").Append(way).Append("</color>");
+            }
+            if (s.Status(q.id) == StoryStatus.Ready)
+            {
+                sb.Append("\n   <color=#e8d9be>• ").Append(Loc.F("story.tracker.handin", Loc.T("npc." + q.giver + ".name"))).Append("</color>");
+                continue;
+            }
+            for (int i = 0; i < q.objectives.Length; i++)
+            {
+                bool done = s.ObjectiveDone(q, i);
+                sb.Append(done ? "\n   <color=#8a7f6e>✓ " : "\n   <color=#e8d9be>• ")
+                  .Append(StoryTracking.ObjectiveRow(s, q, i)).Append("</color>");
+            }
+        }
+        return sb.ToString();
+    }
+
+    static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 
     // ---- booking (static so kills, pickups, tests and the network can call) ----
 

@@ -74,6 +74,8 @@ public static class DiabloUIFactory
             if (st != null && st.IsOpen) return true;
             var wp = hero.GetComponent<DiabloWaypointUI>();
             if (wp != null && wp.IsOpen) return true;
+            var map = hero.GetComponent<WorldMapUI>();
+            if (map != null && map.IsOpen) return true;
         }
         return false;
     }
@@ -116,6 +118,8 @@ public static class DiabloUIFactory
         if (log != null && log != except && log.IsOpen) log.SetOpen(false);
         var dlg = hero.GetComponent<StoryDialogUI>();
         if (dlg != null && dlg != except && dlg.IsOpen) dlg.SetOpen(false);
+        var map = hero.GetComponent<WorldMapUI>();
+        if (map != null && map != except && map.IsOpen) map.SetOpen(false);
     }
 
     public static LayoutElement SetLayout(GameObject go, float prefH = -1f, float prefW = -1f, float flexW = -1f, float flexH = -1f)

@@ -53,8 +53,32 @@ public static class StoryBarks
         return null;
     }
 
+    /// <summary>
+    /// Co-op seam (cinderreach-group-quest-map): set by the network layer, called
+    /// for every bark this process accepts; the host forwards it to all clients,
+    /// so everyone hears the boss, not only who received the phase event.
+    /// </summary>
+    public static System.Action<string> Relay;
+
     /// <summary>Queues bark <paramref name="id"/> unless it was said within <see cref="RepeatSeconds"/>.</summary>
     public static bool Say(string id)
+    {
+        if (!Accept(id)) return false;
+        Relay?.Invoke(id);
+        return true;
+    }
+
+    /// <summary>A bark the host relayed: queued like <see cref="Say"/> but never sent on.</summary>
+    public static bool SayRemote(string id)
+    {
+        relayed++;
+        return Accept(id);
+    }
+
+    /// <summary>Test counter: barks that arrived from the host.</summary>
+    public static int relayed;
+
+    static bool Accept(string id)
     {
         var bark = Get(id);
         if (bark == null) return false;
@@ -86,5 +110,6 @@ public static class StoryBarks
         pending.Clear();
         lastSaid.Clear();
         said = 0;
+        relayed = 0;
     }
 }

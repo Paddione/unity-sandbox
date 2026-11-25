@@ -41,6 +41,16 @@ public static partial class LocCatalog
         E("story.reward.material", "+{0} Material", "+{0} material"),
         E("story.dialog.continue", "Weiter", "Continue"),
         E("story.dialog.end", "Schließen", "Close"),
+        E("story.dialog.hide", "Ausblenden", "Hide"),
+        E("story.dialog.shared", "{0} spricht mit {1}", "{0} is talking to {1}"),
+        E("story.tracker.meters", "{0} m", "{0} m"),
+        E("story.tracker.zone", "→ {0}", "→ {0}"),
+        E("story.tracker.handin", "Bei {0} abgeben", "Hand in to {0}"),
+        E("story.log.offers", "Angebote", "Offers"),
+        E("story.log.offer", "{0} — bei {1}", "{0} — from {1}"),
+        E("story.log.track", "Verfolgen", "Track"),
+        E("story.log.tracked", "Verfolgt ✓", "Tracked ✓"),
+        E("story.log.where", "Ort: {0}", "Place: {0}"),
 
         // ---- Akt I Hauptaufgaben ----
         E("quest.h1.title", "Die dunkle Tür", "The dark door"),

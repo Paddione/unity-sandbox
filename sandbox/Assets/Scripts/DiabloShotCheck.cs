@@ -15,6 +15,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
     const string EquipmentFlag = "-equipment-shots";
     /// <summary>Only the split-body locomotion poses (run, strafe, backpedal, stop) with bone logs.</summary>
     const string LocomotionFlag = "-locomotion-shots";
+    const string MapFlag = "-map-shots";
 
     string dir;
     int index;
@@ -78,6 +79,15 @@ public sealed class DiabloShotCheck : MonoBehaviour
             hero.SetMoveInput(Vector3.zero);
             DiabloClickController.ExternalDrive = false;
             Log($"DONE {index} locomotion shots");
+            Quit(0);
+            yield break;
+        }
+
+        if (HasArg(MapFlag))
+        {
+            yield return MapShots(hero);
+            DiabloClickController.ExternalDrive = false;
+            Log($"DONE {index} map shots");
             Quit(0);
             yield break;
         }
@@ -659,6 +669,43 @@ public sealed class DiabloShotCheck : MonoBehaviour
         DiabloClickController.ExternalDrive = false;
         Log($"DONE {index} shots");
         Quit(0);
+    }
+
+    /// <summary>cinderreach-group-quest-map: tracker, minimap, zone map, shared-dialog listener, log.</summary>
+    IEnumerator MapShots(DiabloClickController hero)
+    {
+        var story = RunProfile.Story;
+        story.Refresh(RunProfile.Act);
+        story.Accept("h1");
+        story.Refresh(RunProfile.Act);
+        story.Accept("n1");
+        yield return Wait(1.2f);
+        int marks = hero.GetComponent<StoryDirector>().Marks.Count;
+        Log($"MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}");
+        yield return Shot("map_minimap_tracker");
+
+        var map = hero.GetComponent<WorldMapUI>();
+        map.SetOpen(true);
+        yield return Wait(0.6f);
+        Log($"MAP zone={map.ViewZone} icons={map.IconsShown}");
+        yield return Shot("map_zone_fen");
+        map.Cycle(1);
+        yield return Wait(0.6f);
+        yield return Shot("map_zone_ossuary");
+        map.SetOpen(false);
+        yield return Wait(0.3f);
+
+        StoryDialogShare.Receive(99, "Alrik", SharedDialogOp.Open, "h1.offer", StoryIds.Ottilie, "0,1,2,3", 1);
+        yield return Wait(0.5f);
+        yield return Shot("dialog_shared_listener");
+        StoryDialogShare.Receive(99, "Alrik", SharedDialogOp.Close, "h1.offer", StoryIds.Ottilie, "", 1);
+        yield return Wait(0.3f);
+
+        var log = hero.GetComponent<StoryQuestUI>();
+        log.SetOpen(true);
+        yield return Wait(0.5f);
+        yield return Shot("quest_log_tracking");
+        log.SetOpen(false);
     }
 
     IEnumerator EquipmentShots(DiabloClickController hero, Vector3 towardCamera)

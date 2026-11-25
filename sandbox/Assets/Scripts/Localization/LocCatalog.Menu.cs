@@ -36,7 +36,7 @@ public static partial class LocCatalog
         E("menu.class.role.dps", "Schaden  •  Kennt jede Hintertür am Ofen", "Damage  •  Blade of the Ashen Paths"),
         E("menu.class.role.tank", "Schild  •  Führt die Totenkarren durch den Nebel", "Tank  •  Oathbound Vanguard of the Fen"),
         E("menu.class.stattag", "Start: {0}  •  {1} Fertigkeiten", "Starter: {0}  •  {1} Skills"),
-        E("menu.pause.hotkeys", "I Inventar  •  C Figur  •  J Fuhrbuch  •  Esc zurück", "I Inventory  •  C Character  •  J Log  •  Esc back"),
+        E("menu.pause.hotkeys", "I Inventar  •  C Figur  •  J Fuhrbuch  •  M Karte  •  Esc zurück", "I Inventory  •  C Character  •  J Log  •  M Map  •  Esc back"),
         E("menu.pause.banner", "<color={0}><b>{1}</b></color>\\n", "<color={0}><b>{1}</b></color>\\n"),
         E("menu.pause.status", "{0}  •  St. {1}  •  {2} Gold  •  {3}", "{0}  •  Lv {1}  •  {2}g  •  {3}"),
         E("menu.pause.title", "PAUSE", "PAUSED"),

@@ -318,3 +318,6 @@ DiabloShotCheck.cs	FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges
 DiabloShotCheck.cs	gearset_{cls.id}_back
 DiabloShotCheck.cs	gearset_{cls.id}_front
 DiabloShotCheck.cs	gearset_{cls.id}_paperdoll
+DiabloShotCheck.cs	DONE {index} map shots
+DiabloShotCheck.cs	MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}
+DiabloShotCheck.cs	MAP zone={map.ViewZone} icons={map.IconsShown}
