@@ -100,9 +100,6 @@ public class VendorLoopTests
         ui.SellBagIndex(0);
         Assert.AreEqual(200 - price + expectBack, wallet.Gold);
         Assert.AreEqual(0, inv.Count);
-        ui.BuyPotion();
-        Assert.AreEqual(1, inv.Count);
-        Assert.AreEqual(ItemSlot.Consumable, inv.Get(0).slot);
         ui.SetOpen(false);
     }
 

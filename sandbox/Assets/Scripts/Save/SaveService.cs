@@ -80,7 +80,10 @@ public static class SaveService
         if (prog != null && (prog.Level > 1 || prog.Xp > 0)) return true;
         if (wallet != null && wallet.Gold > 0) return true;
         if (inv != null && inv.Count > 0) return true;
-        return eq != null && (!Equipment.IsBlank(eq.armor) || !Equipment.IsBlank(eq.weapon) || !Equipment.IsBlank(eq.helmet));
+        if (eq == null) return false;
+        foreach (var slot in Equipment.GearSlots)
+            if (!Equipment.IsBlank(eq.GetEquipped(slot))) return true;
+        return false;
     }
 
     public static bool HasSave(string path = null) => File.Exists(path ?? DefaultPath);
@@ -176,7 +179,11 @@ public static class SaveService
             save.equipmentArmor = eq.armor;
             save.equipmentWeapon = eq.weapon;
             save.equipmentHelmet = eq.helmet;
+            save.equipmentGloves = eq.gloves;
+            save.equipmentBoots = eq.boots;
+            save.equipmentBelt = eq.belt;
         }
+        save.uniquePity = UniquePity.Current;
         var inv = hero.GetComponent<Inventory>();
         if (inv != null)
             for (int i = 0; i < inv.Count; i++)
@@ -210,7 +217,11 @@ public static class SaveService
         eq.armor = save.equipmentArmor;
         eq.weapon = save.equipmentWeapon;
         eq.helmet = save.equipmentHelmet;
+        eq.gloves = save.equipmentGloves;
+        eq.boots = save.equipmentBoots;
+        eq.belt = save.equipmentBelt;
         eq.NormalizeEmptySlots();
+        UniquePity.Current = Mathf.Max(0, save.uniquePity);
         var inv = hero.GetComponent<Inventory>();
         if (inv != null) UnityEngine.Object.DestroyImmediate(inv);
         inv = hero.AddComponent<Inventory>();

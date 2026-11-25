@@ -33,9 +33,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     GameObject settingsPage;
 
     Text heroHeaderText;
-    Text armorText;
-    Text weaponText;
-    Text helmetText;
+    /// <summary>Slot captions, indexed by (int)ItemSlot (Consumable stays null).</summary>
+    readonly Text[] slotTexts = new Text[SlotArraySize];
+    const int SlotArraySize = (int)ItemSlot.Belt + 1;
     Text statsText;
     Text bagCountText;
     Text bagDetailText;
@@ -44,9 +44,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     HeroPaperdollPreview paperdoll;
     Image dragGhost;
 
-    readonly Image[] equipIcons = new Image[3];
-    readonly Image[] equipFrames = new Image[3];
-    readonly float[] flashUntil = new float[3];
+    readonly Image[] equipIcons = new Image[SlotArraySize];
+    readonly Image[] equipFrames = new Image[SlotArraySize];
+    readonly float[] flashUntil = new float[SlotArraySize];
     readonly Button[] tabButtons = new Button[3];
     readonly List<UnityEngine.Events.UnityAction> settingsRefreshes = new List<UnityEngine.Events.UnityAction>();
 
@@ -149,18 +149,14 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (IsOpen) DiabloAudio.PlayUIClick();
     }
 
-    /// <summary>Equip bag[index] (or drink potion when consumable); refreshes stats and HP max.</summary>
+    /// <summary>Equip bag[index]; refreshes stats and HP max. Legacy consumables never equip.</summary>
     public void EquipIndex(int index)
     {
         EnsureBuilt();
         if (inventory == null || equipment == null) return;
         var item = inventory.Get(index);
         if (item == null) return;
-        if (item.slot == ItemSlot.Consumable)
-        {
-            DrinkBagPotion(index);
-            return;
-        }
+        if (!Equipment.IsGearSlot(item.slot)) return;
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned)
         {
@@ -217,31 +213,13 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         if (noticeText != null) noticeText.text = Notice;
     }
 
-    void DrinkBagPotion(int index)
-    {
-        var item = inventory != null ? inventory.Get(index) : null;
-        if (item == null || item.slot != ItemSlot.Consumable) return;
-        var relay = GetComponent<DiabloNetworkPlayer>();
-        if (relay != null && relay.IsSpawned)
-        {
-            relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.DrinkPotion, item);
-            Refresh();
-            return;
-        }
-        if (!inventory.RemoveAt(index)) return;
-        if (health != null) health.Heal(ItemDatabase.PotionHeal);
-        DiabloAudio.PlayUIClick();
-        Debug.Log($"[Inventory] Drank healing potion (+{ItemDatabase.PotionHeal} HP).");
-        Refresh();
-    }
-
     /// <summary>Move an equipped slot back into the bag (button hook).</summary>
     public void UnequipSlot(int slotIndex)
     {
         EnsureBuilt();
         if (inventory == null || equipment == null) return;
         var slot = (ItemSlot)slotIndex;
-        if (slot != ItemSlot.Weapon && slot != ItemSlot.Armor && slot != ItemSlot.Helmet) return;
+        if (!Equipment.IsGearSlot(slot)) return;
         var relay = GetComponent<DiabloNetworkPlayer>();
         if (relay != null && relay.IsSpawned)
         {
@@ -321,7 +299,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     /// <summary>Drop a worn item on the bag: unequips it.</summary>
     public void DropSlotOnBag(ItemSlot slot) => UnequipSlot((int)slot);
 
-    /// <summary>Right click on a bag cell: instant swap into its slot (potions are drunk).</summary>
+    /// <summary>Right click on a bag cell: instant swap into its slot.</summary>
     public void RightClickBag(int index) => EquipIndex(index);
 
     /// <summary>Right click on a worn item: back into the bag.</summary>
@@ -432,7 +410,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             if (frame == null) continue;
             Color tint = Color.white;
             if (Time.unscaledTime < flashUntil[s]) tint = RejectTint;
-            else if (dragged != null && dragged.slot != ItemSlot.Consumable)
+            else if (dragged != null && Equipment.IsGearSlot(dragged.slot))
                 tint = (int)dragged.slot == s ? AcceptTint : DimTint;
             frame.color = tint;
         }
@@ -447,17 +425,17 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         CancelDrag();
         int lv = prog != null ? prog.Level : 1;
         int gold = wallet != null ? wallet.Gold : 0;
-        int potions = CountPotions();
+        var flask = HealingFlask.For(gameObject);
         if (heroHeaderText != null)
             heroHeaderText.text =
                 Loc.F("inv.hero.header", DiabloPalette.ToHex(DiabloPalette.GoldBright), RunProfile.Class.displayName, lv, Loc.Display(RunProfile.Difficulty)) +
-                Loc.F("inv.hero.gold", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, potions);
+                Loc.F("inv.hero.gold", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, flask.Charges, flask.MaxCharges);
 
         if (equipment != null)
         {
-            armorText.text = SlotCaption(Loc.T("item.slot.armor"), equipment.armor);
-            weaponText.text = SlotCaption(Loc.T("item.slot.weapon"), equipment.weapon);
-            helmetText.text = SlotCaption(Loc.T("item.slot.helmet"), equipment.helmet);
+            foreach (var gear in Equipment.GearSlots)
+                if (slotTexts[(int)gear] != null)
+                    slotTexts[(int)gear].text = SlotCaption(ItemText.Slot(gear), equipment.GetEquipped(gear));
             statsText.text =
                 Loc.T("inv.stats.combat") +
                 Loc.F("inv.stats.dmg", DiabloPalette.ToHex(DiabloPalette.TrimGold), equipment.GetDamage()) +
@@ -465,9 +443,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
                 Loc.F("inv.stats.crit", equipment.GetCrit()) +
                 Loc.F("inv.stats.speed", equipment.GetMoveSpeed(), equipment.GetXPMul()) +
                 Loc.F("inv.stats.cdr", Mathf.Min(Equipment.MaxCooldownReductionPct, equipment.Total(AffixLibrary.CooldownReduction)));
-            PaintEquipIcon(0, equipment.armor);
-            PaintEquipIcon(1, equipment.weapon);
-            PaintEquipIcon(2, equipment.helmet);
+            foreach (var gear in Equipment.GearSlots) PaintEquipIcon((int)gear, equipment.GetEquipped(gear));
             if (statsDetailText != null) statsDetailText.text = StatsBlock();
         }
         RebuildBag();
@@ -480,15 +456,6 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     /// <summary>S3 area tooltip line: IncreasedArea percent + radius factor (test seam).</summary>
     public static string AreaLine(Equipment eq) =>
         eq == null ? "Area  +0%" : Loc.F("inv.stats.area", eq.AreaBonusPct(), eq.ScaleArea(1f));
-
-    int CountPotions()
-    {
-        if (inventory == null) return 0;
-        int n = 0;
-        for (int i = 0; i < inventory.Count; i++)
-            if (inventory.Get(i)?.slot == ItemSlot.Consumable) n++;
-        return n;
-    }
 
     string StatsBlock()
     {
@@ -532,8 +499,6 @@ public sealed class DiabloInventoryUI : MonoBehaviour
     string DetailFor(ItemInstance item)
     {
         if (item == null) return Loc.T("inv.baghint");
-        if (item.slot == ItemSlot.Consumable)
-            return Loc.F("inv.potion.tip", LootDrop.ItemLabel(item), BetterColor, ItemDatabase.PotionHeal);
         var equipped = equipment != null ? equipment.GetEquipped(item.slot) : null;
         return ItemDetailsView.Render(item, equipped);
     }
@@ -574,9 +539,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             if (Application.isPlaying) Destroy(child.gameObject);
             else DestroyImmediate(child.gameObject);
         int count = inventory != null ? inventory.Count : 0;
-        int potions = CountPotions();
+        var bagFlask = HealingFlask.For(gameObject);
         if (bagCountText != null)
-            bagCountText.text = Loc.F("inv.bag.count", count, Inventory.Capacity, (wallet != null ? wallet.Gold : 0), potions);
+            bagCountText.text = Loc.F("inv.bag.count", count, Inventory.Capacity, (wallet != null ? wallet.Gold : 0), bagFlask.Charges, bagFlask.MaxCharges);
         for (int i = 0; i < Inventory.Capacity; i++)
         {
             var item = inventory != null && i < inventory.Count ? inventory.Get(i) : null;
@@ -702,7 +667,8 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         heroHeaderText = DiabloUIFactory.MakeText(heroBox.transform, "HeroHeaderText", "", 15, DiabloPalette.Parchment);
         DiabloUIFactory.SetLayout(heroHeaderText.gameObject, prefH: 46f, flexW: 1f);
 
-        // Paperdoll: the live 3D hero with Helmet/Armor left and Weapon right.
+        // Paperdoll: the live 3D hero with Helmet/Armor/Belt left and
+        // Gloves/Weapon/Boots right (gear-slots S1).
         var doll = MakeCard(col, "Paperdoll", 470f);
         var stage = new GameObject("PaperdollStage", typeof(RectTransform));
         stage.transform.SetParent(doll.transform, false);
@@ -725,11 +691,8 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         dollCell.kind = InventoryCell.Kind.Doll;
         dollCell.owner = this;
 
-        string[] slotNames = { Loc.T("item.slot.armor"), Loc.T("item.slot.weapon"), Loc.T("item.slot.helmet") };
-        // Indexed by (int)ItemSlot: Armor, Weapon, Helmet.
-        Vector2[] slotPos = { new Vector2(-170f, -10f), new Vector2(170f, -10f), new Vector2(-170f, 140f) };
-        for (int s = 0; s < 3; s++)
-            BuildEquipSlot(doll.transform, s, slotNames[s], slotPos[s]);
+        foreach (var gear in Equipment.GearSlots)
+            BuildEquipSlot(doll.transform, (int)gear, ItemText.Slot(gear), PaperdollSlotPosition(gear));
 
         var hint = DiabloUIFactory.MakeText(doll.transform, "EquipHint", Loc.T("inv.equiphint"), 12, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         hint.raycastTarget = false;
@@ -778,9 +741,21 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         var label = DiabloUIFactory.MakeText(parent, "SlotLabel" + s, slotName, 13, DiabloPalette.Parchment, TextAnchor.UpperCenter);
         label.raycastTarget = false;
         Place(label.rectTransform, pos + new Vector2(0f, -74f), new Vector2(150f, 44f));
-        if (s == 0) armorText = label;
-        else if (s == 1) weaponText = label;
-        else helmetText = label;
+        slotTexts[s] = label;
+    }
+
+    /// <summary>Paperdoll frame centre per slot: two columns of three (gear-slots S1).</summary>
+    public static Vector2 PaperdollSlotPosition(ItemSlot slot)
+    {
+        switch (slot)
+        {
+            case ItemSlot.Helmet: return new Vector2(-170f, 155f);
+            case ItemSlot.Armor: return new Vector2(-170f, 30f);
+            case ItemSlot.Belt: return new Vector2(-170f, -95f);
+            case ItemSlot.Gloves: return new Vector2(170f, 155f);
+            case ItemSlot.Weapon: return new Vector2(170f, 30f);
+            default: return new Vector2(170f, -95f);
+        }
     }
 
     static GameObject MakeCard(Transform parent, string name, float height)
@@ -809,9 +784,9 @@ public sealed class DiabloInventoryUI : MonoBehaviour
         DiabloUIFactory.SetLayout(bagCountText.gameObject, prefH: 28f, flexW: 1f);
         var potionBtn = DiabloUIFactory.MakeSmallButton(topRow.transform, Loc.T("inv.btn.potion"), () =>
         {
-            if (Vendor.DrinkPotion(gameObject)) Refresh();
+            if (HealingFlask.For(gameObject).TryDrink()) Refresh();
         }, 28f, 170f);
-        potionBtn.name = "PotionQuickButton";
+        potionBtn.name = "FlaskQuickButton";
 
         var gridGo = new GameObject("BagGrid", typeof(RectTransform));
         gridGo.transform.SetParent(col, false);
@@ -934,6 +909,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
 
     void PaintEquipIcon(int slot, ItemInstance item)
     {
+        if (slot < 0 || slot >= equipFrames.Length) return;
         var frame = equipFrames[slot];
         if (frame != null)
         {

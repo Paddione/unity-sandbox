@@ -101,7 +101,7 @@ public sealed class RiskShrineProgress
     public static ItemInstance RollRare(int runSeed)
     {
         var rng = new System.Random(runSeed ^ 0x51ab);
-        var slots = new[] { ItemSlot.Weapon, ItemSlot.Armor, ItemSlot.Helmet };
+        var slots = Equipment.GearSlots;
         var slot = slots[rng.Next(slots.Length)];
         var bases = ItemDatabase.GetBaseTypes(slot);
         var item = new ItemInstance

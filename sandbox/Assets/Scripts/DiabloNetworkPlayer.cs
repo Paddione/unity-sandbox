@@ -273,6 +273,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         public ItemInstance armor;
         public ItemInstance weapon;
         public ItemInstance helmet;
+        public ItemInstance gloves;
+        public ItemInstance boots;
+        public ItemInstance belt;
         public NetworkItemOwnership.State items;
     }
 
@@ -296,6 +299,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             report.armor = eq.armor;
             report.weapon = eq.weapon;
             report.helmet = eq.helmet;
+            report.gloves = eq.gloves;
+            report.boots = eq.boots;
+            report.belt = eq.belt;
         }
         report.items = NetworkItemOwnership.Capture(hero, RunProfile.Stash);
         return report;
@@ -319,6 +325,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         raw.armor = SanitizeGearItem(raw.armor, ItemSlot.Armor);
         raw.weapon = SanitizeGearItem(raw.weapon, ItemSlot.Weapon);
         raw.helmet = SanitizeGearItem(raw.helmet, ItemSlot.Helmet);
+        raw.gloves = SanitizeGearItem(raw.gloves, ItemSlot.Gloves);
+        raw.boots = SanitizeGearItem(raw.boots, ItemSlot.Boots);
+        raw.belt = SanitizeGearItem(raw.belt, ItemSlot.Belt);
         return raw;
     }
 
@@ -355,6 +364,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         eq.armor = report.armor;
         eq.weapon = report.weapon;
         eq.helmet = report.helmet;
+        eq.gloves = report.gloves;
+        eq.boots = report.boots;
+        eq.belt = report.belt;
     }
 
     /// <summary>Client join report, validated and applied to the sender's mirror.</summary>
@@ -387,9 +399,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             else
             {
                 var eq = GetComponent<Equipment>();
-                eq.armor?.EnsureIdentity();
-                eq.weapon?.EnsureIdentity();
-                eq.helmet?.EnsureIdentity();
+                eq.EnsureIdentities();
             }
             InitializeItems(raw.items, clean, sender);
             Debug.Log($"[Net] join stats from {sender}: level {clean.level} applied to mirror.");

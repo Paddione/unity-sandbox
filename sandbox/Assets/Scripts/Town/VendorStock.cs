@@ -5,7 +5,7 @@ using UnityEngine;
 /// Lantern Hold vendor assortment (S3 town). Six seeded offers per zone
 /// visit, rarity prices (Magic 25, Rare 90, Unique 300), 25 % resale.
 /// Pure data + rules, no GameObjects, so EditMode tests pin the economy
-/// without a scene. Potions are always in stock beside the 6 offers.
+/// without a scene. The healing flask replaced the vendor potion (gear-slots S2).
 /// </summary>
 [System.Serializable]
 public sealed class VendorStock
@@ -28,7 +28,6 @@ public sealed class VendorStock
     public static int BuyPrice(ItemInstance item)
     {
         if (item == null) return 0;
-        if (item.slot == ItemSlot.Consumable) return ItemDatabase.PotionPrice;
         switch (item.rarity)
         {
             case ItemRarity.Rare: return 90;
@@ -53,7 +52,7 @@ public sealed class VendorStock
             ItemRarity.Rare, ItemRarity.Rare, ItemRarity.Rare,
             ItemRarity.Rare, ItemRarity.Rare, ItemRarity.Unique,
         };
-        var slots = new[] { ItemSlot.Weapon, ItemSlot.Armor, ItemSlot.Helmet };
+        var slots = Equipment.GearSlots;
         const int itemLevel = ItemLevelRules.VendorLevel;
         int affixTier = DifficultyProfile.Current.affixTier;
         foreach (var rarity in rarities)
@@ -98,16 +97,6 @@ public sealed class VendorStock
         inv.Add(offer.item);
         offers.RemoveAt(index);
         Debug.Log($"[Vendor] Bought {LootDrop.ItemLabel(offer.item)} for {offer.price} gold.");
-        return true;
-    }
-
-    /// <summary>Buy one healing potion into the bag (always in stock).</summary>
-    public static bool BuyPotion(Wallet wallet, Inventory inv)
-    {
-        if (wallet == null || inv == null || inv.FreeSlots <= 0) return false;
-        if (!wallet.TrySpend(ItemDatabase.PotionPrice)) return false;
-        inv.Add(ItemDatabase.CreateHealingPotion());
-        Debug.Log($"[Vendor] Bought healing potion for {ItemDatabase.PotionPrice} gold.");
         return true;
     }
 

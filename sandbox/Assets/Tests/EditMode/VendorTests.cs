@@ -33,8 +33,6 @@ public class VendorTests
         Assert.AreEqual(25, VendorStock.BuyPrice(ItemOf(ItemSlot.Weapon, ItemRarity.Magic)));
         Assert.AreEqual(90, VendorStock.BuyPrice(ItemOf(ItemSlot.Armor, ItemRarity.Rare)));
         Assert.AreEqual(300, VendorStock.BuyPrice(ItemOf(ItemSlot.Helmet, ItemRarity.Unique)));
-        Assert.AreEqual(ItemDatabase.PotionPrice,
-            VendorStock.BuyPrice(ItemDatabase.CreateHealingPotion()));
     }
 
     [Test]
@@ -64,7 +62,6 @@ public class VendorTests
         for (int seed = 0; seed < 20; seed++)
             foreach (var offer in VendorStock.Roll(seed).offers)
                 Assert.AreNotEqual(ItemRarity.Magic, offer.item.rarity, $"Seed {seed}: no blue stock (playtest 2026-11-23).");
-        Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateHealingPotion().rarity);
         Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateStarterBow().rarity);
         Assert.AreNotEqual(ItemRarity.Magic, ItemDatabase.CreateStarterLantern().rarity);
     }
@@ -114,30 +111,6 @@ public class VendorTests
     {
         Assert.IsFalse(VendorStock.TrySell(0, wallet, inv));
         Assert.AreEqual(0, wallet.Gold);
-    }
-
-    [Test]
-    public void Potion_Drink_HealsAndConsumesOne()
-    {
-        var health = hero.GetComponent<PlayerHealth>();
-        wallet.Add(100);
-        Assert.IsTrue(VendorStock.BuyPotion(wallet, inv));
-        Assert.IsTrue(VendorStock.BuyPotion(wallet, inv));
-        Assert.AreEqual(100 - 2 * ItemDatabase.PotionPrice, wallet.Gold);
-        health.TakeDamage(15f);
-        float hurt = health.CurrentHP;
-        Assert.IsTrue(Vendor.DrinkPotion(hero));
-        Assert.AreEqual(1, inv.Count, "Drinking consumes exactly one potion.");
-        Assert.AreEqual(hurt + ItemDatabase.PotionHeal, health.CurrentHP, 0.001f);
-        Assert.AreEqual(1, inv.Count, "Exactly one of the two potions is gone.");
-    }
-
-    [Test]
-    public void Drink_WithoutPotion_Fails()
-    {
-        inv.Add(ItemDatabase.CreateStarterSword());
-        Assert.IsFalse(Vendor.DrinkPotion(hero));
-        Assert.AreEqual(1, inv.Count);
     }
 
     [Test]

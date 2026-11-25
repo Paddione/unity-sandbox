@@ -164,7 +164,6 @@ public sealed class ItemTooltip : MonoBehaviour
 
     static string PlainBody(ItemInstance it)
     {
-        if (it.slot == ItemSlot.Consumable) return Loc.F("inv.tip.potion", DiabloInventoryUI.BetterColor, ItemDatabase.PotionHeal);
         var sb = new System.Text.StringBuilder();
         AppendClassLock(sb, it);
         if (it.affixes == null || it.affixes.Count == 0) sb.AppendLine(Loc.T("item.card.norolls"));

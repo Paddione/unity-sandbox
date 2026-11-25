@@ -73,7 +73,7 @@ public class KindledFinaleRewardTests
     {
         RunProfile.ClassId = ClassCatalog.FenwalkerId;
         var inv = hero.GetComponent<Inventory>();
-        for (int i = 0; i < Inventory.Capacity; i++) inv.Add(ItemDatabase.CreateHealingPotion());
+        for (int i = 0; i < Inventory.Capacity; i++) inv.Add(ItemDatabase.CreateStarterSword());
         Assert.IsFalse(KindledFinaleReward.OnKilnmotherKill(hero, path), "full bag: claim stays open");
         Assert.IsTrue(RunProfile.KindledRewardPending);
         Assert.IsFalse(RunProfile.KindledRewardGranted);
@@ -105,7 +105,7 @@ public class KindledFinaleRewardTests
     {
         RunProfile.ClassId = ClassCatalog.FenwalkerId;
         var inv = hero.GetComponent<Inventory>();
-        for (int i = 0; i < Inventory.Capacity; i++) inv.Add(ItemDatabase.CreateHealingPotion());
+        for (int i = 0; i < Inventory.Capacity; i++) inv.Add(ItemDatabase.CreateStarterSword());
         KindledFinaleReward.OnKilnmotherKill(hero, path);
         Assert.IsTrue(RunProfile.KindledRewardPending);
         // Reload: pending claim survives, bag is full again after load.

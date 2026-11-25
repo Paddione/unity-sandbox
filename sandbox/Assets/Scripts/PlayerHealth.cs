@@ -23,7 +23,11 @@ public sealed class PlayerHealth : MonoBehaviour
     {
         equipment = GetComponent<Equipment>();
         Refresh();
-        if (Application.isPlaying) DiabloLifeGlobe.Ensure();
+        if (Application.isPlaying)
+        {
+            DiabloLifeGlobe.Ensure();
+            GearEffectState.For(gameObject);
+        }
     }
 
     public float MaxHP => mirrored ? mirrorMax : (equipment != null ? equipment.GetMaxHP() : Equipment.BaseMaxHP);
@@ -107,7 +111,9 @@ public sealed class PlayerHealth : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (amount <= 0f || mirrored) return;
+        amount = GearUniqueEffects.ShapeIncoming(this, amount, null);
         amount = AbsorbShield(amount);
+        GearUniqueEffects.OnDamaged(this);
         if (amount <= 0f) return;
         currentHP = Mathf.Clamp(CurrentHP - amount, 0f, MaxHP);
     }
@@ -131,7 +137,9 @@ public sealed class PlayerHealth : MonoBehaviour
             amount = DiabloBlock.Reduce(amount);
             DiabloAudio.PlayBlock();
         }
+        amount = GearUniqueEffects.ShapeIncoming(this, amount, fromPos);
         amount = AbsorbShield(amount);
+        GearUniqueEffects.OnDamaged(this);
         if (blocked)
         {
             var eq = GetComponent<Equipment>();

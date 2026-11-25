@@ -3,9 +3,8 @@ using UnityEngine;
 /// <summary>
 /// Lantern Hold vendor NPC (S3 town): KayKit Adventurer with an idle take.
 /// Opens the hero's <see cref="DiabloVendorUI"/> on click while the hero is
-/// inside <see cref="InteractRadius"/>. Potion drinking (key 1, wired from
-/// the vendor UI) lives here as a static so the consumable never passes
-/// through <see cref="Equipment"/> (S4-owned): potions are bag-only.
+/// inside <see cref="InteractRadius"/>. Key 1 belongs to the
+/// <see cref="HealingFlask"/> (gear-slots S2).
 /// </summary>
 public sealed class Vendor : MonoBehaviour, IUsable
 {
@@ -87,33 +86,5 @@ public sealed class Vendor : MonoBehaviour, IUsable
         heroUI.BindStock(stock);
         heroUI.SetOpen(true);
         Debug.Log("[Vendor] Trade window opened.");
-    }
-
-    /// <summary>
-    /// Drink the first healing potion in the hero's bag (key 1). False when
-    /// the bag holds none (nothing happens, no sound).
-    /// </summary>
-    public static bool DrinkPotion(GameObject hero)
-    {
-        if (hero == null) return false;
-        var inv = hero.GetComponent<Inventory>();
-        if (inv == null) return false;
-        for (int i = 0; i < inv.Count; i++)
-        {
-            var item = inv.Get(i);
-            if (item != null && item.slot == ItemSlot.Consumable)
-            {
-                var relay = hero.GetComponent<DiabloNetworkPlayer>();
-                if (relay != null && relay.IsSpawned)
-                    return relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.DrinkPotion, item);
-                if (!inv.RemoveAt(i)) return false;
-                var health = hero.GetComponent<PlayerHealth>();
-                if (health != null) health.Heal(ItemDatabase.PotionHeal);
-                DiabloAudio.PlayUIClick();
-                Debug.Log($"[Vendor] Drank healing potion (+{ItemDatabase.PotionHeal} HP).");
-                return true;
-            }
-        }
-        return false;
     }
 }

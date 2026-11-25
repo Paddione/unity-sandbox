@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 14;
+    public const int CurrentVersion = 15;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -76,6 +76,13 @@ public sealed class SaveGame
     public int heroHairStyle;
     public int heroHairColor;
     public int heroBuild = (int)HeroBuild.Athletic;
+
+    // v15 (gear-slots): three new gear slots, the unique pity counter, and the
+    // vendor potion retired for the flask (old potions refunded in gold).
+    public ItemInstance equipmentGloves;
+    public ItemInstance equipmentBoots;
+    public ItemInstance equipmentBelt;
+    public int uniquePity;
 }
 
 /// <summary>Frozen board contract (zone-contracts S1, save v5): the accepted

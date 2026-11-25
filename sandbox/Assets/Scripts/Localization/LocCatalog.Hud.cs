@@ -10,7 +10,7 @@ public static partial class LocCatalog
         E("hud.boss.phase1", "PHASE I", "PHASE I"),
         E("hud.boss.phase2", "PHASE II", "PHASE II"),
         E("hud.globe.points", "   <color={0}>+{1} Punkte [C]</color>", "   <color={0}>+{1} pts [C]</color>"),
-        E("hud.globe.purse", "<color={0}>{1} Gold</color>   •   Heiltränke [1]: {2}{3}", "<color={0}>{1}g</color>   •   Potions [1]: {2}{3}"),
+        E("hud.globe.purse", "<color={0}>{1} Gold</color>   •   Heilflasche [1]: {2}{3}", "<color={0}>{1}g</color>   •   Flask [1]: {2}{3}"),
         E("hud.death.sub", "Das Laternenlicht holt dich zurück in die Laternenwacht. Irgendjemand bezahlt dafür.", "The lantern light carries you back to Lantern Hold."),
         E("hud.death.title", "DU BIST GEFALLEN", "YOU HAVE FALLEN"),
         E("hud.zonetoast.title", "LATERNENWACHT  •  ASCHENMOOR", "LANTERN HOLD  •  THE ASHEN FEN"),

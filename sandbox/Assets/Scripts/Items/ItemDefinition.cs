@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
-public enum ItemSlot { Armor, Weapon, Helmet, Consumable }
+/// <summary>Int values are the save/net contract: new slots append after Consumable.</summary>
+public enum ItemSlot { Armor, Weapon, Helmet, Consumable, Gloves, Boots, Belt }
 
 public enum ItemRarity { Magic, Rare, Unique }
 
@@ -81,6 +82,9 @@ public static class ItemText
             case ItemSlot.Armor: return Loc.T("item.slot.armor");
             case ItemSlot.Weapon: return Loc.T("item.slot.weapon");
             case ItemSlot.Helmet: return Loc.T("item.slot.helmet");
+            case ItemSlot.Gloves: return Loc.T("item.slot.gloves");
+            case ItemSlot.Boots: return Loc.T("item.slot.boots");
+            case ItemSlot.Belt: return Loc.T("item.slot.belt");
             default: return Loc.T("item.slot.consumable");
         }
     }

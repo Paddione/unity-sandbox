@@ -141,8 +141,20 @@ public sealed class RiskShrine : MonoBehaviour, IUsable
 
     public float UseRadius => InteractRadius;
     public string UseLabel => Loc.T("use.risk");
-    void OnEnable() => Usables.Register(this);
-    void OnDisable() => Usables.Unregister(this);
+    /// <summary>Shrines in the scene (gear-slots S2: standing at one refills the flask).</summary>
+    public static readonly System.Collections.Generic.List<RiskShrine> Live = new System.Collections.Generic.List<RiskShrine>();
+
+    void OnEnable()
+    {
+        Usables.Register(this);
+        if (!Live.Contains(this)) Live.Add(this);
+    }
+
+    void OnDisable()
+    {
+        Usables.Unregister(this);
+        Live.Remove(this);
+    }
 
     public void Use(GameObject hero)
     {

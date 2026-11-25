@@ -49,6 +49,13 @@ public static class DroptableDatabase
     /// </summary>
     public const float MatrixNonWeaponShare = 0.5f;
 
+    /// <summary>
+    /// gear-slots S5: share of old-slot Uniques that roll one of the zone
+    /// pieces unlocked at the source's item level. Only the within-slot pick
+    /// splits; the per-tier Unique weight stays as it is.
+    /// </summary>
+    public const float ZonePieceShare = 1f / 3f;
+
     /// <summary>Gold roll for the tier: drop chance plus inclusive amount bounds.</summary>
     /// <summary>Kilnmother gold (act-one S4): 300–450.</summary>
     public const int ActBossGoldMin = 300;

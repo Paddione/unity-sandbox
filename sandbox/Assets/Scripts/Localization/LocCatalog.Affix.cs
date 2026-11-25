@@ -19,5 +19,6 @@ public static partial class LocCatalog
         E("affix.magicfind", "+{0} % Magiefund", "+{0}% Magic Find"),
         E("affix.critrating", "+{0} Kritwertung", "+{0} Crit Rating"),
         E("affix.increasedarea", "+{0} % Wirkfläche", "+{0}% Area"),
+        E("affix.flaskhealing", "+{0} % Flaschenheilung", "+{0}% Flask healing"),
     };
 }

@@ -428,6 +428,7 @@ public sealed class DiabloSkills : MonoBehaviour
         var eq = GetComponent<Equipment>();
         int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
         float mul = sheet != null ? sheet.SpecialtySkillMultiplier(s, ActiveClass, gearRanks) : 1f;
+        mul *= GearUniqueEffects.HealMultiplier(eq);
         return Mathf.Max(1, Mathf.RoundToInt(baseHeal * mul));
     }
 

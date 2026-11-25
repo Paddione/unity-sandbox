@@ -117,11 +117,11 @@ public sealed class InventoryPaperdollPlayTests
         Assert.IsNull(equipment.weapon, "Right click on a worn item puts it into the bag.");
         Assert.AreEqual(2, inventory.Count);
 
-        inventory.Add(ItemDatabase.CreateHealingPotion());
+        inventory.Add(new ItemInstance { slot = ItemSlot.Consumable, rarity = ItemRarity.Rare, baseType = "Healing Potion" });
         ui.Refresh();
         yield return null;
         ExecuteEvents.Execute(BagCell(2), Pointer(PointerEventData.InputButton.Right), ExecuteEvents.pointerClickHandler);
-        Assert.AreEqual(2, inventory.Count, "Right click drinks a potion.");
+        Assert.AreEqual(3, inventory.Count, "gear-slots S2: right click never drinks a bag consumable.");
         Assert.IsNull(equipment.helmet);
     }
 

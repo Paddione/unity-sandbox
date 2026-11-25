@@ -98,7 +98,7 @@ public sealed class NetworkItemLifecycleTests
         Assert.That(inventory.Get(inventory.Count - 1).instanceId, Is.EqualTo(armor.instanceId));
         Assert.That(inventory.RemoveAt(inventory.Count - 1), Is.True);
 
-        while (inventory.FreeSlots > 0) inventory.Add(ItemDatabase.CreateHealingPotion());
+        while (inventory.FreeSlots > 0) inventory.Add(ItemDatabase.CreateStarterSword());
         var item = ItemDatabase.RollUnique(ItemDatabase.CreateUnique(ItemDatabase.LancerWardId), 10, 2);
         var pile = LootDrop.SpawnItem(hero.transform.position + Vector3.right * 1.5f, item, true);
         var relay = pile.GetComponent<LootNetRelay>();

@@ -8,7 +8,6 @@ Net/AccountRules.cs	Invalid username or password
 Net/AccountRules.cs	already exists
 Items/ItemDatabase.cs	Cryptwarden Plate
 Items/ItemDatabase.cs	Emberbrand Blade
-Items/ItemDatabase.cs	Healing Potion
 Items/ItemDatabase.cs	Lantern of the Hold
 Items/ItemDatabase.cs	Rogue's Keepsake
 Items/ItemDatabase.cs	Seer's Circlet
@@ -24,7 +23,6 @@ DiabloMenuArt.cs	ClothTunic
 DiabloMenuArt.cs	Dagger
 DiabloMenuArt.cs	EmberCenser
 DiabloMenuArt.cs	GoldCoin
-DiabloMenuArt.cs	Healing Potion
 DiabloMenuArt.cs	HealingPotion
 DiabloMenuArt.cs	HeavyAxe
 DiabloMenuArt.cs	Helm
@@ -37,7 +35,6 @@ DiabloMenuArt.cs	ShortSword
 DiabloMenuArt.cs	Worn Lantern
 DiabloMenuArt.cs	Worn Short Bow
 DiabloMenuArt.cs	Worn Short Sword
-DiabloMenuArt.cs	base:Healing Potion
 DiabloMenuArt.cs	btn_{(primary ? 
 DiabloMenuArt.cs	progress_fill_{w}x{h}
 DiabloMenuArt.cs	rogue blade
@@ -141,12 +138,12 @@ SessionAutoplay.cs	phase town_waypoints done
 SessionAutoplay.cs	phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)
 SessionAutoplay.cs	phase town_waypoints: '{name}' not found, skipped
 SessionAutoplay.cs	phase town_waypoints: reached {name}
-SessionAutoplay.cs	phase vendor_potion done
-SessionAutoplay.cs	phase vendor_potion start (S3 seam: VendorStock.BuyPotion)
-SessionAutoplay.cs	phase vendor_potion: bought={bought}
+SessionAutoplay.cs	phase flask done
+SessionAutoplay.cs	phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)
+SessionAutoplay.cs	phase flask: drank={drank} charges={flask.Charges}/{flask.MaxCharges}
+SessionAutoplay.cs	phase flask: refilled={flask.IsFull}
 SessionAutoplay.cs	phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} 
-SessionAutoplay.cs	purse topped up to {wallet.Gold} gold (deterministic run)
 SessionAutoplay.cs	result written: {result.WriteTo(dir)} exit={result.exit}
 SessionAutoplay.cs	start, god={(godMode ? 
 SessionAutoplay.cs	unstick nudge #{nudges} (moved {moved:0.1} m in 5 s)
@@ -285,3 +282,19 @@ DiabloShotCheck.cs	DONE {index} equipment shots
 DiabloShotCheck.cs	bones {tag}: state={state} t={nt:F2} speed={(anim != null ? anim.GetFloat(LocomotionTwist.MoveSpeedParam) : 0f):F1} twist={(twist != null ? twist.Twist : 0f):F0} back={(twist != null && twist.Backpedaling)} vel={(twist != null ? twist.Velocity.magnitude : 0f):F1} hips={H(
 DiabloShotCheck.cs	DONE {index} locomotion shots
 Net/JoinArgs.cs	-join unity.korczewski.de
+Classes/HeroEquipmentAppearance.cs	Left wrist art
+Classes/HeroEquipmentAppearance.cs	Right wrist art
+Classes/HeroEquipmentAppearance.cs	Left shin art
+Classes/HeroEquipmentAppearance.cs	Right shin art
+Classes/HeroEquipmentAppearance.cs	Left foot art
+Classes/HeroEquipmentAppearance.cs	Right foot art
+Classes/HeroEquipmentAppearance.cs	Hips art
+Classes/HeroGearModels.cs	Glove cuff
+Classes/HeroGearModels.cs	Cuff trim
+Classes/HeroGearModels.cs	Glove back
+Classes/HeroGearModels.cs	Knuckle plate
+Classes/HeroGearModels.cs	Boot shaft
+Classes/HeroGearModels.cs	Boot top
+Classes/HeroGearModels.cs	Boot shoe
+Classes/HeroGearModels.cs	Belt strap
+Classes/HeroGearModels.cs	Sash tail

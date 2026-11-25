@@ -394,7 +394,6 @@ public static class DiabloMenuArt
         string lower = b.ToLowerInvariant();
         foreach (var known in AllArtBases)
             if (lower.Contains(known.ToLowerInvariant())) return "base:" + known;
-        if (lower.Contains("potion")) return "base:Healing Potion";
         return "base:" + b; // novel base: still explicit, drawn by family glyph
     }
 
@@ -406,7 +405,10 @@ public static class DiabloMenuArt
         "RogueBlade", "ShortBow", "HuntingBow",
         "Worn Short Sword", "Worn Lantern", "Worn Short Bow",
         "ClothTunic", "LeatherVest", "Breastplate",
-        "Hood", "Helm", "Circlet", "Healing Potion",
+        "Hood", "Helm", "Circlet",
+        "SilkWraps", "LeatherGloves", "ChainGauntlets",
+        "WrappedSandals", "LeatherBoots", "IronSabatons",
+        "RopeSash", "LeatherBelt", "StuddedGirdle",
     };
 
     /// <summary>S5 overload: icon for a concrete item (base + unique art).</summary>
@@ -467,6 +469,10 @@ public static class DiabloMenuArt
     static bool GlyphHitEx(string baseType, string uniqueId, float dx, float dy)
     {
         string b = ((baseType ?? "") + " " + (uniqueId ?? "")).ToLowerInvariant();
+        // gear-slots S1: hand, foot and waist silhouettes before the generic families.
+        if (IsGloveBase(baseType)) return GloveGlyph(dx, dy);
+        if (IsBootBase(baseType)) return BootGlyph(dx, dy);
+        if (IsBeltBase(baseType)) return BeltGlyph(dx, dy);
         bool isBow = b.Contains("bow");
         bool isLantern = b.Contains("lantern") || b.Contains("censer");
         if (isBow)
@@ -489,6 +495,46 @@ public static class DiabloMenuArt
             return body || cap || handle || glowDot;
         }
         return GlyphHit(baseType, dx, dy);
+    }
+
+    static bool IsGloveBase(string b) => System.Array.IndexOf(ItemDatabase.GloveBases, b) >= 0;
+    static bool IsBootBase(string b) => System.Array.IndexOf(ItemDatabase.BootBases, b) >= 0;
+    static bool IsBeltBase(string b) => System.Array.IndexOf(ItemDatabase.BeltBases, b) >= 0;
+
+    /// <summary>Open hand: palm block, four fingers, thumb, cuff.</summary>
+    static bool GloveGlyph(float dx, float dy)
+    {
+        bool palm = Mathf.Abs(dx) < 0.26f && dy > -0.25f && dy < 0.15f;
+        bool cuff = Mathf.Abs(dx) < 0.30f && dy > -0.52f && dy < -0.30f;
+        bool fingers = false;
+        for (int i = 0; i < 4; i++)
+        {
+            float fx = -0.195f + i * 0.13f;
+            fingers |= Mathf.Abs(dx - fx) < 0.05f && dy >= 0.15f && dy < 0.55f - Mathf.Abs(i - 1.5f) * 0.06f;
+        }
+        bool thumb = Mathf.Abs((dx + 0.33f) - (dy - 0.05f) * 0.6f) < 0.06f && dy > -0.15f && dy < 0.22f;
+        return palm || cuff || fingers || thumb;
+    }
+
+    /// <summary>Boot in profile: shaft, foot, sole and a top cuff.</summary>
+    static bool BootGlyph(float dx, float dy)
+    {
+        bool shaft = dx > -0.30f && dx < 0.05f && dy > -0.30f && dy < 0.50f;
+        bool foot = dx > -0.30f && dx < 0.45f && dy > -0.48f && dy < -0.22f;
+        bool toe = (dx - 0.42f) * (dx - 0.42f) + (dy + 0.35f) * (dy + 0.35f) < 0.018f;
+        bool cuff = dx > -0.36f && dx < 0.11f && dy > 0.42f && dy < 0.55f;
+        return shaft || foot || toe || cuff;
+    }
+
+    /// <summary>Belt seen flat: strap band with a square buckle and its tongue.</summary>
+    static bool BeltGlyph(float dx, float dy)
+    {
+        bool strap = Mathf.Abs(dy) < 0.12f && Mathf.Abs(dx) < 0.72f;
+        bool buckleOuter = Mathf.Abs(dx) < 0.24f && Mathf.Abs(dy) < 0.26f;
+        bool buckleInner = Mathf.Abs(dx) < 0.13f && Mathf.Abs(dy) < 0.15f;
+        bool tongue = Mathf.Abs(dy) < 0.035f && dx > -0.13f && dx < 0.06f;
+        bool notch = Mathf.Abs(dy) < 0.04f && Mathf.Abs(dx - 0.5f) < 0.035f;
+        return (buckleOuter && !buckleInner) || tongue || (strap && !buckleInner && !notch);
     }
 
     /// <summary>
@@ -517,7 +563,7 @@ public static class DiabloMenuArt
                     float dx = (x - c) / c, dy = (y - c) / c;
                     float r = Mathf.Sqrt(dx * dx + dy * dy);
                     Color px = new Color(0, 0, 0, 0);
-                    bool glyph = GlyphHit(baseType, dx, dy);
+                    bool glyph = GlyphHitEx(baseType, null, dx, dy);
                     if (glyph) px = ink;
                     if (r > 0.82f && r < 0.98f) px = Color.Lerp(px, glow, 0.85f);
                     tex.SetPixel(x, y, px);

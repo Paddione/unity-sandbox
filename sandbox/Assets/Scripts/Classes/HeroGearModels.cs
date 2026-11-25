@@ -140,6 +140,162 @@ public static class HeroGearModels
         }),
     };
 
+    // ---- gear-slots S3: worn hands, feet and belt --------------------------------
+    static readonly Color Leather = new Color32(122, 82, 52, 255);
+    static readonly Color Cloth = new Color32(176, 160, 132, 255);
+
+    /// <summary>Look of one hands/feet/belt piece: base colour, trim colour, build weight 0 light .. 2 heavy.</summary>
+    readonly struct LimbLook
+    {
+        public readonly ItemSlot Slot;
+        public readonly Color Main;
+        public readonly Color Trim;
+        public readonly int Weight;
+        public LimbLook(ItemSlot slot, Color main, Color trim, int weight) { Slot = slot; Main = main; Trim = trim; Weight = weight; }
+    }
+
+    static readonly Dictionary<string, LimbLook> Limbs = new Dictionary<string, LimbLook>(StringComparer.Ordinal)
+    {
+        ["SilkWraps"] = new LimbLook(ItemSlot.Gloves, Cloth, Pearl, 0),
+        ["LeatherGloves"] = new LimbLook(ItemSlot.Gloves, Leather, Dark, 1),
+        ["ChainGauntlets"] = new LimbLook(ItemSlot.Gloves, Iron, Dark, 2),
+        ["WrappedSandals"] = new LimbLook(ItemSlot.Boots, Cloth, Leather, 0),
+        ["LeatherBoots"] = new LimbLook(ItemSlot.Boots, Leather, Dark, 1),
+        ["IronSabatons"] = new LimbLook(ItemSlot.Boots, Iron, Dark, 2),
+        ["RopeSash"] = new LimbLook(ItemSlot.Belt, Cloth, Leather, 0),
+        ["LeatherBelt"] = new LimbLook(ItemSlot.Belt, Leather, Brass, 1),
+        ["StuddedGirdle"] = new LimbLook(ItemSlot.Belt, Dark, Iron, 2),
+        [ItemDatabase.IronboundGripsId] = new LimbLook(ItemSlot.Gloves, Iron, Brass, 2),
+        [ItemDatabase.MendersTouchId] = new LimbLook(ItemSlot.Gloves, Pearl, Jade, 0),
+        [ItemDatabase.CutpurseWrapsId] = new LimbLook(ItemSlot.Gloves, Dark, Lilac, 1),
+        [ItemDatabase.BastionTreadsId] = new LimbLook(ItemSlot.Boots, Brass, Iron, 2),
+        [ItemDatabase.PilgrimStepsId] = new LimbLook(ItemSlot.Boots, Pearl, Jade, 0),
+        [ItemDatabase.GhostwalkBootsId] = new LimbLook(ItemSlot.Boots, Dark, Lilac, 1),
+        [ItemDatabase.WardensGirdleId] = new LimbLook(ItemSlot.Belt, Iron, Brass, 2),
+        [ItemDatabase.VialSashId] = new LimbLook(ItemSlot.Belt, Pearl, Jade, 0),
+        [ItemDatabase.QuickdrawBeltId] = new LimbLook(ItemSlot.Belt, Dark, Ember, 1),
+    };
+
+    /// <summary>True for the three gear-slots that render on hands, feet and hips.</summary>
+    public static bool IsLimbSlot(ItemSlot slot) =>
+        slot == ItemSlot.Gloves || slot == ItemSlot.Boots || slot == ItemSlot.Belt;
+
+    /// <summary>Art key of a worn hands/feet/belt item: the unique id when it has a look, else the base.</summary>
+    public static string VisualKey(ItemInstance item)
+    {
+        if (item == null || Equipment.IsBlank(item) || !IsLimbSlot(item.slot)) return null;
+        if (item.rarity == ItemRarity.Unique && item.uniqueId != null && Limbs.ContainsKey(item.uniqueId)) return item.uniqueId;
+        return Limbs.ContainsKey(item.baseType ?? "") ? item.baseType : null;
+    }
+
+    public static bool IsKnownLimb(string key, ItemSlot slot) =>
+        key != null && Limbs.TryGetValue(key, out var look) && look.Slot == slot;
+
+    public static IEnumerable<string> LimbKeys => Limbs.Keys;
+
+    /// <summary>
+    /// One glove on a wrist bone. Authored in bone space: +Y runs from the
+    /// wrist into the hand (KayKit rig convention), so the cuff rings the bone.
+    /// </summary>
+    public static GameObject CreateGlove(string key, Transform wrist)
+    {
+        if (!IsKnownLimb(key, ItemSlot.Gloves) || wrist == null) return null;
+        var look = Limbs[key];
+        var root = LimbRoot(key, wrist);
+        Ring(root, "Glove cuff", look.Main, .082f + .008f * look.Weight, .082f + .008f * look.Weight, -.03f, .05f + .015f * look.Weight);
+        Ring(root, "Cuff trim", look.Trim, .09f + .008f * look.Weight, .09f + .008f * look.Weight, -.065f - .01f * look.Weight, .025f);
+        Box(root, "Glove back", look.Main, new Vector3(0f, .075f, 0f), new Vector3(.15f, .11f, .14f));
+        if (look.Weight >= 2)
+            Box(root, "Knuckle plate", look.Trim, new Vector3(0f, .11f, .075f), new Vector3(.15f, .045f, .03f));
+        return root.gameObject;
+    }
+
+    /// <summary>One boot: shaft rings on the lower leg, the shoe shell on the foot bone.</summary>
+    public static GameObject CreateBoot(string key, Transform lowerLeg, Transform foot)
+    {
+        if (!IsKnownLimb(key, ItemSlot.Boots) || lowerLeg == null || foot == null) return null;
+        var look = Limbs[key];
+        var root = LimbRoot(key, lowerLeg);
+        float r = .085f + .01f * look.Weight;
+        int rings = look.Weight + 1;
+        for (int i = 0; i < rings; i++)
+            Ring(root, "Boot shaft", look.Main, r, r, .14f - i * .045f, .045f);
+        Ring(root, "Boot top", look.Trim, r + .01f, r + .01f, .14f - rings * .045f, .025f);
+        var shoe = LimbRoot("Boot shoe", foot);
+        Link(root.gameObject, shoe.gameObject);
+        Box(shoe, "Shoe", look.Main, new Vector3(0f, .07f, 0f), new Vector3(.15f + .01f * look.Weight, .19f, .12f));
+        Box(shoe, "Sole", look.Trim, new Vector3(0f, .075f, -.065f), new Vector3(.155f, .2f, .025f));
+        return root.gameObject;
+    }
+
+    /// <summary>
+    /// Belt on the hips bone (+Y towards the spine). <paramref name="forward"/>
+    /// is the hero's facing in hips space, so the buckle sits at the front.
+    /// </summary>
+    public static GameObject CreateBelt(string key, Transform hips, Vector3 forward)
+    {
+        if (!IsKnownLimb(key, ItemSlot.Belt) || hips == null) return null;
+        var look = Limbs[key];
+        var root = LimbRoot(key, hips);
+        forward.y = 0f;
+        if (forward.sqrMagnitude < .0001f) forward = Vector3.forward;
+        root.localRotation = Quaternion.LookRotation(forward.normalized, Vector3.up);
+        Ring(root, "Belt strap", look.Main, .235f, .2f, .13f, .05f + .012f * look.Weight);
+        Box(root, "Buckle", look.Trim, new Vector3(0f, .13f, .205f), new Vector3(.09f, .075f, .03f));
+        if (look.Weight == 0)
+            Box(root, "Sash tail", look.Main, new Vector3(.11f, .05f, .19f), new Vector3(.05f, .16f, .02f));
+        if (look.Weight >= 1)
+            Box(root, "Pouch", look.Trim, new Vector3(-.19f, .09f, .09f), new Vector3(.07f, .08f, .06f));
+        if (look.Weight >= 2)
+            foreach (float x in new[] { -.13f, .13f })
+                Box(root, "Stud", look.Trim, new Vector3(x, .13f, .19f), new Vector3(.03f, .03f, .03f));
+        return root.gameObject;
+    }
+
+    /// <summary>Both gloves; the right one follows the left one's lifetime and visibility.</summary>
+    public static GameObject CreateGlovePair(string key, Transform leftWrist, Transform rightWrist)
+    {
+        var left = CreateGlove(key, leftWrist);
+        if (left == null) return null;
+        Link(left, CreateGlove(key, rightWrist));
+        return left;
+    }
+
+    /// <summary>Both boots, linked like the gloves.</summary>
+    public static GameObject CreateBootPair(string key, Transform leftLeg, Transform leftFoot, Transform rightLeg, Transform rightFoot)
+    {
+        var left = CreateBoot(key, leftLeg, leftFoot);
+        if (left == null) return null;
+        Link(left, CreateBoot(key, rightLeg, rightFoot));
+        return left;
+    }
+
+    static void Link(GameObject owner, GameObject follower)
+    {
+        if (owner == null || follower == null) return;
+        owner.AddComponent<GearLink>().follower = follower;
+    }
+
+    static Transform LimbRoot(string name, Transform bone)
+    {
+        var root = new GameObject(name).transform;
+        root.SetParent(bone, false);
+        return root;
+    }
+
+    /// <summary>Elliptic ring in the XZ plane at height y, built from 10 beams.</summary>
+    static void Ring(Transform root, string name, Color color, float rx, float rz, float y, float thickness)
+    {
+        const int segments = 10;
+        for (int i = 0; i < segments; i++)
+        {
+            float a = Mathf.PI * 2f * i / segments;
+            float b = Mathf.PI * 2f * (i + 1) / segments;
+            Beam(root, name, color, new Vector3(rx * Mathf.Cos(a), y, rz * Mathf.Sin(a)),
+                new Vector3(rx * Mathf.Cos(b), y, rz * Mathf.Sin(b)), thickness);
+        }
+    }
+
     static readonly Dictionary<Color, Material> Materials = new Dictionary<Color, Material>();
     static Mesh cube;
     static Mesh Cube => cube != null ? cube : cube = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
@@ -287,4 +443,18 @@ public static class HeroGearModels
         part.AddComponent<MeshRenderer>().sharedMaterial = material;
         return part.transform;
     }
+}
+
+/// <summary>
+/// Keeps a split gear piece together (gear-slots S3): the right glove or the
+/// shoe on the foot bone lives on another bone, so it follows the owner's
+/// visibility and is destroyed with it.
+/// </summary>
+public sealed class GearLink : MonoBehaviour
+{
+    public GameObject follower;
+
+    void OnEnable() { if (follower != null) follower.SetActive(true); }
+    void OnDisable() { if (follower != null) follower.SetActive(false); }
+    void OnDestroy() { if (follower != null) Destroy(follower); }
 }

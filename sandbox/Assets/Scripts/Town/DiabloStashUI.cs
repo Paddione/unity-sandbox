@@ -121,11 +121,6 @@ public sealed class DiabloStashUI : MonoBehaviour
     void InspectItem(ItemInstance item)
     {
         if (inspectText == null || item == null) return;
-        if (item.slot == ItemSlot.Consumable)
-        {
-            inspectText.text = Loc.F("stash.potion.tip", LootDrop.ItemLabel(item), ItemDatabase.PotionHeal);
-            return;
-        }
         var eq = equipment != null ? equipment.GetEquipped(item.slot) : null;
         string eqName = eq != null ? LootDrop.ItemLabel(eq) : Loc.T("town.emptyslot");
         inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> vs {eqName}:\n{DiabloInventoryUI.CompareSummary(item, eq)}";

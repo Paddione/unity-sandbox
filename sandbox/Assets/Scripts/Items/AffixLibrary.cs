@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// Affix table (replayability S2, S3 adds CritRating + IncreasedArea): 16
+/// Affix table (replayability S2, S3 adds CritRating + IncreasedArea, gear-slots S2 FlaskHealing): 17
 /// affixes with tier-1 (Normal) and tier-2 (Kindled) spans. Keys stay strings
 /// for save compatibility. Tier-1 spans of the seven P2 affixes keep their
 /// old ranges.
@@ -25,35 +25,45 @@ public static class AffixLibrary
     public const string MagicFind = "MagicFind";
     public const string CritRating = "CritRating";
     public const string IncreasedArea = "IncreasedArea";
+    /// <summary>gear-slots S2: percent more healing from the flask (belts only).</summary>
+    public const string FlaskHealing = "FlaskHealing";
 
     static readonly ItemSlot[] W = { ItemSlot.Weapon };
-    static readonly ItemSlot[] A = { ItemSlot.Armor };
     static readonly ItemSlot[] H = { ItemSlot.Helmet };
-    static readonly ItemSlot[] WH = { ItemSlot.Weapon, ItemSlot.Helmet };
-    static readonly ItemSlot[] AH = { ItemSlot.Armor, ItemSlot.Helmet };
+    static readonly ItemSlot[] L = { ItemSlot.Belt };
+    // gear-slots S1: gloves ride the offensive keys, boots the defensive and
+    // movement keys, belts life, cooldown, area and the flask affix.
+    static readonly ItemSlot[] WG = { ItemSlot.Weapon, ItemSlot.Gloves };
+    static readonly ItemSlot[] WHG = { ItemSlot.Weapon, ItemSlot.Helmet, ItemSlot.Gloves };
+    static readonly ItemSlot[] AB = { ItemSlot.Armor, ItemSlot.Boots };
+    static readonly ItemSlot[] AHBL = { ItemSlot.Armor, ItemSlot.Helmet, ItemSlot.Boots, ItemSlot.Belt };
+    static readonly ItemSlot[] AHG = { ItemSlot.Armor, ItemSlot.Helmet, ItemSlot.Gloves };
+    static readonly ItemSlot[] AHB = { ItemSlot.Armor, ItemSlot.Helmet, ItemSlot.Boots };
+    static readonly ItemSlot[] HL = { ItemSlot.Helmet, ItemSlot.Belt };
+    static readonly ItemSlot[] AHL = { ItemSlot.Armor, ItemSlot.Helmet, ItemSlot.Belt };
 
     public static readonly AffixDef[] All =
     {
         new AffixDef(Damage, W, 1, 5, 4, 9, true),
-        new AffixDef(AttackSpeed, W, 5, 15, 12, 25, true),
-        new AffixDef(Crit, WH, 2, 10, 6, 15, true),
-        new AffixDef(MaxHP, AH, 5, 20, 15, 35, true),
-        new AffixDef(Armor, A, 1, 3, 3, 6, true),
-        new AffixDef(MoveSpeed, A, 0.1f, 0.3f, 0.25f, 0.5f, false),
+        new AffixDef(AttackSpeed, WG, 5, 15, 12, 25, true),
+        new AffixDef(Crit, WHG, 2, 10, 6, 15, true),
+        new AffixDef(MaxHP, AHBL, 5, 20, 15, 35, true),
+        new AffixDef(Armor, AB, 1, 3, 3, 6, true),
+        new AffixDef(MoveSpeed, AB, 0.1f, 0.3f, 0.25f, 0.5f, false),
         new AffixDef(XPMul, H, 5, 15, 10, 25, true),
         new AffixDef(LifeSteal, W, 2, 6, 5, 10, true),
-        new AffixDef(GoldFind, AH, 10, 30, 25, 60, true),
+        new AffixDef(GoldFind, AHG, 10, 30, 25, 60, true),
         new AffixDef(SkillRank, H, 1, 1, 1, 2, true),
-        new AffixDef(CooldownReduction, H, 3, 8, 6, 15, true),
-        new AffixDef(FireDamage, W, 1, 4, 3, 8, true),
-        new AffixDef(Thorns, A, 1, 2, 2, 4, true),
-        new AffixDef(MagicFind, AH, 5, 20, 15, 40, true),
-        // S3: CritRating rides the Crit slots (WH) at 10 rating = 1 crit point;
-        // IncreasedArea is utility, so it rides Armor/Helmet (AH) and stays off
-        // weapons to keep the weapon pool damage-focused. Both integer, save
-        // keys are plain strings like every other affix.
-        new AffixDef(CritRating, WH, 5, 20, 15, 40, true),
-        new AffixDef(IncreasedArea, AH, 5, 20, 15, 40, true),
+        new AffixDef(CooldownReduction, HL, 3, 8, 6, 15, true),
+        new AffixDef(FireDamage, WG, 1, 4, 3, 8, true),
+        new AffixDef(Thorns, AB, 1, 2, 2, 4, true),
+        new AffixDef(MagicFind, AHB, 5, 20, 15, 40, true),
+        // S3: CritRating rides the Crit slots at 10 rating = 1 crit point;
+        // IncreasedArea is utility, so it stays off weapons to keep the weapon
+        // pool damage-focused. Both integer, save keys are plain strings.
+        new AffixDef(CritRating, WHG, 5, 20, 15, 40, true),
+        new AffixDef(IncreasedArea, AHL, 5, 20, 15, 40, true),
+        new AffixDef(FlaskHealing, L, 5, 15, 10, 25, true),
     };
 
     public static int MagicAffixCount(System.Random rng) => rng.Next(1, 3); // 1-2

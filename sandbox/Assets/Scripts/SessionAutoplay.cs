@@ -8,7 +8,7 @@ using UnityEngine;
 /// local hero via <see cref="DiabloClickController.ExternalDrive"/> and plays
 /// the whole Cinderreach session: Lantern Hold waypoints, Ashen Fen clear
 /// (melee + <see cref="DiabloSkills"/>), potion via the S3 seam
-/// (<see cref="VendorStock.BuyPotion"/>), FenGate → Ossuary through the S5
+/// (<see cref="HealingFlask.TryDrink"/>), FenGate → Ossuary through the S5
 /// <see cref="ZoneGate"/> pair (teleport + <c>zoneReached</c>/autosave check),
 /// Bone Warden clear (<see cref="RangedCaster"/>), The Hollow Abbot
 /// (<see cref="BossController"/>, phase 1 + 2) and the
@@ -116,18 +116,11 @@ public sealed class SessionAutoplay : MonoBehaviour
         DiabloClickController.ExternalDrive = true;
         HitStop.Enabled = false;
 
-        // Deterministic purse for the potion leg (S2 Wallet seam).
-        var wallet = Wallet.EnsureWallet(hero.gameObject);
-        if (wallet != null && wallet.Gold < ItemDatabase.PotionPrice)
-        {
-            wallet.Add(ItemDatabase.PotionPrice * 10);
-            Log($"purse topped up to {wallet.Gold} gold (deterministic run)");
-        }
 
         int startHusks = CountHusks(excludeBoss: false);
         yield return PhaseTownWaypoints(hero, deadline);
         bool townOk = lastPhaseOk;
-        yield return PhaseBuyPotion(hero);
+        yield return PhaseFlask(hero);
         if (townOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseTown);
         yield return FightLoop(hero, "fen", excludeBoss: true, maxDist: 40f, budget: 120f, deadline: deadline);
         if (lastPhaseOk) result.Reach(AutoplayResult.PhaseZone1);
@@ -246,15 +239,19 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log("phase town_waypoints done");
     }
 
-    IEnumerator PhaseBuyPotion(DiabloClickController hero)
+    IEnumerator PhaseFlask(DiabloClickController hero)
     {
-        Log("phase vendor_potion start (S3 seam: VendorStock.BuyPotion)");
-        var inv = hero.GetComponent<Inventory>();
-        bool bought = VendorStock.BuyPotion(wallet: Wallet.EnsureWallet(hero.gameObject), inv: inv);
-        Log($"phase vendor_potion: bought={bought}");
-        lastPhaseOk = bought;
+        Log("phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)");
+        var flask = HealingFlask.For(hero.gameObject);
+        bool drank = flask.TryDrink();
+        Log($"phase flask: drank={drank} charges={flask.Charges}/{flask.MaxCharges}");
+        // The Lantern Hold refills a spent flask within one refill check.
+        float until = Time.time + 2f;
+        while (Time.time < until && !flask.IsFull) yield return null;
+        Log($"phase flask: refilled={flask.IsFull}");
+        lastPhaseOk = drank && flask.IsFull;
         phasesDone++;
-        Log("phase vendor_potion done");
+        Log("phase flask done");
         yield return null;
     }
 

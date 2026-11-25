@@ -22,12 +22,18 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
     Text deathSub;
     Image deathVeil;
     Text hudStatusText;
+    Image flaskIcon;
+    Image flaskSweep;
+    Text flaskText;
     Text fpsText;
     float fpsSmooth = 60f;
 
     /// <summary>Test seams: shown fill (-1 unbuilt) and notice visibility.</summary>
     public float TestFillAmount => fill != null ? fill.fillAmount : -1f;
     public bool TestDeathNoticeShown => deathNotice != null && deathNotice.enabled;
+    /// <summary>Flask HUD seams (gear-slots S2): cooldown sweep fill and the caption.</summary>
+    public float TestFlaskSweep => flaskSweep != null ? flaskSweep.fillAmount : -1f;
+    public string TestFlaskText => flaskText != null ? flaskText.text : null;
     public static DiabloLifeGlobe Instance => instance;
 
     public static void Ensure()
@@ -69,13 +75,11 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         if (hudStatusText != null)
         {
             var w = hero.GetComponent<Wallet>();
-            var inv = hero.GetComponent<Inventory>();
             var prog = hero.GetComponent<DiabloProgression>();
             int gold = w != null ? w.Gold : 0;
-            int pot = 0;
-            if (inv != null)
-                for (int i = 0; i < inv.Count; i++)
-                    if (inv.Get(i)?.slot == ItemSlot.Consumable) pot++;
+            var flask = HealingFlask.For(hero);
+            string pot = $"{flask.Charges}/{flask.MaxCharges}";
+            PaintFlask(flask);
             var sheet = prog != null ? prog.Sheet : null;
             int pts = sheet != null ? sheet.freeAttributePoints + sheet.freeSkillPoints : 0;
             string ptsTag = pts > 0 ? Loc.F("hud.globe.points", DiabloPalette.ToHex(DiabloPalette.GoldBright), pts) : "";
@@ -146,6 +150,32 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
         hsr.anchorMax = Vector2.one;
         hsr.offsetMin = new Vector2(8f, 2f);
         hsr.offsetMax = new Vector2(-8f, -2f);
+
+        // gear-slots S2: flask slot above the status card, dark radial sweep while it refills.
+        var flaskFrame = MakeImage(canvasGo.transform, "FlaskFrame", DiabloMenuArt.SlotBackground(ItemRarity.Rare, 96), Color.white);
+        flaskFrame.type = Image.Type.Sliced;
+        var ffr = flaskFrame.rectTransform;
+        ffr.anchorMin = ffr.anchorMax = ffr.pivot = new Vector2(0f, 0f);
+        ffr.sizeDelta = new Vector2(56f, 56f);
+        ffr.anchoredPosition = new Vector2(158f, 62f);
+        flaskIcon = MakeImage(flaskFrame.transform, "FlaskIcon", DiabloMenuArt.ItemIcon("HealingPotion", ItemRarity.Rare), Color.white);
+        flaskIcon.preserveAspect = true;
+        Stretch(flaskIcon.rectTransform, 6f);
+        flaskSweep = MakeImage(flaskFrame.transform, "FlaskCooldownSweep", CircleSprite(), new Color(0f, 0f, 0f, 0.62f));
+        flaskSweep.type = Image.Type.Filled;
+        flaskSweep.fillMethod = Image.FillMethod.Radial360;
+        flaskSweep.fillOrigin = (int)Image.Origin360.Top;
+        flaskSweep.fillClockwise = false;
+        flaskSweep.fillAmount = 0f;
+        Stretch(flaskSweep.rectTransform, 4f);
+        flaskText = MakeText(flaskFrame.transform, "FlaskCaption", 14);
+        flaskText.alignment = TextAnchor.LowerRight;
+        Stretch(flaskText.rectTransform, 3f);
+        var flaskKey = MakeText(flaskFrame.transform, "FlaskKey", 12);
+        flaskKey.text = "1";
+        flaskKey.alignment = TextAnchor.UpperLeft;
+        flaskKey.color = DiabloPalette.TrimGold;
+        Stretch(flaskKey.rectTransform, 4f);
 
         fpsText = MakeText(canvasGo.transform, "FpsOverlay", 15);
         fpsText.alignment = TextAnchor.UpperRight;
@@ -221,6 +251,25 @@ public sealed class DiabloLifeGlobe : MonoBehaviour
     }
 
     static void Center(RectTransform r, float size) => Place(r, new Vector2(0.5f, 0.5f), Vector2.zero, size);
+
+    void PaintFlask(HealingFlask flask)
+    {
+        if (flaskSweep == null || flask == null) return;
+        bool empty = flask.Charges <= 0;
+        flaskSweep.fillAmount = flask.IsFull ? 0f : 1f - flask.ReadyFraction;
+        flaskIcon.color = empty ? new Color(0.45f, 0.45f, 0.45f, 1f) : flask.IsHealing ? new Color(0.7f, 1f, 0.7f, 1f) : Color.white;
+        flaskText.text = flask.IsFull || !empty
+            ? (flask.MaxCharges > 1 ? $"{flask.Charges}" : "")
+            : $"{Mathf.CeilToInt(flask.CooldownRemaining)}s";
+    }
+
+    static void Stretch(RectTransform r, float inset)
+    {
+        r.anchorMin = Vector2.zero;
+        r.anchorMax = Vector2.one;
+        r.offsetMin = new Vector2(inset, inset);
+        r.offsetMax = new Vector2(-inset, -inset);
+    }
 
     static Image MakeImage(Transform parent, string name, Sprite sprite, Color color)
     {

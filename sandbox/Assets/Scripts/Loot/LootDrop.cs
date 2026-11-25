@@ -46,7 +46,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
         // pickup, own counters — item-orb counts stay exact for the Q5 loop).
         GoldDrop.SpawnGold(pos, tier, rng);
         var profile = DifficultyProfile.Current;
-        var roll = LootTable.Roll(tier, rng, Equipment.LocalMagicFind(), profile.uniqueMul);
+        var roll = UniquePity.Apply(LootTable.Roll(tier, rng, Equipment.LocalMagicFind(), profile.uniqueMul));
         if (!roll.drops) return null;
         return SpawnItem(pos, BuildItem(roll, rng, ItemLevelRules.ForDrop(pos, tier)), networked);
     }
@@ -60,7 +60,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
             // S4: weapons keep the class-bound selection, armor/helmets split
             // legacy/matrix so every matrix piece drops regularly.
             var unique = roll.slot == ItemSlot.Weapon
-                ? ItemDatabase.UniqueWeaponForClass(weaponClass, rng)
+                ? ItemDatabase.UniqueWeaponForClass(weaponClass, rng, itemLevel)
                 : ItemDatabase.CreateUnique(ItemDatabase.UniqueForSlot(roll.slot, itemLevel, rng));
             return ItemDatabase.RollUnique(unique, itemLevel, affixTier);
         }

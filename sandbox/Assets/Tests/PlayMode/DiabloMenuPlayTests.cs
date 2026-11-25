@@ -183,16 +183,17 @@ public class DiabloMenuPlayTests
         var hp = hero.AddComponent<PlayerHealth>();
         hp.TakeDamage(10f);
         float damaged = hp.CurrentHP;
-        inv.Add(ItemDatabase.CreateHealingPotion());
+        inv.Add(new ItemInstance { slot = ItemSlot.Consumable, rarity = ItemRarity.Rare, baseType = "Healing Potion" });
 
         var invUi = hero.AddComponent<DiabloInventoryUI>();
         invUi.SetOpen(true);
         yield return null;
 
-        invUi.EquipIndex(0); // consumes potion cleanly without equipping into helmet
-        yield return null;
-        Assert.Greater(hp.CurrentHP, damaged, "Using a potion from the bag must heal the hero.");
-        Assert.IsNull(hero.GetComponent<Equipment>().helmet, "Potion must never equip into helmet.");
+        invUi.EquipIndex(0); // a legacy consumable never equips into the helmet
+        Assert.IsTrue(HealingFlask.For(hero).TryDrink(), "gear-slots S2: the flask heals instead.");
+        yield return new WaitForSeconds(HealingFlask.TickSeconds + 0.15f);
+        Assert.Greater(hp.CurrentHP, damaged, "The flask's first tick must heal the hero.");
+        Assert.IsNull(hero.GetComponent<Equipment>().helmet, "A consumable must never equip into helmet.");
 
         invUi.ShowTab(DiabloInventoryUI.MenuTab.Settings);
         yield return null;

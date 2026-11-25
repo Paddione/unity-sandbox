@@ -86,8 +86,8 @@ public class ItemCompareTests
         tip.Show(worn, eq);
         Assert.IsFalse(tip.IsComparing);
 
-        // Potions have no slot to compare against.
-        tip.Show(ItemDatabase.CreateHealingPotion(), eq);
+        // Legacy consumables have no slot to compare against.
+        tip.Show(new ItemInstance { slot = ItemSlot.Consumable, rarity = ItemRarity.Rare, baseType = "Healing Potion" }, eq);
         Assert.IsFalse(tip.IsComparing);
 
         // Empty slot: the equipped card explains it, every stat is a gain.

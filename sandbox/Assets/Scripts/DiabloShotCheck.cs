@@ -191,7 +191,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
         {
             bagComp.Add(ItemDatabase.CreateUnique("Emberbrand Blade"));
             bagComp.Add(ItemDatabase.CreateUnique("Cryptwarden Plate"));
-            bagComp.Add(ItemDatabase.CreateHealingPotion());
+            bagComp.Add(ItemDatabase.CreateUnique(ItemDatabase.VialSashId));
         }
 
         var vendorUI = hero.GetComponent<DiabloVendorUI>();

@@ -76,7 +76,7 @@ public static class LootTable
             WeightsFor(tier, out int m, out int r, out _);
             int ipick = rng.Next(100);
             roll.rarity = ipick < m ? ItemRarity.Magic : ipick < m + r ? ItemRarity.Rare : ItemRarity.Unique;
-            roll.slot = (ItemSlot)rng.Next(3);
+            roll.slot = PickSlot(rng);
             return roll;
         }
         WeightsWithMagicFind(tier, magicFind, out float magic, out float rare, out float unique);
@@ -84,7 +84,61 @@ public static class LootTable
         double pick = rng.NextDouble() * (magic + rare + unique);
         roll.rarity = pick < magic ? ItemRarity.Magic
             : pick < magic + rare ? ItemRarity.Rare : ItemRarity.Unique;
-        roll.slot = (ItemSlot)rng.Next(3);
+        roll.slot = PickSlot(rng);
         return roll;
     }
+
+    /// <summary>
+    /// gear-slots S6 slot weights (sum 100): weapon 25, armor 20, helmet 15,
+    /// gloves 15, boots 15, belt 10. The rarity weights above stay untouched,
+    /// so six slots never thin out the per-tier Unique share.
+    /// </summary>
+    public static readonly (ItemSlot slot, int weight)[] SlotWeights =
+    {
+        (ItemSlot.Weapon, 25), (ItemSlot.Armor, 20), (ItemSlot.Helmet, 15),
+        (ItemSlot.Gloves, 15), (ItemSlot.Boots, 15), (ItemSlot.Belt, 10),
+    };
+
+    public static ItemSlot PickSlot(System.Random rng)
+    {
+        int pick = rng.Next(100);
+        foreach (var (slot, weight) in SlotWeights)
+        {
+            if (pick < weight) return slot;
+            pick -= weight;
+        }
+        return ItemSlot.Weapon;
+    }
+
+    /// <summary>Rare drops in a row after which the next item drop is forced Unique.</summary>
+    public const int PityThreshold = 40;
+
+    /// <summary>
+    /// Bad-luck protection (gear-slots S6): <paramref name="rareStreak"/> counts
+    /// item drops since the last Unique. Once it reaches
+    /// <see cref="PityThreshold"/> the next drop becomes Unique; any Unique
+    /// resets it. No-drop rolls leave it alone. Magic Find and Kindled never
+    /// touch the counter, they only shape the roll that comes in.
+    /// </summary>
+    public static LootRoll ApplyPity(LootRoll roll, ref int rareStreak)
+    {
+        if (!roll.drops) return roll;
+        if (roll.rarity != ItemRarity.Unique && rareStreak >= PityThreshold)
+            roll.rarity = ItemRarity.Unique;
+        if (roll.rarity == ItemRarity.Unique) rareStreak = 0;
+        else rareStreak++;
+        return roll;
+    }
+}
+
+/// <summary>
+/// Hero-wide pity counter (gear-slots S6, save v15 <c>uniquePity</c>). Loot
+/// rolls on the host for the local hero, like Magic Find; the counter rides
+/// the local save and resets on load of a fresh hero.
+/// </summary>
+public static class UniquePity
+{
+    public static int Current;
+
+    public static LootRoll Apply(LootRoll roll) => LootTable.ApplyPity(roll, ref Current);
 }

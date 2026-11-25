@@ -43,6 +43,56 @@ public static class ItemDatabase
     public const string GlasswrightPrismId = "glasswright-prism";
     public static readonly string[] ZoneUniqueIds = { ShardbackAegisId, GlasswrightPrismId };
 
+    /// <summary>gear-slots S1: shared bases of the three new slots (light, medium, heavy).</summary>
+    public static readonly string[] GloveBases = { "SilkWraps", "LeatherGloves", "ChainGauntlets" };
+    public static readonly string[] BootBases = { "WrappedSandals", "LeatherBoots", "IronSabatons" };
+    public static readonly string[] BeltBases = { "RopeSash", "LeatherBelt", "StuddedGirdle" };
+
+    // gear-slots S4: role uniques for the new slots (freely wearable, matrix order Tank/Healer/Rogue).
+    public const string IronboundGripsId = "ironbound-grips";
+    public const string MendersTouchId = "menders-touch";
+    public const string CutpurseWrapsId = "cutpurse-wraps";
+    public const string BastionTreadsId = "bastion-treads";
+    public const string PilgrimStepsId = "pilgrim-steps";
+    public const string GhostwalkBootsId = "ghostwalk-boots";
+    public const string WardensGirdleId = "wardens-girdle";
+    public const string VialSashId = "vial-sash";
+    public const string QuickdrawBeltId = "quickdraw-belt";
+
+    // gear-slots S5: zone uniques for the old slots. Weapons stay class-bound.
+    public const string CinderfangCleaverId = "cinderfang-cleaver";
+    public const string OssuaryThuribleId = "ossuary-thurible";
+    public const string GlassthornBowId = "glassthorn-bow";
+    public const string FenWrapId = "fen-wrap";
+    public const string AshenHauberkId = "ashen-hauberk";
+    public const string KilnheartMailId = "kilnheart-mail";
+    public const string ProspectorsHoodId = "prospectors-hood";
+    public const string BonewatchVisorId = "bonewatch-visor";
+    public const string EmberwreathCrownId = "emberwreath-crown";
+
+    /// <summary>The 18 gear-slots uniques (S4 role matrix + S5 zone pieces).</summary>
+    public static readonly string[] GearSlotUniqueIds =
+    {
+        IronboundGripsId, MendersTouchId, CutpurseWrapsId,
+        BastionTreadsId, PilgrimStepsId, GhostwalkBootsId,
+        WardensGirdleId, VialSashId, QuickdrawBeltId,
+        CinderfangCleaverId, OssuaryThuribleId, GlassthornBowId,
+        FenWrapId, AshenHauberkId, KilnheartMailId,
+        ProspectorsHoodId, BonewatchVisorId, EmberwreathCrownId,
+    };
+
+    /// <summary>Lowest item level a zone unique drops at (Fen 1, Ossuary 5, Kiln 10).</summary>
+    public static int MinZoneLevel(string uniqueId)
+    {
+        switch (uniqueId)
+        {
+            case CinderfangCleaverId: case OssuaryThuribleId: case GlassthornBowId:
+            case AshenHauberkId: case BonewatchVisorId: return 5;
+            case KilnheartMailId: case EmberwreathCrownId: return 10;
+            default: return 1;
+        }
+    }
+
     /// <summary>Class that may equip a base type; "" = every class.</summary>
     public static string ClassRestriction(string baseType)
     {
@@ -74,6 +124,12 @@ public static class ItemDatabase
                 return new List<string> { "ShortSword", "HeavyAxe", "Dagger" };
             case ItemSlot.Armor:
                 return new List<string> { "ClothTunic", "LeatherVest", "Breastplate" };
+            case ItemSlot.Gloves:
+                return new List<string>(GloveBases);
+            case ItemSlot.Boots:
+                return new List<string>(BootBases);
+            case ItemSlot.Belt:
+                return new List<string>(BeltBases);
             default:
                 return new List<string> { "Hood", "Helm", "Circlet" };
         }
@@ -202,6 +258,150 @@ public static class ItemDatabase
                 uniqueId = GlasswrightPrismId,
                 affixes = new List<Affix> { new Affix("CritRating", 25f), new Affix("IncreasedArea", 20f), new Affix("CooldownReduction", 10f) },
             },
+            [IronboundGripsId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Gloves,
+                rarity = ItemRarity.Unique,
+                baseType = "ChainGauntlets",
+                uniqueId = IronboundGripsId,
+                affixes = new List<Affix> { new Affix("AttackSpeed", 15f), new Affix("Armor", 3f) },
+            },
+            [MendersTouchId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Gloves,
+                rarity = ItemRarity.Unique,
+                baseType = "SilkWraps",
+                uniqueId = MendersTouchId,
+                affixes = new List<Affix> { new Affix("CooldownReduction", 8f), new Affix("MaxHP", 15f) },
+            },
+            [CutpurseWrapsId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Gloves,
+                rarity = ItemRarity.Unique,
+                baseType = "LeatherGloves",
+                uniqueId = CutpurseWrapsId,
+                affixes = new List<Affix> { new Affix("Crit", 10f), new Affix("GoldFind", 30f) },
+            },
+            [BastionTreadsId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Boots,
+                rarity = ItemRarity.Unique,
+                baseType = "IronSabatons",
+                uniqueId = BastionTreadsId,
+                affixes = new List<Affix> { new Affix("Armor", 3f), new Affix("MaxHP", 20f) },
+            },
+            [PilgrimStepsId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Boots,
+                rarity = ItemRarity.Unique,
+                baseType = "WrappedSandals",
+                uniqueId = PilgrimStepsId,
+                affixes = new List<Affix> { new Affix("MoveSpeed", 0.3f), new Affix("MagicFind", 20f) },
+            },
+            [GhostwalkBootsId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Boots,
+                rarity = ItemRarity.Unique,
+                baseType = "LeatherBoots",
+                uniqueId = GhostwalkBootsId,
+                affixes = new List<Affix> { new Affix("MoveSpeed", 0.3f), new Affix("Thorns", 2f) },
+            },
+            [WardensGirdleId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Belt,
+                rarity = ItemRarity.Unique,
+                baseType = "StuddedGirdle",
+                uniqueId = WardensGirdleId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("Armor", 3f) },
+            },
+            [VialSashId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Belt,
+                rarity = ItemRarity.Unique,
+                baseType = "RopeSash",
+                uniqueId = VialSashId,
+                affixes = new List<Affix> { new Affix("FlaskHealing", 15f), new Affix("CooldownReduction", 8f) },
+            },
+            [QuickdrawBeltId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Belt,
+                rarity = ItemRarity.Unique,
+                baseType = "LeatherBelt",
+                uniqueId = QuickdrawBeltId,
+                affixes = new List<Affix> { new Affix("FlaskHealing", 15f), new Affix("CritRating", 20f) },
+            },
+            [CinderfangCleaverId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "HeavyAxe",
+                uniqueId = CinderfangCleaverId,
+                affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("FireDamage", 4f) },
+            },
+            [OssuaryThuribleId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "HoodedLantern",
+                uniqueId = OssuaryThuribleId,
+                affixes = new List<Affix> { new Affix("SkillRank", 1f), new Affix("MaxHP", 10f) },
+            },
+            [GlassthornBowId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "HuntingBow",
+                uniqueId = GlassthornBowId,
+                affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("CritRating", 20f) },
+            },
+            [FenWrapId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "ClothTunic",
+                uniqueId = FenWrapId,
+                affixes = new List<Affix> { new Affix("MaxHP", 15f), new Affix("GoldFind", 20f) },
+            },
+            [AshenHauberkId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "Breastplate",
+                uniqueId = AshenHauberkId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("Armor", 4f) },
+            },
+            [KilnheartMailId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Armor,
+                rarity = ItemRarity.Unique,
+                baseType = "LeatherVest",
+                uniqueId = KilnheartMailId,
+                affixes = new List<Affix> { new Affix("Thorns", 2f), new Affix("MaxHP", 15f) },
+            },
+            [ProspectorsHoodId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Hood",
+                uniqueId = ProspectorsHoodId,
+                affixes = new List<Affix> { new Affix("GoldFind", 30f), new Affix("MagicFind", 10f) },
+            },
+            [BonewatchVisorId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Helm",
+                uniqueId = BonewatchVisorId,
+                affixes = new List<Affix> { new Affix("MaxHP", 20f), new Affix("CritRating", 15f) },
+            },
+            [EmberwreathCrownId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Helmet,
+                rarity = ItemRarity.Unique,
+                baseType = "Circlet",
+                uniqueId = EmberwreathCrownId,
+                affixes = new List<Affix> { new Affix("CooldownReduction", 10f), new Affix("FireDamage", 3f) },
+            },
             ["Seer's Circlet"] = () => new ItemInstance
             {
                 slot = ItemSlot.Helmet,
@@ -233,24 +433,6 @@ public static class ItemDatabase
         if (item == null || item.rarity != ItemRarity.Magic) return false;
         item.rarity = ItemRarity.Rare;
         return true;
-    }
-
-    /// <summary>Healing potion (S3 vendor consumable, slot Consumable, drunk with key 1).</summary>
-    public const int PotionPrice = 10;
-
-    /// <summary>HP restored by one healing potion.</summary>
-    public const float PotionHeal = 10f;
-
-    /// <summary>Stackable vendor potion: bagged like loot, never equipped.</summary>
-    public static ItemInstance CreateHealingPotion()
-    {
-        return new ItemInstance
-        {
-            slot = ItemSlot.Consumable,
-            rarity = ItemRarity.Rare,
-            baseType = "Healing Potion",
-            affixes = new List<Affix>(),
-        };
     }
 
     /// <summary>Fixed starter sword, auto-equipped at spawn (Ashen Fen).</summary>
@@ -413,10 +595,63 @@ public static class ItemDatabase
     /// </summary>
     public static string UniqueForSlot(ItemSlot slot, int itemLevel, System.Random rng)
     {
+        // gear-slots S4: the new slots draw one of their three role pieces evenly.
+        string[] role = RoleUniquesFor(slot);
+        if (role != null) return role[rng != null ? rng.Next(role.Length) : 0];
         if (ItemLevelRules.GetBracket(itemLevel) >= 4 && rng != null
             && rng.NextDouble() < DroptableDatabase.ZoneUniqueShare)
             return slot == ItemSlot.Armor ? ShardbackAegisId : GlasswrightPrismId;
+        // gear-slots S5: a share of armor/helmet Uniques comes from the zone pieces unlocked here.
+        string zone = ZonePick(slot == ItemSlot.Armor ? ZoneArmors : ZoneHelmets, itemLevel, rng);
+        if (zone != null) return zone;
         return slot == ItemSlot.Armor ? UniqueArmor(rng) : UniqueHelmet(rng);
+    }
+
+    static readonly string[] RoleGloves = { IronboundGripsId, MendersTouchId, CutpurseWrapsId };
+    static readonly string[] RoleBoots = { BastionTreadsId, PilgrimStepsId, GhostwalkBootsId };
+    static readonly string[] RoleBelts = { WardensGirdleId, VialSashId, QuickdrawBeltId };
+    static readonly string[] ZoneArmors = { FenWrapId, AshenHauberkId, KilnheartMailId };
+    static readonly string[] ZoneHelmets = { ProspectorsHoodId, BonewatchVisorId, EmberwreathCrownId };
+
+    /// <summary>Role pieces of a new slot (null for the old slots).</summary>
+    public static string[] RoleUniquesFor(ItemSlot slot)
+    {
+        switch (slot)
+        {
+            case ItemSlot.Gloves: return RoleGloves;
+            case ItemSlot.Boots: return RoleBoots;
+            case ItemSlot.Belt: return RoleBelts;
+            default: return null;
+        }
+    }
+
+    /// <summary>Zone pieces of an old slot that may drop at this item level (S5 gate).</summary>
+    public static List<string> ZoneUniquesFor(ItemSlot slot, int itemLevel, string classId = null)
+    {
+        var all = slot == ItemSlot.Armor ? ZoneArmors : slot == ItemSlot.Helmet ? ZoneHelmets
+            : new[] { ZoneWeaponFor(classId) };
+        var open = new List<string>();
+        foreach (var id in all)
+            if (id != null && itemLevel >= MinZoneLevel(id)) open.Add(id);
+        return open;
+    }
+
+    static string ZonePick(string[] pool, int itemLevel, System.Random rng)
+    {
+        if (rng == null || rng.NextDouble() >= DroptableDatabase.ZonePieceShare) return null;
+        var open = new List<string>();
+        foreach (var id in pool)
+            if (itemLevel >= MinZoneLevel(id)) open.Add(id);
+        return open.Count > 0 ? open[rng.Next(open.Count)] : null;
+    }
+
+    /// <summary>Class-bound zone weapon (S5): Fenwalker cleaver, Lanternbearer thurible, Rogue bow.</summary>
+    public static string ZoneWeaponFor(string classId)
+    {
+        string own = ClassCatalog.Get(classId).id;
+        if (own == ClassCatalog.LanternbearerId) return OssuaryThuribleId;
+        if (own == ClassCatalog.RogueId) return GlassthornBowId;
+        return CinderfangCleaverId;
     }
 
     /// <summary>
@@ -425,8 +660,19 @@ public static class ItemDatabase
     /// both stay regularly obtainable through the existing class-bound Unique
     /// selection. Drop chances are unchanged (regular Unique weight applies).
     /// </summary>
-    public static ItemInstance UniqueWeaponForClass(string classId, System.Random rng)
+    public static ItemInstance UniqueWeaponForClass(string classId, System.Random rng) =>
+        UniqueWeaponForClass(classId, rng, 0);
+
+    /// <summary>
+    /// gear-slots S5: from the Ossuary on (item level 5+), a third of class
+    /// weapon Uniques is the class's zone weapon; the rest keeps the
+    /// build/legacy split below.
+    /// </summary>
+    public static ItemInstance UniqueWeaponForClass(string classId, System.Random rng, int itemLevel)
     {
+        string zone = ZoneWeaponFor(classId);
+        if (rng != null && itemLevel >= MinZoneLevel(zone) && rng.NextDouble() < DroptableDatabase.ZonePieceShare)
+            return CreateUnique(zone);
         bool build = rng != null && rng.NextDouble() < DroptableDatabase.BuildUniqueWeaponShare;
         string id;
         string own = ClassCatalog.Get(classId).id;

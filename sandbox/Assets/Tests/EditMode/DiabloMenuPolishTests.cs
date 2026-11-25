@@ -70,7 +70,7 @@ public class DiabloMenuPolishTests
         hp.TakeDamage(10f);
         float before = hp.CurrentHP;
 
-        var potion = ItemDatabase.CreateHealingPotion();
+        var potion = new ItemInstance { slot = ItemSlot.Consumable, rarity = ItemRarity.Rare, baseType = "Healing Potion" };
         Assert.IsFalse(Equipment.CanEquip(potion, ClassCatalog.FenwalkerId));
         inv.Add(potion);
 
@@ -78,9 +78,9 @@ public class DiabloMenuPolishTests
         ui.SetOpen(true);
         ui.EquipIndex(0);
 
-        Assert.IsNull(eq.helmet, "Consumable potion must never equip into Helmet slot.");
-        Assert.AreEqual(0, inv.Count, "Clicking potion in bag must consume it.");
-        Assert.Greater(hp.CurrentHP, before, "Consuming potion must heal hero.");
+        Assert.IsNull(eq.helmet, "A legacy consumable must never equip into the Helmet slot.");
+        Assert.AreEqual(1, inv.Count, "gear-slots S2: bag consumables no longer drink, the flask heals.");
+        Assert.AreEqual(before, hp.CurrentHP, 0.001f, "Clicking a legacy consumable changes nothing.");
         Object.DestroyImmediate(go);
     }
 

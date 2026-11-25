@@ -77,10 +77,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsFourteen()
+    public void CurrentVersion_IsFifteen()
     {
-        Assert.AreEqual(14, SaveGame.CurrentVersion);
-        Assert.AreEqual(14, new SaveGame().v);
+        Assert.AreEqual(15, SaveGame.CurrentVersion);
+        Assert.AreEqual(15, new SaveGame().v);
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class SaveMigrationTests
         const string json = @"{""v"":13,""level"":5,""gold"":40,""runSeed"":1234}";
         var outcome = SaveMigrations.Migrate(json, out var save, out _);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
-        Assert.AreEqual(14, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
         Assert.IsNotNull(HeroNames.Clean(save.heroName), save.heroName);
         Assert.That(save.heroGender, Is.InRange(0, 2));
         Assert.That(save.heroHairStyle, Is.InRange(0, HeroAppearance.HairStyleCount - 1));
@@ -138,7 +138,7 @@ public class SaveMigrationTests
         const string json = @"{""v"":11,""level"":5,
             ""equipmentWeapon"":{""slot"":1,""rarity"":0,""baseType"":""Worn Short Sword"",""affixes"":[{""key"":""Damage"",""value"":2.0}]},
             ""bag"":[{""slot"":0,""rarity"":0,""baseType"":""ClothTunic""},{""slot"":2,""rarity"":2,""baseType"":""Helm"",""uniqueId"":""seers-circlet""}],
-            ""stash"":[{""slot"":3,""rarity"":0,""baseType"":""Healing Potion""}],
+            ""stash"":[{""slot"":0,""rarity"":0,""baseType"":""LeatherVest""}],
             ""riskReward"":{""slot"":2,""rarity"":0,""baseType"":""Helm""}}";
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out SaveGame save, out int from));
         Assert.AreEqual(11, from);
@@ -184,8 +184,8 @@ public class SaveMigrationTests
         Assert.AreEqual("Cleave", save.skillRanks[1].skill);
         Assert.AreEqual("Emberbrand Blade", save.equipmentWeapon.uniqueId);
         Assert.AreEqual(4f, save.equipmentArmor.GetAffix("Armor"), 0.001f);
-        Assert.AreEqual(1, save.bag.Count);
-        Assert.AreEqual(211, save.gold);
+        Assert.AreEqual(0, save.bag.Count, "v15: the v1 healing potion is retired ...");
+        Assert.AreEqual(211 + SaveMigrations.LegacyPotionRefund, save.gold, "... and refunded at its resale price.");
         Assert.AreEqual(2, save.zoneReached);
         Assert.IsFalse(save.difficultyUnlocked);
         Assert.AreEqual(RunProfile.Normal, save.difficulty);
@@ -220,7 +220,7 @@ public class SaveMigrationTests
         string bak = SaveMigrations.BackupPath(path, 1);
         Assert.IsTrue(File.Exists(bak), "v1 original must be kept as *.v1.bak.");
         Assert.AreEqual(V1Fixture, File.ReadAllText(bak));
-        Assert.AreEqual(211, hero.GetComponent<Wallet>().Gold);
+        Assert.AreEqual(211 + SaveMigrations.LegacyPotionRefund, hero.GetComponent<Wallet>().Gold);
         Assert.AreEqual(2, SaveService.LoadedZoneReached);
         Assert.AreEqual(RunProfile.Normal, RunProfile.Difficulty);
 

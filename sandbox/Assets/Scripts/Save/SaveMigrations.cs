@@ -56,6 +56,7 @@ public static class SaveMigrations
         if (save.v == 11) V11ToV12(save);
         if (save.v == 12) V12ToV13(save);
         if (save.v == 13) V13ToV14(save);
+        if (save.v == 14) V14ToV15(save);
         return Outcome.Migrated;
     }
 
@@ -125,6 +126,9 @@ public static class SaveMigrations
         if (save.equipmentArmor != null) yield return save.equipmentArmor;
         if (save.equipmentWeapon != null) yield return save.equipmentWeapon;
         if (save.equipmentHelmet != null) yield return save.equipmentHelmet;
+        if (save.equipmentGloves != null) yield return save.equipmentGloves;
+        if (save.equipmentBoots != null) yield return save.equipmentBoots;
+        if (save.equipmentBelt != null) yield return save.equipmentBelt;
         if (save.bag != null) foreach (var i in save.bag) yield return i;
         if (save.stash != null) foreach (var i in save.stash) yield return i;
     }
@@ -228,6 +232,32 @@ public static class SaveMigrations
         save.heroHairColor = p.hairColor;
         save.heroBuild = p.build;
         save.v = 14;
+    }
+
+    /// <summary>Gold refunded per retired healing potion: its old resale price (25 % of 10).</summary>
+    public const int LegacyPotionRefund = 2;
+
+    /// <summary>
+    /// v14 → v15 (gear-slots): the new slots start empty, the pity counter at
+    /// zero. Healing potions left the game for the flask: every bagged or
+    /// stashed potion is removed and refunded at its old resale price. All
+    /// other items keep rolls, ids and unique ids verbatim.
+    /// </summary>
+    static void V14ToV15(SaveGame save)
+    {
+        save.equipmentGloves = null;
+        save.equipmentBoots = null;
+        save.equipmentBelt = null;
+        save.uniquePity = 0;
+        int refunded = RemovePotions(save.bag) + RemovePotions(save.stash);
+        save.gold = System.Math.Max(0, save.gold) + refunded * LegacyPotionRefund;
+        save.v = 15;
+    }
+
+    static int RemovePotions(System.Collections.Generic.List<ItemInstance> items)
+    {
+        if (items == null) return 0;
+        return items.RemoveAll(i => i != null && i.slot == ItemSlot.Consumable);
     }
 
     internal static System.Collections.Generic.IEnumerable<ItemInstance> StoredItems(SaveGame save)

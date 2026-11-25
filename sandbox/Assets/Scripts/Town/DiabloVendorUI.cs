@@ -5,11 +5,11 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Lantern Hold trade window (V toggles, 1 drinks a potion, Esc closes and saves).
+/// Lantern Hold trade window (V toggles, Esc closes and saves; the flask owns key 1).
 /// Fixes column layout, adds 3D item icons + rarity slots + PortraitVendor + live
 /// hover comparison tooltip + affordability state, while preserving every test seam
 /// including reflected private <c>stock</c> and public IsOpen, SetOpen, BuyOffer,
-/// SellBagIndex, BuyPotion, Refresh, TryCloseOnOutsideClick, Notice.
+/// SellBagIndex, Refresh, TryCloseOnOutsideClick, Notice.
 /// Click outside the panel closes; co-op trades route through the host relay.
 /// </summary>
 public sealed class DiabloVendorUI : MonoBehaviour
@@ -112,11 +112,6 @@ public sealed class DiabloVendorUI : MonoBehaviour
             SetOpen(false);
             DiabloUIFactory.MarkEscConsumed();
             return;
-        }
-        if (kb.digit1Key.wasPressedThisFrame && (!DiabloUIFactory.IsMenuCapturingKeys(gameObject) || IsOpen))
-        {
-            EnsureBuilt();
-            if (Vendor.DrinkPotion(gameObject)) Refresh();
         }
     }
 
@@ -264,23 +259,6 @@ public sealed class DiabloVendorUI : MonoBehaviour
         return local != null;
     }
 
-    /// <summary>Buy one healing potion (button hook).</summary>
-    public void BuyPotion()
-    {
-        EnsureBuilt();
-        var relay = GetComponent<DiabloNetworkPlayer>();
-        if (relay != null && relay.IsSpawned && CoopSessionRunning())
-        {
-            relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.BuyPotion);
-            return;
-        }
-        if (VendorStock.BuyPotion(wallet, inventory))
-        {
-            DiabloAudio.PlayVendorBuy();
-            Refresh();
-        }
-    }
-
     /// <summary>Rebuild gold label, wares column, bag column and inspect bar.</summary>
     public void Refresh()
     {
@@ -331,19 +309,6 @@ public sealed class DiabloVendorUI : MonoBehaviour
             btn.interactable = true;
             ItemTooltip.AttachHover(btn.gameObject, gameObject, () => offer.item, Loc.F("vendor.buy.offer", offer.price));
         }
-        var potionItem = ItemDatabase.CreateHealingPotion();
-        bool potionAfford = gold >= ItemDatabase.PotionPrice;
-        MakeItemRow(
-            vendorList,
-            potionItem.baseType,
-            potionItem.rarity,
-            Loc.T("item.name.healing-potion"),
-            Loc.F("vendor.potion.row", ItemDatabase.PotionHeal),
-            $"{ItemDatabase.PotionPrice}g",
-            DiabloPalette.Parchment,
-            potionAfford ? DiabloPalette.GoldBright : DiabloPalette.Blood,
-            BuyPotion,
-            () => InspectItem(potionItem, Loc.F("vendor.buy.potion", ItemDatabase.PotionPrice)));
     }
 
     void RebuildBag()
@@ -391,11 +356,6 @@ public sealed class DiabloVendorUI : MonoBehaviour
     void InspectItem(ItemInstance item, string tradeTag)
     {
         if (inspectText == null || item == null) return;
-        if (item.slot == ItemSlot.Consumable)
-        {
-            inspectText.text = Loc.F("vendor.potion.tip", LootDrop.ItemLabel(item), tradeTag, ItemDatabase.PotionHeal);
-            return;
-        }
         var eq = equipment != null ? equipment.GetEquipped(item.slot) : null;
         string eqName = eq != null ? LootDrop.ItemLabel(eq) : Loc.T("town.emptyslot");
         inspectText.text = $"<b>{LootDrop.ItemLabel(item)}</b> ({tradeTag}) vs {eqName}:\n{DiabloInventoryUI.CompareSummary(item, eq)}";

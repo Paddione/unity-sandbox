@@ -39,15 +39,25 @@ public static class DiabloJuice
     /// Roll the attacker's crit chance (<see cref="Equipment.GetCrit"/>, percent).
     /// Returns the possibly doubled damage.
     /// </summary>
+    /// <summary>Last direct striker and its frame (gear-slots S5 kill effects resolve in the same frame).</summary>
+    static Transform lastStriker;
+    static int lastStrikeFrame = -1;
+
+    public static Transform StrikerThisFrame() =>
+        lastStrikeFrame == Time.frameCount && lastStriker != null ? lastStriker : null;
+
     public static int RollCrit(Transform attacker, int damage, out bool crit)
     {
         crit = false;
+        lastStriker = attacker;
+        lastStrikeFrame = Time.frameCount;
         var eq = attacker != null ? attacker.GetComponent<Equipment>() : null;
         if (ForceCrit.HasValue) crit = ForceCrit.Value;
         else if (eq != null) crit = Random.value * 100f < eq.GetCrit();
         if (!crit) return damage;
         CritsRolled++;
-        return Mathf.Max(damage + 1, Mathf.RoundToInt(damage * CritMultiplier));
+        GearUniqueEffects.OnCrit(attacker);
+        return Mathf.Max(damage + 1, Mathf.RoundToInt(damage * GearUniqueEffects.CritMultiplier(eq, CritMultiplier)));
     }
 
     // ---------------------------------------------------------------- events

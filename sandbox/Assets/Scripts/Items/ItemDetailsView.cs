@@ -39,11 +39,6 @@ public sealed class ItemDetailsView : MonoBehaviour
         sb.AppendLine(item.itemLevel <= 0
             ? Loc.T("item.card.ilvl_legacy")
             : Loc.F("item.card.ilvl", item.itemLevel));
-        if (item.slot == ItemSlot.Consumable)
-        {
-            sb.AppendLine(Loc.T("item.card.potion"));
-            return sb.ToString().TrimEnd();
-        }
         if (!Equipment.CanEquip(item, RunProfile.ClassId))
         {
             string who = ClassCatalog.Get(ItemDatabase.ClassRestriction(item.baseType)).displayName;

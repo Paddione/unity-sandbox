@@ -30,6 +30,8 @@ public sealed class EnemyHealth : NetworkBehaviour
 
     int hp;
     bool dead;
+    /// <summary>True once the enemy fell (gear-slots S5 burst skips corpses).</summary>
+    public bool IsDead => dead;
 
     /// <summary>Local HP (mirrors NetHP when spawned).</summary>
     public int CurrentHP => hp;
@@ -183,6 +185,7 @@ public sealed class EnemyHealth : NetworkBehaviour
         DiabloAudio.PlayDeath();
         DiabloJuice.OnEnemyDeath(transform.position);
         DiabloProgression.AwardKill(tier, transform.position);
+        GearUniqueEffects.OnKill(DiabloJuice.StrikerThisFrame(), transform.position);
         StoryDirector.BookKill(gameObject.name);
         Debug.Log($"[Diablo] {gameObject.name} died (kills={HusksKilled}).");
         DropLoot();

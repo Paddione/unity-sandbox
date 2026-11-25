@@ -59,7 +59,7 @@ public static class BuildUniqueEffects
             return Loc.T("unique.effect.shadowstride");
         if (uniqueId == KeenCadenceId)
             return Loc.T("unique.effect.keencadence");
-        return "";
+        return GearUniqueEffects.EffectText(uniqueId);
     }
 
     public static string EffectTextFor(ItemInstance item) =>

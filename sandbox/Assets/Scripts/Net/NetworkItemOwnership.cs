@@ -12,6 +12,9 @@ public static class NetworkItemOwnership
         public ItemInstance armor;
         public ItemInstance weapon;
         public ItemInstance helmet;
+        public ItemInstance gloves;
+        public ItemInstance boots;
+        public ItemInstance belt;
         public int gold;
     }
 
@@ -25,6 +28,9 @@ public static class NetworkItemOwnership
             armor = eq?.armor,
             weapon = eq?.weapon,
             helmet = eq?.helmet,
+            gloves = eq?.gloves,
+            boots = eq?.boots,
+            belt = eq?.belt,
             gold = hero.GetComponent<Wallet>()?.Gold ?? 0,
         };
     }
@@ -36,17 +42,14 @@ public static class NetworkItemOwnership
             || item.affixTier is < 0 or > 2 || item.affixes == null || item.affixes.Count > 6
             || item.reforgeIndexPlusOne < 0 || item.reforgeIndexPlusOne > item.affixes.Count)
             return null;
-        if (item.slot == ItemSlot.Consumable)
+        // gear-slots S2: the vendor potion is gone (flask instead); bagged
+        // consumables never cross the wire any more.
+        if (item.slot == ItemSlot.Consumable) return null;
+        if (item.rarity == ItemRarity.Unique)
         {
-            var potion = ItemDatabase.CreateHealingPotion();
-            if (potion.baseType != item.baseType) return null;
-            potion.instanceId = item.instanceId;
-            item = potion;
-        }
-        else if (item.rarity == ItemRarity.Unique)
-        {
-            var unique = ItemDatabase.GetUniques().Find(x => x.uniqueId == item.uniqueId);
-            if (unique == null || unique.slot != item.slot || unique.baseType != item.baseType) return null;
+            if (!ItemDatabase.IsKnownUniqueId(item.uniqueId)) return null;
+            var unique = ItemDatabase.CreateUnique(item.uniqueId);
+            if (unique.slot != item.slot || unique.baseType != item.baseType) return null;
         }
         else if (item.slot == ItemSlot.Weapon
             ? string.IsNullOrEmpty(ItemDatabase.ClassRestriction(item.baseType))
