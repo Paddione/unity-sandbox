@@ -20,6 +20,9 @@ public static class ItemDatabase
     public const string WickOfHaloId = "wick-of-the-halo";
     public const string NightfangId = "nightfang-edge";
     public const string RogueKeepsakeId = "Rogue's Keepsake";
+    /// <summary>class-kits-parity combo weapons (Pendant to wick-of-the-halo): Fenwalker hook, Rogue keg.</summary>
+    public const string MoorvogtAnchorId = "moorvogt-anchor";
+    public const string SmugglersFuseId = "smugglers-fuse";
 
     /// <summary>
     /// S4 role-unique matrix (cinderreach-itemization S4): six new armor/helmet
@@ -185,6 +188,22 @@ public static class ItemDatabase
                 baseType = "ShortBow",
                 uniqueId = NightfangId,
                 affixes = new List<Affix> { new Affix("Damage", 5f), new Affix("Crit", 8f) },
+            },
+            [MoorvogtAnchorId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "ShortSword",
+                uniqueId = MoorvogtAnchorId,
+                affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("MaxHP", 15f) },
+            },
+            [SmugglersFuseId] = () => new ItemInstance
+            {
+                slot = ItemSlot.Weapon,
+                rarity = ItemRarity.Unique,
+                baseType = "HuntingBow",
+                uniqueId = SmugglersFuseId,
+                affixes = new List<Affix> { new Affix("Damage", 4f), new Affix("IncreasedArea", 15f) },
             },
             [RogueKeepsakeId] = () => new ItemInstance
             {
@@ -655,6 +674,13 @@ public static class ItemDatabase
     }
 
     /// <summary>
+    /// class-kits-parity: Fenwalker and Rogue own two build weapons (matrix +
+    /// combo weapon); the build share splits evenly between them.
+    /// </summary>
+    static string BuildPick(string matrix, string combo, System.Random rng) =>
+        rng != null && rng.NextDouble() < 0.5 ? combo : matrix;
+
+    /// <summary>
     /// Build-unique weapon for a class (cinderreach-build-uniques S1): picks
     /// between the tactial build unique and the legacy class weapon unique so
     /// both stay regularly obtainable through the existing class-bound Unique
@@ -679,9 +705,9 @@ public static class ItemDatabase
         if (own == ClassCatalog.LanternbearerId)
             id = build ? WickOfHaloId : "Lantern of the Hold";
         else if (own == ClassCatalog.RogueId)
-            id = build ? NightfangId : RogueKeepsakeId;
+            id = build ? BuildPick(NightfangId, SmugglersFuseId, rng) : RogueKeepsakeId;
         else
-            id = build ? LancerWardId : "Emberbrand Blade";
+            id = build ? BuildPick(LancerWardId, MoorvogtAnchorId, rng) : "Emberbrand Blade";
         return CreateUnique(id);
     }
 }

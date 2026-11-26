@@ -17,9 +17,16 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>
     /// Explicit values: co-op sends skills as int (DiabloNetworkPlayer), so
     /// existing values never move; Lanternbearer skills append (second-class S1),
-    /// party-role skills append after them (party-roles S2: SeismicSlam, S3: Rogue + Healer).
+    /// party-role skills append after them (party-roles S2: SeismicSlam, S3: Rogue + Healer),
+    /// class-kits-parity appends the Fenwalker (12–15) and Rogue (16–19) kit skills.
     /// </summary>
-    public enum Skill { Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6, SeismicSlam = 7, QuickShot = 8, BladeFlurry = 9, MendingLight = 10, RenewingCircle = 11 }
+    public enum Skill
+    {
+        Fireball = 0, Arrow = 1, Cleave = 2, LanternBolt = 3, Wisps = 4, SearingHalo = 5, VeilStep = 6,
+        SeismicSlam = 7, QuickShot = 8, BladeFlurry = 9, MendingLight = 10, RenewingCircle = 11,
+        MireHook = 12, BogCharge = 13, MireGround = 14, IronVow = 15,
+        SmokePot = 16, ShadowRoll = 17, VenomVial = 18, PowderKeg = 19,
+    }
 
     [Header("Fireball (Q)")]
     public int fireballDamage = 3;
@@ -124,6 +131,17 @@ public sealed class DiabloSkills : MonoBehaviour
 
     void ArmKeen(Skill skill) { keenPending = true; keenPendingSkill = skill; }
 
+    /// <summary>Kit skills (class-kits-parity) arm keen-cadence like the party skills.</summary>
+    internal void ArmKeenFor(Skill skill) => ArmKeen(skill);
+
+    /// <summary>Melee strike pose for kit skills (bow away, strike anim).</summary>
+    internal void PlayStrike()
+    {
+        ExitBowStance();
+        var driver = GetComponent<DiabloAnimator>();
+        if (driver != null) driver.OnStrike();
+    }
+
     /// <summary>
     /// S4 keen-cadence: the first crit of a special cast cuts its remaining
     /// cooldown by <see cref="BuildUniqueEffects.KeenCooldownCut"/> s, once
@@ -182,7 +200,7 @@ public sealed class DiabloSkills : MonoBehaviour
     public static float HPRestored;
 
     /// <summary>Reset run counters (scene load / headless tests).</summary>
-    public static void ResetRun() { HealsCast = 0; HPRestored = 0f; }
+    public static void ResetRun() { HealsCast = 0; HPRestored = 0f; ClassCombos.ResetRun(); }
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     Text hud;
@@ -344,6 +362,14 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.BladeFlurry: return flurryCooldown;
             case Skill.MendingLight: return mendCooldown;
             case Skill.RenewingCircle: return renewCooldown;
+            case Skill.MireHook: return ClassCombos.MireHookCooldown;
+            case Skill.BogCharge: return ClassCombos.BogChargeCooldown;
+            case Skill.MireGround: return ClassCombos.MireGroundCooldown;
+            case Skill.IronVow: return ClassCombos.IronVowCooldown;
+            case Skill.SmokePot: return ClassCombos.SmokeCooldown;
+            case Skill.ShadowRoll: return ClassCombos.ShadowRollCooldown;
+            case Skill.VenomVial: return ClassCombos.VenomCooldown;
+            case Skill.PowderKeg: return ClassCombos.PowderKegCooldown;
             default: return cleaveCooldown;
         }
     }
@@ -403,7 +429,7 @@ public sealed class DiabloSkills : MonoBehaviour
     public int EffectiveDamage(Skill s)
     {
         int baseDmg = BaseDamage(s);
-        if (baseDmg <= 0) return 0; // Veil Step and the heals deal no damage
+        if (baseDmg <= 0) return 0; // Veil Step, the heals and the utility kit skills deal no damage
         var sheet = CharacterSheet.For(gameObject);
         var eq = GetComponent<Equipment>();
         int gearRanks = eq != null ? eq.SkillRankBonus() : 0;
@@ -446,7 +472,12 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.SeismicSlam: return slamDamage;
             case Skill.QuickShot: return quickShotDamage;
             case Skill.BladeFlurry: return flurryDamage;
-            default: return 0;
+            case Skill.MireHook: return ClassCombos.MireHookDamage;
+            case Skill.BogCharge: return ClassCombos.BogChargeDamage;
+            case Skill.MireGround: return ClassCombos.MireGroundDamage;
+            case Skill.VenomVial: return ClassCombos.VenomImpactDamage;
+            case Skill.PowderKeg: return ClassCombos.PowderKegDamage;
+            default: return 0; // Iron Vow, Smoke Pot and Shadow Roll deal no damage
         }
     }
 
@@ -499,6 +530,14 @@ public sealed class DiabloSkills : MonoBehaviour
             else if (s == Skill.SearingHalo) DoHalo(cosmetic: false);
             else DoVeilStep(dir);
             BroadcastIfNetworked(s, at, dir);
+            return true;
+        }
+
+        if (ClassKitSkills.Handles(s))
+        {
+            var kat = transform.position + Vector3.up * LaunchHeight;
+            ClassKitSkills.Execute(this, s, dir, cosmetic: false);
+            BroadcastIfNetworked(s, kat, dir);
             return true;
         }
 
@@ -570,7 +609,11 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.RenewingCircle: DoGroupHeal(cosmetic: true); break;
             case Skill.Wisps: SummonWisps(cosmetic: true); break;
             case Skill.VeilStep: DoVeilStep(dir); break; // movement stays client-side
+            case Skill.BogCharge:
+            case Skill.ShadowRoll:
+                ClassKitSkills.Execute(this, s, dir, cosmetic: true); break; // dashes move the owner client-side
             default:
+                if (ClassKitSkills.Handles(s)) { ClassKitSkills.Execute(this, s, dir, cosmetic: true); break; }
                 var origin = transform.position + Vector3.up * LaunchHeight + dir * LaunchForward;
                 Launch(s, origin, dir, cosmetic: true);
                 break;
@@ -716,7 +759,13 @@ public sealed class DiabloSkills : MonoBehaviour
                 TryKeenReduction(Skill.SeismicSlam, crit);
                 ThreatTable.BookStun(husk, transform);
                 var atk = husk.GetComponent<EnemyAttack>();
-                if (atk != null) atk.Stun(BuildUniqueEffects.SlamStunFor(slamEq, slamStunSeconds, husk == primary));
+                // Fen Shackle (class-kits-parity): mired husks hold twice as long;
+                // seismic-crown keeps its primary bonus and mires everything struck.
+                bool mired = EnemyStatus.IsMired(husk);
+                if (mired) ClassCombos.Note(ClassCombos.FenShackle);
+                if (atk != null)
+                    atk.Stun(ClassCombos.SlamStunOn(BuildUniqueEffects.SlamStunFor(slamEq, slamStunSeconds, husk == primary), mired));
+                if (BuildUniqueEffects.HasSeismicCrown(slamEq)) EnemyStatus.Mire(husk, ClassCombos.MiredSeconds);
                 hits++;
             }
             DiabloAudio.PlayWhoosh();
@@ -765,12 +814,18 @@ public sealed class DiabloSkills : MonoBehaviour
             foreach (var husk in DiabloMelee.FindArcTargets(transform, dir, radius, DiabloMelee.ArcHalfAngle))
             {
                 if (husk == null) continue;
-                bool crit = ApplyHit(husk, blow, transform.position, flurryKnockback, transform);
+                // Throat Cut (class-kits-parity): blinded husks take the harder cut.
+                bool blinded = EnemyStatus.IsBlinded(husk);
+                if (blinded) ClassCombos.Note(ClassCombos.ThroatCut);
+                int cut = ClassCombos.FlurryDamageOn(blow, blinded);
+                bool crit = ApplyHit(husk, cut, transform.position, flurryKnockback, transform);
                 TryKeenReduction(Skill.BladeFlurry, crit);
                 hits++;
             }
-            // S4 shadowstride: flurry hits grant the wearer brief haste.
+            // S4 shadowstride: flurry hits grant the wearer brief haste and pull the roll forward.
             if (hits > 0) BuildUniqueEffects.GrantShadowstrideHaste(gameObject);
+            if (hits > 0 && BuildUniqueEffects.HasShadowstride(GetComponent<Equipment>()))
+                ReduceCooldown(Skill.ShadowRoll, BuildUniqueEffects.ShadowstrideRollCut * hits);
             DiabloAudio.PlayWhoosh();
             PresentationVfx.CleaveArc(transform.position, radius);
             return hits;
@@ -972,13 +1027,29 @@ public sealed class DiabloSkills : MonoBehaviour
             var driver = GetComponent<DiabloAnimator>();
             if (driver != null) driver.OnStrike();
             int blow = EffectiveDamage(Skill.Cleave);
+            var cleaveEq = GetComponent<Equipment>();
+            bool ward = BuildUniqueEffects.HasLancerWard(cleaveEq);
+            // Retribution (class-kits-parity): the Iron Vow store rides on this swing, once.
+            var combo = HeroComboState.For(gameObject, create: false);
+            int retribution = 0;
+            bool anyHit = false;
             foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
             {
                 if (husk == null) continue;
                 if (!SkillVariantTargeting.InCleaveArea(transform.position, dir,
                     husk.transform.position, radius, arc)) continue;
-                ApplyHit(husk, blow, transform.position, cleaveKnockback, transform);
+                if (!anyHit && combo != null) retribution = combo.ConsumeRetribution();
+                anyHit = true;
+                // Shatter: stunned husks take the heavier blow (lancer-ward: double).
+                var atk = husk.GetComponent<EnemyAttack>();
+                bool stunned = atk != null && atk.IsStunned;
+                if (stunned) ClassCombos.Note(ClassCombos.Shatter);
+                ApplyHit(husk, ClassCombos.CleaveDamageOn(blow, stunned, ward, retribution),
+                    transform.position, cleaveKnockback, transform);
             }
+            if (retribution > 0) ClassCombos.Note(ClassCombos.Retribution);
+            if (retribution > 0 && Application.isPlaying)
+                ComboVfx.Flash(transform.position, new Color(0.75f, 0.8f, 1f), radius * 2f, 0.4f);
             // Build unique (lancer-ward S2): at most one interrupt per cast, variant-independent.
             BuildUniqueEffects.TryInterruptCharge(transform, GetComponent<Equipment>(), radius);
             DiabloAudio.PlayWhoosh();
@@ -989,6 +1060,7 @@ public sealed class DiabloSkills : MonoBehaviour
     void SpawnCleaveVisual(float radius)
     {
         PresentationVfx.CleaveArc(transform.position, radius);
+        if (!Application.isPlaying) return; // headless/EditMode: no timed Destroy
         var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
         if (prefab == null) return;
         var arc = Instantiate(prefab, transform.position, Quaternion.identity);
@@ -1014,6 +1086,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (s == Skill.MendingLight) { DoTargetHeal(cosmetic: true); return null; }
         if (s == Skill.RenewingCircle) { DoGroupHeal(cosmetic: true); return null; }
         if (s == Skill.VeilStep) { SpawnVeilPuff(origin); return null; }
+        if (ClassKitSkills.Handles(s)) { ClassKitSkills.ShowRemote(this, s, origin, dir); return null; }
         return Launch(s, origin, dir, cosmetic: true);
     }
 
@@ -1038,10 +1111,22 @@ public sealed class DiabloSkills : MonoBehaviour
         }
         if (s == Skill.QuickShot)
         {
-            var q = DiabloProjectile.Spawn(s, origin, dir, transform, EffectiveDamage(s),
-                quickShotSpeed, quickShotRange, 0f, cosmetic);
-            // S4 nightfang: the rogue specialty pierces one extra target.
-            q.pierce = BuildUniqueEffects.QuickShotPierce(GetComponent<Equipment>());
+            // Variant (class-kits-parity): a fan of three bolts at reduced damage.
+            bool fan = ActiveVariantId(Skill.QuickShot) == SkillVariantCatalog.QuickFanId;
+            int qdmg = EffectiveDamage(s);
+            if (fan) qdmg = SkillVariantCatalog.FanBoltDamage(qdmg);
+            DiabloProjectile q = null;
+            int bolts = fan ? SkillVariantCatalog.FanBolts : 1;
+            for (int i = 0; i < bolts; i++)
+            {
+                float yaw = fan ? (i - (bolts - 1) * 0.5f) * SkillVariantCatalog.FanSpreadDegrees : 0f;
+                var bdir = Quaternion.AngleAxis(yaw, Vector3.up) * dir;
+                var b = DiabloProjectile.Spawn(s, origin, bdir, transform, qdmg,
+                    quickShotSpeed, quickShotRange, 0f, cosmetic);
+                // S4 nightfang: the rogue specialty pierces one extra target.
+                b.pierce = BuildUniqueEffects.QuickShotPierce(GetComponent<Equipment>());
+                if (q == null) q = b;
+            }
             if (!cosmetic) ArmKeen(Skill.QuickShot);
             var qd = GetComponent<DiabloAnimator>();
             EnterBowStance();
@@ -1185,9 +1270,20 @@ public sealed class DiabloSkills : MonoBehaviour
             case Skill.BladeFlurry: return Loc.T("name.skill.bladeflurry");
             case Skill.MendingLight: return Loc.T("name.skill.mendinglight");
             case Skill.RenewingCircle: return Loc.T("name.skill.renewingcircle");
+            case Skill.MireHook: return Loc.T("name.skill.mirehook");
+            case Skill.BogCharge: return Loc.T("name.skill.bogcharge");
+            case Skill.MireGround: return Loc.T("name.skill.mireground");
+            case Skill.IronVow: return Loc.T("name.skill.ironvow");
+            case Skill.SmokePot: return Loc.T("name.skill.smokepot");
+            case Skill.ShadowRoll: return Loc.T("name.skill.shadowroll");
+            case Skill.VenomVial: return Loc.T("name.skill.venomvial");
+            case Skill.PowderKeg: return Loc.T("name.skill.powderkeg");
             default: return Loc.T("name.skill.veilstep");
         }
     }
+
+    /// <summary>One-line effect and combo text of a skill (character sheet tooltip).</summary>
+    public static string SkillDescription(Skill s) => Loc.T("skill.desc." + s.ToString().ToLowerInvariant());
 
     string Slot(string key, string name, Skill s)
     {

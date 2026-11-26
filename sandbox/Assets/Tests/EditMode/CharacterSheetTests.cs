@@ -112,13 +112,14 @@ public class CharacterSheetTests
             Assert.IsTrue(SaveService.TryLoad(fresh, path));
             var sheet = fresh.GetComponent<DiabloProgression>().Sheet;
             Assert.AreEqual(1, sheet.freeAttributePoints);
-            Assert.AreEqual(2, sheet.freeSkillPoints);
+            // class-kits-parity: Fireball/Arrow left the Fenwalker kit, their 4 ranks come back as points.
+            Assert.AreEqual(2 + 4, sheet.freeSkillPoints);
             Assert.AreEqual(2, sheet.strength);
             Assert.AreEqual(1, sheet.vitality);
             Assert.AreEqual(3, sheet.focus);
-            Assert.AreEqual(3, sheet.GetRank(DiabloSkills.Skill.Fireball));
-            Assert.AreEqual(1, sheet.GetRank(DiabloSkills.Skill.Arrow));
-            Assert.AreEqual(2, sheet.GetRank(DiabloSkills.Skill.Cleave));
+            Assert.AreEqual(0, sheet.GetRank(DiabloSkills.Skill.Fireball));
+            Assert.AreEqual(0, sheet.GetRank(DiabloSkills.Skill.Arrow));
+            Assert.AreEqual(2, sheet.GetRank(DiabloSkills.Skill.Cleave), "kit ranks survive");
         }
         finally
         {

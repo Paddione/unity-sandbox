@@ -112,6 +112,7 @@ public sealed class PlayerHealth : MonoBehaviour
     {
         if (amount <= 0f || mirrored) return;
         amount = GearUniqueEffects.ShapeIncoming(this, amount, null);
+        HeroComboState.OnHeroDamaged(gameObject, amount); // Iron Vow charges Retribution
         amount = AbsorbShield(amount);
         GearUniqueEffects.OnDamaged(this);
         if (amount <= 0f) return;
@@ -138,6 +139,8 @@ public sealed class PlayerHealth : MonoBehaviour
             DiabloAudio.PlayBlock();
         }
         amount = GearUniqueEffects.ShapeIncoming(this, amount, fromPos);
+        HeroComboState.OnHeroDamaged(gameObject, amount); // Iron Vow charges Retribution
+        float landed = amount;
         amount = AbsorbShield(amount);
         GearUniqueEffects.OnDamaged(this);
         if (blocked)
@@ -147,6 +150,8 @@ public sealed class PlayerHealth : MonoBehaviour
             {
                 var attacker = HuskAt(fromPos);
                 if (attacker != null) BuildUniqueEffects.BookBulwarkThreat(attacker, transform);
+                // class-kits-parity: a blocked hit charges the next Cleave's Retribution.
+                BuildUniqueEffects.ChargeBulwarkRetribution(gameObject, landed);
             }
         }
         if (amount <= 0f) return;

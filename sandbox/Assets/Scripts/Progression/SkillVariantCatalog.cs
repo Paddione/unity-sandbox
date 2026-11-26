@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Skill variants with noticeable trade-offs (cinderreach-skill-variants S1).
 /// Each variant-bearing class skill (Fenwalker Cleave, Lanternbearer Searing
-/// Halo) has exactly two variants with a stable string id. The first id is
+/// Halo, Rogue Quick Shot since class-kits-parity) has exactly two variants with a stable string id. The first id is
 /// the legacy behavior and the fallback for missing, unknown or
 /// class-foreign ids, so old saves keep playing unchanged. All tuning lives
 /// here so the character sheet preview and the runtime use the same values.
@@ -15,6 +15,8 @@ public static class SkillVariantCatalog
     public const string CleaveFrontalId = "cleave_frontal";
     public const string HaloFollowId = "halo_follow";
     public const string HaloWardId = "halo_ward";
+    public const string QuickSingleId = "quick_single";
+    public const string QuickFanId = "quick_fan";
 
     // ---- shared tuning (preview == runtime) ----
     /// <summary>Frontal cleave: total cone angle in degrees (planar).</summary>
@@ -27,6 +29,15 @@ public static class SkillVariantCatalog
     public const float HaloBaseDuration = 4.0f;
     /// <summary>Stationary ward duration (double the base window).</summary>
     public static float HaloWardDuration => HaloBaseDuration * 2f;
+    /// <summary>Fan Quick Shot: bolts per cast.</summary>
+    public const int FanBolts = 3;
+    /// <summary>Fan Quick Shot: yaw between neighbouring bolts (degrees).</summary>
+    public const float FanSpreadDegrees = 15f;
+    /// <summary>Fan Quick Shot: damage share per bolt.</summary>
+    public const float FanDamageFactor = 0.6f;
+
+    /// <summary>Per-bolt damage of the fan (never below 1).</summary>
+    public static int FanBoltDamage(int single) => Mathf.Max(1, Mathf.RoundToInt(single * FanDamageFactor));
 
     // ---- Lantern Hold town boundary (spatial, not act-based) ----
     /// <summary>Palisade ring center (TownBuilder.BuildCamp).</summary>
@@ -52,6 +63,8 @@ public static class SkillVariantCatalog
             return new[] { CleaveRoundId, CleaveFrontalId };
         if (classId == ClassCatalog.LanternbearerId && skill == DiabloSkills.Skill.SearingHalo)
             return new[] { HaloFollowId, HaloWardId };
+        if (classId == ClassCatalog.RogueId && skill == DiabloSkills.Skill.QuickShot)
+            return new[] { QuickSingleId, QuickFanId };
         return new string[0];
     }
 
@@ -85,6 +98,8 @@ public static class SkillVariantCatalog
             case CleaveFrontalId: return Loc.T("char.variant.frontal");
             case HaloFollowId: return Loc.T("char.variant.aura");
             case HaloWardId: return Loc.T("char.variant.ward");
+            case QuickSingleId: return Loc.T("char.variant.single");
+            case QuickFanId: return Loc.T("char.variant.fan");
             default: return DiabloSkills.SkillName(skill);
         }
     }
@@ -118,6 +133,11 @@ public static class SkillVariantCatalog
                 return Loc.T("char.variant.aura.desc");
             case HaloWardId:
                 return Loc.F("char.variant.ward.desc", HaloWardDuration, HaloTickInterval);
+            case QuickSingleId:
+                return Loc.F("char.variant.single.desc", skills != null ? skills.EffectiveDamage(DiabloSkills.Skill.QuickShot) : 3);
+            case QuickFanId:
+                return Loc.F("char.variant.fan.desc", FanBolts, FanSpreadDegrees,
+                    FanBoltDamage(skills != null ? skills.EffectiveDamage(DiabloSkills.Skill.QuickShot) : 3));
             default:
                 return string.Empty;
         }

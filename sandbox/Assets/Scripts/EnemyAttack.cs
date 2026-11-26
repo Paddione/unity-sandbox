@@ -60,6 +60,9 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>True while a tank slam stuns this husk.</summary>
     public bool IsStunned => Time.time < stunnedUntil;
 
+    /// <summary>Seconds of stun left (0 when free); test seam for combo stun lengths.</summary>
+    public float StunLeft => Mathf.Max(0f, stunnedUntil - Time.time);
+
     /// <summary>Stun for seconds (keeps the longest running stun).</summary>
     public void Stun(float seconds)
     {
@@ -134,7 +137,7 @@ public sealed class EnemyAttack : MonoBehaviour
             var step = hero.position - transform.position;
             step.y = 0f;
             step.Normalize();
-            float move = Mathf.Min(ApproachSpeed * Time.deltaTime, dist - StopDistance);
+            float move = Mathf.Min(ApproachSpeed * EnemyStatus.MoveFactor(gameObject) * Time.deltaTime, dist - StopDistance);
             bool walked = false;
             if (move > 0f)
             {
@@ -179,6 +182,7 @@ public sealed class EnemyAttack : MonoBehaviour
         windupStart = -1f;
         lastStrike = Time.time;
         if (hero == null || dist > Range + DodgeLeeway) return; // dodged
+        if (EnemyStatus.IsBlinded(gameObject)) return; // Smoke Pot: a blinded swing misses
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null) return;
         int dealt = DifficultyProfile.Current.ScaleDamage(damage);

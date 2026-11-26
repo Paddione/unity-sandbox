@@ -192,6 +192,11 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | Renewing Circle | Erneuernder Kreis |
 | Quick Shot | Schnellschuss |
 | Blade Flurry | Klingenwirbel |
+| Mire Hook / Bog Charge / Mire Ground / Iron Vow | Moorhaken / Moorsturm / Sumpfgrund / Eisenschwur |
+| Smoke Pot / Shadow Roll / Venom Vial / Powder Keg | Rauchtopf / Schattenrolle / Giftphiole / Pulverfass |
+| Mired / Blinded / Venom | verschlammt / geblendet / Gift |
+| Shatter / Fen Shackle / Retribution | Zerschmettern / Moorfessel / Vergeltung |
+| Venom Burn / Ambush / Throat Cut / Spark Shot | Giftbrand / Hinterhalt / Kehlenschnitt / Zündschuss |
 | Strike / Thrust / Block | Schlag / Stoß / Block |
 
 ### Spielsysteme
@@ -234,6 +239,8 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | circle-of-dawn | Reif der Frühe |
 | shadowstride-vest | Schattenschrittweste |
 | keen-cadence | Scharfer Takt |
+| moorvogt-anchor | Anker des Moorvogts |
+| smugglers-fuse | Schmugglerlunte |
 
 Weitere Gegenstände (Basistypen, Affixe, Werte) stehen in `LocCatalog.Item.cs`, `LocCatalog.Affix.cs` und `LocCatalog.Stat.cs`.
 

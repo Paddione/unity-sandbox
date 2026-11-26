@@ -53,6 +53,7 @@ public static class DiabloJuice
         lastStrikeFrame = Time.frameCount;
         var eq = attacker != null ? attacker.GetComponent<Equipment>() : null;
         if (ForceCrit.HasValue) crit = ForceCrit.Value;
+        else if (HeroComboState.TryAmbush(attacker)) crit = true; // Ambush (class-kits-parity)
         else if (eq != null) crit = Random.value * 100f < eq.GetCrit();
         if (!crit) return damage;
         CritsRolled++;

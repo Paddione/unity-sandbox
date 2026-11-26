@@ -233,6 +233,10 @@ public static class SaveService
         RunProfile.RunSeed = save.runSeed;
         RunProfile.Stash = Stash.FromList(save.stash);
         RunProfile.ClassId = ClassCatalog.Get(save.classId).id;
+        // class-kits-parity: ranks on skills the class no longer carries come back as points
+        // (old Fenwalker/Rogue saves with Fireball/Arrow ranks). Idempotent on later loads.
+        int refunded = prog.Sheet != null ? prog.Sheet.RefundForeignRanks(RunProfile.Class) : 0;
+        if (refunded > 0) Debug.Log($"[Save] Refunded {refunded} skill point(s) from skills outside the {RunProfile.ClassId} kit.");
         RunProfile.Hero = HeroProfile.Sanitized(new HeroProfile
         {
             heroName = save.heroName, gender = save.heroGender, hairStyle = save.heroHairStyle,

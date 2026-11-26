@@ -48,6 +48,24 @@ public static class HeroGearModels
                 Beam(root, "String", Pearl, new Vector3(-.06f,.52f*side,0), new Vector3(-.06f,0,0), .009f);
             }
         }),
+        [ItemDatabase.MoorvogtAnchorId] = new Model(ItemSlot.Weapon, root =>
+        {
+            Grip(root, .40f);
+            Beam(root, "Anchor shank", Iron, new Vector3(0,.10f,0), new Vector3(0,.58f,0), .05f);
+            Plate(root, "Anchor fluke", Iron, .06f, 0,
+                -.20f,.22f, .20f,.22f, .08f,.08f, -.08f,.08f);
+            Beam(root, "Mire chain", Brass, new Vector3(0,.58f,0), new Vector3(.12f,.40f,0), .02f);
+        }),
+        [ItemDatabase.SmugglersFuseId] = new Model(ItemSlot.Weapon, root =>
+        {
+            for (int side = -1; side <= 1; side += 2)
+            {
+                Plate(root, "Tarred limb", Dark, .05f, 0, -.025f,0, .035f,0, .10f,.22f*side,
+                    .06f,.38f*side, -.05f,.52f*side, -.03f,.36f*side, .03f,.20f*side);
+                Beam(root, "String", Pearl, new Vector3(-.05f,.51f*side,0), new Vector3(-.05f,0,0), .009f);
+            }
+            Box(root, "Powder charge", Ember, new Vector3(.05f,0,0), new Vector3(.08f,.10f,.08f));
+        }),
         ["Lantern of the Hold"] = new Model(ItemSlot.Weapon, root =>
         {
             Beam(root, "Handle", Dark, Vector3.zero, new Vector3(0,-.16f,0), .045f);
@@ -448,7 +466,8 @@ public static class HeroGearModels
     public static IEnumerable<string> Ids => Models.Keys;
 
     /// <summary>Unique bows held in the left hand and drawn like the starter bow.</summary>
-    public static bool IsBowUnique(string id) => id == ItemDatabase.NightfangId || id == ItemDatabase.GlassthornBowId;
+    public static bool IsBowUnique(string id) => id == ItemDatabase.NightfangId || id == ItemDatabase.GlassthornBowId
+        || id == ItemDatabase.SmugglersFuseId;
 
     /// <summary>Unique lanterns that hang straight down from the hand.</summary>
     public static bool IsHangingLantern(string id) =>

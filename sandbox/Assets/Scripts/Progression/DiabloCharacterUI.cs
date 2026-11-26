@@ -163,6 +163,13 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             string mode = dur > 0f ? Loc.F("char.variant.stays", dur) : Loc.T("char.variant.moves");
             line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {mode})";
         }
+        else if (skill == DiabloSkills.Skill.QuickShot && RunProfile.Class.id == ClassCatalog.RogueId)
+        {
+            string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
+            string mode = variant == SkillVariantCatalog.QuickFanId
+                ? Loc.F("char.variant.bolts", SkillVariantCatalog.FanBolts) : Loc.F("char.variant.bolts", 1);
+            line += $"  ({SkillVariantCatalog.DisplayName(RunProfile.Class.id, skill, variant)}: {mode})";
+        }
         else if (skill == DiabloSkills.Skill.Wisps && skills != null)
             line += Loc.F("char.skill.wisps", skills.WispCountFor(sheet.wispsRank));
         return line;
@@ -392,7 +399,8 @@ public sealed class DiabloCharacterUI : MonoBehaviour
             var skill = cls.skills[i];
             var spr = DiabloMenuArt.SkillIcon(skill);
             AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
-                Loc.F("char.skill.tip", cls.KeyLabel(i), DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank), 44f);
+                Loc.F("char.skill.tip", cls.KeyLabel(i), DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank)
+                    + "\n" + DiabloSkills.SkillDescription(skill), 44f);
             skillRows.Add((skill, text, plus));
             if (SkillVariantCatalog.VariantIds(cls.id, skill).Length >= 2)
             {

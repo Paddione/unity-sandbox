@@ -461,6 +461,56 @@ public sealed class DiabloShotCheck : MonoBehaviour
         RunProfile.ClassId = ClassCatalog.FenwalkerId;
         if (look != null) look.Apply(ClassCatalog.Fenwalker);
 
+        // 13d) class-kits-parity: Fenwalker combo chain (mire ground -> slam -> shatter
+        // cleave, both cleave variants) and Rogue combo chain (venom -> smoke -> keg,
+        // both quick shot variants with a spark shot through the keg).
+        var toBoss = boss.transform.position - hero.transform.position;
+        Face(hero, toBoss);
+        hero.distance = 10f;
+        hero.pitch = 48f;
+        KitCast(skills, DiabloSkills.Skill.MireGround, toBoss);
+        yield return Wait(0.3f);
+        yield return Shot("fenwalker_mire_ground");
+        KitCast(skills, DiabloSkills.Skill.IronVow, toBoss);
+        KitCast(skills, DiabloSkills.Skill.SeismicSlam, toBoss);
+        KitCast(skills, DiabloSkills.Skill.MireHook, toBoss);
+        yield return Wait(0.12f);
+        yield return Shot("fenwalker_hook_slam");
+        RunProfile.SkillVariants[ClassCatalog.FenwalkerId + ":" + DiabloSkills.Skill.Cleave] = SkillVariantCatalog.CleaveRoundId;
+        KitCast(skills, DiabloSkills.Skill.Cleave, toBoss);
+        yield return Wait(0.1f);
+        yield return Shot("fenwalker_shatter_whirl");
+        RunProfile.SkillVariants[ClassCatalog.FenwalkerId + ":" + DiabloSkills.Skill.Cleave] = SkillVariantCatalog.CleaveFrontalId;
+        KitCast(skills, DiabloSkills.Skill.Cleave, toBoss);
+        yield return Wait(0.1f);
+        yield return Shot("fenwalker_shatter_frontal");
+        RunProfile.SkillVariants.Remove(ClassCatalog.FenwalkerId + ":" + DiabloSkills.Skill.Cleave);
+        Debug.Log($"[ShotCheck] fenwalker combos: {string.Join(",", ClassCombos.TriggeredLines())}");
+
+        RunProfile.ClassId = ClassCatalog.RogueId;
+        if (look != null) look.Apply(ClassCatalog.Rogue);
+        KitCast(skills, DiabloSkills.Skill.VenomVial, toBoss);
+        KitCast(skills, DiabloSkills.Skill.SmokePot, toBoss);
+        yield return Wait(0.3f);
+        yield return Shot("rogue_venom_smoke");
+        KitCast(skills, DiabloSkills.Skill.PowderKeg, toBoss);
+        yield return Wait(0.2f);
+        yield return Shot("rogue_powder_keg");
+        RunProfile.SkillVariants[ClassCatalog.RogueId + ":" + DiabloSkills.Skill.QuickShot] = SkillVariantCatalog.QuickFanId;
+        KitCast(skills, DiabloSkills.Skill.QuickShot, toBoss);
+        yield return Wait(0.15f);
+        yield return Shot("rogue_fan_spark_shot");
+        RunProfile.SkillVariants.Remove(ClassCatalog.RogueId + ":" + DiabloSkills.Skill.QuickShot);
+        KitCast(skills, DiabloSkills.Skill.QuickShot, toBoss);
+        yield return Wait(0.15f);
+        yield return Shot("rogue_single_shot");
+        KitCast(skills, DiabloSkills.Skill.ShadowRoll, -toBoss);
+        yield return Wait(0.2f);
+        yield return Shot("rogue_shadow_roll");
+        Debug.Log($"[ShotCheck] kit combos: {string.Join(",", ClassCombos.TriggeredLines())}");
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        if (look != null) look.Apply(ClassCatalog.Fenwalker);
+
         // 14) act-one: Cinder Kiln entrance, a thrall pack, the Kilnmother in phase 2, the Act I screen.
         RunProfile.Act.Unlock(ActProgress.Kiln);
         keepAlive = hero.GetComponent<PlayerHealth>();
@@ -933,6 +983,13 @@ public sealed class DiabloShotCheck : MonoBehaviour
     static void Face(DiabloClickController hero, Vector3 dir)
     {
         hero.SetAimPoint(hero.transform.position + dir * 4f);
+    }
+
+    /// <summary>Shotcheck cast: clear the cooldown, then cast (class-kits-parity poses).</summary>
+    static void KitCast(DiabloSkills skills, DiabloSkills.Skill s, Vector3 dir)
+    {
+        skills.ReduceCooldown(s, 999f);
+        skills.CastToward(s, dir);
     }
 
     IEnumerator Shot(string name)

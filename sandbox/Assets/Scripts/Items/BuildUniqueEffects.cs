@@ -24,6 +24,21 @@ public static class BuildUniqueEffects
     public const string DawnCircleId = ItemDatabase.DawnCircleId;
     public const string ShadowstrideVestId = ItemDatabase.ShadowstrideVestId;
     public const string KeenCadenceId = ItemDatabase.KeenCadenceId;
+    public const string MoorvogtAnchorId = ItemDatabase.MoorvogtAnchorId;
+    public const string SmugglersFuseId = ItemDatabase.SmugglersFuseId;
+
+    /// <summary>moorvogt-anchor: Mire Hook drags mired husks this close to the target too.</summary>
+    public const float AnchorDragRadius = 4f;
+    /// <summary>moorvogt-anchor: Bog Charge stuns husks that were already mired.</summary>
+    public const float AnchorChargeStun = 1f;
+    /// <summary>smugglers-fuse: keg blast radius factor inside smoke.</summary>
+    public const float FuseRadiusFactor = 1.5f;
+    /// <summary>smugglers-fuse: venom stacks the smoke blast leaves.</summary>
+    public const int FuseVenomStacks = 2;
+    /// <summary>nightfang: venom stacks per Quick Shot hit.</summary>
+    public const int NightfangVenomStacks = 1;
+    /// <summary>shadowstride-vest: Shadow Roll cooldown cut per Blade Flurry hit.</summary>
+    public const float ShadowstrideRollCut = 0.5f;
 
     /// <summary>Tank-stun bonus on the slam primary (S4): +2 s, primary only, no AoE creep.</summary>
     public const float SeismicCrownBonusStun = 2f;
@@ -59,6 +74,10 @@ public static class BuildUniqueEffects
             return Loc.T("unique.effect.shadowstride");
         if (uniqueId == KeenCadenceId)
             return Loc.T("unique.effect.keencadence");
+        if (uniqueId == MoorvogtAnchorId)
+            return Loc.T("unique.effect.moorvogtanchor");
+        if (uniqueId == SmugglersFuseId)
+            return Loc.T("unique.effect.smugglersfuse");
         return GearUniqueEffects.EffectText(uniqueId);
     }
 
@@ -91,6 +110,19 @@ public static class BuildUniqueEffects
 
     public static bool HasKeenCadence(Equipment eq) =>
         eq != null && eq.helmet != null && eq.helmet.uniqueId == KeenCadenceId;
+
+    public static bool HasMoorvogtAnchor(Equipment eq) =>
+        eq != null && eq.weapon != null && eq.weapon.uniqueId == MoorvogtAnchorId;
+
+    public static bool HasSmugglersFuse(Equipment eq) =>
+        eq != null && eq.weapon != null && eq.weapon.uniqueId == SmugglersFuseId;
+
+    /// <summary>bulwark-carrier (class-kits-parity): a blocked hit charges the next Cleave.</summary>
+    public static void ChargeBulwarkRetribution(GameObject hero, float landed)
+    {
+        if (hero == null || landed <= 0f) return;
+        HeroComboState.For(hero).AddRetribution(landed);
+    }
 
     // ---------- S4: slam primary, block threat, quick-shot pierce ----------
 
@@ -216,6 +248,7 @@ public static class BuildUniqueEffects
     public static void ResetRun()
     {
         haloUntil = float.NegativeInfinity;
+        ClassCombos.ResetRun();
     }
 
     /// <summary>

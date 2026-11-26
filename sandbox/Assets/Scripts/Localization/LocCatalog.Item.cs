@@ -48,6 +48,8 @@ public static partial class LocCatalog
         E("item.name.lancer-ward", "Lanzenbann", "Lancer Ward"),
         E("item.name.wick-of-the-halo", "Docht des Kranzes", "Wick of the Halo"),
         E("item.name.nightfang-edge", "Nachtzahn", "Nightfang Edge"),
+        E("item.name.moorvogt-anchor", "Anker des Moorvogts", "Moorwarden's Anchor"),
+        E("item.name.smugglers-fuse", "Schmugglerlunte", "Smuggler's Fuse"),
         E("item.name.rogue-s-keepsake", "Andenken des Schmugglers", "Rogue's Keepsake"),
         E("item.name.ironbound-grips", "Eisengebundene Griffe", "Ironbound Grips"),
         E("item.name.menders-touch", "Hand der Heilerin", "Mender's Touch"),

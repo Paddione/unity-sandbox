@@ -68,7 +68,8 @@ public class CoopPartyTests
         Assert.IsTrue(DiabloNetworkPlayer.IsCastSkillId((int)DiabloSkills.Skill.Cleave));
         Assert.IsTrue(DiabloNetworkPlayer.IsCastSkillId((int)DiabloSkills.Skill.SeismicSlam));
         Assert.IsTrue(DiabloNetworkPlayer.IsCastSkillId((int)DiabloSkills.Skill.RenewingCircle));
-        Assert.IsFalse(DiabloNetworkPlayer.IsCastSkillId(12));
+        Assert.IsTrue(DiabloNetworkPlayer.IsCastSkillId((int)DiabloSkills.Skill.PowderKeg), "class-kits-parity appends 12-19");
+        Assert.IsFalse(DiabloNetworkPlayer.IsCastSkillId(20));
         Assert.IsFalse(DiabloNetworkPlayer.IsCastSkillId(-1));
     }
 

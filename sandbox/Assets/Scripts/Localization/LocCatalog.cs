@@ -56,6 +56,7 @@ public static partial class LocCatalog
         yield return Menu;
         yield return Class;
         yield return Map;
+        yield return Skill;
     }
 
     /// <summary>All entries in declaration order (duplicates included, for tests).</summary>

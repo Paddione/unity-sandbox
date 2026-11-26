@@ -51,6 +51,32 @@ public sealed class CharacterSheet
     public int renewRank;
 
     /// <summary>True while any point is unspent (drives the UI pulse).</summary>
+    /// <summary>Ranks of the class-kits-parity skills (MireHook and later), keyed by skill.</summary>
+    readonly Dictionary<DiabloSkills.Skill, int> kitRanks = new Dictionary<DiabloSkills.Skill, int>();
+
+    static bool IsKitSkill(DiabloSkills.Skill skill) => skill >= DiabloSkills.Skill.MireHook;
+
+    /// <summary>
+    /// class-kits-parity: ranks on skills outside the hero's kit (Fenwalker and
+    /// Rogue lost Fireball/Arrow) go back as free skill points. Idempotent:
+    /// refunded ranks are zero afterwards. Returns the points refunded.
+    /// </summary>
+    public int RefundForeignRanks(ClassDefinition cls)
+    {
+        if (cls == null) return 0;
+        int refunded = 0;
+        foreach (DiabloSkills.Skill skill in System.Enum.GetValues(typeof(DiabloSkills.Skill)))
+        {
+            if (cls.Has(skill)) continue;
+            int r = GetRank(skill);
+            if (r <= 0) continue;
+            SetRank(skill, 0);
+            refunded += r;
+        }
+        freeSkillPoints += refunded;
+        return refunded;
+    }
+
     public bool HasUnspent => freeAttributePoints > 0 || freeSkillPoints > 0;
 
     /// <summary>One level grants one attribute and one skill point.</summary>
@@ -91,6 +117,7 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.BladeFlurry: return flurryRank;
             case DiabloSkills.Skill.MendingLight: return mendRank;
             case DiabloSkills.Skill.RenewingCircle: return renewRank;
+            case var k when IsKitSkill(k): return kitRanks.TryGetValue(k, out int kr) ? kr : 0;
             default: return 0;
         }
     }
@@ -113,6 +140,7 @@ public sealed class CharacterSheet
             case DiabloSkills.Skill.BladeFlurry: flurryRank++; break;
             case DiabloSkills.Skill.MendingLight: mendRank++; break;
             case DiabloSkills.Skill.RenewingCircle: renewRank++; break;
+            case var k when IsKitSkill(k): kitRanks[k] = GetRank(k) + 1; break;
             default: return false;
         }
         freeSkillPoints--;
@@ -163,8 +191,38 @@ public sealed class CharacterSheet
     public float CleaveRadius(float baseRadius, float perRank) =>
         baseRadius + perRank * cleaveRank;
 
+    void SetRank(DiabloSkills.Skill skill, int rank)
+    {
+        switch (skill)
+        {
+            case DiabloSkills.Skill.Fireball: fireballRank = rank; break;
+            case DiabloSkills.Skill.Arrow: arrowRank = rank; break;
+            case DiabloSkills.Skill.Cleave: cleaveRank = rank; break;
+            case DiabloSkills.Skill.LanternBolt: lanternBoltRank = rank; break;
+            case DiabloSkills.Skill.Wisps: wispsRank = rank; break;
+            case DiabloSkills.Skill.SearingHalo: haloRank = rank; break;
+            case DiabloSkills.Skill.VeilStep: veilRank = rank; break;
+            case DiabloSkills.Skill.SeismicSlam: slamRank = rank; break;
+            case DiabloSkills.Skill.QuickShot: quickRank = rank; break;
+            case DiabloSkills.Skill.BladeFlurry: flurryRank = rank; break;
+            case DiabloSkills.Skill.MendingLight: mendRank = rank; break;
+            case DiabloSkills.Skill.RenewingCircle: renewRank = rank; break;
+            default:
+                if (rank <= 0) kitRanks.Remove(skill); else kitRanks[skill] = rank;
+                break;
+        }
+    }
+
     /// <summary>Export ranks for <see cref="SaveGame.skillRanks"/>.</summary>
-    public List<SkillRankEntry> ToEntries() => new List<SkillRankEntry>
+    public List<SkillRankEntry> ToEntries()
+    {
+        var list = LegacyEntries();
+        foreach (var kv in kitRanks)
+            if (kv.Value > 0) list.Add(new SkillRankEntry { skill = kv.Key.ToString(), rank = kv.Value });
+        return list;
+    }
+
+    List<SkillRankEntry> LegacyEntries() => new List<SkillRankEntry>
     {
         new SkillRankEntry { skill = DiabloSkills.Skill.Fireball.ToString(), rank = fireballRank },
         new SkillRankEntry { skill = DiabloSkills.Skill.Arrow.ToString(), rank = arrowRank },
@@ -186,6 +244,7 @@ public sealed class CharacterSheet
         fireballRank = arrowRank = cleaveRank = 0;
         lanternBoltRank = wispsRank = haloRank = veilRank = slamRank = 0;
         quickRank = flurryRank = mendRank = renewRank = 0;
+        kitRanks.Clear();
         if (entries == null) return;
         foreach (var e in entries)
         {
@@ -205,6 +264,10 @@ public sealed class CharacterSheet
                 case "BladeFlurry": flurryRank = rank; break;
                 case "MendingLight": mendRank = rank; break;
                 case "RenewingCircle": renewRank = rank; break;
+                default:
+                    if (System.Enum.TryParse(e.skill, out DiabloSkills.Skill k) && IsKitSkill(k) && rank > 0)
+                        kitRanks[k] = rank;
+                    break;
             }
         }
     }

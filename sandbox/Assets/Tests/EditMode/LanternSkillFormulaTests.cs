@@ -93,8 +93,9 @@ public class LanternSkillFormulaTests
     [Test]
     public void HudLine_FollowsTheClass()
     {
-        StringAssert.Contains("[Q] Feuerball", skills.HudLine());
-        StringAssert.Contains("[R] Spalten", skills.HudLine());
+        StringAssert.Contains("[Q] Spalten", skills.HudLine());
+        StringAssert.Contains("[E] Moorhaken", skills.HudLine());
+        StringAssert.Contains("[G] Eisenschwur", skills.HudLine());
         RunProfile.ClassId = ClassCatalog.LanternbearerId;
         var line = skills.HudLine();
         StringAssert.Contains("[Q] Laternenblitz", line);

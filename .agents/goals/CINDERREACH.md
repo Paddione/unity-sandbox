@@ -117,13 +117,22 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 | Klasse | Rolle | Rig | Skills (Tasten) |
 |---|---|---|---|
-| Fenwalker | Tank | Knight | Fireball Q, Arrow E, Cleave R, Seismic Slam Space |
+| Fenwalker | Tank | Knight | Cleave Q, Mire Hook E, Seismic Slam R, Bog Charge Space, Mire Ground F, Iron Vow G |
 | Lanternbearer | Heiler/Support | Mage (Re-Skin auf Knight-Rig, Laterne) | Lantern Bolt Q, Wisps E, Searing Halo R, Veil Step Space, Mending Light F, Renewing Circle G |
-| Rogue | DPS | Rogue | Fireball Q, Arrow E, Quick Shot R, Blade Flurry Space |
+| Rogue | DPS | Rogue | Quick Shot Q, Blade Flurry E, Smoke Pot R, Shadow Roll Space, Venom Vial F, Powder Keg G |
 
+- Klassen-Kits (class-kits-parity, 2026-11-26): jede Klasse hat 6 eigene Skills auf Q/E/R/Leertaste/F/G.
+  Fireball/Arrow stehen in keinem Kit mehr (per API weiter wirkbar, `ClassDefinition.BaseSkills`);
+  Ränge auf Skills außerhalb des Kits werden beim Laden erstattet (`CharacterSheet.RefundForeignRanks`).
+  Gegnerstatus `EnemyStatus`: verschlammt (halbes Lauftempo), geblendet (Schläge verfehlen), Gift (Stapel ≤ 5,
+  1 Schaden/Stapel/s). Combos (`ClassCombos`, Zähler im Autoplay-Ergebnis `combos`):
+  Moorgänger Zerschmettern (Spalten ×1,5 auf Betäubte), Moorfessel (Erdstoß ×2 Betäubung auf Verschlammte),
+  Vergeltung (Eisenschwur speichert erlittenen Schaden, ≤ 20, das nächste Spalten gibt ihn pro Ziel ab);
+  Schmuggler Giftbrand (Pulverfass +2 je verbranntem Giftstapel), Hinterhalt (Schattenrolle: nächster Treffer
+  kritisch), Kehlenschnitt (Klingenwirbel ×1,5 auf Geblendete), Zündschuss (Schnellschuss zündet ein Fass sofort ×1,5).
 - Skill-Varianten (`SkillVariantCatalog`): Cleave rundum oder Frontalkegel 90° mit 1,5× Reichweite.
-  Searing Halo mitlaufend oder ortsfest mit doppelter Dauer. Wahl solo im Lantern Hold, im Save.
-  Koop nutzt die Basisvariante.
+  Searing Halo mitlaufend oder ortsfest mit doppelter Dauer. Quick Shot Einzelschuss oder Fächer
+  (3 Bolzen, 15°, je 60 % Schaden). Wahl solo im Lantern Hold, im Save. Koop nutzt die Basisvariante.
 - Spezial-Skills skalieren ×1,5 über die Klassen-Faktoren in `ClassDefinition`.
 - Klassenwahl `ClassSelectUI` beim Start („Continue saved hero“ bei Save), übersprungen für
   Autoplay, Shotcheck, Koop-Peers und `-class`.
@@ -201,8 +210,14 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Krit-Wertung (5 % Basis, Cap 75 %, 2× Schaden) und Flächen-Skalierung `r·sqrt(1+inc/100)` für
   Trefferprüfung und VFX gleichermaßen.
 - Klassengebundene Waffen, Drops zu 70 % passend zur Klasse des Finders. Build-Uniques
-  `lancer-ward` (Cleave unterbricht Lancer-Sturm) und `wick-of-the-halo` (Wisps priorisieren Halo-Ziele),
-  dazu „Lantern of the Hold“.
+  `lancer-ward` (Cleave unterbricht Lancer-Sturm, Zerschmettern ×2), `wick-of-the-halo` (Wisps priorisieren
+  Halo-Ziele), seit class-kits-parity je Klasse eine Combo-Waffe: `moorvogt-anchor` (Moorhaken zieht
+  verschlammte Nachbarn mit, Moorsturm betäubt Verschlammte 1 s) und `smugglers-fuse` (Fass im Rauch zündet
+  sofort, +50 % Radius, 2 Giftstapel); Build-Anteil je Klasse 50/50 zwischen Matrix- und Combo-Waffe.
+  Matrix-Uniques auf Combos ausgerichtet: Karrenbollwerk lädt Vergeltung, Erdstoßkrone verschlammt,
+  Nachtzahn vergiftet, Schattenschrittweste verkürzt die Schattenrolle (0,5 s/Treffer), Scharfer Takt
+  verlängert Hinterhalt auf 4 s. Laterne-Uniques geprüft, unverändert (Docht = Combo-Waffe, Gnadentuch/Reif
+  der Frühe verstärken die Heilungen). Dazu „Lantern of the Hold“.
 - Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %),
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).
@@ -318,7 +333,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - UI-Bausteine `DiabloUIFactory` (9-Slice-Chrome aus `DiabloMenuArt`): `SetLayout` setzt auch die
   Rect-Größe, weil die Panels mit `childControlHeight = false` stapeln; Item-Karten per `FitToBox`.
   Sprites aus Blender (`docs/menu-art/build_menu_pack.py`, `build_icons*.py`): Portraits aller drei
-  Klassen, Icons für alle 12 Skills, Startbild 1920×1080. Spielernamen über `LootDrop.PrettyName`.
+  Klassen, Icons für alle 20 Skills, Startbild 1920×1080. Spielernamen über `LootDrop.PrettyName`.
 - HUD: Lebenskugel mit Todesschleier („YOU HAVE FALLEN“, rein präsentativ), Bronzeplatte unter
   Skill- und XP-Leiste. Charakterblatt mit Varianten-Umschalter (solo im Lantern Hold),
   Waypoint-Fenster mit gesperrten Schreinen („not attuned“/„sealed“), „Press On“ nach dem Abbot.

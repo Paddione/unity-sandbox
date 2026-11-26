@@ -210,10 +210,22 @@ public sealed class PartyCompanion : MonoBehaviour
         float dist = toTarget.magnitude;
         var dir = dist > 0.0001f ? toTarget / dist : transform.forward;
         if (skills == null) return false;
+        bool Ready(DiabloSkills.Skill s) => skills.CooldownLeft(s) <= 0f;
         if (role == ClassDefinition.PartyRole.Tank)
         {
-            if (dist <= skills.slamRadius && skills.CooldownLeft(DiabloSkills.Skill.SeismicSlam) <= 0f)
+            // class-kits-parity combo order: mire the pack, slam it (Fen Shackle), cleave the stunned (Shatter).
+            if (dist <= skills.slamRadius && Ready(DiabloSkills.Skill.SeismicSlam))
                 return skills.CastToward(DiabloSkills.Skill.SeismicSlam, dir);
+            if (Ready(DiabloSkills.Skill.MireGround)
+                && ClassCombos.HusksInRadius(transform.position, ClassCombos.MireGroundRadius).Count >= 2)
+                return skills.CastToward(DiabloSkills.Skill.MireGround, dir);
+            if (dist > meleeRange() && dist <= ClassCombos.MireHookRange && Ready(DiabloSkills.Skill.MireHook))
+                return skills.CastToward(DiabloSkills.Skill.MireHook, dir);
+            if (dist <= skills.CleaveRadius && Ready(DiabloSkills.Skill.Cleave)
+                && target.GetComponent<EnemyAttack>() is EnemyAttack ta && ta.IsStunned)
+                return skills.CastToward(DiabloSkills.Skill.Cleave, dir);
+            if (Ready(DiabloSkills.Skill.IronVow) && hp != null && hp.CurrentHP < hp.MaxHP * 0.7f)
+                return skills.CastToward(DiabloSkills.Skill.IronVow, dir);
             if (dist <= meleeRange() && melee != null)
                 return melee.TryConeAttack(transform, dir) > 0;
             Approach(target, dir, dist);
@@ -221,6 +233,15 @@ public sealed class PartyCompanion : MonoBehaviour
         }
         if (role == ClassDefinition.PartyRole.Dps)
         {
+            // class-kits-parity combo order: venom, then the keg burns it off (Venom Burn).
+            if (dist <= ClassCombos.PowderKegRange && Ready(DiabloSkills.Skill.PowderKeg)
+                && EnemyStatus.Venom(target) >= ClassCombos.VenomStacksPerVial)
+                return skills.CastToward(DiabloSkills.Skill.PowderKeg, dir);
+            if (dist <= ClassCombos.VenomRange && Ready(DiabloSkills.Skill.VenomVial))
+                return skills.CastToward(DiabloSkills.Skill.VenomVial, dir);
+            if (dist <= ClassCombos.SmokeRange && Ready(DiabloSkills.Skill.SmokePot)
+                && ClassCombos.HusksInRadius(target.transform.position, ClassCombos.SmokeRadius).Count >= 2)
+                return skills.CastToward(DiabloSkills.Skill.SmokePot, dir);
             if (dist <= skills.quickShotRange && skills.CooldownLeft(DiabloSkills.Skill.QuickShot) <= 0f)
                 return skills.CastToward(DiabloSkills.Skill.QuickShot, dir);
             if (dist <= skills.flurryRadius && skills.CooldownLeft(DiabloSkills.Skill.BladeFlurry) <= 0f)

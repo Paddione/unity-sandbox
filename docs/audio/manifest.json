@@ -253,6 +253,62 @@
    "seed": 1234,
    "synth": "FilteredNoise 4 ground pools x 3 variants (100..1160Hz, LP)",
    "license": "free"
+  },
+  {
+   "cue": "MireHook",
+   "prompt": "iron chain hook snap and rattle",
+   "seed": 1234,
+   "synth": "MetallicImpact 0.26s (210->90Hz + 520/780Hz ring, LP 1800Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "BogCharge",
+   "prompt": "heavy armoured charge rush through mud",
+   "seed": 1234,
+   "synth": "Whoosh 0.42s (LP 120->520->110Hz, body 62Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "MireGround",
+   "prompt": "wet bog swell, sucking mud",
+   "seed": 1234,
+   "synth": "FilteredNoise 0.55s (60-340Hz, body 70->38Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "IronVow",
+   "prompt": "low oath gong, solemn iron bell",
+   "seed": 1234,
+   "synth": "WarmBell 0.70s D3 (146.8Hz, LP 900Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "SmokePot",
+   "prompt": "clay pot burst and smoke hiss",
+   "seed": 1234,
+   "synth": "FilteredNoise 0.38s (220-1600Hz, body 120->70Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "ShadowRoll",
+   "prompt": "quick cloth roll whisper",
+   "seed": 1234,
+   "synth": "SynthVeil 0.22s",
+   "license": "free"
+  },
+  {
+   "cue": "VenomVial",
+   "prompt": "thin glass vial shatter and splash",
+   "seed": 1234,
+   "synth": "SynthGlassImpact 0.20s (760/1140Hz)",
+   "license": "free"
+  },
+  {
+   "cue": "PowderKeg",
+   "prompt": "black powder keg blast",
+   "seed": 1234,
+   "synth": "Boom 0.70s (95->38Hz, LP 900Hz)",
+   "license": "free"
   }
  ],
  "music": [

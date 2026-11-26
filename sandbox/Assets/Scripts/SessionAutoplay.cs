@@ -165,10 +165,12 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.healsCast = DiabloSkills.HealsCast;
         result.hpRestored = DiabloSkills.HPRestored;
         result.partyRoles = PartyRoleIds();
+        result.combos = ClassCombos.TriggeredLines();
         Log($"DONE phases={phasesDone} huskKills={huskKills} bossKills={bossKills} " +
             $"phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} " +
             $"exceptions={exceptionCount} party={string.Join(",", result.partyRoles)} " +
             $"heals={result.healsCast} hpRestored={result.hpRestored:0} " +
+            $"combos={string.Join(",", result.combos)} " +
             $"result_phases={string.Join(",", result.phases)}");
         Finish(exceptionCount > 0 || bossKills < 1 || SessionComplete.Shown < 1 ? 1 : 0);
     }
@@ -418,33 +420,35 @@ public sealed class SessionAutoplay : MonoBehaviour
     }
 
     /// <summary>
-    /// Class combat profile (second-class S5, rogue party-roles S6).
-    /// Fenwalker: unchanged (Fireball, else Arrow; at the boss Cleave first).
-    /// Lanternbearer: Wisps whenever ready, Searing Halo with 3+ husks (or
-    /// the boss) inside its radius, else Lantern Bolt. Rogue: Quick Shot
-    /// whenever ready, Blade Flurry into 2+ close husks, else base spells.
+    /// Class combat profile (second-class S5, rogue party-roles S6, class-kits-parity).
+    /// Fenwalker: Mire Ground into packs, Seismic Slam (Fen Shackle), Cleave on
+    /// stunned husks (Shatter, Retribution after Iron Vow), Mire Hook and Bog
+    /// Charge to close distance. Lanternbearer: Wisps whenever ready, Searing
+    /// Halo with 3+ husks (or the boss), else Lantern Bolt. Rogue: Venom Vial,
+    /// Powder Keg onto venomed targets (Venom Burn), Smoke Pot into packs,
+    /// Blade Flurry into smoke (Throat Cut), Shadow Roll out of a crowd
+    /// (Ambush), else Quick Shot.
     /// </summary>
     static void CastProfile(DiabloSkills skills, Vector3 toTarget, bool inRange, bool boss = false)
     {
         bool Ready(DiabloSkills.Skill s) => skills.CooldownLeft(s) <= 0f;
+        bool Cast(DiabloSkills.Skill s) => Ready(s) && skills.CastToward(s, toTarget);
+        var pos = skills.transform.position;
+        float dist = new Vector3(toTarget.x, 0f, toTarget.z).magnitude;
+        var target = NearestHusk(pos + toTarget);
         if (RunProfile.ClassId == ClassCatalog.RogueId)
         {
-            if (Ready(DiabloSkills.Skill.QuickShot)) { skills.CastToward(DiabloSkills.Skill.QuickShot, toTarget); return; }
-            int near = 0;
-            foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
-            {
-                if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
-                var d = h.transform.position - skills.transform.position;
-                d.y = 0f;
-                if (d.magnitude <= skills.flurryRadius) near++;
-            }
-            if (Ready(DiabloSkills.Skill.BladeFlurry) && near >= 2)
-            {
-                skills.CastToward(DiabloSkills.Skill.BladeFlurry, toTarget);
-                return;
-            }
-            if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-            else if (Ready(DiabloSkills.Skill.Arrow)) skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
+            int close = ClassCombos.HusksInRadius(pos, 2.2f).Count;
+            if (close >= 2 && Ready(DiabloSkills.Skill.ShadowRoll)
+                && skills.CastToward(DiabloSkills.Skill.ShadowRoll, -toTarget)) return;
+            if (target != null && EnemyStatus.Venom(target) >= ClassCombos.VenomStacksPerVial
+                && dist <= ClassCombos.PowderKegRange && Cast(DiabloSkills.Skill.PowderKeg)) return;
+            if (dist <= ClassCombos.VenomRange && Cast(DiabloSkills.Skill.VenomVial)) return;
+            if (dist <= ClassCombos.SmokeRange && (boss || ClassCombos.HusksInRadius(pos + toTarget, ClassCombos.SmokeRadius).Count >= 2)
+                && Cast(DiabloSkills.Skill.SmokePot)) return;
+            if (ClassCombos.HusksInRadius(pos, skills.flurryRadius).Count >= (boss ? 1 : 2)
+                && Cast(DiabloSkills.Skill.BladeFlurry)) return;
+            Cast(DiabloSkills.Skill.QuickShot);
             return;
         }
         if (RunProfile.ClassId == ClassCatalog.LanternbearerId)
@@ -470,15 +474,30 @@ public sealed class SessionAutoplay : MonoBehaviour
             if (Ready(DiabloSkills.Skill.LanternBolt)) skills.CastToward(DiabloSkills.Skill.LanternBolt, toTarget);
             return;
         }
-        if (boss && inRange)
+        // Fenwalker (tank kit).
+        var hp = skills.GetComponent<PlayerHealth>();
+        if (hp != null && hp.CurrentHP < hp.MaxHP * 0.7f && Cast(DiabloSkills.Skill.IronVow)) return;
+        if (boss && inRange && Ready(DiabloSkills.Skill.IronVow) && Cast(DiabloSkills.Skill.IronVow)) return;
+        int nearPack = ClassCombos.HusksInRadius(pos, ClassCombos.MireGroundRadius).Count;
+        if (nearPack >= 2 && Cast(DiabloSkills.Skill.MireGround)) return;
+        if ((nearPack >= 2 || (boss && inRange)) && dist <= skills.slamRadius && Cast(DiabloSkills.Skill.SeismicSlam)) return;
+        if (dist <= skills.CleaveRadius && Cast(DiabloSkills.Skill.Cleave)) return;
+        if (dist > 3f && dist <= ClassCombos.BogChargeDistance && Cast(DiabloSkills.Skill.BogCharge)) return;
+        if (dist > 2.5f && dist <= ClassCombos.MireHookRange) Cast(DiabloSkills.Skill.MireHook);
+    }
+
+    static GameObject NearestHusk(Vector3 at)
+    {
+        GameObject best = null;
+        float bestD = 1.5f;
+        foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
         {
-            // Pre-class boss rule, unchanged: Cleave, else Fireball.
-            if (Ready(DiabloSkills.Skill.Cleave)) skills.CastToward(DiabloSkills.Skill.Cleave, toTarget);
-            else if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-            return;
+            if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
+            var d = h.transform.position - at;
+            d.y = 0f;
+            if (d.magnitude < bestD) { bestD = d.magnitude; best = h; }
         }
-        if (Ready(DiabloSkills.Skill.Fireball)) skills.CastToward(DiabloSkills.Skill.Fireball, toTarget);
-        else if (Ready(DiabloSkills.Skill.Arrow)) skills.CastToward(DiabloSkills.Skill.Arrow, toTarget);
+        return best;
     }
 
     /// <summary>Hurt living allies (not the caster) inside the group-heal radius.</summary>

@@ -8,7 +8,9 @@ Outputs into sandbox/Assets/Resources/MenuArt/:
         PortraitFenwalker, PortraitLanternbearer, PortraitVendor
     Skill Icons (256x256 RGBA):
         SkillFireball, SkillArrow, SkillCleave,
-        SkillLanternBolt, SkillWisps, SkillSearingHalo, SkillVeilStep
+        SkillLanternBolt, SkillWisps, SkillSearingHalo, SkillVeilStep,
+        SkillMireHook, SkillBogCharge, SkillMireGround, SkillIronVow,
+        SkillSmokePot, SkillShadowRoll, SkillVenomVial, SkillPowderKeg
     Navigation / Badges (256x256 RGBA):
         CrestCinderreach, WaypointSigil, StashChestIcon, SettingsCog
     Startup Key Art Backdrop (1024x576 RGB):
@@ -120,6 +122,11 @@ def make_materials():
     m["veil_violet"] = H.emission_material("P_VeilViolet", "#7462f0", strength=2.2)
     m["ruby"] = H.material("P_Ruby", "#b40c18", roughness=0.06, metallic=0.1, emission="#940a14", emission_strength=1.2)
     m["charcoal"] = H.material_preset("P_Charcoal", "stone", base_color="#1a1416", roughness=0.88, scale=12.0)
+    # class-kits-parity: bog mud, smoke and venom for the Fenwalker/Rogue kit icons.
+    m["mud"] = H.material_preset("P_Mud", "stone", base_color="#3b3020", roughness=0.92, scale=9.0)
+    m["smoke"] = H.material("P_Smoke", "#8a8c94", roughness=0.95, metallic=0.0)
+    m["venom"] = H.emission_material("P_Venom", "#5cf03a", strength=2.2)
+    m["clay"] = H.material_preset("P_Clay", "stone", base_color="#7a4a2c", roughness=0.85, scale=10.0)
     return m
 
 
@@ -822,6 +829,120 @@ def build_startup_backdrop():
     return out_path
 
 
+# ---------------- class-kits-parity: Fenwalker kit ----------------
+
+def build_skill_mire_hook():
+    m = make_materials()
+    parts = []
+    # Iron hook on a chain swinging out of a bog splash.
+    links = []
+    for i in range(6):
+        x = -0.40 + i * 0.12
+        z = -0.22 + i * 0.07
+        links.append(H.add_torus(f"HLink{i}", major=0.045, minor=0.013, location=(x, 0, z),
+                                 rotation=(90 if i % 2 else 0, 0, 30), mat=m["dark_iron"]))
+    shank = H.add_cylinder("HShank", 0.03, 0.30, location=(0.34, 0, 0.26), rotation=(0, 35, 0), mat=m["steel"])
+    hook = H.add_tube("HHook", [(0.42, 0, 0.14), (0.46, 0, 0.0), (0.34, 0, -0.06), (0.26, 0, 0.04)],
+                      radius=0.035, mat=m["steel"], taper=[1.0, 0.9, 0.7, 0.2])
+    splash = H.add_cylinder("HMud", 0.30, 0.05, location=(-0.30, 0.05, -0.30), mat=m["mud"], vertices=9)
+    parts += links + [shank, hook, splash]
+    return render_icon_objs("SkillMireHook", parts, azimuth=0, elevation=8, margin=1.12)
+
+
+def build_skill_bog_charge():
+    m = make_materials()
+    parts = []
+    # Tower shield driving forward through mud with brass speed streaks.
+    shield = H.add_box("BShield", (0.36, 0.06, 0.52), location=(0.12, 0, 0.02), mat=m["steel"], bevel=0.04)
+    boss = H.add_sphere("BBoss", 0.07, location=(0.12, -0.05, 0.04), mat=m["brass"], segments=16)
+    rim = H.add_torus("BRim", major=0.22, minor=0.018, location=(0.12, -0.03, 0.02), rotation=(90, 0, 0), mat=m["brass"])
+    parts += [shield, boss, rim]
+    for i, z in enumerate((-0.18, 0.02, 0.22)):
+        parts.append(H.add_tube(f"BStreak{i}", [(-0.48, 0.02, z), (-0.30, 0.02, z), (-0.10, 0.02, z)],
+                                radius=0.022, mat=m["wisp_gold"], taper=[0.05, 0.6, 1.0]))
+    parts.append(H.add_cylinder("BMud", 0.34, 0.05, location=(0.0, 0.06, -0.30), mat=m["mud"], vertices=8))
+    return render_icon_objs("SkillBogCharge", parts, azimuth=0, elevation=6, margin=1.10)
+
+
+def build_skill_mire_ground():
+    m = make_materials()
+    parts = []
+    # Dark bog pool with rising bubbles and reeds.
+    pool = H.add_cylinder("GPool", 0.42, 0.06, location=(0, 0, -0.18), mat=m["mud"], vertices=12, bevel=0.02)
+    parts.append(pool)
+    for i, (x, z, r) in enumerate([(-0.12, -0.08, 0.06), (0.10, -0.06, 0.05), (0.02, 0.06, 0.04), (0.18, 0.14, 0.03)]):
+        parts.append(H.add_sphere(f"GBubble{i}", r, location=(x, -0.04, z), mat=m["basalt"], segments=12))
+    for i, x in enumerate((-0.30, -0.22, 0.28)):
+        parts.append(H.add_cylinder(f"GReed{i}", 0.012, 0.42, location=(x, 0.02, 0.04), rotation=(0, 8 * (i - 1), 0), mat=m["wood"]))
+    parts.append(H.add_torus("GRing", major=0.40, minor=0.016, location=(0, -0.02, -0.14), rotation=(80, 0, 0), mat=m["brass"]))
+    return render_icon_objs("SkillMireGround", parts, azimuth=0, elevation=24, margin=1.12)
+
+
+def build_skill_iron_vow():
+    m = make_materials()
+    parts = []
+    # Crossed sword over a kite shield ringed by a pale oath halo.
+    shield = H.add_box("VShield", (0.34, 0.05, 0.46), location=(0, 0, -0.02), mat=m["dark_iron"], bevel=0.05)
+    blade = H.add_box("VBlade", (0.05, 0.03, 0.62), location=(0, -0.05, 0.04), mat=m["steel"], bevel=0.01)
+    guard = H.add_box("VGuard", (0.26, 0.04, 0.04), location=(0, -0.06, -0.18), mat=m["brass"], bevel=0.01)
+    halo = H.add_torus("VHalo", major=0.38, minor=0.02, location=(0, -0.02, 0.02), rotation=(90, 0, 0), mat=m["cyan_rune"])
+    parts += [shield, blade, guard, halo]
+    return render_icon_objs("SkillIronVow", parts, azimuth=0, elevation=4, margin=1.10)
+
+
+# ---------------- class-kits-parity: Rogue kit ----------------
+
+def build_skill_smoke_pot():
+    m = make_materials()
+    parts = []
+    # Clay pot bursting into grey smoke puffs.
+    pot = H.add_sphere("SPot", 0.14, location=(-0.10, 0, -0.18), mat=m["clay"], segments=16)
+    neck = H.add_cylinder("SNeck", 0.06, 0.08, location=(-0.10, 0, -0.03), mat=m["clay"])
+    parts += [pot, neck]
+    for i, (x, z, r) in enumerate([(0.0, 0.10, 0.12), (0.16, 0.18, 0.14), (-0.14, 0.22, 0.11), (0.26, 0.02, 0.10), (0.06, 0.32, 0.09)]):
+        parts.append(H.add_sphere(f"SPuff{i}", r, location=(x, -0.02, z), mat=m["smoke"], segments=14))
+    return render_icon_objs("SkillSmokePot", parts, azimuth=0, elevation=6, margin=1.10)
+
+
+def build_skill_shadow_roll():
+    m = make_materials()
+    parts = []
+    # A violet crescent of motion with a dagger glint.
+    arc = [(0.34 * math.cos(math.radians(a)), 0, 0.34 * math.sin(math.radians(a))) for a in range(200, 381, 30)]
+    parts.append(H.add_tube("RArc", arc, radius=0.05, mat=m["veil_violet"], taper=[0.05, 0.4, 0.8, 1.0, 0.8, 0.4, 0.05]))
+    blade = H.add_cone("RBlade", 0.05, 0.30, radius_top=0.004, location=(0.12, -0.04, 0.10), rotation=(0, 50, 0), mat=m["steel"], vertices=4)
+    blade.scale = (0.8, 0.3, 1.0)
+    hilt = H.add_cylinder("RHilt", 0.02, 0.12, location=(0.0, -0.04, -0.02), rotation=(0, 50, 0), mat=m["hood_cloth"])
+    parts += [blade, hilt]
+    return render_icon_objs("SkillShadowRoll", parts, azimuth=0, elevation=4, margin=1.12)
+
+
+def build_skill_venom_vial():
+    m = make_materials()
+    parts = []
+    # Glass vial with glowing green venom dripping.
+    body = H.add_sphere("VBody", 0.15, location=(0, 0, -0.10), mat=m["venom"], segments=18)
+    neck = H.add_cylinder("VNeck", 0.045, 0.16, location=(0, 0, 0.10), mat=m["steel"])
+    cork = H.add_cylinder("VCork", 0.05, 0.06, location=(0, 0, 0.21), mat=m["wood"])
+    parts += [body, neck, cork]
+    for i, (x, z) in enumerate([(0.20, -0.20), (-0.18, -0.26), (0.06, -0.34)]):
+        parts.append(H.add_sphere(f"VDrop{i}", 0.035, location=(x, -0.02, z), mat=m["venom"], segments=10))
+    return render_icon_objs("SkillVenomVial", parts, azimuth=0, elevation=8, margin=1.12)
+
+
+def build_skill_powder_keg():
+    m = make_materials()
+    parts = []
+    # Banded powder keg with a lit fuse spark.
+    keg = H.add_cylinder("KBody", 0.20, 0.40, location=(0, 0, -0.08), mat=m["wood"], vertices=16, bevel=0.03)
+    for i, z in enumerate((-0.22, 0.06)):
+        parts.append(H.add_torus(f"KBand{i}", major=0.205, minor=0.014, location=(0, 0, z), mat=m["dark_iron"]))
+    fuse = H.add_tube("KFuse", [(0.0, 0, 0.12), (0.08, 0, 0.22), (0.16, 0, 0.26)], radius=0.012, mat=m["charcoal"])
+    spark = H.add_sphere("KSpark", 0.06, location=(0.18, -0.02, 0.27), mat=m["fire_core"], segments=12)
+    parts += [keg, fuse, spark]
+    return render_icon_objs("SkillPowderKeg", parts, azimuth=12, elevation=14, margin=1.12)
+
+
 TASKS = [
     ("PortraitFenwalker", build_portrait_fenwalker),
     ("PortraitLanternbearer", build_portrait_lanternbearer),
@@ -839,6 +960,14 @@ TASKS = [
     ("SkillSeismicSlam", build_skill_seismic_slam),
     ("SkillMendingLight", build_skill_mending_light),
     ("SkillRenewingCircle", build_skill_renewing_circle),
+    ("SkillMireHook", build_skill_mire_hook),
+    ("SkillBogCharge", build_skill_bog_charge),
+    ("SkillMireGround", build_skill_mire_ground),
+    ("SkillIronVow", build_skill_iron_vow),
+    ("SkillSmokePot", build_skill_smoke_pot),
+    ("SkillShadowRoll", build_skill_shadow_roll),
+    ("SkillVenomVial", build_skill_venom_vial),
+    ("SkillPowderKeg", build_skill_powder_keg),
     ("CrestCinderreach", build_crest_cinderreach),
     ("WaypointSigil", build_waypoint_sigil),
     ("StashChestIcon", build_stash_chest_icon),

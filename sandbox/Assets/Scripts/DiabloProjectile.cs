@@ -163,6 +163,13 @@ public sealed class DiabloProjectile : MonoBehaviour
             return;
         }
 
+        // Spark Shot (class-kits-parity): a Quick Shot through a powder keg sets it off at once.
+        if (kind == DiabloSkills.Skill.QuickShot && !cosmetic)
+        {
+            var keg = PowderKeg.OnSegment(from, to, ClassCombos.IgniteRadius);
+            if (keg != null) keg.Detonate(true);
+        }
+
         var husk = FirstHuskOnSegment(from, to, out float huskT);
         float wallT = WallDistance(from, step);
         if (husk != null && huskT <= wallT)
@@ -176,6 +183,7 @@ public sealed class DiabloProjectile : MonoBehaviour
                 {
                     bool crit = DiabloSkills.ApplyHit(husk, damage, from, knockback, owner);
                     NotifyKeen(crit);
+                    NotifyNightfang(husk);
                 }
                 transform.position = to;
                 travelled += step;
@@ -290,6 +298,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         {
             bool keenCrit = DiabloSkills.ApplyHit(directHit, damage, origin, knockback, owner);
             NotifyKeen(keenCrit);
+            NotifyNightfang(directHit);
         }
 
         // A wall-struck arrow stays stuck for a moment; everything else goes now.
@@ -318,6 +327,14 @@ public sealed class DiabloProjectile : MonoBehaviour
             HeroHits++;
             if (Application.isPlaying) DiabloJuice.OnPlayerHurt(hero.transform.position, dmg);
         }
+    }
+
+    /// <summary>nightfang (class-kits-parity): every Quick Shot hit leaves a venom stack.</summary>
+    void NotifyNightfang(GameObject husk)
+    {
+        if (kind != DiabloSkills.Skill.QuickShot || owner == null || husk == null) return;
+        if (!BuildUniqueEffects.HasNightfang(owner.GetComponent<Equipment>())) return;
+        EnemyStatus.AddVenom(husk, owner, BuildUniqueEffects.NightfangVenomStacks);
     }
 
     /// <summary>

@@ -369,6 +369,14 @@ public static class DiabloMenuArt
             case DiabloSkills.Skill.BladeFlurry: res = "SkillBladeFlurry"; break;
             case DiabloSkills.Skill.MendingLight: res = "SkillMendingLight"; break;
             case DiabloSkills.Skill.RenewingCircle: res = "SkillRenewingCircle"; break;
+            case DiabloSkills.Skill.MireHook: res = "SkillMireHook"; break;
+            case DiabloSkills.Skill.BogCharge: res = "SkillBogCharge"; break;
+            case DiabloSkills.Skill.MireGround: res = "SkillMireGround"; break;
+            case DiabloSkills.Skill.IronVow: res = "SkillIronVow"; break;
+            case DiabloSkills.Skill.SmokePot: res = "SkillSmokePot"; break;
+            case DiabloSkills.Skill.ShadowRoll: res = "SkillShadowRoll"; break;
+            case DiabloSkills.Skill.VenomVial: res = "SkillVenomVial"; break;
+            case DiabloSkills.Skill.PowderKeg: res = "SkillPowderKeg"; break;
             default: return null;
         }
         return MenuArtSprite(res);

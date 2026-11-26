@@ -111,8 +111,10 @@ public class PartySkillFormulaTests
     public void HudLine_NamesNewSkills()
     {
         RunProfile.ClassId = ClassCatalog.RogueId;
-        StringAssert.Contains("[R] Schnellschuss", skills.HudLine());
-        StringAssert.Contains("[Leertaste] Klingenwirbel", skills.HudLine());
+        StringAssert.Contains("[Q] Schnellschuss", skills.HudLine());
+        StringAssert.Contains("[E] Klingenwirbel", skills.HudLine());
+        StringAssert.Contains("[Leertaste] Schattenrolle", skills.HudLine());
+        StringAssert.Contains("[G] Pulverfass", skills.HudLine());
         RunProfile.ClassId = ClassCatalog.LanternbearerId;
         StringAssert.Contains("[F] Heilendes Licht", skills.HudLine());
         StringAssert.Contains("[G] Erneuernder Kreis", skills.HudLine());

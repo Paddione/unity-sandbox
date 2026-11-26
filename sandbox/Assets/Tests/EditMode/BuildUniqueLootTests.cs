@@ -85,6 +85,8 @@ public class BuildUniqueLootTests
                 Assert.That(item.uniqueId, Is.EqualTo(ItemDatabase.LancerWardId)
                     .Or.EqualTo(ItemDatabase.WickOfHaloId)
                     .Or.EqualTo(ItemDatabase.NightfangId)
+                    .Or.EqualTo(ItemDatabase.MoorvogtAnchorId)
+                    .Or.EqualTo(ItemDatabase.SmugglersFuseId)
                     .Or.EqualTo("Emberbrand Blade")
                     .Or.EqualTo("Lantern of the Hold")
                     .Or.EqualTo(ItemDatabase.RogueKeepsakeId));

@@ -3,15 +3,17 @@ public static partial class LocCatalog
 {
     static readonly Entry[] Unique =
     {
-        E("unique.effect.lancerward", "Spalten unterbricht einen anstürmenden Aschenlanzer (er erholt sich erschöpft).", "Cleave interrupts one charging Lancer (it recovers exhausted)."),
+        E("unique.effect.lancerward", "Spalten unterbricht einen anstürmenden Aschenlanzer und zerschmettert betäubte Gegner mit doppeltem Schaden.", "Cleave interrupts one charging Lancer and shatters stunned foes for double damage."),
         E("unique.effect.wick", "Irrlichter treffen zuerst Beute in deinem brennenden Kranz.", "Wisps strike prey inside your burning halo first."),
-        E("unique.effect.nightfang", "Schnellschuss durchbohrt ein weiteres Ziel.", "Quick Shot pierces one extra target."),
-        E("unique.effect.bulwark", "Ein frontal geblockter Treffer fordert den Angreifer heraus (Bedrohung).", "A blocked frontal hit calls out the attacker (threat)."),
-        E("unique.effect.seismiccrown", "Erdstoß hält sein Hauptziel 2 s länger fest.", "Seismic Slam holds its main target 2 s longer."),
+        E("unique.effect.nightfang", "Schnellschuss durchbohrt ein weiteres Ziel und vergiftet jeden Getroffenen (1 Stapel).", "Quick Shot pierces one extra target and leaves a venom stack on every foe hit."),
+        E("unique.effect.bulwark", "Ein frontal geblockter Treffer fordert den Angreifer heraus (Bedrohung) und lädt die Vergeltung deines nächsten Spaltens.", "A blocked frontal hit calls out the attacker (threat) and charges your next Cleave's Retribution."),
+        E("unique.effect.seismiccrown", "Erdstoß hält sein Hauptziel 2 s länger fest und verschlammt alle Getroffenen.", "Seismic Slam holds its main target 2 s longer and mires every foe struck."),
         E("unique.effect.mercyshroud", "Heilendes Licht gewährt einen Schild von 5 Leben (4 s).", "Mending Light grants a 5 HP shield (4 s)."),
         E("unique.effect.dawncircle", "Erneuernder Kreis heilt den schwächsten Verbündeten ein weiteres Mal.", "Renewing Circle mends the weakest ally once more."),
-        E("unique.effect.shadowstride", "Treffer des Klingenwirbels geben +30 % Lauftempo (3 s).", "Blade Flurry hits grant +30% move speed (3 s)."),
-        E("unique.effect.keencadence", "Der erste kritische Treffer einer Spezialfertigkeit verkürzt ihre Abklingzeit um 2 s.", "The first crit of a special cast cuts its cooldown by 2 s."),
+        E("unique.effect.shadowstride", "Treffer des Klingenwirbels geben +30 % Lauftempo (3 s) und verkürzen die Schattenrolle um 0,5 s je Treffer.", "Blade Flurry hits grant +30% move speed (3 s) and cut Shadow Roll's cooldown by 0.5 s each."),
+        E("unique.effect.keencadence", "Der erste kritische Treffer einer Spezialfertigkeit verkürzt ihre Abklingzeit um 2 s. Hinterhalt hält 4 s statt 2,5 s.", "The first crit of a special cast cuts its cooldown by 2 s. Ambush lasts 4 s instead of 2.5 s."),
+        E("unique.effect.moorvogtanchor", "Moorhaken zieht auch alle verschlammten Gegner im Umkreis von 4 m um das Ziel heran. Moorsturm betäubt bereits verschlammte Gegner 1 s.", "Mire Hook also drags every mired foe within 4 m of the target. Bog Charge stuns foes that were already mired for 1 s."),
+        E("unique.effect.smugglersfuse", "Ein Pulverfass in deinem Rauch zündet sofort, mit 50 % mehr Radius, und vergiftet alle Getroffenen (2 Stapel).", "A powder keg in your smoke goes off at once with 50% more radius and poisons every foe hit (2 stacks)."),
         E("unique.effect.ironboundgrips", "Ein erlittener Treffer gewährt einen Schild von 4 Leben (3 s, höchstens alle 3 s).", "Taking a hit grants a 4 HP shield (3 s, at most every 3 s)."),
         E("unique.effect.menderstouch", "Heilendes Licht und Erneuernder Kreis heilen 20 % mehr.", "Mending Light and Renewing Circle heal 20% more."),
         E("unique.effect.cutpursewraps", "Kritische Treffer heilen dich um 2 Leben.", "Critical hits heal you for 2 HP."),

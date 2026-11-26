@@ -23,6 +23,8 @@ public static class DiabloAudio
         HuskGrowl, WardenTaunt, BossRoar,
         Gold, RareDrop, VendorBuy, VendorSell, Gate,
         Heal, Quest, Shrine, Block, Footstep,
+        MireHook, BogCharge, MireGround, IronVow,
+        SmokePot, ShadowRoll, VenomVial, PowderKeg,
     }
 
     public static int soundedSwings;
@@ -78,6 +80,8 @@ public static class DiabloAudio
     static AudioClip swingClip, hitClip, deathClip, lootClip, uiClickClip, hurtClip, playerDeathClip;
     static AudioClip whooshClip, blastClip, twangClip, critClip, levelUpClip, ambientClip;
     static AudioClip lanternClip, haloClip, veilClip;
+    static AudioClip mireHookClip, bogChargeClip, mireGroundClip, ironVowClip;
+    static AudioClip smokePotClip, shadowRollClip, venomVialClip, powderKegClip;
     static AudioClip swordHit1Clip, swordHit2Clip, swordHit3Clip;
     static AudioClip fireballClip, arrowClip, cleaveClip;
     static AudioClip huskGrowlClip, wardenTauntClip, bossRoarClip;
@@ -273,6 +277,16 @@ public static class DiabloAudio
     public static void PlayLantern() { EnsureBuilt(); Varied(Resolve("Lantern", lanternClip), 0.58f); soundedCasts++; }
     public static void PlayHalo() { EnsureBuilt(); Varied(Resolve("Halo", haloClip), 0.62f); soundedCasts++; }
     public static void PlayVeil() { EnsureBuilt(); Varied(Resolve("Veil", veilClip), 0.55f); soundedCasts++; }
+    // Fenwalker kit (class-kits-parity): iron chain rattle, heavy charge, wet bog, oath gong.
+    public static void PlayMireHook() { EnsureBuilt(); Varied(Resolve("MireHook", mireHookClip), 0.62f); soundedCasts++; }
+    public static void PlayBogCharge() { EnsureBuilt(); Varied(Resolve("BogCharge", bogChargeClip), 0.66f); soundedCasts++; }
+    public static void PlayMireGround() { EnsureBuilt(); Varied(Resolve("MireGround", mireGroundClip), 0.60f); soundedCasts++; }
+    public static void PlayIronVow() { EnsureBuilt(); Varied(Resolve("IronVow", ironVowClip), 0.62f); soundedCasts++; }
+    // Rogue kit: clay pot puff, cloth roll, glass vial splash, powder blast.
+    public static void PlaySmokePot() { EnsureBuilt(); Varied(Resolve("SmokePot", smokePotClip), 0.58f); soundedCasts++; }
+    public static void PlayShadowRoll() { EnsureBuilt(); Varied(Resolve("ShadowRoll", shadowRollClip), 0.52f); soundedCasts++; }
+    public static void PlayVenomVial() { EnsureBuilt(); Varied(Resolve("VenomVial", venomVialClip), 0.58f); soundedCasts++; }
+    public static void PlayPowderKeg() { EnsureBuilt(); Varied(Resolve("PowderKeg", powderKegClip), 0.80f); soundedBlasts++; }
     public static AudioClip LanternClip { get { EnsureBuilt(); return lanternClip; } }
     public static AudioClip HaloClip { get { EnsureBuilt(); return haloClip; } }
     public static AudioClip VeilClip { get { EnsureBuilt(); return veilClip; } }
@@ -335,6 +349,14 @@ public static class DiabloAudio
             case Cue.Shrine: PlayShrine(); break;
             case Cue.Block: PlayBlock(); break;
             case Cue.Footstep: PlayFootstep(); break;
+            case Cue.MireHook: PlayMireHook(); break;
+            case Cue.BogCharge: PlayBogCharge(); break;
+            case Cue.MireGround: PlayMireGround(); break;
+            case Cue.IronVow: PlayIronVow(); break;
+            case Cue.SmokePot: PlaySmokePot(); break;
+            case Cue.ShadowRoll: PlayShadowRoll(); break;
+            case Cue.VenomVial: PlayVenomVial(); break;
+            case Cue.PowderKeg: PlayPowderKeg(); break;
             case Cue.Ambient: break; // looping bed is owned by DiabloAmbience, never a hit
             default: PlayHit(); break;
         }
@@ -476,6 +498,14 @@ public static class DiabloAudio
         lanternClip = WarmBell("LanternBolt", 0.44f, 329.63f, 1250f, 0.55f);
         haloClip = SynthHalo("SearingHalo", 0.42f);
         veilClip = SynthVeil("VeilStep", 0.28f, rng);
+        mireHookClip = MetallicImpact("MireHook", 0.26f, 210f, 90f, 520f, 780f, 0.45f, 1800f, 0.60f, rng);
+        bogChargeClip = Whoosh("BogCharge", 0.42f, 120f, 520f, 110f, 62f, 0.40f, 0.68f, rng);
+        mireGroundClip = FilteredNoise("MireGround", 0.55f, 60f, 340f, 70f, 38f, 0.55f, 0.58f, rng);
+        ironVowClip = WarmBell("IronVow", 0.70f, 146.83f, 900f, 0.60f);
+        smokePotClip = FilteredNoise("SmokePot", 0.38f, 220f, 1600f, 120f, 70f, 0.25f, 0.55f, rng);
+        shadowRollClip = SynthVeil("ShadowRoll", 0.22f, rng);
+        venomVialClip = SynthGlassImpact("VenomVial", 0.20f, 760f, 1140f, 0.56f, rng);
+        powderKegClip = Boom("PowderKeg", 0.70f, 95f, 38f, 900f, 0.78f, rng);
 
         swingVariants = new[]
         {

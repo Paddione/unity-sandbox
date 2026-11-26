@@ -56,6 +56,8 @@ public sealed class AutoplayResult
     public int healsCast;
     /// <summary>HP restored by heals on the route (party-roles S6).</summary>
     public float hpRestored;
+    /// <summary>Combo payoffs on the route, "Name=count" (class-kits-parity).</summary>
+    public List<string> combos = new List<string>();
 
     public const string RoleSolo = "solo";
     public const string RoleHost = "host";

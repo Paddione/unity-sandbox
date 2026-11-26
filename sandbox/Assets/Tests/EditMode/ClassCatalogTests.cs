@@ -34,12 +34,14 @@ public class ClassCatalogTests
     }
 
     [Test]
-    public void Fenwalker_IsTheExistingHero()
+    public void Fenwalker_IsTheTankKit()
     {
+        // class-kits-parity: six own skills, Fireball/Arrow left the kit (still castable as base set).
         var f = ClassCatalog.Fenwalker;
         CollectionAssert.AreEqual(
-            new[] { DiabloSkills.Skill.Fireball, DiabloSkills.Skill.Arrow, DiabloSkills.Skill.Cleave, DiabloSkills.Skill.SeismicSlam }, f.skills);
-        CollectionAssert.AreEqual(new[] { "Q", "E", "R", "Space" }, f.keys);
+            new[] { DiabloSkills.Skill.Cleave, DiabloSkills.Skill.MireHook, DiabloSkills.Skill.SeismicSlam,
+                DiabloSkills.Skill.BogCharge, DiabloSkills.Skill.MireGround, DiabloSkills.Skill.IronVow }, f.skills);
+        CollectionAssert.AreEqual(new[] { "Q", "E", "R", "Space", "F", "G" }, f.keys);
         Assert.AreEqual(1f, f.focusSkillFactor);
         Assert.AreEqual(1f, f.strengthMeleeFactor);
         Assert.AreEqual("Adventurers/Characters/Knight.fbx", f.modelPath);
