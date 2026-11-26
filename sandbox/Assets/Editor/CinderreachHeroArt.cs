@@ -32,9 +32,9 @@ public static class CinderreachHeroArt
             throw new InvalidOperationException("Cinderreach light clothing is missing or has no skin.");
         var signatures = new HashSet<Hash128>();
         var ids = new HashSet<string>(ItemDatabase.UniqueIds);
-        // gear-slots S3: hands/feet/belt uniques build on limb bones, the rest on the classic mounts.
-        var bodyIds = new HashSet<string>(ids.Where(i => !HeroGearModels.IsLimbSlot(ItemDatabase.CreateUnique(i).slot)));
-        if (!bodyIds.SetEquals(HeroGearModels.Ids))
+        // gear-slots S3/S4: hands/feet/belt uniques build on limb bones (verified via
+        // CreateLimbPreview below), the rest on the classic mounts — Models covers every Unique.
+        if (!ids.SetEquals(HeroGearModels.Ids))
             throw new InvalidOperationException("Unique model coverage differs from the item catalog.");
         foreach (var id in ids)
         {

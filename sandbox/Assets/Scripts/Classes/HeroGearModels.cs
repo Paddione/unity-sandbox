@@ -197,6 +197,63 @@ public static class HeroGearModels
                 Crystal(root, "Ember leaf", Ember, new Vector3(i*.11f,.32f-Mathf.Abs(i)*.03f,.24f),
                     new Vector3(.09f,.18f,.06f));
         }),
+        // gear-slots S4: limb uniques as showcase models (worn looks live in Limbs above).
+        [ItemDatabase.IronboundGripsId] = new Model(ItemSlot.Gloves, root =>
+        {
+            Band(root, Iron, .24f, .10f, .42f);
+            Box(root, "Knuckle plate", Brass, new Vector3(0f,.30f,.10f), new Vector3(.34f,.10f,.05f));
+            foreach (float x in new[] { -.11f, 0f, .11f })
+                Box(root, "Rivet", Brass, new Vector3(x,.30f,.13f), new Vector3(.04f,.04f,.03f));
+        }),
+        [ItemDatabase.MendersTouchId] = new Model(ItemSlot.Gloves, root =>
+        {
+            Band(root, Pearl, .22f, .10f, .40f);
+            Crystal(root, "Mender stone", Jade, new Vector3(0f,.30f,.12f), new Vector3(.12f,.16f,.06f));
+            Beam(root, "Wrap tie", Pearl, new Vector3(-.20f,.02f,0f), new Vector3(.20f,.18f,.06f), .03f);
+        }),
+        [ItemDatabase.CutpurseWrapsId] = new Model(ItemSlot.Gloves, root =>
+        {
+            Band(root, Dark, .22f, .10f, .40f);
+            Box(root, "Coin pouch", Lilac, new Vector3(.20f,.16f,.08f), new Vector3(.12f,.14f,.09f));
+            Plate(root, "Hooked pick", Lilac, .03f, .10f, -.06f,.30f, .06f,.30f, .02f,.44f, -.02f,.44f);
+        }),
+        [ItemDatabase.BastionTreadsId] = new Model(ItemSlot.Boots, root =>
+        {
+            Box(root, "Shaft", Brass, new Vector3(0f,.18f,0f), new Vector3(.30f,.44f,.26f));
+            Box(root, "Sole", Iron, new Vector3(0f,-.08f,.02f), new Vector3(.32f,.08f,.34f));
+            Box(root, "Shin plate", Iron, new Vector3(0f,.20f,.15f), new Vector3(.22f,.34f,.04f));
+        }),
+        [ItemDatabase.PilgrimStepsId] = new Model(ItemSlot.Boots, root =>
+        {
+            Plate(root, "Sandal sole", Pearl, .05f, 0f, -.16f,-.10f, .16f,-.10f, .14f,.34f, -.14f,.34f);
+            Beam(root, "Toe strap", Jade, new Vector3(-.13f,.26f,.03f), new Vector3(.13f,.26f,.03f), .035f);
+            Beam(root, "Ankle strap", Jade, new Vector3(-.15f,.06f,.02f), new Vector3(.15f,.06f,.02f), .035f);
+        }),
+        [ItemDatabase.GhostwalkBootsId] = new Model(ItemSlot.Boots, root =>
+        {
+            Box(root, "Shaft", Dark, new Vector3(0f,.16f,0f), new Vector3(.26f,.40f,.22f));
+            Crystal(root, "Wisp", Lilac, new Vector3(.16f,.30f,.06f), new Vector3(.09f,.20f,.07f));
+            Crystal(root, "Wisp echo", Lilac, new Vector3(-.15f,.10f,-.04f), new Vector3(.07f,.15f,.06f));
+        }),
+        [ItemDatabase.WardensGirdleId] = new Model(ItemSlot.Belt, root =>
+        {
+            Band(root, Iron, .30f, .10f, .20f);
+            Box(root, "Buckle", Brass, new Vector3(0f,.10f,.30f), new Vector3(.16f,.12f,.05f));
+            foreach (float x in new[] { -.20f, .20f })
+                Box(root, "Stud", Brass, new Vector3(x,.10f,.24f), new Vector3(.05f,.05f,.04f));
+        }),
+        [ItemDatabase.VialSashId] = new Model(ItemSlot.Belt, root =>
+        {
+            Band(root, Pearl, .28f, .10f, .16f);
+            Box(root, "Sash tail", Pearl, new Vector3(.24f,-.08f,.12f), new Vector3(.09f,.28f,.04f));
+            Crystal(root, "Vial", Jade, new Vector3(-.22f,.10f,.20f), new Vector3(.10f,.16f,.07f));
+        }),
+        [ItemDatabase.QuickdrawBeltId] = new Model(ItemSlot.Belt, root =>
+        {
+            Band(root, Dark, .29f, .10f, .18f);
+            Plate(root, "Sheath", Ember, .06f, .18f, -.10f,-.06f, -.02f,-.06f, -.02f,.24f, -.10f,.24f);
+            Box(root, "Buckle", Ember, new Vector3(.10f,.10f,.28f), new Vector3(.10f,.07f,.04f));
+        }),
     };
 
     // ---- gear-slots S3: worn hands, feet and belt --------------------------------

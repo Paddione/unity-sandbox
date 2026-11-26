@@ -26,13 +26,7 @@ Prozent: 100 %
 
 ## Nächste Schritte
 
-- B1: erledigt/verifiziert. B2: ausgeführt am 2026-11-24 (`0 of 115`, Inkling
-  restoret + healthy) — bei künftigen S2-Neutexte (Stale > 0) neues Fenster nötig.
-- B3: Abnahme grün am 2026-11-24 — QA `clips 115, mean CER 0.007, above 0.25: 0`
-  (schlechteste: `bark.abbot.death` 0.14); Gates `check-voice-lines` 115/0,
-  `check-meta` OK, `check-audio-manifest` OK (35 cues, 8 tracks); Suiten EditMode
-  539/539 + PlayMode 303/303 (Unity 6000.0.85f2). Belege: `docs/voice-batch-run-log.md`,
-  `docs/dev-journal.md` (Eintrag 2026-11-24).
+Keine — alle Batches (B1–B3) am 2026-11-24 erledigt und abgenommen (Details unter „Erledigt").
 
 ## Offene Punkte
 
