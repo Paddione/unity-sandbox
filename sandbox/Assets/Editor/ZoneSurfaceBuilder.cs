@@ -39,6 +39,8 @@ public static class ZoneSurfaceBuilder
             { "Bone", (0.6f, 0f) },
             { "Iron", (0.7f, 0f) },
             { "BloodCloth", (0.6f, 0f) },
+            { "WaystoneRune", (0.6f, 2f) },
+            { "PortalVeil", (0.6f, 1.4f) },
         };
 
     /// <summary>Scene object name (exact or prefix ending in '_') → (surface, metres per texture repeat).</summary>
@@ -58,6 +60,13 @@ public static class ZoneSurfaceBuilder
         (BarrensBuilder.DunePrefix, "BarrensSand", 10f),
         (BarrensBuilder.SpirePrefix, "BarrensStone", 2.5f),
         ("WaypointShrine_", "Stone", 1.5f),
+        ("ShrineStone", "WaystoneRune", 1.5f),
+        (ZoneGate.FenGateName, "PortalVeil", 2.5f),
+        (ZoneGate.OssuaryGateName, "PortalVeil", 2.5f),
+        (ZoneGate.KilnGateName, "PortalVeil", 2.5f),
+        (ZoneGate.KilnReturnGateName, "PortalVeil", 2.5f),
+        (ZoneGate.BarrensGateName, "PortalVeil", 2.5f),
+        (ZoneGate.BarrensReturnGateName, "PortalVeil", 2.5f),
         (ZoneEdgeBuilder.Prefix + "Ossuary_", "CryptAshlar", 2.5f),
         (ZoneEdgeBuilder.Prefix + "Kiln_", "KilnBrick", 3f),
         (ZoneEdgeBuilder.Prefix + "Barrens_", "BarrensStone", 2.5f),
