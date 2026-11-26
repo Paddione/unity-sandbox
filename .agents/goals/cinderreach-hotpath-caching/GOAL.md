@@ -1,5 +1,6 @@
 # Goal: cinderreach-hotpath-caching
 
+plan_refs: [.agents/plans/cinderreach-hotpath-caching/tasks.md]
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
 health_probe: {"id":"G-DIABLO08","title":"No per-frame Camera.main or transform.Find in LootDropView.LateUpdate and DiabloClickController.Update/UpdateCamera","cmd":"cd ~/unity-sandbox && python3 scripts/check-hotpath-caching.py >/dev/null 2>&1; echo $?","target":0}
 

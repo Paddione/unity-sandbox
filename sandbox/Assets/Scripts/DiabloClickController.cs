@@ -30,6 +30,8 @@ public sealed class DiabloClickController : MonoBehaviour
     DiabloMelee melee;
     DiabloNetworkPlayer netPlayer;
     DiabloBlock block;
+    DiabloInventoryUI cachedInventoryUi;
+    Camera cachedCam;
     float verticalVelocity;
     float lastNetSwing = float.NegativeInfinity;
     float lastNetThrust = float.NegativeInfinity;
@@ -55,6 +57,7 @@ public sealed class DiabloClickController : MonoBehaviour
         }
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
+        cachedInventoryUi = GetComponent<DiabloInventoryUI>();
         block = GetComponent<DiabloBlock>();
         if (block == null) block = gameObject.AddComponent<DiabloBlock>();
         var fwd = transform.forward;
@@ -71,6 +74,20 @@ public sealed class DiabloClickController : MonoBehaviour
         // and fight the network player over the camera. Yield in that case.
         if (ShouldYieldToNetcode(netPlayer != null, NetworkManager.Singleton != null))
             enabled = false;
+    }
+
+    Camera ResolveCamera()
+    {
+        if (cachedCam == null || !cachedCam.isActiveAndEnabled)
+            cachedCam = Camera.main;
+        return cachedCam;
+    }
+
+    DiabloInventoryUI ResolveInventoryUI()
+    {
+        if (cachedInventoryUi == null)
+            cachedInventoryUi = GetComponent<DiabloInventoryUI>();
+        return cachedInventoryUi;
     }
 
     /// <summary>
@@ -251,16 +268,17 @@ public sealed class DiabloClickController : MonoBehaviour
         if (!ExternalDrive) PollKeyboard();
         UpdateBlock();
 
+        var cam = ResolveCamera();
         var mouse = ExternalDrive ? null : Mouse.current;
-        if (mouse != null && Camera.main != null)
+        if (mouse != null && cam != null)
         {
             // Aim tracks the cursor every frame (twin-stick feel).
-            var ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+            var ray = cam.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out var aimHit, 200f))
                 SetAimPoint(aimHit.point);
             // Modal checks only on click frames (they walk the hero's panels).
             bool clicked = mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame;
-            if (clicked && !ShouldBlockClicks(GetComponent<DiabloInventoryUI>())
+            if (clicked && !ShouldBlockClicks(ResolveInventoryUI())
                 && !DiabloUIFactory.IsWorldInputBlocked(gameObject))
             {
                 if (mouse.leftButton.wasPressedThisFrame)
@@ -344,7 +362,7 @@ public sealed class DiabloClickController : MonoBehaviour
         }
         controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
 
-        UpdateCamera();
+        UpdateCamera(cam);
     }
 
     /// <summary>WASD/arrows drive MoveInput; held keys cancel click orders.</summary>
@@ -399,9 +417,8 @@ public sealed class DiabloClickController : MonoBehaviour
             Quaternion.LookRotation(planar), 14f * Time.deltaTime);
     }
 
-    void UpdateCamera()
+    void UpdateCamera(Camera cam)
     {
-        var cam = Camera.main;
         if (cam == null) return;
         var pivot = transform.position + Vector3.up * 1f;
         var rot = Quaternion.Euler(pitch, yaw, 0f);

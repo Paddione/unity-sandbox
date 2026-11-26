@@ -185,4 +185,47 @@ public class ItemPresentationTests
         Assert.IsNotEmpty(vendorUi.Notice, "rejected buy must surface a notice");
         vendorUi.SetOpen(false);
     }
+
+    [UnityTest]
+    public IEnumerator GroundView_BillboardsIcon_AndFollowsCameraSwap()
+    {
+        var previousMain = Camera.main;
+        bool hadPrevious = previousMain != null && previousMain.enabled;
+        if (previousMain != null) previousMain.enabled = false;
+
+        var dropGo = new GameObject("BillboardDrop");
+        var cam1Go = new GameObject("TestCam1");
+        var cam2Go = new GameObject("TestCam2");
+        try
+        {
+            cam1Go.tag = "MainCamera";
+            var cam1 = cam1Go.AddComponent<Camera>();
+            cam1Go.transform.rotation = Quaternion.Euler(45f, 30f, 0f);
+
+            var view = LootDropView.ShowOn(dropGo, RolledWeapon());
+            Assert.IsNotNull(view);
+            var icon = dropGo.transform.Find("LootBall/ItemIcon");
+            Assert.IsNotNull(icon, "ItemIcon must exist after ShowOn");
+
+            yield return null;
+            Assert.That(Quaternion.Angle(icon.rotation, cam1.transform.rotation), Is.LessThan(0.1f),
+                "LateUpdate must billboard ItemIcon to the initial MainCamera");
+
+            cam1.enabled = false;
+            cam2Go.tag = "MainCamera";
+            var cam2 = cam2Go.AddComponent<Camera>();
+            cam2Go.transform.rotation = Quaternion.Euler(60f, -75f, 0f);
+
+            yield return null;
+            Assert.That(Quaternion.Angle(icon.rotation, cam2.transform.rotation), Is.LessThan(0.1f),
+                "ResolveCamera fallback must pick up a newly active MainCamera after swap");
+        }
+        finally
+        {
+            Object.DestroyImmediate(dropGo);
+            Object.DestroyImmediate(cam1Go);
+            Object.DestroyImmediate(cam2Go);
+            if (previousMain != null) previousMain.enabled = hadPrevious;
+        }
+    }
 }

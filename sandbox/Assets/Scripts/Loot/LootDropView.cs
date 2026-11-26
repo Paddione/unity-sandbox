@@ -92,17 +92,39 @@ public sealed class LootDropView : MonoBehaviour
         // Gentle bob so the drop reads as loot, not scenery.
         var bob = GetComponent<LootBob>() ?? gameObject.AddComponent<LootBob>();
         bob.SetTarget(iconGo, IconRideY);
+        cachedBall = ball;
+        cachedIcon = iconGo;
+    }
+
+    Transform cachedBall;
+    Transform cachedIcon;
+    Camera cachedCam;
+
+    void Awake()
+    {
+        CacheChildren();
+    }
+
+    void CacheChildren()
+    {
+        cachedBall = transform.Find("LootBall");
+        cachedIcon = cachedBall != null ? cachedBall.Find("ItemIcon") : null;
+    }
+
+    Camera ResolveCamera()
+    {
+        if (cachedCam == null || !cachedCam.isActiveAndEnabled)
+            cachedCam = Camera.main;
+        return cachedCam;
     }
 
     /// <summary>Billboard the icon at the camera (readable at any angle).</summary>
     void LateUpdate()
     {
-        var cam = Camera.main;
+        if (cachedIcon == null || !cachedIcon.gameObject.activeInHierarchy) return;
+        var cam = ResolveCamera();
         if (cam == null) return;
-        var ball = transform.Find("LootBall");
-        if (ball == null) return;
-        var icon = ball.Find("ItemIcon");
-        if (icon != null) icon.rotation = cam.transform.rotation;
+        cachedIcon.rotation = cam.transform.rotation;
     }
 
     /// <summary>Emissive rarity sphere; the drop's anchor and color signal.</summary>
