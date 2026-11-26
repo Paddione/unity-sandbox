@@ -172,13 +172,16 @@ public sealed class StoryDialogUI : MonoBehaviour
         if (IsShared) HideShared();
     }
 
+    /// <summary>Voice length of the line on display in seconds (0 when silent); test/cutscene seam.</summary>
+    public float LastLineDuration { get; private set; }
+
     void ShowLine()
     {
         int i = lines[index];
         string speaker = StoryDialog.Speaker(dialog.speakers[i]);
         speakerText.text = speaker == "n" ? "" : Loc.T("npc." + speaker + ".name");
         bodyText.text = Loc.T(dialog.Key(i));
-        StoryVoice.Play(dialog.Key(i));
+        LastLineDuration = StoryVoice.Play(dialog.Key(i));
         bodyText.fontStyle = speaker == "n" ? FontStyle.Italic : FontStyle.Normal;
         buttonText.text = IsShared ? Loc.T("story.dialog.hide")
             : Loc.T(index + 1 < lines.Count ? "story.dialog.continue" : "story.dialog.end");

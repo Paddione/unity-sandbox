@@ -86,6 +86,7 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
     void Update()
     {
         if (dead || !Authority) return;
+        if (CutsceneDirector.HoldBosses) return; // boss intro runs: no engage, no lances
         var hp = GetComponent<EnemyHealth>();
         if (hp == null) return;
         if (!PhaseTwo && hp.HPFraction() <= PhaseTwoFraction) EnterPhaseTwo();

@@ -99,6 +99,7 @@ public sealed class StoryDirector : MonoBehaviour
     {
         if (DiabloUIFactory.IsRemoteMirror(this)) return;
         TickBarks();
+        CutsceneDirector.Tick(Time.unscaledTime);
         if (toastLeft > 0f)
         {
             toastLeft -= Time.unscaledDeltaTime;
@@ -328,6 +329,8 @@ public sealed class StoryDirector : MonoBehaviour
         if (ui == null) ui = hero.AddComponent<StoryDialogUI>();
         if (ui.IsOpen) return true;
         ui.Show(plan, npc);
+        if (plan.questId != null && StoryCatalog.Get(plan.questId) is StoryQuest quest && quest.main)
+            CutsceneDirector.PlayDialog(ui, npc);
         return true;
     }
 }

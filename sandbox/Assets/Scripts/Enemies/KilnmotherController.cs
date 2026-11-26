@@ -47,6 +47,7 @@ public sealed class KilnmotherController : MonoBehaviour, IEnemyDeathHook
     void Update()
     {
         if (dead) return;
+        if (CutsceneDirector.HoldBosses) return; // boss intro runs: no waves, no phase entry
         var hp = GetComponent<EnemyHealth>();
         if (hp == null) return;
         if (!PhaseTwo && hp.HPFraction() <= PhaseTwoFraction) EnterPhaseTwo();

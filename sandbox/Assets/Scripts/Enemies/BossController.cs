@@ -67,6 +67,7 @@ public sealed class BossController : NetworkBehaviour
     void Update()
     {
         if (dead) return;
+        if (CutsceneDirector.HoldBosses) return; // boss intro runs: no slam, no phase entry
         var hp = GetComponent<EnemyHealth>();
         if (hp == null) return;
         if (!phaseTwo && hp.HPFraction() <= PhaseTwoFraction)
