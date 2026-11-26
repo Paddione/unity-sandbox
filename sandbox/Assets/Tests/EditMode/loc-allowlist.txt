@@ -313,6 +313,15 @@ Classes/HeroGearModels.cs	Lamp stone
 Classes/HeroGearModels.cs	Bone visor
 Classes/HeroGearModels.cs	Eye slit
 Classes/HeroGearModels.cs	Ember leaf
+Classes/HeroGearModels.cs	Ankle strap
+Classes/HeroGearModels.cs	Coin pouch
+Classes/HeroGearModels.cs	Hooked pick
+Classes/HeroGearModels.cs	Mender stone
+Classes/HeroGearModels.cs	Sandal sole
+Classes/HeroGearModels.cs	Shin plate
+Classes/HeroGearModels.cs	Toe strap
+Classes/HeroGearModels.cs	Wisp echo
+Classes/HeroGearModels.cs	Wrap tie
 DiabloShotCheck.cs	FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges} cooldown={flask.CooldownRemaining:0.0}
 DiabloShotCheck.cs	gearset_{cls.id}_back
 DiabloShotCheck.cs	gearset_{cls.id}_front
