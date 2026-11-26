@@ -527,9 +527,13 @@ public static class HeroGearModels
         part.AddComponent<MeshFilter>().sharedMesh = mesh;
         if (!Materials.TryGetValue(color, out var material) || material == null)
         {
-            material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            material.SetColor(ColorProperty, color);
-            Materials[color] = material;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader != null) // dedicated server builds ship no shaders
+            {
+                material = new Material(shader);
+                material.SetColor(ColorProperty, color);
+                Materials[color] = material;
+            }
         }
         part.AddComponent<MeshRenderer>().sharedMaterial = material;
         return part.transform;

@@ -221,9 +221,9 @@ public sealed class ClassAppearance : MonoBehaviour
 
     static Material HairMaterial(int colorIndex)
     {
-        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"))
-        { color = HeroAppearance.HairColor(colorIndex), name = "HeroHairMaterial" };
-        return mat;
+        var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+        if (shader == null) return null; // dedicated server builds ship no shaders
+        return new Material(shader) { color = HeroAppearance.HairColor(colorIndex), name = "HeroHairMaterial" };
     }
 
     internal void SetStarterLanternVisible(bool visible)
