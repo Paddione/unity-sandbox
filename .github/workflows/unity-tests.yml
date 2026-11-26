@@ -99,11 +99,11 @@ jobs:
             HOME="$profile" XDG_CONFIG_HOME="$profile/config" XDG_DATA_HOME="$profile/data" XDG_CACHE_HOME="$profile/cache" \
               AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/$route" -seed "$SEED" "$@"
           }
-          run_route normal &
+          run_route normal -port 28771 &
           normal=$!
-          run_route kindled -difficulty kindled &
+          run_route kindled -port 28772 -difficulty kindled &
           kindled=$!
-          run_route lanternbearer -class lanternbearer &
+          run_route lanternbearer -port 28773 -class lanternbearer &
           lanternbearer=$!
           rc=0
           for pid in "$normal" "$kindled" "$lanternbearer"; do
