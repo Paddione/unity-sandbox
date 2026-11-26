@@ -127,8 +127,9 @@ public sealed class ClassSelectUI : MonoBehaviour
             string newClass = SaveService.NewHeroAfterReload;
         SaveService.NewHeroAfterReload = null;
         bool ok = newClass != null ? StartFreshHero(newClass) : Continue(p);
-            Debug.Log(ok ? "[Class] Resumed the saved hero after the reload."
-                         : "[Class] Reload continue found no readable save.");
+            Debug.Log(!ok ? "[Class] Reload continue found no readable save."
+                : newClass != null ? "[Class] Fresh hero stands after the reload."
+                : "[Class] Resumed the saved hero after the reload.");
             Destroy(gameObject);
         }
         else if (Time.unscaledTime > reloadDeadline)
@@ -212,6 +213,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         else if (canvas != null) canvas.enabled = open;
         DiabloClickController.ExternalDrive = open;
         if (!open && previewView != null) previewView.Hide();
+        ShowCardFigures(open);
         if (open)
         {
             PendingCustomizeClass = null;
@@ -453,8 +455,7 @@ public sealed class ClassSelectUI : MonoBehaviour
             RunProfile.Reset();
             SessionComplete.ResetRun();
             Debug.Log($"[Class] New {ClassCatalog.Get(classId).displayName}: reloading a fresh world.");
-            UnityEngine.SceneManagement.SceneManager.LoadScene(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            SceneReload.ReloadActiveScene();
             return;
         }
         ChooseNew(classId);
@@ -629,7 +630,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         // Class Selection Card Deck
         var cardsRow = new GameObject("CardsRow", typeof(RectTransform));
         cardsRow.transform.SetParent(mainContent.transform, false);
-        DiabloUIFactory.SetLayout(cardsRow, prefH: 590f, flexW: 1f);
+        DiabloUIFactory.SetLayout(cardsRow, prefH: CardsRowHeight, flexW: 1f);
         var ch = cardsRow.AddComponent<HorizontalLayoutGroup>();
         ch.spacing = 18f;
         ch.childControlWidth = true;
@@ -749,9 +750,14 @@ public sealed class ClassSelectUI : MonoBehaviour
                Loc.T("menu.herochoice.ask");
     }
 
+    /// <summary>Creation step size: the full-body preview needs the height.</summary>
+    public static readonly Vector2 CustomizePanelSize = new Vector2(1100f, 820f);
+    public const float CustomizePreviewHeight = 600f;
+    public const float CustomizePreviewWidth = 440f;
+
     void BuildCustomize(Transform canvas)
     {
-        customizeModal = DiabloUIFactory.MakePanel(canvas, "HeroCustomizePanel", new Vector2(640f, 880f), Vector2.zero);
+        customizeModal = DiabloUIFactory.MakePanel(canvas, "HeroCustomizePanel", CustomizePanelSize, Vector2.zero);
         var v = customizeModal.AddComponent<VerticalLayoutGroup>();
         v.padding = new RectOffset(24, 24, 18, 20);
         v.spacing = 10f;
@@ -760,23 +766,43 @@ public sealed class ClassSelectUI : MonoBehaviour
         DiabloUIFactory.MakeHeader(customizeModal.transform, Loc.T("menu.create.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), CancelCustomize);
         customizeClassLabel = DiabloUIFactory.MakeText(customizeModal.transform, "CustomizeClass", "", 16, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(customizeClassLabel.gameObject, prefH: 24f, flexW: 1f);
-        previewView = HeroPreviewView.BuildInto(customizeModal.transform);
 
-        genderValue = CycleRow(customizeModal.transform, "GenderRow", "menu.create.gender", CycleGender);
-        hairValue = CycleRow(customizeModal.transform, "HairRow", "menu.create.hair", CycleHair);
-        hairColorValue = CycleRow(customizeModal.transform, "HairColorRow", "menu.create.haircolor", CycleHairColor);
-        buildValue = CycleRow(customizeModal.transform, "BuildRow", "menu.create.build", CycleBuild);
+        // Body: full-body preview on the left, the choices on the right.
+        var body = new GameObject("CustomizeBody", typeof(RectTransform));
+        body.transform.SetParent(customizeModal.transform, false);
+        DiabloUIFactory.SetLayout(body, prefH: CustomizePreviewHeight, flexW: 1f);
+        var bh = body.AddComponent<HorizontalLayoutGroup>();
+        bh.spacing = 24f;
+        bh.childControlWidth = true;
+        bh.childControlHeight = true;
+        bh.childForceExpandWidth = false;
+        bh.childForceExpandHeight = true;
+        previewView = HeroPreviewView.BuildInto(body.transform, CustomizePreviewHeight, CustomizePreviewWidth);
 
-        var nameLabel = DiabloUIFactory.MakeText(customizeModal.transform, "HeroNameLabel", Loc.T("menu.create.name"), 15, DiabloPalette.ParchmentDim);
+        var col = new GameObject("CustomizeChoices", typeof(RectTransform));
+        col.transform.SetParent(body.transform, false);
+        DiabloUIFactory.SetLayout(col, flexW: 1f);
+        var cv = col.AddComponent<VerticalLayoutGroup>();
+        cv.spacing = 14f;
+        cv.padding = new RectOffset(0, 0, 60, 0);
+        cv.childControlWidth = true;
+        cv.childControlHeight = false;
+
+        genderValue = CycleRow(col.transform, "GenderRow", "menu.create.gender", CycleGender);
+        hairValue = CycleRow(col.transform, "HairRow", "menu.create.hair", CycleHair);
+        hairColorValue = CycleRow(col.transform, "HairColorRow", "menu.create.haircolor", CycleHairColor);
+        buildValue = CycleRow(col.transform, "BuildRow", "menu.create.build", CycleBuild);
+
+        var nameLabel = DiabloUIFactory.MakeText(col.transform, "HeroNameLabel", Loc.T("menu.create.name"), 15, DiabloPalette.ParchmentDim);
         DiabloUIFactory.SetLayout(nameLabel.gameObject, prefH: 22f, flexW: 1f);
-        var nameRow = DiabloUIFactory.MakeHorizontalRow(customizeModal.transform, "HeroNameRow", 10f, 46f);
+        var nameRow = DiabloUIFactory.MakeHorizontalRow(col.transform, "HeroNameRow", 10f, 46f);
         heroNameField = AccountPanel.Field(nameRow.transform, "HeroNameField", "", 16);
         heroNameField.onValueChanged.AddListener(raw => SetDraftName(raw));
         DiabloUIFactory.SetLayout(heroNameField.gameObject, prefH: 44f, flexW: 1f);
         var diceBtn = DiabloUIFactory.MakeButton(nameRow.transform, "RerollNameButton", Loc.T("menu.create.random"), 15, false, null, RerollDraftName);
         DiabloUIFactory.SetLayout(diceBtn.gameObject, prefH: 44f, prefW: 120f);
 
-        customizeHint = DiabloUIFactory.MakeText(customizeModal.transform, "CustomizeHint", "", 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
+        customizeHint = DiabloUIFactory.MakeText(col.transform, "CustomizeHint", "", 14, DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(customizeHint.gameObject, prefH: 22f, flexW: 1f);
 
         var row = DiabloUIFactory.MakeHorizontalRow(customizeModal.transform, "CustomizeButtons", 14f, 46f);
@@ -858,12 +884,12 @@ public sealed class ClassSelectUI : MonoBehaviour
         v.childControlHeight = false;
 
         // Top section: Portrait box + Class Title & Identity
-        var topRow = DiabloUIFactory.MakeHorizontalRow(card.transform, "ClassTopRow", 14f, 128f);
+        var topRow = DiabloUIFactory.MakeHorizontalRow(card.transform, "ClassTopRow", 14f, CardFigureHeight + 4f);
         topRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
 
         var frame = new GameObject("PortraitFrame", typeof(RectTransform));
         frame.transform.SetParent(topRow.transform, false);
-        DiabloUIFactory.SetLayout(frame, prefH: 124f, prefW: 124f);
+        DiabloUIFactory.SetLayout(frame, prefH: CardFigureHeight, prefW: CardFigureWidth);
         var fImg = frame.AddComponent<Image>();
         fImg.sprite = DiabloMenuArt.SlotBackground(cls.role == ClassDefinition.PartyRole.Healer ? ItemRarity.Unique
             : cls.role == ClassDefinition.PartyRole.Dps ? ItemRarity.Magic : ItemRarity.Rare);
@@ -871,6 +897,7 @@ public sealed class ClassSelectUI : MonoBehaviour
         fImg.raycastTarget = false;
 
         var portSprite = DiabloMenuArt.ClassPortrait(cls.id);
+        Image portraitImg = null;
         if (portSprite != null)
         {
             var pGo = new GameObject("Portrait", typeof(RectTransform));
@@ -879,16 +906,26 @@ public sealed class ClassSelectUI : MonoBehaviour
             pImg.sprite = portSprite;
             pImg.preserveAspect = true;
             pImg.raycastTarget = false;
+            portraitImg = pImg;
             var pr = pGo.GetComponent<RectTransform>();
             pr.anchorMin = Vector2.zero;
             pr.anchorMax = Vector2.one;
             pr.offsetMin = new Vector2(8f, 8f);
             pr.offsetMax = new Vector2(-8f, -8f);
         }
+        // Full-body 3D figure over the bust art (the art stays as fallback without a hero rig).
+        var figureGo = new GameObject("Figure", typeof(RectTransform));
+        figureGo.transform.SetParent(frame.transform, false);
+        var fr = figureGo.GetComponent<RectTransform>();
+        fr.anchorMin = Vector2.zero;
+        fr.anchorMax = Vector2.one;
+        fr.offsetMin = new Vector2(6f, 6f);
+        fr.offsetMax = new Vector2(-6f, -6f);
+        cardFigures.Add(new KeyValuePair<string, HeroPreviewView>(cls.id, HeroPreviewView.AttachTo(fr, portraitImg, turntable: false)));
 
         var headCol = new GameObject("ClassTitleCol", typeof(RectTransform));
         headCol.transform.SetParent(topRow.transform, false);
-        DiabloUIFactory.SetLayout(headCol, prefH: 124f, flexW: 1f);
+        DiabloUIFactory.SetLayout(headCol, prefH: CardFigureHeight, flexW: 1f);
         var hv = headCol.AddComponent<VerticalLayoutGroup>();
         hv.spacing = 4f;
         hv.childAlignment = TextAnchor.MiddleLeft;
@@ -971,6 +1008,40 @@ public sealed class ClassSelectUI : MonoBehaviour
     }
 
     static GameObject skillsLblHeight(GameObject go) => go;
+
+    /// <summary>Class card figure frame: tall enough for the whole standing hero.</summary>
+    public const float CardFigureWidth = 150f;
+    public const float CardFigureHeight = 220f;
+    public const float CardsRowHeight = 700f;
+
+    readonly List<KeyValuePair<string, HeroPreviewView>> cardFigures = new List<KeyValuePair<string, HeroPreviewView>>();
+
+    /// <summary>Live card figures by class (test seam).</summary>
+    public HeroPreviewView CardFigure(string classId)
+    {
+        foreach (var kv in cardFigures) if (kv.Key == classId) return kv.Value;
+        return null;
+    }
+
+    /// <summary>Showcase look per class card (the creation step picks the real one).</summary>
+    public static HeroProfile CardProfile(ClassDefinition cls)
+    {
+        var p = new HeroProfile { heroName = cls.displayName, hairStyle = 0, build = (int)HeroBuild.Athletic };
+        if (cls.id == ClassCatalog.LanternbearerId) { p.gender = (int)HeroGender.Female; p.hairStyle = 1; p.hairColor = 5; }
+        else if (cls.id == ClassCatalog.RogueId) { p.gender = (int)HeroGender.Male; p.hairStyle = 2; p.hairColor = 7; }
+        else { p.gender = (int)HeroGender.Male; p.hairStyle = 0; p.hairColor = 1; }
+        return HeroProfile.Sanitized(p);
+    }
+
+    void ShowCardFigures(bool show)
+    {
+        foreach (var kv in cardFigures)
+        {
+            if (kv.Value == null) continue;
+            if (show && Application.isPlaying) kv.Value.Show(ClassCatalog.Get(kv.Key), CardProfile(ClassCatalog.Get(kv.Key)));
+            else kv.Value.Hide();
+        }
+    }
 
     /// <summary>Card role line, driven by the party role so new classes never inherit another's title.</summary>
     public static string CardSubtitle(ClassDefinition cls)

@@ -40,7 +40,7 @@ public sealed class PauseMenuUI : MonoBehaviour
     readonly List<UnityEngine.Events.UnityAction> settingsRefreshes = new List<UnityEngine.Events.UnityAction>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Boot()
+    internal static void Boot()
     {
         if (Object.FindFirstObjectByType<ClassAppearance>(FindObjectsInactive.Include) == null) return;
         if (Object.FindFirstObjectByType<PauseMenuUI>(FindObjectsInactive.Include) != null) return;

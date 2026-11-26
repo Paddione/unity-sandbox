@@ -63,7 +63,7 @@ public static class LayoutSeeder
     public static int CurrentSeed { get; private set; } = -1;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Boot()
+    internal static void Boot()
     {
         if (GameObject.Find(PropRootPrefix + "0") == null) return; // not the zone scene
         if (IsCoopPeer())

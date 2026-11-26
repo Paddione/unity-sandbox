@@ -309,6 +309,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Neuer Held fragt nach („BEGIN ANEW?“), wenn ein gespeicherter oder aktueller Held ersetzt würde;
   mitten in der Sitzung (solo) per Szenen-Reload mit frischem `RunProfile`. „New run“ in den Settings
   setzt den Helden nach dem Reload fort (`SaveService.ContinueAfterReload`).
+  Beide Reloads laufen über `SceneReload` (persistenten `NetworkManager` erst abbauen, danach
+  Pausemenü/Layout/Party/JoinPanel neu booten). Klassenkarten und Erstellung zeigen den Helden als
+  Ganzkörper-Figur (`HeroPreviewView`, Hochformat, Framing aus Bounds); Haar sitzt außerhalb des Kopfs,
+  der eingebaute Ritterhelm ist aus. Sichtprüfung: Shotcheck `-charselect-shots`.
   `PauseMenuUI` (Esc) friert solo die Zeit ein (Hit-Stop-sicher, Koop nie). Offen-Status über
   `ClassSelectUI.AnyOpen`/`PauseMenuUI.AnyOpen`, kein Szenen-Scan.
 - UI-Bausteine `DiabloUIFactory` (9-Slice-Chrome aus `DiabloMenuArt`): `SetLayout` setzt auch die

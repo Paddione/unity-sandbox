@@ -38,7 +38,7 @@ public sealed class JoinPanel : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Boot()
+    internal static void Boot()
     {
         // Hotkey host for F7; inert for automation runs.
         foreach (var a in System.Environment.GetCommandLineArgs())

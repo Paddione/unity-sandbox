@@ -104,7 +104,8 @@ public class ClassItemTests
         Assert.AreEqual(ItemDatabase.StarterLanternBase, eq.weapon.baseType, "starter weapon follows the class");
 
         look.Apply(ClassCatalog.Fenwalker);
-        foreach (var r in knightBody) Assert.IsTrue(r.enabled);
+        // The built-in Knight helmet stays off so the chosen hair shows (worn helmets still cover it).
+        foreach (var r in knightBody) Assert.AreEqual(!ClassAppearance.IsBuiltInHelmet(r.name), r.enabled, r.name);
         Assert.IsFalse(skin.gameObject.activeSelf);
         Assert.AreEqual(ItemDatabase.StarterSwordBase, eq.weapon.baseType);
         Object.DestroyImmediate(hero);

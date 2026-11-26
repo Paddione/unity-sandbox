@@ -1,6 +1,5 @@
 # Literals the lint flags that are not player text (ids, object names, log lines).
 # Format: <path under Assets/Scripts><TAB><literal>.
-Menu/ClassSelectUI.cs	[Class] Reload continue found no readable save.
 Menu/ClassSelectUI.cs	CINDERREACH
 Menu/MainMenu.cs	CINDERREACH
 Net/JoinPanel.cs	Join server
@@ -321,3 +320,9 @@ DiabloShotCheck.cs	gearset_{cls.id}_paperdoll
 DiabloShotCheck.cs	DONE {index} map shots
 DiabloShotCheck.cs	MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}
 DiabloShotCheck.cs	MAP zone={map.ViewZone} icons={map.IconsShown}
+DiabloShotCheck.cs	)} controller={(ctrl != null)} camDist={camDist:0.0} pause={pause} class={RunProfile.ClassId} name={RunProfile.Hero.heroName}
+DiabloShotCheck.cs	DONE {index} charselect shots
+DiabloShotCheck.cs	NEW_HERO_RELOAD {(ok ? 
+Menu/ClassSelectUI.cs	[Class] Fresh hero stands after the reload.
+Menu/ClassSelectUI.cs	[Class] Resumed the saved hero after the reload.
+DiabloShotCheck.cs	solo before new hero: {Diablo.IsSolo()}

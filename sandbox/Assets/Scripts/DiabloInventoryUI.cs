@@ -891,8 +891,7 @@ public sealed class DiabloInventoryUI : MonoBehaviour
             SaveService.ContinueAfterReload = true; // the reloaded scene resumes this hero
             SaveService.ContinueAfterReloadPath = null;
         }
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        SceneReload.ReloadActiveScene();
     }
 
     /// <summary>Settings line for the difficulty row (test seam).</summary>

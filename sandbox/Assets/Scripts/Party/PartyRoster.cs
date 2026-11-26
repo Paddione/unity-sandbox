@@ -87,7 +87,7 @@ public sealed class PartyRoster : MonoBehaviour
     /// clients spawn nothing — their party is the host's.
     /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Boot()
+    internal static void Boot()
     {
         if (!Application.isPlaying) return;
         if (DedicatedServer.RequestedByProcess) return; // no server hero to lead AI companions

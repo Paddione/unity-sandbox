@@ -33,8 +33,9 @@ public class HeroPreviewTests
     {
         foreach (var rig in GameObject.FindObjectsOfType<HeroPreviewView>())
             Object.DestroyImmediate(rig.gameObject);
-        var stray = GameObject.Find(HeroPreviewView.PreviewObjectName);
-        if (stray != null) Object.DestroyImmediate(stray);
+        foreach (var name in new[] { HeroPreviewView.PreviewObjectName, HeroPreviewView.CardObjectName })
+            for (var stray = GameObject.Find(name); stray != null; stray = GameObject.Find(name))
+                Object.DestroyImmediate(stray);
         Object.Destroy(selectGo);
         Object.Destroy(hero);
         DiabloClickController.ExternalDrive = false;
@@ -82,5 +83,81 @@ public class HeroPreviewTests
         Assert.IsFalse(ui.PreviewVisible, "the run starts without a leftover stage");
         yield return null;
         Assert.IsNull(GameObject.Find(HeroPreviewView.PreviewObjectName));
+    }
+
+    [UnityTest]
+    public IEnumerator Preview_KeepsThePortraitAspectAndFramesTheWholeFigure()
+    {
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.OpenCustomize(ClassCatalog.LanternbearerId);
+        yield return null;
+        yield return null;
+        var rig = GameObject.Find(HeroPreviewView.PreviewObjectName);
+        Assert.IsNotNull(rig);
+        var view = Object.FindFirstObjectByType<HeroPreviewView>();
+        foreach (var v in Object.FindObjectsByType<HeroPreviewView>(FindObjectsSortMode.None))
+            if (v.Rig == rig) view = v;
+        var fit = view.Image.GetComponent<UnityEngine.UI.AspectRatioFitter>();
+        Assert.IsNotNull(fit, "the render keeps its aspect instead of stretching");
+        Assert.AreEqual(HeroPreviewView.TextureAspect, fit.aspectRatio, 0.001f);
+        if (!HeroPreviewView.Headless)
+        {
+            Assert.AreEqual(HeroPreviewView.TextureWidth, view.Image.texture.width);
+            Assert.AreEqual(HeroPreviewView.TextureHeight, view.Image.texture.height);
+        }
+        // Head and feet of the rig project inside the preview camera.
+        var cam = view.PreviewCamera;
+        Assert.IsNotNull(cam);
+        if (HeroPreviewView.TryFigureBounds(rig, out var b))
+        {
+            var top = cam.WorldToViewportPoint(new Vector3(rig.transform.position.x, b.max.y, rig.transform.position.z));
+            var feet = cam.WorldToViewportPoint(new Vector3(rig.transform.position.x, b.min.y, rig.transform.position.z));
+            Assert.That(top.y, Is.InRange(0f, 1f), "head in view");
+            Assert.That(feet.y, Is.InRange(0f, 1f), "feet in view");
+        }
+        ui.CancelCustomize();
+    }
+
+    [UnityTest]
+    public IEnumerator Preview_DropsTheCurrentHerosWornGear()
+    {
+        var mount = new GameObject(HeroEquipmentAppearance.MountNames[1]);
+        mount.transform.SetParent(hero.transform, false);
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        ui.OpenCustomize(ClassCatalog.RogueId);
+        yield return null;
+        var rig = GameObject.Find(HeroPreviewView.PreviewObjectName);
+        Assert.IsNotNull(rig);
+        Assert.IsNull(rig.transform.Find(HeroEquipmentAppearance.MountNames[1]), "a new hero starts without the old gear");
+        ui.CancelCustomize();
+    }
+
+    [UnityTest]
+    public IEnumerator ClassCards_ShowFullBodyFiguresWhileOpen()
+    {
+        var ui = selectGo.AddComponent<ClassSelectUI>();
+        ui.SetOpen(true);
+        yield return null;
+        foreach (var cls in ClassCatalog.All)
+        {
+            var fig = ui.CardFigure(cls.id);
+            Assert.IsNotNull(fig, $"{cls.id} card has a figure");
+            Assert.IsTrue(fig.IsLive, $"{cls.id} figure stands");
+            Assert.AreEqual(cls.id, fig.Rig.GetComponent<ClassAppearance>().AppliedClassId, "each card shows its class");
+            Assert.AreEqual(HeroPreviewView.CardObjectName, fig.Rig.name);
+            Assert.IsFalse(fig.turntable, "card figures stand still");
+        }
+        ui.OpenCustomize(ClassCatalog.FenwalkerId);
+        yield return null;
+        Assert.IsFalse(ui.CardFigure(ClassCatalog.FenwalkerId).PreviewCamera.enabled, "hidden cards stop rendering");
+        ui.CancelCustomize();
+        yield return null;
+        Assert.IsTrue(ui.CardFigure(ClassCatalog.FenwalkerId).PreviewCamera.enabled, "back on the cards they render again");
+        ui.ChooseNew(ClassCatalog.FenwalkerId);
+        Assert.IsFalse(ui.CardFigure(ClassCatalog.FenwalkerId).IsLive, "closing the screen removes the card rigs");
+        yield return null;
+        Assert.IsNull(GameObject.Find(HeroPreviewView.CardObjectName));
     }
 }

@@ -113,7 +113,9 @@ public sealed class ClassAppearance : MonoBehaviour
         }
         // The class+gender body stays visible under gear: worn items mount on
         // top of it, so every class keeps its own silhouette.
-        foreach (var r in baseBody) if (r != null) r.enabled = skin == null;
+        // The Knight's built-in helmet is body, not gear: it would hide the chosen
+        // hair for good. Worn helmets (HeroEquipmentAppearance) still cover it.
+        foreach (var r in baseBody) if (r != null) r.enabled = skin == null && !IsBuiltInHelmet(r.name);
         SetSword(!healer);
         if (skin != builtSkin)
         {
@@ -165,6 +167,10 @@ public sealed class ClassAppearance : MonoBehaviour
         }
     }
 
+    /// <summary>Stock helmet meshes of the KayKit Knight body (hidden so the hair shows).</summary>
+    public static bool IsBuiltInHelmet(string rendererName) =>
+        !string.IsNullOrEmpty(rendererName) && rendererName.Contains("Helmet");
+
     void RebuildHair()
     {
         if (hair != null) { if (Application.isPlaying) Destroy(hair); else DestroyImmediate(hair); hair = null; }
@@ -179,28 +185,79 @@ public sealed class ClassAppearance : MonoBehaviour
             if (Application.isPlaying) Destroy(old); else DestroyImmediate(old);
         }
         if (AppliedProfile.hairStyle == 4) return; // Glatze
-        hair = BuildHair(head, AppliedProfile);
+        var headBounds = HeadBounds(head, out bool hooded);
+        hair = BuildHair(head, AppliedProfile, headBounds, hooded);
     }
 
-    static GameObject BuildHair(Transform head, HeroProfile profile)
+    /// <summary>Head size of a KayKit chibi base in head-bone space (used when no head mesh is found).</summary>
+    public static readonly Bounds DefaultHeadBounds = new Bounds(new Vector3(0f, 0.42f, 0.01f), new Vector3(1.1f, 1.08f, 1.05f));
+
+    /// <summary>
+    /// Head mesh bounds in head-bone space per KayKit base, measured from the
+    /// bind pose (the FBX imports are not readable at runtime). The chibi heads
+    /// are about 1.1 m wide, so hair sized to the bone alone sat inside the head.
+    /// </summary>
+    static readonly Dictionary<string, Bounds> HeadBoundsByMesh = new Dictionary<string, Bounds>
+    {
+        { "Knight_Head", new Bounds(new Vector3(0f, 0.51f, 0.02f), new Vector3(1.09f, 1.07f, 1.01f)) },
+        { "Ranger_Head", new Bounds(new Vector3(0f, 0.49f, 0.02f), new Vector3(1.09f, 1.08f, 1.02f)) },
+        { "Mage_Head", new Bounds(new Vector3(0f, 0.38f, 0.01f), new Vector3(1.14f, 1.08f, 1.03f)) },
+        { "Rogue_Head", new Bounds(new Vector3(0.01f, 0.37f, -0.01f), new Vector3(1.14f, 1.13f, 1.14f)) },
+        { "RogueHooded_Head", new Bounds(new Vector3(0f, 0.37f, 0.01f), new Vector3(1.04f, 1.12f, 1.10f)) },
+    };
+
+    /// <summary>Head bounds of the visible base head (head-bone space); hooded bases keep their hood.</summary>
+    Bounds HeadBounds(Transform head, out bool hooded)
+    {
+        hooded = false;
+        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            if (smr == null || !smr.enabled || !smr.name.EndsWith("_Head")) continue;
+            hooded = smr.name.Contains("Hooded");
+            return HeadBoundsFor(smr.name);
+        }
+        return DefaultHeadBounds;
+    }
+
+    /// <summary>Head bounds for a head mesh name (pure; unknown names get the default).</summary>
+    public static Bounds HeadBoundsFor(string headMeshName) =>
+        headMeshName != null && HeadBoundsByMesh.TryGetValue(headMeshName, out var b) ? b : DefaultHeadBounds;
+
+    /// <summary>
+    /// Hair parts sized to the head (head-bone space, +y up, +z face):
+    /// a cap over crown and sides, side locks that frame the face (visible
+    /// under hats and hoods) and the style piece behind or on top.
+    /// </summary>
+    public static GameObject BuildHair(Transform head, HeroProfile profile, Bounds h, bool hooded)
     {
         var root = new GameObject(HeroAppearance.HairRootName);
         root.transform.SetParent(head, false);
         var mat = HairMaterial(profile.hairColor);
-        AddHairPart(root, "HairCap", PrimitiveType.Sphere, new Vector3(0f, 0.10f, -0.01f), new Vector3(0.24f, 0.17f, 0.24f), mat);
+        Vector3 c = h.center, s = h.size;
+        Vector3 P(float x, float y, float z) => new Vector3(c.x + x * s.x, c.y + y * s.y, c.z + z * s.z);
+        Vector3 S(float x, float y, float z) => new Vector3(x * s.x, y * s.y, z * s.z);
+        bool longHair = profile.hairStyle == 1;
+        if (!hooded)
+            AddHairPart(root, "HairCap", PrimitiveType.Sphere, P(0f, 0.10f, -0.05f), S(1.06f, 0.86f, 1.04f), mat);
+        float lockLen = longHair ? 0.78f : 0.42f;
+        float lockY = longHair ? -0.30f : -0.12f;
+        AddHairPart(root, "HairLockL", PrimitiveType.Cube, P(-0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
+        AddHairPart(root, "HairLockR", PrimitiveType.Cube, P(0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
         switch (profile.hairStyle)
         {
             case 1: // Lang
-                AddHairPart(root, "HairBack", PrimitiveType.Cube, new Vector3(0f, -0.08f, -0.11f), new Vector3(0.20f, 0.34f, 0.07f), mat);
+                AddHairPart(root, "HairBack", PrimitiveType.Cube, P(0f, -0.30f, -0.46f), S(0.92f, 0.85f, 0.16f), mat);
                 break;
             case 2: // Zopf
-                AddHairPart(root, "HairTail", PrimitiveType.Capsule, new Vector3(0f, -0.10f, -0.13f), new Vector3(0.08f, 0.22f, 0.08f), mat);
+                AddHairPart(root, "HairTie", PrimitiveType.Sphere, P(0f, 0.02f, -0.55f), S(0.20f, 0.18f, 0.18f), mat);
+                AddHairPart(root, "HairTail", PrimitiveType.Capsule, P(0f, -0.38f, -0.60f), S(0.20f, 0.36f, 0.20f), mat);
                 break;
-            case 3: // Kapuze
-                AddHairPart(root, "HairHood", PrimitiveType.Sphere, new Vector3(0f, 0.06f, -0.03f), new Vector3(0.30f, 0.26f, 0.30f), mat);
+            case 3: // Kapuze: a shell over the back of the head plus a drape, the face stays open
+                AddHairPart(root, "HairHood", PrimitiveType.Sphere, P(0f, 0.08f, -0.16f), S(1.10f, 0.98f, 0.92f), mat);
+                AddHairPart(root, "HairDrape", PrimitiveType.Cube, P(0f, -0.40f, -0.40f), S(0.96f, 0.50f, 0.24f), mat);
                 break;
             case 5: // Knoten
-                AddHairPart(root, "HairBun", PrimitiveType.Sphere, new Vector3(0f, 0.22f, -0.05f), new Vector3(0.11f, 0.10f, 0.11f), mat);
+                AddHairPart(root, "HairBun", PrimitiveType.Sphere, P(0f, 0.50f, -0.22f), S(0.34f, 0.30f, 0.32f), mat);
                 break;
         }
         return root;
