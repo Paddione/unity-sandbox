@@ -52,6 +52,7 @@ if [ "${AUTOPLAY_SKIP_BUILD:-0}" != 1 ]; then
     "$OUT/build.log"
 fi
 [ -x "$PLAYER" ] || { echo "run-autoplay: player missing: $PLAYER" >&2; exit 1; }
+if [ "${AUTOPLAY_BUILD_ONLY:-0}" = 1 ]; then exit 0; fi
 MODE="${AUTOPLAY_DISPLAY:-auto}"
 if [ "$MODE" = auto ]; then
   if [ -S /tmp/.X11-unix/X0 ] && [ -e /dev/dxg ]; then MODE=wslg; else MODE=xvfb; fi

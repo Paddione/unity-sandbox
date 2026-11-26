@@ -90,18 +90,26 @@ jobs:
           # replayability S3: rotate the Ashen Fen layout seed 0..2 by weekday.
           SEED=$(( $(date +%u) % 3 ))
           echo "layout seed $SEED"
-          set +e
-          bash scripts/run-autoplay.sh "$OUT/normal" -seed "$SEED"
-          RC_NORMAL=$?
-          # replayability S5: second run on Kindled, same build and seed.
-          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/kindled" -seed "$SEED" -difficulty kindled
-          RC_KINDLED=$?
-          # second-class S5: third run as the Lanternbearer (Normal, same seed).
-          AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/lanternbearer" -seed "$SEED" -class lanternbearer
-          RC_LANTERN=$?
-          set -e
-          echo "normal exit $RC_NORMAL, kindled exit $RC_KINDLED, lanternbearer exit $RC_LANTERN"
-          [ "$RC_NORMAL" -eq 0 ] && [ "$RC_KINDLED" -eq 0 ] && [ "$RC_LANTERN" -eq 0 ]
+          AUTOPLAY_BUILD_ONLY=1 bash scripts/run-autoplay.sh "$OUT/build"
+          run_route() {
+            local route=$1
+            shift
+            local profile
+            profile=$(mktemp -d "$RUNNER_TEMP/autoplay.XXXXXXXX")
+            HOME="$profile" XDG_CONFIG_HOME="$profile/config" XDG_DATA_HOME="$profile/data" XDG_CACHE_HOME="$profile/cache" \
+              AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/$route" -seed "$SEED" "$@"
+          }
+          run_route normal &
+          normal=$!
+          run_route kindled -difficulty kindled &
+          kindled=$!
+          run_route lanternbearer -class lanternbearer &
+          lanternbearer=$!
+          rc=0
+          for pid in "$normal" "$kindled" "$lanternbearer"; do
+            wait "$pid" || rc=1
+          done
+          exit "$rc"
 
       - name: Copy results to host store
         if: always() && steps.run.outputs.out != ''
