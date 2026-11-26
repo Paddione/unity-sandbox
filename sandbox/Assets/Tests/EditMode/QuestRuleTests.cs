@@ -6,7 +6,8 @@ using UnityEngine;
 /// <summary>
 /// cinderreach-quest-interaktionen, EditMode: Questregeln und Speicherung.
 ///
-/// Deckt jede Quest (quest:h1..h9, quest:n1..n5) ueber die reine
+/// Deckt jede Quest (quest:h1..h9, quest:n1..n5, Vertiefung quest:h14..h17,
+/// quest:n8..n11) ueber die reine
 /// <see cref="StoryState"/>-Logik ab: vorgesehener Verlauf, gesperrte Schritte
 /// (Voraussetzung, Akt-Gate, falsches Ziel), einmalige Belohnungen ueber den
 /// produktiven <see cref="StoryDirector"/>-Vergabepfad (private
@@ -207,6 +208,151 @@ public class QuestRuleTests
         Assert.AreEqual(StoryStatus.Ready, S().Status("n3"));
         TurnIn("n3");
         Assert.AreEqual(StoryStatus.Done, S().Status("n3"));
+    }
+
+    // ---- Akt-I-Vertiefung (cinderreach-akt1-vertiefung S1): H14-H17 + N8-N11 ----
+
+    [Test]
+    public void NeueAngebote_StellenAlteErstangeboteNichtUm()
+    {
+        var s = S();
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.AreEqual("h1", StoryDialogs.Plan(s, StoryIds.Ottilie).questId);
+        Assert.IsTrue(s.Accept("h1"));
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Collect, StoryIds.Fuhrbrief));
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Kill, StoryIds.FenBrute));
+        s.TurnIn("h1"); // quest:h14 quest:n8 stehen bereit, h2 bleibt erstes Angebot
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.AreEqual("h2", StoryDialogs.Plan(s, StoryIds.Ottilie).questId);
+        Assert.IsTrue(S().Accept("h2"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Enter, StoryIds.ZoneOssuary));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.BoneWarden, 4));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.Abbot));
+        TurnIn("h2"); // quest:h15 quest:n9 stehen bereit, h3 bleibt erstes Angebot
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual("h3", StoryDialogs.Plan(s, StoryIds.Ottilie).questId);
+    }
+
+    [Test]
+    public void H14_FetzenBruteTurnIn_Completes() // quest:h14
+    {
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h1"));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("h14"));
+        Assert.IsTrue(S().Accept("h14"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Fuhrfetzen));
+        Assert.AreEqual(StoryStatus.Active, S().Status("h14"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Fuhrfetzen));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.FenBrute));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("h14"));
+        TurnIn("h14");
+        Assert.AreEqual(StoryStatus.Done, S().Status("h14"));
+    }
+
+    [Test]
+    public void N8_BandTurnIn_Completes() // quest:n8
+    {
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h1"));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("n8"));
+        Assert.IsTrue(S().Accept("n8"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Siegelband));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n8"));
+        TurnIn("n8");
+        Assert.AreEqual(StoryStatus.Done, S().Status("n8"));
+    }
+
+    [Test]
+    public void H15_BruchTalk_CompletesWithoutTurnIn() // quest:h15
+    {
+        CompleteH1();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h2"));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("h15"));
+        Assert.IsTrue(S().Accept("h15"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Tafelbruch, 3));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Ottilie));
+        Assert.AreEqual(StoryStatus.Done, S().Status("h15"), "h15 has no turn-in");
+        Assert.IsFalse(S().TurnIn("h15"), "no turn-in without Ready");
+    }
+
+    [Test]
+    public void N9_LichtTurnIn_Completes() // quest:n9
+    {
+        CompleteH1();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h2"));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("n9"));
+        Assert.IsTrue(S().Accept("n9"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Grablicht));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n9"));
+        TurnIn("n9");
+        Assert.AreEqual(StoryStatus.Done, S().Status("n9"));
+    }
+
+    [Test]
+    public void H16_ListeLancersTurnIn_Completes() // quest:h16
+    {
+        CompleteH2();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h3"));
+        Assert.IsTrue(Act().Unlock(ActProgress.Kiln));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("h16"));
+        Assert.IsTrue(S().Accept("h16"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Fuhrliste));
+        Assert.AreEqual(StoryStatus.Active, S().Status("h16"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.AshLancer, 2));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("h16"));
+        TurnIn("h16");
+        Assert.AreEqual(StoryStatus.Done, S().Status("h16"));
+    }
+
+    [Test]
+    public void N10_ThrallsTurnIn_Completes() // quest:n10
+    {
+        Assert.IsTrue(Act().Unlock(ActProgress.Kiln));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("n10"));
+        Assert.IsTrue(S().Accept("n10"));
+        for (int i = 0; i < 4; i++)
+            Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.CinderThrall));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n10"));
+        TurnIn("n10");
+        Assert.AreEqual(StoryStatus.Done, S().Status("n10"));
+    }
+
+    [Test]
+    public void N11_SeiteTurnIn_Completes() // quest:n11
+    {
+        CompleteH2();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h3"));
+        Assert.IsTrue(Act().Unlock(ActProgress.Kiln));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("n11"));
+        Assert.IsTrue(S().Accept("n11"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Russseite));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n11"));
+        TurnIn("n11");
+        Assert.AreEqual(StoryStatus.Done, S().Status("n11"));
+    }
+
+    [Test]
+    public void H17_TwoTalks_CompletesWithoutTurnIn() // quest:h17
+    {
+        CompleteH4();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("h17"));
+        Assert.IsTrue(S().Accept("h17"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Ilsabe));
+        Assert.AreEqual(StoryStatus.Active, S().Status("h17"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Ottilie));
+        Assert.AreEqual(StoryStatus.Done, S().Status("h17"), "h17 has no turn-in");
     }
 
     [Test]

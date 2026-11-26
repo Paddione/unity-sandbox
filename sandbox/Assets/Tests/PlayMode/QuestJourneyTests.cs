@@ -6,7 +6,8 @@ using UnityEngine.TestTools;
 /// <summary>
 /// cinderreach-quest-interaktionen, PlayMode: Quest-Reisen.
 ///
-/// Jede Quest (quest:h1..h9, quest:n1..n5) laeuft vom echten Ausloeser
+/// Jede Quest (quest:h1..h9, quest:n1..n5, Vertiefung quest:h14..h17,
+/// quest:n8..n11) laeuft vom echten Ausloeser
 /// (<see cref="StoryDirector.BookTalk"/>, <see cref="StoryDirector.BookCollect"/>,
 /// <see cref="StoryDirector.BookKill"/>, <see cref="StoryDirector.BookEnter"/> —
 /// dieselben Einstiegspunkte, die NPC-Klick, Pickup-Trigger und Zonenwechsel
@@ -71,6 +72,16 @@ public class QuestJourneyTests
         Assert.AreEqual(StoryTalkKind.TurnIn, plan.kind, $"turn-in for {questId}");
         Assert.AreEqual(questId, plan.questId);
         Assert.IsNotNull(plan.dialog, $"{questId}.done dialog exists");
+        StoryDirector.BookTalk(npc, GameObject.Find(DiabloNetworkPlayer.HeroName));
+        Assert.AreEqual(StoryStatus.Done, S().Status(questId));
+    }
+
+    /// <summary>Gibt eine neue Aufgabe ueber den echten Gespraechspfad ab (Dialoge kommen in S2/S3).</summary>
+    static void TurnInNewViaTalk(string npc, string questId)
+    {
+        var plan = StoryDialogs.Plan(S(), npc);
+        Assert.AreEqual(StoryTalkKind.TurnIn, plan.kind, $"turn-in for {questId}");
+        Assert.AreEqual(questId, plan.questId);
         StoryDirector.BookTalk(npc, GameObject.Find(DiabloNetworkPlayer.HeroName));
         Assert.AreEqual(StoryStatus.Done, S().Status(questId));
     }
@@ -257,6 +268,193 @@ public class QuestJourneyTests
         Assert.IsTrue(LogShowsDone("n3"), string.Join("\n", StoryQuestUI.Lines(S())));
         yield return RunDirector();
         Assert.AreEqual(3, RunProfile.SmithingMaterial, "reward stays one-shot");
+    }
+
+    // ---- Akt-I-Vertiefung (cinderreach-akt1-vertiefung S1): H14-H17 + N8-N11 ----
+    // Die Dialoge (offer/hint/done) und Fundorte kommen in S2/S3; hier laeuft
+    // jede neue Aufgabe ueber dieselben Einstiegspunkte (BookTalk/BookCollect/
+    // BookKill) bis zum sichtbaren Abschluss im Fuhrbuch.
+
+    [UnityTest]
+    public IEnumerator H14_Journey_FetzenBruteToDone() // quest:h14
+    {
+        Assert.IsTrue(S().Refresh(RunProfile.Act));
+        AcceptViaTalk(StoryIds.Ottilie, "h1");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h14");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        StoryDirector.BookKill("The Fen Brute(Clone)");
+        Assert.AreEqual(StoryStatus.Ready, S().Status("h14"));
+        TurnInNewViaTalk(StoryIds.Ottilie, "h14");
+        Assert.IsTrue(LogShowsDone("h14"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator N8_Journey_BandToDoneAnd100Gold() // quest:n8
+    {
+        Assert.IsTrue(S().Refresh(RunProfile.Act));
+        AcceptViaTalk(StoryIds.Ottilie, "h1");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h14");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n8");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Siegelband));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n8"));
+        TurnInNewViaTalk(StoryIds.Ottilie, "n8");
+        yield return RunDirector();
+        Assert.AreEqual(100, hero.GetComponent<Wallet>().Gold);
+        Assert.IsTrue(LogShowsDone("n8"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield return RunDirector();
+        Assert.AreEqual(100, hero.GetComponent<Wallet>().Gold, "reward stays one-shot");
+    }
+
+    [UnityTest]
+    public IEnumerator H15_Journey_BruchTalkToDone() // quest:h15
+    {
+        PlayH2();
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h3");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n2");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h14");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        StoryDirector.BookKill("The Fen Brute(Clone)");
+        TurnInNewViaTalk(StoryIds.Ottilie, "h14");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h15");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        var talk = StoryDialogs.Plan(S(), StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.Talk, talk.kind);
+        StoryDirector.BookTalk(StoryIds.Ottilie, hero);
+        Assert.AreEqual(StoryStatus.Done, S().Status("h15"));
+        Assert.IsTrue(LogShowsDone("h15"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator N9_Journey_LichtToDoneAnd60Gold() // quest:n9
+    {
+        PlayH2();
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h3");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n2");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h14");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrfetzen));
+        StoryDirector.BookKill("The Fen Brute(Clone)");
+        TurnInNewViaTalk(StoryIds.Ottilie, "h14");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h15");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Tafelbruch));
+        StoryDirector.BookTalk(StoryIds.Ottilie, hero);
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n8");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n9");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Grablicht));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n9"));
+        TurnInNewViaTalk(StoryIds.Ottilie, "n9");
+        yield return RunDirector();
+        Assert.AreEqual(60, hero.GetComponent<Wallet>().Gold);
+        Assert.IsTrue(LogShowsDone("n9"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield return RunDirector();
+        Assert.AreEqual(60, hero.GetComponent<Wallet>().Gold, "reward stays one-shot");
+    }
+
+    [UnityTest]
+    public IEnumerator H16_Journey_ListeLancersToDone() // quest:h16
+    {
+        PlayH2();
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h3");
+        var talkH3 = StoryDialogs.Plan(S(), StoryIds.Jorin);
+        Assert.AreEqual(StoryTalkKind.Talk, talkH3.kind);
+        StoryDirector.BookTalk(StoryIds.Jorin, hero);
+        StoryDirector.BookEnter(StoryIds.ZoneKiln);
+        Assert.AreEqual(StoryStatus.Done, S().Status("h3"));
+        Assert.IsTrue(RunProfile.Act.Unlock(ActProgress.Kiln));
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Jorin, "n3");
+        for (int i = 0; i < 6; i++) StoryDirector.BookKill("Ash Lancer_0");
+        TurnInViaTalk(StoryIds.Jorin, "n3");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Jorin, "h16");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Fuhrliste));
+        StoryDirector.BookKill("Ash Lancer_0");
+        StoryDirector.BookKill("Ash Lancer_0");
+        Assert.AreEqual(StoryStatus.Ready, S().Status("h16"));
+        TurnInNewViaTalk(StoryIds.Jorin, "h16");
+        Assert.IsTrue(LogShowsDone("h16"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator N10_Journey_ThrallsToDoneAnd80Gold() // quest:n10
+    {
+        Assert.IsTrue(RunProfile.Act.Unlock(ActProgress.Kiln));
+        Assert.IsTrue(S().Refresh(RunProfile.Act));
+        AcceptViaTalk(StoryIds.Jorin, "n3");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Jorin, "n10");
+        for (int i = 0; i < 4; i++) StoryDirector.BookKill("Cinder Thrall_0");
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n10"));
+        TurnInNewViaTalk(StoryIds.Jorin, "n10");
+        yield return RunDirector();
+        Assert.AreEqual(80, hero.GetComponent<Wallet>().Gold);
+        Assert.IsTrue(LogShowsDone("n10"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield return RunDirector();
+        Assert.AreEqual(80, hero.GetComponent<Wallet>().Gold, "reward stays one-shot");
+    }
+
+    [UnityTest]
+    public IEnumerator N11_Journey_SeiteToDoneAnd270Gold() // quest:n11
+    {
+        Assert.IsTrue(RunProfile.Act.Unlock(ActProgress.Kiln));
+        Assert.IsTrue(S().Refresh(RunProfile.Act));
+        AcceptViaTalk(StoryIds.Ottilie, "h3");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ilsabe, "n1");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Lieferbuch));
+        TurnInViaTalk(StoryIds.Ilsabe, "n1");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ilsabe, "n11");
+        Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Russseite));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n11"));
+        TurnInNewViaTalk(StoryIds.Ilsabe, "n11");
+        yield return RunDirector();
+        Assert.AreEqual(270, hero.GetComponent<Wallet>().Gold, "n1 (150) + n11 (120)");
+        Assert.IsTrue(LogShowsDone("n11"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield return RunDirector();
+        Assert.AreEqual(270, hero.GetComponent<Wallet>().Gold, "reward stays one-shot");
+    }
+
+    [UnityTest]
+    public IEnumerator H17_Journey_TwoTalksToDone() // quest:h17
+    {
+        Assert.IsTrue(RunProfile.Act.Unlock(ActProgress.Kiln));
+        Assert.IsTrue(RunProfile.Act.CompleteAct());
+        Assert.IsTrue(S().Refresh(RunProfile.Act));
+        AcceptViaTalk(StoryIds.Ottilie, "h5");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "n2");
+        S().Refresh(RunProfile.Act);
+        AcceptViaTalk(StoryIds.Ottilie, "h17");
+        StoryDirector.BookTalk(StoryIds.Ottilie, hero);
+        Assert.AreEqual(StoryStatus.Active, S().Status("h17"), "ein Gespräch reicht nicht (R3)");
+        StoryDirector.BookTalk(StoryIds.Ilsabe, hero);
+        Assert.AreEqual(StoryStatus.Done, S().Status("h17"));
+        Assert.IsTrue(LogShowsDone("h17"), string.Join("\n", StoryQuestUI.Lines(S())));
+        yield break;
     }
 
     [UnityTest]

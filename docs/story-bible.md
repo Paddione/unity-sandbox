@@ -271,9 +271,15 @@ brennen, die Brache kein Glas, und in der Laternenwacht ist die erste Laterne er
 | H3 | Lest die Namen | Ottilie | Das Brevier zu Ottilie bringen. Mit Jorin über den Ofen sprechen. Den Glutofen betreten. | Ottilie erkennt in den Fuhrlisten Namen aus der Wacht, die noch lebten. Wendung 1. |
 | H4 | Asche schuldet niemand | Ottilie | Die Ofenmutter bezwingen. Das Rußbuch aufheben (fällt beim Kill). | Rußbuch zu Ottilie bringen. Wendung 2: Ilsabes Hand, Vogts Siegel. |
 | H5 | Siebenundvierzig | Ottilie | In die Laternenwacht zurückkehren und mit Ottilie sprechen. | Ottilie löscht die Laterne über Ilsabes Tür. Akt I abgeschlossen. |
+| H14 | Der zweite Karren | Ottilie | Zwei Fuhrfetzen am zweiten Karren im Aschenmoor finden (Rätsel R1). Den Moorschläger erschlagen, der ihn bewacht. | Fetzen bei Ottilie abgeben. Die Schrift ist jünger als der erste Fuhrbrief — und das Siegelband fehlt. |
+| H15 | Die siebte Tafel | Ottilie | Drei Tafelbruchstücke im Versunkenen Beinhaus bergen (Rätsel R2). Mit Ottilie sprechen. | Die siebte Tafel nennt keinen Toten, sondern eine Schuld. Ottilie kennt den Namen. |
+| H16 | Jorins Liste | Jorin | Die Fuhrliste im Glutofen finden. Zwei Aschenlanzer erschlagen, die sie bewachen. | Liste zu Jorin bringen. Er kennt die Namen darauf — es sind seine Lieferungen. |
+| H17 | Das zweite Siegel | Ottilie | Mit Ilsabe sprechen. Mit Ottilie sprechen (Rätsel R3: wem sie glaubt). | Ottilie hält zwei Siegel nebeneinander: das des Vogts und Ilsabes Hand. Sie entscheidet. |
 
 H2 begleitet das bestehende Tor: Der Abt-Kill öffnet weiterhin den Ofen. H4 begleitet den Kilnmother-Kill,
 der weiterhin Akt I abschließt und die Brache öffnet. H5 ist rein erzählerisch und sperrt nichts.
+H14–H17 sind interne Kennungen (das Fuhrbuch zeigt nur Titel); sie vertiefen je einen Bestandsschritt,
+ohne die Anker zu verschieben.
 
 ### Nebenaufgaben
 
@@ -282,6 +288,21 @@ der weiterhin Akt I abschließt und die Brache öffnet. H5 ist rein erzählerisc
 | N1 | Ilsabes Lieferbuch | Ilsabe | Den Moorvorrat im Aschenmoor bergen (die Kiste). Das Lieferbuch zu Ilsabe bringen. | 150 Gold | Das Lieferbuch zeigt Mengen, die nie ein Totenkarren gefahren hat. Wer N1 erledigt hat, erkennt in H4 Ilsabes Handschrift wieder; der Abschluss-Dialog von H4 hat eine eigene Zeile. |
 | N2 | Die stillen Brüder | Ottilie | Im Beinhaus drei Grabtafeln lesen (Fundstücke an den Sarkophagen). | 1 Fertigkeitsrang-Gegenstand (Selten) | Die Knochenwächter haben Namen. Der Abt hat seine Brüder nicht missbraucht, sie haben ihm ihre Gebeine angeboten. Im H3-Angebot erinnert sich Ottilie an Thewes und an ihre eigene Rolle. Im Kampf ruft der Abt seine Brüder bei Namen. |
 | N3 | Hagedorns Spitzen | Jorin | Sechs Aschenlanzer im Glutofen erschlagen. Zu Jorin zurückkehren. | Ein kostenloses Umschmieden | Jorin gesteht, dass er wusste, wofür die Lanzen gedacht waren: nicht gegen Plünderer, sondern gegen Knechte, die fliehen wollten. Im H4-Abschluss erzählt Ottilie, dass Jorin die Spitzen eingeschmolzen hat. |
+| N8 | Vogts Bote | Ottilie | Das Siegelband am zweiten Karren im Aschenmoor bergen (gehört zu Rätsel R1). | 100 Gold | Das Band trägt das Siegel des Vogts. Wer N8 erledigt hat, hört im H2-Angebot Ottilies Satz dazu — der Vogt wusste vom zweiten Karren. |
+| N9 | Thewes' Licht | Ottilie | Das Grablicht am Sarkophag des Thewes im Beinhaus bergen (gehört zu Rätsel R2). | 60 Gold | Thewes hat sein Licht nie gelöscht. Wer N9 erledigt hat, hört im H3-Angebot, dass Ottilie seinen Namen selbst auf die Liste gesetzt hat. |
+| N10 | Schlackeglut | Jorin | Vier Schlackenknechte (Cinder Thralls) im Glutofen erschlagen. | 80 Gold | Die Knechte trugen noch Glut in den Händen — sie wollten nichts bewachen, sie wollten tragen. Wer N10 erledigt hat, hört im H4-Abschluss Ottilies Satz dazu: Die Wacht hat sie geschickt. |
+| N11 | Ilsabes Preis | Ilsabe | Eine lose Rußseite im Glutofen bergen. | 120 Gold | Die Seite nennt einen Preis pro Name. Wer N11 erledigt hat, hört im H5-Angebot Ilsabes Satz dazu — bevor Ottilie die Laterne löscht. |
+
+### Rätsel-Definitionen (Akt I)
+
+Alle Rätsel nutzen Bestandssysteme: Fundstücke über `StoryPickup`/`IUsable` mit der Benutzen-Taste (T),
+Gespräche über `StoryDialog` mit Folgezeilen-Mechanik (`x|nK`). Kein neues Interaktionssystem.
+
+| Nr | Name | Typ | Ort (Quests) | Regel |
+|---|---|---|---|---|
+| R1 | Zusammengehörige Fetzen | Umgebung/Fundstück | Aschenmoor (H14 + N8) | Zwei Fuhrfetzen (H14) und das Siegelband (N8) gehören aneinander. Erst wenn alle drei Stücke geborgen sind, liest sich im Fuhrbuch der ganze Satz: Der zweite Karren fuhr nicht für die Toten. |
+| R2 | Die siebte Tafel | Umgebung/Fundstück | Beinhaus (H15 + N9) | Drei Tafelbruchstücke (H15) ergeben erst mit Thewes' Grablicht (N9) eine lesbare Tafel: Sie nennt eine Schuld, keinen Toten. |
+| R3 | Das zweite Siegel | Dialog/Entscheidung | Laternenwacht (H17, mit Folge in H5) | Zwei Gespräche (Ilsabe, dann Ottilie): Ilsabe erklärt das Vogtsiegel, Ottilie wägt ab. Die Entscheidung steht im H5-Abschluss — mit eigener Zeile je nachdem, ob N11 (Ilsabes Preis) bekannt ist. |
 
 ## Akt II – „Was im Glas wohnt“
 
@@ -319,7 +340,8 @@ aufgelöst.
 
 Dialogzeilen mit Sprecher `x|nK` erscheinen nur, wenn Nebenaufgabe `nK` erledigt ist, `x|!nK` nur, wenn nicht
 (`StoryDialog.Visible`). So ändert jede Nebenaufgabe eine Zeile der Hauptkette: N1 → H5-Angebot, N2 → H3-Angebot,
-N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie.
+N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie,
+N8 → H2-Angebot, N9 → H3-Angebot, N10 → H4-Abschluss, N11 → H5-Angebot.
 
 ## Zurufe
 

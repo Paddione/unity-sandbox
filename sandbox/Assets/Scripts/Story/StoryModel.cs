@@ -18,6 +18,13 @@ public static class StoryIds
     public const string Fuhrbrief = "fuhrbrief";
     public const string Lieferbuch = "lieferbuch";
     public const string Grabtafel = "grabtafel";
+    // Akt-I-Vertiefung (S1): R1 Fuhrbrief-Kombination, R2 siebte Tafel, R3 Siegel-Strang.
+    public const string Fuhrfetzen = "fuhrfetzen";
+    public const string Siegelband = "siegelband";
+    public const string Tafelbruch = "tafelbruch";
+    public const string Grablicht = "grablicht";
+    public const string Fuhrliste = "fuhrliste";
+    public const string Russseite = "russseite";
 
     // Zones as WorldBounds names.
     public const string ZoneOssuary = "Ossuary";
@@ -29,6 +36,7 @@ public static class StoryIds
     public const string BoneWarden = "Bone Warden";
     public const string Abbot = "Hollow Abbot";
     public const string AshLancer = "Ash Lancer";
+    public const string CinderThrall = "Cinder Thrall";
     public const string Kilnmother = "Kilnmother";
     public const string DuneAugur = "Dune Augur";
     public const string GlassElite = "Glass Elite";
@@ -125,7 +133,7 @@ public sealed class StoryQuest
     public string SummaryKey => "quest." + id + ".summary";
 }
 
-/// <summary>All story tasks in narrative order (docs/story-bible.md, Akt I and Akt II).</summary>
+/// <summary>All story tasks in narrative order (docs/story-bible.md, Akt I mit Vertiefung H14-H17/N8-N11, Akt II).</summary>
 public static class StoryCatalog
 {
     static StoryObjective Talk(string npc, string key) => new StoryObjective(StoryObjectiveType.Talk, npc, 1, key);
@@ -199,6 +207,48 @@ public static class StoryCatalog
         {
             Kill(StoryIds.DuneAugur, 4, "quest.n5.obj.augurs"),
         }, prereq: "h5", gate: StoryGate.ActOneComplete, reward: StoryReward.SeerCirclet),
+
+        // ---- Akt I Vertiefung (cinderreach-akt1-vertiefung S1): H14-H17 + N8-N11 ----
+        // am Ende halten die Gespraechsplaene des Bestands stabil
+        // (erstes Angebot je NPC bleibt h1/h2/h3/h5/n1/n5). Neue Kennungen meiden
+        // h10-h13/n6-n7 (Akt III) und bleiben coverage-faehig ([a-z]+\d+).
+        new StoryQuest("h14", 1, true, StoryIds.Ottilie, new[]
+        {
+            Collect(StoryIds.Fuhrfetzen, 2, "quest.h14.obj.fetzen"),
+            Kill(StoryIds.FenBrute, 1, "quest.h14.obj.brute"),
+        }, prereq: "h1", prereqStatus: StoryStatus.Active, catchUp: StoryGate.KilnOpen),
+        new StoryQuest("h15", 1, true, StoryIds.Ottilie, new[]
+        {
+            Collect(StoryIds.Tafelbruch, 3, "quest.h15.obj.bruch"),
+            Talk(StoryIds.Ottilie, "quest.h15.obj.ottilie"),
+        }, prereq: "h2", prereqStatus: StoryStatus.Active, turnIn: false, catchUp: StoryGate.KilnOpen),
+        new StoryQuest("h16", 1, true, StoryIds.Jorin, new[]
+        {
+            Collect(StoryIds.Fuhrliste, 1, "quest.h16.obj.liste"),
+            Kill(StoryIds.AshLancer, 2, "quest.h16.obj.lancers"),
+        }, prereq: "h3", prereqStatus: StoryStatus.Active, gate: StoryGate.KilnOpen, catchUp: StoryGate.ActOneComplete),
+        new StoryQuest("h17", 1, true, StoryIds.Ottilie, new[]
+        {
+            Talk(StoryIds.Ilsabe, "quest.h17.obj.ilsabe"),
+            Talk(StoryIds.Ottilie, "quest.h17.obj.ottilie"),
+        }, prereq: "h4", turnIn: false),
+        new StoryQuest("n8", 1, false, StoryIds.Ottilie, new[]
+        {
+            Collect(StoryIds.Siegelband, 1, "quest.n8.obj.band"),
+        }, prereq: "h1", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 100),
+        new StoryQuest("n9", 1, false, StoryIds.Ottilie, new[]
+        {
+            Collect(StoryIds.Grablicht, 1, "quest.n9.obj.licht"),
+        }, prereq: "h2", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 60),
+        new StoryQuest("n10", 1, false, StoryIds.Jorin, new[]
+        {
+            Kill(StoryIds.CinderThrall, 4, "quest.n10.obj.thralls"),
+        }, gate: StoryGate.KilnOpen, reward: StoryReward.Gold, rewardGold: 80),
+        new StoryQuest("n11", 1, false, StoryIds.Ilsabe, new[]
+        {
+            Collect(StoryIds.Russseite, 1, "quest.n11.obj.seite"),
+        }, prereq: "h3", prereqStatus: StoryStatus.Active, gate: StoryGate.KilnOpen, reward: StoryReward.Gold, rewardGold: 120),
+
     };
 
     static Dictionary<string, StoryQuest> byId;
