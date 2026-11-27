@@ -295,6 +295,112 @@ public class QuestRuleTests
         Assert.AreEqual(StoryStatus.Done, S().Status("n9"));
     }
 
+    // ---- Akt-II-Vertiefung (cinderreach-akt2-vertiefung S2): Brache ----
+
+    [Test]
+    public void H18_SehglasTalk_CompletesWithoutTurnIn() // quest:h18
+    {
+        CompleteH4();
+        OpenActTwo();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h6"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Enter, StoryIds.ZoneBarrens));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Active, S().Status("h7"), "h7 auto-accepts");
+        Assert.AreEqual(StoryStatus.Active, S().Status("h18"), "h18 auto-accepts ab h7-aktiv");
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Sehglas, 2));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Merle));
+        Assert.AreEqual(StoryStatus.Done, S().Status("h18"), "h18 has no turn-in");
+        Assert.IsFalse(S().TurnIn("h18"), "no turn-in without Ready");
+    }
+
+    [Test]
+    public void N12_NeedsN4_Reward150Once() // quest:n12
+    {
+        CompleteH4();
+        OpenActTwo();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h6"));
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Locked, S().Status("n12"), "ohne N4 gesperrt");
+        Assert.IsFalse(S().Accept("n12"));
+        Assert.IsTrue(S().Accept("n4"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.GlassElite));
+        TurnIn("n4");
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.AreEqual(StoryStatus.Available, S().Status("n12"));
+        Assert.IsTrue(S().Accept("n12"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Speichenrad));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Merle));
+        Assert.AreEqual(StoryStatus.Ready, S().Status("n12"));
+        var q = StoryCatalog.Get("n12");
+        Assert.AreEqual(StoryReward.Gold, q.reward);
+        Assert.AreEqual(150, q.rewardGold);
+        TurnIn("n12");
+        var wallet = hero.GetComponent<Wallet>();
+        GrantRewards(hero);
+        Assert.AreEqual(400, wallet.Gold, "n4 (250) + n12 (150)");
+        GrantRewards(hero);
+        Assert.AreEqual(400, wallet.Gold, "second grant is a no-op");
+    }
+
+    [Test]
+    public void R6_PfadeUnabhaengig_MerleVsIlsabe() // quest:h18 quest:n13
+    {
+        CompleteH4();
+        OpenActTwo();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h5"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Ilsabe));
+        TurnIn("h5");
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h6"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Enter, StoryIds.ZoneBarrens));
+        S().Refresh(Act()); // Kette oeffnen
+        Assert.AreEqual(StoryStatus.Active, S().Status("h18"), "h18 auto-accepts ab h7-aktiv");
+        S().Refresh(Act()); // Kette oeffnen (ggf. no-op)
+        Assert.IsTrue(S().Accept("n5"));
+        for (int i = 0; i < 4; i++)
+            Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.DuneAugur));
+        TurnIn("n5");
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("n13"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Sehglas));
+        TurnIn("n13");
+        Assert.AreEqual(StoryStatus.Done, S().Status("n13"));
+        // R6: Ilsabes Glas berührt Merles Aufgabe nicht — und umgekehrt.
+        Assert.AreNotEqual(StoryStatus.Done, S().Status("h18"));
+        Assert.AreEqual(1, S().Count("h18", 0), "Buchungen zählen für jede aktive Aufgabe");
+    }
+
+    [Test]
+    public void Reward_N13_GoldOnce() // quest:n13
+    {
+        var q = StoryCatalog.Get("n13");
+        Assert.AreEqual(StoryReward.Gold, q.reward);
+        Assert.AreEqual(200, q.rewardGold);
+        CompleteH4();
+        OpenActTwo();
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h5"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Talk, StoryIds.Ilsabe));
+        TurnIn("h5");
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("n5"));
+        for (int i = 0; i < 4; i++)
+            Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.DuneAugur));
+        TurnIn("n5");
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("n13"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Sehglas));
+        TurnIn("n13");
+        var wallet = hero.GetComponent<Wallet>();
+        GrantRewards(hero);
+        Assert.AreEqual(200, wallet.Gold);
+        GrantRewards(hero);
+        Assert.AreEqual(200, wallet.Gold, "second grant is a no-op");
+    }
+
     // ---- Akt-I-Vertiefung (cinderreach-akt1-vertiefung S2): Moor/Beinhaus-Dialoge ----
 
     [Test]

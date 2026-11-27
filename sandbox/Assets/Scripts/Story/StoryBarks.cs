@@ -43,6 +43,9 @@ public static class StoryBarks
         // Knechte). Laufen über OnKill, gedrosselt wie Bossrufe.
         new StoryBark("lancer.fall", "n"),
         new StoryBark("thrall.fall", "n"),
+        // Akt II Vertiefung S2: Brache — Erzähler bei H18/H19-Aktivierung (R4/R5-Funde).
+        new StoryBark("sehglas.find", "n"),
+        new StoryBark("scherben.find", "n"),
     };
 
     static readonly Queue<StoryBark> pending = new Queue<StoryBark>();

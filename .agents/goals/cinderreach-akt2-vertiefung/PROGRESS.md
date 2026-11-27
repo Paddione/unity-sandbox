@@ -1,9 +1,10 @@
 # Progress: cinderreach-akt2-vertiefung
 
-Prozent: 33 %
+Prozent: 66 %
 
 ## Erledigt
 
+- 2026-11-27 (S2 brache, dieser Branch): H18/H19/N12–N15-Dialoge (29 Zeilen + H9-Folgen merle.7/ottilie.7-8) + 2 Wendung-3-Barks in `StoryBarks.cs`/`StoryDirector.cs` (R4/R5 beim Aufwachen), Loc-Texte de/en, 9 Brache-Pickups in `TownBuilder` + Szene rebuildet, `Akt2BrachenTests` (6 PlayMode-Reisen: H18/H19/N12/N13-N15/N14-Folge/Surfacing mit 43 Schlüssel-Assert), +4 Regel-Fälle in `QuestRuleTests` (H18-AutoAccept, N12-Sperre/150-Gold, R6-Pfadtrennung, N13-200-Gold), Voice-Clips gerendert. Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK (KayKit verified: Skeletons/CharacterAnimations, URP Lit + Atlas), `check-voice-lines` 211/0, `check-meta` OK, Coverage 0 uncovered. S2-Arbeit nach 2 Harness-Fehlern vom Primary übernommen (Teilarbeit adoptiert, Locks stale).
 - 2026-11-27: S1 gelandet (Worktree `feature/cinderreach-akt2-vertiefung-s1`, NICHT gemergt/gepusht — landet der Primary): Bibel §Akt II auf 12 Einträge (H18/H19 + N12–N15, Rätsel R4–R6, Wendung 3 geschärft, Anker H6/H8/H9 unangetastet), StoryModel +6 Quests +4 Items (h10–h13/n6–n7 frei, Save v16 unangetastet, State/Director generisch — keine Pfadänderung), LocCatalog.Story.cs +26 Zeilen Quest-/Item-Texte (Präzedenz Akt-I-S1 6646cff, verlangt von StoryStateTests), Akt2ModellTests neu (12/12). Belege: EditMode 686/686, PlayMode 383/383, VerifyDiabloZone OK, KayKitAssets.Verify OK, check-meta OK, workspace-check still. 1 Diagnose-Runde (Testfahrpläne), 0 Wiederholungs-Budget verbraucht für Modellfehler.
 
 - 2026-11-24: setgoal-Runde beantwortet (siehe Goal `cinderreach-akt1-vertiefung`: beides kombiniert, gemischte Rätsel, Laternen-Finale für Akt III, 4 Goals).
@@ -14,11 +15,9 @@ Prozent: 33 %
 
 ## Nächste Schritte
 
-- S1: Story-Bibel Akt II fortschreiben (neue H/N-Tabellen, Rätsel-Definitionen) + Datenmodell — nach Akt-I-S1.
-- S2: Brachen-Strang (Sehglas-/Scherben-Rätsel, Tamm-/Ilsabe-Folgen, Glasmacher-Anker).
-- S3: Abnahme (Autoplay bis boss3, Voice für neue Zeilen, Doku).
+- S2: Brachen-Strang in Abnahme (Suite + Voice-Gate + Commit) — läuft.
+- S3: Abnahme (Save-Migration, Koop-Buchung, Autoplay bis boss3, Doku).
 
 ## Offene Punkte
 
-- Stufen-Reihenfolge und Quest-Namen stehen erst mit S1 (Story-Bibel-Fortschreibung).
-- S1-Start auf aktuellem main nach Akt-I-S1; Save v15/Bracket-4-Regeln (Gear-Slots) dabei unangetastet lassen.
+Keine.

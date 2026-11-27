@@ -164,6 +164,18 @@ public static class TownBuilder
         var k = KilnLayout.KilnOffset;
         SpawnStoryPickup(StoryIds.Fuhrliste, k + new Vector3(10f, 0.7f, 8f), 0);
         SpawnStoryPickup(StoryIds.Russseite, k + new Vector3(3f, 0.7f, -5f), 0);
+        // Akt II Vertiefung S2: Glasbrache (R4 Sehgläser, R5 Scherben, N12-Rad, N15-Seite).
+        // Positionen paarweise entzerrt (Test-Reise nutzt dieselben Stellen).
+        var b = BarrensLayout.BarrensOffset;
+        SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(-5f, 0.7f, 11f), 0);
+        SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(5f, 0.7f, 11f), 1);
+        SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(8f, 0.7f, -7f), 2);
+        SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-2f, 0.7f, 7f), 0);
+        SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(5f, 0.7f, -2f), 1);
+        SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-6f, 0.7f, 5f), 2);
+        SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-8f, 0.7f, -11f), 3);
+        SpawnStoryPickup(StoryIds.Speichenrad, b + new Vector3(11f, 0.7f, -10f), 0);
+        SpawnStoryPickup(StoryIds.Spendenseite, b + new Vector3(-12f, 0.7f, -1f), 0);
     }
 
     static void SpawnStoryPickup(string itemId, Vector3 pos, int index)

@@ -81,8 +81,11 @@ public static class StoryDialogs
         new StoryDialog("h6.hint", M),
         new StoryDialog("h7.hint", M),
         new StoryDialog("h8.hint", M),
-        new StoryDialog("h9.talk.merle", M, M, M, M + "|n4", M + "|!n4", M),
-        new StoryDialog("h9.talk.ottilie", N, O, O, O + "|n5", N, O),
+        // S2: H9-Varianten stehen hinten (x|nK, dlg-Schlüssel stabil): n12
+        // vergräbt das Glas, n13/n15 geben Ilsabes Lesen eine eigene Zeile.
+        new StoryDialog("h9.talk.merle", M, M, M, M + "|n4", M + "|!n4", M, M + "|n12"),
+        new StoryDialog("h9.talk.ottilie", N, O, O, O + "|n5", N, O, O + "|n13", O + "|n15"),
+
         new StoryDialog("n1.offer", I, I, I),
         new StoryDialog("n1.hint", I),
         new StoryDialog("n1.done", I, I, I),
@@ -130,6 +133,26 @@ public static class StoryDialogs
         new StoryDialog("n11.offer", I, I, I),
         new StoryDialog("n11.hint", I),
         new StoryDialog("n11.done", I, I),
+        // ---- Akt II Vertiefung S2: Brache (R4 Sehgläser, R5 Scherben, R6-Entscheidung) ----
+        // H18/H19 sind autoAccept (nie Available): kein .offer nötig. Die
+        // R6-Entscheidung (behalten statt abliefern) läuft über Bestandspfade
+        // (Buchungen zählen für jede aktive Aufgabe). H18/H19-Texte stehen bei
+        // den Zeilen in LocCatalog.Story.cs (S2-Abschnitt).
+        new StoryDialog("h18.hint", M),
+        new StoryDialog("h18.talk.merle", M, M, M, M + "|n14"),
+        new StoryDialog("h19.hint", M),
+        new StoryDialog("n12.offer", M, M),
+        new StoryDialog("n12.hint", M),
+        new StoryDialog("n12.done", M, M),
+        new StoryDialog("n13.offer", I, I),
+        new StoryDialog("n13.hint", I),
+        new StoryDialog("n13.done", I, I),
+        new StoryDialog("n14.offer", M, M),
+        new StoryDialog("n14.hint", M),
+        new StoryDialog("n14.done", M, M),
+        new StoryDialog("n15.offer", I, I),
+        new StoryDialog("n15.hint", I),
+        new StoryDialog("n15.done", I, I),
         new StoryDialog("idle.ottilie.1", O),
         new StoryDialog("idle.ottilie.2", O),
         new StoryDialog("idle.ottilie.3", O),

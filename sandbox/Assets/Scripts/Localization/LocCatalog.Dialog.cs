@@ -91,6 +91,38 @@ public static partial class LocCatalog
         E("dlg.h9.talk.ottilie.4", "Und Ilsabe kauft schon Sehgläser, damit sie weiß, wann sie kommen. Sie wird ihnen etwas anbieten. Jemanden.", "And Ilsabe is already buying seeing glasses, so she knows when they come. She'll offer them something. Someone."),
         E("dlg.h9.talk.ottilie.5", "Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.", "Beyond the Fen Gate, husks stand in the fog and look across. None comes closer. Not yet."),
         E("dlg.h9.talk.ottilie.6", "Geht schlafen. Ich zähle noch einmal.", "Go and sleep. I'll count once more."),
+        // Akt II Vertiefung S2: H9-Folgen (N12 → Merle vergräbt, N13/N15 → Ottilie liest mit).
+        E("dlg.h9.talk.merle.7", "Tamms Rad habe ich vergraben, mit dem Glas obendrauf. Verkauft wird hier nichts mehr.", "I buried Tamm's wheel, with the glass on top. Nothing gets sold here any more."),
+        E("dlg.h9.talk.ottilie.7", "Fünf Gläser hat sie jetzt. Ilsabe liest darin die Nächte der Hüllen — und wir zählen mit.", "She has five glasses now. Ilsabe reads the husks' nights in them — and we count along."),
+        E("dlg.h9.talk.ottilie.8", "Eine Spendenseite pro Laterne. Irgendwer zahlt immer — sorgt dafür, dass ihr es nicht seid.", "One donation page per lantern. Someone always pays — make sure it isn't you."),
+
+        // ---- Akt II Vertiefung S2: Brache (H18/H19, N12-N15) ----
+        E("dlg.h18.hint.1", "Die Seher tragen zwei Gläser bei sich. Nehmt sie ihnen ab — und sprecht dann mit mir.", "The seers carry two glasses. Take them from them — then talk to me."),
+        E("dlg.h18.talk.merle.1", "Legt sie her. Ja — darin liegt die Wacht, von außen gesehen.", "Lay them down. Yes — inside lies the Hold, seen from outside."),
+        E("dlg.h18.talk.merle.2", "Seht ihr die Gestalten um die Lichter? Das sind keine Schatten. Das sind Hüllen.", "Do you see the figures around the lights? Those aren't shadows. Those are husks."),
+        E("dlg.h18.talk.merle.3", "Sie ziehen zu genau den Laternen, deren Glut sie tragen. So ruft das Glas sie heim.", "They drift to exactly the lanterns whose ember they carry. That's how the glass calls them home."),
+        E("dlg.h18.talk.merle.4", "Und auf Tamms Scherbe steht sein Name. Er hat es gewusst — und ist trotzdem gefahren.", "And Tamm's shard bears his name. He knew — and drove anyway."),
+        E("dlg.h19.hint.1", "Die Säulen tragen Scheiben für jeden Namen. Bringt mir drei Scherben, ich setze sie zusammen.", "The pillars carry panes for every name. Bring me three shards, I'll fit them together."),
+        E("dlg.n12.offer.1", "Tamm ist nicht heimgekommen. Sein Karren steht noch in der Brache.", "Tamm never came home. His cart still stands in the barrens."),
+        E("dlg.n12.offer.2", "Holt sein Speichenrad. Ich will etwas haben, das ich vergraben kann.", "Fetch his wheel. I want something I can bury."),
+        E("dlg.n12.hint.1", "Das Rad liegt bei seinem Karren, zwischen den Trümmern im Süden.", "The wheel lies by his cart, among the rubble in the south."),
+        E("dlg.n12.done.1", "Ja. Das ist sein Rad — die Speiche habe ich selbst geschnitzt.", "Yes. That's his wheel — I carved that spoke myself."),
+        E("dlg.n12.done.2", "Ich vergrabe es mit dem Glas obendrauf. Verkauft wird hier nichts mehr.", "I'll bury it with the glass on top. Nothing gets sold here any more."),
+        E("dlg.n13.offer.1", "Vier Gläser hat Merle. Das fünfte liegt tief in der Brache, wo keiner mehr hingeht.", "Merle has four glasses. The fifth lies deep in the barrens, where nobody goes any more."),
+        E("dlg.n13.offer.2", "Bringt es mir, nicht ihm. Ich lese darin, wann die Hüllen kommen.", "Bring it to me, not to him. I'll read in it when the husks come."),
+        E("dlg.n13.hint.1", "Sucht bei den Glassäulen im Süden, hinter dem Glasmacher.", "Search by the glass pillars in the south, past the Glasswright."),
+        E("dlg.n13.done.1", "Fünf Gläser. Jetzt kann ich die Nächte lesen.", "Five glasses. Now I can read the nights."),
+        E("dlg.n13.done.2", "Sagt es Ottilie — aber leise. Die Wacht schläft noch.", "Tell Ottilie — but quietly. The Hold still sleeps."),
+        E("dlg.n14.offer.1", "Zwischen den Scherben liegt eine mit einem Namen. Tamms Name.", "Among the shards lies one with a name. Tamm's name."),
+        E("dlg.n14.offer.2", "Bringt sie mir. Ich will wissen, ob er es gewusst hat.", "Bring it to me. I want to know whether he knew."),
+        E("dlg.n14.hint.1", "Die eingeritzte Scherbe liegt bei den Säulen, wo das Glas am dichtesten liegt.", "The etched shard lies by the pillars, where the glass lies thickest."),
+        E("dlg.n14.done.1", "Da steht er. Tamm. Eingeritzt, bevor das Glas kalt war.", "There he is. Tamm. Etched before the glass went cold."),
+        E("dlg.n14.done.2", "Er hat es gewusst. Und ist trotzdem gefahren. Vergesst das nicht.", "He knew. And drove anyway. Don't forget that."),
+        E("dlg.n15.offer.1", "Eine Seite fehlt mir noch. Eine Spendenseite, lose in der Brache verweht.", "One page is still missing. A donation page, blown loose across the barrens."),
+        E("dlg.n15.offer.2", "Darauf steht ein Preis pro Laterne. Holt sie — bevor der Wind sie frisst.", "It names a price per lantern. Fetch it — before the wind eats it."),
+        E("dlg.n15.hint.1", "Papier bleibt an Mauern hängen. Sucht bei der Ruine im Westen.", "Paper catches on walls. Search by the ruin in the west."),
+        E("dlg.n15.done.1", "Da steht es. Ein Preis pro Laterne, sauber gerechnet.", "There it is. A price per lantern, neatly counted."),
+        E("dlg.n15.done.2", "Was eine Laterne kostet, zahlt immer jemand. Merkt euch das.", "What a lantern costs, someone always pays. Remember that."),
 
         // ---- N1 Ilsabes Lieferbuch ----
         E("dlg.n1.offer.1", "Ihr geht ins Moor? Dann tut mir einen Gefallen. Gegen Bezahlung, natürlich.", "Going into the fen? Then do me a favour. Paid, of course."),
@@ -199,6 +231,9 @@ public static partial class LocCatalog
         E("dlg.h5.done.5", "Den Preis kennt ihr jetzt. Sagt es ihnen morgen, wenn sie fragen, was eine Laterne kostet.", "You know the price now. Tell them tomorrow, when they ask what a lantern costs."),
         E("dlg.h5.done.6", "Fragt mich nicht, was eine Laterne kostet. Ich habe aufgeh\u00f6rt zu z\u00e4hlen.", "Don't ask me what a lantern costs. I've stopped counting."),
         E("bark.lancer.fall", "Noch eine Spitze f\u00fcr Jorins Schmelze.", "One more point for Jorin's melt."),
+        // Akt II Vertiefung S2: Brache (R4/R5-Funde).
+        E("bark.sehglas.find", "Zwei Gläser. Darin liegt die Wacht, von außen gesehen.", "Two glasses. Inside lies the Hold, seen from outside."),
+        E("bark.scherben.find", "Drei Scherben. Sie passen aneinander — eine Scheibe, ein Name.", "Three shards. They fit together — one pane, one name."),
         E("bark.thrall.fall", "Leer. Sie trugen nichts als Glut in den H\u00e4nden.", "Empty. They carried nothing but embers in their hands."),
 
         // ---- Barks (cinderreach-story-voice): Bosse im Kampf, Erzähler an Wendepunkten ----

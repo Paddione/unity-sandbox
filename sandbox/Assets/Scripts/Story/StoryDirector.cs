@@ -189,6 +189,9 @@ public sealed class StoryDirector : MonoBehaviour
             if (q == null) continue;
             if (c.objective < 0 && c.status == StoryStatus.Active && q.id == "h4") StoryBarks.Say("h4.start");
             if (c.objective < 0 && c.status == StoryStatus.Done && q.id == "h7") StoryBarks.Say("h7.done");
+            // Akt II Vertiefung S2: R4/R5-Funde sprechen beim Aufwachen der Aufgabe.
+            if (c.objective < 0 && c.status == StoryStatus.Active && q.id == "h18") StoryBarks.Say("sehglas.find");
+            if (c.objective < 0 && c.status == StoryStatus.Active && q.id == "h19") StoryBarks.Say("scherben.find");
             if (c.objective < 0 && c.status == StoryStatus.Active) Toast(Loc.F("story.quest.new", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Ready) Toast(Loc.F("story.quest.ready", Loc.T(q.TitleKey)));
             else if (c.objective < 0 && c.status == StoryStatus.Done) Toast(Loc.F("story.quest.done", Loc.T(q.TitleKey)));
