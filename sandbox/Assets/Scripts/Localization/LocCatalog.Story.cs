@@ -32,6 +32,8 @@ public static partial class LocCatalog
         E("story.item.glasscherbe", "Glasscherbe", "Glass shard"),
         E("story.item.speichenrad", "Speichenrad", "Spoke wheel"),
         E("story.item.spendenseite", "Spendenseite", "Donation page"),
+        E("story.item.glutspur", "Glutspur", "Ember trace"),
+        E("story.item.lanzenspitze", "Lanzenspitze", "Lance head"),
         E("story.pickup", "Aufgehoben: {0}", "Picked up: {0}"),
         E("story.talk", "Sprechen: {0}", "Talk: {0}"),
 

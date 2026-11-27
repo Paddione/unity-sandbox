@@ -434,6 +434,67 @@ public class Akt3FinaleTests
     }
 
     [UnityTest]
+    public IEnumerator Thewes_Auftritt_H11RespawnNachFruehemKill()
+    // quest:h11 quest:h12 quest:h13
+    // S3c: Thewes stirbt im Akt-II-Sweep vor H9, tritt aber erst mit H11
+    // am Moortor auf (Respawn bei H11-Aktivierung, genau 1x, kein Doppel).
+    {
+        DriveToH11();
+        Assert.AreEqual(0, StoryDirector.ThewesEntranceEntries);
+        // Akt-II-Sweep: Thewes liegt schon tot da, kein Auftritt vor H11.
+        var early = MakeThewes(ThewesPos);
+        StoryDirector.BookKill(StoryIds.Thewes);
+        Object.DestroyImmediate(early);
+        Assert.AreEqual(StoryStatus.Active, S().Status("h11"));
+        // H11-Kante: Gate steht, dritte Spur nennt ihn — er erscheint neu.
+        var gate = MakeGate(ZoneGate.MoortorGateName, MoortorGatePos, MoortorArrival, ActProgress.Barrens);
+        try
+        {
+            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
+            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
+            Assert.AreEqual(StoryStatus.Active, S().Status("h11"));
+            StoryDirector.MaybeSpawnThewesAtH11();
+            Assert.AreEqual(1, StoryDirector.ThewesEntranceEntries, "Kante feuert genau 1x");
+            yield return null;
+            var foes = new System.Collections.Generic.List<EnemyHealth>(
+                Object.FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None));
+            int thewesCount = 0;
+            EnemyHealth thewes = null;
+            foreach (var h in foes)
+                if (h != null && h.name == StoryIds.Thewes) { thewesCount++; thewes = h; }
+            Assert.AreEqual(1, thewesCount, "genau ein Thewes nach Respawn");
+            Assert.IsNotNull(thewes);
+            Assert.AreEqual(LootTier.Boss, thewes.tier);
+            Assert.AreEqual(GlasswrightController.MaxHP, thewes.CurrentHP, "volles HP");
+            Assert.AreEqual(StoryIds.Thewes, thewes.name, "exakter Name");
+            // Lebendig: kein Doppel-Spawn, Kante bleibt bei 1x.
+            StoryDirector.MaybeSpawnThewesAtH11();
+            Assert.AreEqual(1, StoryDirector.ThewesEntranceEntries);
+            yield return null;
+            thewesCount = 0;
+            foreach (var h in Object.FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None))
+                if (h != null && h.name == StoryIds.Thewes) thewesCount++;
+            Assert.AreEqual(1, thewesCount, "kein Doppel-Spawn wenn lebendig");
+            // Dritte Spur: H12 wartet, Thewes faellt, H13 entscheidet.
+            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
+            Assert.AreEqual(StoryStatus.Done, S().Status("h11"));
+            Assert.AreEqual(StoryStatus.Active, S().Status("h12"));
+            StoryDirector.BookKill(thewes.name);
+            Assert.AreEqual(StoryStatus.Done, S().Status("h12"));
+            Assert.AreEqual(StoryStatus.Active, S().Status("h13"));
+            Assert.IsTrue(StoryDirector.BookDecision(true));
+            Assert.AreEqual(ActProgressAkt3.Shatter, RunProfile.Finale.Decision);
+        }
+        finally
+        {
+            Object.DestroyImmediate(gate);
+            var foe = GameObject.Find(StoryIds.Thewes);
+            if (foe != null) Object.DestroyImmediate(foe);
+        }
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator Finale_Surfacing_LogTrackerKarte()
     {
         DriveToH11();
