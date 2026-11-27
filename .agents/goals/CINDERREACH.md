@@ -17,6 +17,12 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
+Abgeschlossen: `cinderreach-class-kits-parity` (2026-11-27, `aaa2571`): Moorgänger und Schmuggler mit je 6 eigenen
+Skills, 7 Combos über `EnemyStatus`, Schnellschuss-Fächer als Variante, Matrix-Uniques auf Combos ausgerichtet plus
+Combo-Waffen `moorvogt-anchor`/`smugglers-fuse`, Rang-Rückerstattung beim Laden (Details unter „Klassen und Skills“
+und bei den Uniques). Belege `docs/class-kits-run-log.md` (Autoplay je Klasse Exit 0 mit Combo-Zählern,
+Windows-Shotcheck `47`–`55`, fps-gate 63 fps @1080p, Server-Image-Pin dotfiles `9fbe8bf`).
+
 Abgeschlossen: `cinderreach-group-quest-map` (2026-11-26): Koop-Story gemeinsam. Öffnet ein Held einen NPC-Dialog,
 sehen alle anderen dieselben Zeilen mit Stimme als Zuhörerfenster („<Held> spricht mit <NPC>“, nicht blockierend,
 ausblendbar, eigener Dialog hat Vorrang; `StoryDialogShare`, `DiabloNetworkPlayer.Story.cs`, Host prüft Dialog-ID und

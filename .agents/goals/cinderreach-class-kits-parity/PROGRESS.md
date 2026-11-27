@@ -1,6 +1,6 @@
 # Progress: cinderreach-class-kits-parity
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -14,10 +14,12 @@ Prozent: 90 %
 - K7: `CharacterSheet.RefundForeignRanks` beim Laden (`OldSave_RefundsRanksOutsideTheKit`, `CharacterSheetTests.Points_SurviveSaveRoundtrip` über `SaveService.TryLoad`), Kit-Ränge im Save (`KitRanks_RoundTripThroughTheSave`).
 - K8: Koop-Intent akzeptiert Kit-Skills nur für ihre Klasse (`CoopIntent_AcceptsKitSkillsForTheirClassOnly`, `CoopPartyTests.IsCastSkillId_CoversTheWholeEnum`); Status/Schaden nur auf Host/Solo.
 
+- Deploy 2026-11-27: gelandet `aaa2571`; Server und Client aus `443d7c0` gebaut, Image `sha256:46dd1baa…` in dotfiles `9fbe8bf` gepinnt, Pod läuft ohne Exception, Windows-Client gestaget (`docs/class-kits-run-log.md`).
+
 ## Nächste Schritte
 
-- Landen, Server-Image veröffentlichen und in dotfiles pinnen, Windows-Client stagen, Join-Test.
+Keine.
 
 ## Offene Punkte
 
-- Deploy (Server-Image-Pin, Windows-Stage) steht aus.
+Keine.
