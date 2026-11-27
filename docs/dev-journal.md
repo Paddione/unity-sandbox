@@ -1029,3 +1029,18 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Sandbox nicht erreichbar (`cuInit` 100, dxg ENODEV trotz Treiber mit CUDA UMD 13.5) — separater System-Task.
 - Gelernt: Worker-Sessions können mit transientem `tool_choice`-Harness-Fehler sterben und trotzdem brauchbare
   Teilarbeit im Worktree hinterlassen (S3/S4 mehrfach) — adoptieren statt duplizieren; stale Locks per TTL-Reap lösbar.
+
+## 2026-11-27 — Autoplay travel unstick + autoplay-only starting gear (cinderreach-autoplay-travel-unstick)
+
+- Ziel: schnellerer Autoplay-Durchlauf ohne Balance- oder Teständerung. Nur
+  `sandbox/Assets/Scripts/SessionAutoplay.cs` angefasst (reine -autoplay-Pfade).
+- Travel-Leg-Watchdog `TravelLegTick` (5 s / 1 m / 6-Nudges wie `UnstickTick`,
+  plus `SetDestination`-Repath, Speeds/Ziele unverändert) in `PhaseTownWaypoints`
+  (25 s → 15 s pro Leg) und `PhaseGate`-Anmarsch (40 s → 30 s) verdrahtet.
+  Log-Literal byte-identisch zum Fight-Loop, daher kein Allowlist-Update nötig.
+- `GrantAutoplayGear` rüstet nach dem Hero-Fund die klassenpassende
+  Kindled-Finale-Rare (`ItemDatabase.CreateKindledFinaleWeapon`, kein Drop-/Vendor-
+  Eingriff, realer Spielpfad unberührt): `Weapon/ShortSword/Rare dmg 7 statt 3`.
+- Beleg, je `-seed 0`, exit 0, 0 Exceptions, 12 Phasen bis actboss+einheimsen:
+  baseline `duration_s=186.6 s` → nachher `duration_s=135.4 s` (~27 % schneller).
+  Suites grün: EditMode 674/674, PlayMode 383/383.
