@@ -1,21 +1,23 @@
 # Progress: cinderreach-graph-adr-hygiene
 
-Prozent: 0 %
+Prozent: 20 %
 
 ## Erledigt
 
 - 2026-11-26: Aus A2/A3-Graph- und ADR-Audit (`5bd41d3`) sowie `/setgoal`-Klärungsrunde als Goal angelegt.
-- 2026-11-27: Stufenplan [tasks.md](../../plans/cinderreach-graph-adr-hygiene/tasks.md) angelegt (5 Stufen, Basis `8e59d00`); `plan_refs` in GOAL.md ergänzt. Prozent bleibt 0 %.
+- 2026-11-27: Stufenplan [tasks.md](../../plans/cinderreach-graph-adr-hygiene/tasks.md) angelegt (5 Stufen, Basis `8e59d00`); `plan_refs` in GOAL.md ergänzt.
 
-- 2026-11-27: Plan gegen `1ff1b95` geprüft (unverändert) und als P7 priorisiert (unabhängig, jederzeit als Füller). Prozent bleibt 0 %.
+- 2026-11-27: Plan gegen `1ff1b95` geprüft (unverändert) und als P7 priorisiert (unabhängig, jederzeit als Füller).
+
+- 2026-11-27 (S1, Worktree `feature/cinderreach-graph-adr-hygiene-s1`): frische `index_status`-Messung nach Re-Index auf `main`-HEAD (s. S1-Baseline unten) — gelandet als `8e781a7` (ff, Push durch, Worktree aufgeräumt). Prozent jetzt 20 %.
 
 ## Nächste Schritte
 
-- S1 aus dem Stufenplan: frische `index_status`-Messung (Audit-Zahlen 45/179 auf Basis `5bd41d3` neu erheben) und Funde klassieren, danach S2 (`run-coop-pair.sh:92`), S3/S4 (`doc_links`), S5 (ADR-Prozess).
+- S2 aus dem Stufenplan: `parse_partial` in `scripts/run-coop-pair.sh:92` glätten (Verhaltensnachweis + Re-Index-Beleg), danach S3 (`missing` → 0) und S4 (`ambiguous` reduzieren), S5 (ADR-Prozess + Gesamtverifikation).
 
 ## Offene Punkte
 
-- Bereinigung, Doku-Update und Re-Index-Nachweis noch offen.
+- S2–S5 stehen aus; S1-Baseline (63/260/1) ist die Arbeitsbasis für alle Folgestufen.
 
 ## S1-Baseline (Messung, 2026-11-27)
 

@@ -5,8 +5,8 @@ branch: feature/cinderreach-sprache-voice-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO03, G-DIABLO07]
-priority: P6 (Gesamtziel ans Kettenende; S1 jederzeit startbar, S2 erst nach Akt-III-S1)
-status: partially_ready — S1 startbar; S2 gestaffelt blockiert (Akt-I-S1 erfüllt, Akt-II-S1 und Akt-III-S1 offen)
+priority: P6 (Gesamtziel ans Kettenende; S1 gelandet, S2 erst nach Akt-II/III-S1)
+status: in_progress — S1 gelandet (a5087c8, 33 %); S2 gestaffelt blockiert (Akt-I-S1+S2 erfüllt, Akt-II-S1 und Akt-III-S1 offen)
 start_condition: main @ 1ff1b95 sauber; S2 erst nach Textständen aus Akt-I-S1 (erfüllt, 6646cff), Akt-II-S1 (offen), Akt-III-S1 (offen) — gestaffelt
 plan_refs: [.agents/goals/cinderreach-sprache-voice/GOAL.md]
 ---

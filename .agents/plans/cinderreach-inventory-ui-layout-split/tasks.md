@@ -5,8 +5,8 @@ branch: feature/cinderreach-inventory-ui-layout-split-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
-priority: P3 (unabhängiges Refactoring, mechanisch/niedriges Risiko; parallel zur Story-Kette möglich, vor skills-modularization)
-status: ready — Code-Basis seit Planerstellung unverändert (1ff1b95 enthält nur Pläne)
+priority: P3 (unabhängiges Refactoring, mechanisch/niedriges Risiko; parallel zur Story-Kette möglich, S2 als Nächstes)
+status: in_progress — S1-Baseline gelandet (396980a, 33 %, 39/39), nächster Schritt S2 split
 start_condition: main sauber; kein paralleles Schreiben an DiabloInventoryUI.cs (insb. kein offener Inventory-/Gear-Worktree)
 plan_refs: [.agents/goals/cinderreach-inventory-ui-layout-split/GOAL.md]
 ---

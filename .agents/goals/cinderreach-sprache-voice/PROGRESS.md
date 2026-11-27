@@ -1,6 +1,6 @@
 # Progress: cinderreach-sprache-voice
 
-Prozent: 0 %
+Prozent: 33 %
 
 ## Erledigt
 
@@ -10,14 +10,15 @@ Prozent: 0 %
 
 - 2026-11-27 (S1, Worktree `feature/cinderreach-sprache-voice-s1`): Ton-Fortschreibung in `docs/story-bible.md` (§Ton-Fortschreibung, 8 Glättungsregeln + Vorher/Nachher-Beispiele; Glossar + Ton unberührt, Akt-Tabellen unberührt) und Voll-Inventur `docs/sprache-inventur.md` neu: 238 Textzeilen (115 vertont = 107 dlg + 8 bark, 123 Story-Katalog inkl. 28 quest.* + 6 story.item.* aus `6646cff`), 115/115 Clips, `check-voice-lines.py`: 115 lines, 0 problems (nur gelesen). Offen: Akt-II-S1 + Akt-III-S1-Textstände sowie N8–N11-Folgezeilen (keine `|n8`…`|n11`-Flags) — alles S2 nach Staffelung.
 
-- 2026-11-27: Plan auf `1ff1b95` rebased und als P6 priorisiert: Akt-I-S1-Textstand steht (`6646cff`), Akt-II-S1 und Akt-III-S1 fehlen weiter — S1 (Regeln+Inventur) startbar, S2 bleibt gestaffelt blockiert; Zeilen-/Clip-Stand (115) auf aktuellem HEAD bestätigt. Prozent bleibt 0 %.
+- 2026-11-27: Plan auf `1ff1b95` rebased und als P6 priorisiert: Akt-I-S1-Textstand steht (`6646cff`), Akt-II-S1 und Akt-III-S1 fehlen weiter — S1 (Regeln+Inventur) startbar, S2 bleibt gestaffelt blockiert; Zeilen-/Clip-Stand (115) auf aktuellem HEAD bestätigt.
+
+- 2026-11-27 (S1, Worktree `feature/cinderreach-sprache-voice-s1`, gelandet als `a5087c8` auf `main` — ff, Push durch, Worktree aufgeräumt): s. Eintrag oben (Ton-Fortschreibung + 238-Zeilen-Inventur). Prozent jetzt 33 %.
 
 ## Nächste Schritte
 
-- S1: Glättungsregeln (Ton-Fortschreibung + Beispiele) + Bestands-Inventur aller 115+ Zeilen — sofort startbar, entblockt nichts, wird aber erst mit den Quest-S1-Ständen vollständig.
-- S2: Text-Glättung (Loc + Dialogs/Barks) + Voice-Render + QA — nach Akt-I/II/III-S1.
+- S2: Text-Glättung (Loc + Dialogs/Barks) + Voice-Render + QA — nach den Quest-S1-Textständen (Akt-I-S1+S2 stehen mit `6646cff`/`16833a6`, Akt-II-S1 und Akt-III-S1 weiter offen).
 - S3: Abnahme (Suiten, check-voice-lines, Doku).
 
 ## Offene Punkte
 
-- Neutexte aus den Quest-Goals kommen gestaffelt; S2 läuft erst nach deren S1-Textständen (alle drei noch offen).
+- S2 läuft erst nach Akt-II-S1- und Akt-III-S1-Textständen; Akt-I-Seite (inkl. S2-Dialoge) ist inventarisiert.

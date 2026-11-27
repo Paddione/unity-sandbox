@@ -6,7 +6,7 @@ repo_main: main
 tickets: none
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
 priority: P1 (Kettenkopf Story; entblockt Akt II, Akt III und sprache-voice S2)
-status: in_progress — S1 gelandet (6646cff, 25 %), nächster Schritt S2
+status: in_progress — S1 gelandet (6646cff, 25 %), S2 gelandet (16833a6, 50 %), S3 läuft (Ofen/Wacht)
 start_condition: main @ 1ff1b95 sauber; kein anderes Quest-Goal schreibt gleichzeitig an StoryModel/StoryState (disjunkte Stufen, siehe Manifest)
 plan_refs: [.agents/goals/cinderreach-akt1-vertiefung/GOAL.md]
 ---
