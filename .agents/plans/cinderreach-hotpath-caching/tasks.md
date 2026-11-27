@@ -1,7 +1,7 @@
 ---
 title: "Cinderreach Hot-Path Caching (LootDropView & DiabloClickController)"
 domains: [unity, gameplay, performance]
-status: in_progress
+status: done
 goal: cinderreach-hotpath-caching
 slug: cinderreach-hotpath-caching
 branch: feature/cinderreach-hotpath-caching
@@ -19,4 +19,4 @@ health_probe: {"id":"G-DIABLO08","title":"No per-frame Camera.main or transform.
 | --- | --- | --- |
 | S1 Hot-Path-Caching (erledigt) | `Scripts/Loot/LootDropView.cs`, `Scripts/DiabloClickController.cs`, `Tests/PlayMode/ItemPresentationTests.cs` | `ItemPresentationTests` 6/6 grün (inkl. `GroundView_BillboardsIcon_AndFollowsCameraSwap`) |
 | S2 Health-Probe `G-DIABLO08` (erledigt) | `scripts/check-hotpath-caching.py`, `scripts/test_check_hotpath-caching.py` | `python3 scripts/check-hotpath-caching.py` OK, `pytest scripts` 30 passed |
-| S3 Vollabnahme (blockiert durch `71a6137` auf `main`) | EditMode + PlayMode komplett, `check-meta.py`, `goal-lint.mjs`, `KayKitAssets.Verify` | `EditMode` 665/665 grün; `PlayMode` 376/377 (vorbestehender Blocker `VfxSpawnTests.Boss_TelegraphAndPhaseTwoFire` aus `71a6137`) |
+| S3 Vollabnahme (erledigt) | EditMode + PlayMode komplett, `check-meta.py`, `goal-lint.mjs`, `KayKitAssets.Verify` | `EditMode` 670/670 grün; `PlayMode` 377/377 grün (Basis `8e59d00`, inkl. `VfxSpawnTests`-Isolationsfix) |

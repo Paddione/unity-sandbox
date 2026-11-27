@@ -143,7 +143,12 @@ public class VfxSpawnTests
         boss.transform.position = new Vector3(0f, 0.05f, 2f); // inside slam range
         boss.AddComponent<EnemyHealth>().SetTier(BossController.BossMaxHP, LootTier.Boss);
         var ctrl = boss.AddComponent<BossController>();
-        yield return null; // Update arms the telegraph when the hero is close
+        yield return null; // StoryDirector may arm the Abbot intro cutscene when hero is within 12 m
+        if (CutsceneDirector.Active)
+        {
+            CutsceneDirector.Skip(); // the intro holds the boss (HoldBosses); this test covers combat VFX
+            yield return null; // next frame BossController arms the slam telegraph unblocked
+        }
         Assert.Greater(PresentationVfx.BossTelegraphs, 0, "Slam windup must show a ground ring.");
         ctrl.EnterPhaseTwo();
         Assert.Greater(PresentationVfx.PhaseTwoBursts, 0, "Phase 2 must erupt.");
