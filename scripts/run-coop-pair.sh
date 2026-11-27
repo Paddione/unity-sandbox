@@ -88,11 +88,17 @@ PEERS=(-coop-peers $((CLIENTS + 1)))
 [ "$SERVER" = 1 ] && PEERS=(-coop-peers "$CLIENTS")   # dedicated server: only clients are players
 start_client() { # k target-args...
   local k=$1; shift
-  local cls; cls="$(cclass "$k")"
-  echo "run-coop-pair: client $k -> $* ${cls:+(class $cls)}"
-  timeout --kill-after=30 "$TIMEOUT" "${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}" ${CLIENT_GOD[@]+"${CLIENT_GOD[@]}"} \
-    "$@" -coop-autoplay "$(crole "$k")" ${SERVER_PEERS[@]+"${SERVER_PEERS[@]}"} ${cls:+-class "$cls"} -save-file "$(csave "$k")" -player-name "Client$k" \
-    -autoplay-out "$OUT/$(cdir "$k")" -logFile "$OUT/$(cdir "$k")/player.log" &
+  local cls cls_note=""
+  cls="$(cclass "$k")"
+  if [ -n "$cls" ]; then cls_note=" (class $cls)"; fi
+  echo "run-coop-pair: client $k -> $*${cls_note}"
+  local args=("${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}")
+  if [ "${#CLIENT_GOD[@]}" -gt 0 ]; then args+=("${CLIENT_GOD[@]}"); fi
+  args+=("$@" -coop-autoplay "$(crole "$k")")
+  if [ "${#SERVER_PEERS[@]}" -gt 0 ]; then args+=("${SERVER_PEERS[@]}"); fi
+  if [ -n "$cls" ]; then args+=(-class "$cls"); fi
+  args+=(-save-file "$(csave "$k")" -player-name "Client$k" -autoplay-out "$OUT/$(cdir "$k")" -logFile "$OUT/$(cdir "$k")/player.log")
+  timeout --kill-after=30 "$TIMEOUT" "${args[@]}" &
   CLIENT_PIDS+=($!)
 }
 CLIENT_PIDS=()

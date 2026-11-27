@@ -1,6 +1,6 @@
 # Progress: cinderreach-graph-adr-hygiene
 
-Prozent: 20 %
+Prozent: 40 %
 
 ## Erledigt
 
@@ -10,10 +10,11 @@ Prozent: 20 %
 - 2026-11-27: Plan gegen `1ff1b95` geprüft (unverändert) und als P7 priorisiert (unabhängig, jederzeit als Füller).
 
 - 2026-11-27 (S1, Worktree `feature/cinderreach-graph-adr-hygiene-s1`): frische `index_status`-Messung nach Re-Index auf `main`-HEAD (s. S1-Baseline unten) — gelandet als `8e781a7` (ff, Push durch, Worktree aufgeräumt). Prozent jetzt 20 %.
+- 2026-11-27 (S2, Worktree `feature/cinderreach-graph-adr-hygiene-s2`): `start_client()` in `scripts/run-coop-pair.sh` auf explizites Array-Sammeln (`args=(...)`) und `if [ -n "$cls" ]` statt `${cls:+(class $cls)}` / `${arr[@]+...}` umgestellt (Laufzeitverhalten identisch). Belege: `bash -n scripts/run-coop-pair.sh` Exit 0; `scripts/test_run_coop_pair.py` (4 Matrixfälle `COOP_SERVER=0/1` × `COOP_CLIENT_GOD=0/1` × `COOP_CLIENT_CLASS`) + `python3 -m pytest scripts -q` (34/34) grün; Probe-Re-Index `unity-sandbox-s2-probe` meldet `parse_partial.count == 0` (`10541` nodes, `57696` edges). Prozent jetzt 40 %.
 
 ## Nächste Schritte
 
-- S2 aus dem Stufenplan: `parse_partial` in `scripts/run-coop-pair.sh:92` glätten (Verhaltensnachweis + Re-Index-Beleg), danach S3 (`missing` → 0) und S4 (`ambiguous` reduzieren), S5 (ADR-Prozess + Gesamtverifikation).
+- S3 (`missing` → 0), S4 (`ambiguous` reduzieren), S5 (ADR-Prozess in `docs/runbook.md` + `manage_adr`-Lauf + Gesamtverifikation).
 
 ## Offene Punkte
 
