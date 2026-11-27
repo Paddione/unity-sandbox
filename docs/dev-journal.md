@@ -1063,3 +1063,24 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Gelernt: `run-autoplay.sh`-Wrapper-Kill (Tool-Timeout 600 s) tötet den Unity-Build nicht — der Build
   (PID bekannt) lief weiter und `Succeeded`; Player-Lauf manuell mit identischen Args nachgeholt.
   Vor Commit `git status -s` prüfen: Unity regeneriert gern `TimeManager.asset`-Churn — revertieren.
+
+## 2026-11-27 — Autoplay spielt alle Quests, Navigation um Terrain (autoplay-quests-nav)
+
+- `SessionAutoplay` umgebaut: Route und Ergebnisvertrag bleiben, Bewegung läuft über
+  `AutoplayMover`/`AutoplayNav` (Grid-A* 0,5 m, Kapsel-Probe gegen statische Collider, Figuren,
+  Trigger und lose Rigidbodies ignoriert, gelernte Blockzellen, Stall-Replan nach 1,5 s, Warp nur
+  auf geprüfte freie Zellen). Ersetzt `UnstickTick`/`TravelLegTick` (blinde 3-m-Teleports in
+  Laufrichtung). Die drei Bossphasen teilen sich `BossFight`.
+- Quest-Modus (Solo-Standard, `-autoplay-no-quests` aus, Koop-Host aus): `QuestRound` nach jeder
+  Routenetappe, generisch aus `StoryDialogs.Plan` und offenen Zielen (`AutoplayQuests`), keine
+  hartkodierten Quest-IDs. Pflichtphase `quests` = alle 28 Katalog-Quests `Done`, keine per Catch-up.
+- Gefundener Level-Bug: `StoryPickup_sehglas_2` lag im Collider von `BarrensDune_3`, n13 war
+  für Spieler unerreichbar (h18 verbraucht die anderen zwei Sehgläser). Verschoben auf
+  Brache-lokal (11.5, 0.7, −6) in `TownBuilder`, Szene per `SandboxBuilder.BuildDiabloZone` neu
+  gebaut, `Akt2BrachenTests.Sehglas2Pos` nachgezogen. Die PlayMode-Tests teleportierten auf den Fund
+  und verdeckten den Bug.
+- Belege `-seed 0` (WSLg): Lauf 1 vor dem Fix 27/28 (n13 offen), Lauf 2 nach dem Fix Exit 0,
+  28/28, 0 Catch-up, 0 Exceptions, 11 Phasen, 284 s, 14 Warps (Fund auf Sarkophag, Fund in
+  Thrall-Gruppe). Danach Planziel für Funde auf freie Zellen bis 1,05 m um den Trigger: Lauf 3
+  Exit 0, 28/28, 0 Catch-up, 2 Warps, 219 s. EditMode 699/699, PlayMode 389/389 (ein Lauf endete
+  nach grünen Tests mit Editor-Exit 136, Wiederholung rc 0). `run-autoplay.sh`-Timeout 1200 → 2700 s.

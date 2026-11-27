@@ -99,16 +99,19 @@ Net/CoopAutoplay.cs	route end: hits={hits} roleCasts={roleCasts} deaths={deaths}
 Net/CoopAutoplay.cs	zone {lastZone} → {zone}: hits there {zoneHits[lastZone]}, hero at {Fmt(hero.transform.position)}
 Net/CoopAutoplay.cs	zoneBoss={RunProfile.Act.ZoneBossDefeated} connected={Connected()}
 SessionAutoplay.cs	)}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})
+SessionAutoplay.cs	, result.combos)} 
 SessionAutoplay.cs	, result.partyRoles)} 
 SessionAutoplay.cs	, result.phases)}
 SessionAutoplay.cs	DONE phases={phasesDone} huskKills={huskKills} bossKills={bossKills} 
 SessionAutoplay.cs	FAIL co-op: {(nm == null ? 0 : nm.ConnectedClientsIds.Count)}/{peers} players within 90 s
 SessionAutoplay.cs	FAIL no controllable hero within 30 s
+SessionAutoplay.cs	Town
 SessionAutoplay.cs	act={RunProfile.Act.ActOneComplete} overlay={SessionComplete.ActOneMode}
 SessionAutoplay.cs	census: none left
 SessionAutoplay.cs	census: {n} left, nearest {name} {best:0.0} m at {Fmt(at)}
 SessionAutoplay.cs	co-op host: client joined ({nm.ConnectedClientsIds.Count} connected)
 SessionAutoplay.cs	co-op host: driving the owned network hero (solo hero stood down)
+SessionAutoplay.cs	combos={string.Join(
 SessionAutoplay.cs	exceptions={exceptionCount} party={string.Join(
 SessionAutoplay.cs	heals={result.healsCast} hpRestored={result.hpRestored:0} 
 SessionAutoplay.cs	novas={GlasswrightController.NovasFired} fields={GlasswrightController.FieldsCalled} warded={GlassWard.Warded} 
@@ -128,24 +131,32 @@ SessionAutoplay.cs	phase combat_{label} start (excludeBoss={excludeBoss}) hero={
 SessionAutoplay.cs	phase combat_{label}: FAIL hero left the zone mid-fight 
 SessionAutoplay.cs	phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)}) 
 SessionAutoplay.cs	phase combat_{label}: not cleared, {HuskCensus(hero.transform.position, excludeBoss)}
+SessionAutoplay.cs	phase combat_{label}: target {husk.name} set aside (no damage in {TargetStallSeconds:0} s)
+SessionAutoplay.cs	phase flask done
+SessionAutoplay.cs	phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)
+SessionAutoplay.cs	phase flask: drank={drank} charges={flask.Charges}/{flask.MaxCharges}
+SessionAutoplay.cs	phase flask: refilled={flask.IsFull}
 SessionAutoplay.cs	phase gate_{gateName} done
 SessionAutoplay.cs	phase gate_{gateName} start (expect zoneReached={expectZone}) hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phase gate_{gateName}: FAIL gate not found
 SessionAutoplay.cs	phase gate_{gateName}: FAIL no ZoneGate component
 SessionAutoplay.cs	phase gate_{gateName}: teleports={ZoneGate.Teleports - before} zoneSaved={saved} (expectZone={expectZone})
+SessionAutoplay.cs	phase quests: done={result.questsDone}/{result.questsTotal} open=[{open}] caughtUp=[{caught}]
 SessionAutoplay.cs	phase town_waypoints done
 SessionAutoplay.cs	phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)
 SessionAutoplay.cs	phase town_waypoints: '{name}' not found, skipped
-SessionAutoplay.cs	phase town_waypoints: reached {name}
-SessionAutoplay.cs	phase flask done
-SessionAutoplay.cs	phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)
-SessionAutoplay.cs	phase flask: drank={drank} charges={flask.Charges}/{flask.MaxCharges}
-SessionAutoplay.cs	phase flask: refilled={flask.IsFull}
+SessionAutoplay.cs	phase town_waypoints: {name} reached={lastWalkOk}
 SessionAutoplay.cs	phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}
+SessionAutoplay.cs	phase {label}: fight ended kills={kills() - startKills} hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} 
+SessionAutoplay.cs	quest find {item}: taken={!obj.activeInHierarchy}
+SessionAutoplay.cs	quest hunt {target}: killed={dead}
+SessionAutoplay.cs	quest shrine {id}: discovered={found}
+SessionAutoplay.cs	quest talk {npc}: {plan.kind} {plan.questId} walked={lastWalkOk}
+SessionAutoplay.cs	quest travel to {ShrineFor(zone)}: ok={ok} hero={Fmt(hero.transform.position)}
+SessionAutoplay.cs	quests={result.questsDone}/{result.questsTotal} navPlans={result.navPlans} navWarps={result.navWarps} 
 SessionAutoplay.cs	result written: {result.WriteTo(dir)} exit={result.exit}
 SessionAutoplay.cs	start, god={(godMode ? 
-SessionAutoplay.cs	unstick nudge #{nudges} (moved {moved:0.1} m in 5 s)
 SessionAutoplay.cs	zoneBoss={RunProfile.Act.ZoneBossDefeated} drop={GlasswrightController.LastZoneUnique?.uniqueId} overlay={SessionComplete.ZoneBossMode}
 Net/PlayerAccount.cs	created account
 Net/PlayerAccount.cs	signed in
@@ -340,5 +351,3 @@ Classes/HeroGearModels.cs	Anchor shank
 Classes/HeroGearModels.cs	Mire chain
 Classes/HeroGearModels.cs	Powder charge
 Classes/HeroGearModels.cs	Tarred limb
-SessionAutoplay.cs	, result.combos)} 
-SessionAutoplay.cs	combos={string.Join(

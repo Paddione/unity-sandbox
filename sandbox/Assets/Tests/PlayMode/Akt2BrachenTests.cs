@@ -24,7 +24,7 @@ public class Akt2BrachenTests
     // Dieselben Positionen wie TownBuilder.SpawnStoryPickups (S2-Anteil).
     static readonly Vector3 Sehglas0Pos = B + new Vector3(-5f, 0.7f, 11f);
     static readonly Vector3 Sehglas1Pos = B + new Vector3(5f, 0.7f, 11f);
-    static readonly Vector3 Sehglas2Pos = B + new Vector3(8f, 0.7f, -7f);
+    static readonly Vector3 Sehglas2Pos = B + new Vector3(11.5f, 0.7f, -6f);
     static Vector3 ScherbePos(int i) => B + new Vector3(
         i == 0 ? -2f : (i == 1 ? 5f : (i == 2 ? -6f : -8f)), 0.7f,
         i == 0 ? 7f : (i == 1 ? -2f : (i == 2 ? 5f : -11f)));

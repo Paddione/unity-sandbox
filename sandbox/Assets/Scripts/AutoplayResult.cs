@@ -25,6 +25,8 @@ public sealed class AutoplayResult
     public const string PhaseZone4 = "zone4";
     public const string PhaseBoss3 = "boss3";
     public const string PhaseComplete = "complete";
+    /// <summary>autoplay-quests: every story quest played to Done (no catch-up). Only required in quest mode.</summary>
+    public const string PhaseQuests = "quests";
 
     /// <summary>Canonical order; a full session reaches all of them.</summary>
     public static readonly string[] RequiredPhases =
@@ -58,6 +60,18 @@ public sealed class AutoplayResult
     public float hpRestored;
     /// <summary>Combo payoffs on the route, "Name=count" (class-kits-parity).</summary>
     public List<string> combos = new List<string>();
+    /// <summary>autoplay-quests: the run played the story quests (solo default; off with -autoplay-no-quests and in co-op).</summary>
+    public bool questMode;
+    /// <summary>Story quests in the catalog / Done at the end of the run.</summary>
+    public int questsTotal;
+    public int questsDone;
+    /// <summary>Quest ids not Done at the end.</summary>
+    public List<string> questsOpen = new List<string>();
+    /// <summary>Quest ids the act state closed by catch-up instead of being played.</summary>
+    public List<string> questsCaughtUp = new List<string>();
+    /// <summary>Terrain navigation: path plans and last-resort warps onto validated cells.</summary>
+    public int navPlans;
+    public int navWarps;
 
     public const string RoleSolo = "solo";
     public const string RoleHost = "host";
@@ -100,7 +114,7 @@ public sealed class AutoplayResult
     {
         foreach (var p in RequiredFor(role))
             if (!phases.Contains(p)) return false;
-        return true;
+        return !questMode || phases.Contains(PhaseQuests);
     }
 
     /// <summary>Exit code: 0 only with all phases and zero exceptions.</summary>

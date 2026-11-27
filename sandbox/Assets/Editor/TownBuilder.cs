@@ -169,7 +169,8 @@ public static class TownBuilder
         var b = BarrensLayout.BarrensOffset;
         SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(-5f, 0.7f, 11f), 0);
         SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(5f, 0.7f, 11f), 1);
-        SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(8f, 0.7f, -7f), 2);
+        // Off BarrensDune_3 (its collider swallowed the old spot at (8, -7), n13 was unreachable).
+        SpawnStoryPickup(StoryIds.Sehglas, b + new Vector3(11.5f, 0.7f, -6f), 2);
         SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-2f, 0.7f, 7f), 0);
         SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(5f, 0.7f, -2f), 1);
         SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-6f, 0.7f, 5f), 2);

@@ -385,7 +385,14 @@ liest für Menüs ohne Nebenwirkung.
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   "autoplay-result.json" mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
-  complete` (Koop-Client siehe Koop-Paarlauf).
+  complete` (Koop-Client siehe Koop-Paarlauf). Solo spielt der Autoplay seit 2026-11-27 alle Story-Quests
+  (Quest-Modus, aus mit `-autoplay-no-quests`, im Koop-Host aus): `QuestRound` spricht NPCs an (Angebote,
+  Gesprächsziele, Abgaben über `StoryDirector.BookTalk`), läuft gewollte Funde ab, jagt gewollte Kill-Ziele
+  und reist per Wegschrein zwischen Siedlung und Zonen. Pflichtphase `quests` nur im Quest-Modus: alle
+  Katalog-Quests `Done`, keine per Catch-up (`AutoplayQuestLedger`; Felder `questsDone`, `questsOpen`,
+  `questsCaughtUp`). Bewegung über `AutoplayMover` (Grid-A* `GridAStar` mit Kapsel-Probe gegen statische
+  Collider, Stall-Replan, letzter Ausweg Warp auf eine geprüfte freie Zelle; Zähler `navPlans`, `navWarps`).
+  Code unter `sandbox/Assets/Scripts/Autoplay/`.
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Auf Abruf
   per Job `autoplay` in `.github/workflows/unity-tests.yml` (`gh workflow run unity-tests.yml -f autoplay=true`,
   Runner `unity-licensed`, Xvfb ohne Desktopfenster, kein Zeitplan seit 2026-11-25) für Normal, Kindled und Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
