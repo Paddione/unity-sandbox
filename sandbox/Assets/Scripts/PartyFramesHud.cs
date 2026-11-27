@@ -14,6 +14,8 @@ using UnityEngine.UI;
 public sealed class PartyFramesHud : MonoBehaviour
 {
     public const int MaxFrames = 4;
+    /// <summary>Frames repaint at 10 Hz: life bars need no per-frame precision.</summary>
+    public const float RepaintInterval = 0.1f;
 
     /// <summary>One frame's data (pure, testable).</summary>
     public struct Row
@@ -45,6 +47,8 @@ public sealed class PartyFramesHud : MonoBehaviour
     public static float Hp01(Vector2 curMax) => curMax.y > 0f ? Mathf.Clamp01(curMax.x / curMax.y) : 0f;
 
     Canvas canvas;
+    GameObject hero;
+    float nextPaint;
     readonly List<Frame> frames = new List<Frame>();
     readonly List<Row> others = new List<Row>();
 
@@ -74,8 +78,11 @@ public sealed class PartyFramesHud : MonoBehaviour
 
     void LateUpdate()
     {
+        if (Time.unscaledTime < nextPaint) return;
+        nextPaint = Time.unscaledTime + RepaintInterval;
         Shown.Clear();
-        var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
+        if (hero == null || !hero.activeInHierarchy || hero.name != DiabloNetworkPlayer.HeroName)
+            hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         bool hidden = hero == null || ClassSelectUI.AnyOpen || PauseMenuUI.AnyOpen;
         canvas.enabled = !hidden;
         if (hidden) return;
@@ -168,11 +175,10 @@ public sealed class PartyFramesHud : MonoBehaviour
         HudChrome.Anchor(f.ring.rectTransform, new Vector2(0f, 0.5f), new Vector2(12f, 0f), new Vector2(disc, disc));
         var well = HudChrome.Img(f.ring.transform, "PortraitWell", HudChrome.Circle(), new Color(0.11f, 0.08f, 0.125f, 1f));
         HudChrome.Anchor(well.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(disc - 4f, disc - 4f));
-        var maskGo = well.gameObject.AddComponent<Mask>();
-        maskGo.showMaskGraphic = true;
+        // No stencil mask (it breaks UI batching): the bust sits inset inside the round well.
         f.portrait = HudChrome.Img(well.transform, "Portrait", null, Color.white);
         f.portrait.preserveAspect = true;
-        HudChrome.Stretch(f.portrait.rectTransform, 0f);
+        HudChrome.Stretch(f.portrait.rectTransform, disc * 0.12f);
 
         float left = 12f + disc + 14f;
         float right = 14f;
