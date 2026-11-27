@@ -184,6 +184,7 @@ public static class ActBossGate
             {
                 pendingIntro.Remove(b.introId);
                 RunProfile.Story?.Flags.Add(SpawnFlag(b.act));
+                Debug.Log($"[ActBoss] Spawn-Cutscene {b.introId} (Akt {b.act}, authority={Diablo.IsLocalAuthority()}).");
             }
         }
     }

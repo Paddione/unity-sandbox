@@ -1144,3 +1144,28 @@ PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-B
   VoiceVol-Test im Bestand → als Lücke benannt, kein neuer Test (nicht im Write-Set).
 - Lücke bleibt: `dlg.h11–h13` + `bark.thewes.*` fehlen (S2-Doku, nichts erfunden,
   an S4-Nachfolge gemeldet). Belege: `docs/sprache-voice-run-log.md` (neu).
+
+## 2026-11-27 — Akt-Bosse erst nach allen übrigen Akt-Quests (cinderreach-act-boss-gating)
+
+- `ActBossGate`: Kilnmother (h4), Glasswright (h8) und Thewes (h12) bleiben inaktiv, bis alle übrigen
+  Haupt- und Nebenquests ihres Akts `Done` sind (Pflichtmenge aus dem Katalog: gleicher Akt, ohne Boss-Quest,
+  ohne Prereq-Kette über sie, ohne Gate auf den eigenen Boss-Zustand). Danach erscheinen sie genau einmal pro
+  Lauf und spielen die Spawn-Cutscene. Story-Flag `bossspawn.<akt>` verhindert die Wiederholung nach dem Laden.
+  Besiegte Akte werden nie gesperrt. Der H11-Auftritt aus akt3-finale S3c (`MaybeSpawnThewesAtH11`) ist ersetzt.
+  Der Thewes-Vorkill aus dem Akt-II-Sweep ist damit strukturell ausgeschlossen.
+- Cutscene: `TryStartSpawnIntro` schneidet hart zur Arena im Spielwinkel (Push-in 17 → 11 m), unabhängig vom
+  Ort des Helden. `CutsceneDirector.OwnsCamera` hält `DiabloClickController.UpdateCamera` an. Vorher schrieben
+  Click-Kamera und Intro beide in `Update` auf die Kamera. Die Reihenfolge war undefiniert, das Intro konnte also
+  verlieren. Alle
+  `cutscene.ability.*`-Untertitel sind entfernt (auch Phase 2). Das Banner zeigt nur den Bossnamen. Thewes
+  bekam ein eigenes Intro. Der Arena-Trigger gilt nur noch für den Abbot.
+- Koop: Der Host sendet mit jeder Story-Übertragung `NotifyActBossesClientRpc(mask)`. Clients wecken nur nach
+  dieser Maske.
+- Autoplay: Quest-Modus immer an (`-autoplay-no-quests` entfernt, Koop-Host spielt Quests),
+  `QuestsUntilBoss` vor jedem Akt-Boss, Phase `boss4` (Thewes), Ergebnisfeld `actBossKills`
+  (`akt:boss:offen`), Exit 1 ohne drei `-`-Einträge. Belege: `run-autoplay.sh -seed 0` Exit 0, 293,6 s,
+  34/34 Quests, `caughtUp=[]`, `actBossKills=[1:Kilnmother:-, 2:Glasswright:-, 3:Thewes:-]`, Spawns 1/1/1 mit
+  Cutscene. Koop-Paar Exit 0 (Host 289 s mit `boss4`/`quests`, Client alle Phasen). Client-Log zeigt
+  `Spawn-Cutscene intro.kilnmother/intro.glasswright (authority=False)`.
+- Lektion: Ein Kamera-Override in `Update` hängt von der Skriptreihenfolge ab. Eine Sequenz, die die
+  Kamera führt, braucht ein explizites Besitz-Flag, das die Folgekamera respektiert.

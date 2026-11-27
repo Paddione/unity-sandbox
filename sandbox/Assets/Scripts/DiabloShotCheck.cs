@@ -538,6 +538,8 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield return Wait(0.8f);
             yield return Shot("thrall_pack");
         }
+        // cinderreach-act-boss-gating: the Kilnmother appears with her spawn cutscene once Act I's other quests are done.
+        yield return SpawnCutsceneShot(1, "kilnmother_spawn_cutscene");
         var mother = GameObject.Find(KilnLayout.KilnmotherName);
         if (mother != null)
         {
@@ -573,6 +575,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield return Wait(1.3f);
             yield return Shot("shardback_pack");
         }
+        yield return SpawnCutsceneShot(2, "glasswright_spawn_cutscene");
         var glass = GameObject.Find(GlasswrightController.BossName);
         if (glass != null)
         {
@@ -588,6 +591,9 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.5f);
         yield return Shot("barrens_cleared");
         SessionComplete.ZoneBossMode = false;
+        foreach (var sc in Object.FindObjectsByType<SessionComplete>(FindObjectsSortMode.None)) sc.PressOn();
+        // cinderreach-act-boss-gating: Thewes at the Moortor after H10/H11/N6/N7.
+        yield return SpawnCutsceneShot(3, "thewes_spawn_cutscene");
         keepAlive = null;
 
         // 13) SessionComplete overlay (S5 end screen, shown on boss death;
@@ -1015,6 +1021,33 @@ public sealed class DiabloShotCheck : MonoBehaviour
 
     /// <summary>Hero kept at full life while set (act-one Kiln shots: the zone mobs on arrival).</summary>
     static PlayerHealth keepAlive;
+
+    /// <summary>
+    /// cinderreach-act-boss-gating: marks the act's other quests done (no
+    /// toasts), lets the gate wake the boss and shoots its spawn cutscene
+    /// right after the first ability showcase, then skips back to the hero.
+    /// </summary>
+    IEnumerator SpawnCutsceneShot(int act, string shot)
+    {
+        var parts = new System.Collections.Generic.List<string>();
+        foreach (var id in ActBossGate.RequiredQuests(act)) parts.Add(id + ":" + StoryStatus.Done + ":");
+        RunProfile.Story.Merge(string.Join(";", parts));
+        RunProfile.Story.TakeChanges();
+        ActBossGate.Tick(Time.unscaledTime);
+        if (!CutsceneDirector.Active)
+        {
+            Debug.LogWarning($"[ShotCheck] {shot}: no spawn cutscene (act {act}).");
+            yield break;
+        }
+        string id0 = CutsceneDirector.ActiveId;
+        float until = Time.unscaledTime + 6f;
+        while (CutsceneDirector.CurrentAbilityKey.Length == 0 && Time.unscaledTime < until) yield return null;
+        yield return Wait(0.6f); // let the first cast's telegraph bloom
+        Debug.Log($"[ShotCheck] {shot}: {id0} cast={CutsceneDirector.CurrentAbilityKey} banner={CutsceneDirector.BannerText}");
+        yield return Shot(shot);
+        CutsceneDirector.Skip();
+        yield return Wait(0.3f);
+    }
 
     static IEnumerator Wait(float seconds)
     {

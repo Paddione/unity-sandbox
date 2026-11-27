@@ -535,8 +535,9 @@ public static class CutsceneDirector
         bannerText = DiabloUIFactory.MakeText(letterbox.transform, "CutsceneBanner", "", 34,
             DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         var rt = bannerText.rectTransform;
-        rt.anchorMin = new Vector2(0f, 0.5f); rt.anchorMax = new Vector2(1f, 0.5f);
-        rt.offsetMin = new Vector2(0f, 40f); rt.offsetMax = new Vector2(0f, 110f);
+        // Inside the bottom bar: the camera centres the boss, a mid-screen banner would cover it.
+        rt.anchorMin = new Vector2(0f, 0f); rt.anchorMax = new Vector2(1f, 0f);
+        rt.offsetMin = new Vector2(0f, 30f); rt.offsetMax = new Vector2(0f, 110f);
         bannerText.enabled = false;
     }
 
