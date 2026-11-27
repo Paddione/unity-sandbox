@@ -286,8 +286,25 @@ public sealed class StoryDirector : MonoBehaviour
         State.Apply(StoryObjectiveType.Kill, target);
         // Akt III Finale S3: Thewes down ends H12 and arms the H13 decision
         // (no new boss system: EnemyHealth books every kill through here).
-        if (target == StoryIds.Thewes) RunProfile.Finale.DefeatFinalBoss();
+        if (target == StoryIds.Thewes)
+        {
+            BookFinalBossKill();
+            DiabloNetworkPlayer.HostRelay()?.BroadcastFinalBossKill();
+        }
         State.Refresh(RunProfile.Act);
+    }
+
+    /// <summary>
+    /// Thewes down: finale state plus the Kindled unlock (cinderreach-team-autoplay
+    /// K1, formerly on the Abbot). Solo/host via <see cref="BookKill"/>, co-op
+    /// clients via the host broadcast. True when Kindled unlocked just now.
+    /// </summary>
+    public static bool BookFinalBossKill()
+    {
+        RunProfile.Finale.DefeatFinalBoss();
+        bool kindled = DifficultyProfile.UnlockKindled();
+        SessionComplete.KindledUnlockedThisRun |= kindled;
+        return kindled;
     }
 
     public static bool BookCollect(string itemId)

@@ -188,13 +188,12 @@ public sealed class BossController : NetworkBehaviour
         BossesKilled++;
         if (string.IsNullOrEmpty(LastBossDrop)) LastBossDrop = Loc.T("loot.cache.boss");
         Debug.Log($"[Boss] {BossName} slain (kills={BossesKilled}, drop={LastBossDrop}).");
-        // replayability S4: the first kill unlocks Kindled and persists it.
-        bool unlocked = DifficultyProfile.UnlockKindled();
-        SessionComplete.KindledUnlockedThisRun |= unlocked;
+        // cinderreach-team-autoplay K1: Kindled unlocks on the Thewes kill
+        // (StoryDirector.BookFinalBossKill), no longer here.
         // act-one S1: the Abbot opens the Cinder Kiln.
         bool kilnOpened = RunProfile.Act.Unlock(ActProgress.Kiln);
         if (kilnOpened) UnityEngine.Debug.Log("[Act] Cinder Kiln unlocked.");
-        if ((unlocked || kilnOpened) && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
+        if (kilnOpened && hero != null && Diablo.IsLocalAuthority()) SaveService.SaveNow(hero);
         // S5: clients autosave their own hero on the shared boss kill, like solo.
         var relay = DiabloNetworkPlayer.HostRelay();
         if (relay != null) relay.BroadcastBossKill();

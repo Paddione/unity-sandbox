@@ -3,7 +3,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>replayability S4: first Abbot kill unlocks Kindled (saved), Kindled scales enemies.</summary>
+/// <summary>replayability S4 / cinderreach-team-autoplay K1: the Thewes kill unlocks Kindled (saved), the Abbot no longer does; Kindled scales enemies.</summary>
 public class KindledUnlockTests
 {
     GameObject player;
@@ -41,13 +41,27 @@ public class KindledUnlockTests
     }
 
     [UnityTest]
-    public IEnumerator FirstBossKill_UnlocksKindledAndSavesIt()
+    public IEnumerator AbbotKill_NoLongerUnlocksKindled()
+    {
+        var boss = new GameObject(BossController.BossName);
+        boss.tag = "Husk";
+        boss.AddComponent<BossController>().OnBossDeath(player);
+        Assert.IsFalse(RunProfile.DifficultyUnlocked);
+        Assert.IsFalse(SessionComplete.KindledUnlockedThisRun);
+        StringAssert.DoesNotContain(SessionComplete.KindledLine, SessionComplete.LastSummary);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator ThewesKill_UnlocksKindledAndSavesIt()
     {
         var boss = new GameObject(BossController.BossName);
         boss.tag = "Husk";
         var ctrl = boss.AddComponent<BossController>();
         Assert.IsFalse(RunProfile.DifficultyUnlocked);
 
+        StoryDirector.BookKill(StoryIds.Thewes);
+        SaveService.SaveNow(player);
         ctrl.OnBossDeath(player);
         Assert.IsTrue(RunProfile.DifficultyUnlocked);
         Assert.IsTrue(SessionComplete.KindledUnlockedThisRun);

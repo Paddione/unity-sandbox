@@ -20,7 +20,7 @@ public static partial class LocCatalog
         E("inv.tab.bag", "2 Tasche", "2 Bag"),
         E("inv.tab.stats", "2 Werte", "2 Stats"),
         E("inv.tab.settings", "3 Einstellungen", "3 Settings"),
-        E("inv.diff.locked", "  (Entfacht gesperrt: bezwinge den Hohlen Abt)", "  (Kindled locked: defeat the Hollow Abbot)"),
+        E("inv.diff.locked", "  (Entfacht gesperrt: bezwinge Thewes, den Heimkehrer)", "  (Kindled locked: defeat Thewes the Homecomer)"),
         E("inv.diff.current", "Schwierigkeit: {0}", "Difficulty: {0}"),
         E("inv.stats.combat", "<b>Kampfwerte</b>\\n", "<b>Combat Summary</b>\\n"),
         E("inv.potion.tip", "<b>{0}</b>\\nVerbrauchsgut: stellt <color={1}>+{2} Leben</color> wieder her. Klicken oder Taste 1 zum Trinken.", "<b>{0}</b>\\nConsumable: restores <color={1}>+{2} HP</color>. Click or press 1 to drink."),

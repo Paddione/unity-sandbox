@@ -442,15 +442,32 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     }
 
     /// <summary>
-    /// coop-trio: a client books the host's Abbot kill like solo (Kindled unlock,
-    /// Cinder Kiln open), so its own save carries the act state.
+    /// coop-trio: a client books the host's Abbot kill like solo (Cinder Kiln
+    /// open), so its own save carries the act state. Kindled unlocks on Thewes.
     /// </summary>
     public static void BookAbbotKill()
     {
-        bool kindled = DifficultyProfile.UnlockKindled();
-        SessionComplete.KindledUnlockedThisRun |= kindled;
         bool kiln = RunProfile.Act.Unlock(ActProgress.Kiln);
-        Debug.Log($"[Net] abbot kill from host: kilnOpened={kiln} kindled={kindled}.");
+        Debug.Log($"[Net] abbot kill from host: kilnOpened={kiln}.");
+    }
+
+    /// <summary>
+    /// cinderreach-team-autoplay K1: server tells every client in the party
+    /// that Thewes fell, so each one unlocks Kindled in its own save.
+    /// </summary>
+    public void BroadcastFinalBossKill()
+    {
+        if (!IsServer || !IsSpawned) return;
+        NotifyFinalBossKillClientRpc();
+    }
+
+    [ClientRpc]
+    void NotifyFinalBossKillClientRpc()
+    {
+        if (IsServer) return; // the host books it in StoryDirector.BookKill
+        bool kindled = StoryDirector.BookFinalBossKill();
+        Debug.Log($"[Net] thewes kill from host: kindled={kindled} unlocked={RunProfile.DifficultyUnlocked}.");
+        SaveLocalHero();
     }
 
     /// <summary>coop-trio: a client books the host's Kilnmother kill (Act I complete, Barrens open).</summary>

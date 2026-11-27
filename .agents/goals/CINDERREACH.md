@@ -265,7 +265,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - `LayoutSeeder`: je 3 Varianten für Fen-Gruppen, Elites, Props, Kiln- und Barrens-Anker, Seed aus `-seed N`
   oder Run-Seed. Koop-Peers bleiben auf Variante 0.
 - Kindled (`DifficultyProfile`): HP/Schaden ×1,8, Affix-Tier 2, Unique ×2, Gold ×1,5, freigeschaltet
-  beim ersten Abbot-Kill. Einmaliger Kindled-Finale-Anspruch auf eine klassenkompatible Rare-Waffe.
+  beim Thewes-Kill (Akt III, seit `cinderreach-team-autoplay` K1, vorher Abbot). Einmaliger Kindled-Finale-Anspruch auf eine klassenkompatible Rare-Waffe.
 - Optionale Systeme: Auftragsbrett (Jagd + Bergung, einmal pro Run abholbar), Risiko-Schrein im Fen
   (Heilung oder Elite +25 % HP mit garantiertem Rare).
 
@@ -277,8 +277,8 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   bei jedem `ZoneTravel.TeleportHero` des Anführers mit (`PartyRoster.PortWithLeader`). Koop-Spieler ersetzen die KI ihrer Rolle 1:1 (max. drei Rollen).
 - Dreiergruppe (coop-trio, 2026-11-23): Host + zwei Clients spielen Akt I und die Glass Barrens
   komplett durch (`COOP_CLIENTS=2 bash scripts/run-coop-pair.sh`, Host wartet per `-coop-peers 3`).
-  Clients buchen die Boss-Kills des Hosts in ihren eigenen Akt-Stand und Save (Abbot → Kindled + Kiln,
-  Kilnmother → Akt I + Barrens, Glasswright). Gruppen-Tore verlangen wie solo 0,6 s Verweilzeit und
+  Clients buchen die Boss-Kills des Hosts in ihren eigenen Akt-Stand und Save (Abbot → Kiln,
+  Kilnmother → Akt I + Barrens, Glasswright, Thewes → Kindled). Gruppen-Tore verlangen wie solo 0,6 s Verweilzeit und
   senden nach einem Broadcast 2 s lang nicht erneut. Helden blockieren sich nicht gegenseitig
   (`DiabloNetworkPlayer.IgnoreAllyCollisions`). Mitspieler-HP folgen dem Besitzer
   (`DiabloNetworkPlayer.hpState` → `PlayerHealth.SetMirrored`), Heiler sehen verletzte Mitspieler auf
