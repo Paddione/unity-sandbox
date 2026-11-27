@@ -184,3 +184,28 @@ Namen per `-player-name`, Konten über `scripts/account-smoke.sh` (Wegwerf-Konto
 | s4-smoke-linux | `account-smoke.sh` (Linux-Player) | create/restore/pc2 je 0 Fehler: Gast behält ID, Neustart stellt Konto her, Upload, Konflikt, Download |
 | s4-smoke-windows | gleiche Probe mit `Games\cinderreach\cinderreach.exe` (`dc62621`) | create/restore/pc2 je 0 Fehler, Konto-Held (Stufe 7, 123 Gold) kommt auf dem zweiten Profil an |
 | s4-prod-names | devmesh-Pod (Image `sha256:a6f619ab…`), Windows `-join-server` Lead „WinTester“, Linux Follow „LinuxTester“ | Lead `town,zone1,gate,zone2`, Follow `town,zone1,zone2,boss`, je 0 Exceptions, beide sehen den Namen des anderen |
+
+## Teamkampagne auf dediziertem Server (cinderreach-team-autoplay, 2026-11-27)
+
+`bash scripts/run-team-autoplay.sh artifacts/coop-team/<lauf>`: headless `-server` (UTP 127.0.0.1) plus drei
+Linux-Clients unter `xvfb-gpu`, je eigenes HOME/XDG-Profil. Client 1 fenwalker führt mit `-autoplay -autoplay-god
+-coop-autoplay lead` (volle Solo-Route mit allen Quests und Thewes), Client 2 lanternbearer und Client 3 rogue sind
+sterblich (`-coop-autoplay follow`). Sitzung `normal` aus frischen Saves, danach `kindled` aus denselben Saves ohne
+`-difficulty`. Auswertung `scripts/team_autoplay_verdict.py` (`<sitzung>/team-verdict.json`).
+
+| Lauf | Ergebnis | Befund und Fix |
+|---|---|---|
+| run1 | Lead 11/34 Quests, Follower hängen | Lead plante das nächste Gespräch vor dem Story-Broadcast des Servers (Jorin vergab h16/n10 nicht), Follower folgten nach dem Abgang des Leads einander: Lead wartet auf die Buchung, Follower binden sich an die Lead-ClientId |
+| run2 | Lead 13/34, Akt 2/3 fehlen | Clients versteckten die Akt-Bosse vor dem Szenen-Sync, NGO spawnt inaktive In-Scene-Objekte nicht: jeder Client tötete eine lokale Kilnmother. `ActBossGate.MayHide` versteckt auf Clients erst nach dem Spawn |
+| run3 | kein Spiel | Editor-SIGFPE beim Beenden nach erfolgreichem Build: `run-unity-build.sh` wertet Signal-Exit nach Marker und Batchmode-Quit als OK |
+| run4 | Lead 32/34 (h12, h13) | Thewes-RPC vor dem Story-Broadcast: Lead wartet nach Thewes auf H12 Done |
+| run5 | Lead 13/34 | Questrunden vor dem Akt-Boss aufgebraucht, bevor n3 beim Lead ankam: 10 Runden mit 1,5 s Sync-Pause |
+| run6 | Lead ohne `zone1` | Gegner haben keine NetworkTransform, die Client-Kopie driftete (~1200 Reichweiten-Ablehnungen): Server schickt nach einer Ablehnung die Server-Position an den Absender (`SnapEnemyClientRpc`, 0,5 s Drossel) |
+| run7 | normal PASS, kindled PASS | Lead 34/34, `1:Kilnmother:- 2:Glasswright:- 3:Thewes:-`, Follower 9/9 Phasen, alle drei Kindled freigeschaltet und gespeichert, Server Exit 0; Kindled: `[Difficulty] server adopts Kindled from client 1: hp x1.8 damage x1.8 gold x1.5 unique x2 affixTier 2, 70 enemies rescaled`, Lead 34/34, je 0 Exceptions (Normal 307 s, Kindled 414 s) |
+| run8 (nach Rebase auf `c0aad39`) | normal PASS, kindled Lead exit 1 | Lead 34/34, aber `caughtUp=[h19]`: der Client schloss H19 per lokalem Catch-up, bevor der Server-Broadcast H19 als gestartet zeigte (gespielt haben es die Follower). Koop-Clients wenden keinen Story-Catch-up mehr an (`StoryDirector.CatchUpHere`) |
+
+Regeln: Der dedizierte Server ist Story-Autorität (`StoryDirector.ServerTick`: Refresh, Moortor, Akt-Boss-Gate,
+Broadcast bei Änderung, Log `[Server] story gate`). Clients leiten Funde und Zonenbetreten weiter
+(`SubmitStoryEventServerRpc`). Der erste Join bestimmt die Schwierigkeit des Servers (`DedicatedServer.AdoptPartyDifficulty`,
+lebende Gegner werden umgerechnet). Ein Neuer Lauf auf anderer Schwierigkeit startet die Kampagne neu und behält den Helden
+(`RunProfile.StartCampaign`, auch der Button „Neuer Lauf“).

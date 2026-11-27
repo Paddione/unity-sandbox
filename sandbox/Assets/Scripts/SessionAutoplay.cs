@@ -83,6 +83,9 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.commit = ArgValue(CommitFlag) ?? "unknown";
         bool coopHost = CoopAutoplay.Role == AutoplayResult.RoleHost;
         if (coopHost) result.role = AutoplayResult.RoleHost;
+        // cinderreach-team-autoplay K2: on a dedicated server client 1 plays the full route as lead.
+        coopLead = CoopAutoplay.Role == AutoplayResult.RoleLead;
+        if (coopLead) result.role = AutoplayResult.RoleLead;
         questMode = true; // act bosses need their act's quests (solo and co-op host alike)
         result.questMode = questMode;
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
@@ -91,8 +94,21 @@ public sealed class SessionAutoplay : MonoBehaviour
         DiabloSkills.ResetRun();
         // Quest mode walks back to Lantern Hold between zones and makes a second Barrens pass.
         float deadline = Time.realtimeSinceStartup + (questMode ? 2400f : 1100f);
+        if (coopLead) deadline += 1200f; // three processes share the machine, the party waits for followers
 
-        DiabloClickController hero = null;
+        if (coopLead)
+        {
+            yield return CoopAutoplay.WaitForParty(c => leadHero = c);
+            if (leadHero == null)
+            {
+                Log("FAIL co-op lead: no owned hero or party incomplete");
+                Finish(1);
+                yield break;
+            }
+            Log($"co-op lead: party of {CoopAutoplay.PlayerCount()} together, client {Unity.Netcode.NetworkManager.Singleton.LocalClientId}");
+        }
+
+        DiabloClickController hero = leadHero;
         float heroDeadline = Time.realtimeSinceStartup + 30f;
         while (hero == null && Time.realtimeSinceStartup < heroDeadline)
         {
@@ -213,10 +229,12 @@ public sealed class SessionAutoplay : MonoBehaviour
         mover.Reset();
         Log($"phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}");
         if (bossOk && actOk && zoneBossOk && home && RunProfile.Act.ActOneComplete
-            && RunProfile.Act.ZoneBossDefeated && SessionComplete.ZoneBossMode)
+            && RunProfile.Act.ZoneBossDefeated && (coopLead || SessionComplete.ZoneBossMode))
             result.Reach(AutoplayResult.PhaseComplete);
         yield return QuestsUntilBoss(hero, 3, deadline);
         yield return PhaseThewes(hero, deadline);
+        // Co-op lead: the kill RPC outruns the server's story broadcast; H13 needs H12 Done here.
+        if (coopLead) yield return WaitFor(() => RunProfile.Story.Status("h12") == StoryStatus.Done, 15f);
         yield return QuestRound(hero, deadline); // H13 homecoming after the final boss
         ReportQuests();
         result.actBossKills = new List<string>(ActBossGate.KillLog);
@@ -225,6 +243,8 @@ public sealed class SessionAutoplay : MonoBehaviour
 
         int huskKills = startHusks - AutoplayCombat.CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
+        // A lead client never runs the boss bookkeeping (the server does); its act state proves the kills.
+        if (coopLead) bossKills = RunProfile.Act.IsUnlocked(ActProgress.Kiln) ? 1 : 0;
         DiabloClickController.ExternalDrive = false;
         result.huskKills = huskKills;
         result.healsCast = DiabloSkills.HealsCast;
@@ -240,7 +260,9 @@ public sealed class SessionAutoplay : MonoBehaviour
             $"combos={string.Join(",", result.combos)} " +
             $"quests={result.questsDone}/{result.questsTotal} navPlans={result.navPlans} navWarps={result.navWarps} " +
             $"result_phases={string.Join(",", result.phases)}");
-        Finish(exceptionCount > 0 || bossKills < 1 || SessionComplete.Shown < 1 ? 1 : 0);
+        result.kindledUnlocked = RunProfile.DifficultyUnlocked;
+        result.finalBossDefeated = RunProfile.Finale.FinalBossDefeated;
+        Finish(exceptionCount > 0 || bossKills < 1 || (!coopLead && SessionComplete.Shown < 1) ? 1 : 0);
     }
 
     void ReportQuests()
@@ -499,6 +521,23 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log($"phase {label}: fight ended kills={kills() - startKills} hero={Fmt(hero.transform.position)}");
     }
 
+    bool coopLead;
+    DiabloClickController leadHero;
+
+    /// <summary>Lead client: boss kills arrive as act-state broadcasts from the server (0..4).</summary>
+    int ActKills()
+    {
+        if (!coopLead) return 0;
+        return (RunProfile.Act.IsUnlocked(ActProgress.Kiln) ? 1 : 0) + (RunProfile.Act.ActOneComplete ? 1 : 0)
+            + (RunProfile.Act.ZoneBossDefeated ? 1 : 0) + (RunProfile.Finale.FinalBossDefeated ? 1 : 0);
+    }
+
+    static IEnumerator WaitFor(System.Func<bool> done, float seconds)
+    {
+        float until = Time.realtimeSinceStartup + seconds;
+        while (!done() && Time.realtimeSinceStartup < until) yield return null;
+    }
+
     /// <summary>Walk to The Hollow Abbot and fight until BossesKilled ticks,
     /// then wait for the SessionComplete overlay.</summary>
     IEnumerator PhaseBoss(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
@@ -508,15 +547,18 @@ public sealed class SessionAutoplay : MonoBehaviour
         var boss = GameObject.Find(BossController.BossName);
         if (boss == null)
         {
+            // Co-op lead: the party may fell the boss during the zone fight; the server's kill broadcast counts.
+            if (coopLead && RunProfile.Act.IsUnlocked(ActProgress.Kiln)) { Log("phase boss: already down (party kill)"); phasesDone++; onResult?.Invoke(true); yield break; }
             Log("phase boss: FAIL boss not found");
             yield break;
         }
         Log($"phase boss: hero={Fmt(hero.transform.position)} boss={Fmt(boss.transform.position)}");
-        yield return BossFight(hero, "boss", boss, () => BossController.BossesKilled, b => b, 200f, deadline);
-        int bossKills = BossController.BossesKilled - startBosses;
+        yield return BossFight(hero, "boss", boss, () => BossController.BossesKilled + ActKills(), b => b, 200f, deadline);
+        if (coopLead) yield return WaitFor(() => RunProfile.Act.IsUnlocked(ActProgress.Kiln), 15f);
+        int bossKills = coopLead ? (RunProfile.Act.IsUnlocked(ActProgress.Kiln) ? 1 : 0) : BossController.BossesKilled - startBosses;
         Log($"phase boss: bossKills={bossKills} phaseTwo={BossController.PhaseTwoEntries} drop={BossController.LastBossDrop}");
         float overlayEnd = Time.realtimeSinceStartup + 10f;
-        while (SessionComplete.Shown < 1 && Time.realtimeSinceStartup < overlayEnd)
+        while (!coopLead && SessionComplete.Shown < 1 && Time.realtimeSinceStartup < overlayEnd)
             yield return null;
         Log($"phase boss done (overlay={SessionComplete.Shown} summary='{SessionComplete.LastSummary}')");
         phasesDone++;
@@ -532,11 +574,13 @@ public sealed class SessionAutoplay : MonoBehaviour
         var boss = GameObject.Find(KilnLayout.KilnmotherName);
         if (boss == null)
         {
+            if (coopLead && RunProfile.Act.ActOneComplete) { Log("phase actboss: already down (party kill)"); phasesDone++; onResult?.Invoke(true); yield break; }
             Log("phase actboss: FAIL Kilnmother not found");
             yield break;
         }
-        yield return BossFight(hero, "actboss", boss, () => KilnmotherController.Kills, b => b, 240f, deadline);
-        int kills = KilnmotherController.Kills - startKills;
+        yield return BossFight(hero, "actboss", boss, () => KilnmotherController.Kills + ActKills(), b => b, 240f, deadline);
+        if (coopLead) yield return WaitFor(() => RunProfile.Act.ActOneComplete, 15f);
+        int kills = coopLead ? (RunProfile.Act.ActOneComplete ? 1 : 0) : KilnmotherController.Kills - startKills;
         Log($"phase actboss: kills={kills} phaseTwo={KilnmotherController.PhaseTwoEntries} waves={KilnmotherController.WavesFired} " +
             $"act={RunProfile.Act.ActOneComplete} overlay={SessionComplete.ActOneMode}");
         phasesDone++;
@@ -556,11 +600,13 @@ public sealed class SessionAutoplay : MonoBehaviour
         var boss = GameObject.Find(GlasswrightController.BossName);
         if (boss == null)
         {
+            if (coopLead && RunProfile.Act.ZoneBossDefeated) { Log("phase boss3: already down (party kill)"); phasesDone++; onResult?.Invoke(true); yield break; }
             Log("phase boss3: FAIL Glasswright not found");
             yield break;
         }
-        yield return BossFight(hero, "boss3", boss, () => GlasswrightController.Kills, AutoplayCombat.GlassPillarOr, 260f, deadline);
-        int kills = GlasswrightController.Kills - startKills;
+        yield return BossFight(hero, "boss3", boss, () => GlasswrightController.Kills + ActKills(), AutoplayCombat.GlassPillarOr, 260f, deadline);
+        if (coopLead) yield return WaitFor(() => RunProfile.Act.ZoneBossDefeated, 15f);
+        int kills = coopLead ? (RunProfile.Act.ZoneBossDefeated ? 1 : 0) : GlasswrightController.Kills - startKills;
         Log($"phase boss3: kills={kills} phaseTwo={GlasswrightController.PhaseTwoEntries} lances={GlasswrightController.LanceVolleys} " +
             $"novas={GlasswrightController.NovasFired} fields={GlasswrightController.FieldsCalled} warded={GlassWard.Warded} " +
             $"zoneBoss={RunProfile.Act.ZoneBossDefeated} drop={GlasswrightController.LastZoneUnique?.uniqueId} overlay={SessionComplete.ZoneBossMode}");
@@ -575,9 +621,16 @@ public sealed class SessionAutoplay : MonoBehaviour
     /// </summary>
     IEnumerator QuestsUntilBoss(DiabloClickController hero, int act, float deadline)
     {
-        for (int round = 0; round < 6 && !ActBossGate.Ready(RunProfile.Story, act)
-             && Time.realtimeSinceStartup < deadline; round++)
+        // Co-op lead: kills and finds book on the server and arrive with its next story
+        // broadcast, so it gets more rounds and a short sync pause before each check.
+        int rounds = coopLead ? 10 : 6;
+        for (int round = 0; round < rounds && Time.realtimeSinceStartup < deadline; round++)
+        {
+            if (coopLead) yield return WaitFor(() => false, 1.5f);
+            if (ActBossGate.Ready(RunProfile.Story, act)) break;
             yield return QuestRound(hero, deadline);
+        }
+        if (coopLead) yield return WaitFor(() => ActBossGate.Ready(RunProfile.Story, act), 5f);
         var open = new List<string>();
         foreach (var id in ActBossGate.RequiredQuests(act))
             if (RunProfile.Story.Status(id) != StoryStatus.Done) open.Add(id);
@@ -599,6 +652,14 @@ public sealed class SessionAutoplay : MonoBehaviour
         var boss = GameObject.Find(StoryIds.Thewes);
         if (boss == null)
         {
+            if (coopLead && RunProfile.Finale.FinalBossDefeated)
+            {
+                Log("phase boss4: already down (party kill)");
+                phasesDone++;
+                onResult?.Invoke(true);
+                result.Reach(AutoplayResult.PhaseFinalBoss);
+                yield break;
+            }
             Log("phase boss4: FAIL Thewes not found");
             yield break;
         }
@@ -614,6 +675,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             FightTick(hero, skills, boss, boss: true);
             yield return null;
         }
+        if (coopLead) yield return WaitFor(() => RunProfile.Finale.FinalBossDefeated, 15f);
         bool down = RunProfile.Finale.FinalBossDefeated;
         Log($"phase boss4: finalBoss={down} h12={RunProfile.Story.Status("h12")}");
         phasesDone++;
@@ -762,6 +824,9 @@ public sealed class SessionAutoplay : MonoBehaviour
                 int rev = RunProfile.Story.Revision;
                 var plan = StoryDirector.BookTalk(npc, hero.gameObject);
                 yield return null;
+                // Co-op lead: the server books the talk; wait for its story broadcast before
+                // planning the next talk, or the NPC is set aside with offers still pending.
+                if (coopLead) yield return WaitFor(() => RunProfile.Story.Revision != rev, 4f);
                 Log($"quest talk {npc}: {plan.kind} {plan.questId} walked={walked}");
                 if (RunProfile.Story.Revision == rev) asideNpc.Add(npc);
             }
@@ -862,6 +927,11 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.difficulty = DifficultyProfile.Current.name;
         result.classId = RunProfile.ClassId;
         result.actOneComplete = RunProfile.Act.ActOneComplete;
+        if (coopLead)
+        {
+            result.nextRunKindled = AutoplayResult.PrepareKindledCampaign();
+            result.kindledSaved = AutoplayResult.SaveCarriesKindled();
+        }
         result.exit = Mathf.Max(legacyExit, result.ComputeExit());
         string dir = ArgValue(OutFlag)
             ?? System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? ".", "autoplay");

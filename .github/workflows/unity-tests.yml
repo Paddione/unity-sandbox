@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       autoplay:
-        description: "Also run the session autoplay (Normal, Kindled, Lanternbearer; headless under Xvfb)"
+        description: "Also run the team autoplay (server + 3 clients, Normal then Kindled; headless under Xvfb)"
         type: boolean
         default: false
 
@@ -57,19 +57,22 @@ jobs:
           retention-days: 14
 
   autoplay:
-    # cinderreach-loop-guard: full-session autoplay on the licensed runner, on demand only
-    # (no schedule since 2026-11-25: unattended runs popped 3 windows on the desktop and
-    # were killed when they got closed). Result JSON goes to the artifact (14 days) and to
-    # ~/unity-sandbox-autoplay/<YYYY-MM-DD>/ on the host, which dotfiles G-DIABLO06 reads.
-    name: Session autoplay (Linux player, Xvfb)
+    # cinderreach-team-autoplay: the session autoplay plays as a team on the licensed runner,
+    # on demand only (no schedule since 2026-11-25: unattended runs popped windows on the
+    # desktop). Dedicated server + three clients (fenwalker lead, lanternbearer, rogue) play
+    # the whole campaign on Normal up to Thewes, whose kill unlocks Kindled; a second session
+    # plays Kindled from the same saves. Results go to the artifact (14 days) and to
+    # ~/unity-sandbox-autoplay/<YYYY-MM-DD>[-<run_id>]/{normal,kindled}/ on the host, which
+    # dotfiles G-DIABLO06 reads.
+    name: Session autoplay (team, dedicated server, Xvfb)
     if: github.event_name == 'workflow_dispatch' && inputs.autoplay
     runs-on: [self-hosted, Linux, X64, unity-licensed]
-    timeout-minutes: 60
+    timeout-minutes: 300
     env:
       # Xvfb off-screen, rendered on the RTX 3060 Ti through Mesa d3d12 (/dev/dxg): no
-      # windows on the desktop, ~10x the llvmpipe frame rate. The 5070 Ti stays free for
-      # the LLM services. The Linux fps-gate stays advisory.
-      AUTOPLAY_DISPLAY: xvfb-gpu
+      # windows on the desktop. The 5070 Ti stays free for the LLM services. Three clients
+      # share the GPU, so there is no fps gate.
+      COOP_DISPLAY: xvfb-gpu
       AUTOPLAY_GPU_ADAPTER: "3060"
     concurrency:
       group: unity-autoplay
@@ -83,51 +86,27 @@ jobs:
           # Keep the Unity import cache; G-DIABLO03 reads artifacts/*.xml of this workspace.
           clean: false
 
-      - name: Build and run autoplay (Normal + Kindled + Lanternbearer)
+      - name: Build and run the team autoplay (Normal, then Kindled from the saves)
         id: run
         run: |
           OUT="artifacts/autoplay/$(date +%F)-${GITHUB_RUN_ID}"
           echo "out=$OUT" >> "$GITHUB_OUTPUT"
-          # replayability S3: rotate the Ashen Fen layout seed 0..2 by weekday.
-          SEED=$(( $(date +%u) % 3 ))
-          echo "layout seed $SEED"
-          AUTOPLAY_BUILD_ONLY=1 bash scripts/run-autoplay.sh "$OUT/build"
-          run_route() {
-            local route=$1
-            shift
-            local profile
-            profile=$(mktemp -d "$RUNNER_TEMP/autoplay.XXXXXXXX")
-            HOME="$profile" XDG_CONFIG_HOME="$profile/config" XDG_DATA_HOME="$profile/data" XDG_CACHE_HOME="$profile/cache" \
-              AUTOPLAY_SKIP_BUILD=1 bash scripts/run-autoplay.sh "$OUT/$route" -seed "$SEED" "$@"
-          }
-          run_route normal -port 28771 &
-          normal=$!
-          run_route kindled -port 28772 -difficulty kindled &
-          kindled=$!
-          run_route lanternbearer -port 28773 -class lanternbearer &
-          lanternbearer=$!
-          rc=0
-          for pid in "$normal" "$kindled" "$lanternbearer"; do
-            wait "$pid" || rc=1
-          done
-          exit "$rc"
+          bash scripts/run-team-autoplay.sh "$OUT"
 
       - name: Copy results to host store
         if: always() && steps.run.outputs.out != ''
         env:
           RUN_OUT: ${{ steps.run.outputs.out }}
         run: |
-          # One folder per run kind: <date>[-<run_id>], ...-kindled, ...-lanternbearer.
+          # <date>[-<run_id>]/{normal,kindled}/{server,client1..3}/ plus team-verdict.json per session.
           BASE="$HOME/unity-sandbox-autoplay/$(date +%F)"
-          if [ -f "$BASE/autoplay-result.json" ]; then BASE="$BASE-${GITHUB_RUN_ID}"; fi
-          for kind in normal kindled lanternbearer; do
+          if [ -e "$BASE" ]; then BASE="$BASE-${GITHUB_RUN_ID}"; fi
+          for kind in normal kindled; do
             [ -d "$RUN_OUT/$kind" ] || continue
-            DEST="$BASE"
-            [ "$kind" != normal ] && DEST="$BASE-$kind"
-            mkdir -p "$DEST"
-            cp -a "$RUN_OUT/$kind/." "$DEST/" || true
-            ls -la "$DEST"
+            mkdir -p "$BASE/$kind"
+            cp -a "$RUN_OUT/$kind/." "$BASE/$kind/" || true
           done
+          ls -laR "$BASE" | head -60
           find "$HOME/unity-sandbox-autoplay" -mindepth 1 -maxdepth 1 -type d -mtime +30 -print -exec rm -rf {} +
 
       - name: Upload autoplay artifacts

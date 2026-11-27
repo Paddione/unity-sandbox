@@ -95,6 +95,30 @@ public static class DedicatedServer
         return i >= 0 ? players[i].transform : null;
     }
 
+    static bool difficultyAdopted;
+
+    /// <summary>
+    /// cinderreach-team-autoplay K3: the server has no save; the first joining hero's run
+    /// difficulty decides the session (Kindled only when that hero unlocked it).
+    /// </summary>
+    public static string PartyDifficulty(string reported, bool unlocked) =>
+        unlocked && string.Equals(reported, RunProfile.Kindled, System.StringComparison.OrdinalIgnoreCase)
+            ? RunProfile.Kindled : RunProfile.Normal;
+
+    /// <summary>Applies <see cref="PartyDifficulty"/> once per server run and rescales living enemies.</summary>
+    public static void AdoptPartyDifficulty(string reported, bool unlocked, ulong sender)
+    {
+        if (difficultyAdopted) return;
+        difficultyAdopted = true;
+        string d = PartyDifficulty(reported, unlocked);
+        if (d == RunProfile.Kindled) RunProfile.DifficultyUnlocked = true;
+        DifficultyProfile.Select(d);
+        int rescaled = EnemyHealth.RescaleAll();
+        var p = DifficultyProfile.Current;
+        Debug.Log($"[Difficulty] server adopts {p.name} from client {sender}: hp x{p.hpMul} damage x{p.damageMul} " +
+                  $"gold x{p.goldMul} unique x{p.uniqueMul} affixTier {p.affixTier}, {rescaled} enemies rescaled.");
+    }
+
     /// <summary>Any spawned player object (server broadcasts ride it when there is no host hero).</summary>
     public static DiabloNetworkPlayer AnyPlayer()
     {

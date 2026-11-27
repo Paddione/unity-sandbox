@@ -43,7 +43,7 @@ public sealed class StoryDirector : MonoBehaviour
     {
         BuildHud();
         lastZone = WorldBounds.ZoneAt(transform.position).name;
-        State.Refresh(RunProfile.Act);
+        State.Refresh(RunProfile.Act, CatchUpHere);
         State.TakeChanges();
         SyncDoneFlags();
         // cinderreach-act-boss-gating: unreleased act bosses vanish before the first frame.
@@ -111,7 +111,7 @@ public sealed class StoryDirector : MonoBehaviour
         if (poll > 0f) return;
         poll = 0.25f;
 
-        State.Refresh(RunProfile.Act);
+        State.Refresh(RunProfile.Act, CatchUpHere);
         // Akt III Finale S3: the Barrens boss opens the Moortor (Abbot→Kiln
         // pattern, idempotent; persists via the generic story lists, v16 stays).
         RunProfile.Finale.OpenMoortor(RunProfile.Act);
@@ -119,7 +119,11 @@ public sealed class StoryDirector : MonoBehaviour
         // other quests are done (replaces the H11 Thewes entrance of S3c).
         ActBossGate.Tick(Time.unscaledTime);
         var zone = WorldBounds.ZoneAt(transform.position).name;
-        if (lastZone != null && zone != lastZone) BookEnter(zone);
+        if (lastZone != null && zone != lastZone)
+        {
+            BookEnter(zone);
+            ForwardToHost(StoryEventEnter, zone, gameObject);
+        }
         lastZone = zone;
         SyncDoneFlags();
         GrantRewards();
@@ -139,7 +143,7 @@ public sealed class StoryDirector : MonoBehaviour
         lastRevision = State.Revision;
     }
 
-    void SyncDoneFlags()
+    static void SyncDoneFlags()
     {
         foreach (var q in StoryCatalog.All)
             if (State.Status(q.id) == StoryStatus.Done) State.Flags.Add(q.id);
@@ -276,6 +280,97 @@ public sealed class StoryDirector : MonoBehaviour
 
     static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 
+    // ---- cinderreach-team-autoplay K2: dedicated server is the story authority ----
+
+    /// <summary>
+    /// Story catch-up runs only where the story state counts (solo, host, server). A connected
+    /// co-op client gets catch-up results with the next story broadcast (team-autoplay run 8:
+    /// a client closed H19 itself before the host's broadcast showed it started).
+    /// </summary>
+    public static bool CatchUpHere
+    {
+        get
+        {
+            var nm = NetworkManager.Singleton;
+            return nm == null || !nm.IsListening || nm.IsServer;
+        }
+    }
+
+    public const int StoryEventCollect = 0;
+    public const int StoryEventEnter = 1;
+    static int serverRevision = -1;
+    static float serverPoll;
+
+    /// <summary>
+    /// Dedicated server (no hero, so no StoryDirector component): the server's
+    /// story state counts for the party. Same 0.25 s poll as a host's director
+    /// (refresh, Moortor, act-boss gate, done flags) and a story broadcast to
+    /// every client whenever the state moved.
+    /// </summary>
+    public static void ServerTick(float now)
+    {
+        serverPoll -= Time.unscaledDeltaTime;
+        if (serverPoll > 0f) return;
+        serverPoll = 0.25f;
+        State.Refresh(RunProfile.Act, CatchUpHere);
+        RunProfile.Finale.OpenMoortor(RunProfile.Act);
+        ActBossGate.Tick(now);
+        SyncDoneFlags();
+        State.TakeChanges();
+        if (serverRevision >= 0 && State.Revision != serverRevision)
+        {
+            var relay = DiabloNetworkPlayer.HostRelay();
+            if (relay != null) relay.BroadcastStory(State.Snapshot());
+            LogServerGate();
+        }
+        serverRevision = State.Revision;
+    }
+
+    static string serverGateLine;
+
+    /// <summary>Server log: act-boss release state and the open required quests, on change.</summary>
+    static void LogServerGate()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var b in ActBossGate.Bosses)
+        {
+            var open = new List<string>();
+            foreach (var id in ActBossGate.RequiredQuests(b.act))
+                if (State.Status(id) != StoryStatus.Done) open.Add(id + ":" + State.Status(id));
+            sb.Append(" act").Append(b.act).Append("=[").Append(string.Join(",", open)).Append(']');
+        }
+        string line = sb.ToString();
+        if (line == serverGateLine) return;
+        serverGateLine = line;
+        Debug.Log("[Server] story gate" + line);
+    }
+
+    /// <summary>
+    /// Co-op client: a collect or zone entry also books on the host/server (its
+    /// state counts and comes back with the next story broadcast). No-op solo/host.
+    /// </summary>
+    public static void ForwardToHost(int kind, string id, GameObject hero)
+    {
+        if (hero == null || string.IsNullOrEmpty(id)) return;
+        var nm = NetworkManager.Singleton;
+        if (nm == null || !nm.IsListening || nm.IsServer) return;
+        var relay = hero.GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && relay.IsOwner) relay.SubmitStoryEventServerRpc(kind, id);
+    }
+
+    /// <summary>Host/server side of <see cref="ForwardToHost"/>.</summary>
+    public static bool BookForwarded(int kind, string id)
+    {
+        if (kind == StoryEventCollect) return BookCollect(id);
+        if (kind == StoryEventEnter)
+        {
+            int before = State.Revision;
+            BookEnter(id);
+            return State.Revision != before;
+        }
+        return false;
+    }
+
     // ---- booking (static so kills, pickups, tests and the network can call) ----
 
     public static void BookKill(string objectName)
@@ -291,7 +386,7 @@ public sealed class StoryDirector : MonoBehaviour
             BookFinalBossKill();
             DiabloNetworkPlayer.HostRelay()?.BroadcastFinalBossKill();
         }
-        State.Refresh(RunProfile.Act);
+        State.Refresh(RunProfile.Act, CatchUpHere);
     }
 
     /// <summary>
@@ -310,14 +405,14 @@ public sealed class StoryDirector : MonoBehaviour
     public static bool BookCollect(string itemId)
     {
         bool counted = State.Apply(StoryObjectiveType.Collect, itemId);
-        if (counted) State.Refresh(RunProfile.Act);
+        if (counted) State.Refresh(RunProfile.Act, CatchUpHere);
         return counted;
     }
 
     public static void BookEnter(string zoneName)
     {
         State.Apply(StoryObjectiveType.Enter, zoneName);
-        State.Refresh(RunProfile.Act);
+        State.Refresh(RunProfile.Act, CatchUpHere);
     }
 
     /// <summary>Books the pending talk with <paramref name="npc"/> after its dialog ran. Co-op clients forward it to the host.</summary>
@@ -347,7 +442,7 @@ public sealed class StoryDirector : MonoBehaviour
             case StoryTalkKind.TurnIn: if (State.TurnIn(plan.questId)) DiabloAudio.PlayQuest(); break;
             case StoryTalkKind.Talk: State.Apply(StoryObjectiveType.Talk, npc); break;
         }
-        State.Refresh(RunProfile.Act);
+        State.Refresh(RunProfile.Act, CatchUpHere);
     }
 
     // ---- Akt III Finale S3 (Moortor: H11-Raetsel, H12-Boss, H13-Entscheidung) ----

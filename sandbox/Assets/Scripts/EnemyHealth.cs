@@ -43,8 +43,32 @@ public sealed class EnemyHealth : NetworkBehaviour
     {
         // replayability S4: scene enemies scale by difficulty when they wake
         // (play mode only, so builder/edit-mode values stay unscaled).
+        baseMaxHP = maxHP;
         if (Application.isPlaying) maxHP = DifficultyProfile.Current.ScaleHP(maxHP);
         hp = maxHP;
+    }
+
+    int baseMaxHP;
+
+    /// <summary>
+    /// cinderreach-team-autoplay K3: a dedicated server adopts the party's difficulty after
+    /// its scene enemies woke; living enemies rescale from their unscaled HP, keeping the
+    /// share of HP they still have. Returns how many changed.
+    /// </summary>
+    public static int RescaleAll()
+    {
+        int n = 0;
+        foreach (var e in FindObjectsByType<EnemyHealth>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (e == null || e.dead || e.baseMaxHP <= 0) continue;
+            int newMax = DifficultyProfile.Current.ScaleHP(e.baseMaxHP);
+            if (newMax == e.maxHP) continue;
+            e.hp = e.hp >= e.maxHP ? newMax : Mathf.Max(1, Mathf.RoundToInt(e.hp * (float)newMax / Mathf.Max(1, e.maxHP)));
+            e.maxHP = newMax;
+            if (e.IsSpawned && e.IsServer) e.NetHP.Value = e.hp;
+            n++;
+        }
+        return n;
     }
 
     public override void OnNetworkSpawn()
@@ -87,6 +111,7 @@ public sealed class EnemyHealth : NetworkBehaviour
     public void SetTier(int tierMaxHP, LootTier lootTier)
     {
         // Runtime spawns (boss summons) scale here; the builder runs in edit mode.
+        baseMaxHP = tierMaxHP;
         maxHP = Application.isPlaying ? DifficultyProfile.Current.ScaleHP(tierMaxHP) : tierMaxHP;
         hp = maxHP;
         tier = lootTier;

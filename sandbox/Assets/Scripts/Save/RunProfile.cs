@@ -69,6 +69,29 @@ public static class RunProfile
         Hero = HeroProfile.CreateDefault(new System.Random());
     }
 
+    /// <summary>
+    /// cinderreach-team-autoplay K3: a new run on <paramref name="difficulty"/> restarts the
+    /// campaign (acts, story, finale, contracts, risk shrine, fresh layout seed) and keeps the
+    /// hero: class, level, gear, stash, smithing material, skill variants, Kindled unlock and
+    /// the Kindled-finale claim. Returns the active difficulty (Kindled only while unlocked).
+    /// </summary>
+    public static string StartCampaign(string difficulty)
+    {
+        string active = DifficultyProfile.Select(difficulty);
+        RunSeed = NewSeed();
+        Act = new ActProgress();
+        KilnLayout.ResetPlaza();
+        BarrensLayout.ResetPlaza();
+        ContractProgress.Reset();
+        Story = new StoryState();
+        Finale = new ActProgressAkt3();
+        StoryDirector.ResetFinaleForTests();
+        ActBossGate.ResetRun();
+        RiskShrine.Reset();
+        UnityEngine.Debug.Log($"[Difficulty] new campaign on {active} (hero kept).");
+        return active;
+    }
+
     static string VariantKey(string classId, DiabloSkills.Skill skill) => classId + ":" + skill;
 
     /// <summary>Active variant: stored pick when known, else the legacy default.</summary>

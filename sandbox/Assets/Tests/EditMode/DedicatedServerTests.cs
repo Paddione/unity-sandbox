@@ -43,13 +43,17 @@ public class DedicatedServerTests
     {
         Assert.AreEqual("lead", CoopAutoplay.RoleFor(new[] { "x", "-coop-autoplay", "lead" }));
         Assert.AreEqual("follow", CoopAutoplay.RoleFor(new[] { "x", "-coop-autoplay", "follow" }));
+        // cinderreach-team-autoplay K2: the lead plays the full solo route, act bosses last.
         var lead = new AutoplayResult { role = AutoplayResult.RoleLead };
-        foreach (var p in new[] { "town", "zone1", "gate" }) lead.Reach(p);
-        Assert.IsFalse(lead.AllPhasesReached());
-        lead.Reach("zone2");
+        foreach (var p in AutoplayResult.RequiredPhases) lead.Reach(p);
+        Assert.IsFalse(lead.AllPhasesReached(), "act bosses must be proven to fall last");
+        lead.actBossKills.AddRange(new[] { "1:Kilnmother:-", "2:Glasswright:-", "3:Thewes:-" });
         Assert.IsTrue(lead.AllPhasesReached());
+        // Followers follow through the whole campaign, Thewes included.
         var follow = new AutoplayResult { role = AutoplayResult.RoleFollow };
-        foreach (var p in new[] { "town", "zone1", "zone2" }) follow.Reach(p);
+        foreach (var p in new[] { "town", "zone1", "zone2", "boss", "zone3", "actboss", "zone4", "boss3" }) follow.Reach(p);
+        Assert.IsFalse(follow.AllPhasesReached());
+        follow.Reach("boss4");
         Assert.IsTrue(follow.AllPhasesReached());
     }
 

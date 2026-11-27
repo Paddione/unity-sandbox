@@ -100,6 +100,8 @@ public sealed class DedicatedServerHost : MonoBehaviour
         }
         TouchReadyFile(nm);
         if (quitting) return;
+        // cinderreach-team-autoplay K2: quests, act bosses and the finale run on the server state.
+        StoryDirector.ServerTick(Time.unscaledTime);
         int count = nm.ConnectedClientsIds.Count;
         if (count != lastCount)
         {

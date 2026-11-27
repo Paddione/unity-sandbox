@@ -136,6 +136,13 @@ fi
 # --- 4. Result ---------------------------------------------------------------
 trap - EXIT
 restore_service
+# Known failure 3: the editor crashes by signal (e.g. SIGFPE, exit 136) while it shuts down
+# after a finished build and the batchmode quit; the outputs are already written.
+if [ "$RC" -ge 128 ] && grep -a -F -q "$MARKER" "$LOG" \
+   && grep -a -F -q "Batchmode quit successfully invoked" "$LOG"; then
+  echo "run-unity-build: WARNING Unity crashed in shutdown (exit $RC) after the success marker; treating as OK."
+  RC=0
+fi
 if [ "$RC" -ne 0 ]; then
   echo "run-unity-build: Unity exited $RC." >&2
   tail -20 "$LOG" | cut -c1-160 >&2 || true

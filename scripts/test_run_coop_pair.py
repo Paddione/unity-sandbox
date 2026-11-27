@@ -12,7 +12,7 @@ def _extract_functions() -> str:
     text = SCRIPT.read_text()
     helpers = "\n".join(
         line for line in text.splitlines()
-        if re.match(r"^(cdir|csave|cclass|crole)\(\)", line)
+        if re.match(r"^(cdir|csave|cclass|crole|chome)\(\)", line)
     )
     m = re.search(r"(?ms)^start_client\(\)\s*\{.*?^\}", text)
     assert m is not None, "start_client() not found in run-coop-pair.sh"
@@ -41,6 +41,7 @@ PLAYER="/tmp/player"
 LAUNCH=(xvfb-run -a)
 COMMON=(-screen-width 960)
 SERVER="${{COOP_SERVER:-0}}"
+GOD=(-autoplay-god)
 CLIENT_GOD=(-autoplay-god)
 [ "${{COOP_CLIENT_GOD:-1}}" = 0 ] && CLIENT_GOD=()
 SERVER_PEERS=()
@@ -81,6 +82,8 @@ wait "${{CLIENT_PIDS[0]}}"
         ("0", "0", "rogue", 2, ["-join", "127.0.0.1:7790"], "client", "client2", "coop-client2.json", {"COOP_CLIENT2_CLASS": "rogue"}),
         ("1", "1", "fenwalker", 1, ["-join-server", "-server-name", "Cinderreach Test"], "lead", "client", "coop-client.json", None),
         ("1", "0", "", 2, ["-join-server", "-server-name", "Cinderreach Test"], "follow", "client2", "coop-client2.json", None),
+        # cinderreach-team-autoplay K2: the lead plays the full route (-autoplay) and stays god with mortal clients.
+        ("1", "0", "fenwalker", 1, ["-join", "127.0.0.1:7790"], "lead", "client", "coop-client.json", None),
     ],
 )
 def test_start_client_arg_assembly(
@@ -117,7 +120,9 @@ def test_start_client_arg_assembly(
         "-screen-width",
         "960",
     ]
-    if client_god != "0":
+    if expected_role == "lead":
+        expected.extend(["-autoplay", "-autoplay-god"])
+    elif client_god != "0":
         expected.append("-autoplay-god")
     expected.extend(target_args)
     expected.extend(["-coop-autoplay", expected_role])
@@ -136,3 +141,18 @@ def test_start_client_arg_assembly(
         f"/tmp/coop-out/{expected_dir}/player.log",
     ])
     assert captured == expected
+
+
+def test_client_homes_give_each_client_its_own_profile(tmp_path):
+    _, captured = _run_start_client(
+        server="1", client_god="0", client_class="rogue", k=3,
+        target_args=["-join", "127.0.0.1:7790"],
+        extra_env={"COOP_CLIENT_HOMES": str(tmp_path), "COOP_CLIENT3_CLASS": "rogue"},
+    )
+    home = tmp_path / "client3"
+    assert captured[2:7] == [
+        "env", f"HOME={home}", f"XDG_CONFIG_HOME={home}/config",
+        f"XDG_DATA_HOME={home}/data", f"XDG_CACHE_HOME={home}/cache",
+    ]
+    assert (home / "config").is_dir()
+    assert captured[7:9] == ["xvfb-run", "-a"]

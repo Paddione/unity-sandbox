@@ -76,6 +76,14 @@ public sealed class AutoplayResult
     /// <summary>cinderreach-act-boss-gating: act-boss kills in order, "act:boss:open" ("-" = all other act quests were Done).</summary>
     public List<string> actBossKills = new List<string>();
     public int navWarps;
+    /// <summary>cinderreach-team-autoplay: Kindled unlocked in this process at the end (Thewes kill).</summary>
+    public bool kindledUnlocked;
+    /// <summary>cinderreach-team-autoplay: the save file on disk carries the Kindled unlock.</summary>
+    public bool kindledSaved;
+    /// <summary>cinderreach-team-autoplay: Act III final boss (Thewes) down in this process.</summary>
+    public bool finalBossDefeated;
+    /// <summary>cinderreach-team-autoplay K3: the save now starts the next run on Kindled.</summary>
+    public bool nextRunKindled;
 
     public const string RoleSolo = "solo";
     public const string RoleHost = "host";
@@ -85,11 +93,13 @@ public sealed class AutoplayResult
     /// <summary>Dedicated-server run: a client following the lead (S1).</summary>
     public const string RoleFollow = "follow";
 
-    /// <summary>Phases the lead must reach on a dedicated server (Fen fight, group travel, Ossuary fight).</summary>
-    public static readonly string[] LeadPhases = { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2 };
-
-    /// <summary>Phases a follower must reach on a dedicated server.</summary>
-    public static readonly string[] FollowPhases = { PhaseTown, PhaseZone1, PhaseZone2 };
+    /// <summary>
+    /// Phases a follower must reach on a dedicated server (cinderreach-team-autoplay K2):
+    /// it follows the lead through the whole campaign, fights in every zone and books
+    /// every act-boss kill the server broadcasts, Thewes included.
+    /// </summary>
+    public static readonly string[] FollowPhases =
+        { PhaseTown, PhaseZone1, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3, PhaseFinalBoss };
 
     /// <summary>
     /// Phases a co-op client must reach (coop-trio): it follows the host from
@@ -103,7 +113,7 @@ public sealed class AutoplayResult
     /// <summary>Required phases for a role (solo and host play the full route).</summary>
     public static string[] RequiredFor(string role) =>
         role == RoleClient ? ClientPhases
-        : role == RoleLead ? LeadPhases
+        : role == RoleLead ? RequiredPhases
         : role == RoleFollow ? FollowPhases
         : RequiredPhases;
 
@@ -118,7 +128,7 @@ public sealed class AutoplayResult
     {
         foreach (var p in RequiredFor(role))
             if (!phases.Contains(p)) return false;
-        if (role == RoleSolo || role == RoleHost)
+        if (role == RoleSolo || role == RoleHost || role == RoleLead)
             if (!ActBossesFellLast()) return false;
         return !questMode || phases.Contains(PhaseQuests);
     }
@@ -133,6 +143,31 @@ public sealed class AutoplayResult
             acts.Add(k.Split(':')[0]);
         }
         return acts.Contains("1") && acts.Contains("2") && acts.Contains("3");
+    }
+
+    /// <summary>
+    /// cinderreach-team-autoplay K3: after a Normal campaign that killed Thewes, the team
+    /// starts its next run on Kindled like a player would (Settings → new run): campaign
+    /// restarts, hero kept, saved. True when it switched.
+    /// </summary>
+    public static bool PrepareKindledCampaign()
+    {
+        if (!RunProfile.DifficultyUnlocked || !RunProfile.Finale.FinalBossDefeated
+            || DifficultyProfile.Current == DifficultyProfile.Kindled) return false;
+        RunProfile.StartCampaign(RunProfile.Kindled);
+        DiabloNetworkPlayer.SaveLocalHero();
+        return RunProfile.Difficulty == RunProfile.Kindled;
+    }
+
+    /// <summary>True when the hero's save on disk carries the Kindled unlock.</summary>
+    public static bool SaveCarriesKindled()
+    {
+        try
+        {
+            return SaveService.HasSave()
+                && System.IO.File.ReadAllText(SaveService.DefaultPath).Replace(" ", "").Contains("\"difficultyUnlocked\":true");
+        }
+        catch (System.Exception) { return false; }
     }
 
     /// <summary>Exit code: 0 only with all phases and zero exceptions.</summary>

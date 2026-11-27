@@ -23,34 +23,41 @@ to inspect its GitHub status. Runner credentials stay in the ignored,
 owner-only `~/.local/share/github-runner-unity` directory. Registration is
 idempotent and refuses to replace an existing remote runner name.
 
-## Session autoplay (cinderreach-loop-guard)
+## Session autoplay (cinderreach-team-autoplay)
 
 The `autoplay` job in `.github/workflows/unity-tests.yml` runs only on demand: dispatch
 **Unity Tests** with the input `autoplay` checked (`gh workflow run unity-tests.yml -f autoplay=true`).
-The nightly schedule was removed on 2026-11-25: the unattended runs opened three game
-windows on the desktop and failed whenever those were closed. It uses the same
-`unity-licensed` runner and calls
-`bash scripts/run-autoplay.sh artifacts/autoplay/<date>-<run_id>`: Linux player build into
-`builds/autoplay-player/` of the runner checkout, full session with
-`-autoplay -autoplay-god`, then the FPS gate (`--min-fps 30 --resolution 1280x720 --skip-first 1`).
+The nightly schedule was removed on 2026-11-25: the unattended runs opened game windows on
+the desktop and failed whenever those were closed. It uses the same `unity-licensed` runner
+and calls `bash scripts/run-team-autoplay.sh artifacts/autoplay/<date>-<run_id>`. There is no
+solo route any more: a headless dedicated server (`-server`, UTP on 127.0.0.1) and three
+Linux clients play as a team.
 
-- Display: the job sets `AUTOPLAY_DISPLAY=xvfb-gpu` and `AUTOPLAY_GPU_ADAPTER=3060`: the
-  player renders off-screen in Xvfb through Mesa d3d12 (`/dev/dxg`) on the RTX 3060 Ti and
-  opens no window on the desktop. Measured 2026-11-27 (single route): median 45 fps, worst
-  window 13 fps, against ~3-5 fps on llvmpipe. If the log shows no `D3D12` renderer,
-  `run-autoplay.sh` warns that Mesa fell back to software. `AUTOPLAY_DISPLAY=xvfb` (llvmpipe)
-  remains as fallback. The WSLg window path (`AUTOPLAY_DISPLAY=wslg`) crashed at startup with
-  SIGSEGV in `libnvidia-gpucomp.so` after the 2026-11-25 driver update (KMD 621.40, WSL UMD
-  620.70). The FPS gate is advisory on Linux either way.
+- Team: client 1 fenwalker leads (`-autoplay -autoplay-god -coop-autoplay lead`, the full solo
+  route with every quest, all act bosses and Thewes), client 2 lanternbearer and client 3 rogue
+  are mortal and follow (`-coop-autoplay follow`). Each client runs with its own HOME/XDG
+  profile (`COOP_CLIENT_HOMES`) and its own save file. The server is the story authority:
+  clients forward finds and zone entries, the server books kills and broadcasts the quest state.
+- Sessions: `normal` starts from fresh saves. The Thewes kill unlocks Kindled for every client,
+  and each client then starts its next run on Kindled (campaign restarts, hero kept,
+  `RunProfile.StartCampaign`). `kindled` reuses the same three saves without a `-difficulty`
+  flag; the server adopts the difficulty of the first joining hero (`[Difficulty] server adopts
+  Kindled ... hp x1.8`). The Kindled session is skipped when the Normal session fails.
+- Verdict: `scripts/team_autoplay_verdict.py` writes `<session>/team-verdict.json`: every client
+  exit 0 with 0 exceptions, Thewes down, Kindled unlocked and saved; three different classes; the
+  lead with every quest done and the act bosses proven last (`fellLast`); the expected difficulty;
+  the server ends the session by itself.
+- Display: the job sets `COOP_DISPLAY=xvfb-gpu` and `AUTOPLAY_GPU_ADAPTER=3060`: each client
+  renders off-screen in its own Xvfb through Mesa d3d12 (`/dev/dxg`) on the RTX 3060 Ti and opens
+  no window on the desktop. Three clients share the GPU, so there is no FPS gate.
 - Results: artifact `autoplay-<run_id>` (14 days) and a host copy under
-  `~/unity-sandbox-autoplay/<YYYY-MM-DD>/` (a second run on the same day gets a
-  `-<run_id>` suffix). Host folders older than 30 days are deleted by the job.
-  The dotfiles probe `G-DIABLO06` reads only that host folder.
+  `~/unity-sandbox-autoplay/<YYYY-MM-DD>[-<run_id>]/{normal,kindled}/{server,client1,client2,client3}/`.
+  Host folders older than 30 days are deleted by the job. The dotfiles probe `G-DIABLO06` reads
+  the newest run there (both `team-verdict.json` files).
 - Serialisation with the `test` job: both jobs use the same runner and the same runner
   Library. A single runner executes jobs one after another, which is the protection; the
   `unity-autoplay` concurrency group only prevents two autoplay runs queueing in parallel.
-- A player that exits 0 without "autoplay-result.json" was shut down from outside, usually
-  by closing its window; `scripts/run-autoplay.sh` says so in the log.
+- Solo checks stay available locally: `bash scripts/run-autoplay.sh` (one player, `-autoplay`).
 
 ## Unity Scene Captures
 

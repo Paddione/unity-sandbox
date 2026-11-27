@@ -8,10 +8,13 @@
 #   client: -join 127.0.0.1:$PORT -autoplay-god -coop-autoplay client
 #           (CoopAutoplay follows the host through Lantern Hold and the Fen)
 # COOP_SERVER=1 (cinderreach-dedicated-server): a headless -server without a hero instead of the host;
-# client 1 leads (-coop-autoplay lead), the others follow; the server must quit by itself afterwards.
+# client 1 leads (-autoplay -coop-autoplay lead: the full solo route incl. quests and Thewes,
+# cinderreach-team-autoplay K2), the others follow through the whole campaign; the server must
+# quit by itself afterwards. Each result also reports kindledUnlocked/kindledSaved.
 # Each writes autoplay-result.json (role host|client) into its own directory
 # and uses its own save file (-save-file), so the two never share a save.
-# Display as in run-autoplay.sh (COOP_DISPLAY=auto|wslg|xvfb). No FPS gate:
+# Display as in run-autoplay.sh (COOP_DISPLAY=auto|wslg|xvfb|xvfb-gpu; xvfb-gpu renders each client
+# off-screen in its own Xvfb through Mesa d3d12 on AUTOPLAY_GPU_ADAPTER, default 3060). No FPS gate:
 # two players share one GPU, the pair proves content, not frame rate.
 # Classes: COOP_HOST_CLASS / COOP_CLIENT_CLASS set the -class flag per side
 # (party-roles S5: e.g. host fenwalker + client rogue to prove role replacement).
@@ -19,7 +22,11 @@
 # waits for all of them (-coop-peers N+1). Client k>1 writes to client<k>/,
 # saves to coop-client<k>.json and takes its class from COOP_CLIENT<k>_CLASS.
 # COOP_CLIENT_GOD=0 drops -autoplay-god on the clients (mortal clients: they
-# take real damage, so healers have hurt allies to mend; the host stays god).
+# take real damage, so healers have hurt allies to mend; the host and a
+# dedicated-server lead stay god).
+#
+# COOP_CLIENT_HOMES=<dir> gives client k its own HOME/XDG profile under <dir>/client<k>
+# (cinderreach-team-autoplay: separate settings, account and save directories per client).
 #
 # Exit = max(host, client); 2 = hang (COOP_TIMEOUT, default 1200 s).
 # Usage (repo root): bash scripts/run-coop-pair.sh [out_dir]
@@ -36,6 +43,7 @@ CLIENTS="${COOP_CLIENTS:-1}"
 case "$CLIENTS" in 1|2|3) ;; *) echo "run-coop-pair: COOP_CLIENTS must be 1..3, got $CLIENTS" >&2; exit 1 ;; esac
 cdir() { [ "$1" -eq 1 ] && echo client || echo "client$1"; }   # client k -> out subdir
 csave() { [ "$1" -eq 1 ] && echo coop-client.json || echo "coop-client$1.json"; }
+chome() { echo "$COOP_CLIENT_HOMES/client$1"; }   # client k -> own profile (COOP_CLIENT_HOMES set)
 cclass() { if [ "$1" -eq 1 ]; then echo "${COOP_CLIENT_CLASS:-}"; else local v="COOP_CLIENT$1_CLASS"; echo "${!v:-}"; fi; }
 SERVER="${COOP_SERVER:-0}"
 HOSTDIR=host; [ "$SERVER" = 1 ] && HOSTDIR=server
@@ -65,7 +73,12 @@ case "$MODE" in
   xvfb)
     command -v xvfb-run >/dev/null || { echo "run-coop-pair: xvfb-run missing" >&2; exit 1; }
     LAUNCH=(xvfb-run -a -s "-screen 0 960x540x24") ;;
-  *) echo "run-coop-pair: COOP_DISPLAY must be auto|wslg|xvfb, got $MODE" >&2; exit 1 ;;
+  xvfb-gpu)
+    command -v xvfb-run >/dev/null || { echo "run-coop-pair: xvfb-run missing" >&2; exit 1; }
+    [ -e /dev/dxg ] || { echo "run-coop-pair: xvfb-gpu needs /dev/dxg (WSL GPU)" >&2; exit 1; }
+    LAUNCH=(env GALLIUM_DRIVER=d3d12 MESA_D3D12_DEFAULT_ADAPTER_NAME="${AUTOPLAY_GPU_ADAPTER:-3060}"
+      xvfb-run -a -s "-screen 0 960x540x24") ;;
+  *) echo "run-coop-pair: COOP_DISPLAY must be auto|wslg|xvfb|xvfb-gpu, got $MODE" >&2; exit 1 ;;
 esac
 
 COMMON=(-screen-width 960 -screen-height 540 -screen-fullscreen 0 -autoplay-commit "$COMMIT")
@@ -75,14 +88,24 @@ CLIENT_GOD=(-autoplay-god)
 rm -f "$OUT"/*/autoplay-result.json
 # Fresh saves per run (S6): loot accumulates in the bag across runs, and a
 # full bag would fail the deterministic town potion buy. Previous saves are
-# archived with a timestamp, never silently deleted.
+# archived with a timestamp, never silently deleted. COOP_KEEP_SAVES=1 keeps
+# them (cinderreach-team-autoplay K3: the Kindled session continues the saves).
 SAVEDIR="${XDG_CONFIG_HOME:-$HOME/.config}/unity3d/Unity Technologies/Cinderreach"
-for s in coop-host.json $(for k in $(seq 1 "$CLIENTS"); do csave "$k"; done); do
-  if [ -f "$SAVEDIR/$s" ]; then
-    bak="$SAVEDIR/$s.bak-$(date +%F-%H%M%S)"
-    mv "$SAVEDIR/$s" "$bak" && echo "run-coop-pair: archived stale save to $bak"
+csavedir() { # client k -> directory of its save file
+  if [ -n "${COOP_CLIENT_HOMES:-}" ]; then echo "$(chome "$1")/config/unity3d/Unity Technologies/Cinderreach"
+  else echo "$SAVEDIR"; fi
+}
+archive_save() { # dir file
+  if [ -f "$1/$2" ]; then
+    local bak
+    bak="$1/$2.bak-$(date +%F-%H%M%S)"
+    mv "$1/$2" "$bak" && echo "run-coop-pair: archived stale save to $bak"
   fi
-done
+}
+if [ "${COOP_KEEP_SAVES:-0}" != 1 ]; then
+  archive_save "$SAVEDIR" coop-host.json
+  for k in $(seq 1 "$CLIENTS"); do archive_save "$(csavedir "$k")" "$(csave "$k")"; done
+fi
 
 PEERS=(-coop-peers $((CLIENTS + 1)))
 [ "$SERVER" = 1 ] && PEERS=(-coop-peers "$CLIENTS")   # dedicated server: only clients are players
@@ -92,8 +115,16 @@ start_client() { # k target-args...
   cls="$(cclass "$k")"
   if [ -n "$cls" ]; then cls_note=" (class $cls)"; fi
   echo "run-coop-pair: client $k -> $*${cls_note}"
-  local args=("${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}")
-  if [ "${#CLIENT_GOD[@]}" -gt 0 ]; then args+=("${CLIENT_GOD[@]}"); fi
+  local args=()
+  if [ -n "${COOP_CLIENT_HOMES:-}" ]; then
+    local h
+    h="$(chome "$k")"
+    mkdir -p "$h/config" "$h/data" "$h/cache"
+    args+=(env HOME="$h" XDG_CONFIG_HOME="$h/config" XDG_DATA_HOME="$h/data" XDG_CACHE_HOME="$h/cache")
+  fi
+  args+=("${LAUNCH[@]}" "$PLAYER" "${COMMON[@]}")
+  if [ "$(crole "$k")" = lead ]; then args+=(-autoplay "${GOD[@]}")
+  elif [ "${#CLIENT_GOD[@]}" -gt 0 ]; then args+=("${CLIENT_GOD[@]}"); fi
   args+=("$@" -coop-autoplay "$(crole "$k")")
   if [ "${#SERVER_PEERS[@]}" -gt 0 ]; then args+=("${SERVER_PEERS[@]}"); fi
   if [ -n "$cls" ]; then args+=(-class "$cls"); fi
@@ -162,7 +193,9 @@ verdict() { # role rc
 import json, sys
 d = json.load(open(sys.argv[1]))
 print(f"run-coop-pair: {sys.argv[2]} exit={d['exit']} phases={','.join(d['phases'])} "
-      f"exceptions={d['exceptions']} duration={d['duration_s']:.0f}s role={d.get('role')}")
+      f"exceptions={d['exceptions']} duration={d['duration_s']:.0f}s role={d.get('role')} "
+      f"class={d.get('classId')} difficulty={d.get('difficulty')} quests={d.get('questsDone')}/{d.get('questsTotal')} "
+      f"actBossKills={d.get('actBossKills')} kindled={d.get('kindledUnlocked')}/{d.get('kindledSaved')}")
 sys.exit(d["exit"])
 PY
 }

@@ -79,20 +79,13 @@ Net/AccountSmoke.cs	unknown mode {mode}
 Net/AccountSmoke.cs	wrong password text ({wrong.Result})
 Net/CoopAutoplay.cs	, result.phases)} exceptions={exceptions}
 Net/CoopAutoplay.cs	FAIL host hero not reached in Lantern Hold
-Net/CoopAutoplay.cs	FAIL lead: Fen Gate missing
-Net/CoopAutoplay.cs	FAIL lead: lost the server during the Fen fight
-Net/CoopAutoplay.cs	FAIL lead: lost the server on the way to the gate
-Net/CoopAutoplay.cs	FAIL lead: no group travel into the Ossuary, hero at {Fmt(hero.transform.position)}
-Net/CoopAutoplay.cs	FAIL lead: {PlayerCount()}/{peers} players within 120 s
 Net/CoopAutoplay.cs	FAIL not connected with an owned hero within 60 s
 Net/CoopAutoplay.cs	client start, target {MultiplayerAutoStarter.Current}, god={(god ? 
 Net/CoopAutoplay.cs	connected as client {NetworkManager.Singleton.LocalClientId}, hero at {Fmt(hero.transform.position)}
 Net/CoopAutoplay.cs	following the host: zone {zone} hits {zoneHits[zone]} hero {Fmt(hero.transform.position)} host {Fmt(host.position)}
 Net/CoopAutoplay.cs	hero down (deaths={deaths}) at {Fmt(hero.transform.position)}
 Net/CoopAutoplay.cs	kiln={RunProfile.Act.IsUnlocked(ActProgress.Kiln)} actOne={RunProfile.Act.ActOneComplete} 
-Net/CoopAutoplay.cs	lead fight zone {zone}: {lastLeadHits} hits
 Net/CoopAutoplay.cs	lead left, follower run over
-Net/CoopAutoplay.cs	lead: party of {PlayerCount()} together
 Net/CoopAutoplay.cs	phase town: next to the host
 Net/CoopAutoplay.cs	result written: {result.WriteTo(dir)} exit={result.exit} phases={string.Join(
 Net/CoopAutoplay.cs	route end: hits={hits} roleCasts={roleCasts} deaths={deaths} perZone=[{zoneHits[1]},{zoneHits[2]},{zoneHits[3]},{zoneHits[4]}] 
@@ -356,3 +349,12 @@ SessionAutoplay.cs	phase boss4 start (Thewes)
 SessionAutoplay.cs	phase boss4: FAIL Thewes not found
 SessionAutoplay.cs	phase boss4: finalBoss={down} h12={RunProfile.Story.Status(
 SessionAutoplay.cs	quest gate act {act}: ready={open.Count == 0} open=[{string.Join(
+Net/CoopAutoplay.cs	caught up with the lead: zone {mine} → {theirs}, hero at {Fmt(hero.transform.position)}
+Net/CoopAutoplay.cs	FAIL lead: hero={(hero != null)} players {PlayerCount()}/{peers} within 180 s
+SessionAutoplay.cs	co-op lead: party of {CoopAutoplay.PlayerCount()} together, client {Unity.Netcode.NetworkManager.Singleton.LocalClientId}
+SessionAutoplay.cs	FAIL co-op lead: no owned hero or party incomplete
+Net/DedicatedServer.cs	gold x{p.goldMul} unique x{p.uniqueMul} affixTier {p.affixTier}, {rescaled} enemies rescaled.
+SessionAutoplay.cs	phase boss: already down (party kill)
+SessionAutoplay.cs	phase actboss: already down (party kill)
+SessionAutoplay.cs	phase boss3: already down (party kill)
+SessionAutoplay.cs	phase boss4: already down (party kill)

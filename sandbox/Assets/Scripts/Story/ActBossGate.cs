@@ -168,7 +168,7 @@ public static class ActBossGate
             }
             if (!Released(b))
             {
-                if (go.activeSelf) go.SetActive(false);
+                if (go.activeSelf && MayHide(go)) go.SetActive(false);
                 woken.Remove(b.anchorName);
                 continue;
             }
@@ -177,7 +177,7 @@ public static class ActBossGate
             {
                 Spawns[b.act - 1]++;
                 Debug.Log($"[ActBoss] {b.anchorName} erscheint (Akt {b.act}).");
-                if (RunProfile.Story == null || !RunProfile.Story.Flags.Contains(SpawnFlag(b.act)))
+                if (!DedicatedServer.Active && (RunProfile.Story == null || !RunProfile.Story.Flags.Contains(SpawnFlag(b.act))))
                     pendingIntro.Add(b.introId);
             }
             if (pendingIntro.Contains(b.introId) && CutsceneDirector.TryStartSpawnIntro(b.introId, now))
@@ -187,6 +187,31 @@ public static class ActBossGate
                 Debug.Log($"[ActBoss] Spawn-Cutscene {b.introId} (Akt {b.act}, authority={Diablo.IsLocalAuthority()}).");
             }
         }
+    }
+
+    /// <summary>
+    /// cinderreach-team-autoplay K2: NGO finds in-scene NetworkObjects only while they are
+    /// active. A co-op client that hid a boss before the server's scene sync never spawns
+    /// it, so its hits land on a local copy the server never sees. A client therefore hides
+    /// a networked boss only once that boss is spawned here.
+    /// </summary>
+    static int processIsClient = -1;
+    /// <summary>The command line joins a host or server (set before any network start).</summary>
+    static bool ProcessIsClient
+    {
+        get
+        {
+            if (processIsClient < 0)
+                processIsClient = JoinArgs.Parse(System.Environment.GetCommandLineArgs()).IsClient ? 1 : 0;
+            return processIsClient == 1;
+        }
+    }
+
+    static bool MayHide(GameObject boss)
+    {
+        if (!ProcessIsClient) return true;
+        var net = boss.GetComponent<Unity.Netcode.NetworkObject>();
+        return net == null || net.IsSpawned;
     }
 
     /// <summary>Scene object by name, cached so it stays reachable while inactive.</summary>

@@ -277,6 +277,9 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         public ItemInstance boots;
         public ItemInstance belt;
         public NetworkItemOwnership.State items;
+        /// <summary>cinderreach-team-autoplay K3: the hero's run difficulty (a dedicated server adopts the first one).</summary>
+        public string difficulty;
+        public bool difficultyUnlocked;
     }
 
     /// <summary>Capture this hero's join report (owner side).</summary>
@@ -304,6 +307,8 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             report.belt = eq.belt;
         }
         report.items = NetworkItemOwnership.Capture(hero, RunProfile.Stash);
+        report.difficulty = RunProfile.Difficulty;
+        report.difficultyUnlocked = RunProfile.DifficultyUnlocked;
         return report;
     }
 
@@ -403,6 +408,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             }
             InitializeItems(raw.items, clean, sender);
             Debug.Log($"[Net] join stats from {sender}: level {clean.level} applied to mirror.");
+            if (DedicatedServer.Active) DedicatedServer.AdoptPartyDifficulty(raw.difficulty, raw.difficultyUnlocked, sender);
             return;
         }
     }
@@ -421,6 +427,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         // A client that joined late (or missed a broadcast) catches the act chain up here.
         if (!RunProfile.Act.ActOneComplete) BookKilnmotherKill();
         bool booked = RunProfile.Act.DefeatZoneBoss();
+        if (booked) ActBossGate.NoteKill(StoryIds.Glasswright, RunProfile.Story);
         Debug.Log($"[Net] zone boss kill from host: booked={booked} defeated={RunProfile.Act.ZoneBossDefeated}.");
         SaveLocalHero();
         try { MusicDirector.Ensure().PlayZone(ActProgress.Barrens); } catch { }
@@ -465,6 +472,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     void NotifyFinalBossKillClientRpc()
     {
         if (IsServer) return; // the host books it in StoryDirector.BookKill
+        if (!RunProfile.Finale.FinalBossDefeated) ActBossGate.NoteKill(StoryIds.Thewes, RunProfile.Story);
         bool kindled = StoryDirector.BookFinalBossKill();
         Debug.Log($"[Net] thewes kill from host: kindled={kindled} unlocked={RunProfile.DifficultyUnlocked}.");
         SaveLocalHero();
@@ -489,6 +497,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     void NotifyActBossKillClientRpc()
     {
         if (IsServer) return; // the host books it in KilnmotherController.OnEnemyDeath
+        if (!RunProfile.Act.ActOneComplete) ActBossGate.NoteKill(StoryIds.Kilnmother, RunProfile.Story);
         BookKilnmotherKill();
         SaveLocalHero();
     }
@@ -514,7 +523,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     {
         if (IsServer) return; // the host books its own talks and kills directly
         bool moved = RunProfile.Story.Merge(snapshot);
-        if (moved) { RunProfile.Story.Refresh(RunProfile.Act); SaveLocalHero(); }
+        if (moved) { RunProfile.Story.Refresh(RunProfile.Act, catchUp: false); SaveLocalHero(); }
     }
 
     /// <summary>Client asks the host to book a finished story talk (host state counts).</summary>
@@ -525,7 +534,18 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         BroadcastStory(RunProfile.Story.Snapshot());
     }
 
-    static void SaveLocalHero()
+    /// <summary>cinderreach-team-autoplay K2: client forwards a collect/zone entry; the host/server books it.</summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitStoryEventServerRpc(int kind, string id, ServerRpcParams rpcParams = default)
+    {
+        if (string.IsNullOrEmpty(id) || id.Length > 64) return;
+        bool moved = StoryDirector.BookForwarded(kind, id);
+        Debug.Log($"[Net] story event {kind}:{id} from {rpcParams.Receive.SenderClientId}: moved={moved}.");
+        if (moved) BroadcastStory(RunProfile.Story.Snapshot());
+    }
+
+    /// <summary>Autosaves this process's own hero (co-op client or solo).</summary>
+    public static void SaveLocalHero()
     {
         var nm = NetworkManager.Singleton;
         GameObject hero = null;
@@ -728,6 +748,7 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             if (reason != null)
             {
                 Debug.Log($"[Net] rejected hit from {sender}: {reason}.");
+                if (reason.StartsWith("range")) CorrectEnemy(nb, targetNb, sender, now);
                 return;
             }
             lastHit[sender] = now;
@@ -736,6 +757,47 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
             ThreatTable.BookDamage(targetNb.gameObject, nb.transform, damage);
             return;
         }
+    }
+
+    /// <summary>Min seconds between two position corrections of one enemy for one client.</summary>
+    public const float EnemyCorrectionInterval = 0.5f;
+    static readonly System.Collections.Generic.Dictionary<(ulong, ulong), float> lastCorrection =
+        new System.Collections.Generic.Dictionary<(ulong, ulong), float>();
+
+    /// <summary>
+    /// cinderreach-team-autoplay K2: enemies move on every process (no NetworkTransform), so a
+    /// client's copy can drift from the server's. A hit rejected for range tells the sender
+    /// where the enemy really is (throttled per client and enemy); the client snaps its copy.
+    /// </summary>
+    static void CorrectEnemy(NetworkObject senderPlayer, NetworkObject enemy, ulong sender, float now)
+    {
+        var key = (sender, enemy.NetworkObjectId);
+        if (lastCorrection.TryGetValue(key, out float last) && now - last < EnemyCorrectionInterval) return;
+        lastCorrection[key] = now;
+        var relay = senderPlayer.GetComponent<DiabloNetworkPlayer>();
+        if (relay == null || !relay.IsSpawned) return;
+        var to = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sender } } };
+        relay.SnapEnemyClientRpc(enemy.NetworkObjectId, enemy.transform.position, to);
+    }
+
+    [ClientRpc]
+    void SnapEnemyClientRpc(ulong enemyNetId, Vector3 serverPos, ClientRpcParams rpcParams = default)
+    {
+        if (IsServer) return;
+        var nm = NetworkManager.Singleton;
+        if (nm == null || nm.SpawnManager == null
+            || !nm.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out var enemy) || enemy == null) return;
+        SnapEnemy(enemy.gameObject, serverPos);
+    }
+
+    /// <summary>Moves a client's enemy copy to the server position (test seam).</summary>
+    public static void SnapEnemy(GameObject enemy, Vector3 serverPos)
+    {
+        if (enemy == null) return;
+        var cc = enemy.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        enemy.transform.position = serverPos;
+        if (cc != null) cc.enabled = true;
     }
 
     /// <summary>Last validated heal per sender (server cooldown gate, party-roles S5).</summary>

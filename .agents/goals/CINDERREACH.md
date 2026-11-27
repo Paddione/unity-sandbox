@@ -20,7 +20,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
 | P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
-| P9 | [`cinderreach-team-autoplay`](cinderreach-team-autoplay/GOAL.md) | 0 %, angelegt 2026-11-27 | K1 Kindled-Freischaltung auf Thewes, dann Teamlauf Server + 3 Clients (Normal → Kindled aus Saves) im CI |
+| P9 | [`cinderreach-team-autoplay`](cinderreach-team-autoplay/GOAL.md) | 70 %, K1–K3 erledigt, lokal grün | K1 Kindled-Freischaltung auf Thewes, dann Teamlauf Server + 3 Clients (Normal → Kindled aus Saves) im CI |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
@@ -416,7 +416,10 @@ liest für Menüs ohne Nebenwirkung.
   Code unter `sandbox/Assets/Scripts/Autoplay/`.
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Auf Abruf
   per Job `autoplay` in `.github/workflows/unity-tests.yml` (`gh workflow run unity-tests.yml -f autoplay=true`,
-  Runner `unity-licensed`, Xvfb ohne Desktopfenster, kein Zeitplan seit 2026-11-25) für Normal, Kindled und Lanternbearer, Seed rotiert 0–2. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
+  Runner `unity-licensed`, Xvfb ohne Desktopfenster, kein Zeitplan seit 2026-11-25) als Teamlauf
+  `scripts/run-team-autoplay.sh`: dedizierter Server + fenwalker-Lead (god, volle Route) + lanternbearer/rogue
+  (sterblich), Sitzung Normal bis Thewes, dann Kindled aus denselben Saves (`team-verdict.json`, `docs/ci-runner.md`).
+  Solo-Lauf nur noch lokal. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
   Dreiergruppe, `COOP_CLIENT_GOD=0` für sterbliche Clients). Koop-Client-Phasen: `town, zone1, zone2,
   boss, zone3, actboss, zone4, boss3` (je Zone Treffer oder Angriffs-Casts, je Boss die gebuchte Kill-Meldung).
 - Installer: `scripts/build-installer.sh` (Inno Setup 6 per winget, `scripts/installer/cinderreach.iss`) packt

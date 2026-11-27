@@ -85,8 +85,10 @@ public sealed class StoryState
     /// ones and completes not-yet-started chain quests the act state already
     /// passed (old saves, late co-op joins, a boss killed before the talk).
     /// Repeats until stable; returns true when anything changed.
+    /// <paramref name="catchUp"/> false (co-op clients): the host/server decides catch-up and
+    /// broadcasts it, a client closing a quest on its own would race the host's state.
     /// </summary>
-    public bool Refresh(ActProgress act)
+    public bool Refresh(ActProgress act, bool catchUp = true)
     {
         bool any = false;
         for (int guard = 0; guard < 8; guard++)
@@ -95,7 +97,7 @@ public sealed class StoryState
             foreach (var q in StoryCatalog.All)
             {
                 var e = quests[q.id];
-                if (e.status < StoryStatus.Active && q.catchUp != StoryGate.None && GateOpen(q.catchUp, act))
+                if (catchUp && e.status < StoryStatus.Active && q.catchUp != StoryGate.None && GateOpen(q.catchUp, act))
                 {
                     for (int i = 0; i < e.counts.Length; i++) e.counts[i] = q.objectives[i].count;
                     SetStatus(e, StoryStatus.Done);
