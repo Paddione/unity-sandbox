@@ -1,53 +1,59 @@
 # Akt-III-Finale — Laufprotokoll (cinderreach-akt3-finale S4)
 
-Stand 2026-11-27 (S4, Worktree `cinderreach-akt3-finale-s4`, Basis `eb1c8e2` = S3).
+Stand 2026-11-27 (S4-Rerun, Worktree `cinderreach-akt3-finale-s4`, Commit `d4183bf`
+= S4-Doku auf S3b `468e35b` = Szene enthält MoortorGate/ReturnGate, 8 Finds, Thewes).
 Kette H9→H10→H11→H12→H13 + N6/N7 (Bibel §Akt III „Was nach Hause will"), 34 Katalog-Quests.
 
-## S4-Abnahmelauf (Linux-Player, WSLg, `-autoplay -autoplay-god -seed 0`)
+## S4-Rerun (Linux-Player, WSLg, `-autoplay -autoplay-god -seed 0`)
 
-`bash scripts/run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau, kein Skip):
+`bash scripts/run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau, Commit `d4183bf`):
 
-- Player-Exit 1, `duration_s` 213 s, `exceptions` 0, `huskKills` 69, `bossKills` 1.
+- Player-Exit 1, `duration_s` 261,6 s, `exceptions` 0, `huskKills` 70, `navPlans` 134, `navWarps` 3.
 - `result_phases`: `town,zone1,gate,zone2,boss,zone3,actboss,zone4,boss3,complete` —
-  die `complete`-Phase ist erreicht (inkl. `boss3: kills=1 phaseTwo=1 lances=14
-  novas=0 fields=3 warded=4 zoneBoss=True drop=shardback-aegis overlay=True`).
-- Quests: `29/34`, `open=[n6,n7,h11,h12,h13]`, `caughtUp=[]` → `quests`-Phase fehlt,
-  `ComputeExit` 1. Ablauf bis `TurnIn h10` sauber (H9-Talks, H10-Angebot/Talks,
-  N6-/N7-Angebote), danach findet der Sweep keine Arbeit mehr.
-- Nebenbefund: fps-gate FAIL (worst 29,7 fps vs. 30,0) — advisory (Eigner-Entscheid:
-  Performance wird per Windows-GPU-Shotcheck belegt), kein Gate.
+  die `complete`-Phase ist erreicht (inkl. `boss3: kills=1 phaseTwo=1 lances=13
+  novas=0 fields=3 warded=5 zoneBoss=True drop=glasswright-prism overlay=True`).
+- Quests: `32/34`, `open=[h12,h13]`, `caughtUp=[]` → `quests`-Phase fehlt, `ComputeExit` 1.
+- Fortschritt ggü. S4-Erstlauf (29/34, offen n6/n7/h11/h12/h13): H11-Rätsel löst aus
+  (3× `glutspur`-Finds am Moortor, `h11` autoAccept/turnIn-frei → Done ohne Talk),
+  N6 (4× `lanzenspitze`) und N7 (2. `spendenseite`) via Sweep + TurnIn sauber.
+  H9-Talks, H10-Angebot/Talks, N6-/N7-Angebote: alle `walked=True`.
+- Nebenbefunde: fps-gate FAIL (worst 29,1 fps vs. 30,0) — advisory (Eigner-Entscheid:
+  Performance wird per Windows-GPU-Shotcheck belegt), kein Gate. Neu: `[Loc] missing
+  key 'story.item.lanzenspitze'` + `'story.item.glutspur'` im Player-Log
+  (`LocCatalog.Story.cs` kennt nur `story.item.spendenseite`) — Anzeige-Keys fehlen,
+  kein Quest-Blocker.
 
-## Blocker: Moortor hat keine physische Präsenz in der Szene
+## Blocker: Thewes fällt vor H12 — Kill zählt nicht, kein Respawn
 
-Die 5 offenen Quests brauchen Inhalte, die in `DiabloZone.unity` nicht existieren
-(grep-Beleg, je 0 Treffer im Szenenfile):
+H12 (`Kill(Thewes,1)`, `prereq: h11`, `autoAccept: true`, `turnIn: false`) bleibt offen,
+H13 hängt an H12. Ablauf aus `artifacts/autoplay-s4.log/autoplay-player.log`:
 
-- H11 (Rätsel R7): 3× `glutspur`-Finds am Moortor — kein `StoryPickup_glutspur_*`.
-- H12: Killziel `Thewes` — kein Thewes-Gegner (nur Kill-String + Director-Logik).
-- H13: hängt an H12 (Talk Ottilie nach Thewes' Fall).
-- N6: 4× `lanzenspitze` — keine Quelle (kein Pickup, kein Drop).
-- N7: 1× `spendenseite` — das einzige Exemplar (`StoryPickup_spendenseite_0`)
-  verbraucht N15, bevor N7 angeboten wird (kein Respawn: `StoryPickup` despawnt
-  erst, wenn ein aktiver Task zählt).
+- Zeilen ~1235–1349: Die Gruppe bekämpft Thewes (420 HP) während des Akt-II-Barrens-Sweeps
+  (Sehglas-/Speichenrad-Funde) und tötet ihn (`Thewes died (kills=76)`) — zu diesem
+  Zeitpunkt sind nicht einmal die H9-Talks geführt (Zeile ~1530), H10-TurnIn erst
+  Zeile 1544. Der Kill wird auf keine Quest gebucht (H12 weder angeboten noch aktiv).
+- Nach `TurnIn h10` bietet niemand H11 per Talk an (per Design: `autoAccept`), die Finds
+  lösen H11 direkt ein; H12 wird danach aktiv — sein Ziel ist bereits tot, und der
+  S3b-Spawner (`BarrensBuilder.SpawnMoortor`, einmalig nach Glasswright-Muster) lässt
+  Thewes nicht wiedererscheinen. H12 ist in einem einzigen Autoplay-Pass unerfüllbar.
+- Kein Autoplay-/Sweep-Fix möglich: Retro-Buchung (`BookKill` nachträglich) oder Respawn
+  wären Code-/Szene-Änderungen und liegen außerhalb des S4-Write-Sets (Code/Szene/Tests
+  sind read-only). Folge-Arbeit (eigener Branch): z. B. Thewes erst mit H12-Aktivierung
+  aggressiv/spawnbar machen, Kill-Rückwirkung gelten lassen oder Einmal-Respawn —
+  Design-Entscheid des Story-Eigners, nicht S4.
 
-S3 (`eb1c8e2`) lieferte Modell/Kette (`h10→h11→h12→h13`, N6/N7 ab H10),
-Director-Finale (`BookFinalBossPhase` genau 1×, `BookDecision` genau 1×),
-Moortor-Gate-*Logik* (`ZoneGate.IsMoortorGate`, `Locked` via `Finale.MoortorOpen`),
-Save ohne Migration (`RestoreFinale`, v16) und 10 PlayMode-Reisen — aber kein
-Tor-Objekt, keine Finds, keinen Boss-Spawn (S3-Stat: keine Szene/Builder-Datei).
-`SessionAutoplay` kann die Moortor-Kette daher nicht spielen: `QuestSweep` sucht
-Finds nur in der aktuellen Zone, `ZoneWithWork` reist nur per Wegpunkt
-(Town/Ossuary/Kiln/Barrens) — das Moortor ist über keinen Pfad erreichbar.
-Direktes `BookCollect`/`BookKill` aus Autoplay-Code wäre fabrizierter Nachweis,
-kein Beweis, und bleibt deshalb verboten.
+## Vorlauf: S4-Erstlauf (Basis ohne Moortor-Präsenz, historisch)
 
-Folge-Arbeit (außerhalb S4-Write-Set, braucht Szene/Builder-Zugriff):
-`MoortorGate` + `MoortorReturnGate` platzieren (Tor-Seam wie Fen-/Kiln-/BarrensGate),
-3 Glutspur-Pickups + 4 Lanzenspitzen-Quellen + 2. Spendenseite (N7 nach N15) legen,
-Thewes-Gegner spawnen (Hüllen-Gefolge, Bossbalken/Phase-2-Muster Bestand).
-Erst danach kann S4 `34/34, 0 Catch-up, Exit 0` belegen.
+Player-Exit 1, `duration_s` 213 s, `exceptions` 0, `huskKills` 69, `bossKills` 1:
+`complete` erreicht, Quests `29/34`, `open=[n6,n7,h11,h12,h13]`. Ursache damals: keine
+physische Moortor-Präsenz in `DiabloZone.unity` (kein Tor-Objekt, keine Finds, kein
+Thewes-Gegner; einzige Spendenseite verbrauchte N15 vor N7). S3b (`468e35b`) hat das
+behoben (Tore, 8 Finds, Thewes-Spawner, Presence-Journey) — der Rerun oben belegt den
+neuen Stand (S3b-Belege: EditMode 716/716, PlayMode 409/409, `VerifyDiabloZone` OK,
+`KayKitAssets.Verify` OK, `check-meta` OK, Coverage 0 uncovered, `check-voice-lines`
+244/0, workspace-check still).
 
-## Save/Koop-Befunde aus S3 (für die Abnahme vorgemerkt)
+## Save/Koopf-Befunde aus S3 (für die Abnahme vorgemerkt)
 
 - Save: `Save_Roundtrip_FinaleBleibtBestehen` — nach `BookDecision(true)` Roundtrip
   über `SaveNow`/`TryLoad`: h10–h13 Done, `MoortorOpen`, `FinalBossDefeated`,
@@ -58,8 +64,8 @@ Erst danach kann S4 `34/34, 0 Catch-up, Exit 0` belegen.
   `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, `check-meta` OK,
   `check-quest-coverage` 0 uncovered, `check-voice-lines` 244/0.
 
-## Voice-Stand S4
+## Voice-Stand S4 (Rerun-bestätigt)
 
-`check-voice-lines`: 244 Zeilen, 0 Probleme. `dlg.h11–h13` existieren nicht und
-werden NICHT erfunden — Glättung macht P6 S2 nach dem S4-Drop (Handoff).
-`docs/audio/voice-lines.lock.json` unverändert.
+`check-voice-lines`: 244 Zeilen, 0 Probleme (Worktree-Stand, 2026-11-27).
+`dlg.h11–h13` existieren nicht und werden NICHT erfunden — Glättung macht P6 S2
+nach dem S4-Drop (Handoff). `docs/audio/voice-lines.lock.json` unverändert.

@@ -157,3 +157,18 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Headless proof: EditMode 358/358 + PlayMode 262/262 (dieser Branch, inkl. aller Party-Bestands-Tests).
 - Grenze: Begleiter-Build ist ein Spiegel des Helden (keine eigene Skillung); Begleiter-UI (Bag/Vendor)
   bleibt Follow-up — Ausrüsten läuft über die `Equip`-API.
+
+## Q13 — Zählt ein Boss-Kill, der vor Quest-Aktivierung fällt? (Akt-III-Finale H12)
+
+- Question: Thewes steht als Barrens-Gegner in der Welt und fällt im Akt-II-Sweep,
+  bevor H12 (`Kill(Thewes,1)`, `autoAccept` ab H11) aktiv ist — danach kein Respawn,
+  H12/H13 unerfüllbar (S4-Rerun: 32/34, Exit 1, 0 Exceptions, `complete` erreicht).
+- Setup: `StoryModel` H11/H12/H13 (`autoAccept`, `turnIn: false`), `BarrensBuilder.SpawnMoortor`
+  (einmaliger Thewes-Spawn), `StoryDirector.BookFinalBossPhase`/`DefeatFinalBoss`.
+- Exit criterion: Eigner-Entscheid über Spawn-/Buchungs-Reihenfolge (z. B. Thewes erst ab
+  H12-Aktivierung, Kill-Rückwirkung, Einmal-Respawn) + Autoplay 34/34 Exit 0 auf eigenem
+  Branch; S4 bleibt STOP (Code/Szene read-only), PROGRESS 75 %.
+- Headless proof (S4-Rerun): `docs/akt3-finale-run-log.md` — 261,6 s, 70 Husk-Kills,
+  boss3 Phase 2, H11/N6/N7 sauber, `[h12,h13]` offen, `caughtUp=[]`.
+- Grenze: kein Retro-Booking und kein Respawn aus S4 heraus; `dlg.h11–h13`-Glättung
+  weiter P6 S2 nach dem S4-Drop.

@@ -1101,3 +1101,21 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Befund in `docs/akt3-finale-run-log.md` festgehalten, PROGRESS bleibt < 100 %.
   Voice-Gate steht (`check-voice-lines` 244/0, `dlg.h11–h13` nicht erfunden — P6 S2),
   fps-gate-FAIL (29,7 vs. 30) nur advisory per Eigner-Entscheid.
+
+## 2026-11-27 — Akt-III-Abnahme S4-Rerun: 32/34, Thewes-Vorkill blockiert H12/H13 (cinderreach-akt3-finale-s4)
+
+- Rerun `run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau, Commit `d4183bf`
+  = S4-Doku auf S3b-Szene `468e35b`): Exit 1, 261,6 s, 0 Exceptions, 70 Husk-Kills,
+  `complete` erreicht (boss3 Phase 2, 13 Lanzen, 5 gewardete Felder) — aber Quests
+  32/34, offen nur noch [h12,h13]. H11 (3 Glutspur-Finds, autoAccept/turnIn-frei),
+  N6 (4 Lanzenspitzen), N7 (2. Spendenseite) spielen sauber; alle H9/H10-Talks walked.
+- Diagnose (kein Code-Fix, Code/Szene read-only): Thewes (420 HP) stirbt bereits im
+  Akt-II-Barrens-Sweep (Player-Log ~Z. 1235–1349, `kills=76`), bevor H9-Talks/H10-TurnIn
+  laufen — der Kill wird auf nichts gebucht; H12 (`Kill(Thewes,1)`, autoAccept ab H11)
+  findet danach ein totes Ziel ohne Respawn (S3b-Spawner einmalig). H13 hängt an H12.
+  Folge-Arbeit braucht eigenen Branch (Spawn-/Buchungs-Reihenfolge, Eigner-Entscheid).
+- Nebenbefunde: fps-gate FAIL 29,1 vs. 30 fps = advisory (Eigner-Entscheid, Windows-Shotcheck
+  ist Perf-Gate); `[Loc] missing key` für `story.item.lanzenspitze`/`glutspur` (nur
+  `spendenseite` ist katalogisiert) — Anzeige-Lücke, kein Quest-Blocker.
+  `check-voice-lines` 244/0, `check-quest-coverage` 0 uncovered (Rerun-bestätigt).
+  Gemäß Abnahme-Regel STOP: PROGRESS bleibt 75 %, kein Commit von Code/Tests/Szene.
