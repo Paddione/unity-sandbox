@@ -13,7 +13,10 @@
 #     the GPU through the WSLg X server (/tmp/.X11-unix/X0) and Mesa d3d12
 #     (/dev/dxg), measured 47+ fps worst window on 2026-11-18. xvfb renders on
 #     llvmpipe (CPU, ~6 fps) and only proves the session, never the FPS gate.
-#     auto picks wslg when both exist; the window shows on the desktop ~2 min;
+#     auto picks wslg when both exist; the window shows on the desktop ~2 min.
+#     xvfb-gpu renders off-screen in Xvfb through Mesa d3d12 on the GPU named by
+#     AUTOPLAY_GPU_ADAPTER (substring match, default 3060): no desktop window,
+#     measured median 45 fps / worst window 13 fps on the RTX 3060 Ti 2026-11-27;
 #  3. hard timeout (AUTOPLAY_TIMEOUT, default 2700 s) -> exit 2 (hang);
 #  4. fps-gate.py --min-fps 30 --resolution 1280x720 --skip-first 1 on the log,
 #     advisory only since 2026-11-22: performance is proven on Windows with the
@@ -62,7 +65,12 @@ case "$MODE" in
   xvfb)
     command -v xvfb-run >/dev/null || { echo "run-autoplay: xvfb-run missing" >&2; exit 1; }
     LAUNCH=(xvfb-run -a -s "-screen 0 1280x720x24") ;;
-  *) echo "run-autoplay: AUTOPLAY_DISPLAY must be auto|wslg|xvfb, got $MODE" >&2; exit 1 ;;
+  xvfb-gpu)
+    command -v xvfb-run >/dev/null || { echo "run-autoplay: xvfb-run missing" >&2; exit 1; }
+    [ -e /dev/dxg ] || { echo "run-autoplay: xvfb-gpu needs /dev/dxg (WSL GPU)" >&2; exit 1; }
+    LAUNCH=(env GALLIUM_DRIVER=d3d12 MESA_D3D12_DEFAULT_ADAPTER_NAME="${AUTOPLAY_GPU_ADAPTER:-3060}"
+      xvfb-run -a -s "-screen 0 1280x720x24") ;;
+  *) echo "run-autoplay: AUTOPLAY_DISPLAY must be auto|wslg|xvfb|xvfb-gpu, got $MODE" >&2; exit 1 ;;
 esac
 
 rm -f "$OUT/autoplay-result.json"
@@ -90,7 +98,11 @@ if [ ! -f "$OUT/autoplay-result.json" ]; then
   exit 1
 fi
 
-grep -a 'Renderer:' "$LOG" | head -n 1 || true
+RENDERER="$(grep -a 'Renderer:' "$LOG" | head -n 1 || true)"
+echo "$RENDERER"
+if [ "$MODE" = xvfb-gpu ] && ! grep -q 'D3D12' <<<"$RENDERER"; then
+  echo "run-autoplay: WARNING xvfb-gpu fell back to software rendering (no D3D12 renderer)" >&2
+fi
 set +e
 python3 "$ROOT/scripts/fps-gate.py" "$LOG" --min-fps "$MIN_FPS" --resolution 1280x720 --skip-first 1
 FPS_RC=$?

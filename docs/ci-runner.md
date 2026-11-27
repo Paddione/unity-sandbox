@@ -34,11 +34,14 @@ windows on the desktop and failed whenever those were closed. It uses the same
 `builds/autoplay-player/` of the runner checkout, full session with
 `-autoplay -autoplay-god`, then the FPS gate (`--min-fps 30 --resolution 1280x720 --skip-first 1`).
 
-- Display: the job sets `AUTOPLAY_DISPLAY=xvfb`, so the player renders on llvmpipe (CPU,
-  ~8 fps, full route ~4 min) and opens no window on the desktop. The WSLg GPU path
-  (`AUTOPLAY_DISPLAY=wslg`, d3d12 through `/dev/dxg`) still exists for local runs, but crashes at
-  startup with SIGSEGV in `libnvidia-gpucomp.so` since the 2026-11-25 driver update
-  (KMD 621.40, WSL UMD 620.70). The FPS gate is advisory on Linux either way.
+- Display: the job sets `AUTOPLAY_DISPLAY=xvfb-gpu` and `AUTOPLAY_GPU_ADAPTER=3060`: the
+  player renders off-screen in Xvfb through Mesa d3d12 (`/dev/dxg`) on the RTX 3060 Ti and
+  opens no window on the desktop. Measured 2026-11-27 (single route): median 45 fps, worst
+  window 13 fps, against ~3-5 fps on llvmpipe. If the log shows no `D3D12` renderer,
+  `run-autoplay.sh` warns that Mesa fell back to software. `AUTOPLAY_DISPLAY=xvfb` (llvmpipe)
+  remains as fallback. The WSLg window path (`AUTOPLAY_DISPLAY=wslg`) crashed at startup with
+  SIGSEGV in `libnvidia-gpucomp.so` after the 2026-11-25 driver update (KMD 621.40, WSL UMD
+  620.70). The FPS gate is advisory on Linux either way.
 - Results: artifact `autoplay-<run_id>` (14 days) and a host copy under
   `~/unity-sandbox-autoplay/<YYYY-MM-DD>/` (a second run on the same day gets a
   `-<run_id>` suffix). Host folders older than 30 days are deleted by the job.
