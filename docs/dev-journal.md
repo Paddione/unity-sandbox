@@ -1084,3 +1084,20 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Thrall-Gruppe). Danach Planziel für Funde auf freie Zellen bis 1,05 m um den Trigger: Lauf 3
   Exit 0, 28/28, 0 Catch-up, 2 Warps, 219 s. EditMode 699/699, PlayMode 389/389 (ein Lauf endete
   nach grünen Tests mit Editor-Exit 136, Wiederholung rc 0). `run-autoplay.sh`-Timeout 1200 → 2700 s.
+
+## 2026-11-27 — Akt-III-Abnahme S4: complete erreicht, Moortor-Inhalt fehlt (cinderreach-akt3-finale-s4)
+
+- S4-Lauf `run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau): `complete` in
+  `result_phases`, 0 Exceptions, 213 s, 69 Husk-Kills, boss3 mit Phase 2 — aber Exit 1,
+  weil `quests` fehlt (29/34, offen: n6/n7/h11/h12/h13). Der Sweep spielt H9/H10 sauber
+  bis `TurnIn h10` und findet danach keine Arbeit: die Moortor-Kette hat keine physische
+  Präsenz in `DiabloZone.unity` (kein MoortorGate-Objekt, keine Glutspur-/Lanzenspitzen-Finds,
+  kein Thewes-Gegner; die einzige Spendenseite verbraucht N15 vor N7). S3 lieferte nur
+  Modell/Director/Gate-Logik/Save/Tests — keine Szene-Platzierung.
+- Kein Autoplay-Fix möglich: Finds jenseits des Wegpunktnetzes sind unerreichbar
+  (`QuestSweep` aktuelle Zone, `ZoneWithWork` nur Wegpunktziele); `BookCollect`/`BookKill`
+  direkt zu buchen wäre fabrizierter Nachweis. Echter Fix (Tor platzieren, Finds legen,
+  Thewes spawnen) liegt außerhalb des S4-Write-Sets (Szene/Builder: never-touch/read-only).
+  Befund in `docs/akt3-finale-run-log.md` festgehalten, PROGRESS bleibt < 100 %.
+  Voice-Gate steht (`check-voice-lines` 244/0, `dlg.h11–h13` nicht erfunden — P6 S2),
+  fps-gate-FAIL (29,7 vs. 30) nur advisory per Eigner-Entscheid.
