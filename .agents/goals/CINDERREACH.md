@@ -19,7 +19,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 100 %, S1–S4 gelandet | Abgeschlossen (Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
-| P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 20 %, S1-Baseline gelandet (`8e781a7`, 63/260/1) | S2 parse-fix; unabhängig, keine Entblockung, jederzeit als Füller |
+| P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
 (Story-Kette Akt I → II → III → Sprache), danach unabhängige Refactorings nach Risiko

@@ -1,6 +1,6 @@
 # Progress: cinderreach-graph-adr-hygiene
 
-Prozent: 40 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -10,15 +10,21 @@ Prozent: 40 %
 - 2026-11-27: Plan gegen `1ff1b95` geprüft (unverändert) und als P7 priorisiert (unabhängig, jederzeit als Füller).
 
 - 2026-11-27 (S1, Worktree `feature/cinderreach-graph-adr-hygiene-s1`): frische `index_status`-Messung nach Re-Index auf `main`-HEAD (s. S1-Baseline unten) — gelandet als `8e781a7` (ff, Push durch, Worktree aufgeräumt). Prozent jetzt 20 %.
-- 2026-11-27 (S2, Worktree `feature/cinderreach-graph-adr-hygiene-s2`): `start_client()` in `scripts/run-coop-pair.sh` auf explizites Array-Sammeln (`args=(...)`) und `if [ -n "$cls" ]` statt `${cls:+(class $cls)}` / `${arr[@]+...}` umgestellt (Laufzeitverhalten identisch). Belege: `bash -n scripts/run-coop-pair.sh` Exit 0; `scripts/test_run_coop_pair.py` (4 Matrixfälle `COOP_SERVER=0/1` × `COOP_CLIENT_GOD=0/1` × `COOP_CLIENT_CLASS`) + `python3 -m pytest scripts -q` (34/34) grün; Probe-Re-Index `unity-sandbox-s2-probe` meldet `parse_partial.count == 0` (`10541` nodes, `57696` edges). Prozent jetzt 40 %.
+- 2026-11-27 (S2, Worktree `feature/cinderreach-graph-adr-hygiene-s2`): `start_client()` in `scripts/run-coop-pair.sh` auf explizites Array-Sammeln (`args=(...)`) und `if [ -n "$cls" ]` statt `${cls:+(class $cls)}` / `${arr[@]+...}` umgestellt (Laufzeitverhalten identisch); als `8e3eef0` gelandet. Belege: `bash -n scripts/run-coop-pair.sh` Exit 0; `scripts/test_run_coop_pair.py` (4 Matrixfälle) + `python3 -m pytest scripts -q` (34/34) grün; `home-patrick-unity-sandbox` meldet `parse_partial.count == 0`.
+- 2026-11-27 (S3 + S4 + S5-Runbook, Worktree `feature/cinderreach-graph-adr-hygiene-s3`, gelandet als `dcb2367`):
+  - S3 (`missing` 63 → 0): alle fehlenden `doc_links` über Diagnose-Index bereinigt — `<see cref="RiskShrineProgress.Reset"/>` in `sandbox/Assets/Scripts/Zones/RiskShrineProgress.cs` korrigiert (`RiskShrine` EditMode 9/9 grün), G4-Lint-Rest in `.agents/goals/cinderreach-akt1-vertiefung/PROGRESS.md` behoben (`Keine.`), Tippfehler `scripts/test_check_hotpath_caching.py` korrigiert, Ordner- und externe/Laufzeit-Namen (z. B. Dotfiles-Proben, geplante Run-Logs, entfernte historische Methodennamen) ohne irreführende Repo-Code-Links formatiert.
+  - S4 (`ambiguous` 260 bzw. 309 vor S3 → 229): Bare-Filenames in `.agents/goals/CINDERREACH.md`, aktiven Goal-Dateien (ohne gesperrtes `cinderreach-akt2-vertiefung`) und lebenden Doku-Dateien unter `docs` durch eindeutige repo-relative Pfade ersetzt; historische Verläufe blieben unangetastet.
+  - S5-Runbook: Abschnitt `## Code-Graph und ADR-Pflege` in `docs/runbook.md` ergänzt (Auslöser, `index_repository` → `manage_adr` → `index_status`, Zuständigkeit am landenden Goal).
+  - Belege nach Landung von `dcb2367` auf `main`: Re-Index `home-patrick-unity-sandbox` (`indexed_at 2026-11-27T06:15:47Z`, `10543` nodes, `57834` edges) liefert `parse_partial: 0`, `doc_links.unresolved.missing: 0`, `ambiguous: 229` (`1236` mentions).
+- 2026-11-27 (S5 ADR-Update + Abschluss, Worktree `feature/cinderreach-graph-adr-hygiene-s5`): ADR für `home-patrick-unity-sandbox` per `manage_adr(mode='update')` aktualisiert (6 Abschnitte, < 8.000 Zeichen; `dcb2367`, `DiabloSkills.Skill` `0..19`, Teilklassen-/Fassaden-Splits, `CA-01`–`CA-03` abgeschlossen, Graph-Zähler `0/229/0`); `manage_adr(mode='outline')` und `adr_present: true` bestätigt; `node ~/scripts/goal-lint.mjs --repo .`, `python3 scripts/check-meta.py`, `python3 -m pytest scripts -q` (34/34) und `python3 ~/scripts/agent-workspace.py check` grün.
 
 ## Nächste Schritte
 
-- S3 (`missing` → 0), S4 (`ambiguous` reduzieren), S5 (ADR-Prozess in `docs/runbook.md` + `manage_adr`-Lauf + Gesamtverifikation).
+Keine.
 
 ## Offene Punkte
 
-- S2–S5 stehen aus; S1-Baseline (63/260/1) ist die Arbeitsbasis für alle Folgestufen.
+Keine.
 
 ## S1-Baseline (Messung, 2026-11-27)
 

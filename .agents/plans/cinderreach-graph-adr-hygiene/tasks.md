@@ -6,7 +6,7 @@ repo_main: main
 tickets: none
 health_goals: [G-GOALS01]
 priority: P7 (unabhängig, nur Doku/Hygiene, keine Entblockung; jederzeit als Füller parallel möglich)
-status: in_progress — S1 gelandet (8e781a7, 20 %), nächster Schritt S2 parse-fix
+status: done (100 %) — S1–S5 gelandet (`8e781a7`, `8e3eef0`, `dcb2367` + ADR-Update), `parse_partial: 0`, `missing: 0`, `ambiguous: 229`
 start_condition: main sauber; fleet-workspace-Hub erreichbar (index_repository/index_status/manage_adr); kein paralleles Schreiben an .agents/goals/** durch ein anderes Goal
 plan_refs: [.agents/goals/cinderreach-graph-adr-hygiene/GOAL.md]
 ---
