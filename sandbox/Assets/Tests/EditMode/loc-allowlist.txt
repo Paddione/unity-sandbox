@@ -181,10 +181,10 @@ Net/JoinArgs.cs	-join without address, using
 Net/JoinArgs.cs	-join-code without a code, using 
 Net/JoinArgs.cs	empty address, using 
 Net/JoinArgs.cs	invalid port '{portText}', using {DefaultPort}
-Net/TradeValidator.cs	bag full
-Net/TradeValidator.cs	gold {gold} < price {price}
-Net/TradeValidator.cs	price {price} not for sale
-Net/TradeValidator.cs	price {price} outside 1..{MaxSellPrice}
+Foundation/TradeValidator.cs	bag full
+Foundation/TradeValidator.cs	gold {gold} < price {price}
+Foundation/TradeValidator.cs	price {price} not for sale
+Foundation/TradeValidator.cs	price {price} outside 1..{MaxSellPrice}
 Save/CloudHeroSync.cs	cloud(exists={cloud != null}) -> {action}
 Save/SaveService.cs	v{SaveGame.CurrentVersion}: not loaded, file left untouched.
 Zones/EncounterLayout.cs	Kiln Warden_

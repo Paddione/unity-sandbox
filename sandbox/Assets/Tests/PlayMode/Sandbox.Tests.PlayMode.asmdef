@@ -7,6 +7,8 @@
     "Unity.InputSystem",
     "Unity.InputSystem.TestFramework",
     "Sandbox.Runtime",
+    "Sandbox.Foundation",
+    "Sandbox.Core",
     "Unity.Netcode.Runtime",
     "Unity.Collections",
     "Unity.Networking.Transport"

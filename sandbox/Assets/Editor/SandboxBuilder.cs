@@ -489,13 +489,15 @@ public static class SandboxBuilder
             throw new System.Exception("Diablo build failed; see log.");
     }
 
-    /// <summary>Dedicated-server build for DiabloZone (no rendering) for hosts like gpu-metal.</summary>
+    /// <summary>Dedicated-server build for DiabloZone (no rendering) for hosts like gpu-metal.
+    /// -buildOut overrides the path. Standalone backend is pinned to Mono (fast iteration +
+    /// fast release builds); IL2CPP only where platform policy requires it.</summary>
     public static void BuildDiabloZoneServer()
     {
         var opts = new BuildPlayerOptions
         {
             scenes = new[] { DiabloZoneScenePath },
-            locationPathName = "/home/patrick/unity-sandbox/builds/diablo-server/diablo-server",
+            locationPathName = BuildOutArg() ?? "/home/patrick/unity-sandbox/builds/diablo-server/diablo-server",
             target = BuildTarget.StandaloneLinux64,
             subtarget = (int)StandaloneBuildSubtarget.Server,
             options = BuildOptions.None,
@@ -504,10 +506,16 @@ public static class SandboxBuilder
         // the server optimizations strip every shader and those paths throw mid-kill.
         // Ship the server with the same content as the tested player.
         bool optimizations = PlayerSettings.dedicatedServerOptimizations;
+        var backend = PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone);
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.dedicatedServerOptimizations = false;
         UnityEditor.Build.Reporting.BuildReport report;
         try { report = BuildPipeline.BuildPlayer(opts); }
-        finally { PlayerSettings.dedicatedServerOptimizations = optimizations; }
+        finally
+        {
+            PlayerSettings.dedicatedServerOptimizations = optimizations;
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, backend);
+        }
         Debug.Log($"[SandboxBuilder] DiabloZone server build result: {report.summary.result} " +
                   $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
                   $"{report.summary.totalSize / 1048576} MB");
@@ -1388,18 +1396,23 @@ public static class SandboxBuilder
     /// <summary>
     /// Windows player build of DiabloZone for GPU playtests (run the .exe
     /// on Windows; same scene + netcode as the Linux build).
+    /// -buildOut overrides the path. Standalone backend is pinned to Mono.
     /// </summary>
     public static void BuildDiabloZoneWindows()
     {
         var opts = new BuildPlayerOptions
         {
             scenes = new[] { DiabloZoneScenePath },
-            locationPathName = "/home/patrick/unity-sandbox/builds/cinderreach-windows/cinderreach.exe",
+            locationPathName = BuildOutArg() ?? "/home/patrick/unity-sandbox/builds/cinderreach-windows/cinderreach.exe",
             target = BuildTarget.StandaloneWindows64,
             subtarget = (int)StandaloneBuildSubtarget.Player,
             options = BuildOptions.None,
         };
-        var report = BuildPipeline.BuildPlayer(opts);
+        var backend = PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone);
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
+        UnityEditor.Build.Reporting.BuildReport report;
+        try { report = BuildPipeline.BuildPlayer(opts); }
+        finally { PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, backend); }
         Debug.Log($"[SandboxBuilder] DiabloZone Windows build result: {report.summary.result} " +
                   $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
                   $"{report.summary.totalSize / 1048576} MB");
@@ -1437,12 +1450,17 @@ public static class SandboxBuilder
             scenes = new[] { DiabloZoneScenePath },
             // -buildOut <path> overrides the default (loop-guard: run-autoplay.sh
             // builds into its own checkout, e.g. the CI runner workspace).
+            // Standalone backend is pinned to Mono (fast iteration + release).
             locationPathName = BuildOutArg() ?? "/home/patrick/unity-sandbox/builds/diablo-zone/diablo-zone",
             target = BuildTarget.StandaloneLinux64,
             subtarget = (int)StandaloneBuildSubtarget.Player,
             options = BuildOptions.None,
         };
-        var report = BuildPipeline.BuildPlayer(opts);
+        var backend = PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone);
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
+        UnityEditor.Build.Reporting.BuildReport report;
+        try { report = BuildPipeline.BuildPlayer(opts); }
+        finally { PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, backend); }
         Debug.Log($"[SandboxBuilder] DiabloZone build result: {report.summary.result} " +
                   $"in {report.summary.totalTime.TotalSeconds:F1}s, " +
                   $"{report.summary.totalSize / 1048576} MB");

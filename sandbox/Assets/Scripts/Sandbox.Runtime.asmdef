@@ -2,6 +2,8 @@
   "name": "Sandbox.Runtime",
   "rootNamespace": "",
   "references": [
+    "Sandbox.Foundation",
+    "Sandbox.Core",
     "Unity.InputSystem",
     "Unity.Cinemachine",
     "Unity.Timeline",

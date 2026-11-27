@@ -6,6 +6,8 @@
     "UnityEditor.TestRunner",
     "Unity.RenderPipelines.Universal.Runtime",
     "Sandbox.Runtime",
+    "Sandbox.Foundation",
+    "Sandbox.Core",
     "Unity.Timeline",
     "Unity.Cinemachine",
     "Unity.Netcode.Runtime",

@@ -10,6 +10,11 @@
 #  3. no heartbeat, so a stuck build looks identical to a slow one.
 #
 # What it does:
+#  - incremental is the default: build outputs are always reused, which is
+#    what makes Unity's incremental build pipeline skip unchanged work;
+#    UNITY_CLEAN_BUILD=1 deletes only the repo-relative dirs listed in
+#    UNITY_CLEAN_DIRS (colon-separated) before building — clean is opt-in,
+#    never implicit (unity-build-speed-5x, Task 2);
 #  - refuses to start when another Unity holds this project (exit 3);
 #    only a stale lockfile (no live holder) is removed;
 #  - stops unity-sandbox-editor.service for the build and restarts it after
@@ -106,6 +111,28 @@ if [ -e "$LOCKFILE" ]; then
   fi
   echo "run-unity-build: removing stale lockfile (no live holder)."
   rm -f "$LOCKFILE"
+fi
+
+# --- 2b. Opt-in clean -------------------------------------------------------
+# Incremental reuse is the default; a clean build deletes ONLY the listed
+# output dirs. Everything else (Library/, Assets/, out-of-tree) is refused.
+if [ "${UNITY_CLEAN_BUILD:-0}" = "1" ]; then
+  [ -n "${UNITY_CLEAN_DIRS:-}" ] || { echo "run-unity-build: UNITY_CLEAN_BUILD=1 needs UNITY_CLEAN_DIRS (repo-relative, colon-separated)." >&2; exit 2; }
+  ROOT_REAL=$(cd "$ROOT" && pwd -P)
+  OLDIFS=$IFS; IFS=:
+  # shellcheck disable=SC2162
+  for d in $UNITY_CLEAN_DIRS; do
+    case "$d" in ""|/*|.*|*..*) echo "run-unity-build: refusing to clean '$d' (must be a repo-relative subdir)." >&2; exit 2;; esac
+    case "$d" in Library*|sandbox/Library*|Assets*|sandbox/Assets*|ProjectSettings*|sandbox/ProjectSettings*|Packages*|sandbox/Packages*|sandbox|.|scripts*) echo "run-unity-build: refusing to clean '$d' (protected path)." >&2; exit 2;; esac
+    target="$ROOT_REAL/$d"
+    if [ -e "$target" ]; then
+      echo "run-unity-build: cleaning $target (UNITY_CLEAN_BUILD=1)."
+      rm -rf "$target"
+    else
+      echo "run-unity-build: clean skip, not present: $target."
+    fi
+  done
+  IFS=$OLDIFS
 fi
 
 # --- 3. Build with heartbeat, stall watchdog + hard timeout ----------------
