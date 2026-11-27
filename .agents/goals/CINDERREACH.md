@@ -1,6 +1,6 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-26 (zuletzt `cinderreach-group-quest-map`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-27 (zuletzt `diablo-cutscene-v2`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte "ROADMAP.md". Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -257,6 +257,13 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Wiederholung nach dem Laden (kein Save-Feld, v16 bleibt). Besiegte Akte werden nie wieder gesperrt. Koop: der
   Queststand des Hosts entscheidet (`NotifyActBossesClientRpc` mit jeder Story-Übertragung). Der Arena-Trigger
   gilt nur noch für den Hollow Abbot. "StoryDirector.MaybeSpawnThewesAtH11" (akt3-finale S3c) ist entfallen.
+- Beim Arena-Eintritt des Abts spielt `Resources/Cutscene_BossIntro` zwei Cinemachine-Shots,
+  KayKits Idle-Animation und die deutsche Zeile `dlg.h2.offer.2`. Das Endsignal gibt die
+  Steuerung frei. Der Director übernimmt im Batchmode und mit `-director-only` beide Einstellungen.
+- Im Play Mode öffnet **Cinderreach → Trailers → Preview Ossuary** den dreisekündigen Blender-Trailer.
+  **Record three seconds of Game view** zeichnet den aktuellen Game View als WebM unter `Recordings/` auf.
+  Für einen neuen Trailer aus dem Zonen-Blockout im Repo-Root `blender -b -P scripts/render-ossuary-trailer.py`
+  ausführen. Der Encoder wird über `FFMPEG` oder den Suchpfad gefunden.
 - Weltränder: jede Zone ist ummauert. Der Fen hat die `MoorEdge_*`-Erdwälle, Ossuary, Kiln und Barrens je vier
   `ZoneEdge_<Zone>_<Seite>`-Mauern (1,6 m, `ZoneEdgeBuilder`, Zonen-Texturen). Die begehbaren Rechtecke stehen
   in `Zones/WorldBounds` (SSOT für Builder, Begleiter-Clamp und `WorldEdgeTests`).

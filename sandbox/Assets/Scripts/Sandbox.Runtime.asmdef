@@ -3,6 +3,8 @@
   "rootNamespace": "",
   "references": [
     "Unity.InputSystem",
+    "Unity.Cinemachine",
+    "Unity.Timeline",
     "Unity.Netcode.Runtime",
     "Unity.Collections",
     "Unity.Networking.Transport",

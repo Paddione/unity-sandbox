@@ -1,4 +1,7 @@
+using System.Linq;
 using NUnit.Framework;
+using UnityEngine.Timeline;
+using Unity.Cinemachine;
 using UnityEngine;
 
 /// <summary>Cutscene pipeline: boss intros trigger once, hold the boss, skip cleanly; main-quest talks play boxed.</summary>
@@ -33,6 +36,110 @@ public class CutsceneDirectorTests
         boss = new GameObject(name);
         boss.transform.position = at;
         return boss;
+    }
+
+    [Test]
+    public void AbbotTimeline_ContainsTwoShotsKayKitVoiceAndRelease()
+    {
+        var timeline = Resources.Load<TimelineAsset>("Cutscene_BossIntro");
+        Assert.IsNotNull(timeline);
+        var tracks = timeline.GetOutputTracks().ToArray();
+        var shots = tracks.OfType<CinemachineTrack>().Single().GetClips().OrderBy(c => c.start).ToArray();
+        Assert.AreEqual(2, shots.Length);
+        Assert.AreEqual(shots[0].end, shots[1].start, 0.001);
+        Assert.AreNotEqual(((CinemachineShot)shots[0].asset).VirtualCamera.exposedName,
+            ((CinemachineShot)shots[1].asset).VirtualCamera.exposedName);
+        var animation = tracks.OfType<AnimationTrack>().Single().GetClips().Single().animationClip;
+        StringAssert.Contains("Rig_Medium", UnityEditor.AssetDatabase.GetAssetPath(animation));
+        var audio = (AudioPlayableAsset)tracks.OfType<AudioTrack>().Single().GetClips().Single().asset;
+        Assert.IsNotNull(audio.clip);
+        Assert.AreEqual(StoryVoice.Clip(BossIntroTimeline.VoiceKey), audio.clip);
+        var end = tracks.OfType<SignalTrack>().Single().GetMarkers().OfType<SignalEmitter>().Single();
+        Assert.IsNotNull(end.asset);
+        Assert.AreEqual(timeline.duration, end.time, 0.05);
+    }
+
+    [TestCase("skip")]
+    [TestCase("reset")]
+    [TestCase("end")]
+    public void IntroExit_RestoresCameraAndPreviouslyDisabledMovement(string exit)
+    {
+        var created = Camera.main == null;
+        var cam = created ? new GameObject("Intro test camera", typeof(Camera)) : Camera.main.gameObject;
+        var originalPosition = cam.transform.position;
+        try
+        {
+            cam.tag = "MainCamera";
+            cam.transform.position = new Vector3(2, 7, -8);
+            var position = cam.transform.position;
+            var rotation = cam.transform.rotation;
+            var movement = hero.AddComponent<ThirdPersonController>();
+            movement.enabled = false;
+            SpawnBoss(BossController.BossName, Vector3.forward * 8);
+            Assert.IsTrue(CutsceneDirector.TryStartBossIntro("intro.abbot", 0));
+            CutsceneDirector.Tick(2);
+            Assert.AreNotEqual(position, cam.transform.position);
+            if (exit == "skip") CutsceneDirector.Skip();
+            else if (exit == "reset") CutsceneDirector.ResetRun();
+            else CutsceneDirector.Tick(10);
+            Assert.AreEqual(position, cam.transform.position);
+            Assert.AreEqual(rotation, cam.transform.rotation);
+            Assert.IsFalse(movement.enabled);
+        }
+        finally
+        {
+            if (created) Object.DestroyImmediate(cam);
+            else cam.transform.position = originalPosition;
+        }
+    }
+
+    [Test]
+    public void DirectorFallback_SwitchesShotAndRespectsVoiceLanguage()
+    {
+        var prevLang = Loc.Language;
+        var created = Camera.main == null;
+        var cam = created ? new GameObject("Fallback test camera", typeof(Camera)) : Camera.main.gameObject;
+        var originalPosition = cam.transform.position;
+        var originalRotation = cam.transform.rotation;
+        try
+        {
+            cam.tag = "MainCamera";
+            cam.transform.SetPositionAndRotation(new Vector3(2, 7, -8), Quaternion.Euler(45f, 0f, 0f));
+            Loc.Language = Loc.German;
+            StoryVoice.played = 0;
+            StoryVoice.lastKey = null;
+            SpawnBoss(BossController.BossName, Vector3.forward * 8);
+
+            Assert.IsTrue(CutsceneDirector.TryStartBossIntro("intro.abbot", 0f));
+            Assert.AreEqual(BossIntroTimeline.VoiceKey, StoryVoice.lastKey);
+            Assert.AreEqual(1, StoryVoice.played);
+
+            CutsceneDirector.Tick(2f);
+            var shot1 = cam.transform.position;
+            CutsceneDirector.Tick(6f);
+            var shot2 = cam.transform.position;
+            Assert.Greater(Vector3.Distance(shot1, shot2), 0.5f);
+
+            Assert.IsTrue(CutsceneDirector.Skip());
+            Assert.IsFalse(CutsceneDirector.Active);
+            Assert.AreEqual(new Vector3(2, 7, -8), cam.transform.position);
+
+            Loc.Language = Loc.English;
+            CutsceneDirector.ResetRun();
+            StoryVoice.played = 0;
+            Assert.IsTrue(CutsceneDirector.TryStartBossIntro("intro.abbot", 0f));
+            Assert.AreEqual(0, StoryVoice.played);
+            Assert.IsTrue(CutsceneDirector.Skip());
+
+            Assert.IsNotNull(UnityEditor.AssetDatabase.LoadAssetAtPath<TimelineAsset>("Assets/Editor/Trailers/MenuCapture.playable"));
+            Assert.IsTrue(System.IO.File.Exists(System.IO.Path.Combine(Application.dataPath, "Editor/Trailers/Ossuary.webm")));
+        }
+        finally
+        {
+            Loc.Language = prevLang;
+            if (created) Object.DestroyImmediate(cam);
+            else cam.transform.SetPositionAndRotation(originalPosition, originalRotation);
+        }
     }
 
     [Test]

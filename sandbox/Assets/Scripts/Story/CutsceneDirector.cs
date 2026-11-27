@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// In-engine cutscenes (diablo-cutscene-pipeline): boss introductions and
-/// main-quest dialogue highlights. No video, no Timeline: a static,
+/// main-quest dialogue highlights. A static,
 /// headless-callable state machine in the style of <see cref="ZoneGate"/>
 /// (explicit time, <see cref="ResetRun"/> seam) plus a thin per-frame
 /// <see cref="Tick"/> hook from <see cref="StoryDirector"/>.
@@ -95,6 +95,10 @@ public static class CutsceneDirector
     static float lineStart;
     static float lineWindow = 2f;
     static bool roared;
+    static BossIntroTimeline timeline;
+    static Camera ownedCamera;
+    static bool movementEnabled, meleeEnabled;
+    static bool introVoice;
     static Vector3 camPos;
     static Quaternion camRot;
     static Vector3 dollyFrom;
@@ -261,13 +265,14 @@ public static class CutsceneDirector
             if (hero != null)
             {
                 frozenTpc = hero.GetComponent<ThirdPersonController>();
-                if (frozenTpc != null) frozenTpc.enabled = false;
+                if (frozenTpc != null) { movementEnabled = frozenTpc.enabled; frozenTpc.enabled = false; }
                 frozenMelee = hero.GetComponent<DiabloMelee>();
-                if (frozenMelee != null) frozenMelee.enabled = false;
+                if (frozenMelee != null) { meleeEnabled = frozenMelee.enabled; frozenMelee.enabled = false; }
             }
             var cam = Camera.main;
             if (cam != null)
             {
+                ownedCamera = cam;
                 camPos = cam.transform.position;
                 camRot = cam.transform.rotation;
                 if (SpawnMode || hero == null)
@@ -280,8 +285,15 @@ public static class CutsceneDirector
                     FrameBoss(cam, anchor.transform.position, hero.position);
                     dollyFrom = cam.transform.position;
                     dollyFromRot = cam.transform.rotation;
+                    if (sequenceId == "intro.abbot" && Application.isPlaying && !Application.isBatchMode)
+                        timeline = BossIntroTimeline.StartIntro(cam, anchor.transform, hero.position);
                 }
             }
+        }
+        if (!phaseTwo && !timeline && sequenceId == "intro.abbot")
+        {
+            introVoice = true;
+            StoryVoice.Play(BossIntroTimeline.VoiceKey);
         }
         ShowLetterbox(Loc.T(intro.bannerKey));
     }
@@ -299,15 +311,24 @@ public static class CutsceneDirector
             roared = true;
             try { DiabloAudio.PlayBossRoar(); } catch { }
         }
-        if (!phaseTwoMode)
+        if (!phaseTwoMode && !timeline)
         {
-            var cam = Camera.main;
-            if (cam != null)
+            if (ownedCamera)
             {
-                float t = Mathf.Clamp01((now - t0) / 1.2f);
-                float e = t * t * (3f - 2f * t);
-                cam.transform.position = Vector3.Lerp(dollyFrom, dollyTo, e);
-                cam.transform.rotation = Quaternion.Slerp(dollyFromRot, dollyToRot, e);
+                float elapsed = now - t0;
+                if (elapsed < intro.duration * 0.5f)
+                {
+                    float ease = Mathf.SmoothStep(0, 1, elapsed / 1.2f);
+                    ownedCamera.transform.SetPositionAndRotation(Vector3.Lerp(dollyFrom, dollyTo, ease),
+                        Quaternion.Slerp(dollyFromRot, dollyToRot, ease));
+                }
+                else
+                {
+                    var focus = anchor.transform.position + Vector3.up * 1.2f;
+                    float ease = Mathf.InverseLerp(intro.duration * 0.5f, intro.duration, elapsed);
+                    var position = focus + dollyToRot * new Vector3(2.5f, 0.8f, -Mathf.Lerp(7, 5, ease));
+                    ownedCamera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(focus - position));
+                }
             }
         }
         // Spawn mode: casts aim at a point in front of the boss so they stay on screen.
@@ -315,7 +336,7 @@ public static class CutsceneDirector
         var aim = SpawnMode || hero == null ? bossPos + anchor.transform.forward * 5f : hero.position;
         TickShowcaseSteps(intro, bossPos, aim, now);
         float duration = phaseTwoMode ? intro.phaseTwoDuration : intro.duration;
-        if (SkipPressed() || now - t0 >= duration) End(SkipPressed());
+        if (SkipPressed() || (timeline && timeline.Finished) || now - t0 >= duration) End(SkipPressed());
     }
 
     /// <summary>Fire each due showcase cast once: harmless presentation at the boss, no caption
@@ -467,15 +488,6 @@ public static class CutsceneDirector
         if (skipped) Skips++;
         else Completes++;
         RestoreControl();
-        if (!phaseTwoMode) // phase-2 showcase never moved the camera
-        {
-            var cam = Camera.main;
-            if (cam != null)
-            {
-                cam.transform.position = camPos;
-                cam.transform.rotation = camRot;
-            }
-        }
         HideLetterbox();
         Active = false;
         ActiveId = "";
@@ -487,14 +499,20 @@ public static class CutsceneDirector
 
     static void RestoreControl()
     {
+        if (introVoice && StoryVoice.lastKey == BossIntroTimeline.VoiceKey) StoryVoice.Stop();
+        introVoice = false;
+        if (timeline) timeline.Release();
+        timeline = null;
+        if (ownedCamera) ownedCamera.transform.SetPositionAndRotation(camPos, camRot);
+        ownedCamera = null;
         if (frozenTpc != null)
         {
-            try { frozenTpc.enabled = true; } catch { }
+            try { frozenTpc.enabled = movementEnabled; } catch { }
             frozenTpc = null;
         }
         if (frozenMelee != null)
         {
-            try { frozenMelee.enabled = true; } catch { }
+            try { frozenMelee.enabled = meleeEnabled; } catch { }
             frozenMelee = null;
         }
     }

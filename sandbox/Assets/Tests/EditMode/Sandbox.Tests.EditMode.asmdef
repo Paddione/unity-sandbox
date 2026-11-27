@@ -6,6 +6,8 @@
     "UnityEditor.TestRunner",
     "Unity.RenderPipelines.Universal.Runtime",
     "Sandbox.Runtime",
+    "Unity.Timeline",
+    "Unity.Cinemachine",
     "Unity.Netcode.Runtime",
     "Unity.InputSystem",
     "Unity.Services.Multiplayer",

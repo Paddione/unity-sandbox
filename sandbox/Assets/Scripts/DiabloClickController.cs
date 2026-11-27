@@ -206,7 +206,7 @@ public sealed class DiabloClickController : MonoBehaviour
     /// </summary>
     public bool Strike()
     {
-        if (IsBlocking()) return false;
+        if (CutsceneDirector.OwnsCamera || IsBlocking()) return false;
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
         var driver = ResolveAnimator();
@@ -247,7 +247,7 @@ public sealed class DiabloClickController : MonoBehaviour
     /// </summary>
     public bool Thrust()
     {
-        if (IsBlocking()) return false;
+        if (CutsceneDirector.OwnsCamera || IsBlocking()) return false;
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
         var driver = ResolveAnimator();
@@ -282,7 +282,7 @@ public sealed class DiabloClickController : MonoBehaviour
     void Update()
     {
         // P2 co-op: remote mirrors are driven by NetworkTransform, not input.
-        if (IsRemoteMirror) return;
+        if (IsRemoteMirror || CutsceneDirector.OwnsCamera) return;
         if (!ExternalDrive) PollKeyboard();
         UpdateBlock();
 
