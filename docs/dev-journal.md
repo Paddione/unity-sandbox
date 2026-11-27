@@ -1044,3 +1044,22 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Beleg, je `-seed 0`, exit 0, 0 Exceptions, 12 Phasen bis actboss+einheimsen:
   baseline `duration_s=186.6 s` → nachher `duration_s=135.4 s` (~27 % schneller).
   Suites grün: EditMode 674/674, PlayMode 383/383.
+
+## 2026-11-27 — Akt-II-Vertiefung S3 (cinderreach-akt2-vertiefung, Abnahme bis boss3, 100 %)
+
+- Save: keine Migration. S2-Schritte (H18/H19/N12–N15, R4/R5) brauchen keine persistierten Felder
+  (generische `storyQuests`/`storyFlags` + Catch-up in `StoryState.Refresh`) — V15→V16-Präzedenz
+  (Akt-I-S4); `CurrentVersion` bleibt 16, kein Migrations-Code ohne Bedarf.
+- Koop: neue Schritte laufen über den generischen Buchungspfad (`BookTalk` → `SubmitStoryTalkServerRpc` →
+  Host-`BookTalkLocal` → `BroadcastStory`/Merge; R4/R5-Barks via `StoryBarks.Relay` → `BroadcastBark`).
+  Code-verifiziert, quest-agnostisch — kein Lauf nötig.
+- Autoplay `-seed 0`: Exit 0, 0 Exceptions, `duration_s=178.7`, 12 Phasen bis `boss3` + `complete`
+  (huskKills=69, boss3 phaseTwo=1/warded=3). Build `Succeeded in 350.6s`. Linux-fps-gate advisory FAIL
+  (worst 28.1 < 30) — wie immer advisory, Perf-Gate ist der Windows-Shotcheck.
+- Voice verify-only: `check-voice-lines` 211/0, keine neuen Clips. GPU/5070Ti in WSL weiter blockiert
+  (cuInit→100) — kein Versuch, nur dokumentiert.
+- Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK,
+  `check-meta` OK, Coverage 0 uncovered, Workspace-Check still.
+- Gelernt: `run-autoplay.sh`-Wrapper-Kill (Tool-Timeout 600 s) tötet den Unity-Build nicht — der Build
+  (PID bekannt) lief weiter und `Succeeded`; Player-Lauf manuell mit identischen Args nachgeholt.
+  Vor Commit `git status -s` prüfen: Unity regeneriert gern `TimeManager.asset`-Churn — revertieren.

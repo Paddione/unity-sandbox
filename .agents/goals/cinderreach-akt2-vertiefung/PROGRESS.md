@@ -1,6 +1,6 @@
 # Progress: cinderreach-akt2-vertiefung
 
-Prozent: 66 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -16,8 +16,14 @@ Prozent: 66 %
 ## Nächste Schritte
 
 - S2: Brachen-Strang in Abnahme (Suite + Voice-Gate + Commit) — läuft.
-- S3: Abnahme (Save-Migration, Koop-Buchung, Autoplay bis boss3, Doku).
+- S3 (gelandet als Proof-Commit, Abnahme): KEINE Save-Migration (S2 braucht keine persistierten Felder —
+  generische `storyQuests`/`storyFlags` + `StoryState.Refresh`-Catch-up, V15→V16-Präzedenz; v16 bleibt);
+  Koop code-verifiziert (generischer `BookTalk`→`SubmitStoryTalkServerRpc`→Host→`BroadcastStory`-Pfad,
+  R4/R5-Barks via Host-Relay); Autoplay `-seed 0` Exit 0, 0 Exceptions, `duration_s=178.7`, 12 Phasen bis
+  `boss3`+`complete` (huskKills=69, phaseTwo=1); Voice verify-only 211/0; Doku (`akt2-vertiefung-run-log.md`,
+  Journal). Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK,
+  `check-meta` OK, Coverage 0 uncovered, Workspace-Check still.
 
 ## Offene Punkte
 
-Keine.
+Keine — alle 6 Erfolgskriterien aus GOAL.md erfüllt (Bibel 12 Einträge, Rätsel R4–R6, H9-Varianten, Anker erhalten, Save/Koop/Autoplay/Voice/Doku).
