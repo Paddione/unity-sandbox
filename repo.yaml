@@ -10,6 +10,8 @@ repo:
 # The editor version matches sandbox/ProjectSettings/ProjectVersion.txt.
 verify:
   - $HOME/Unity/Hub/Editor/6000.0.85f2/Editor/Unity -batchmode -nographics -quit -projectPath sandbox -executeMethod KayKitAssets.Verify -logFile /tmp/unity-sandbox-assets-verify.log
+  - python3 -m pytest scripts -q
+  - python3 scripts/check-meta.py
 
 land: ff
 deps: []
