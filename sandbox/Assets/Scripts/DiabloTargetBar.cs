@@ -14,6 +14,8 @@ public sealed class DiabloTargetBar : MonoBehaviour
 
     Canvas canvas;
     Text nameText;
+    Text tierBadge;
+    Text pctText;
     Image fill;
     RectTransform targetPanel;
     CanvasGroup targetGroup;
@@ -66,6 +68,15 @@ public sealed class DiabloTargetBar : MonoBehaviour
         nameText.text = DisplayName(target.name);
         nameText.color = TierColor(health.tier);
         fill.fillAmount = health.HPFraction();
+        if (pctText != null) pctText.text = PercentText(health.HPFraction());
+        if (tierBadge != null)
+        {
+            string tier = TierLabel(health.tier);
+            tierBadge.transform.parent.gameObject.SetActive(tier.Length > 0);
+            tierBadge.text = tier;
+            tierBadge.color = TierColor(health.tier);
+            tierBadge.transform.parent.GetComponent<Outline>().effectColor = TierColor(health.tier);
+        }
     }
 
     /// <summary>
@@ -97,6 +108,24 @@ public sealed class DiabloTargetBar : MonoBehaviour
             default: return DiabloPalette.Parchment;
         }
     }
+
+    /// <summary>Plaque text next to the name (hud-redesign): empty for normal foes.</summary>
+    public static string TierLabel(LootTier tier)
+    {
+        switch (tier)
+        {
+            case LootTier.Elite: return Loc.T("hud.tier.elite");
+            case LootTier.Boss: return Loc.T("hud.tier.boss");
+            case LootTier.ActBoss: return Loc.T("hud.tier.actboss");
+            default: return "";
+        }
+    }
+
+    /// <summary>"62 %" centred on the bar.</summary>
+    public static string PercentText(float fraction) => $"{Mathf.CeilToInt(Mathf.Clamp01(fraction) * 100f)} %";
+
+    /// <summary>Tier plaque shown (test seam).</summary>
+    public bool TestTierBadgeShown => tierBadge != null && tierBadge.transform.parent.gameObject.activeSelf;
 
     bool targetVisible;
 
@@ -179,52 +208,49 @@ public sealed class DiabloTargetBar : MonoBehaviour
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
 
-        var white = WhiteSprite();
         var panelGo = new GameObject("Panel");
         panelGo.transform.SetParent(canvasGo.transform, false);
         var panel = panelGo.AddComponent<Image>();
-        panel.sprite = DiabloMenuArt.TooltipBackground();
-        panel.type = Image.Type.Sliced;
-        panel.color = Color.white;
+        panel.color = new Color(0.043f, 0.035f, 0.063f, 0.55f); // soft backing so the name reads on bright ground
         panel.raycastTarget = false;
         var rect = panelGo.GetComponent<RectTransform>();
         rect.anchorMin = new Vector2(0.5f, 1f);
         rect.anchorMax = new Vector2(0.5f, 1f);
         rect.pivot = new Vector2(0.5f, 1f);
-        rect.sizeDelta = new Vector2(360f, 54f);
+        rect.sizeDelta = new Vector2(640f, 70f);
         rect.anchoredPosition = new Vector2(0f, -12f);
         targetPanel = rect;
         targetGroup = panelGo.AddComponent<CanvasGroup>();
         targetGroup.blocksRaycasts = false;
 
-        nameText = MakeLabel(panelGo.transform, "", 16);
-        nameText.alignment = TextAnchor.MiddleCenter;
-        nameText.color = DiabloPalette.Parchment;
-        nameText.gameObject.AddComponent<Shadow>().effectColor = new Color(0f, 0f, 0f, 0.9f);
-        var bgGo = new GameObject("BarBg");
-        bgGo.transform.SetParent(panelGo.transform, false);
-        var bg = bgGo.AddComponent<Image>();
-        bg.color = new Color(0.16f, 0.04f, 0.04f, 1f);
-        bg.raycastTarget = false;
-        var bgRect = bgGo.GetComponent<RectTransform>();
-        bgRect.anchorMin = new Vector2(0.5f, 0f);
-        bgRect.anchorMax = new Vector2(0.5f, 0f);
-        bgRect.pivot = new Vector2(0.5f, 0f);
-        bgRect.sizeDelta = new Vector2(332f, 14f);
-        bgRect.anchoredPosition = new Vector2(0f, 8f);
-        var fillGo = new GameObject("BarFill");
-        fillGo.transform.SetParent(bgGo.transform, false);
-        fill = fillGo.AddComponent<Image>();
-        fill.sprite = DiabloMenuArt.ProgressFillSprite();
-        fill.color = new Color(0.84f, 0.14f, 0.14f, 1f);
-        fill.raycastTarget = false;
-        fill.type = Image.Type.Filled;
-        fill.fillMethod = Image.FillMethod.Horizontal;
-        var fillRect = fillGo.GetComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = new Vector2(1f, 1f);
-        fillRect.offsetMax = new Vector2(-1f, -1f);
+        // Name row: Cinzel name in tier colour plus an outlined tier plaque beside it.
+        var row = new GameObject("NameRow", typeof(RectTransform));
+        row.transform.SetParent(panelGo.transform, false);
+        var rowRt = (RectTransform)row.transform;
+        rowRt.anchorMin = new Vector2(0f, 1f); rowRt.anchorMax = new Vector2(1f, 1f); rowRt.pivot = new Vector2(0.5f, 1f);
+        rowRt.sizeDelta = new Vector2(0f, 32f); rowRt.anchoredPosition = new Vector2(0f, -4f);
+        var hz = row.AddComponent<HorizontalLayoutGroup>();
+        hz.spacing = 10f;
+        hz.childAlignment = TextAnchor.MiddleCenter;
+        hz.childControlWidth = false; hz.childControlHeight = false;
+        hz.childForceExpandWidth = false; hz.childForceExpandHeight = false;
+
+        nameText = DiabloUIFactory.MakeText(row.transform, "Label", "", 22, DiabloPalette.Parchment, TextAnchor.MiddleCenter, font: DiabloUIFactory.DisplayFont);
+        nameText.fontStyle = FontStyle.Bold;
+        nameText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        nameText.rectTransform.sizeDelta = new Vector2(360f, 30f);
+        var fitter = nameText.gameObject.AddComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        tierBadge = HudChrome.Badge(row.transform, "TierBadge", "ELITE", DiabloPalette.FenSteel, 13);
+        tierBadge.transform.parent.gameObject.SetActive(false);
+
+        var bgRect = HudChrome.Bar(panelGo.transform, "BarBg", new Vector2(600f, 18f), DiabloPalette.Blood, out fill);
+        fill.gameObject.name = "BarFill";
+        bgRect.anchorMin = bgRect.anchorMax = bgRect.pivot = new Vector2(0.5f, 0f);
+        bgRect.anchoredPosition = new Vector2(0f, 10f);
+        pctText = DiabloUIFactory.MakeText(bgRect, "BarPct", "", 13, Color.white, TextAnchor.MiddleCenter, font: DiabloUIFactory.BodyFont);
+        pctText.fontStyle = FontStyle.Bold;
+        HudChrome.Stretch(pctText.rectTransform, 0f);
 
         BuildBossBar(canvasGo.transform);
     }
@@ -234,15 +260,18 @@ public sealed class DiabloTargetBar : MonoBehaviour
         bossPanel = new GameObject("BossPanel");
         bossPanel.transform.SetParent(parent, false);
         var img = bossPanel.AddComponent<Image>();
-        img.sprite = DiabloMenuArt.HeaderBanner();
-        img.type = Image.Type.Sliced;
+        img.color = DiabloPalette.HudPanel;
         img.raycastTarget = false;
+        var edge = bossPanel.AddComponent<Outline>();
+        edge.effectColor = DiabloPalette.TrimGold;
+        edge.effectDistance = new Vector2(1f, -1f);
         var r = bossPanel.GetComponent<RectTransform>();
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 1f);
         r.sizeDelta = new Vector2(760f, 64f);
         r.anchoredPosition = new Vector2(0f, -10f);
 
-        bossNameText = MakeLabel(bossPanel.transform, "", 20);
+        bossNameText = MakeLabel(bossPanel.transform, "", 22);
+        bossNameText.font = DiabloUIFactory.DisplayFont;
         bossNameText.name = "BossName";
         bossNameText.fontStyle = FontStyle.Bold;
         bossNameText.alignment = TextAnchor.UpperCenter;
@@ -283,28 +312,13 @@ public sealed class DiabloTargetBar : MonoBehaviour
         bossPanel.SetActive(false);
     }
 
-    static Sprite whiteSprite;
-
-    /// <summary>Plain white sprite: FillMethod needs one or fillAmount no-ops.</summary>
-    static Sprite WhiteSprite()
-    {
-        if (whiteSprite != null) return whiteSprite;
-        var tex = new Texture2D(4, 4, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
-        var px = new Color32[16];
-        for (int i = 0; i < px.Length; i++) px[i] = new Color32(255, 255, 255, 255);
-        tex.SetPixels32(px);
-        tex.Apply();
-        whiteSprite = Sprite.Create(tex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f));
-        return whiteSprite;
-    }
-
     Text MakeLabel(Transform parent, string text, int size)
     {
         var go = new GameObject("Label");
         go.transform.SetParent(parent, false);
         var label = go.AddComponent<Text>();
         label.text = text;
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.font = DiabloUIFactory.BodyFont;
         label.fontSize = size;
         label.color = Color.white;
         label.raycastTarget = false;

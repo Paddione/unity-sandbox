@@ -31,10 +31,15 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     public readonly NetworkVariable<Vector2> hpState = new NetworkVariable<Vector2>(Vector2.zero,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    /// <summary>Owner's hero level for the party frames (cinderreach-hud-redesign).</summary>
+    public readonly NetworkVariable<int> heroLevel = new NetworkVariable<int>(1,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     /// <summary>HP change below this is not re-sent (float noise from regen ticks).</summary>
     public const float HpSyncEpsilon = 0.05f;
 
     PlayerHealth ownHealth;
+    DiabloProgression ownProgression;
 
     void Update()
     {
@@ -43,6 +48,8 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
         if (ownHealth == null) return;
         var now = new Vector2(ownHealth.CurrentHP, ownHealth.MaxHP);
         if (NeedsHpSync(hpState.Value, now)) hpState.Value = now;
+        if (ownProgression == null) ownProgression = GetComponent<DiabloProgression>();
+        if (ownProgression != null && heroLevel.Value != ownProgression.Level) heroLevel.Value = ownProgression.Level;
     }
 
     /// <summary>Owner-side send rule (pure): first report, or a change beyond <see cref="HpSyncEpsilon"/>.</summary>

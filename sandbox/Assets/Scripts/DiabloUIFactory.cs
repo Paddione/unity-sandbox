@@ -23,6 +23,25 @@ public static class DiabloUIFactory
         }
     }
 
+    public const string DisplayFontPath = "Fonts/Cinzel-Bold";
+    public const string BodyFontPath = "Fonts/AlegreyaSans-Regular";
+    static Font displayFont;
+    static Font bodyFont;
+
+    /// <summary>HUD redesign: Cinzel for titles and numbers (OFL, Resources/Fonts), builtin fallback.</summary>
+    public static Font DisplayFont => displayFont != null ? displayFont : (displayFont = LoadFont(DisplayFontPath));
+
+    /// <summary>HUD redesign: Alegreya Sans for body text (OFL, Resources/Fonts), builtin fallback.</summary>
+    public static Font BodyFont => bodyFont != null ? bodyFont : (bodyFont = LoadFont(BodyFontPath));
+
+    static Font LoadFont(string path)
+    {
+        var f = Resources.Load<Font>(path);
+        if (f != null) return f;
+        Debug.LogWarning($"[UI] Font '{path}' missing, using builtin.");
+        return DefaultFont;
+    }
+
     public static Canvas ConfigureOverlayCanvas(GameObject canvasGo, int sortingOrder = 10, bool raycaster = true)
     {
         var canvas = canvasGo.AddComponent<Canvas>();
@@ -161,12 +180,12 @@ public static class DiabloUIFactory
     }
 
     public static Text MakeText(Transform parent, string name, string body, int size, Color color,
-        TextAnchor align = TextAnchor.MiddleLeft, bool shadow = true, bool richText = true)
+        TextAnchor align = TextAnchor.MiddleLeft, bool shadow = true, bool richText = true, Font font = null)
     {
         var go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<Text>();
-        t.font = DefaultFont;
+        t.font = font != null ? font : DefaultFont;
         t.fontSize = size;
         t.color = color;
         t.alignment = align;

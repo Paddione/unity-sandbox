@@ -21,6 +21,11 @@ public sealed class StoryDirector : MonoBehaviour
     Canvas canvas;
     UnityEngine.UI.Text toastText;
     UnityEngine.UI.Text trackerText;
+    RectTransform trackerPanel;
+
+    /// <summary>Tracker panel geometry (hud-redesign): under the round minimap, top right.</summary>
+    public const float TrackerWidth = 320f;
+    public static readonly Vector2 TrackerTopRight = new Vector2(-28f, -(28f + MinimapHud.SizePx + 36f + 14f));
     UnityEngine.UI.Text barkText;
     float barkLeft;
 
@@ -56,11 +61,25 @@ public sealed class StoryDirector : MonoBehaviour
         var canvasGo = new GameObject("StoryCanvas");
         canvasGo.transform.SetParent(transform, false);
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 25, raycaster: false);
+        // hud-redesign: "FUHRBUCH" panel under the minimap; the text stays StoryCanvas/StoryTracker.
+        trackerPanel = HudChrome.Panel(canvasGo.transform, "StoryTrackerPanel", new Vector2(TrackerWidth, 60f));
+        trackerPanel.anchorMin = trackerPanel.anchorMax = trackerPanel.pivot = new Vector2(1f, 1f);
+        trackerPanel.anchoredPosition = TrackerTopRight;
+        var head = DiabloUIFactory.MakeText(trackerPanel, "TrackerTitle", Loc.T("hud.tracker.title"), 14, DiabloPalette.TrimGold,
+            TextAnchor.UpperLeft, shadow: false, font: DiabloUIFactory.DisplayFont);
+        head.rectTransform.anchorMin = new Vector2(0f, 1f); head.rectTransform.anchorMax = new Vector2(1f, 1f);
+        head.rectTransform.pivot = new Vector2(0.5f, 1f);
+        head.rectTransform.offsetMin = new Vector2(14f, -30f); head.rectTransform.offsetMax = new Vector2(-14f, -10f);
+        var keyHint = DiabloUIFactory.MakeText(trackerPanel, "TrackerKey", "J", 13, DiabloPalette.ParchmentDim,
+            TextAnchor.UpperRight, shadow: false, font: DiabloUIFactory.BodyFont);
+        keyHint.rectTransform.anchorMin = head.rectTransform.anchorMin; keyHint.rectTransform.anchorMax = head.rectTransform.anchorMax;
+        keyHint.rectTransform.pivot = head.rectTransform.pivot;
+        keyHint.rectTransform.offsetMin = head.rectTransform.offsetMin; keyHint.rectTransform.offsetMax = head.rectTransform.offsetMax;
         trackerText = DiabloUIFactory.MakeText(canvasGo.transform, "StoryTracker", "", 16,
-            DiabloPalette.GoldBright, TextAnchor.UpperLeft);
+            DiabloPalette.Parchment, TextAnchor.UpperLeft, font: DiabloUIFactory.BodyFont);
         var rt = trackerText.rectTransform;
-        rt.anchorMin = new Vector2(0f, 1f); rt.anchorMax = new Vector2(0f, 1f); rt.pivot = new Vector2(0f, 1f);
-        rt.anchoredPosition = new Vector2(18f, -14f); rt.sizeDelta = new Vector2(560f, 320f);
+        rt.anchorMin = new Vector2(1f, 1f); rt.anchorMax = new Vector2(1f, 1f); rt.pivot = new Vector2(1f, 1f);
+        rt.anchoredPosition = TrackerTopRight + new Vector2(-14f, -36f); rt.sizeDelta = new Vector2(TrackerWidth - 28f, 320f);
         trackerText.supportRichText = true;
         toastText = DiabloUIFactory.MakeText(canvasGo.transform, "StoryToast", "", 19,
             DiabloPalette.Parchment, TextAnchor.MiddleCenter);
@@ -240,6 +259,12 @@ public sealed class StoryDirector : MonoBehaviour
     {
         if (trackerText == null) return;
         trackerText.text = TrackerText(State, World, Marks, transform.position);
+        if (trackerPanel != null)
+        {
+            bool any = !string.IsNullOrEmpty(trackerText.text);
+            trackerPanel.gameObject.SetActive(any);
+            if (any) trackerPanel.sizeDelta = new Vector2(TrackerWidth, 36f + trackerText.preferredHeight + 12f);
+        }
     }
 
     /// <summary>

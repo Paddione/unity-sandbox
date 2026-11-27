@@ -358,3 +358,7 @@ SessionAutoplay.cs	phase boss: already down (party kill)
 SessionAutoplay.cs	phase actboss: already down (party kill)
 SessionAutoplay.cs	phase boss3: already down (party kill)
 SessionAutoplay.cs	phase boss4: already down (party kill)
+DiabloShotCheck.cs	Ash Elite_0
+DiabloTargetBar.cs	ELITE
+PartyFramesHud.cs	PartyFrame
+PartyFramesHud.cs	PartyFrameOwn

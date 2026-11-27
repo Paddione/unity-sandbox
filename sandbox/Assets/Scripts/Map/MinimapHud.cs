@@ -47,7 +47,7 @@ public sealed class MinimapHud : MonoBehaviour
             var tex = ZoneMap.Picture(zone);
             picture.texture = tex;
             picture.color = tex != null ? Color.white : ZoneMap.Background;
-            zoneLabel.text = ActProgress.ZoneName(zone);
+            zoneLabel.text = ActProgress.ZoneName(zone).ToUpperInvariant();
             iconTick = 0f;
         }
         float frac = ViewMeters / ZoneMap.Span(z);
@@ -71,11 +71,17 @@ public sealed class MinimapHud : MonoBehaviour
         canvasGo.transform.SetParent(transform, false);
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 22, raycaster: false);
 
-        var frame = DiabloUIFactory.MakePanel(canvasGo.transform, "MinimapFrame", new Vector2(SizePx + 12f, SizePx + 36f), Vector2.zero);
+        // hud-redesign: round map, bronze ring with an ember-gold hairline, zone name below in Cinzel.
+        var frame = new GameObject("MinimapFrame", typeof(RectTransform));
+        frame.transform.SetParent(canvasGo.transform, false);
         var fr = (RectTransform)frame.transform;
         fr.anchorMin = fr.anchorMax = fr.pivot = new Vector2(1f, 1f);
-        fr.anchoredPosition = new Vector2(-14f, -40f);
-        foreach (var g in frame.GetComponentsInChildren<Graphic>()) g.raycastTarget = false;
+        fr.sizeDelta = new Vector2(SizePx + 12f, SizePx + 36f);
+        fr.anchoredPosition = new Vector2(-28f, -28f);
+        var gold = HudChrome.Img(frame.transform, "MinimapGoldRing", HudChrome.Circle(), DiabloPalette.TrimGold);
+        HudChrome.Anchor(gold.rectTransform, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(SizePx + 12f, SizePx + 12f));
+        var bronze = HudChrome.Img(gold.transform, "MinimapBronzeRing", HudChrome.Circle(), DiabloPalette.PanelEdge);
+        HudChrome.Anchor(bronze.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(SizePx + 9f, SizePx + 9f));
 
         var vpGo = new GameObject("MinimapViewport", typeof(RectTransform));
         vpGo.transform.SetParent(frame.transform, false);
@@ -84,7 +90,10 @@ public sealed class MinimapHud : MonoBehaviour
         viewport.pivot = new Vector2(0.5f, 1f);
         viewport.anchoredPosition = new Vector2(0f, -6f);
         viewport.sizeDelta = new Vector2(SizePx, SizePx);
-        vpGo.AddComponent<RectMask2D>();
+        var maskImg = vpGo.AddComponent<Image>();
+        maskImg.sprite = HudChrome.Circle();
+        maskImg.raycastTarget = false;
+        vpGo.AddComponent<Mask>().showMaskGraphic = false;
 
         var picGo = new GameObject("MinimapPicture", typeof(RectTransform));
         picGo.transform.SetParent(viewport, false);
@@ -101,7 +110,7 @@ public sealed class MinimapHud : MonoBehaviour
         ir.sizeDelta = Vector2.zero;
         layer = new MapIconLayer(ir);
 
-        zoneLabel = DiabloUIFactory.MakeText(frame.transform, "MinimapZone", "", 14, DiabloPalette.TrimGold, TextAnchor.MiddleCenter);
+        zoneLabel = DiabloUIFactory.MakeText(frame.transform, "MinimapZone", "", 16, DiabloPalette.Parchment, TextAnchor.MiddleCenter, font: DiabloUIFactory.DisplayFont);
         zoneLabel.raycastTarget = false;
         var zr = zoneLabel.rectTransform;
         zr.anchorMin = zr.anchorMax = new Vector2(0.5f, 0f);

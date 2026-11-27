@@ -28,6 +28,15 @@ public static class DiabloPalette
     public static readonly Color FenSteel = new Color(0.55f, 0.72f, 0.88f, 1f);
     public static readonly Color RogueVerdant = new Color(0.56f, 0.80f, 0.46f, 1f); // #8FCC75 fen-moss
     public static readonly Color DisabledText = new Color(0.45f, 0.42f, 0.38f, 1f);
+    // HUD redesign (canvas "HUD im Spiel").
+    public static readonly Color Shield = new Color(0.55f, 0.72f, 0.88f, 1f);        // #8CB7E0
+    public static readonly Color CooldownVeil = new Color(0.043f, 0.035f, 0.063f, 0.78f);
+    public static readonly Color MagicText = new Color(0.43f, 0.61f, 0.95f, 1f);     // #6E9BF2
+    public static readonly Color EffectEmber = new Color(1f, 0.60f, 0.30f, 1f);      // #FF9A4D
+    public static readonly Color GoldCoin = new Color(0.98f, 0.80f, 0.28f, 1f);      // #FACC47
+    public static readonly Color HudPanel = new Color(0.078f, 0.063f, 0.102f, 0.90f);
+    public static readonly Color BarTrack = new Color(0.043f, 0.035f, 0.063f, 1f);
+    public static readonly Color ButtonPlain = new Color(0.17f, 0.14f, 0.19f, 1f);   // #2B2330
 
     public static Color ClassAccent(string classId)
     {

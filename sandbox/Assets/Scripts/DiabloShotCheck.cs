@@ -133,6 +133,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
     {
         // 1) Gameplay framing, idle with sword.
         yield return Shot("gameplay_idle");
+        yield return HudRedesignShots(hero);
 
         // 1b) Wide look over the moor: props, fires, fog.
         hero.distance = 24f;
@@ -225,6 +226,50 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield return Wait(1.0f);
             yield return Shot("level_up_settled");
         }
+    }
+
+    /// <summary>
+    /// cinderreach-hud-redesign: the new HUD in three states — hurt hero with a
+    /// shield and gold, a hurt companion in the party frames, and an elite on
+    /// the target bar with its tier plaque.
+    /// </summary>
+    IEnumerator HudRedesignShots(DiabloClickController hero)
+    {
+        var hp = hero.GetComponent<PlayerHealth>();
+        var wallet = Wallet.EnsureWallet(hero.gameObject);
+        int goldBefore = wallet != null ? wallet.Gold : 0;
+        if (wallet != null) wallet.SetGold(1284);
+        if (hp != null)
+        {
+            hp.TakeDamage(hp.MaxHP * 0.28f);
+            hp.GrantShield(15f, 6f);
+        }
+        yield return Wait(0.5f);
+        yield return Shot("hud_solo");
+
+        foreach (var c in PartyCompanion.Live)
+        {
+            var ch = c != null ? c.GetComponent<PlayerHealth>() : null;
+            if (ch != null) { ch.TakeDamage(ch.MaxHP * 0.55f); break; }
+        }
+        yield return Wait(0.4f);
+        yield return Shot("hud_party");
+
+        var elite = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        elite.name = "Ash Elite_0";
+        elite.transform.position = hero.transform.position + hero.transform.right * 3f;
+        var eh = elite.AddComponent<EnemyHealth>();
+        eh.tier = LootTier.Elite;
+        DiabloMelee.LastStruck = elite;
+        DiabloMelee.LastStruckTime = Time.time;
+        yield return Wait(0.3f);
+        DiabloMelee.LastStruckTime = Time.time;
+        yield return Shot("hud_target_elite");
+        DiabloMelee.LastStruck = null;
+        Destroy(elite);
+        if (wallet != null) wallet.SetGold(goldBefore);
+        if (hp != null) hp.Heal(hp.MaxHP);
+        yield return Wait(0.2f);
     }
 
     IEnumerator TownAndUiGalleryShots(DiabloClickController hero)

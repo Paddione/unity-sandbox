@@ -39,6 +39,7 @@ public sealed class DiabloProgression : MonoBehaviour
 
     Image xpFill;
     Text levelLabel;
+    Text xpAmountLabel;
     Image flash;
     Text banner;
     Text bannerSub;
@@ -276,7 +277,15 @@ public sealed class DiabloProgression : MonoBehaviour
     {
         if (!IsLocalHero() || IsCompanion) return; // companions mirror the hero: no own XP bar
         EnsureHud();
-        levelLabel.text = Loc.F("hud.level.short", Level);
+        levelLabel.text = Loc.F("hud.xp.level", Level);
+        xpAmountLabel.text = XpAmountText(Level, Xp);
+    }
+
+    /// <summary>"2.840 / 4.500 EP" under the bar, "Höchststufe" at the cap (hud-redesign).</summary>
+    public static string XpAmountText(int level, int xp)
+    {
+        if (level >= MaxLevel) return Loc.T("hud.xp.max");
+        return Loc.F("hud.xp.amount", DiabloLifeGlobe.FormatGold(xp), DiabloLifeGlobe.FormatGold(XpToNext(level)));
     }
 
     void TweenFill(float target)
@@ -310,22 +319,20 @@ public sealed class DiabloProgression : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         var white = WhiteSprite();
 
-        var back = NewImage(canvasGo.transform, "XpBack", DiabloMenuArt.TooltipBackground(), Color.white);
-        back.type = Image.Type.Sliced;
-        Place(back.rectTransform, new Vector2(0.5f, 0f), new Vector2(620f, 14f), new Vector2(0f, 76f));
-        xpFill = NewImage(back.transform, "XpFill", DiabloMenuArt.ProgressFillSprite(), DiabloPalette.TrimGold);
-        xpFill.type = Image.Type.Filled; // needs a sprite, or fillAmount no-ops
-        xpFill.fillMethod = Image.FillMethod.Horizontal;
+        // hud-redesign: thin bar inside the skill plate, "Stufe N" left and "x / y EP" right under it.
+        var back = HudChrome.Bar(canvasGo.transform, "XpBack", new Vector2(HudLayout.XpBarWidth, 8f), DiabloPalette.TrimGold, out xpFill);
+        xpFill.name = "XpFill";
         xpFill.fillAmount = shownFill;
-        var fr = xpFill.rectTransform;
-        fr.anchorMin = Vector2.zero;
-        fr.anchorMax = Vector2.one;
-        fr.offsetMin = new Vector2(3f, 3f);
-        fr.offsetMax = new Vector2(-3f, -3f);
+        Place(back, new Vector2(0.5f, 0f), new Vector2(HudLayout.XpBarWidth, 8f), new Vector2(0f, HudLayout.XpBarY));
 
-        levelLabel = NewText(canvasGo.transform, "LevelLabel", 17, DiabloPalette.GoldBright);
-        levelLabel.fontStyle = FontStyle.Bold;
-        Place(levelLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(84f, 24f), new Vector2(-358f, 76f));
+        levelLabel = NewText(canvasGo.transform, "LevelLabel", 14, DiabloPalette.ParchmentDim);
+        levelLabel.font = DiabloUIFactory.BodyFont;
+        levelLabel.alignment = TextAnchor.MiddleLeft;
+        Place(levelLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(HudLayout.XpBarWidth, 18f), new Vector2(0f, HudLayout.XpLabelY));
+        xpAmountLabel = NewText(canvasGo.transform, "XpAmountLabel", 14, DiabloPalette.ParchmentDim);
+        xpAmountLabel.font = DiabloUIFactory.BodyFont;
+        xpAmountLabel.alignment = TextAnchor.MiddleRight;
+        Place(xpAmountLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(HudLayout.XpBarWidth, 18f), new Vector2(0f, HudLayout.XpLabelY));
 
         flash = NewImage(canvasGo.transform, "LevelFlash", white, DiabloPalette.TrimGold);
         var flr = flash.rectTransform;

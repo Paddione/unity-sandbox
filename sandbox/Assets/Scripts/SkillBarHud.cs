@@ -22,6 +22,11 @@ public sealed class SkillBarHud
     string hudBuiltFor = "";
     readonly List<(DiabloSkills.Skill skill, Image frame, Image veil, Text cdText)> hudSlots =
         new List<(DiabloSkills.Skill, Image, Image, Text)>();
+    // Longest cooldown seen since the slot went on cooldown: the radial sweep's 100 %.
+    readonly Dictionary<DiabloSkills.Skill, float> cdSpan = new Dictionary<DiabloSkills.Skill, float>();
+
+    /// <summary>Sweep fill (0..1) for a cooldown: left over the span it started from.</summary>
+    public static float SweepFill(float left, float span) => left <= 0f || span <= 0f ? 0f : Mathf.Clamp01(left / span);
 
     public SkillBarHud(Transform owner, Func<DiabloSkills.Skill, float> cooldownLeft,
         Func<ClassDefinition> activeClass, Func<DiabloSkills.Skill> lastUsed)
@@ -43,11 +48,19 @@ public sealed class SkillBarHud
         {
             float left = cooldownLeft(skill);
             bool onCd = left > 0f;
-            if (veil != null) veil.enabled = onCd;
+            cdSpan.TryGetValue(skill, out float span);
+            if (!onCd) span = 0f;
+            else if (left > span) span = left;
+            cdSpan[skill] = span;
+            if (veil != null)
+            {
+                veil.enabled = onCd;
+                veil.fillAmount = SweepFill(left, span);
+            }
             if (cdText != null)
             {
                 cdText.enabled = onCd;
-                if (onCd) cdText.text = $"{left:0.0}";
+                if (onCd) cdText.text = left >= 10f ? $"{left:0}" : $"{left:0.0}";
             }
             if (frame != null)
                 frame.color = skill == last ? DiabloPalette.GoldBright : Color.white;
@@ -76,29 +89,22 @@ public sealed class SkillBarHud
         canvasGo.transform.SetParent(owner, false);
         DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: true);
 
-        // Bronze HUD plate under skills, key labels and the XP bar (XpCanvas sorts above at 6),
-        // so the bar reads against bright town paving and dark fen alike.
-        var plateGo = new GameObject("HudPlate", typeof(RectTransform));
-        plateGo.transform.SetParent(canvasGo.transform, false);
-        var plate = plateGo.AddComponent<Image>();
-        plate.sprite = DiabloMenuArt.PanelBackground();
-        plate.type = Image.Type.Sliced;
-        plate.color = new Color(1f, 1f, 1f, 0.92f);
-        plate.raycastTarget = false;
-        var prt = plate.rectTransform;
+        // HUD plate under skills, names and the XP bar (XpCanvas sorts above at 6), canvas
+        // "HUD im Spiel": crypt panel, bronze edge, ember-gold top line.
+        var prt = HudChrome.Panel(canvasGo.transform, "HudPlate", new Vector2(HudLayout.PanelWidth, HudLayout.PanelHeight), goldTop: true,
+            fill: new Color(0.078f, 0.063f, 0.102f, 0.94f));
         prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0f);
-        prt.sizeDelta = new Vector2(880f, 100f);
-        prt.anchoredPosition = new Vector2(0f, -6f);
+        prt.anchoredPosition = new Vector2(0f, HudLayout.PanelBottom);
 
         var rowGo = new GameObject("SkillSlotsRow", typeof(RectTransform));
         rowGo.transform.SetParent(canvasGo.transform, false);
         var rrt = rowGo.GetComponent<RectTransform>();
         rrt.anchorMin = rrt.anchorMax = rrt.pivot = new Vector2(0.5f, 0f);
-        rrt.sizeDelta = new Vector2(340f, 52f);
-        rrt.anchoredPosition = new Vector2(0f, 20f);
+        rrt.sizeDelta = new Vector2(HudLayout.SkillSlots * HudLayout.SlotSize + (HudLayout.SkillSlots - 1) * HudLayout.SlotGap, HudLayout.SlotSize);
+        rrt.anchoredPosition = new Vector2(HudLayout.SkillRowCenterX, HudLayout.SlotY);
         var hz = rowGo.AddComponent<HorizontalLayoutGroup>();
-        hz.spacing = 10f;
-        hz.childAlignment = TextAnchor.MiddleCenter;
+        hz.spacing = HudLayout.SlotGap;
+        hz.childAlignment = TextAnchor.MiddleLeft;
         hz.childControlWidth = false;
         hz.childControlHeight = false;
         slotsContainer = rowGo.transform;
@@ -117,6 +123,7 @@ public sealed class SkillBarHud
         r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0f);
         r.sizeDelta = new Vector2(920f, 20f);
         r.anchoredPosition = new Vector2(0f, 2f);
+        hud.enabled = false; // hud-redesign: names sit under the slots; Line() stays the text seam
 
         RebuildSlots();
     }
@@ -138,9 +145,9 @@ public sealed class SkillBarHud
 
             var slot = new GameObject($"SkillSlot_{sk}", typeof(RectTransform));
             slot.transform.SetParent(slotsContainer, false);
-            slot.GetComponent<RectTransform>().sizeDelta = new Vector2(50f, 50f);
+            slot.GetComponent<RectTransform>().sizeDelta = new Vector2(HudLayout.SlotSize, HudLayout.SlotSize);
             var frame = slot.AddComponent<Image>();
-            frame.sprite = DiabloMenuArt.SlotBackground(sk == last ? ItemRarity.Rare : (ItemRarity?)null, 64);
+            frame.sprite = DiabloMenuArt.SlotBackground(sk == last ? ItemRarity.Rare : (ItemRarity?)null, 96);
             frame.type = Image.Type.Sliced;
             frame.raycastTarget = true;
 
@@ -155,45 +162,36 @@ public sealed class SkillBarHud
             var spr = DiabloMenuArt.SkillIcon(sk);
             if (spr != null)
             {
-                var iGo = new GameObject("Icon", typeof(RectTransform));
-                iGo.transform.SetParent(slot.transform, false);
-                var iImg = iGo.AddComponent<Image>();
-                iImg.sprite = spr;
+                var iImg = HudChrome.Img(slot.transform, "Icon", spr, Color.white);
                 iImg.preserveAspect = true;
-                iImg.raycastTarget = false;
-                var ir = iGo.GetComponent<RectTransform>();
-                ir.anchorMin = Vector2.zero;
-                ir.anchorMax = Vector2.one;
-                ir.offsetMin = new Vector2(4f, 4f);
-                ir.offsetMax = new Vector2(-4f, -4f);
+                HudChrome.Stretch(iImg.rectTransform, 6f);
             }
 
-            var veilGo = new GameObject("CooldownVeil", typeof(RectTransform));
-            veilGo.transform.SetParent(slot.transform, false);
-            var veil = veilGo.AddComponent<Image>();
-            veil.color = new Color(0.02f, 0.02f, 0.04f, 0.72f);
-            veil.raycastTarget = false;
-            var vr = veilGo.GetComponent<RectTransform>();
-            vr.anchorMin = Vector2.zero;
-            vr.anchorMax = Vector2.one;
-            vr.offsetMin = vr.offsetMax = Vector2.zero;
+            // Radial cooldown sweep (canvas: dark wedge shrinking clockwise) instead of a flat veil.
+            var veil = HudChrome.Img(slot.transform, "CooldownVeil", HudChrome.WhiteSprite(), DiabloPalette.CooldownVeil);
+            veil.type = Image.Type.Filled;
+            veil.fillMethod = Image.FillMethod.Radial360;
+            veil.fillOrigin = (int)Image.Origin360.Top;
+            veil.fillClockwise = false;
+            HudChrome.Stretch(veil.rectTransform, 3f);
             veil.enabled = false;
 
-            var cd = DiabloUIFactory.MakeText(slot.transform, "CdText", "", 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+            var cd = DiabloUIFactory.MakeText(slot.transform, "CdText", "", 24, Color.white, TextAnchor.MiddleCenter, font: DiabloUIFactory.DisplayFont);
             cd.fontStyle = FontStyle.Bold;
-            var cdr = cd.rectTransform;
-            cdr.anchorMin = Vector2.zero;
-            cdr.anchorMax = Vector2.one;
-            cdr.offsetMin = cdr.offsetMax = Vector2.zero;
+            HudChrome.Stretch(cd.rectTransform, 0f);
             cd.enabled = false;
 
-            var keyLbl = DiabloUIFactory.MakeText(slot.transform, "KeyBadge", key, 11, DiabloPalette.TrimGold, TextAnchor.LowerRight);
+            var keyLbl = DiabloUIFactory.MakeText(slot.transform, "KeyBadge", key, 13, DiabloPalette.TrimGold, TextAnchor.UpperLeft, font: DiabloUIFactory.BodyFont);
             keyLbl.fontStyle = FontStyle.Bold;
-            var kr = keyLbl.rectTransform;
-            kr.anchorMin = Vector2.zero;
-            kr.anchorMax = Vector2.one;
-            kr.offsetMin = new Vector2(2f, 2f);
-            kr.offsetMax = new Vector2(-4f, -2f);
+            HudChrome.Stretch(keyLbl.rectTransform, 5f);
+
+            var nameLbl = DiabloUIFactory.MakeText(slot.transform, "SkillName", DiabloSkills.SkillName(sk), 13, DiabloPalette.ParchmentDim,
+                TextAnchor.MiddleCenter, shadow: false, font: DiabloUIFactory.BodyFont);
+            nameLbl.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var nr = nameLbl.rectTransform;
+            nr.anchorMin = nr.anchorMax = nr.pivot = new Vector2(0.5f, 0f);
+            nr.sizeDelta = new Vector2(HudLayout.SlotSize + HudLayout.SlotGap, 16f);
+            nr.anchoredPosition = new Vector2(0f, HudLayout.SlotNameY - HudLayout.SlotY);
 
             hudSlots.Add((sk, frame, veil, cd));
         }

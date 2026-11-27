@@ -76,6 +76,9 @@ public sealed class PlayerHealth : MonoBehaviour
     /// <summary>Live absorb (0 when expired).</summary>
     public float ShieldAmount => Time.time <= shieldUntil ? shieldAmount : 0f;
 
+    /// <summary>Seconds the live shield has left (0 when none; HUD shield chip).</summary>
+    public float ShieldSecondsLeft => ShieldAmount > 0f ? Mathf.Max(0f, shieldUntil - Time.time) : 0f;
+
     /// <summary>Grant an absorb shield for seconds (refreshes any running shield).</summary>
     public void GrantShield(float amount, float duration)
     {
