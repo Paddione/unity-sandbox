@@ -137,15 +137,28 @@ public static class TownBuilder
     /// <summary>
     /// cinderreach-deutsch-story S5: story finds — cart letter and ledger by
     /// the fen chest, three grave tablets on the ossuary sarcophagi.
+    /// cinderreach-akt1-vertiefung S2: R1/R2 finds — two cart scraps and the
+    /// seal ribbon at the second cart in the fen, three tablet fragments and
+    /// Thewes' grave light in the ossuary.
     /// </summary>
     public static void SpawnStoryPickups()
     {
         SpawnStoryPickup(StoryIds.Fuhrbrief, new Vector3(-10.6f, 0.5f, 1.6f), 0);
         SpawnStoryPickup(StoryIds.Lieferbuch, new Vector3(-13.4f, 0.5f, -1.6f), 0);
+        // S2: zweiter Karren im Moor (R1). Positionen paarweise entzerrt,
+        // damit je ein Trigger anspricht (Box 2,4 m + Heldradius).
+        SpawnStoryPickup(StoryIds.Fuhrfetzen, new Vector3(-8.5f, 0.5f, 3.5f), 0);
+        SpawnStoryPickup(StoryIds.Fuhrfetzen, new Vector3(-4.0f, 0.5f, 8.0f), 1);
+        SpawnStoryPickup(StoryIds.Siegelband, new Vector3(-5.0f, 0.5f, 4.5f), 0);
         var o = KilnLayout.OssuaryOffset;
         SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(-6.8f, 0.7f, -6f), 0);
         SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(9.2f, 0.7f, -3f), 1);
         SpawnStoryPickup(StoryIds.Grabtafel, o + new Vector3(-6.8f, 0.7f, 0f), 2);
+        // S2: siebte Tafel in Stuecken plus Thewes' Grablicht (R2).
+        SpawnStoryPickup(StoryIds.Tafelbruch, o + new Vector3(-5.6f, 0.7f, -6f), 0);
+        SpawnStoryPickup(StoryIds.Tafelbruch, o + new Vector3(8.0f, 0.7f, -3f), 1);
+        SpawnStoryPickup(StoryIds.Tafelbruch, o + new Vector3(-5.6f, 0.7f, 0f), 2);
+        SpawnStoryPickup(StoryIds.Grablicht, o + new Vector3(10.4f, 0.7f, -2f), 0);
     }
 
     static void SpawnStoryPickup(string itemId, Vector3 pos, int index)

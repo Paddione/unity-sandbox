@@ -220,10 +220,10 @@ public class GroupQuestMapTests
     [Test]
     public void DialogShare_LinesRoundTripAndHostChecks()
     {
-        var dlg = StoryDialogs.Get("h3.offer"); // 7 lines
+        var dlg = StoryDialogs.Get("h3.offer"); // 8 lines (S2: +n9-Folgezeile)
         Assert.AreEqual("0,1,2,3,4,6", StoryDialogShare.EncodeLines(new[] { 0, 1, 2, 3, 4, 6 }));
         Assert.AreEqual(new[] { 0, 1, 6 }, StoryDialogShare.DecodeLines("0,1,6", dlg).ToArray());
-        Assert.IsNull(StoryDialogShare.DecodeLines("0,7", dlg), "line past the script");
+        Assert.IsNull(StoryDialogShare.DecodeLines("0,8", dlg), "line past the script");
         Assert.IsNull(StoryDialogShare.DecodeLines("1,0", dlg), "out of order");
         Assert.IsNull(StoryDialogShare.DecodeLines("0,x", dlg));
         Assert.IsNull(StoryDialogShare.DecodeLines("", dlg));

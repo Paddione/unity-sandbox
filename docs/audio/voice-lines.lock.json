@@ -90,6 +90,81 @@
    "speaker": "ottilie",
    "seconds": 5.69
   },
+  "dlg.h14.done.1": {
+   "hash": "bd1db3a81c93",
+   "speaker": "ottilie",
+   "seconds": 2.72
+  },
+  "dlg.h14.done.2": {
+   "hash": "d1346548c04a",
+   "speaker": "ottilie",
+   "seconds": 5.69
+  },
+  "dlg.h14.done.3": {
+   "hash": "2c9f91400178",
+   "speaker": "ottilie",
+   "seconds": 7.21
+  },
+  "dlg.h14.hint.1": {
+   "hash": "43ffb1b82e7d",
+   "speaker": "ottilie",
+   "seconds": 5.88
+  },
+  "dlg.h14.offer.1": {
+   "hash": "d4ee2b183559",
+   "speaker": "ottilie",
+   "seconds": 5.09
+  },
+  "dlg.h14.offer.2": {
+   "hash": "efceb494cfa6",
+   "speaker": "ottilie",
+   "seconds": 3.25
+  },
+  "dlg.h14.offer.3": {
+   "hash": "8424906a98e4",
+   "speaker": "ottilie",
+   "seconds": 6.61
+  },
+  "dlg.h14.offer.4": {
+   "hash": "3133fba783ae",
+   "speaker": "ottilie",
+   "seconds": 6.06
+  },
+  "dlg.h15.hint.1": {
+   "hash": "dc95a36309e3",
+   "speaker": "ottilie",
+   "seconds": 6.55
+  },
+  "dlg.h15.offer.1": {
+   "hash": "976710d3bee4",
+   "speaker": "ottilie",
+   "seconds": 5.06
+  },
+  "dlg.h15.offer.2": {
+   "hash": "cfa0711cb796",
+   "speaker": "ottilie",
+   "seconds": 3.57
+  },
+  "dlg.h15.offer.3": {
+   "hash": "797be8224638",
+   "speaker": "ottilie",
+   "seconds": 7.03
+  },
+  "dlg.h15.talk.ottilie.1": {
+   "hash": "5b3d552806ea",
+   "speaker": "ottilie",
+   "seconds": 5.1
+  },
+  "dlg.h15.talk.ottilie.2": {
+   "hash": "66adff73886f",
+   "speaker": "ottilie",
+   "seconds": 8.45
+  },
+  "dlg.h15.talk.ottilie.3": {
+   "hash": "2a2420e2b56d",
+   "speaker": "ottilie",
+   "seconds": 6.54
+  },
   "dlg.h2.done.1": {
    "hash": "be5c84def312",
    "speaker": "ottilie",
@@ -124,6 +199,11 @@
    "hash": "09a9615b0ae1",
    "speaker": "ottilie",
    "seconds": 7.07
+  },
+  "dlg.h2.offer.5": {
+   "hash": "306c219fbfc3",
+   "speaker": "ottilie",
+   "seconds": 7.31
   },
   "dlg.h3.hint.1": {
    "hash": "b9a3249f3ead",
@@ -164,6 +244,11 @@
    "hash": "825a17ef0500",
    "speaker": "ottilie",
    "seconds": 7.28
+  },
+  "dlg.h3.offer.8": {
+   "hash": "d3d997dbbaab",
+   "speaker": "ottilie",
+   "seconds": 8.05
   },
   "dlg.h3.talk.jorin.1": {
    "hash": "1c6b7884cd0a",
@@ -574,6 +659,61 @@
    "hash": "7877020b154b",
    "speaker": "ilsabe",
    "seconds": 6.79
+  },
+  "dlg.n8.done.1": {
+   "hash": "d9300b3336e4",
+   "speaker": "ottilie",
+   "seconds": 2.95
+  },
+  "dlg.n8.done.2": {
+   "hash": "2f287fadde71",
+   "speaker": "ottilie",
+   "seconds": 5.11
+  },
+  "dlg.n8.hint.1": {
+   "hash": "791ed8510de1",
+   "speaker": "ottilie",
+   "seconds": 4.22
+  },
+  "dlg.n8.offer.1": {
+   "hash": "c24d908bf1fa",
+   "speaker": "ottilie",
+   "seconds": 4.99
+  },
+  "dlg.n8.offer.2": {
+   "hash": "e1303b030f0d",
+   "speaker": "ottilie",
+   "seconds": 2.95
+  },
+  "dlg.n9.done.1": {
+   "hash": "a777fc64bc98",
+   "speaker": "ottilie",
+   "seconds": 3.64
+  },
+  "dlg.n9.done.2": {
+   "hash": "64b7cf31e4be",
+   "speaker": "ottilie",
+   "seconds": 6.75
+  },
+  "dlg.n9.done.3": {
+   "hash": "5a6deec240da",
+   "speaker": "ottilie",
+   "seconds": 6.29
+  },
+  "dlg.n9.hint.1": {
+   "hash": "a9e7a6226721",
+   "speaker": "ottilie",
+   "seconds": 4.81
+  },
+  "dlg.n9.offer.1": {
+   "hash": "f00eeeb3e50d",
+   "speaker": "ottilie",
+   "seconds": 4.86
+  },
+  "dlg.n9.offer.2": {
+   "hash": "beb77f2910c4",
+   "speaker": "ottilie",
+   "seconds": 4.3
   }
  }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -292,6 +293,92 @@ public class QuestRuleTests
         Assert.AreEqual(StoryStatus.Ready, S().Status("n9"));
         TurnIn("n9");
         Assert.AreEqual(StoryStatus.Done, S().Status("n9"));
+    }
+
+    // ---- Akt-I-Vertiefung (cinderreach-akt1-vertiefung S2): Moor/Beinhaus-Dialoge ----
+
+    [Test]
+    public void MoorDialoge_AngebotUndAbschlussHabenSkript() // quest:h14 quest:n8
+    {
+        Assert.IsTrue(S().Refresh(Act()));
+        Assert.IsTrue(S().Accept("h1"));
+        Assert.IsTrue(S().Refresh(Act()));
+        var offer = StoryDialogs.Plan(S(), StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.Offer, offer.kind);
+        Assert.AreEqual("h14", offer.questId);
+        Assert.AreEqual(StoryDialogs.Get("h14.offer"), offer.dialog);
+        Assert.IsTrue(S().Accept("h14"));
+        var offerN8 = StoryDialogs.Plan(S(), StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.Offer, offerN8.kind);
+        Assert.AreEqual("n8", offerN8.questId);
+        Assert.AreEqual(StoryDialogs.Get("n8.offer"), offerN8.dialog);
+        Assert.IsTrue(S().Accept("n8"));
+        // Hinweise existieren als Rueckfall (Plan zeigt die frueheste aktive Quest).
+        Assert.IsNotNull(StoryDialogs.Get("h14.hint"));
+        Assert.IsNotNull(StoryDialogs.Get("n8.hint"));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Fuhrfetzen, 2));
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Kill, StoryIds.FenBrute));
+        var done = StoryDialogs.Plan(S(), StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.TurnIn, done.kind);
+        Assert.AreEqual("h14", done.questId);
+        Assert.AreEqual(StoryDialogs.Get("h14.done"), done.dialog);
+        TurnIn("h14");
+        Assert.IsTrue(S().Apply(StoryObjectiveType.Collect, StoryIds.Siegelband));
+        var doneN8 = StoryDialogs.Plan(S(), StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.TurnIn, doneN8.kind);
+        Assert.AreEqual("n8", doneN8.questId);
+        Assert.AreEqual(StoryDialogs.Get("n8.done"), doneN8.dialog);
+    }
+
+    [Test]
+    public void MoorFolgezeile_N8AendertH2AngebotUndH14Abschluss() // quest:h14 quest:n8
+    {
+        var s = S();
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.IsTrue(s.Accept("h1"));
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.IsTrue(s.Accept("h14"));
+        Assert.IsTrue(s.Accept("n8"));
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Collect, StoryIds.Siegelband));
+        TurnIn("n8");
+        s.Flags.Add("n8"); // StoryDirector.SyncDoneFlags im Spiel
+        var h2 = StoryDialogs.Get("h2.offer");
+        Assert.AreEqual(5, h2.speakers.Length);
+        Assert.IsTrue(StoryDialog.Visible(h2.speakers[4], s.Flags), "n8 aendert H2-Angebot");
+        Assert.IsFalse(StoryDialog.Visible(h2.speakers[4], new HashSet<string>()));
+        // R1: der H14-Abschluss liest sich erst mit Vogts Band zu Ende.
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Collect, StoryIds.Fuhrfetzen, 2));
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Kill, StoryIds.FenBrute));
+        var done = StoryDialogs.Plan(s, StoryIds.Ottilie);
+        Assert.AreEqual("h14", done.questId);
+        var h14done = StoryDialogs.Get("h14.done");
+        Assert.AreEqual(3, h14done.speakers.Length);
+        Assert.IsTrue(StoryDialog.Visible(h14done.speakers[2], s.Flags), "n8 vollendet R1");
+    }
+
+    [Test]
+    public void BeinhausFolgezeile_N9AendertH3Angebot() // quest:h15 quest:n9
+    {
+        CompleteH1();
+        var s = S();
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.IsTrue(s.Accept("h2"));
+        Assert.IsTrue(s.Refresh(Act()));
+        Assert.IsTrue(s.Accept("h15"));
+        Assert.IsTrue(s.Accept("n9"));
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Collect, StoryIds.Grablicht));
+        TurnIn("n9");
+        s.Flags.Add("n9"); // StoryDirector.SyncDoneFlags im Spiel
+        var h3 = StoryDialogs.Get("h3.offer");
+        Assert.AreEqual(8, h3.speakers.Length);
+        Assert.IsTrue(StoryDialog.Visible(h3.speakers[7], s.Flags), "n9 aendert H3-Angebot");
+        Assert.IsFalse(StoryDialog.Visible(h3.speakers[7], new HashSet<string>()));
+        // R2: drei Brueche, dann das Gespraech mit Ottilie.
+        Assert.IsTrue(s.Apply(StoryObjectiveType.Collect, StoryIds.Tafelbruch, 3));
+        var talk = StoryDialogs.Plan(s, StoryIds.Ottilie);
+        Assert.AreEqual(StoryTalkKind.Talk, talk.kind);
+        Assert.AreEqual("h15", talk.questId);
+        Assert.AreEqual(StoryDialogs.Get("h15.talk.ottilie"), talk.dialog);
     }
 
     [Test]
