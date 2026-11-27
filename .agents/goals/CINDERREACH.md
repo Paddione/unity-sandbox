@@ -16,7 +16,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P1 | [`cinderreach-akt1-vertiefung`](cinderreach-akt1-vertiefung/GOAL.md) | 50 %, S1+S2 gelandet (`6646cff`, `16833a6`) | S3 Ofen/Wacht-Strang läuft; Kettenkopf, entblockt Akt II/III und sprache-voice S2 |
 | P2 | [`cinderreach-akt2-vertiefung`](cinderreach-akt2-vertiefung/GOAL.md) | 0 %, Startbedingung Akt-I-S1 erfüllt | S1 Bibel+Modell, sobald `StoryModel`/`story-bible.md` frei sind (nach Akt-I-S3 empfohlen) |
 | P3 | [`cinderreach-inventory-ui-layout-split`](cinderreach-inventory-ui-layout-split/GOAL.md) | 33 %, S1-Baseline gelandet (`396980a`, 39/39) | S2 Partial-Split; unabhängig, parallel zur Story-Kette möglich |
-| P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 75 %, S1–S3 gelandet (`71cb9eb`) | S4 proof (Smoke + Abschluss); unabhängig, parallel möglich |
+| P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 100 %, S1–S4 gelandet | Abgeschlossen (Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 20 %, S1-Baseline gelandet (`8e781a7`, 63/260/1) | S2 parse-fix; unabhängig, keine Entblockung, jederzeit als Füller |

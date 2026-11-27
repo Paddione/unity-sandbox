@@ -1,6 +1,6 @@
 # Progress: cinderreach-skills-modularization
 
-Prozent: 75 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -18,11 +18,19 @@ Prozent: 75 %
 - 2026-11-27: Plan gegen `1ff1b95` geprüft (Code unverändert, 1.414 Zeilen, Enum 0..19) und als P4 priorisiert; `cinderreach-party-roles` ist 100 %, der S1-Abgleich ist damit nur noch lesende Kontrolle.
 
 - 2026-11-27 (S1–S3-Land): als `71cb9eb` auf `main` gelandet (ff nach Rebase auf `a5087c8`, Push durch, Worktree aufgeräumt). Prozent jetzt 75 %.
+- 2026-11-27 (S4 proof, Worktree `feature/cinderreach-skills-modularization-s4`): Gesamtverifikation und Verhaltens-Smokes grün abgeschlossen:
+  - Zeilenzahlen vorher/nachher: `sandbox/Assets/Scripts/DiabloSkills.cs` 1.414 → 1.158 (−256), `sandbox/Assets/Scripts/BowStanceVisuals.cs` 140 (neu), `sandbox/Assets/Scripts/SkillBarHud.cs` 194 (neu).
+  - Verträge per `grep`: `DiabloSkills.Skill` Wire-Int-Enum `Fireball = 0 .. PowderKeg = 19` unverändert; `DiabloNetworkPlayer.SubmitSkillCastServerRpc(int skillId, Vector3 origin, Vector3 dir, ...)` unverändert (Zeile 624, Aufruf `DiabloSkills.cs:417`); `grep -rln DiabloSkills sandbox/Assets/Scripts sandbox/Assets/Tests` = 61 Dateien (59 Bestand + `BowStanceVisuals.cs` + `SkillBarHud.cs`).
+  - Gezielte Kriterium-Suites: EditMode (`SkillRankTests;BuildUniqueEffectTests;PartySkillFormulaTests;LanternSkillFormulaTests`) **16/16**, PlayMode (`DiabloSkillsTests;LanternSkillTests;PartySkillTests;DiabloHdPlayTests`) **24/24**.
+  - Voll-Suiten (`bash scripts/run-unity-tests.sh`): EditMode **673/673** (29,2 s), PlayMode **383/383** (162,6 s); `python3 scripts/check-meta.py` OK; `KayKitAssets.Verify` (`repo.yaml:verify`) Exit 0.
+  - Autoplay-Smoke (`bash scripts/run-autoplay.sh artifacts/skills-s4-autoplay -seed 0`): Exit **0**, `exceptions: 0`, `duration_s: 305.0`, alle Phasen `town,zone1,gate,zone2,boss,zone3,actboss,zone4,boss3,complete`, `combos: [FenShackle=16, Retribution=10, Shatter=12]`, `fps-gate` 33,9 fps PASS.
+  - Koop-Paar-Smoke (`AUTOPLAY_SKIP_BUILD=1 bash scripts/run-coop-pair.sh artifacts/skills-s4-coop`): Exit **0**, Host (`exit=0`, `exceptions=0`, `duration=253s`) und Client (`exit=0`, `exceptions=0`, `duration=244s`, `hits=43`, `roleCasts=155`, `deaths=0`) synchron durch alle Zonen bis `boss3`/`complete`.
+  - Sichtprüfung (`-shotcheck`): `08_bow_aim_front.png` (Bogen gezeichnet in Bogenhaltung), `09_bow_put_away.png` (Schwert zurück in der Hand), `33_flask_cooldown_hud.png` (Skillbar-HUD und Cooldown-Veil `0.1` auf Q sauber gerendert).
 
 ## Nächste Schritte
 
-- S4: Gesamtverifikation (Autoplay-/Koop-Smoke bei verfügbarem Player-Build, sonst als offene manuelle Evidenz benennen), PROGRESS-Abschluss, Goal auf 100 % mit `Offene Punkte: Keine.`
+Keine.
 
 ## Offene Punkte
 
-- S1–S3 gelandet (`71cb9eb`); S4-Abnahme (Smoke + Abschluss) steht aus.
+Keine.

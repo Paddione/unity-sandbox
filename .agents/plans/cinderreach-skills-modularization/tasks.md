@@ -6,7 +6,7 @@ repo_main: main
 tickets: none
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
 priority: P4 (unabhängiges Refactoring, höheres Risiko Kampf-Autorität; S1–S3 gelandet, S4 proof offen)
-status: in_progress — S1–S3 gelandet (71cb9eb, 75 %), nächster Schritt S4 proof
+status: done (100 %) — S1–S4 gelandet, alle Suiten, Smokes und Sichtprüfung grün
 start_condition: Stand gegen cinderreach-party-roles abgeglichen (GOAL-Abhängigkeit, erfüllt: 100 %); kein paralleles Schreiben an DiabloSkills.cs; GOAL-Korrektur aus S1 ist gelandet
 plan_refs: [.agents/goals/cinderreach-skills-modularization/GOAL.md]
 ---
