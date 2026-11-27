@@ -159,6 +159,11 @@ public static class TownBuilder
         SpawnStoryPickup(StoryIds.Tafelbruch, o + new Vector3(8.0f, 0.7f, -3f), 1);
         SpawnStoryPickup(StoryIds.Tafelbruch, o + new Vector3(-5.6f, 0.7f, 0f), 2);
         SpawnStoryPickup(StoryIds.Grablicht, o + new Vector3(10.4f, 0.7f, -2f), 0);
+        // S3: Fuhrliste am Aufgang, Rußseite auf dem Weg zur Ofenmutter (R3).
+        // Positionen paarweise entzerrt (Test-Reise nutzt dieselben Stellen).
+        var k = KilnLayout.KilnOffset;
+        SpawnStoryPickup(StoryIds.Fuhrliste, k + new Vector3(10f, 0.7f, 8f), 0);
+        SpawnStoryPickup(StoryIds.Russseite, k + new Vector3(3f, 0.7f, -5f), 0);
     }
 
     static void SpawnStoryPickup(string itemId, Vector3 pos, int index)

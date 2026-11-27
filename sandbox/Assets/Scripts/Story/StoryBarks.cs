@@ -39,6 +39,10 @@ public static class StoryBarks
         new StoryBark("glasswright.death", Glasswright),
         new StoryBark("h4.start", "n"),
         new StoryBark("h7.done", "n"),
+        // Akt I Vertiefung S3: Ofen/Wacht — Erzähler bei Jorins Strang (Spitzen,
+        // Knechte). Laufen über OnKill, gedrosselt wie Bossrufe.
+        new StoryBark("lancer.fall", "n"),
+        new StoryBark("thrall.fall", "n"),
     };
 
     static readonly Queue<StoryBark> pending = new Queue<StoryBark>();
@@ -97,6 +101,8 @@ public static class StoryBarks
         if (killTarget == StoryIds.Abbot) Say("abbot.death");
         else if (killTarget == StoryIds.Kilnmother) Say("kilnmother.death");
         else if (killTarget == StoryIds.Glasswright) Say("glasswright.death");
+        else if (killTarget == StoryIds.AshLancer) Say("lancer.fall");
+        else if (killTarget == StoryIds.CinderThrall) Say("thrall.fall");
     }
 
     public static bool TryTake(out StoryBark bark)
