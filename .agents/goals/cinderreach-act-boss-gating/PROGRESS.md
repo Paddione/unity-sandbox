@@ -1,6 +1,6 @@
 # Progress: cinderreach-act-boss-gating
 
-Prozent: 90 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -27,10 +27,14 @@ Prozent: 90 %
     `actBossKills=[1:Kilnmother:-, 2:Glasswright:-, 3:Thewes:-]`, Spawns 1/1/1 mit Cutscene.
   - K9: EditMode 727/727, PlayMode 410/410, `check-meta` OK, Quest-Coverage 0 uncovered, Voice 244/0.
 
+- 2026-11-27: Gelandet `54ae7f2` (ff), Dotfiles-Probe `81b16e5c` (`AUTOPLAY_PHASES` + `boss4`). CI-Autoplay
+  Run 46004537242 grün: Normal 417 s, Kindled 537 s, Lanternbearer 410 s, je Exit 0, 34/34 Quests,
+  `actBossKills=[1:Kilnmother:-, 2:Glasswright:-, 3:Thewes:-]`. `G-DIABLO06`: 0 Befunde (11 Phasen je Gruppe).
+
 ## Nächste Schritte
 
-- `land`, Probe-Vertrag `boss4` in den Dotfiles landen, CI-Autoplay (Normal/Kindled/Lanternbearer) für `G-DIABLO06`.
+Keine.
 
 ## Offene Punkte
 
-- `G-DIABLO06` braucht frische CI-Autoplay-Ergebnisse mit `boss4`.
+Keine.
