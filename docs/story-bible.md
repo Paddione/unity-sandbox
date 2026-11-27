@@ -53,6 +53,40 @@ Licht das Moor herbei.
 - UI-Texte sachlich und kurz, Imperativ ohne Ausrufezeichen („Truhe öffnen“, nicht „Öffne die Truhe!“).
 - Zahlen mit deutschem Dezimalkomma („1,5 s“), Prozent mit Leerzeichen („25 %“).
 
+### Ton-Fortschreibung (Glättungsregeln, `cinderreach-sprache-voice` S1)
+
+Verständlich-modern heißt: nur verstaubte Wendungen ersetzen, alles andere bleibt. Glossar und Ton oben
+sind bindend; diese Regeln sagen, wie weit eine Glättung gehen darf (S2 wendet sie Zeile für Zeile an).
+
+1. **Nur Staub wischen.** Ersetzt wird, was ein heutiger Leser zweimal lesen muss: verdrehte Satzstellung,
+   Kanzleipartizipien („die vom Ofen geforderten, noch lebenden Namen“), gestelzte Füllwörter („gar wohl“,
+   „allhier“, „denn“ als Füllsel). Sinn, Satzlänge und Wortstellung bleiben sonst unangetastet.
+2. **Glossar ist Gesetz.** Orte, Gegner, Klassen, Systeme und Story-Begriffe aus dem Glossar werden nie
+   umschrieben oder „geglättet“ (kein „Brennofen“ für Glutofen, kein „Zombie“ für Hülle).
+3. **Kurz vor schön.** Düster, knapp, konkret: ein Satz, ein Bild, ein Gegenstand. Abstrakta („die Last der
+   Schuld“, „das Dunkel der Verzweiflung“) werden zu Dingen (Karren, Ruß, Siegel, Docht, Scherbe) oder
+   gestrichen. Keine Monologe über das Böse; Figuren reden über Arbeit, Schulden, Wetter, Tote mit Namen.
+4. **Stimmen bleiben Stimmen.** Ottilie zählt, Ilsabe rechnet, Jorin schweigt in kurzen Sätzen, Merle ist
+   stumpf, der Erzähler liest Chronik. Ironie nur trocken und nur bei Ilsabe und dem Schmuggler.
+5. **Anrede fest.** Die Figuren duzen die Gruppe („ihr“), der Vogt siezt schriftlich. Daran ändert keine
+   Glättung etwas.
+6. **UI und Zahlen fest.** UI-Texte sachlich, Imperativ ohne Ausrufezeichen. Deutsches Dezimalkomma,
+   Prozent mit Leerzeichen.
+7. **Kein Slang, keine Jetztzeit.** Verständlich heißt zeitlos-klar, nicht heutig: keine Anglizismen, keine
+   Jugendsprache, keine Ironie-Anachronismen („down“, „Grind“, „okay“, „Deal“). Was 1990 und 2026 gleich
+   klingt, ist richtig.
+8. **Englisch folgt.** Die `en`-Fallbacks bleiben sinngetreu; Glättung ändert sie nur mit (S2-Notiz, kein
+   eigener Umbau).
+
+Beispiele (Illustration, keine Zeilenänderung):
+
+| Regel | Vorher (verstaubt/abstrakt) | Nachher (geglättet) |
+|---|---|---|
+| 1 | „Höret, die Fuhre harret euer“ | „Die Fuhre wartet. Kommt.“ |
+| 3 | „Die Dunkelheit der Verzweiflung senkt sich über die Wacht“ | „Sechsundvierzig. Fragt mich morgen wieder.“ |
+| 4 | „Ich verkaufe nichts, was nicht vorher jemand hergegeben hat, versteht ihr, das ist nun einmal der ganze Handel“ | „Ich verkaufe nichts, was nicht vorher jemand hergegeben hat. Das ist der ganze Handel.“ |
+| 7 (verboten) | „Der Ofen ist down, wir brauchen mehr Grind“ | Unzulässig — bleibt: „Der Ofen ist kalt. Ohne Tote brennt er nicht.“ |
+
 ## Die Gruppe
 
 Die Wacht schickt keine Helden, sie schickt eine **Fuhre**: drei Leute, die man entbehren kann und die
