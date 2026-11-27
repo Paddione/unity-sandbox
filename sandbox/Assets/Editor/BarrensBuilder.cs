@@ -92,6 +92,7 @@ public static class BarrensBuilder
         TryKayKitDressing(root);
         SpawnEnemies(root.transform);
         SpawnGlasswright(root.transform);
+        SpawnMoortor(root.transform);
 
         var gate = SpawnGate(ZoneGate.BarrensGateName, BarrensLayout.BarrensGatePos, BarrensLayout.BarrensArrival,
             ActProgress.Barrens, withHint: true);
@@ -100,6 +101,43 @@ public static class BarrensBuilder
         var ret = SpawnGate(ZoneGate.BarrensReturnGateName, BarrensLayout.BarrensReturnPos, BarrensLayout.KilnReturnArrival,
             ActProgress.Kiln, withHint: false);
         ret.transform.SetParent(root.transform, true);
+    }
+
+    // ---- Akt III Finale S3b: Moortor-Kette ----
+    // The Moortor hangs off the Barrens south end (the south lane stays open:
+    // the spire ring tops out at r 15.5, dunes sit north of z -11). Both gates
+    // keep targetZone Barrens for the save (ZoneGate S3 contract); the pair
+    // opens via the finale (RunProfile.Finale.MoortorOpen), not the act.
+    static readonly Vector3 MoortorGatePos = BarrensLayout.BarrensOffset + new Vector3(4f, 1f, -15.5f);
+    static readonly Vector3 MoortorArrival = BarrensLayout.BarrensOffset + new Vector3(0f, 1f, -18.5f);
+    static readonly Vector3 MoortorReturnPos = BarrensLayout.BarrensOffset + new Vector3(-4f, 1f, -18f);
+    static readonly Vector3 MoortorReturnArrival = BarrensLayout.BarrensOffset + new Vector3(4f, 1f, -13.5f);
+    static readonly Vector3 ThewesPos = BarrensLayout.BarrensOffset + new Vector3(0f, 0.05f, -19f);
+
+    /// <summary>
+    /// S3b: Moortor gate pair after the BarrensGate pattern (cube trigger,
+    /// <c>targetZone</c> + <c>destination</c>) plus Thewes, the Homecomer
+    /// (H12) after the <c>SpawnGlasswright</c> pattern: boss tier for the
+    /// target bar, melee through <see cref="EnemyAttack"/>, animated husk
+    /// rig. The kill books generically (<c>EnemyHealth</c> →
+    /// <c>BookKill(Thewes)</c> → <c>Finale.DefeatFinalBoss</c>): no new
+    /// boss controller, no new system. No hint marker: the shared hint text
+    /// names the act lock (Kilnmother), not the finale.
+    /// </summary>
+    static void SpawnMoortor(Transform parent)
+    {
+        var gate = SpawnGate(ZoneGate.MoortorGateName, MoortorGatePos, MoortorArrival,
+            ActProgress.Barrens, withHint: false);
+        gate.transform.SetParent(parent, true);
+        var ret = SpawnGate(ZoneGate.MoortorReturnGateName, MoortorReturnPos, MoortorReturnArrival,
+            ActProgress.Barrens, withHint: false);
+        ret.transform.SetParent(parent, true);
+        var thewes = SpawnBody("Skeletons/Characters/Skeleton_Warrior.fbx", StoryIds.Thewes,
+            ThewesPos, GlasswrightController.MaxHP, LootTier.Boss, 2.2f, parent);
+        var attack = thewes.AddComponent<EnemyAttack>();
+        attack.damage = 3;
+        attack.encounterGroup = EncounterLayout.FrontGroup;
+        SandboxBuilder.WireHuskAnimator(thewes);
     }
 
     static void SpawnEnemies(Transform parent)

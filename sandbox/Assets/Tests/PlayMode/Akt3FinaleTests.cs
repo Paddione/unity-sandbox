@@ -89,6 +89,61 @@ public class Akt3FinaleTests
 
     static StoryState S() => RunProfile.Story;
 
+    static readonly Vector3 B = BarrensLayout.BarrensOffset;
+    // Dieselben Stellen wie TownBuilder.SpawnStoryPickups (S3b-Anteil) und
+    // BarrensBuilder.SpawnMoortor: die Reise belegt die Szene ueber Trigger.
+    static Vector3 GlutPos(int i) => B + new Vector3(
+        i == 0 ? -3f : (i == 1 ? 1f : 5f), 0.7f,
+        i == 0 ? -16f : (i == 1 ? -17f : -15.5f));
+    static Vector3 LanzenPos(int i) => B + new Vector3(
+        i == 0 ? 8f : (i == 1 ? 8.5f : (i == 2 ? 4f : 8.5f)), 0.7f,
+        i == 0 ? 2f : (i == 1 ? -2.5f : (i == 2 ? -13f : -13.5f)));
+    static readonly Vector3 Seite1Pos = B + new Vector3(12f, 0.7f, 2f);
+    static readonly Vector3 MoortorGatePos = B + new Vector3(4f, 1f, -15.5f);
+    static readonly Vector3 MoortorArrival = B + new Vector3(0f, 1f, -18.5f);
+    static readonly Vector3 MoortorReturnPos = B + new Vector3(-4f, 1f, -18f);
+    static readonly Vector3 MoortorReturnArrival = B + new Vector3(4f, 1f, -13.5f);
+    static readonly Vector3 ThewesPos = B + new Vector3(0f, 0.05f, -19f);
+
+    static GameObject MakePickup(string itemId, int index, Vector3 pos)
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = $"StoryPickup_{itemId}_{index}";
+        go.transform.position = pos;
+        go.transform.localScale = new Vector3(0.45f, 0.12f, 0.6f);
+        var col = go.GetComponent<BoxCollider>();
+        col.isTrigger = true;
+        col.size = new Vector3(2.4f, 2f, 2.4f);
+        go.AddComponent<StoryPickup>().itemId = itemId;
+        return go;
+    }
+
+    static GameObject MakeGate(string name, Vector3 pos, Vector3 dest, int zone)
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = name;
+        go.transform.position = pos;
+        go.GetComponent<BoxCollider>().isTrigger = true;
+        var gate = go.AddComponent<ZoneGate>();
+        gate.destination = dest;
+        gate.targetZone = zone;
+        return go;
+    }
+
+    static GameObject MakeThewes(Vector3 pos)
+    {
+        var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        go.name = StoryIds.Thewes;
+        go.tag = "Husk";
+        go.transform.position = pos;
+        var health = go.AddComponent<EnemyHealth>();
+        health.SetTier(GlasswrightController.MaxHP, LootTier.Boss);
+        var attack = go.AddComponent<EnemyAttack>();
+        attack.damage = 3;
+        attack.encounterGroup = EncounterLayout.FrontGroup;
+        return go;
+    }
+
     /// <summary>Act II fertig + Moortor offen: H9 wartet aktiv (TurnIn-frei).</summary>
     static void DriveAct()
     {
@@ -307,6 +362,74 @@ public class Akt3FinaleTests
         Assert.AreEqual(StoryStatus.Done, client.Status("h11"));
         Assert.AreEqual(StoryStatus.Done, client.Status("h12"));
         Assert.AreEqual(StoryStatus.Active, client.Status("h13"));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator Moortor_Szene_ToreFindsThewes()
+    // quest:h11 quest:h12 quest:n6 quest:n7
+    // placement:DiabloZone:MoortorGate
+    // placement:DiabloZone:MoortorReturnGate
+    // placement:DiabloZone:StoryPickup_glutspur_0
+    // placement:DiabloZone:StoryPickup_glutspur_1
+    // placement:DiabloZone:StoryPickup_glutspur_2
+    // placement:DiabloZone:StoryPickup_lanzenspitze_0
+    // placement:DiabloZone:StoryPickup_lanzenspitze_1
+    // placement:DiabloZone:StoryPickup_lanzenspitze_2
+    // placement:DiabloZone:StoryPickup_lanzenspitze_3
+    // placement:DiabloZone:StoryPickup_spendenseite_1
+    {
+        DriveToH11();
+        var gate = MakeGate(ZoneGate.MoortorGateName, MoortorGatePos, MoortorArrival, ActProgress.Barrens);
+        var ret = MakeGate(ZoneGate.MoortorReturnGateName, MoortorReturnPos, MoortorReturnArrival, ActProgress.Barrens);
+        var thewes = MakeThewes(ThewesPos);
+        var picks = new GameObject[8];
+        for (int i = 0; i < 3; i++) picks[i] = MakePickup(StoryIds.Glutspur, i, GlutPos(i));
+        for (int i = 0; i < 4; i++) picks[3 + i] = MakePickup(StoryIds.Lanzenspitze, i, LanzenPos(i));
+        picks[7] = MakePickup(StoryIds.Spendenseite, 1, Seite1Pos);
+        try
+        {
+            // Tore: exakte Builder-Namen, Moortor-Finale schaltet beide.
+            Assert.AreEqual(ZoneGate.MoortorGateName, GameObject.Find(ZoneGate.MoortorGateName).name);
+            Assert.AreEqual(ZoneGate.MoortorReturnGateName, GameObject.Find(ZoneGate.MoortorReturnGateName).name);
+            Assert.IsTrue(gate.GetComponent<ZoneGate>().IsMoortorGate);
+            Assert.IsTrue(ret.GetComponent<ZoneGate>().IsMoortorGate);
+            Assert.IsFalse(gate.GetComponent<ZoneGate>().Locked, "Barrens-Boss offen");
+            DiabloTestFixture.TeleportHero(hero, MoortorGatePos);
+            gate.GetComponent<ZoneGate>().BeginDwell(hero, 80f);
+            Assert.IsTrue(gate.GetComponent<ZoneGate>().TickDwell(80f + ZoneGate.DwellSeconds + 0.1f, -100f));
+            Assert.AreEqual(MoortorArrival, hero.transform.position);
+            // Thewes: exakter Name, Boss-Tier fuer den Balken.
+            var foe = GameObject.Find(StoryIds.Thewes);
+            Assert.IsNotNull(foe);
+            Assert.AreEqual(LootTier.Boss, foe.GetComponent<EnemyHealth>().tier);
+            Assert.IsTrue(DiabloTargetBar.IsBossTier(foe.GetComponent<EnemyHealth>().tier));
+            Assert.AreEqual(StoryIds.Thewes, DiabloTargetBar.DisplayName(StoryIds.Thewes));
+            // N6/N7 annehmen, dann alle 8 Funde ueber echte Trigger einsammeln.
+            Assert.IsTrue(S().Accept("n6"));
+            Assert.IsTrue(S().Accept("n7"));
+            foreach (var pk in picks)
+            {
+                DiabloTestFixture.TeleportHero(hero, pk.transform.position + new Vector3(0.2f, 0f, 0f));
+                yield return DiabloTestFixture.WaitSeconds(0.5f);
+            }
+            for (int i = 0; i < 8; i++) Assert.IsFalse(picks[i].activeSelf, $"fund {picks[i].name} despawns");
+            Assert.AreEqual(StoryStatus.Ready, S().Status("n6"));
+            Assert.AreEqual(StoryStatus.Ready, S().Status("n7"));
+            Assert.AreEqual(StoryStatus.Done, S().Status("h11"), "R7: drei Spuren nennen Thewes");
+            // H12: Thewes faellt wie jeder Boss, H13 wartet.
+            StoryDirector.BookKill(foe.name);
+            Assert.AreEqual(StoryStatus.Done, S().Status("h12"));
+            Assert.IsTrue(RunProfile.Finale.FinalBossDefeated);
+            Assert.AreEqual(StoryStatus.Active, S().Status("h13"));
+        }
+        finally
+        {
+            Object.DestroyImmediate(gate);
+            Object.DestroyImmediate(ret);
+            Object.DestroyImmediate(thewes);
+            foreach (var pk in picks) if (pk != null) Object.DestroyImmediate(pk);
+        }
         yield break;
     }
 

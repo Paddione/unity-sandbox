@@ -177,6 +177,18 @@ public static class TownBuilder
         SpawnStoryPickup(StoryIds.Glasscherbe, b + new Vector3(-8f, 0.7f, -11f), 3);
         SpawnStoryPickup(StoryIds.Speichenrad, b + new Vector3(11f, 0.7f, -10f), 0);
         SpawnStoryPickup(StoryIds.Spendenseite, b + new Vector3(-12f, 0.7f, -1f), 0);
+        // Akt III Finale S3b: Moortor-Kette (R7 Glutspuren am Moortor, N6
+        // Lanzenspitzen, N7 letzte Spendenseite Index 1). Positionen paarweise
+        // entzerrt (Test-Reise nutzt dieselben Stellen), an Barrens-Geometrie
+        // angelehnt: Sued-Lane frei von Spiren/Duenen, Funde fern der Bestand-Finds.
+        SpawnStoryPickup(StoryIds.Glutspur, b + new Vector3(-3f, 0.7f, -16f), 0);
+        SpawnStoryPickup(StoryIds.Glutspur, b + new Vector3(1f, 0.7f, -17f), 1);
+        SpawnStoryPickup(StoryIds.Glutspur, b + new Vector3(5f, 0.7f, -15.5f), 2);
+        SpawnStoryPickup(StoryIds.Lanzenspitze, b + new Vector3(8f, 0.7f, 2f), 0);
+        SpawnStoryPickup(StoryIds.Lanzenspitze, b + new Vector3(8.5f, 0.7f, -2.5f), 1);
+        SpawnStoryPickup(StoryIds.Lanzenspitze, b + new Vector3(4f, 0.7f, -13f), 2);
+        SpawnStoryPickup(StoryIds.Lanzenspitze, b + new Vector3(8.5f, 0.7f, -13.5f), 3);
+        SpawnStoryPickup(StoryIds.Spendenseite, b + new Vector3(12f, 0.7f, 2f), 1);
     }
 
     static void SpawnStoryPickup(string itemId, Vector3 pos, int index)
