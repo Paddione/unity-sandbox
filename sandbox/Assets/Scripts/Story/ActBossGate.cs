@@ -60,7 +60,7 @@ public static class ActBossGate
         }
     }
 
-    static readonly Dictionary<int, List<string>> required = new Dictionary<int, List<string>>();
+    static readonly Dictionary<int, List<string>> requiredByAct = new Dictionary<int, List<string>>();
     static readonly Dictionary<string, GameObject> anchors = new Dictionary<string, GameObject>();
     static readonly HashSet<string> pendingIntro = new HashSet<string>();
     /// <summary>Bosses already released this run (a boss found released at scene start counts too).</summary>
@@ -77,7 +77,7 @@ public static class ActBossGate
     /// <summary>Quests of <paramref name="act"/> that must be Done before its boss appears (catalog order).</summary>
     public static IReadOnlyList<string> RequiredQuests(int act)
     {
-        if (required.TryGetValue(act, out var list)) return list;
+        if (requiredByAct.TryGetValue(act, out var list)) return list;
         list = new List<string>();
         int bi = IndexOfAct(act);
         if (bi >= 0)
@@ -91,7 +91,7 @@ public static class ActBossGate
                 list.Add(q.id);
             }
         }
-        required[act] = list;
+        requiredByAct[act] = list;
         return list;
     }
 

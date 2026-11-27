@@ -256,7 +256,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Fähigkeits-Untertitel, nur Namensbanner, zurück zum Helden). Story-Flag `bossspawn.<akt>` verhindert die
   Wiederholung nach dem Laden (kein Save-Feld, v16 bleibt). Besiegte Akte werden nie wieder gesperrt. Koop: der
   Queststand des Hosts entscheidet (`NotifyActBossesClientRpc` mit jeder Story-Übertragung). Der Arena-Trigger
-  gilt nur noch für den Hollow Abbot. `StoryDirector.MaybeSpawnThewesAtH11` (akt3-finale S3c) ist entfallen.
+  gilt nur noch für den Hollow Abbot. "StoryDirector.MaybeSpawnThewesAtH11" (akt3-finale S3c) ist entfallen.
 - Weltränder: jede Zone ist ummauert. Der Fen hat die `MoorEdge_*`-Erdwälle, Ossuary, Kiln und Barrens je vier
   `ZoneEdge_<Zone>_<Seite>`-Mauern (1,6 m, `ZoneEdgeBuilder`, Zonen-Texturen). Die begehbaren Rechtecke stehen
   in `Zones/WorldBounds` (SSOT für Builder, Begleiter-Clamp und `WorldEdgeTests`).

@@ -27,7 +27,7 @@ alle Akt-Quests vor dem jeweiligen Boss-Kill.
    Boss während aller Showcase-Casts im View-Frustum (PlayMode-Test via `Camera.WorldToViewportPoint`), jede
    Phase-1-Fähigkeit einmal, danach Kamera zurück zum Helden, Skip funktioniert.
 4. Keine Fähigkeits-Captions mehr (Spawn-Cutscene und Phase-2-Showcase). Test belegt: kein Caption-Text gerendert.
-5. Thewes' H11-Auftritt (`StoryDirector.MaybeSpawnThewesAtH11`) ist durch das neue Gate ersetzt, `Akt3FinaleTests`
+5. Thewes' H11-Auftritt ("StoryDirector.MaybeSpawnThewesAtH11") ist durch das neue Gate ersetzt, `Akt3FinaleTests`
    umgestellt.
 6. Kein Deadlock: keine Pflichtquest hängt an einem Gate/Catch-up, das erst der Boss-Kill auslöst. Alte Saves (v16)
    bleiben spielbar, Zustand wird aus dem Queststand abgeleitet (keine neue Save-Version).
