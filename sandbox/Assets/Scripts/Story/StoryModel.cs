@@ -25,6 +25,12 @@ public static class StoryIds
     public const string Grablicht = "grablicht";
     public const string Fuhrliste = "fuhrliste";
     public const string Russseite = "russseite";
+    // Akt-II-Vertiefung (S1): R4 Sehglas-Kombination, R5 Scherben-Ordnung,
+    // R6 behalten/abliefern-Entscheidung, Tamm-/Ilsabe-Folgen.
+    public const string Sehglas = "sehglas";
+    public const string Glasscherbe = "glasscherbe";
+    public const string Speichenrad = "speichenrad";
+    public const string Spendenseite = "spendenseite";
 
     // Zones as WorldBounds names.
     public const string ZoneOssuary = "Ossuary";
@@ -133,7 +139,7 @@ public sealed class StoryQuest
     public string SummaryKey => "quest." + id + ".summary";
 }
 
-/// <summary>All story tasks in narrative order (docs/story-bible.md, Akt I mit Vertiefung H14-H17/N8-N11, Akt II).</summary>
+/// <summary>All story tasks in narrative order (docs/story-bible.md, Akt I mit Vertiefung H14-H17/N8-N11, Akt II mit Vertiefung H18-H19/N12-N15).</summary>
 public static class StoryCatalog
 {
     static StoryObjective Talk(string npc, string key) => new StoryObjective(StoryObjectiveType.Talk, npc, 1, key);
@@ -248,6 +254,38 @@ public static class StoryCatalog
         {
             Collect(StoryIds.Russseite, 1, "quest.n11.obj.seite"),
         }, prereq: "h3", prereqStatus: StoryStatus.Active, gate: StoryGate.KilnOpen, reward: StoryReward.Gold, rewardGold: 120),
+
+        // ---- Akt II Vertiefung (cinderreach-akt2-vertiefung S1): H18-H19 + N12-N15 ----
+        // haengt wie H14-H17 neben den Ankern: H6 (Merle-Angebot), H8
+        // (Glasmacher-Kill mit Prisma) und H9 (Rueckkehr mit Scherben-Zeile)
+        // bleiben unangetastet. Neue Kennungen meiden h10-h13/n6-n7
+        // (Akt III) und bleiben coverage-faehig ([a-z]+\d+).
+        new StoryQuest("h18", 2, true, StoryIds.Merle, new[]
+        {
+            Collect(StoryIds.Sehglas, 2, "quest.h18.obj.sehglas"),
+            Talk(StoryIds.Merle, "quest.h18.obj.merle"),
+        }, prereq: "h7", prereqStatus: StoryStatus.Active, autoAccept: true, turnIn: false, catchUp: StoryGate.ZoneBossDefeated),
+        new StoryQuest("h19", 2, true, StoryIds.Merle, new[]
+        {
+            Collect(StoryIds.Glasscherbe, 3, "quest.h19.obj.scherben"),
+        }, prereq: "h8", prereqStatus: StoryStatus.Done, autoAccept: true, turnIn: false, catchUp: StoryGate.ZoneBossDefeated),
+        new StoryQuest("n12", 2, false, StoryIds.Merle, new[]
+        {
+            Collect(StoryIds.Speichenrad, 1, "quest.n12.obj.rad"),
+            Talk(StoryIds.Merle, "quest.n12.obj.merle"),
+        }, prereq: "n4", prereqStatus: StoryStatus.Done, reward: StoryReward.Gold, rewardGold: 150),
+        new StoryQuest("n13", 2, false, StoryIds.Ilsabe, new[]
+        {
+            Collect(StoryIds.Sehglas, 1, "quest.n13.obj.sehglas"),
+        }, prereq: "n5", prereqStatus: StoryStatus.Done, reward: StoryReward.Gold, rewardGold: 200),
+        new StoryQuest("n14", 2, false, StoryIds.Merle, new[]
+        {
+            Collect(StoryIds.Glasscherbe, 1, "quest.n14.obj.scherbe"),
+        }, prereq: "h18", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 100),
+        new StoryQuest("n15", 2, false, StoryIds.Ilsabe, new[]
+        {
+            Collect(StoryIds.Spendenseite, 1, "quest.n15.obj.seite"),
+        }, prereq: "n5", prereqStatus: StoryStatus.Done, reward: StoryReward.Gold, rewardGold: 150),
 
     };
 

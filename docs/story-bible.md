@@ -37,7 +37,7 @@ Die Spieler entdecken sie in drei Schichten, je eine pro Wendepunkt.
    Ilsabe Krumm, mit dem Siegel des Vogts.
 3. **Die Hüllen wollen ihre Glut zurück.** (Wendung Akt II, Glasbrache.) Glutglas bewahrt die Glut nicht
    als Wärme, es hält sie fest. Der Körper, dem sie gehört, steht ohne sie wieder auf und wird zur Hülle.
-   Die Hüllen im Moor kommen nicht trotz der Laternen. Sie kommen wegen der Laternen.
+   Die Hüllen im Moor kommen nicht trotz der Laternen. Sie kommen wegen der Laternen. Je heller die Wacht brennt, desto mehr stehen draußen im Nebel.
 
 Damit kippt die Ausgangsfrage. Die Wacht dachte, ihr Licht schütze sie vor dem Moor. In Wahrheit ruft ihr
 Licht das Moor herbei.
@@ -351,6 +351,12 @@ Nachschub. Merle Sandkamp kommt mit einem leeren Karren aus der Glasbrache.
 | H7 | Scherben lesen | Merle | Dünenseher erschlagen (3). Ihre Sehgläser zeigen die Laternenwacht von außen: Hüllen, die zum Licht ziehen. | Wendung 3 deutet sich an. |
 | H8 | Nicht loslassen | Merle | Den Glasmacher bezwingen. Das Prisma des Glasmachers tragen oder aufheben. | Der Glasmacher spricht von Wendeline und der Glut im Glas. |
 | H9 | Wessen Licht | Ottilie und Merle | In die Laternenwacht zurückkehren und mit beiden sprechen. | Ottilie hält eine Scherbe gegen ihre Laterne. Offenes Ende (siehe Ausblick). |
+| H18 | Was im Glas liegt | Merle | Zwei Sehgläser der Dünenseher bergen (Rätsel R4). Mit Merle sprechen. | Die Gläser zeigen die Wacht von außen: Hüllen, die zum Licht ziehen. Wendung 3 wird greifbar. |
+| H19 | Die Ordnung der Scherben | Merle | Drei Glasscherben an den Glassäulen bergen (Rätsel R5). | Die Scherben passen aneinander: Der Glasmacher hat jede Scheibe für einen Namen geschliffen. |
+
+H6 (Ankunft bei Merle), H8 (Glasmacher-Kill mit Prisma) und H9 (Rückkehr mit Scherben-Zeile) sind
+Anker und bleiben unangetastet. H18–H19 hängen wie H14–H17 daneben: Sie vertiefen einzelne Schritte,
+ohne die Anker zu verschieben.
 
 ### Nebenaufgaben
 
@@ -358,6 +364,21 @@ Nachschub. Merle Sandkamp kommt mit einem leeren Karren aus der Glasbrache.
 |---|---|---|---|---|---|
 | N4 | Tamm | Merle | Einen Glasvogt in der Glasbrache bezwingen. Seine Karrnermarke zu Merle bringen. | 250 Gold | Tamm war einer der Glasvögte. Merle legt die Marke nicht weg, sondern in ihren Sack mit dem Glutglas. In H9 sagt sie dann, dass sie das Glas nicht mehr verkauft. Ohne N4 verkauft sie es weiter („Irgendwer kauft immer Licht“). |
 | N5 | Was die Seher sahen | Ilsabe | Zwei Sehgläser behalten statt sie Merle zu geben (vier Dünenseher erschlagen). Zu Ilsabe bringen. | 1 einzigartiger Gegenstand aus Ilsabes Bestand | Ilsabe will die Sehgläser, um zu wissen, wann die Hüllen kommen. Sie plant schon die nächste Spende. Die Wacht hat aus Akt I nichts gelernt. In H9 spricht Ottilie es aus: „Sie wird ihnen etwas anbieten. Jemanden.“ |
+| N12 | Tamms Rad | Merle | Das Speichenrad von Tamms Karren in der Glasbrache bergen. Zu Merle bringen. | 150 Gold | Tamm fuhr die letzte Fuhre selbst. Wer N12 erledigt hat, hört in H9 Merles Satz dazu: Sie vergräbt das Glas, statt es zu verkaufen. |
+| N13 | Das fünfte Glas | Ilsabe | Ein fünftes Sehglas tief in der Glasbrache bergen (gehört zu Rätsel R4). Zu Ilsabe bringen. | 200 Gold | Mit fünf Gläsern kann Ilsabe lesen, wann die Hüllen kommen. Wer N13 erledigt hat, hört in H9 Ottilies zweiten Satz dazu. |
+| N14 | Tamms Scherbe | Merle | Eine Glasscherbe mit eingeritztem Namen an den Glassäulen bergen (gehört zu Rätsel R5). | 100 Gold | Die Scherbe trägt Tamms Namen. Wer N14 erledigt hat, hört im H19-Gespräch Merles Satz dazu. |
+| N15 | Die nächste Spende | Ilsabe | Eine lose Spendenseite in der Glasbrache bergen. | 150 Gold | Die Seite nennt einen Preis pro Laterne. Wer N15 erledigt hat, hört in H9 Ilsabes eigenen Satz dazu. |
+
+### Rätsel-Definitionen (Akt II)
+
+Alle Rätsel nutzen Bestandssysteme: Fundstücke über `StoryPickup`/`IUsable` mit der Benutzen-Taste (T),
+Gespräche über `StoryDialog` mit Folgezeilen-Mechanik (`x|nK`). Kein neues Interaktionssystem.
+
+| Nr | Name | Typ | Ort (Quests) | Regel |
+|---|---|---|---|---|
+| R4 | Sehgläser zusammen | Umgebung/Fundstück | Glasbrache (H18 + N5 + N13) | Zwei Sehgläser (H18) und das fünfte Glas (N13) gehören zu den behaltenen Gläsern (N5, Bestand). Erst wenn alle geborgen sind, liest sich im Fuhrbuch der ganze Satz: Die Hüllen ziehen zu genau den Laternen, deren Glut sie tragen. |
+| R5 | Die Ordnung der Scherben | Umgebung/Fundstück | Glasbrache (H19 + N14) | Drei Glasscherben (H19) ergeben erst mit Tamms Scherbe (N14) eine lesbare Scheibe: Sie nennt einen Namen aus der Wacht. |
+| R6 | Behalten oder abliefern | Dialog/Entscheidung | Glasbrache/Laternenwacht (N5 + N13, mit Folge in H9) | Die Gläser zu Ilsabe bringen (N5, N13), statt sie Merle zu geben (H18): Ilsabe liest darin die Nächte der Hüllen. Die Entscheidung steht im H9-Abschluss — mit eigener Zeile je nachdem, ob N13/N15 bekannt sind. |
 
 ## Ausblick nach Akt II
 
@@ -374,7 +395,7 @@ aufgelöst.
 
 Dialogzeilen mit Sprecher `x|nK` erscheinen nur, wenn Nebenaufgabe `nK` erledigt ist, `x|!nK` nur, wenn nicht
 (`StoryDialog.Visible`). So ändert jede Nebenaufgabe eine Zeile der Hauptkette: N1 → H5-Angebot, N2 → H3-Angebot,
-N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie,
+N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie, N12 → H9 Merle, N13 → H9 Ottilie, N14 → H19, N15 → H9 Ilsabe,
 N8 → H2-Angebot, N9 → H3-Angebot, N10 → H4-Abschluss, N11 → H5-Angebot.
 
 ## Zurufe

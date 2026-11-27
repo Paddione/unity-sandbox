@@ -1,8 +1,10 @@
 # Progress: cinderreach-akt2-vertiefung
 
-Prozent: 0 %
+Prozent: 33 %
 
 ## Erledigt
+
+- 2026-11-27: S1 gelandet (Worktree `feature/cinderreach-akt2-vertiefung-s1`, NICHT gemergt/gepusht — landet der Primary): Bibel §Akt II auf 12 Einträge (H18/H19 + N12–N15, Rätsel R4–R6, Wendung 3 geschärft, Anker H6/H8/H9 unangetastet), StoryModel +6 Quests +4 Items (h10–h13/n6–n7 frei, Save v16 unangetastet, State/Director generisch — keine Pfadänderung), LocCatalog.Story.cs +26 Zeilen Quest-/Item-Texte (Präzedenz Akt-I-S1 6646cff, verlangt von StoryStateTests), Akt2ModellTests neu (12/12). Belege: EditMode 686/686, PlayMode 383/383, VerifyDiabloZone OK, KayKitAssets.Verify OK, check-meta OK, workspace-check still. 1 Diagnose-Runde (Testfahrpläne), 0 Wiederholungs-Budget verbraucht für Modellfehler.
 
 - 2026-11-24: setgoal-Runde beantwortet (siehe Goal `cinderreach-akt1-vertiefung`: beides kombiniert, gemischte Rätsel, Laternen-Finale für Akt III, 4 Goals).
 - 2026-11-24: Goal persistent angelegt (GOAL.md + PROGRESS.md, health_goals ab 0 %) und Ausführungsplan `.agents/plans/cinderreach-akt2-vertiefung/tasks.md` geschrieben.
