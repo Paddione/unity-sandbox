@@ -172,3 +172,5 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
   boss3 Phase 2, H11/N6/N7 sauber, `[h12,h13]` offen, `caughtUp=[]`.
 - Grenze: kein Retro-Booking und kein Respawn aus S4 heraus; `dlg.h11–h13`-Glättung
   weiter P6 S2 nach dem S4-Drop.
+
+- Erledigt (S4-Final): Exit criterion erfüllt — Thewes-Respawn bei H11 (S3c) + Autoplay 34/34 Exit 0. Kein offener Mechanics-Punkt aus Akt III mehr; P6 S2 übernimmt Textglättung.

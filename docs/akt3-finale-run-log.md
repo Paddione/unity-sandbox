@@ -1,10 +1,26 @@
 # Akt-III-Finale — Laufprotokoll (cinderreach-akt3-finale S4)
 
-Stand 2026-11-27 (S4-Rerun, Worktree `cinderreach-akt3-finale-s4`, Commit `d4183bf`
-= S4-Doku auf S3b `468e35b` = Szene enthält MoortorGate/ReturnGate, 8 Finds, Thewes).
+Stand 2026-11-27 (S4-Final, Worktree `cinderreach-akt3-finale-s4`, Commit-Basis S3c
+`9865355` = H11-Kanten-Hook mit Thewes-Respawn + Item-Namen auf S3b-Szene `468e35b`).
 Kette H9→H10→H11→H12→H13 + N6/N7 (Bibel §Akt III „Was nach Hause will"), 34 Katalog-Quests.
 
-## S4-Rerun (Linux-Player, WSLg, `-autoplay -autoplay-god -seed 0`)
+## S4-Final (Linux-Player, WSLg, `-autoplay -autoplay-god -seed 0`)
+
+`bash scripts/run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau, Ergebnis-Commit
+`a0c74d5` + S3c `9865355` per Rebase im Branch):
+
+- Player-Exit **0**, `duration_s` 284,4 s, `exceptions` 0, `huskKills` 70, `navPlans` 126, `navWarps` 2.
+- `result_phases`: `town,zone1,gate,zone2,boss,zone3,actboss,zone4,boss3,complete,quests` —
+  `complete` erreicht (boss3: kills=1, Phase 2, 13 Lanzen, 5 gewardete Felder), danach
+  `quests`-Phase: **34/34, `open=[]`, `caughtUp=[]`** → `ComputeExit` 0.
+- Sweep-Beleg (Player-Log): N6/N7-Angebote + H10-Talks `walked=True`, `TurnIn h10`;
+  4× `lanzenspitze` + 3× `glutspur` + N7-`spendenseite` `taken=True`; `hunt Thewes:
+  killed=True` (Auftritt via S3c-Hook nach H11); `Talk h13`, `TurnIn n6`, `TurnIn n7`.
+- fps-gate **PASS** (worst avg 31,7 fps vs. 30,0 bei 56 Fenstern, 1280×720, RTX 5070 Ti D3D12).
+- Blocker aus dem Rerun (Thewes-Vorkill → H12 unerfüllbar) ist durch S3c aufgelöst:
+  H11-Kante spawnt Thewes neu (voll HP, Boss-Tier), H12-Kill bucht, H13-Entscheidung läuft.
+
+## S4-Rerun (historisch: 32/34, Thewes-Vorkill)
 
 `bash scripts/run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau, Commit `d4183bf`):
 

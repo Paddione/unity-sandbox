@@ -1,6 +1,6 @@
 # Progress: cinderreach-akt3-finale
 
-Prozent: 75 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -10,6 +10,7 @@ Prozent: 75 %
 
 - 2026-11-27: Plan auf `1ff1b95` rebased und als P5 priorisiert: Akt-I-S1 erfüllt (`6646cff`, IDs `h10–h13`/`n6–n7` freigehalten), Akt-II-S1 steht weiter aus — S1 bleibt blockiert; Save-Stand auf v15 korrigiert. Prozent bleibt 0 %.
 
+- 2026-11-27: S4-Final (eigene Übernahme, Worker gestoppt): `run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau auf S3c) Exit **0**, 284,4 s, 0 Exceptions, `complete` + `quests`-Phase **34/34** (`open=[]`), huskKills 70, fps-gate PASS (31,7 vs. 30,0). S3c-Hook löst den Rerun-Blocker (Thewes-Vorkill): H11-Kante spawnt neu, H12-Kill bucht, H13 läuft. Belege: EditMode 716/716, PlayMode 410/410, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, `check-meta` OK, Coverage 0 uncovered, `check-voice-lines` 244/0, workspace-check still. **Akt III 100 %.** Handoff an P6 S2: Dialog-Drop steht (dlg.h11–h13 fehlen, Glättung + Voice nach diesem Drop).
 - 2026-11-27: S4-Rerun auf S3b-Szene (dieser Worktree, Commit `d4183bf`): `run-autoplay.sh artifacts/autoplay-s4.log -seed 0` (Neubau) Exit 1, 261,6 s, 0 Exceptions, `complete` erreicht, Quests 32/34 offen [h12,h13] (`caughtUp=[]`). H11/N6/N7 spielen sauber (S3b-Finds tragen); Blocker: Thewes fällt bereits im Akt-II-Barrens-Sweep (vor H12-Aktivierung), kein Respawn — H12/H13 in einem Pass unerfüllbar, kein Code-Fix aus S4 (read-only), Folge-Arbeit in eigenem Branch. Nebenbefund `[Loc] missing key story.item.lanzenspitze/glutspur`, fps-gate FAIL advisory. `check-voice-lines` 244/0, Coverage 0 uncovered. PROGRESS bleibt 75 % (Abnahme-Regel: STOP bei Exit != 0).
 - 2026-11-27: S1 bibel+akt gelandet (Branch `cinderreach-akt3-finale-s1`, dieser Worktree): Bibel §Akt III „Was nach Hause will" (H10 Letzte Nacht in der Wacht / H11 Glut am Moortor mit Rätsel R7 Laternenlesung / H12 Finalboss Thewes der Heimkehrer / H13 Entscheidung zerschlagen-halten; N6 Jorins Einschmelzen / N7 Ilsabes letztes Angebot; Ausblick-Platzhalter ersetzt, Haken-Zitat „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter." wörtlich erhalten; Glossar: Der Heimkehrer + Akt III; Zurufe Thewes Phase 2/besiegt; Zwischentexte H12/H13; genau 1 offene Zeile aufgelöst: N9 Thewes' Licht). `ActProgressAkt3.cs` neu (Entwurf: OpenMoortor braucht Barrens-Boss wie Kilnmother→Brache, DefeatFinalBoss braucht Moortor, Decide genau 1 Schlusszeile Shatter/Hold — kein Balance-/Drop-/Gear-Eingriff, Save v16 unangetastet, Save/Koop in S3). `Akt3ModellTests.cs` neu (12/12: Reservierung h10–h13/n6–n7, H9-Anker für H10, H9-Varianten merle.7/ottilie.7-8 seit Akt-II-S2, Katalog-Reihenfolge, Catch-up, Wacht-/Moortor-Gates, Finalboss-Reihenfolge, H13-Entscheidung, v16-Stillstand). Belege: EditMode 702/702, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, `check-meta` OK, workspace-check still. Diagnose: `GameSettingsTests.MainMenu_NewContinueValidation` war einmal rot durch einen liegengebliebenen Spielstand unter `~/.config/unity3d/.../cinderreach-save.json` (fremder Testlauf, kein S1-Fehler) — nach Löschen des Stands voll grün. Handoff an S2: Bibel-Drop steht, Voice-Render neuer Zeilen erst ab S2 (S2-Textglättung wartet auf diesen Bibel-Drop); S2 hängt H10–H13/N6–N7 an H9 (prereq-Kette H9→H10→H11→H12→H13, N6/N7→H13-Folge).
 
@@ -22,8 +23,8 @@ Prozent: 75 %
 
 - S1: Story-Bibel Akt III schreiben (H10–H13/N6–N7, Boss- und Entscheidungs-Definition) + ActProgress-Entwurf — nach Akt-I-S1 + Akt-II-S1.
 - S2: Wacht-Strang (H10, N6–N7, NPC-Dialoge Ottilie/Merle/Ilsabe/Jorin).
-- S3: Moortor-Finale (H11-Rätsel, H12-Boss, H13-Entscheidung, Save-Migration, Koop-Buchung) — läuft (eigene Übernahme nach Worker-Harness-Fehlern).
-- S4: Abnahme (Autoplay bis complete, Voice, Doku).
+- S3: Moortor-Finale + S3b-Szene + S3c-Auftritt — gelandet.
+- S4: Abnahme — gelandet (34/34 Exit 0). Akt III 100 %; Handoff an P6 S2 (Sprache/Voice).
 
 ## Offene Punkte
 

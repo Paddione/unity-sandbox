@@ -1119,3 +1119,12 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   `spendenseite` ist katalogisiert) — Anzeige-Lücke, kein Quest-Blocker.
   `check-voice-lines` 244/0, `check-quest-coverage` 0 uncovered (Rerun-bestätigt).
   Gemäß Abnahme-Regel STOP: PROGRESS bleibt 75 %, kein Commit von Code/Tests/Szene.
+
+## 2026-11-27 — Akt-III-Abnahme 34/34 (S4-Final, Eigner-Finallauf)
+
+S3c-Hook trägt: Thewes-Vorkill aus dem Akt-II-Sweep blockiert nicht mehr — H11-Kante
+spawnt neu, H12-Kill bucht generisch, H13-Entscheidung läuft, N6/N7-TurnIns schließen.
+Autoplay `-seed 0`: Exit 0, 284,4 s, 0 Exceptions, `complete` + `quests` 34/34, fps-gate
+PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-Bedingung
+(H11 nennt ihn) gehört zum Spawn dazu, nicht nur zum Modell. P6 S2 übernimmt Textglättung
++ dlg.h11–h13/Voice auf diesem Drop.
