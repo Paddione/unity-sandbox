@@ -205,6 +205,7 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | Glass Elite | Glasvogt |
 | Glass Pillar | Glassäule |
 | The Glasswright | Der Glasmacher |
+| The Homecomer | Der Heimkehrer |
 
 ### Klassen und Fähigkeiten
 
@@ -251,7 +252,7 @@ Interne Bezeichner bleiben englisch. Diese Tabelle regelt ausschließlich Anzeig
 | Health potion | Heiltrank |
 | Strength / Vitality / Focus | Stärke / Vitalität / Fokus |
 | Level / Skill point | Stufe / Fertigkeitspunkt |
-| Act I / Act II | Akt I / Akt II |
+| Act I / Act II / Act III | Akt I / Akt II / Akt III |
 
 ### Einzigartige Gegenstände
 
@@ -380,23 +381,88 @@ Gespräche über `StoryDialog` mit Folgezeilen-Mechanik (`x|nK`). Kein neues Int
 | R5 | Die Ordnung der Scherben | Umgebung/Fundstück | Glasbrache (H19 + N14) | Drei Glasscherben (H19) ergeben erst mit Tamms Scherbe (N14) eine lesbare Scheibe: Sie nennt einen Namen aus der Wacht. |
 | R6 | Behalten oder abliefern | Dialog/Entscheidung | Glasbrache/Laternenwacht (N5 + N13, mit Folge in H9) | Die Gläser zu Ilsabe bringen (N5, N13), statt sie Merle zu geben (H18): Ilsabe liest darin die Nächte der Hüllen. Die Entscheidung steht im H9-Abschluss — mit eigener Zeile je nachdem, ob N13/N15 bekannt sind. |
 
-## Ausblick nach Akt II
+## Akt III – „Was nach Hause will“
 
-Kein Akt III in diesem Goal. Das Ende bleibt offen und unbequem:
+Ausgangslage: Ottilie hält die Scherbe gegen ihre Laterne. Der Haken aus Akt II bleibt wörtlich stehen:
 
 > Ottilie hält die Scherbe gegen ihre Laterne. Das Licht darin flackert im Takt eines Atems.
 > „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter. Sie wollen nur nach Hause.“
 > Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.
 
-Die spätere Entscheidung (Laternen brechen oder halten) ist der Haken für Akt III und wird hier nicht
-aufgelöst.
+Die Fuhre geht zum Moortor und findet heraus, wer da steht: Thewes, der Heimkehrer — die erste Hülle
+mit einem Namen aus der Wacht. Am Ende entscheidet die Wacht, ob die Laternen zerschlagen oder
+gehalten werden. Eine Entscheidung, eine Schlusszeile je Ausgang, ein Durchlauf.
+
+### Hauptaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele | Abschluss |
+|---|---|---|---|---|
+| H10 | Die letzte Nacht in der Wacht | Ottilie | Mit Ottilie, Merle, Ilsabe und Jorin sprechen. Die Scherbe an Ottilies Laterne halten. | Die Wacht schickt die Fuhre zum Moortor. Voraussetzung ist H9: Erst wer mit Merle und Ottilie gesprochen hat, geht los. |
+| H11 | Glut am Moortor | Merle | Drei Glutspuren am Moortor deuten (Rätsel R7). | Die dritte Spur nennt Thewes. |
+| H12 | Die Heimkehr | Ottilie | Thewes, den Heimkehrer, am Moortor bezwingen. | Sein Grablicht erlischt. Damit löst sich N9 (Thewes' Licht) auf. |
+| H13 | Zerschlagen oder halten | Ottilie | In die Wacht zurückkehren. Entscheiden: die Laternen zerschlagen oder halten. | Eine Schlusszeile je Ausgang bei gleichem Durchlauf (siehe Entscheidung). |
+
+H10 hängt an H9 (Prereq), H11 an H10, H12 an H11, H13 an H12. Kein neuer Ort: Wacht und Moortor
+genügen. Kein neuer Boss-Mechanismus: H12 nutzt Bosssystem, Bossbalken und Cutscene-Muster des
+Bestands (siehe Finalboss).
+
+### Nebenaufgaben
+
+| Nr | Titel | Auftraggeber | Ziele | Belohnung | Was sie an der Hauptgeschichte ändert |
+|---|---|---|---|---|---|
+| N6 | Jorins Einschmelzen | Jorin | Die übrigen Lanzenspitzen an der Schmiede abgeben. Jorin beim Einschmelzen zusehen. | Ein kostenloses Umschmieden | Jorin schmilzt ein, was er geschmiedet hat. Wer N6 erledigt hat, hört im H13-Abschluss seinen Satz dazu: Die Spitzen werden zu Nägeln für die Fensterläden. |
+| N7 | Ilsabes letztes Angebot | Ilsabe | Die letzte Spendenseite zu Ilsabe bringen. Ihr Angebot anhören und ablehnen. | 200 Gold | Ilsabe bietet die nächste Spende an: sich selbst gegen Glas. Die Fuhre lehnt ab. Wer N7 erledigt hat, hört im H13-Abschluss Ilsabes eigenen Satz dazu. |
+
+### Der Finalboss: Thewes, der Heimkehrer
+
+Thewes stand auf einer Grabtafel im Beinhaus und gab dem Abt seine Knochen, damit der Grund gehütet
+bleibt (H3, N9). Seine Glut aber brannte in einer Laterne der Wacht — Ottilie hatte seinen Namen
+selbst auf die Liste gesetzt. Darum ist er die erste Hülle, die weiß, wohin sie gehört: nach Hause.
+Er ist kein Auserwählter und kein Fluch, nur eine Rechnung, die noch offen ist.
+
+Kampf auf vorhandenem System: Hüllen-Gefolge wie beim Abt, Bossbalken wie bei allen Bossen,
+Intro- und Phase-2-Muster aus dem vorhandenen Cutscene-System (`CutsceneDirector`). Kein neues
+Boss-System, keine neue Arena-Mechanik.
+
+- Phase 1: Thewes geht langsam auf die Gruppe zu und greift nach ihrer Laterne. Wer ihm im Weg
+  steht, wird beiseite geschoben.
+- Phase 2 (ab 50 %): Er ruft die Hüllen beim Namen, wie der Abt seine Brüder rief. Mehr Hüllen,
+  gleiche Regeln.
+
+Zurufe: siehe `## Zurufe` (Thewes Phase 2, Thewes besiegt).
+
+### Die Entscheidung (H13)
+
+Eine Aufgabe, eine Abgabe bei Ottilie, zwei Schlusszeilen. Kein Content-Baum, kein zweites Ende mit
+eigenem Boss: Der Durchlauf ist gleich, nur die letzte Zeile unterscheidet sich.
+
+- Zerschlagen: „Dann löscht sie eine Laterne nach der anderen. Bei jeder nennt sie einen Namen, und
+  bei jedem Namen wird es draußen einen Schritt leiser.“
+- Halten: „Dann hängt sie die Scherbe zurück an die Tür. Das Licht flackert weiter im Takt eines
+  Atems, und draußen warten sie. Sie haben Zeit.“
+
+### Rätsel-Definitionen (Akt III)
+
+Alle Rätsel nutzen Bestandssysteme: Fundstücke über `StoryPickup`/`IUsable` mit der Benutzen-Taste (T),
+Gespräche über `StoryDialog` mit Folgezeilen-Mechanik (`x|nK`). Kein neues Interaktionssystem.
+
+| Nr | Name | Typ | Ort (Quests) | Regel |
+|---|---|---|---|---|
+| R7 | Laternenlesung | Umgebung/Fundstück | Moortor (H11 + N7) | Drei Glutspuren (H11) lesen sich erst mit Ilsabes letzter Spendenseite (N7) als Weg: Die Spuren führen zu genau der Laterne, deren Glut Thewes trägt. |
+
+### Aufgelöste Zeile
+
+N9 (Thewes' Licht): Thewes hat sein Licht nie gelöscht, und Ottilie hat seinen Namen selbst auf die
+Liste gesetzt. In H12 kommt er heim, und sein Grablicht erlischt. Das ist die eine offene,
+unbequeme Zeile, die Akt III auflöst; alles andere bleibt stehen.
 
 ## Folgezeilen der Nebenaufgaben
 
 Dialogzeilen mit Sprecher `x|nK` erscheinen nur, wenn Nebenaufgabe `nK` erledigt ist, `x|!nK` nur, wenn nicht
 (`StoryDialog.Visible`). So ändert jede Nebenaufgabe eine Zeile der Hauptkette: N1 → H5-Angebot, N2 → H3-Angebot,
 N3 → H4-Abschluss, N4 → H9 Merle (zwei Varianten), N5 → H9 Ottilie, N12 → H9 Merle, N13 → H9 Ottilie, N14 → H19, N15 → H9 Ilsabe,
-N8 → H2-Angebot, N9 → H3-Angebot, N10 → H4-Abschluss, N11 → H5-Angebot.
+N8 → H2-Angebot, N9 → H3-Angebot, N10 → H4-Abschluss, N11 → H5-Angebot, N6 → H13-Abschluss,
+N7 → H13-Abschluss.
 
 ## Zurufe
 
@@ -410,6 +476,8 @@ Kurze vertonte Zeilen außerhalb des Dialogfensters, als Untertitel über der Ak
 | Ofenmutter besiegt | Die Ofenmutter | „Ich habe niemanden geholt. Sie wurden mir gebracht. Von euch.“ |
 | Glasmacher Phase 2 | Der Glasmacher | „Wendeline, hab keine Angst. Sie wollen dich nur ansehen. Ich halte dich.“ |
 | Glasmacher besiegt | Der Glasmacher | „Ihr nennt es Gefangenschaft. Ich nenne es: nicht loslassen.“ |
+| Thewes Phase 2 | Thewes, der Heimkehrer | „Thewes. Feddersen. Die Kinder vom Hirten. Kommt. Eure Namen brennen noch.“ |
+| Thewes besiegt | Thewes, der Heimkehrer | „Löscht sie. Oder haltet sie. Aber sagt meinen Namen dazu.“ |
 | H4 beginnt (Glutofen betreten) | Erzähler | „Hinter dem Tor ist die Luft so heiß, dass der Ruß nicht fällt. Irgendwo zählt eine Stimme Körbe.“ |
 | H7 erledigt (Wendung 3) | Erzähler | „Im letzten Sehglas liegt die Laternenwacht, von außen gesehen. Um ihre Lichter steht der Nebel voller Gestalten, alle mit dem Gesicht zur Tür.“ |
 
@@ -429,4 +497,6 @@ einer Zeile macht ihren Clip ungültig (`scripts/check-voice-lines.py`), neu ren
 | Abt besiegt | DER STILLE GRUND SCHWEIGT | Der Abt fällt wie ein leerer Mantel. In seinem Brevier stehen Namen, und neben manchen steht kein Todestag. |
 | Ofenmutter besiegt (Akt I) | AKT I ABGESCHLOSSEN | Zum ersten Mal seit drei Generationen kühlt der Ofen aus. Hinter ihm liegt die Glasbrache offen. |
 | Glasmacher besiegt | DIE GLASBRACHE IST STILL | Das Prisma ist warm. Es wird nicht kälter. |
+| Thewes besiegt (Akt III) | DIE HEIMKEHR IST STILL | Das Grablicht am Sarkophag des Thewes ist erloschen. Zum ersten Mal seit vierzig Tagen ist es am Moortor leise. |
+| H13 entschieden | AKT III ABGESCHLOSSEN | Die Wacht hat entschieden: zerschlagen oder halten. Der Durchlauf bleibt gleich, nur die letzte Zeile nicht. |
 | Akt II beginnt (Merle erscheint) | AKT II – WAS IM GLAS WOHNT | Ein leerer Karren rollt durch das Moortor. Die Frau darauf hat seit Tagen niemanden gesehen, der noch glüht. |
