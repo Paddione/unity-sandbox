@@ -39,7 +39,7 @@ public static partial class LocCatalog
         E("dlg.h3.offer.7", "Jorin Hagedorn war Lehrling am Ofen. Redet mit ihm, bevor ihr hingeht. Er sagt nicht viel, aber er lügt nicht.", "Jorin Hagedorn was an apprentice at the kiln. Talk to him before you go. He doesn't say much, but he doesn't lie."),
         E("dlg.h3.offer.8", "Thewes' Licht habt ihr gefunden. Seinen Namen habe ich selbst auf die Liste gesetzt. Vergebt mir, oder lasst es.", "You found Thewes' light. I put his name on the list myself. Forgive me, or don't."),
         E("dlg.h3.hint.1", "Redet mit Jorin an der Schmiede. Dann in den Glutofen. Der Weg führt durch das Beinhaus.", "Talk to Jorin at the smithy. Then into the Cinder Kiln. The way leads through the ossuary."),
-        E("dlg.h3.talk.jorin.1", "Ottilie schickt euch. Hab's mir gedacht.", "Ottilie sent you. Figured."),
+        E("dlg.h3.talk.jorin.1", "Ottilie schickt euch. Das dachte ich mir.", "Ottilie sent you. Thought so."),
         E("dlg.h3.talk.jorin.2", "Die Meisterin. Ihr nennt sie Ofenmutter. Wir haben sie nie so genannt, wenn sie zugehört hat.", "The master. You call her the Kilnmother. We never called her that when she could hear."),
         E("dlg.h3.talk.jorin.3", "Ich hab die Lanzen ihrer Wächter geschmiedet. Gegen Plünderer, hieß es. Gegen Plünderer braucht man keine Widerhaken.", "I forged her wardens' lances. Against looters, they said. You don't need barbs against looters."),
         E("dlg.h3.talk.jorin.4", "Ihre Knechte glühen. Nicht von der Arbeit. Wenn sie fallen, platzen sie. Bleibt nicht stehen, wenn einer fällt.", "Her thralls glow. Not from the work. When they fall, they burst. Don't stand still when one falls."),
@@ -48,7 +48,7 @@ public static partial class LocCatalog
         // ---- H4 Asche schuldet niemand ----
         E("dlg.h4.hint.1", "Der Ofen brennt noch. Solange er brennt, hört sie nicht auf.", "The kiln still burns. As long as it burns, she won't stop."),
         E("dlg.h4.done.1", "Das ist ihr Brennbuch? Schwer. Ruß an jeder Seite.", "That's her firing book? Heavy. Soot on every page."),
-        E("dlg.h4.done.2", "Sie hat euch etwas gesagt, bevor sie fiel. Ich seh es euch an. Nein, sagt es mir nicht. Ich lese es selbst.", "She said something to you before she fell. I can see it on you. No, don't tell me. I'll read it myself."),
+        E("dlg.h4.done.2", "Sie hat euch etwas gesagt, bevor sie fiel. Ich sehe es euch an. Nein, sagt es mir nicht. Ich lese es selbst.", "She said something to you before she fell. I can see it on you. No, don't tell me. I'll read it myself."),
         E("dlg.h4.done.3", "Jorin hat heute sechs Spitzen eingeschmolzen. Er sagt, das sei seit Jahren das erste Stück, das er gern macht.", "Jorin melted down six points today. He says it's the first piece in years he's been glad to make."),
         E("dlg.h4.done.4", "Gebt mir einen Abend damit.", "Give me an evening with it."),
 
@@ -82,7 +82,7 @@ public static partial class LocCatalog
         E("dlg.h9.talk.merle.1", "Ihr habt das Prisma. Es ist warm, nicht wahr? Er hat gesagt, das sei seine Frau. Wendeline.", "You have the prism. It's warm, isn't it? He said that was his wife. Wendeline."),
         E("dlg.h9.talk.merle.2", "Die Sehgläser haben euch die Wacht gezeigt. Von außen. Die Hüllen im Nebel, alle mit dem Gesicht zum Licht.", "The seeing glasses showed you the Hold. From outside. The husks in the fog, all facing the light."),
         E("dlg.h9.talk.merle.3", "Sie kommen nicht trotz der Laternen. Sie kommen, weil ihre Glut darin steckt. Sie wollen nach Hause.", "They don't come despite the lanterns. They come because their ember is inside them. They want to go home."),
-        E("dlg.h9.talk.merle.4", "Ich verkaufe das Glas nicht mehr. Tamm liegt jetzt mit drin.", "I don't sell the glass any more. Tamm is in there now too."),
+        E("dlg.h9.talk.merle.4", "Ich verkaufe das Glas nicht mehr. Tamm liegt jetzt darin.", "I don't sell the glass any more. Tamm is in there now too."),
         E("dlg.h9.talk.merle.5", "Den Sack verkaufe ich trotzdem. Irgendwer kauft immer Licht, und ich muss essen.", "I'll sell the sack anyway. Someone always buys light, and I have to eat."),
         E("dlg.h9.talk.merle.6", "Sagt Ottilie, was ihr gesehen habt. Sie ist die Einzige, die die Laternen zählt.", "Tell Ottilie what you saw. She's the only one who counts the lanterns."),
         E("dlg.h9.talk.ottilie.1", "Ottilie hält eine Scherbe gegen ihre Laterne. Das Licht darin flackert im Takt eines Atems.", "Ottilie holds a shard against her lantern. The light inside flickers like breathing."),
@@ -92,7 +92,7 @@ public static partial class LocCatalog
         E("dlg.h9.talk.ottilie.5", "Hinter dem Moortor stehen Hüllen im Nebel und sehen herüber. Keine kommt näher. Noch nicht.", "Beyond the Fen Gate, husks stand in the fog and look across. None comes closer. Not yet."),
         E("dlg.h9.talk.ottilie.6", "Geht schlafen. Ich zähle noch einmal.", "Go and sleep. I'll count once more."),
         // Akt II Vertiefung S2: H9-Folgen (N12 → Merle vergräbt, N13/N15 → Ottilie liest mit).
-        E("dlg.h9.talk.merle.7", "Tamms Rad habe ich vergraben, mit dem Glas obendrauf. Verkauft wird hier nichts mehr.", "I buried Tamm's wheel, with the glass on top. Nothing gets sold here any more."),
+        E("dlg.h9.talk.merle.7", "Tamms Rad habe ich vergraben, mit dem Glas darauf. Verkauft wird hier nichts mehr.", "I buried Tamm's wheel, with the glass on top. Nothing gets sold here any more."),
         E("dlg.h9.talk.ottilie.7", "Fünf Gläser hat sie jetzt. Ilsabe liest darin die Nächte der Hüllen — und wir zählen mit.", "She has five glasses now. Ilsabe reads the husks' nights in them — and we count along."),
         E("dlg.h9.talk.ottilie.8", "Eine Spendenseite pro Laterne. Irgendwer zahlt immer — sorgt dafür, dass ihr es nicht seid.", "One donation page per lantern. Someone always pays — make sure it isn't you."),
 
@@ -107,8 +107,8 @@ public static partial class LocCatalog
         E("dlg.n12.offer.2", "Holt sein Speichenrad. Ich will etwas haben, das ich vergraben kann.", "Fetch his wheel. I want something I can bury."),
         E("dlg.n12.hint.1", "Das Rad liegt bei seinem Karren, zwischen den Trümmern im Süden.", "The wheel lies by his cart, among the rubble in the south."),
         E("dlg.n12.done.1", "Ja. Das ist sein Rad — die Speiche habe ich selbst geschnitzt.", "Yes. That's his wheel — I carved that spoke myself."),
-        E("dlg.n12.done.2", "Ich vergrabe es mit dem Glas obendrauf. Verkauft wird hier nichts mehr.", "I'll bury it with the glass on top. Nothing gets sold here any more."),
-        E("dlg.n13.offer.1", "Vier Gläser hat Merle. Das fünfte liegt tief in der Brache, wo keiner mehr hingeht.", "Merle has four glasses. The fifth lies deep in the barrens, where nobody goes any more."),
+        E("dlg.n12.done.2", "Ich vergrabe es mit dem Glas darauf. Verkauft wird hier nichts mehr.", "I'll bury it with the glass on top. Nothing gets sold here any more."),
+        E("dlg.n13.offer.1", "Vier Gläser hat Merle. Das fünfte liegt tief in der Brache, wo niemand mehr hingeht.", "Merle has four glasses. The fifth lies deep in the barrens, where nobody goes any more."),
         E("dlg.n13.offer.2", "Bringt es mir, nicht ihm. Ich lese darin, wann die Hüllen kommen.", "Bring it to me, not to him. I'll read in it when the husks come."),
         E("dlg.n13.hint.1", "Sucht bei den Glassäulen im Süden, hinter dem Glasmacher.", "Search by the glass pillars in the south, past the Glasswright."),
         E("dlg.n13.done.1", "Fünf Gläser. Jetzt kann ich die Nächte lesen.", "Five glasses. Now I can read the nights."),
@@ -125,7 +125,7 @@ public static partial class LocCatalog
         E("dlg.n15.done.2", "Was eine Laterne kostet, zahlt immer jemand. Merkt euch das.", "What a lantern costs, someone always pays. Remember that."),
 
         // ---- Akt III Finale S2: Wacht (H10, N6, N7; Bibel §Akt III) ----
-        E("dlg.h10.offer.1", "Heute Nacht schläft die Wacht nicht. Morgen geht die Fuhre zum Moortor, und vorher will ich jede Stimme gehört haben — auch die, die sonst nur rechnet und schweigt.", "The Hold won't sleep tonight. Tomorrow the cart goes to the Fen Gate, and first I want to have heard every voice — even those that usually only count and stay silent."),
+        E("dlg.h10.offer.1", "Heute Nacht schläft die Wacht nicht. Morgen geht die Fuhre zum Moortor. Vorher will ich jede Stimme gehört haben — auch die, die sonst nur rechnet und schweigt.", "The Hold won't sleep tonight. Tomorrow the cart goes to the Fen Gate. First I want to have heard every voice — even those that usually only count and stay silent."),
         E("dlg.h10.offer.2", "Sprecht mit Merle. Sie hat gesehen, was im Glas auf uns wartet, und sie sagt es nur einmal.", "Talk to Merle. She has seen what waits for us in the glass, and she'll say it only once."),
         E("dlg.h10.offer.3", "Sprecht mit Ilsabe und mit Jorin. Die eine zählt, der andere schweigt — beide wissen etwas, das ich nicht weiß.", "Talk to Ilsabe and to Jorin. One counts, the other keeps silent — both know something I don't."),
         E("dlg.h10.offer.4", "Und dann kommt wieder her. Die Scherbe halten wir gemeinsam an mein Licht. Was dann brennt, tragen wir hinaus.", "And then come back. Together we'll hold the shard to my light. Whatever burns then, we carry outside."),
@@ -140,7 +140,7 @@ public static partial class LocCatalog
         E("dlg.h10.talk.ottilie.2", "Es ist nicht mein Atem. Es ist jemandes, der draußen im Nebel steht und nach Hause will.", "It's not my breath. It's someone's, standing out in the fog, wanting to go home."),
         E("dlg.h10.talk.ottilie.3", "Morgen fahren wir hin und finden heraus, wer da steht. Geht jetzt zu den anderen. Ich halte so lange still.", "Tomorrow we drive there and find out who stands there. Go to the others now. I'll hold still until then."),
         E("dlg.h10.talk.merle.1", "Ihr wollt wissen, was euch am Moortor erwartet? Hüllen. Im Nebel. Alle mit dem Gesicht zu unseren Laternen.", "You want to know what waits at the Fen Gate? Husks. In the fog. All facing our lanterns."),
-        E("dlg.h10.talk.merle.2", "Sie kommen nicht trotz des Lichts. Ihre Glut steckt darin — Tamm liegt jetzt mit drin, und er zieht mich noch immer heimwärts.", "They don't come despite the light. Their ember is inside it — Tamm lies in there now, and he still pulls me homeward."),
+        E("dlg.h10.talk.merle.2", "Sie kommen nicht trotz des Lichts. Ihre Glut steckt darin — Tamm liegt jetzt darin, und er zieht mich noch immer heimwärts.", "They don't come despite the light. Their ember is inside it — Tamm lies in there now, and he still pulls me homeward."),
         E("dlg.h10.talk.merle.3", "Sagt Ottilie, dass ich fahre. Ich habe meinen Teil gefahren, aber diesen fahre ich noch.", "Tell Ottilie I'm driving. I've driven my share, but I'll drive this one too."),
         E("dlg.h10.talk.ilsabe.1", "Zum Moortor? Dann braucht ihr Proviant, und ich brauche — nein. Diesmal rechne ich nichts. Diesmal wünsche ich euch nur, dass ihr wiederkommt.", "To the Fen Gate? Then you need provisions, and I need — no. This time I count nothing. This time I only wish you back."),
         E("dlg.h10.talk.ilsabe.2", "Und wenn dort draußen jemand einen Preis nennt — zahlt ihn nicht. Sagt lieber, Ilsabe handelt alles, nur das nicht.", "And if someone out there names a price — don't pay it. Say instead that Ilsabe trades anything, only not that."),
@@ -185,7 +185,7 @@ public static partial class LocCatalog
         E("dlg.n3.done.3", "Nehmt das Material. Das nächste Umschmieden zahle ich. Mehr hab ich nicht.", "Take the material. I'll pay for the next reforge. That's all I have."),
 
         // ---- N4 Tamm ----
-        E("dlg.n4.offer.1", "Tamm trägt eine Karrnermarke. Blech, mit einer Drei drauf. Er war der dritte Fahrer.", "Tamm wears a carter's tag. Tin, with a three on it. He was the third driver."),
+        E("dlg.n4.offer.1", "Tamm trägt eine Karrnermarke. Blech, mit einer Drei darauf. Er war der dritte Fahrer.", "Tamm wears a carter's tag. Tin, with a three on it. He was the third driver."),
         E("dlg.n4.offer.2", "Er ist jetzt einer von denen, die das Glas vorn tragen und die anderen anführen.", "He's one of those now who wear the glass in front and lead the others."),
         E("dlg.n4.offer.3", "Ich will ihn nicht zurück. Ich will, dass er aufhört. Bringt mir die Marke.", "I don't want him back. I want him to stop. Bring me the tag."),
         E("dlg.n4.hint.1", "Ein Glasvogt. Die Marke hängt ihm am Hals, wenn noch ein Hals da ist.", "A glass reeve. The tag hangs at his neck, if there's still a neck."),
@@ -204,7 +204,7 @@ public static partial class LocCatalog
         // ---- Akt I Vertiefung S2: Moor/Beinhaus (R1 zweiter Karren, R2 siebte Tafel) ----
         E("dlg.h14.offer.1", "Noch ein Karren steckt im Moor. Jünger als der erste, und sein Siegelband fehlt.", "One more cart is stuck in the fen. Newer than the first, and its seal ribbon is missing."),
         E("dlg.h14.offer.2", "Zwei Fetzen hängen noch am Holz. Bringt sie mir, beide.", "Two scraps still hang on the wood. Bring them to me, both."),
-        E("dlg.h14.offer.3", "Derselbe Moorschläger? Nein. Ein anderer. Sie vermehren sich wie Rechnungen.", "The same fen brute? No. Another one. They multiply like bills."),
+        E("dlg.h14.offer.3", "Derselbe Moorschläger? Nein. Ein anderer. Es werden mehr.", "The same fen brute? No. Another one. There are more of them."),
         E("dlg.h14.offer.4", "Und schaut nach einem Band. Jeder Karren trägt eines. Wenn es fehlt, fehlt es nicht von allein.", "And look for a ribbon. Every cart carries one. When it's missing, it's not missing by itself."),
         E("dlg.h14.hint.1", "Die Fetzen am zweiten Karren, im Moor bei der alten Kiste. Der Moorschläger bewacht sie noch.", "The scraps on the second cart, in the fen by the old chest. The fen brute still guards them."),
         E("dlg.h14.done.1", "Zeigt her. Zwei Fetzen.", "Show me. Two scraps."),
@@ -215,10 +215,10 @@ public static partial class LocCatalog
         E("dlg.h15.offer.3", "Thewes hat darunter gelegen. Fragt mich nicht, woher ich das weiß. Bringt sie mir, und ich sage es euch.", "Thewes lay beneath it. Don't ask how I know. Bring them to me, and I'll tell you."),
         E("dlg.h15.hint.1", "Die Bruchstücke im Beinhaus, bei den Sarkophagen. Drei. Thewes' Stück liegt am weitesten unten.", "The fragments in the ossuary, by the sarcophagi. Three. Thewes' piece lies lowest."),
         E("dlg.h15.talk.ottilie.1", "Legt sie zusammen. Vorsichtig. Die Kanten sind schärfer, als sie aussehen.", "Lay them together. Carefully. The edges are sharper than they look."),
-        E("dlg.h15.talk.ottilie.2", "‚Schuld: … Personen, Ausgleich in …' Der Rest bleibt blind. Kein Todestag, keine Namen.", "'Debt: … persons, settled in …' The rest stays blind. No date of death, no names."),
+        E("dlg.h15.talk.ottilie.2", "‚Schuld: … Personen, Ausgleich in …' Der Rest ist nicht lesbar. Kein Todestag, keine Namen.", "'Debt: … persons, settled in …' The rest stays blind. No date of death, no names."),
         E("dlg.h15.talk.ottilie.3", "Thewes' Grablicht brennt noch an seinem Sarkophag. Holt es. Bei seinem Licht lesen wir den Rest.", "Thewes' grave light still burns on his sarcophagus. Fetch it. By its light we'll read the rest."),
         E("dlg.n8.offer.1", "Am zweiten Karren hing ein Siegelband. Jetzt hängt es nicht mehr. Sucht es.", "A seal ribbon hung on the second cart. Now it doesn't. Find it."),
-        E("dlg.n8.offer.2", "Hundert Gold, wenn es das Siegel trägt, das ich fürchte.", "A hundred gold, if it bears the seal I fear."),
+        E("dlg.n8.offer.2", "Hundert Gold. Ich fürchte, ich weiß schon, wessen Siegel darauf ist.", "A hundred gold. I fear I already know whose seal is on it."),
         E("dlg.n8.hint.1", "Das Band am zweiten Karren, im Moor. Rot wie Vogtswachs.", "The ribbon on the second cart, in the fen. Red like reeve's wax."),
         E("dlg.n8.done.1", "Das Siegel des Vogts. Sauber gedrückt.", "The reeve's seal. Cleanly pressed."),
         E("dlg.n8.done.2", "Hundert, wie versprochen. Und sagt niemandem, dass ihr es mir gezeigt habt.", "A hundred, as promised. And tell no one you showed it to me."),

@@ -162,7 +162,7 @@ public static partial class LocCatalog
         E("quest.n7.summary", "Die letzte Spendenseite gehört zu Ilsabe. Sie bietet die nächste Spende an: sich selbst gegen Glas.", "The last donation page belongs to Ilsabe. She offers the next donation: herself for glass."),
         E("quest.n7.obj.seite", "Die letzte Spendenseite zu Ilsabe bringen", "Bring the last donation page to Ilsabe"),
         E("quest.h11.title", "Glut am Moortor", "Ember at the Moortor"),
-        E("quest.h11.summary", "Drei Glutspuren am Moortor. Gelesen mit Ilsabes letzter Spendenseite führen sie zu Thewes' Laterne.", "Three ember traces at the Moortor. Read with Ilsabe's last donation page, they lead to Thewes' lantern."),
+        E("quest.h11.summary", "Drei Glutspuren am Moortor. Mit Ilsabes letzter Spendenseite gelesen führen sie zu Thewes' Laterne.", "Three ember traces at the Moortor. Read with Ilsabe's last donation page, they lead to Thewes' lantern."),
         E("quest.h11.obj.glut", "Drei Glutspuren am Moortor deuten", "Read the three ember traces at the Moortor"),
         E("quest.h12.title", "Die Heimkehr", "The homecoming"),
         E("quest.h12.summary", "Thewes, der Heimkehrer, steht am Moortor. Sein Grablicht muss erlöschen.", "Thewes the Homecomer stands at the Moortor. His grave light must go out."),
