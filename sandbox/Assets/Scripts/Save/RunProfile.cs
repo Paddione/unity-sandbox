@@ -37,6 +37,9 @@ public static class RunProfile
 
     /// <summary>Story quest progress (cinderreach-deutsch-story S4, save v13).</summary>
     public static StoryState Story = new StoryState();
+    /// <summary>Akt III finale run-through (cinderreach-akt3-finale S3): Moortor,
+    /// final boss, H13 decision. Persists via the generic story lists (v16 stays).</summary>
+    public static ActProgressAkt3 Finale = new ActProgressAkt3();
 
     /// <summary>Hero look + name (character-creation, save v14). Separate from the account name.</summary>
     public static HeroProfile Hero = HeroProfile.CreateDefault(new System.Random());
@@ -55,6 +58,8 @@ public static class RunProfile
         BarrensLayout.ResetPlaza();
         ContractProgress.Reset();
         Story = new StoryState();
+        Finale = new ActProgressAkt3();
+        StoryDirector.ResetFinaleForTests();
         SmithingMaterial = 0;
         RiskShrine.Reset();
         KindledRewardPending = false;

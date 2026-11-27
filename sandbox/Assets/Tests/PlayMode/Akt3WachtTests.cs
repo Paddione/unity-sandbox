@@ -219,10 +219,10 @@ public class Akt3WachtTests
         Assert.AreEqual(7, merle.speakers.Length);
         var ottilie = StoryDialogs.Get("h9.talk.ottilie");
         Assert.AreEqual(8, ottilie.speakers.Length);
-        // Modell-Reservierung steht weiter: S3 haengt H10/N6/N7 an H9.
-        Assert.IsNull(StoryCatalog.Get("h10"));
-        Assert.IsNull(StoryCatalog.Get("n6"));
-        Assert.IsNull(StoryCatalog.Get("n7"));
+        // S3 loest die Reservierung ein: H10/N6/N7 haengen an H9 (S3-Test faehrt Ketten).
+        Assert.AreEqual("h9", StoryCatalog.Get("h10").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n6").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n7").prereq);
         yield break;
     }
 }

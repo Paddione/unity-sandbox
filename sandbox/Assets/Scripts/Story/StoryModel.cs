@@ -25,6 +25,11 @@ public static class StoryIds
     public const string Grablicht = "grablicht";
     public const string Fuhrliste = "fuhrliste";
     public const string Russseite = "russseite";
+    // Akt-III-Finale (S3): R7 Laternenlesung (Glutspuren), N6 Lanzenspitzen.
+    public const string Glutspur = "glutspur";
+    public const string Lanzenspitze = "lanzenspitze";
+    // Akt-III-Finale (S3): Finalboss Thewes, der Heimkehrer (H12 Kill-Ziel).
+    public const string Thewes = "Thewes";
     // Akt-II-Vertiefung (S1): R4 Sehglas-Kombination, R5 Scherben-Ordnung,
     // R6 behalten/abliefern-Entscheidung, Tamm-/Ilsabe-Folgen.
     public const string Sehglas = "sehglas";
@@ -286,6 +291,46 @@ public static class StoryCatalog
         {
             Collect(StoryIds.Spendenseite, 1, "quest.n15.obj.seite"),
         }, prereq: "n5", prereqStatus: StoryStatus.Done, reward: StoryReward.Gold, rewardGold: 150),
+
+        // ---- Akt III Finale (cinderreach-akt3-finale S3): H10-H13 + N6-N7 ----
+        // Append-only (Save-Vertrag): haengt die S1-Reservierung an H9 an
+        // (H9 -> H10 -> H11 -> H12 -> H13, N6/N7 ab H10). Katalog-Reihenfolge
+        // bleibt: erstes Angebot je NPC weiter h1/n1/n3/h6 (h10/n6/n7 sind
+        // spaeter, h11-h13 autoAccept). Loc-Texte (quest.*) und Voice
+        // (dlg./bark.) pflegt P6 S2 nach dem S4-Drop; bis dahin zeigt das
+        // Log die Schluessel.
+        new StoryQuest("h10", 3, true, StoryIds.Ottilie, new[]
+        {
+            Talk(StoryIds.Ottilie, "quest.h10.obj.ottilie"),
+            Talk(StoryIds.Merle, "quest.h10.obj.merle"),
+            Talk(StoryIds.Ilsabe, "quest.h10.obj.ilsabe"),
+            Talk(StoryIds.Jorin, "quest.h10.obj.jorin"),
+        }, prereq: "h9"),
+        new StoryQuest("n6", 3, false, StoryIds.Jorin, new[]
+        {
+            Collect(StoryIds.Lanzenspitze, 4, "quest.n6.obj.spitzen"),
+        }, prereq: "h10", prereqStatus: StoryStatus.Active, reward: StoryReward.SmithKit),
+        new StoryQuest("n7", 3, false, StoryIds.Ilsabe, new[]
+        {
+            Collect(StoryIds.Spendenseite, 1, "quest.n7.obj.seite"),
+        }, prereq: "h10", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 200),
+        // H11-Raetsel R7: drei Glutspuren am Moortor (StoryPickup, generisch).
+        new StoryQuest("h11", 3, true, StoryIds.Merle, new[]
+        {
+            Collect(StoryIds.Glutspur, 3, "quest.h11.obj.glut"),
+        }, prereq: "h10", autoAccept: true, turnIn: false),
+        // H12: Thewes faellt wie jeder Boss (EnemyHealth -> BookKill); Phase 2
+        // ab 50 % bucht StoryDirector.BookFinalBossPhase (Bossbalken generisch).
+        new StoryQuest("h12", 3, true, StoryIds.Ottilie, new[]
+        {
+            Kill(StoryIds.Thewes, 1, "quest.h12.obj.thewes"),
+        }, prereq: "h11", autoAccept: true, turnIn: false),
+        // H13: Rueckkehr in die Wacht; die Entscheidung (zerschlagen/halten)
+        // bucht StoryDirector.BookDecision genau 1x (Decide), Ausgang als Flag.
+        new StoryQuest("h13", 3, true, StoryIds.Ottilie, new[]
+        {
+            Talk(StoryIds.Ottilie, "quest.h13.obj.heimkehr"),
+        }, prereq: "h12", autoAccept: true, turnIn: false),
 
     };
 

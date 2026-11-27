@@ -36,11 +36,15 @@ public class Akt3ModellTests
     }
 
     [Test]
-    public void Kennungen_BleibenReserviert()
+    public void Kennungen_HaengenAnH9()
     {
-        // S2/S3 haengen H10–H13/N6–N7 an H9; bis dahin bleiben sie frei.
-        foreach (var id in Akt3Haupt) Assert.IsNull(StoryCatalog.Get(id), id);
-        foreach (var id in Akt3Neben) Assert.IsNull(StoryCatalog.Get(id), id);
+        // S3 loest die Reservierung ein: H10–H13/N6–N7 haengen an H9.
+        Assert.AreEqual("h9", StoryCatalog.Get("h10").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n6").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n7").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("h11").prereq);
+        Assert.AreEqual("h11", StoryCatalog.Get("h12").prereq);
+        Assert.AreEqual("h12", StoryCatalog.Get("h13").prereq);
     }
 
     [Test]

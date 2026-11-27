@@ -57,9 +57,13 @@ public class Akt1ModellTests
         }
         foreach (var id in NeuHaupt) Assert.IsNotNull(StoryCatalog.Get(id), id);
         foreach (var id in NeuNeben) Assert.IsNotNull(StoryCatalog.Get(id), id);
-        // Akt-III-Nummern bleiben frei.
-        foreach (var id in new[] { "h10", "h11", "h12", "h13", "n6", "n7" })
-            Assert.IsNull(StoryCatalog.Get(id), id);
+        // Akt-III-Kette haengt (S3): H9 -> H10 -> H11 -> H12 -> H13, N6/N7 ab H10.
+        Assert.AreEqual("h9", StoryCatalog.Get("h10").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n6").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("n7").prereq);
+        Assert.AreEqual("h10", StoryCatalog.Get("h11").prereq);
+        Assert.AreEqual("h11", StoryCatalog.Get("h12").prereq);
+        Assert.AreEqual("h12", StoryCatalog.Get("h13").prereq);
     }
 
     [Test]

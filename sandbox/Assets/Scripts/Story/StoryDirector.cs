@@ -110,6 +110,9 @@ public sealed class StoryDirector : MonoBehaviour
         poll = 0.25f;
 
         State.Refresh(RunProfile.Act);
+        // Akt III Finale S3: the Barrens boss opens the Moortor (Abbot→Kiln
+        // pattern, idempotent; persists via the generic story lists, v16 stays).
+        RunProfile.Finale.OpenMoortor(RunProfile.Act);
         var zone = WorldBounds.ZoneAt(transform.position).name;
         if (lastZone != null && zone != lastZone) BookEnter(zone);
         lastZone = zone;
@@ -275,6 +278,9 @@ public sealed class StoryDirector : MonoBehaviour
         string target = StoryIds.KillTarget(objectName ?? "");
         StoryBarks.OnKill(target);
         State.Apply(StoryObjectiveType.Kill, target);
+        // Akt III Finale S3: Thewes down ends H12 and arms the H13 decision
+        // (no new boss system: EnemyHealth books every kill through here).
+        if (target == StoryIds.Thewes) RunProfile.Finale.DefeatFinalBoss();
         State.Refresh(RunProfile.Act);
     }
 
@@ -319,6 +325,55 @@ public sealed class StoryDirector : MonoBehaviour
             case StoryTalkKind.Talk: State.Apply(StoryObjectiveType.Talk, npc); break;
         }
         State.Refresh(RunProfile.Act);
+    }
+
+    // ---- Akt III Finale S3 (Moortor: H11-Raetsel, H12-Boss, H13-Entscheidung) ----
+
+    /// <summary>Final-boss phase-2 entries this run (test seam, boss precedent).</summary>
+    public static int FinalBossPhaseTwoEntries;
+    static bool finalBossPhaseTwo;
+
+    /// <summary>
+    /// Akt III Finale S3: Thewes phase 2 at/below 50 % HP (boss pattern, once
+    /// per run: roar + boss music). The phase-2 showcase reuses the existing
+    /// <see cref="CutsceneDirector"/> path as soon as a Thewes intro exists;
+    /// until then that step is a no-op, never a new system.
+    /// </summary>
+    public static bool BookFinalBossPhase(float hpFraction)
+    {
+        if (finalBossPhaseTwo || hpFraction > 0.5f) return false;
+        finalBossPhaseTwo = true;
+        FinalBossPhaseTwoEntries++;
+        Debug.Log("[Finale] Thewes enters phase 2.");
+        try { DiabloAudio.PlayBossRoar(); } catch { }
+        try { MusicDirector.Ensure().PlayBoss(); } catch { }
+        foreach (var intro in CutsceneDirector.BossIntros)
+            if (intro.anchorName == StoryIds.Thewes)
+            {
+                CutsceneDirector.TryStartPhaseTwoShowcase(intro.id, Time.unscaledTime);
+                break;
+            }
+        return true;
+    }
+
+    /// <summary>
+    /// Akt III Finale S3 (H13): books the one closing line. Exactly once per
+    /// run (<see cref="ActProgressAkt3.Decide"/>); the outcome flag rides the
+    /// generic story flags, so the save (v16, no migration) and the log keep
+    /// it without a new field or new network code.
+    /// </summary>
+    public static bool BookDecision(bool shatter)
+    {
+        if (!RunProfile.Finale.Decide(shatter)) return false;
+        State.Flags.Add(shatter ? "h13.shatter" : "h13.hold");
+        return true;
+    }
+
+    /// <summary>Reset finale run state (scene load / headless tests).</summary>
+    public static void ResetFinaleForTests()
+    {
+        FinalBossPhaseTwoEntries = 0;
+        finalBossPhaseTwo = false;
     }
 
     /// <summary>Opens the dialog for <paramref name="npc"/> when one is scripted; shops only for pending talks.</summary>

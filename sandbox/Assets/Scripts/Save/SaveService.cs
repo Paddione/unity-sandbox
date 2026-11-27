@@ -246,6 +246,7 @@ public static class SaveService
         if (heroLook != null) heroLook.Apply(RunProfile.Class, RunProfile.Hero);
         RunProfile.Act = ActProgress.FromSave(save.highestUnlockedZone, save.actOneComplete, save.actTwoBossDefeated, save.waypoints);
         RunProfile.Story = StoryState.FromSave(save.storyQuests, save.storyFlags);
+        RestoreFinale();
         RunProfile.Story.Refresh(RunProfile.Act);
         RunProfile.Story.TakeChanges();
         ContractProgress.FromSnapshot(save.contract);
@@ -261,6 +262,24 @@ public static class SaveService
                  && RunProfile.RiskShrine.PendingReward == null)
             RunProfile.RiskShrine.PendingReward =
                 RiskShrineProgress.RollRare(RunProfile.RunSeed);
+    }
+
+    /// <summary>
+    /// Akt III Finale S3: the finale rides the generic story lists (no save
+    /// migration, v16 stays — V15ToV16 precedent: steps needing no stored
+    /// fields get none). The Moortor reopens from the act + H10 state, the
+    /// H13 closing line from its outcome flag.
+    /// </summary>
+    static void RestoreFinale()
+    {
+        RunProfile.Finale = new ActProgressAkt3();
+        StoryDirector.ResetFinaleForTests();
+        if (RunProfile.Story.Status("h10") == StoryStatus.Done)
+            RunProfile.Finale.OpenMoortor(RunProfile.Act);
+        if (RunProfile.Story.Status("h12") == StoryStatus.Done)
+            RunProfile.Finale.DefeatFinalBoss();
+        if (RunProfile.Story.Flags.Contains("h13.shatter")) RunProfile.Finale.Decide(true);
+        else if (RunProfile.Story.Flags.Contains("h13.hold")) RunProfile.Finale.Decide(false);
     }
 
     static System.Collections.Generic.List<SkillVariantEntry> CaptureVariants()

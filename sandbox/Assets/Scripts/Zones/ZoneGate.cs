@@ -22,10 +22,18 @@ public sealed class ZoneGate : MonoBehaviour
     // act-two-opening S1: Kiln → Glass Barrens (locked until the Kilnmother falls) and back.
     public const string BarrensGateName = "BarrensGate";
     public const string BarrensReturnGateName = "BarrensReturnGate";
+    // Akt III Finale S3: the Moortor hangs off the Barrens (targetZone stays
+    // Barrens for the save); the gate itself opens via the finale, not the act.
+    public const string MoortorGateName = "MoortorGate";
+    public const string MoortorReturnGateName = "MoortorReturnGate";
     public const string LockedHintName = "GateHint";
 
+    /// <summary>Akt III Finale S3: Moortor gates answer to the finale, the rest to the act.</summary>
+    public bool IsMoortorGate => gameObject != null &&
+        (gameObject.name == MoortorGateName || gameObject.name == MoortorReturnGateName);
+
     /// <summary>Gate leads into a zone the act has not opened yet.</summary>
-    public bool Locked => !RunProfile.Act.IsUnlocked(targetZone);
+    public bool Locked => IsMoortorGate ? !RunProfile.Finale.MoortorOpen : !RunProfile.Act.IsUnlocked(targetZone);
 
     /// <summary>Gates refused because the target zone was locked (test seam).</summary>
     public static int Refusals;
