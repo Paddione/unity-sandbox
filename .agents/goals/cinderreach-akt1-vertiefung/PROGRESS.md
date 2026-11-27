@@ -17,7 +17,7 @@ Prozent: 100 %
 
 ## Nächste Schritte
 
-- Abgeschlossen — Kette frei für P2 Akt-II S1.
+Keine.
 
 ## Offene Punkte
 

@@ -21,7 +21,7 @@ Prozess:
    100 MB pro Datei, ThirdParty-Anteil < 60 %).
 3. Unused-Reste löschen: Jede Datei unter `Assets` wird auf frischen Clones in den
    `Library`-Cache re-importiert (Import-/Clone-/Disk-Kosten), auch wenn Unity
-   Ungenutztes beim Build stript — außer `Resources/`, das immer mit ausliefert.
+   Ungenutztes beim Build stript — außer Ordner `Resources`, das immer mit ausliefert.
 
 ## 3. Erst messen: Editor.log-Aggregat
 
@@ -41,10 +41,10 @@ nicht für den Build gedachte Texturen entfernen.
 
 `sandbox/Assets/Editor/AssetPipelineImportRules.cs` (AssetPostprocessor) fixiert beim Import:
 
-- Audio (`Assets/Resources/Voice/`, `Assets/Resources/Music/`): mono, Vorbis, 0.6 —
+- Audio (Ordner `Assets` / `Resources` / `Voice` und `Music`): mono, Vorbis, 0.6 —
   passend zu `docs/audio/manifest.json` (22050 Hz, mono, oggQuality 0.6, Budget ≤ 60 MB).
   SFX brauchen keine Dateien (`DiabloAudio` synthetisiert zur Laufzeit).
-- UI-Icons (`Resources/MenuArt/`, `Resources/SkillArt/`): Sprite/Single, Alpha, kein Mipmap
+- UI-Icons (Ordner `Resources` (`MenuArt`, `SkillArt`)): Sprite/Single, Alpha, kein Mipmap
   (lädt per `Resources.Load<Sprite>`; Batch-Reparatur: `MenuArtImporter.ImportAsSprites`).
-- Neues Art (`Assets/Art/`): sRGB, max 2048, `ImportStandard`-Materialien (URP Lit).
-- `Assets/ThirdParty/` (KayKit) ist ausgenommen — dort gilt `KayKitAssets`.
+- Neues Art (Ordner `Assets` / `Art`): sRGB, max 2048, `ImportStandard`-Materialien (URP Lit).
+- `KayKit`-Bestand unter `Assets` / `ThirdParty` ist ausgenommen — dort gilt `KayKitAssets`.

@@ -19,13 +19,13 @@ In `unity-sandbox` alle Spieltexte (Bestand H1–H9/N1–N5/Barks + neue Zeilen 
 2. Glossar-Namen unverändert; alle Dialog-/Bark-Zeilen ersetzt, `Loc`-Tabelle + `-lang en`-Fallback konsistent.
 3. `scripts/check-voice-lines.py` grün (keine fehlenden/veralteten Clips); `scripts/voice/render_voices.py` + `scripts/voice/qa_transcribe.py` belegt verständlich.
 4. Voice-Regler „Stimmen“ funktioniert weiter; Koop-Bark-Regel (nur lokaler Empfänger bei Phase-2-/Todes-Zurufen) bleibt.
-5. Belege: EditMode + PlayMode grün, `check-meta.py` grün (neue Clips je mit `.meta`).
+5. Belege: EditMode + PlayMode grün, `scripts/check-meta.py` grün (neue Clips je mit `.meta`).
 
 ## Scope
 
 - `docs/story-bible.md` §Ton (Glättungsregeln, Beispiele)
-- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs`, `LocCatalog.Dialog.cs` (alle betroffenen Zeilen)
-- `sandbox/Assets/Scripts/Story/StoryDialogs.cs`, `StoryBarks.cs` (Textseite; Quest-Logik unangetastet)
+- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs`, `sandbox/Assets/Scripts/Localization/LocCatalog.Dialog.cs` (alle betroffenen Zeilen)
+- `sandbox/Assets/Scripts/Story/StoryDialogs.cs`, `sandbox/Assets/Scripts/Story/StoryBarks.cs` (Textseite; Quest-Logik unangetastet)
 - `docs/audio/voices.json`, Clips unter `sandbox/Assets/Resources/Voice/<key>.ogg`, `scripts/voice/*`
 
 ## Nicht-Ziele
@@ -38,6 +38,6 @@ In `unity-sandbox` alle Spieltexte (Bestand H1–H9/N1–N5/Barks + neue Zeilen 
 
 - `cinderreach-deutsch-story` + `cinderreach-story-voice` (100 %): 115 Zeilen, 8 Stimmen, Voice-Pipeline
 - Zu glättende Neutexte kommen aus `cinderreach-akt1-vertiefung`, `cinderreach-akt2-vertiefung`, `cinderreach-akt3-finale` (Reihenfolge: deren S1-Texte stehen vor diesem Goal S2)
-- Vertrag: `scripts/check-audio-manifest.py` = Probe G-DIABLO07; `scripts/health_probes/diablo_unity.py` G-DIABLO03
+- Vertrag: `scripts/check-audio-manifest.py` = Probe G-DIABLO07; "scripts/health_probes/diablo_unity.py" G-DIABLO03
 - Ausführung: `.agents/plans/cinderreach-sprache-voice/tasks.md` (Stufen S1–S3, je eigener Worktree + `land: ff`)
 - health_goals: [G-DIABLO03, G-DIABLO07]

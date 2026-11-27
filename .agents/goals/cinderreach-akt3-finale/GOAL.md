@@ -19,7 +19,7 @@ In `unity-sandbox` den dritten finalen Akt als lineare Kette mit End-Entscheidun
 2. Genau eine offene, unbequeme Schlusszeile wird aufgelöst (kein verzweigter Content-Baum, kein zweites Ende mit eigenem Boss).
 3. `ActProgress`-Erweiterung für Akt III (Tor-/Freischalt-Logik wie Abt→Kiln, Kilnmother→Brache), Save-Version +1 mit Migration; Koop-Buchung wie Bestand (Boss-Kill bucht Akt-Stand/Save bei Clients).
 4. Neue Texte verständlich-modern (Glossar verbindlich); Vertonung neuer Zeilen über die Voice-Pipeline.
-5. Belege: EditMode + PlayMode grün, `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `check-meta.py` grün, Autoplay erreicht die `complete`-Phase mit 0 Exceptions.
+5. Belege: EditMode + PlayMode grün, `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `scripts/check-meta.py` grün, Autoplay erreicht die `complete`-Phase mit 0 Exceptions.
 
 ## Scope
 

@@ -19,7 +19,7 @@ health_goals: none (Einmaliger Produktionspilot mit GPU-Messung und Unity-Build-
 | Pfad | Verantwortung |
 |---|---|
 | `docs/world-art/local-art-pilot/README.md` und `workflows/{concept,prop}.json` darunter | Anleitung, Herkunft, Messwerte, Entscheidung und reproduzierbare ComfyUI-Exporte |
-| `sandbox/Assets/Art/LocalArtPilot/` | `LootChest.glb`, `TornBanner.glb`, `Quadruped.fbx`, `LootIcon.png`, Materialien, Animationen und drei Wrapper-Prefabs unter `Prefabs/`, jeweils mit Unity-Metadaten |
+| `sandbox/Assets/Art/LocalArtPilot/` | `LootChest.glb`, `TornBanner.glb`, `Quadruped.fbx`, `LootIcon.png`, Materialien, Animationen und drei Wrapper-Prefabs unter Ordner `Prefabs`, jeweils mit Unity-Metadaten |
 | `sandbox/Packages/{manifest,packages-lock}.json` | glTFast und durch Unity aufgelöste Paketversion |
 | `.gitattributes` | Git LFS für GLBs im Pilotordner |
 | `sandbox/Assets/Editor/{SandboxBuilder,OssuaryBuilder}.cs` | Kandidaten für die Einbindung beim Szenenneuaufbau. Zuständigen Pfad vor Änderung im Codegraph bestätigen |

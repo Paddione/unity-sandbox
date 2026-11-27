@@ -26,8 +26,8 @@ In `unity-sandbox` (Cinderreach, `sandbox/`, Unity 6 URP) Akt I von 8 Einträgen
 ## Scope
 
 - `docs/story-bible.md` (Akt-I-Tabellen H/N erweitern, Wendungen 1+2 schärfen)
-- `sandbox/Assets/Scripts/Story/StoryModel.cs`, `StoryState.cs`, `StoryDirector.cs`, `StoryDialogs.cs`, `StoryBarks.cs`, `StoryPickup.cs`, `StoryNpc.cs`, `StoryQuestUI.cs`
-- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs` (+ `LocCatalog.Dialog.cs` für neue Zeilen)
+- `sandbox/Assets/Scripts/Story/StoryModel.cs`, `sandbox/Assets/Scripts/Story/StoryState.cs`, `sandbox/Assets/Scripts/Story/StoryDirector.cs`, `sandbox/Assets/Scripts/Story/StoryDialogs.cs`, `sandbox/Assets/Scripts/Story/StoryBarks.cs`, `sandbox/Assets/Scripts/Story/StoryPickup.cs`, `sandbox/Assets/Scripts/Story/StoryNpc.cs`, `sandbox/Assets/Scripts/Story/StoryQuestUI.cs`
+- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs` (+ `sandbox/Assets/Scripts/Localization/LocCatalog.Dialog.cs` für neue Zeilen)
 - Neue Tests unter `sandbox/Assets/Tests/{EditMode,PlayMode}` (Questkette, Rätsel-Logik, Folgezeilen-Sichtbarkeit)
 
 ## Nicht-Ziele
@@ -40,6 +40,6 @@ In `unity-sandbox` (Cinderreach, `sandbox/`, Unity 6 URP) Akt I von 8 Einträgen
 ## Abhängigkeiten / Referenzen
 
 - `cinderreach-deutsch-story` (100 %): H1–H9/N1–N5, Fuhrbuch, Folgezeilen `x|nK`
-- `cinderreach-story-voice` (100 %): Barks, Voice-Pipeline (`scripts/voice/`, `scripts/check-voice-lines.py`)
+- `cinderreach-story-voice` (100 %): Barks, Voice-Pipeline (Ordner `scripts/voice`, `scripts/check-voice-lines.py`)
 - Ausführung: `.agents/plans/cinderreach-akt1-vertiefung/tasks.md` (Stufen S1–S4, je eigener Worktree + `land: ff`)
 - health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]

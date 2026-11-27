@@ -46,7 +46,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 ## 2026-11-15 — Q5 Diablo click-to-move kill-loot (goal unity-diablo-prototype)
 
 - Done: Q5 mechanics question; `DiabloClickController` (iso click + attack-move) + `DiabloMelee` (range/cooldown) + `EnemyHealth` (HP/flash/death orb-drop); `ToyTrigger` activator widened to tag fallback; `Husk` tag; `SandboxBuilder.BuildDiabloScene/VerifyDiablo/BuildDiablo` (Knight hero, 3 Skeleton husks, tile floor 25, wall ring 24, torches, chest GoalPad); `KayKitAssets` extended to 5 packs (Adventurers 6, Skeletons 4, Rig_Medium 8 anim rigs); EditMode 9/9 + PlayMode 4/4; diablo player build Succeeded (36.6s, 98MB), 45s run clean (0 exceptions).
-- Faced: `-quit` kills `-runTests` before execution (omit `-quit`; runner exits itself); controller cached sibling `DiabloMelee` in `Awake` before it existed (lazy resolve fix, test-found); KayKit figure packs use `Characters/` not `Models/` + need URP check without atlas remap; type is `EditorBuildSettingsScene`.
+- Faced: `-quit` kills `-runTests` before execution (omit `-quit`; runner exits itself); controller cached sibling `DiabloMelee` in `Awake` before it existed (lazy resolve fix, test-found); KayKit figure packs use Ordner `Characters` not Ordner `Models` + need URP check without atlas remap; type is `EditorBuildSettingsScene`.
 - Learned: PlayMode `InputTestFixture` virtual devices work headless; `VerifyDiablo` inventory pattern scales; owner GUI import mapped URP materials correctly (Verify green first try).
 - Next: visual-fit check in editor, hero accessories, Rig_Medium animation wiring, one human feel session (follow-ups, not criteria).
 
@@ -127,17 +127,17 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 ## 2026-11-17 — Ein Windows-Spielordner (SSOT)
 
 - Befund: `C:\Users\PatrickKorczewski\Games` hatte drei Kopien desselben Spiels (`diablo-zone.exe`): `diablo-zone-strike` (15.11., Strike-Meilenstein), `diablo-bloodmoor` (17.11. früh, Stage-Ziel aus dem combat-feel-Plan) und `diablo-zone`. Jede Phase hat von Hand in einen neuen Ordner kopiert, ein Skript gab es nicht.
-- Fix: `scripts/stage-windows.sh` spiegelt `builds/diablo-zone-windows` per `rsync --delete` nach `Games\diablo-zone` und schreibt `BUILD_INFO.json`; Plan-Verweis auf `diablo-bloodmoor` ersetzt; die zwei Altordner gelöscht (nur Build-Dateien, keine Spielstände, keine Verknüpfungen).
+- Fix: `scripts/stage-windows.sh` spiegelt `builds/diablo-zone-windows` per `rsync --delete` nach `Games\diablo-zone` und schreibt "BUILD_INFO.json"; Plan-Verweis auf `diablo-bloodmoor` ersetzt; die zwei Altordner gelöscht (nur Build-Dateien, keine Spielstände, keine Verknüpfungen).
 
 ## 2026-11-17 — S1 identity (Cinderreach / Ashen Fen)
 
 - Done: alle spielersichtbaren Strings + Kommentare + `WorldArtBuilder`-Objektnamen auf die Identitäts-Tabelle umgestellt (Ashen Fen, Lantern Hold, Fen Gate, Fen Brute, Ash Elite); `productName: Cinderreach`; `BuildDiabloZoneWindows()` → `builds/cinderreach-windows/cinderreach.exe`; `stage-windows.sh`/`shotcheck-windows.sh` → `Games\cinderreach` (Altordner `Games\diablo-zone` bleibt unangetastet, nur als Kommentar vermerkt); Art-Bible in `STARTERPACK.md`, `build_props.py`, `DiabloPalette.cs` auf Ashen Fen (`BloodBanner` bleibt); neue `EditMode/IdentityTests.cs` (Szenen-Namenskatalog + Hint-Quellen, Regex-Gate); Test-IDs `DiabloBloodMoor*` → `DiabloAshenFen*`; Setting-Absatz in `docs/one-page-gdd.md`.
-- Faced: `grep`-Regex trifft auch Historie (Journal, decision-log, mechanics-questions), Asset-Pfade (`Assets/Art/BloodMoor`, `bake_moor_ground.py`) und die Regex-Definition in `IdentityTests.cs` selbst — bewusst ausgenommen (GUIDs/Verlauf bleiben), im PROGRESS dokumentiert.
+- Faced: `grep`-Regex trifft auch Historie (Journal, decision-log, mechanics-questions), Asset-Pfade (`Assets/Art/BloodMoor`, "bake_moor_ground.py") und die Regex-Definition in `IdentityTests.cs` selbst — bewusst ausgenommen (GUIDs/Verlauf bleiben), im PROGRESS dokumentiert.
 - Learned: `Husk_Elite`/`Husk_Brute` sind Szenen-Objektnamen (Target-Bar-sichtbar) → mit `VerifyDiabloZone` und `DiabloP2ConfigTests` zusammen umbenennen, sonst bricht Verify.
 - Belegt: EditMode 58/58, PlayMode 59/59, `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `check-meta.py` OK.
 - Extra-Fix: `DiabloAudio.EnsureBuilt` (latent): Szenen-Ladungen zerstörten die statisch gecachten Synth-Clips
   (`built` blieb true) → `AudioClips_AreValidMono22050` war reihenfolgeabhängig rot. Jetzt Rebuild bei totem Clip.
-- Next: dotfiles-Anteile (`diablo_unity.py`-Probe) laufen NICHT hier (eigener Worktree, Orchestrator); S2 nach S1-land.
+- Next: dotfiles-Anteile ("diablo_unity.py"-Probe) laufen NICHT hier (eigener Worktree, Orchestrator); S2 nach S1-land.
 
 ## 2026-11-18 — S2 economy+save (Cinderreach-Session, Stufe S2)
 
@@ -145,7 +145,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   (Builder + `VerifyDiabloZone`- + Prefab-Check); `GoldDrop`-Pickup (Normal 70 % 3–8, Elite 100 % 15–30,
   Chest 40–60, Konstanten + `GetGoldTable` in `DroptableDatabase`), unabhängiger Roll in
   `LootDrop.SpawnLoot` neben der Item-Kugel (Q5-Orb-Zähler unberührt); `SaveGame` (v=1, S4-Punktfelder
-  forward-kompatibel) + `SaveService` (`cinderreach-save.json`, tmp+rename, Autosave Level-Up + Quit,
+  forward-kompatibel) + `SaveService` ("cinderreach-save.json", tmp+rename, Autosave Level-Up + Quit,
   `SaveNow(hero, zoneReached)`-Hooks für S5-Gate/S3-Vendor als Kommentar, korrupt → `*.corrupt` + Warnung);
   `DiabloProgression.GetState/SetState` (Level-Up-Autosave); Tests `SaveGameTests` (7, Roundtrip/Version/
   Korrupt/Wallet/Tabellen) + `EconomyLoopTests` (3, Pickup-Bilanz/Drop-Bilanz/Reload).
@@ -163,7 +163,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Done: `CharacterSheet` (pur: 1 Attribut- + 1 Skillpunkt/Level, Ränge 1–5 je Skill +20 % Schaden/Rang,
   Strength +1 Nahkampf/Punkt, Vitality +5 Life/Punkt auf +3 Life/Level-Basis, Focus +8 % Skillschaden
   und −3 % Cooldown/Punkt mit Floor 50 %); `DiabloProgression` mit Sheet, erweitertem GetState/SetState
-  (Save-Roundtrip via `SaveService`, Level-Up-Banner „+1 Attribut, +1 Skill“); `DiabloSkills.Cleave`
+  (Save-Roundtrip via `SaveService`, Level-Up-Banner „+1 Attribut, +1 Skill“); `Cleave` in `DiabloSkills`
   (R, 360°, 6 s Cooldown, Rang erweitert Radius +0,4 m/Rang) + `SkillArtBuilder.BuildCleaveArc`;
   `DiabloCharacterUI` (Taste `C`, HD-Scaler 1920×1080, ungespendete Punkte pulsieren); `DiabloMelee`
   liest Strength-Bonus, `SaveGame`/`SaveService` persistieren alle Punktfelder; Tests
@@ -187,7 +187,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Trank mit Taste 1 via `DrinkPotion`), `VendorStock` (6 seeded Offers 3×Magic/2×Rare/1×Unique,
   Preise 25/90/300, Verkauf 25 %, `BuyPotion`), `DiabloVendorUI` (UGUI Runtime wie InventoryUI,
   Spalten Vendor/Bag, Gold-Label, HD-Scaler 1920×1080/0.5, `ExternalDrive`-Lock, Schluss → `SaveNow`).
-  Consumable-Seam: `ItemSlot.Consumable`, `ItemDatabase.CreateHealingPotion` (10 g, +10 HP),
+  Consumable-Seam: `ItemSlot.Consumable`, `CreateHealingPotion` in `ItemDatabase` (10 g, +10 HP),
   `Inventory.RemoveAt`. Tests `VendorTests` (10: Preise, 6er-Seed-Stock, Kauf-ohne-Gold, Kauf/Verkauf-Bilanz,
   Bag-voll-Block, Trank-Heilung/Konsum, Radius) + `VendorLoopTests` (3: UI frisst Klicks/Schluss speichert,
   UI-Kauf/Verkauf/Trank, Radius-Gate) + `DiabloHdTests.Vendor_UsesHdScaler`.
@@ -225,7 +225,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 
 - Done: `Scripts/SessionAutoplay.cs` (neu, `-autoplay` inert ohne Flag; Wegpunkte
   Campfire/Vendor/Tor-Pfeiler, Kampf per `DiabloMelee` + Q/E-Skills, Trank-Kauf über
-  S3-Seam `VendorStock.BuyPotion`, Fen-Gate-Marsch; Ossuary-Root, `ZoneGate`, Bone
+  S3-Seam `BuyPotion` in `VendorStock`, Fen-Gate-Marsch; Ossuary-Root, `ZoneGate`, Bone
   Warden, The Hollow Abbot, `SessionComplete` als benannte S5-Seams mit SKIPPED-Log;
   Cheat nur `-autoplay-god`, im Log ausgewiesen; Phasen- + Exception-Zähler, Exit 0/1).
   `DiabloShotCheck` + `town_lantern_hold`, `vendor_open`, `character_open`
@@ -287,7 +287,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 
 ## 2026-11-18 — cinderreach-loop-guard S2 nightly (Workflow + Host-Ablage)
 
-- Done: `.github/workflows/autoplay-nightly.yml` (02:30 UTC + Dispatch, `unity-licensed`, 45 min),
+- Done: ehemaliger Workflow `autoplay-nightly` (02:30 UTC + Dispatch, `unity-licensed`, 45 min),
   Ergebnis als Artefakt (14 Tage) und Kopie nach `~/unity-sandbox-autoplay/`, `docs/ci-runner.md`.
 - Belegt: 3 Dispatch-Läufe grün (44219811822, 44220861693, 44222093327), je 131 s, 0 Exceptions,
   6/6 Phasen, FPS-Minimum 48,0–48,5 auf D3D12 aus dem Runner-Dienst.
@@ -297,7 +297,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 
 ## 2026-11-18 — cinderreach-loop-guard S3 probe + Fehlertest, Goal 100 %
 
-- Done: dotfiles `G-DIABLO06` (neuestes `autoplay-result.json` aus `~/unity-sandbox-autoplay`: ≤ 48 h,
+- Done: dotfiles `G-DIABLO06` (neuestes "autoplay-result.json" aus `~/unity-sandbox-autoplay`: ≤ 48 h,
   exit 0, 6 Phasen, 0 Exceptions, Dauer ≤ 1,5× Median der vorigen 5, FPS-Fenster ohne erstes ≥ 30).
 - Belegt: Probe-Tests 20 passed, Live `G-DIABLO06 achieved`. Fehlertest mit unverwundbarem Boss auf
   Wegwerf-Branch → `critical 3`. Danach Lauf auf `main` → achieved.
@@ -448,7 +448,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Belegt: EditMode 168/168 (Material-Assert in `OssuaryConfigTests.Boss_PhaseTwoAtHalfHp`), PlayMode 80/80,
   Windows-Shotcheck `21_abbot_phase2.png` zeigt graue Kapseln.
 - Faced: Ein `DestroyImmediate` der Beschwörungen im EditMode-Test ließ in derselben Testsitzung alle später
-  geöffneten Szenen ohne `Sandbox.Runtime`-Komponenten laden (11 Szenen-Tests rot). Per Bisect belegt
+  geöffneten Szenen ohne Assembly Sandbox-Runtime-Komponenten laden (11 Szenen-Tests rot). Per Bisect belegt
   (ohne Teständerung 168/168, ohne Fix-Änderung im Skript ebenfalls rot nur mit der Teständerung), Mechanismus
   nicht gefunden. Der Test lässt die Beschwörungen wie früher stehen. Library-Kopien aus Hauptcheckout und
   Runner waren nicht die Ursache.
@@ -585,7 +585,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   (Server; solo lokal), `RangedCaster` → `NetworkBehaviour` mit `TelegraphClientRpc` + nächste
   lebende Heldin, `DiabloNetworkPlayer`-Validierung (Melee 4 m/0,5 s, Ranged 24 m/0,3 s, je Sender),
   `DiabloSkills.ApplyHit`-Kommentar (HitValidator), PlayMode `HostEnemyTests` (5 Tests) +
-  `Sandbox.Tests.PlayMode`-Asmdef um `Unity.Netcode.Runtime` ergänzt.
+  Assembly Sandbox-Tests-PlayMode-Asmdef um `Unity.Netcode.Runtime` ergänzt.
 - Belegt: EditMode 257/257, PlayMode 113/113, `VerifyDiabloZone` OK (husks=48, armed),
   `KayKitAssets.Verify` grün, `check-meta` OK; Paarlauf Exit 0 (Host 8/8, 0 Exc, 181 s; Client
   town,zone1, 0 Exc, hits=232, 108 s); Solo-Autoplay Exit 0, 0 Exc, FPS-Pass 34,6 (≥30).
@@ -670,7 +670,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Eigners) — Live-Join + Shotcheck-PNG als Eigner-Lauf dokumentiert.
 - Faced: `BossController.cs` steht nicht in der S5-target_files-Liste (3-Zeilen-Hook,
   wie S2–S4 dokumentiert). `RunProfile`/`DifficultyProfile` liegen unter
-  `Save/` bzw. `Difficulty/`, nicht wie vermutet direkt unter `Scripts/`.
+  Ordner `Save` bzw. Ordner `Difficulty`, nicht wie vermutet direkt unter Ordner `Scripts`.
 - Next: S6 relay (Join-Code, Multiplayer-Services-Migration, Eigner-Läufe).
 
 ## 2026-11-18 — coop-session S6: Relay-Join-Code (FINAL)
@@ -697,7 +697,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   bei `StartHost`); gleiche Anon-Identität kann sich nicht selbst joinen (pro
   Prozess frisch via `SignOut(clearCredentials:true)`); volle Save-Bags brechen
   den deterministischen Trank-Kauf (Harness archiviert Stale-Saves seit S6).
-- Faced: `MultiplayerAutoStarter.cs`/`run-coop-pair.sh`/`Sandbox.Runtime.asmdef`
+- Faced: `MultiplayerAutoStarter.cs`/`run-coop-pair.sh`/Assembly-Definition Sandbox-Runtime
   (Assembly-Referenzen) stehen nicht in der S6-target_files-Liste, tragen aber
   Relay-Boot, Harness und Kompilierbarkeit (wie S2–S5 dokumentiert).
   `ugs-relay-probe.sh` blieb unverändert (Vorab-Check, Exit 0).
@@ -770,7 +770,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Coop-Smoke und E2E-Join gegen gpu-metal auf dieser Maschine.
 - Done: `SandboxBuilder.BuildDiabloZoneServer` Succeeded (49,1 s, 92 MB), Smoke lokal
   `[Net] Server started`; neuer Code im Build belegt (`MirrorHeroProgress` in
-  `Sandbox.Runtime.dll`); `rsync` nach `gpu-metal:~/diablo-server/` + `BUILD_INFO.json`
+  `Sandbox.Runtime.dll`); `rsync` nach `gpu-metal:~/diablo-server/` + "BUILD_INFO.json"
   (`a4e8aaf`, `diablo-zone`); `diablo-server.service` restart, active, `[Net] Server started`.
   `SandboxBuilder.BuildDiabloZoneWindows` Succeeded (40,7 s, 139 MB), `stage-windows.sh` OK
   (`Games\cinderreach`, neuer Code in staged DLL belegt, Tests korrekterweise absent).
@@ -851,7 +851,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
   Koop behält den Klassenwechsel an Ort und Stelle. Belege im Player: Shotcheck `NEW_HERO`.
 - Fund: `shotcheck-windows.sh` startete Shotcheck und Windows-Autoplay ohne `-save-file`; gleicher
   `productName` heißt gleicher `persistentDataPath`, die Läufe schrieben also den echten
-  `cinderreach-save.json` des installierten Spiels (zuletzt 2026-11-21 02:05). Jetzt
+  "cinderreach-save.json" des installierten Spiels (zuletzt 2026-11-21 02:05). Jetzt
   `-save-file automation-save.json`. Der überschriebene Stand ist ohne Backup nicht wiederherstellbar.
 
 ## 2026-11-21 — Gegnernamen und Bossbalken

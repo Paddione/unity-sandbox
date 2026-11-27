@@ -13,10 +13,10 @@ health_probe: {"id":"G-DIABLO08","title":"No per-frame Camera.main or transform.
 
 # cinderreach-hotpath-caching — Implementation Plan
 
-[Ziel und Erfolgskriterien](../../goals/cinderreach-hotpath-caching/GOAL.md). Planbasis `aaa2571`. Pfade relativ zu `sandbox/Assets/`.
+[Ziel und Erfolgskriterien](../../goals/cinderreach-hotpath-caching/GOAL.md). Planbasis `aaa2571`. Pfade relativ zu Ordner `sandbox/Assets`.
 
 | Stufe | Zuständigkeit und Dateipfade | Prüfung |
 | --- | --- | --- |
 | S1 Hot-Path-Caching (erledigt) | `Scripts/Loot/LootDropView.cs`, `Scripts/DiabloClickController.cs`, `Tests/PlayMode/ItemPresentationTests.cs` | `ItemPresentationTests` 6/6 grün (inkl. `GroundView_BillboardsIcon_AndFollowsCameraSwap`) |
-| S2 Health-Probe `G-DIABLO08` (erledigt) | `scripts/check-hotpath-caching.py`, `scripts/test_check_hotpath-caching.py` | `python3 scripts/check-hotpath-caching.py` OK, `pytest scripts` 30 passed |
-| S3 Vollabnahme (erledigt) | EditMode + PlayMode komplett, `check-meta.py`, `goal-lint.mjs`, `KayKitAssets.Verify` | `EditMode` 670/670 grün; `PlayMode` 377/377 grün (Basis `8e59d00`, inkl. `VfxSpawnTests`-Isolationsfix) |
+| S2 Health-Probe `G-DIABLO08` (erledigt) | `scripts/check-hotpath-caching.py`, `scripts/test_check_hotpath_caching.py` | `python3 scripts/check-hotpath-caching.py` OK, `pytest scripts` 30 passed |
+| S3 Vollabnahme (erledigt) | EditMode + PlayMode komplett, `check-meta.py`, "goal-lint.mjs", `KayKitAssets.Verify` | `EditMode` 670/670 grün; `PlayMode` 377/377 grün (Basis `8e59d00`, inkl. `VfxSpawnTests`-Isolationsfix) |

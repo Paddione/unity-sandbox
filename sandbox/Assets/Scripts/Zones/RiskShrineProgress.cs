@@ -2,7 +2,7 @@
 /// Risk-shrine choice state (cinderreach-risk-shrines S1). One choice per run:
 /// instant heal to max HP, or an empowered elite fight for a guaranteed rare.
 /// Older saves start <see cref="RiskShrineState.Unchosen"/>; a new run calls
-/// <see cref="Reset"/>. The payout is atomic: the item and
+/// <see cref="RiskShrineProgress.Reset"/>. The payout is atomic: the item and
 /// <see cref="RiskShrineState.RewardClaimed"/> persist together, a write
 /// failure rolls the bag insertion back and keeps the claim open, and a full
 /// bag keeps the claim open too.

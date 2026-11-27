@@ -37,9 +37,9 @@ xvfb (~2 fps, CPU) sind renderbegrenzt und kein Balance-Maß.
 - Gelandet `aaa2571` auf `main`. Während der Builds landeten andere Sessions `6646cff` und `443d7c0`; Server und
   Client wurden deshalb beide aus `443d7c0` neu gebaut (HEAD vor/nach dem Build gleich).
 - Server-Image `ghcr.io/paddione/cinderreach-server@sha256:46dd1baa…ce0c6`, gepinnt in dotfiles `9fbe8bf`
-  (`apps/cinderreach-server/k8s/deployment-direct.yaml`), Flux `cinderreach-server` Applied, Pod
+  ("apps/cinderreach-server/k8s/deployment-direct.yaml"), Flux `cinderreach-server` Applied, Pod
   `cinderreach-server-direct-*` Running auf dem neuen Digest, 0 `Exception` im Log.
-- Windows-Client `Games\cinderreach` gestaget (`BUILD_INFO.json` commit `443d7c0`), `cinderreach-wip` entfernt.
+- Windows-Client `Games\cinderreach` gestaget ("BUILD_INFO.json" commit `443d7c0`), `cinderreach-wip` entfernt.
 - Join-Test: `-join-server` (Relay) meldet „Server offline“ (Server läuft seit `752d2e08` nur direkt).
   `-join unity.korczewski.de` trennt ohne Server-Eintrag (Name löst hier nur auf IPv6 auf). `-join 10.10.10.3`
   meldet clientseitig `client 1 is JoinTest (you)`, das Log des Pods zeigt den Beitritt aber nicht. Offen als

@@ -38,7 +38,7 @@ the 40-slot limit, the stash window and the save roundtrip are covered by `Stash
 
 ## Nightly
 
-`autoplay-nightly.yml` now runs Normal and Kindled with the weekday seed and stores both under
+"autoplay-nightly.yml" now runs Normal and Kindled with the weekday seed and stores both under
 `~/unity-sandbox-autoplay/<date>` and `<date>-kindled`. dotfiles `G-DIABLO06` judges the newest run per
 difficulty.
 

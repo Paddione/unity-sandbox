@@ -10,7 +10,7 @@ Katalog-Gear), und beide Seiten speichern bei Gate und Boss-Kill wie solo.
 - Host: `exit=0 phases=town,zone1,gate,zone2,boss,zone3,actboss,complete`,
   0 Exceptions, ~220 s. Client: `exit=0 phases=town,zone1`, 0 Exceptions,
   ~106 s. Artefakte: `artifacts/coop/2026-11-18/{host,client}/player.log`
-  und `autoplay-result.json` je Seite.
+  und "autoplay-result.json" je Seite.
 - Join: beide Seiten loggen `loaded local save for co-op join`; der Host
   wendet die Reports auf die Spiegel an (`join stats from 0: level 5 ...`,
   `join stats from 1: level 3 ...`).
@@ -19,9 +19,9 @@ Katalog-Gear), und beide Seiten speichern bei Gate und Boss-Kill wie solo.
   Spawn-Offsets Host `(0,0,0)` / Client `(1.5,0,0)`), danach je ein eigener
   Corpse-Aufbau pro getötetem Husk auf dem Client (`remote corpse ...`, S3).
 - Saves danach (`~/.config/unity3d/Unity Technologies/Cinderreach/`):
-  `coop-host.json` Level 6, 380 Gold, Zone 1 (Rückweg-Tor in die Town),
-  `coop-client.json` Level 3, Zone 2 (Gate-Reise gespeichert wie solo).
-  Getrennte Dateien per `-save-file` (`coop-host.json` / `coop-client.json`).
+  "coop-host.json" Level 6, 380 Gold, Zone 1 (Rückweg-Tor in die Town),
+  "coop-client.json" Level 3, Zone 2 (Gate-Reise gespeichert wie solo).
+  Getrennte Dateien per `-save-file` ("coop-host.json" / "coop-client.json").
 - Solo-Regression (`run-autoplay.sh`): Exit 0, 0 Exceptions, FPS-Pass.
 
 ## Windows-Client gegen WSL-Host (Eigner-Lauf, Vorlage)
@@ -32,7 +32,7 @@ der Start gehört auf den Windows-Desktop):
 1. Windows-Build (braucht das WindowsStandalone-Modul, ~2 min):
    `bash scripts/run-unity-build.sh SandboxBuilder.BuildDiabloZoneWindows "DiabloZone Windows build result: Succeeded" 1500`
    (Stand S5: Succeeded, 120 MB; der Builder schreibt fest nach
-   `builds/cinderreach-windows/`, also im Hauptcheckout — `BUILD_INFO.json`
+   `builds/cinderreach-windows/`, also im Hauptcheckout — "BUILD_INFO.json"
    nennt dort den Main-Stand, das Binary kam aus diesem Worktree).
 2. Stagen (verweigert bei laufendem Spiel, Exit 3):
    `bash scripts/stage-windows.sh`
@@ -49,7 +49,7 @@ der Start gehört auf den Windows-Desktop):
 
 Harness: `COOP_RELAY=1 bash scripts/run-coop-pair.sh artifacts/coop-relay/<datum>`
 (Host `-host-relay`, Code aus `RELAY_JOIN_CODE=…`, Client `-join-code CODE`).
-Windows-Läufe zusätzlich über Einmal-Harness `/tmp/coop-win.sh`
+Windows-Läufe zusätzlich über Einmal-Harness "/tmp/coop-win.sh"
 (`MODE=direct|relay`; kein Repo-Bestandteil — Befehle siehe unten).
 
 - Linux-Linux: Host `RELAY_JOIN_CODE=MHP868`, beide Exit 0, Client
@@ -153,7 +153,7 @@ Image aus `scripts/publish-server-image.sh` lokal per `docker run … -server-na
 
 | Lauf | Ergebnis |
 |---|---|
-| s3-docker-2 | Server-Subtarget: Lead/Follow grün, aber 32 Server-Exceptions (`Material..ctor` ohne Shader in `EnemyHealth.DropOrb`, `GoldDrop`, `ToyTrigger.PaintGoal`, mitten in `Die()`) |
+| s3-docker-2 | Server-Subtarget: Lead/Follow grün, aber 32 Server-Exceptions (`Material..ctor` ohne Shader in `EnemyHealth.DropOrb`, `GoldDrop`, `PaintGoal` in `ToyTrigger`, mitten in `Die()`) |
 | Player-Subtarget im Container | Segfault in `PlayerMain` nach dem Szenenstart, auch mit X11/GL/GTK-Bibliotheken: verworfen |
 | s3-docker-4 | Server-Subtarget mit Shader-Null-Schutz: Lead 4/4, Follow 3/3 (+ `boss`), Container-Exit 0, 0 Server-Exceptions |
 

@@ -6,7 +6,7 @@ path smoke-tested via scripted review where headless input is absent).
 
 ## Headless Q1 run (done, see `docs/q1-run-log.md`)
 
-1. `SandboxBuilder.VerifyGreybox` opens `Greybox.unity` and asserts the
+1. `SandboxBuilder.VerifyGreybox` opens `sandbox/Assets/Scenes/Greybox.unity` and asserts the
    inventory: player + `ThirdPersonController`, 6 blocks, 4 walls,
    1 trigger zone, 3 orbs, 1 goal pad.
 2. Linux player build `greybox` launches headless, loads the scene,

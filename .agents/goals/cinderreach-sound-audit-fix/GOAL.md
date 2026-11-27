@@ -29,4 +29,4 @@ Auf neuester Version (`unity-sandbox main`, Basis `c2b14bb`, vor Start per Fetch
 ## Abhängigkeiten
 
 - Unity 6000.0.85f2 (`sandbox/ProjectSettings/ProjectVersion.txt`), Testlauf `bash scripts/run-unity-tests.sh`, Metadaten `python3 scripts/check-meta.py`.
-- Health-Vertrag Dotfiles: `G-DIABLO01/02/03/06` in `scripts/health_probes/diablo_unity.py`; neue Probe `G-DIABLO07` läuft repo-lokal über `scripts/check-audio-manifest.py`.
+- Health-Vertrag Dotfiles: `G-DIABLO01/02/03/06` in "scripts/health_probes/diablo_unity.py"; neue Probe `G-DIABLO07` läuft repo-lokal über `scripts/check-audio-manifest.py`.

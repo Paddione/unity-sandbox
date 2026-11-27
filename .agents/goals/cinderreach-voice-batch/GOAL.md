@@ -34,13 +34,13 @@ Eigner-Go. Danach QA + Voice-Gates grün. Ausführung von S2 aus `cinderreach-sp
 
 ## Scope
 
-- `sandbox/Assets/Scripts/Story/StoryDialogs.cs`, `StoryBarks.cs` (Keys `dlg.*` / `bark.*`)
-- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs`, `LocCatalog.Dialog.cs` (gelesene Texte)
+- `sandbox/Assets/Scripts/Story/StoryDialogs.cs`, `sandbox/Assets/Scripts/Story/StoryBarks.cs` (Keys `dlg.*` / `bark.*`)
+- `sandbox/Assets/Scripts/Localization/LocCatalog.Story.cs`, `sandbox/Assets/Scripts/Localization/LocCatalog.Dialog.cs` (gelesene Texte)
 - `docs/audio/voices.json` (8 Bestandsstimmen: abbot, glasswright, ilsabe, jorin,
   kilnmother, merle, ottilie, narrator)
 - `docs/audio/voices/<id>/ref.ogg` + `ref.txt` (nur fehlende designen)
 - `sandbox/Assets/Resources/Voice/<key>.ogg` (+ `.meta`), `docs/audio/voice-lines.lock.json`
-- `scripts/voice/render_voices.py`, `voice_lines.py`, `qa_transcribe.py`,
+- `scripts/voice/render_voices.py`, `scripts/voice/voice_lines.py`, `scripts/voice/qa_transcribe.py`,
   `scripts/check-voice-lines.py`, `scripts/check-audio-manifest.py`
 
 ## Nicht-Ziele
@@ -58,6 +58,6 @@ Eigner-Go. Danach QA + Voice-Gates grün. Ausführung von S2 aus `cinderreach-sp
   müssen vor dem Batch stehen)
 - `cinderreach-deutsch-story` + `cinderreach-story-voice`: 115+ Zeilen, 8 Stimmen, Voice-Pipeline
 - Vertrag: `scripts/check-audio-manifest.py` = Probe G-DIABLO07;
-  `scripts/health_probes/diablo_unity.py` = G-DIABLO03
+  "scripts/health_probes/diablo_unity.py" = G-DIABLO03
 - Ausführung: `.agents/plans/cinderreach-voice-batch/tasks.md` (Batch-Stufen B1–B3, ein Worktree + `land: ff`)
 - health_goals: [G-DIABLO03, G-DIABLO07]

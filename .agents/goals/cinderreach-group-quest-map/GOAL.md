@@ -2,7 +2,7 @@
 
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
 
-Ausgangslage: [`CINDERREACH.md`](../CINDERREACH.md) (Stand `main` @ `b8ae9a6`).
+Ausgangslage: [`.agents/goals/CINDERREACH.md`](../CINDERREACH.md) (Stand `main` @ `b8ae9a6`).
 
 ## Objective
 
@@ -27,7 +27,7 @@ Eine Minimap und eine Zonenkarte (M) zeigen Questziele, Abgaben, Angebote, Tore,
 5. Karten: Minimap oben rechts (28-m-Fenster, kameragleich gedreht, Rand-Pfeile für Ziele außer Sicht) und Zonenkarte
    auf M mit Legende, verfolgten Aufgaben und ◀/▶ über freigeschaltete Zonen. Zonenbild einmalig per Top-down-Render,
    in Batchmode ohne Grafik ein neutraler Grund.
-6. Abnahme: EditMode und PlayMode komplett grün, `check-meta.py` OK. Autoplay normal DONE ohne Exceptions,
+6. Abnahme: EditMode und PlayMode komplett grün, `scripts/check-meta.py` OK. Autoplay normal DONE ohne Exceptions,
    Koop-Paar Exit 0. Windows-Shots von Minimap und Zonenkarte.
 
 ## Nicht-Ziele

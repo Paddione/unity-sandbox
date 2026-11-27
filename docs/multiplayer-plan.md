@@ -1,6 +1,6 @@
 # Multiplayer demo plan — unity-multiplayer-demo (NGO + Relay/Lobby, co-op greybox)
 
-Goal: `.agents/goals/unity-multiplayer-demo/GOAL.md` (0%). Location: `~/unity-sandbox`, branch `feature/unity-multiplayer-demo`.
+Goal: ".agents/goals/unity-multiplayer-demo/GOAL.md" (0%). Location: `~/unity-sandbox`, branch `feature/unity-multiplayer-demo`.
 Assumptions (repo has no `repo.yaml`): `main_branch = main`, `tickets = none`, `task_runner = none`, `generated_artifacts = false`.
 
 ## Tasks
@@ -13,7 +13,7 @@ Assumptions (repo has no `repo.yaml`): `main_branch = main`, `tickets = none`, `
 2. Networked player + manager
    - `NetworkPlayer` prefab: capsule + CharacterController + NetworkObject + ClientNetworkTransform + owner-only `ThirdPersonController` gate.
    - `NetworkManager` in Greybox scene: NetworkManager + UnityTransport (localhost 7777).
-   - `MultiplayerAutoStarter.cs`: host in main editor, auto-connect as client when running under ParrelSync clone (`Application.dataPath` contains `_clone`) or `--net-client` arg; no hard ParrelSync dependency.
+   - `sandbox/Assets/Scripts/MultiplayerAutoStarter.cs`: host in main editor, auto-connect as client when running under ParrelSync clone (`Application.dataPath` contains `_clone`) or `--net-client` arg; no hard ParrelSync dependency.
 
 3. Scene + builder update
    - Extend `SandboxBuilder.BuildScene` to spawn NetworkManager + auto-starter (keep Q1-Q3 toys untouched).

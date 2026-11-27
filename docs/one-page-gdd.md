@@ -28,7 +28,7 @@ crypt seal against a cold fen-night haze.
 
 - Headless verify (`SandboxBuilder.VerifyGreybox`) green on every scene change
 - Linux player build runs the scene with zero errors
-- Save/continue: `cinderreach-save.json` (v=1, atomic tmp+rename, autosave on
+- Save/continue: "cinderreach-save.json" (v=1, atomic tmp+rename, autosave on
   level-up + vendor close + quit), corrupt → `*.corrupt` backup + restart
 
 ## Could-haves

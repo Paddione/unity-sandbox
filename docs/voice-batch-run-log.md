@@ -34,6 +34,6 @@
 ## Health-Goals
 
 - G-DIABLO07: `scripts/check-audio-manifest.py` = OK (35 cues, 8 tracks).
-- G-DIABLO03: Referenz-Skript `scripts/health_probes/diablo_unity.py` existiert weder im
+- G-DIABLO03: Referenz-Skript "scripts/health_probes/diablo_unity.py" existiert weder im
   Worktree noch auf `main` (veraltete GOAL-Referenz) — Substanz via EditMode 539/539 +
   PlayMode 303/303 + `check-meta.py` OK abgedeckt.

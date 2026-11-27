@@ -4,14 +4,14 @@
 
 | Einstiegspunkt | Abdeckung |
 | --- | --- |
-| `DiabloZone.unity` | Cinderreach-Player mit eingebetteten Zonen, Helden, Gegnern, Licht, Effekten und Menü |
-| `Diablo.unity` und `Greybox.unity` | Zusätzlich aktivierte Projekt- und Testspiel-Szenen mit eigenen Zeilenmarkierungen |
+| `sandbox/Assets/Scenes/DiabloZone.unity` | Cinderreach-Player mit eingebetteten Zonen, Helden, Gegnern, Licht, Effekten und Menü |
+| `sandbox/Assets/Scenes/Diablo.unity` und `sandbox/Assets/Scenes/Greybox.unity` | Zusätzlich aktivierte Projekt- und Testspiel-Szenen mit eigenen Zeilenmarkierungen |
 | `Resources` und `StreamingAssets` | Assets für dynamisches Laden einschließlich Menü-Icons, Skill-Effekten, Netzwerk-Prefabs, Animation und Heldenkleidung |
 | Build-Konfiguration, Grafik, Qualität und Player-Preloads | Unity- und Paketabhängigkeiten, einschließlich URP-Assets |
 
-`Assets/ThirdParty/KayKit` enthält die verwendeten Teile der KayKit-Pakete. Die übrigen Projektpfade gehören zum Cinderreach-Projekt. Unter `Packages/` steht die jeweilige Paket-ID als Herkunft. Paket- und Projektassets können mehrere Einstiegspunkte haben.
+`Assets/ThirdParty/KayKit` enthält die verwendeten Teile der KayKit-Pakete. Die übrigen Projektpfade gehören zum Cinderreach-Projekt. Unter Ordner `Packages` steht die jeweilige Paket-ID als Herkunft. Paket- und Projektassets können mehrere Einstiegspunkte haben.
 
-Der Export folgt Unitys transitiven Asset-Referenzen. Ein `Resources`-Eintrag benennt eine verfügbare Laufzeitressource. Ob er in einer bestimmten Spielsitzung tatsächlich geladen wird, hängt von Szenario, Menüpfad und Klasse ab. Unitys eingebaute Geometrie und prozedural erzeugte Renderobjekte haben keinen eigenen importierten Dateipfad. Hierzu gehören die Würfelbasis für Ausrüstungsteile und die zur Laufzeit erzeugten Unique-Meshes aus `HeroGearModels.cs`. Ein Player-Build kann Shader-Varianten entfernen und weitere interne Engine-Daten hinzufügen.
+Der Export folgt Unitys transitiven Asset-Referenzen. Ein `Resources`-Eintrag benennt eine verfügbare Laufzeitressource. Ob er in einer bestimmten Spielsitzung tatsächlich geladen wird, hängt von Szenario, Menüpfad und Klasse ab. Unitys eingebaute Geometrie und prozedural erzeugte Renderobjekte haben keinen eigenen importierten Dateipfad. Hierzu gehören die Würfelbasis für Ausrüstungsteile und die zur Laufzeit erzeugten Unique-Meshes aus `sandbox/Assets/Scripts/Classes/HeroGearModels.cs`. Ein Player-Build kann Shader-Varianten entfernen und weitere interne Engine-Daten hinzufügen.
 
 ## Laufzeit-Aufrufer
 
@@ -34,7 +34,7 @@ Der Unity-Verifikationslauf prüft die Katalogabdeckung, den korrekten Slot, gü
 
 ## Kameraaufnahmen
 
-Die Bildserie in `docs/cinderreach-equipment-shots/` zeigt alle drei Basischaraktere und jedes ausgerüstete Unique. Beispiele sind [Fenwalker](cinderreach-equipment-shots/01_base_fenwalker.png), [Seismic Crown](cinderreach-equipment-shots/12_seismic-crown.png) und [Shardback Aegis](cinderreach-equipment-shots/17_shardback-aegis.png).
+Die Bildserie in Ordner `cinderreach-equipment-shots` unter `docs` zeigt alle drei Basischaraktere und jedes ausgerüstete Unique. Beispiele sind [Fenwalker](cinderreach-equipment-shots/01_base_fenwalker.png), [Seismic Crown](cinderreach-equipment-shots/12_seismic-crown.png) und [Shardback Aegis](cinderreach-equipment-shots/17_shardback-aegis.png).
 
 ## Reproduzieren
 

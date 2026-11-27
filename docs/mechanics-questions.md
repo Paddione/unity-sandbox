@@ -44,7 +44,7 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 
 - Question: is the solo click-to-move kill-loot loop fun? (move → melee
   3 skeleton husks → orbs drop → extraction arms → loop complete).
-- Setup: new `Diablo.unity` scene (Greybox unchanged): isometric fixed-angle
+- Setup: new `sandbox/Assets/Scenes/Diablo.unity` scene (Greybox unchanged): isometric fixed-angle
   camera + `DiabloClickController` (ground-plane click-to-move, click-husk =
   attack-move), `DiabloMelee` (range arc, cooldown), 3 `Skeletons`-pack husks
   with `EnemyHealth` (HP, death drops pickup orb), Adventurers hero named
@@ -70,7 +70,7 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 
 - Question: is the co-op kill-loot-extract loop with a Magic/Rare/Unique
   rarity chase fun in a first explorable crypt zone?
-- Setup: new `DiabloZone.unity` scene ("Ember Crypt Approach"): south stairs
+- Setup: new `sandbox/Assets/Scenes/DiabloZone.unity` scene ("Ember Crypt Approach"): south stairs
   entry → crypt hall (Diablo room kit) → west elite alcove (`Husk_Elite`,
   15 HP, chest with guaranteed Rare+) → east rubble (blocked) → north
   crypt-gate extraction (`GoalPad`, Q3 semantics, `Needed = 3` unchanged).
@@ -119,7 +119,7 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
   bossKills=1 phaseTwo=1 overlay=1 exceptions=0`, `/tmp/s6-autoplay-full.log`);
   `DiabloShotCheck` mit 22 Shots inkl. Ossuary/Boss/Overlay.
 - Headless proof: `docs/session-loop-run-log.md` (Vollpass-Abschnitt).
-- Windows: `stage-windows.sh` → `shotcheck-windows.sh` OK, PNGs 19–22 geprüft.
+- Windows: `scripts/stage-windows.sh` → `scripts/shotcheck-windows.sh` OK, PNGs 19–22 geprüft.
 - Grenze: Ossuary-Leash findet keine Ziele (Folgepass Leash/Anmarsch).
 
 - Historie: Basis-Teil ohne S5 (Seams) siehe Git-Historie dieser Datei.
@@ -137,7 +137,7 @@ Greybox discipline: primitives only, fresh URP/Lit materials, code-owned
 - Setup: `ClassCatalog` (Rogue neu, Rollen + Spezial-Faktor 1,5), `ThreatTable` (Schaden 1:1, Slam +20, Heal gebucht), `DiabloSkills` (Seismic Slam 7, Quick Shot 8, Blade Flurry 9, Mending Light 10, Renewing Circle 11; Basis-Set für alle), `PartyCompanion`/`PartyRoster` (folgen, Threat-/Leader-Ziel, Cooldown-Skills, Tod → Camp + Wiedereinstieg; Host-Reconcile mit Join-Gate), Heal-/Threat-Relay über `DiabloNetworkPlayer`/`HitValidator`.
 - Exit criterion: Autoplay je Klasse Exit 0, 0 Exceptions, Clear-Zeit Rogue/Heiler-Gruppe innerhalb ±25 % der Fenwalker-Gruppe — erfüllt (163,0 s / 132,6 s / 189,7 s, alle 8/8 Phasen, 0 Exceptions, FPS-Pass; siehe `docs/party-roles-run-log.md`); Koop-Paar Host-Tank + Client-Rogue Exit 0/0, KI-Rogue tritt zurück, KI-Heiler bleibt, Client ohne Phantom-KI.
 - Headless proof: EditMode 346/346 + PlayMode 228/228 (S6-Branch, inkl. Peer-Tests von `main`); Ergebnis-JSON trägt `partyRoles`/`huskKills`/`healsCast`/`hpRestored`.
-- Windows: `stage-windows.sh` → `shotcheck-windows.sh` OK, Shots 26–29 (Slam, Quick Shot, Flurry, Renewing Circle).
+- Windows: `scripts/stage-windows.sh` → `scripts/shotcheck-windows.sh` OK, Shots 26–29 (Slam, Quick Shot, Flurry, Renewing Circle).
 - Grenze: Heals 0 in God-Läufen (God-Held hält alle Aggro, Begleiter unverletzt) — Heil-Mechanik über `SoloPartyTests`/`PartySkillTests` belegt; Non-God-Ausdauerlauf bleibt Follow-up.
 
 ## Q12 — Bleiben Begleiter im Kampf belegt und auf Heldenniveau?

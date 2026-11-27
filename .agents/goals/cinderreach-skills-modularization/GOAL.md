@@ -9,7 +9,7 @@ plan_refs: [.agents/plans/cinderreach-skills-modularization/tasks.md]
 
 ## Objective
 
-Die hochfrequente Kernklasse `DiabloSkills.cs` (1.304 Zeilen, 55 Methoden, 36 Commits in 12 Tagen) auf Basis von `main` (`5bd41d3`) entzerren, indem UGUI-Skillbar-Rendering (`SkillBarHud`) und Bogen-/Schwert-Stance-Visuals (`BowStanceVisuals`) aus der Kampf-Autorität herausgelöst werden, ohne Netz- oder Kampfverträge zu brechen. Ausgangslage: [CINDERREACH.md](../CINDERREACH.md).
+Die hochfrequente Kernklasse `sandbox/Assets/Scripts/DiabloSkills.cs` (1.304 Zeilen, 55 Methoden, 36 Commits in 12 Tagen) auf Basis von `main` (`5bd41d3`) entzerren, indem UGUI-Skillbar-Rendering (`SkillBarHud`) und Bogen-/Schwert-Stance-Visuals (`BowStanceVisuals`) aus der Kampf-Autorität herausgelöst werden, ohne Netz- oder Kampfverträge zu brechen. Ausgangslage: [CINDERREACH.md](../CINDERREACH.md).
 
 ## Erfolgskriterien
 
@@ -26,7 +26,7 @@ Die hochfrequente Kernklasse `DiabloSkills.cs` (1.304 Zeilen, 55 Methoden, 36 Co
 ## Nicht-Ziele
 
 - Keine Balance-Änderungen, keine neuen Skills oder Enum-Werte und keine Änderungen an `DiabloNetworkPlayer`-RPC-Signaturen.
-- Kein Umbau von `DiabloAudio.cs`.
+- Kein Umbau von `sandbox/Assets/Scripts/DiabloAudio.cs`.
 
 ## Abhängigkeiten
 

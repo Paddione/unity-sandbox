@@ -16,7 +16,7 @@ S5-Beine (Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow Abbot,
 - Ergebnis: **Exit-Code 0, 0 Exceptions / 0 Errors** im Player-Log.
 - Phasen (`[Autoplay]`):
   - `town_waypoints`: Campfire → Vendor → ZGatePillar_0 erreicht.
-  - `vendor_potion`: `bought=True` (S3-Seam `VendorStock.BuyPotion`, Gold
+  - `vendor_potion`: `bought=True` (S3-Seam `BuyPotion` in `VendorStock`, Gold
     100 → 90, Trank im Bag).
   - `combat`: `kills=12` (10 Husks + Fen Brute + Ash Elite, Melee + Q/E,
     29 Schadens-Events im Log).
@@ -31,11 +31,11 @@ S5-Beine (Ossuary-Root, `ZoneGate`, Bone Warden, The Hollow Abbot,
 - Windows-Build: `SandboxBuilder.BuildDiabloZoneWindows` → Succeeded.
 - Stage: `scripts/stage-windows.sh` → OK (`Games\cinderreach`, 119 MB).
 - Shots: `scripts/shotcheck-windows.sh` → 18 Shots, `DONE 18 shots`, u. a. neu:
-  - `artifacts/shotcheck/16_town_lantern_hold.png` — Lantern Hold von oben
+  - "artifacts/shotcheck/16_town_lantern_hold.png" — Lantern Hold von oben
     (Palisade, Campfire, Vendor-NPC; Vendor-Panel im Shot sichtbar).
-  - `artifacts/shotcheck/17_vendor_open.png` — „Lantern Hold vendor“,
+  - "artifacts/shotcheck/17_vendor_open.png" — „Lantern Hold vendor“,
     Gold-Anzeige, Trank-Tooltip „Buy … Potion (+10 HP, key 1) — 10g“.
-  - `artifacts/shotcheck/18_character_open.png` — Character-Sheet
+  - "artifacts/shotcheck/18_character_open.png" — Character-Sheet
     (Attribute points: 1, Skill points: 1, Lv-2-Held, Q/E/R-Leiste).
 - Befund: alle drei Panels rendern korrekt (HD-Scaler). Nebenbefund (S3-Kosmetik,
   außerhalb S6-Scope, für Folgepass notiert): Vendor-Tooltip-Text läuft eng

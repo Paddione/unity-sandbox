@@ -23,8 +23,8 @@ In `unity-sandbox` (`sandbox/`, Unity 6000.0.85f2, URP, Cinderreach) Begleiter u
 
 ## Scope
 
-- `sandbox/Assets/Scripts/Party/` (`PartyRoster.cs`, `PartyCompanion.cs`)
-- `sandbox/Assets/Scripts/Classes/` (`ClassCatalog.cs`, `ClassAppearance.cs`, `HeroAppearance.cs`)
+- `sandbox/Assets/Scripts/Party/` (`sandbox/Assets/Scripts/Party/PartyRoster.cs`, `sandbox/Assets/Scripts/Party/PartyCompanion.cs`)
+- `sandbox/Assets/Scripts/Classes/` (`sandbox/Assets/Scripts/Classes/ClassCatalog.cs`, `sandbox/Assets/Scripts/Classes/ClassAppearance.cs`, `sandbox/Assets/Scripts/Classes/HeroAppearance.cs`)
 - `sandbox/Assets/Scripts/Menu/ClassSelectUI.cs` (Customize-Modal, Vorschau-Viewport, `Loc`-Texte deutsch mit Englisch-Fallback)
 - Primitive Feind-Spawns (`Enemies/BossController.cs`, `Zones/RiskShrine.cs`, `Enemies/DuneAugur.cs`, `Enemies/BurningGround.cs`)
 - KayKit-Bestand unter `Assets/ThirdParty/KayKit/` (keine neuen Imports)
@@ -39,6 +39,6 @@ In `unity-sandbox` (`sandbox/`, Unity 6000.0.85f2, URP, Cinderreach) Begleiter u
 
 ## Abhängigkeiten / Referenzen
 
-- Ist-Stand: `.agents/goals/cinderreach-character-creation/` (Erstellung mit Gender/Haar/Build/Name, Save v14, Koop-Profil; dort als Nicht-Ziel: keine echten Gender-Körpermodelle — dieses Goal erweitert genau diesen Punkt, bleibt aber beim KayKit-Bestand ohne neue Pipeline), `.agents/goals/cinderreach-party-roles/`, `.agents/goals/cinderreach-party-team/`, `CINDERREACH.md`
+- Ist-Stand: `.agents/goals/cinderreach-character-creation/` (Erstellung mit Gender/Haar/Build/Name, Save v14, Koop-Profil; dort als Nicht-Ziel: keine echten Gender-Körpermodelle — dieses Goal erweitert genau diesen Punkt, bleibt aber beim KayKit-Bestand ohne neue Pipeline), `.agents/goals/cinderreach-party-roles/`, `.agents/goals/cinderreach-party-team/`, `.agents/goals/CINDERREACH.md`
 - Ausführung: Worktree `feature/cinderreach-companion-rendering`, Abschluss per `agent-workspace.py land` (`land: ff`)
 - health_goals: [G-DIABLO02, G-DIABLO03, G-GOALS01]

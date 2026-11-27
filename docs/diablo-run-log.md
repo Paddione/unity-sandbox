@@ -5,7 +5,7 @@
 - `Adventurers/Characters`: 6 heroes (Knight/Mage/Ranger/Rogue/Rogue_Hooded/Barbarian).
 - `Skeletons/Characters`: 4 enemies (Warrior/Minion/Rogue/Mage).
 - `CharacterAnimations/Rig_Medium`: 8 animation rigs (clip carriers).
-- No `Models/` dirs here (unlike Dungeon/ForestNature) — `KayKitAssets`
+- No Ordner `Models` dirs here (unlike Dungeon/ForestNature) — `KayKitAssets`
   now tracks per-pack model dirs + counts.
 
 ## Build

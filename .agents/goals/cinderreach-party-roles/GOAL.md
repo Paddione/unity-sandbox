@@ -33,12 +33,12 @@ In `unity-sandbox` (`sandbox/`, Unity 6 URP, Cinderreach) Gruppen-Spiel mit drei
 
 ## Scope
 
-- `sandbox/Assets/Scripts/Classes/ClassCatalog.cs`, `ClassDefinition.cs` (Rogue, Rollen, Faktoren)
+- `sandbox/Assets/Scripts/Classes/ClassCatalog.cs`, `sandbox/Assets/Scripts/Classes/ClassDefinition.cs` (Rogue, Rollen, Faktoren)
 - `sandbox/Assets/Scripts/DiabloSkills.cs` (Tank-AoE/Stun, Rogue-Skills, Heal-/Support-Skills, Basis-Set ohne Klassen-Gate)
-- Gegner-Threat/Zielwahl: `EnemyAttack.cs` (`AcquireHero`), `EnemyHealth.cs`, neue Threat-Komponente
-- KI-Begleiter (neu) + Gruppen-Auffüllung am Helden-/Spawn-Pfad, `HeroLocator.cs`
-- Koop: `DiabloNetworkPlayer.cs`, `Net/HitValidator.cs` (Heal-/Threat-Validierung, Rollen-Ersatz)
-- `SessionAutoplay.cs` (Party-Profil) + Tests unter `sandbox/Assets/Tests/{EditMode,PlayMode}`
+- Gegner-Threat/Zielwahl: `sandbox/Assets/Scripts/EnemyAttack.cs` (`AcquireHero`), `sandbox/Assets/Scripts/EnemyHealth.cs`, neue Threat-Komponente
+- KI-Begleiter (neu) + Gruppen-Auffüllung am Helden-/Spawn-Pfad, `sandbox/Assets/Scripts/HeroLocator.cs`
+- Koop: `sandbox/Assets/Scripts/DiabloNetworkPlayer.cs`, `Net/HitValidator.cs` (Heal-/Threat-Validierung, Rollen-Ersatz)
+- `sandbox/Assets/Scripts/SessionAutoplay.cs` (Party-Profil) + Tests unter `sandbox/Assets/Tests/{EditMode,PlayMode}`
 
 ## Nicht-Ziele
 

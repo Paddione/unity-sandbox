@@ -1,7 +1,7 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
 Stand: 2026-11-26 (zuletzt `cinderreach-group-quest-map`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
-ihre Stufenpläne und die alte `ROADMAP.md`. Neue Arbeit beginnt hier: neues Goal unter
+ihre Stufenpläne und die alte "ROADMAP.md". Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
 
@@ -14,8 +14,8 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | Prio | Goal | Stand | Nächster Schritt |
 |---|---|---|---|
 | P1 | [`cinderreach-akt1-vertiefung`](cinderreach-akt1-vertiefung/GOAL.md) | 50 %, S1+S2 gelandet (`6646cff`, `16833a6`) | S3 Ofen/Wacht-Strang läuft; Kettenkopf, entblockt Akt II/III und sprache-voice S2 |
-| P2 | [`cinderreach-akt2-vertiefung`](cinderreach-akt2-vertiefung/GOAL.md) | 0 %, Startbedingung Akt-I-S1 erfüllt | S1 Bibel+Modell, sobald `StoryModel`/`story-bible.md` frei sind (nach Akt-I-S3 empfohlen) |
-| P3 | [`cinderreach-inventory-ui-layout-split`](cinderreach-inventory-ui-layout-split/GOAL.md) | 100 %, S1–S3 gelandet | Abgeschlossen (`DiabloInventoryUI.Layout.cs`, 39/39 + Voll-Suiten + Shotcheck grün) |
+| P2 | [`cinderreach-akt2-vertiefung`](cinderreach-akt2-vertiefung/GOAL.md) | 0 %, Startbedingung Akt-I-S1 erfüllt | S1 Bibel+Modell, sobald `StoryModel`/`docs/story-bible.md` frei sind (nach Akt-I-S3 empfohlen) |
+| P3 | [`cinderreach-inventory-ui-layout-split`](cinderreach-inventory-ui-layout-split/GOAL.md) | 100 %, S1–S3 gelandet | Abgeschlossen (`sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs`, 39/39 + Voll-Suiten + Shotcheck grün) |
 | P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 100 %, S1–S4 gelandet | Abgeschlossen (Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
@@ -24,7 +24,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
 (Story-Kette Akt I → II → III → Sprache), danach unabhängige Refactorings nach Risiko
 (Inventar mechanisch vor Skills/Kampf-Autorität), Kettenende und reine Hygiene. P3/P4/P7 sind dateidisjunkt zur Story-Kette und
-zueinander und können parallel laufen; die Story-Ziele teilen sich `StoryModel.cs` und
+zueinander und können parallel laufen; die Story-Ziele teilen sich `sandbox/Assets/Scripts/Story/StoryModel.cs` und
 `docs/story-bible.md` und bleiben seriell. `cinderreach-party-roles`, `cinderreach-itemization` und `cinderreach-hotpath-caching` (seit `a4d3dc3`) stehen in ihren `PROGRESS.md` auf 100 % (keine offenen Punkte);
 ihre Einarbeitung hier und das Entfernen der Goal-Verzeichnisse ist der noch ausstehende
 Konsolidierungsschritt nach der Regel unten, kein offenes Umsetzungsziel.
@@ -38,7 +38,7 @@ Windows-Shotcheck `47`–`55`, fps-gate 63 fps @1080p, Server-Image-Pin dotfiles
 
 Abgeschlossen: `cinderreach-group-quest-map` (2026-11-26): Koop-Story gemeinsam. Öffnet ein Held einen NPC-Dialog,
 sehen alle anderen dieselben Zeilen mit Stimme als Zuhörerfenster („<Held> spricht mit <NPC>“, nicht blockierend,
-ausblendbar, eigener Dialog hat Vorrang; `StoryDialogShare`, `DiabloNetworkPlayer.Story.cs`, Host prüft Dialog-ID und
+ausblendbar, eigener Dialog hat Vorrang; `StoryDialogShare`, `sandbox/Assets/Scripts/DiabloNetworkPlayer.Story.cs`, Host prüft Dialog-ID und
 Zeilen). Jeder vom Host angenommene Bark geht an alle Clients (`StoryBarks.Relay`, 20-s-Sperre gegen Doppelungen).
 Quest-Tracking: alle aktiven/abgabebereiten Aufgaben verfolgt bis zum Abschalten im Fuhrbuch (Flag `untrack:<id>`,
 keine Save-Migration), HUD-Tracker mit bis zu 4 Aufgaben, Zielen, Zählern, Abgabe-NPC und Weg (Meter bzw. → Zone),
@@ -51,7 +51,7 @@ Windows-Shots `map_*`, `dialog_shared_listener`, `quest_log_tracking`.
 
 Abgeschlossen: `cinderreach-inventory-paperdoll` (2026-11-25, `6ab5a17`): Inventar mit Live-3D-Held neben der Tasche,
 Umschalt-Vergleich mit ▲/▼, Drag & Drop und Rechtsklick-Tausch, gemeinsamer Tooltip für Truhe, Händler und Schmied
-(Belege `docs/cinderreach-inventory-shots/`).
+(Belege Ordner `cinderreach-inventory-shots` unter `docs`).
 
 Abgeschlossen: `cinderreach-character-creation` (2026-11-23): Charaktererstellung im `ClassSelectUI`
 (Klasse → Gender/Frisur/Haarfarbe/Build/Name → Start) mit zufälligem deutschen Heldennamen als
@@ -98,8 +98,8 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ## Projektstruktur
 
-- Szenen: `DiabloZone.unity` (das Spiel, alle Zonen als Roots in einer Szene, +200 m X Ossuary,
-  +400 m X Kiln, +600 m X Glass Barrens), `Diablo.unity` (früher Prototyp), `Greybox.unity` (Mechanik-Testbed).
+- Szenen: `sandbox/Assets/Scenes/DiabloZone.unity` (das Spiel, alle Zonen als Roots in einer Szene, +200 m X Ossuary,
+  +400 m X Kiln, +600 m X Glass Barrens), `sandbox/Assets/Scenes/Diablo.unity` (früher Prototyp), `sandbox/Assets/Scenes/Greybox.unity` (Mechanik-Testbed).
 - Szenen nur über Builder regenerieren, nie von Hand: `SandboxBuilder.BuildDiabloZone` mit
   `TownBuilder`, `OssuaryBuilder`, `KilnBuilder`, `BarrensBuilder`, `EncounterBuilder`, `RiskShrineBuilder`,
   `LightingBuilder`, `VfxBuilder`, zuletzt `ZoneSurfaceBuilder.Apply` (Oberflächen). Abnahme: `SandboxBuilder.VerifyDiabloZone` (inkl. `VerifyKiln`, `VerifyBarrens`).
@@ -109,7 +109,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `Enemies`, `Items`, `Loot`, `Menu`, `Net`, `Party`, `Progression`, `Save`, `Town`, `Vfx`, `Zones`.
 - Assets: KayKit (Dungeon 211 Modelle, Adventurers 6, Skeletons 4, Rig_Medium-Animationen) plus
   Blender-Pipeline (`docs/world-art`, `docs/menu-art`). Keine Fremd-IP, kein Asset-Store-Kauf ohne Freigabe.
-- Tests: `sandbox/Assets/Tests/{EditMode,PlayMode}`, gemeinsame Helfer in `DiabloTestFixture.cs`.
+- Tests: `sandbox/Assets/Tests/{EditMode,PlayMode}`, gemeinsame Helfer in `sandbox/Assets/Tests/PlayMode/DiabloTestFixture.cs`.
   Letzter voller Lauf (menu-flow-polish): EditMode 378/378, PlayMode 268/268.
 
 ## Systeme (Ist-Stand)
@@ -337,7 +337,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `PlayHitFor` über 5 Oberflächen, zonenbodenabhängige Schritte, Synth als Fallback,
   `docs/audio/manifest.json`; Vertrag `scripts/check-audio-manifest.py` = Probe `G-DIABLO07`),
   gepoolte VFX (`PresentationVfx`).
-- Menüs (`Menu/`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
+- Menüs (Ordner `sandbox/Assets/Scripts/Menu`): genau ein Startbildschirm `ClassSelectUI` (Startbild, drei Klassenkarten aus
   Rolle/Starter/Skillzahl, Continue mit Spielstand-Info über `SaveService.TryPeek`, Co-op, Settings,
   Quit, 0,45-s-Ausblenden). Das Legacy-`MainMenu` weicht im Spiel (`ClassSelectOwnsStart`).
   Neuer Held fragt nach („BEGIN ANEW?“), wenn ein gespeicherter oder aktueller Held ersetzt würde;
@@ -366,7 +366,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ### Spielstand
 
-`SaveService` schreibt `cinderreach-save.json` (für Konten zusätzlich Cloud Save, siehe oben) (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
+`SaveService` schreibt "cinderreach-save.json" (für Konten zusätzlich Cloud Save, siehe oben) (tmp+rename, Autosave bei Level-Up, Zonenwechsel,
 Vendor-Schluss, Quit). `SaveGame.CurrentVersion = 12` (v11: `actTwoBossDefeated`, Migration öffnet die
 Barrens für Kilnmother-Bezwinger; v12: Magic-Items werden Rare), Migrationskette v1 → … → v12 in
 `SaveMigrations` mit Backup `*.vN.bak`. Neuere Versionen werden nicht geladen und bleiben unberührt.
@@ -378,13 +378,13 @@ liest für Menüs ohne Nebenwirkung.
 
 ## Qualitätsnetz
 
-- Health Goals in dotfiles `scripts/health_probes/diablo_unity.py` (Goal `diablo-unity-health-goals`):
+- Health Goals in dotfiles "scripts/health_probes/diablo_unity.py" (Goal `diablo-unity-health-goals`):
   `G-DIABLO01` `.meta`-Vollständigkeit, `G-DIABLO02` Szenen-/Asset-/Skript-Vertrag, `G-DIABLO03`
   neueste Testergebnisse, `G-DIABLO04` Runner- und Editor-Dienst, `G-DIABLO05` Windows-Stage-Parität,
   `G-DIABLO06` neuester Autoplay. Neue Prefabs, Skripte oder Pflichtphasen ziehen den Vertrag in
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
-  `autoplay-result.json` mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
+  "autoplay-result.json" mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
   complete` (Koop-Client siehe Koop-Paarlauf).
   `scripts/run-autoplay.sh` (Build → Lauf → `fps-gate.py --min-fps 30` nur als Hinweis, `AUTOPLAY_FPS_STRICT=1` macht es wieder blockierend). Auf Abruf
   per Job `autoplay` in `.github/workflows/unity-tests.yml` (`gh workflow run unity-tests.yml -f autoplay=true`,
@@ -396,9 +396,9 @@ liest für Menüs ohne Nebenwirkung.
   `%LOCALAPPDATA%\Programs\Cinderreach`, Startmenü, optional Desktop, Deinstaller; Spielstände bleiben).
   `INSTALLER_DEST` kopiert das Setup in einen Windows-Ordner.
 - Windows: `scripts/stage-windows.sh` nach `Games\cinderreach`, Sichtprüfung `scripts/shotcheck-windows.sh`
-  (`--autoplay`). Shotcheck/Autoplay schreiben `automation-save.json`, nie den Spieler-Save. Für
+  (`--autoplay`). Shotcheck/Autoplay schreiben "automation-save.json", nie den Spieler-Save. Für
   WIP-Builds `STAGE_DEST=…/Games/cinderreach-wip`, `SHOTCHECK_GAME` gleich. 60 FPS @1080p belegt (schlechtestes Fenster 131,5 fps über die volle Route bis zum Glasswright, 2026-11-22). Performance gilt nur auf Windows mit GPU (`shotcheck-windows.sh --autoplay`, 60 FPS @1080p); das Linux-FPS-Gate (WSLg/Mesa d3d12) ist seit 2026-11-22 nur ein Hinweis.
-- CI: `unity-tests.yml` (inkl. Autoplay auf Abruf), `unity-scene-captures.yml` (GPU-Runner).
+- CI: `.github/workflows/unity-tests.yml` (inkl. Autoplay auf Abruf), `.github/workflows/unity-scene-captures.yml` (GPU-Runner).
 - Bekannte Grenze: Solo-Autoplay ohne `-seed` mit einem Save-Seed außerhalb 0–2 kann in einer
   seltenen Fen-Variante hängen. Der Nightly deckt nur Seeds 0–2 ab.
 
@@ -432,9 +432,9 @@ zuerst). `Diablo.IsSolo` zählt den Server nicht mit. Library nie bei laufendem
 
 - Design: `docs/one-page-gdd.md`, `docs/mechanics-questions.md` (Q1–Q10), `docs/decision-log.md`,
   `docs/dev-journal.md`, `docs/playtest-protocol.md`, `docs/fair-fights-playtest.md`.
-- Laufprotokolle: `session-loop-run-log.md`, `replayability-run-log.md`, `second-class-run-log.md`,
-  `act-one-run-log.md`, `act-two-run-log.md`, `coop-run-log.md`, `presentation-run-log.md`,
-  `story-run-log.md` (alle unter `docs/`). Story-SSOT: `docs/story-bible.md`.
+- Laufprotokolle: `docs/session-loop-run-log.md`, `docs/replayability-run-log.md`, `docs/second-class-run-log.md`,
+  `docs/act-one-run-log.md`, `docs/act-two-run-log.md`, `docs/coop-run-log.md`, `docs/presentation-run-log.md`,
+  `docs/story-run-log.md` (alle unter `docs/`). Story-SSOT: `docs/story-bible.md`.
 - Betrieb: `docs/runbook.md`, `docs/ci-runner.md`, `docs/mcp.md`, `docs/kaykit-assets.md`.
 
 ## Konsolidierte Goals

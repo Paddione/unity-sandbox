@@ -36,13 +36,13 @@ Referenzen: <https://docs.comfy.org/tutorials/flux/flux-2-klein>,
 ## 3. Workflows (wieder öffnbar, API-Format)
 
 - `workflows/concept.json` — FLUX.2-klein-T2I exakt nach offiziellem Template
-  (`image_flux2_klein_text_to_image.json`): UNETLoader + CLIPLoader(flux2) +
+  ("image_flux2_klein_text_to_image.json"): UNETLoader + CLIPLoader(flux2) +
   CLIPTextEncode + EmptyFlux2LatentImage + CFGGuider(cfg 5) + Flux2Scheduler +
   KSamplerSelect(euler) + RandomNoise + SamplerCustomAdvanced + VAEDecode +
-  SaveImage. 20 Steps. Erzeugt mit `driver.py` (siehe Runbook-Notizen).
+  SaveImage. 20 Steps. Erzeugt mit "driver.py" (siehe Runbook-Notizen).
 - `workflows/prop.json` — TRELLIS.2-INT8 exakt nach offiziellem Template
-  (`3d_pixal3d_trellis2_image_to_model.json`), konvertiert mit
-  `trellis_convert.py` (UI→API, Switch=true-Pfad, Pixal3D/MoGe-Zweige
+  ("3d_pixal3d_trellis2_image_to_model.json"), konvertiert mit
+  "trellis_convert.py" (UI→API, Switch=true-Pfad, Pixal3D/MoGe-Zweige
   entfernt, Finale SaveGLB). Besonderheiten: DynamicCombo-Subinputs brauchen
   dotted keys (`sign_mode.fill`), verlinkte Widget-Inputs belegen trotzdem
   Widget-Slots, `control_after_generate` als API-Input mitschicken.
@@ -89,7 +89,7 @@ Auftragskosten; lokale Stromkosten pro Pilotlauf vernachlässigbar
 
 - `sandbox/Assets/Art/LocalArtPilot/`: `LootChest.glb`, `TornBanner.glb`
   (glTFast-Import), `Quadruped.fbx` (Generic-Rig), `LootIcon.png`,
-  Materialien + Wrapper-Prefabs unter `Prefabs/`.
+  Materialien + Wrapper-Prefabs unter Ordner `Prefabs`.
 - glTFast-Eintrag in `sandbox/Packages/manifest.json`.
 - Platzierung über `SandboxBuilder`/`OssuaryBuilder`-Hooks (Loot-State und
   Collider bleiben an der vorhandenen Spielobjektwurzel).

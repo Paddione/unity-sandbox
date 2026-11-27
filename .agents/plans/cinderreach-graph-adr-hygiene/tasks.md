@@ -53,7 +53,7 @@ Gesamt-Gate S5: Re-Index mit `parse_partial.count == 0` und
 ## Entscheide (Annahmen, im Plan gelockt)
 
 1. ADR-Prozess kommt als eigener Abschnitt in `docs/runbook.md` (Kriterium 3 nennt
-   `docs/runbook.md` zuerst); ein dediziertes `docs/code-graph-adr.md` nur, wenn der
+   `docs/runbook.md` zuerst); ein dediziertes code-graph-adr (optional unter `docs`) nur, wenn der
    Abschnitt das Gameplay-Runbook sprengt — dann verlinkt `docs/runbook.md` darauf.
    Verworfene Alternative: still ein neues Doku-File ohne Runbook-Verweis (auffindbar schlechter).
 2. `ambiguous` wird nur in aktiven Goals und lebender Doku (`docs/*.md` ohne
@@ -86,7 +86,7 @@ damit Zähler nicht auf veraltetem Index beruhen.
 | S2 parse-fix | `run-coop-pair.sh:92`-Konstrukt glätten, Verhaltensnachweis | `scripts/run-coop-pair.sh`, ggf. `scripts/test_*.py` für Argument-Konstruktion |
 | S3 missing | 45 `missing`-`doc_links` korrigieren/umstellen/entfernen | `.agents/goals/**/*.md`, `docs/**/*.md` (nur Fundstellen) |
 | S4 ambiguous | Bare-Filenames in aktiven Goals/Doku durch relative Pfade ersetzen | `.agents/goals/*/GOAL.md`, `docs/*.md` (nur aktive Fundstellen) |
-| S5 adr-prozess | ADR-Aktualisierungsprozess dokumentieren, `manage_adr`-Lauf, Gesamtverifikation | `docs/runbook.md` (neuer Abschnitt) oder `docs/code-graph-adr.md` (neu) + Runbook-Verweis, `.agents/goals/cinderreach-graph-adr-hygiene/{GOAL,PROGRESS}.md` |
+| S5 adr-prozess | ADR-Aktualisierungsprozess dokumentieren, `manage_adr`-Lauf, Gesamtverifikation | `docs/runbook.md` (neuer Abschnitt) oder code-graph-adr (optional unter `docs`) (neu) + Runbook-Verweis, `.agents/goals/cinderreach-graph-adr-hygiene/{GOAL,PROGRESS}.md` |
 
 S1 zuerst (Baseline). S2 ist unabhängig von S3/S4, aber vor S5, damit der
 Abschluss-Re-Index alle drei Messwerte gleichzeitig beweist. S3 vor S4, weil
@@ -171,5 +171,5 @@ aus S4 mit auflösen können. S5 zuletzt (Prozess beschreibt den erreichten Ist-
 - Rollback: Jede Stufe eigener Branch/Worktree; Link-Batches sind reine Doku-Edits
   und per Commit isoliert revertierbar. Der S2-Eingriff ist auf ein Konstrukt begrenzt.
 - Open Questions: Keine für S1–S4. Ob der ADR-Abschnitt in `docs/runbook.md`
-  bleibt oder als `docs/code-graph-adr.md` ausgelagert wird, entscheidet S5 an der
+  bleibt oder als code-graph-adr (optional unter `docs`) ausgelagert wird, entscheidet S5 an der
   Länge (Entscheid 1); beides erfüllt Kriterium 3.

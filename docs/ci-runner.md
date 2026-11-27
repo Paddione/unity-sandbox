@@ -46,8 +46,8 @@ windows on the desktop and failed whenever those were closed. It uses the same
 - Serialisation with the `test` job: both jobs use the same runner and the same runner
   Library. A single runner executes jobs one after another, which is the protection; the
   `unity-autoplay` concurrency group only prevents two autoplay runs queueing in parallel.
-- A player that exits 0 without `autoplay-result.json` was shut down from outside, usually
-  by closing its window; `run-autoplay.sh` says so in the log.
+- A player that exits 0 without "autoplay-result.json" was shut down from outside, usually
+  by closing its window; `scripts/run-autoplay.sh` says so in the log.
 
 ## Unity Scene Captures
 

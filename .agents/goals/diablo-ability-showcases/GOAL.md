@@ -18,15 +18,15 @@ In `unity-sandbox` (Cinderreach, `sandbox/`) den bestehenden In-Engine-`Cutscene
 1. Intro-Showcases: Pro Boss demonstriert das Intro jede Phase-1-Fähigkeit genau einmal als echten, aber schadlosen Cast (kein Schaden, keine bleibenden Adds/Felder/Projektile nach Sequenzende); Kampf beginnt erst nach Sequenzende oder Skip.
 2. Phase-2-Showcases: Beim ersten `EnterPhaseTwo` pro Boss läuft einmalig eine ca. 4 s Sequenz, die die Phase-2-Fähigkeit zeigt; die echten Phase-2-Effekte (Summons/Pillars) bleiben bestehen, der Boss hält während der Sequenz still (`HoldBosses`), der Held behält die volle Kontrolle (kein Freeze inmitten frisch beschworener Adds).
 3. Vertrag unverändert: jederzeit skipbar (Space/Esc/Klick) mit Kamera-/Steuerungs-Restore, genau einmal pro Run (`ResetRun`-Seam), kein Trigger bei totem Boss, Bosse halten während Sequenzen still (`HoldBosses`).
-4. Text & Audio: neue lokalisierte Einblendungs-Keys pro Fähigkeit im bestehenden Loc-Katalog; keine neuen Voice-Aufnahmen oder Voice-Keys (bestehende Roars/Barks, Voice-Gate `check-voice-lines.py` bleibt grün).
-5. Belege: EditMode-Tests (Trigger, Einmaligkeit, Skip/Restore, Schadlosigkeit der Demo-Casts, Phase-2-Showcase je Boss) grün; `G-DIABLO07`-Probe (Dotfiles `scripts/health_probes/diablo_unity.py`) um Ability-Showcase-Anker erweitert inkl. Tests; übrige `repo.yaml:verify`-Suites grün.
+4. Text & Audio: neue lokalisierte Einblendungs-Keys pro Fähigkeit im bestehenden Loc-Katalog; keine neuen Voice-Aufnahmen oder Voice-Keys (bestehende Roars/Barks, Voice-Gate `scripts/check-voice-lines.py` bleibt grün).
+5. Belege: EditMode-Tests (Trigger, Einmaligkeit, Skip/Restore, Schadlosigkeit der Demo-Casts, Phase-2-Showcase je Boss) grün; `G-DIABLO07`-Probe (Dotfiles "scripts/health_probes/diablo_unity.py") um Ability-Showcase-Anker erweitert inkl. Tests; übrige `repo.yaml:verify`-Suites grün.
 
 ## Scope
 
-- `sandbox/Assets/Scripts/Story/CutsceneDirector.cs`, ggf. `StoryDirector.cs`
-- `sandbox/Assets/Scripts/Enemies/BossController.cs`, `KilnmotherController.cs`, `GlasswrightController.cs` (nur Demo-/Showcase-Hooks, keine neuen Fähigkeiten)
+- `sandbox/Assets/Scripts/Story/CutsceneDirector.cs`, ggf. `sandbox/Assets/Scripts/Story/StoryDirector.cs`
+- `sandbox/Assets/Scripts/Enemies/BossController.cs`, `sandbox/Assets/Scripts/Enemies/KilnmotherController.cs`, `sandbox/Assets/Scripts/Enemies/GlasswrightController.cs` (nur Demo-/Showcase-Hooks, keine neuen Fähigkeiten)
 - Lokalisierungs-Katalog für neue Einblendungs-Keys
-- EditMode-Tests unter `sandbox/Assets/Tests/`; Health-Probe in Dotfiles-Repo `scripts/health_probes/diablo_unity.py` + `scripts/test_diablo_unity_health.py`
+- EditMode-Tests unter `sandbox/Assets/Tests/`; Health-Probe in Dotfiles-Repo "scripts/health_probes/diablo_unity.py" + Dotfiles-Test `test_diablo_unity_health`
 
 ## Nicht-Ziele
 
@@ -37,6 +37,6 @@ In `unity-sandbox` (Cinderreach, `sandbox/`) den bestehenden In-Engine-`Cutscene
 ## Abhängigkeiten
 
 - `CutsceneDirector` (Boss-Intros, `HoldBosses`, Skip-Pfad), `StoryDialogUI`, `StoryVoice`, drei Boss-Controller, Arena-Trigger
-- `scripts/health_probes/diablo_unity.py` (`G-DIABLO07`), `scripts/test_diablo_unity_health.py`, `ci-map.yaml` (Dotfiles-Repo `~`)
+- "scripts/health_probes/diablo_unity.py" (`G-DIABLO07`), Dotfiles-Test `test_diablo_unity_health`, "ci-map.yaml" (Dotfiles-Repo `~`)
 
 health_goals: [G-DIABLO02, G-DIABLO07, G-GOALS01]

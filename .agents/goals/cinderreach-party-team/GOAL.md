@@ -46,7 +46,7 @@ kein Loot-Bag/kein Vendor — Nicht-Ziel aus party-roles bleibt),
 - `sandbox/Assets/Scripts/Party/PartyCompanion.cs` (`Gear`/`Equip`, Doku)
 - `sandbox/Assets/Scripts/DiabloProgression.cs` (`MirrorHeroProgress`, Companion-Guards)
 - `sandbox/Assets/Scripts/PlayerHealth.cs` (`Refresh` pflegt Equipment nach)
-- `sandbox/Assets/Tests/PlayMode/PartyTeamLifecycleTests.cs` + `PartyGearLevelTests.cs` (neu)
+- `sandbox/Assets/Tests/PlayMode/PartyTeamLifecycleTests.cs` + `sandbox/Assets/Tests/PlayMode/PartyGearLevelTests.cs` (neu)
 
 ## Nicht-Ziele
 

@@ -54,7 +54,7 @@ Bibel zuerst (Akt-II-Tabellen + Rätsel), dann Daten auf dem Akt-I-Modellstand, 
 |---|---|---|
 | S1 bibel+modell | Akt-II-Tabellen neu (ca. +6), Rätsel-Definitionen, Model/State/Director auf Akt-I-Stand + Tests | `docs/story-bible.md` (§Akt II), `Scripts/Story/StoryModel.cs`, `Scripts/Story/StoryState.cs`, `Scripts/Story/StoryDirector.cs`, `Tests/EditMode/Akt2ModellTests.cs` (neu) |
 | S2 brache | Brachen-Strang: H-Ergänzungen, Sehglas-/Scherben-Rätsel, Tamm-/Ilsabe-Folgen, H9-Varianten + Tests | `Scripts/Story/StoryDialogs.cs` (Akt II), `Scripts/Story/StoryPickup.cs` (Sehglas/Scherben), `Scripts/Story/StoryBarks.cs` (Wendung-3-Zurufe), `Localization/LocCatalog.Story.cs` (Brache-Zeilen), `Tests/PlayMode/Akt2BrachenTests.cs` (neu) |
-| S3 proof | Save/Koop neuer Schritte, Autoplay bis boss3, Voice neuer Zeilen, Doku | `Scripts/Save/*` (Migration), `Scripts/SessionAutoplay.cs`, `docs/akt2-vertiefung-run-log.md` (neu), `docs/dev-journal.md` |
+| S3 proof | Save/Koop neuer Schritte, Autoplay bis boss3, Voice neuer Zeilen, Doku | `Scripts/Save/*` (Migration), `Scripts/SessionAutoplay.cs`, akt2-vertiefung-run-log (neu unter `docs`) (neu), `docs/dev-journal.md` |
 
 ## Verify je Stufe (vor Commit, im Worktree-Root)
 

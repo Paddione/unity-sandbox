@@ -39,7 +39,7 @@ Ziel: 6 Goal-Kriterien belegt, `G-DIABLO06` (Linux 30 FPS) grün, Windows 60 FPS
 
 ## S4 menü — Hauptmenü, Pause, Settings-Datei
 
-- `Scripts/Menu/GameSettings.cs` (`cinderreach-settings.json`, tmp+rename, Roundtrip,
+- `Scripts/Menu/GameSettings.cs` ("cinderreach-settings.json", tmp+rename, Roundtrip,
   `Apply` auf `DiabloSettings`+Screen), `MainMenu.cs` (Title/Settings/Playing,
   New/Continue/Settings/Quit + Host/Join, Continue nur mit Save, HD-Scaler),
   `PauseMenu.cs` (Esc, TimeScale 0/1, Resume/Settings/Menu).
@@ -72,7 +72,7 @@ Ziel: 6 Goal-Kriterien belegt, `G-DIABLO06` (Linux 30 FPS) grün, Windows 60 FPS
   wslg D3D12 RTX 5070 Ti). `DONE phases=9 huskKills=52 bossKills=1 phaseTwo=1 overlay=2
   exceptions=0` (town → zone1 → gate → zone2 → boss → zone3 → actboss → complete,
   inkl. `waypoint_home travelled=True`). `fps-gate --min-fps 30 --skip-first 1`:
-  34 Windows, worst avg **32.7 fps** → PASS. `autoplay-result.json` exit 0.
+  34 Windows, worst avg **32.7 fps** → PASS. "autoplay-result.json" exit 0.
 - [x] Windows-Build + Stage: **OK** 2026-11-18 (`BuildDiabloZoneWindows` Succeeded,
   `stage-windows.sh` OK, Commit `ec711e8`, 122 MB → `Games\cinderreach`).
 - [x] Windows `-autoplay` @1080p: **PASS** (game exit 0, `bossKills=1 phaseTwo=1`,

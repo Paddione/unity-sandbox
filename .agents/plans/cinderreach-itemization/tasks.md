@@ -16,7 +16,7 @@ health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
 
 ## File Structure
 
-Pfade in den Stufen sind relativ zu `sandbox/Assets/`. Für neue Assets und Ordner die Unity-Metadaten mitführen. Der Repo-Vertrag enthält keinen S1-Zeilenratchet. Umfangreiche Logik in die benannten neuen Komponenten auslagern und große bestehende Dateien an ihren Anschlussstellen ändern.
+Pfade in den Stufen sind relativ zu Ordner `sandbox/Assets`. Für neue Assets und Ordner die Unity-Metadaten mitführen. Der Repo-Vertrag enthält keinen S1-Zeilenratchet. Umfangreiche Logik in die benannten neuen Komponenten auslagern und große bestehende Dateien an ihren Anschlussstellen ändern.
 
 | Stufe | Zuständigkeit und Dateipfade |
 | --- | --- |

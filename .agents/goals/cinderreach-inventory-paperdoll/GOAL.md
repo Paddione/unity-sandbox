@@ -13,7 +13,7 @@ Das Cinderreach-Inventar wird zu einer kombinierten Ansicht umgebaut: Live-3D-Ch
 3. Hover über ein Taschen-Item mit gehaltener Shift-Taste zeigt den Tooltip neben dem des im selben Slot angelegten Items. Abweichende Stats tragen einen grünen ↑-Pfeil (besser) oder roten ↓-Pfeil (schlechter) mit Delta. Bei leerem Slot sind alle Stats grün, gleiche Stats bleiben ohne Pfeil.
 4. Drag & Drop Tasche → passender Slot legt an und tauscht das alte Item in die Tasche. Ein Drop auf einen falschen Slot wird ohne Statewechsel abgewiesen und rot markiert. Slot → Tasche legt ab.
 5. Rechtsklick auf ein Taschen-Item tauscht es sofort in seinen Slot. Rechtsklick auf einen Trank trinkt ihn.
-6. Alle Swaps laufen über den autoritativen Pfad in `DiabloNetworkPlayer.Items.cs` und funktionieren im Multiplayer.
+6. Alle Swaps laufen über den autoritativen Pfad in `sandbox/Assets/Scripts/DiabloNetworkPlayer.Items.cs` und funktionieren im Multiplayer.
 7. Truhe, Händler und Schmied verwenden die gemeinsame Tooltip- und Vergleichskomponente (Shift-Vergleich auch dort).
 8. Visuelles Polish: einheitliche Rarity-Rahmen für Magic/Rare/Unique, Hover- und Drag-Feedback, konsistente Abstände nach `DiabloPalette`/`DiabloUIFactory`, überarbeitete Pause- und Stats-Seite.
 9. EditMode-Tests decken die Stat-Diff-Logik ab (besser, schlechter, gleich, leerer Slot). PlayMode-Tests decken Rechtsklick-Swap, Drag-Swap und abgewiesenen Fehl-Drop ab.

@@ -28,7 +28,7 @@ Die im Code-Graph- und ADR-Audit (A2/A3, Revision `5bd41d3`) festgestellten repo
 ## Nicht-Ziele
 
 - Keine Änderungen am Upstream-Indexer `codebase-memory` (C#-`TESTS`-Kanten-Erkennung, Short-Name-Heuristiken wie `.Add`/`.Contains` und das `python-resources-2`-Gap an `scripts/voice/voice_lines.py:91` bleiben dokumentierte Tool-Grenzen).
-- Kein Refactoring von `SandboxBuilder.cs` oder `DiabloShotCheck.cs` und keine Gameplay-Code-Änderungen.
+- Kein Refactoring von `sandbox/Assets/Editor/SandboxBuilder.cs` oder `sandbox/Assets/Scripts/DiabloShotCheck.cs` und keine Gameplay-Code-Änderungen.
 
 ## Abhängigkeiten
 

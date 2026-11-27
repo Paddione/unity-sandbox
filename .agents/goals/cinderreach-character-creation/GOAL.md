@@ -14,7 +14,7 @@ In `unity-sandbox` (`sandbox/`, Unity 6000.0.85f2, URP, Cinderreach) die Charakt
 
 ## Entschiedene Mechaniken (Eigner, 2026-11-23)
 
-1. **Gender:** Wählbares Profilfeld (weiblich/männlich/nicht-binär) mit sichtbarer Silhouette über Proportions-Presets und passendem Zufallsnamen-Pool. Kein neues Gender-FBX, keine Klassen- oder Skill-Bindung, kein Gameplay-Vorteil. KayKit-Modelle (Knight/Mage/Rogue/Barbarian/Ranger, ein Rig, Knochen per Name gemappt in `ClassAppearance.BuildSkin`) bleiben die Basis.
+1. **Gender:** Wählbares Profilfeld (weiblich/männlich/nicht-binär) mit sichtbarer Silhouette über Proportions-Presets und passendem Zufallsnamen-Pool. Kein neues Gender-FBX, keine Klassen- oder Skill-Bindung, kein Gameplay-Vorteil. KayKit-Modelle (Knight/Mage/Rogue/Barbarian/Ranger, ein Rig, Knochen per Name gemappt in `BuildSkin` in `ClassAppearance`) bleiben die Basis.
 2. **Haar:** 4–6 Frisuren als Knochen-Aufsätze (KayKit-Accessories/Hood-Varianten/einfach erzeugt) plus 8–10 Haarfarben als Material-Tint, live in der Vorschau. Keine neue Blender-Haar-Pipeline.
 3. **Build:** 3 diskrete Stufen (schlank/athletisch/kräftig) als proportionale Skalierung von Torso/Schultern/Armen über das gemeinsame Rig. Rein kosmetisch: keine Änderung an Stats, Hitbox/Collision, Lauftempo oder Animationen.
 4. **Name:** Deutsch-fantastischer Zufallsname beim Öffnen vorbelegt (Pools passend zum Gender plus neutrale Namen), per Würfel-Button neu würfelbar, frei editierbar (getrimmt, 2–16 Zeichen, leer/ungültig blockiert den Start bzw. fällt auf einen Zufallsnamen zurück). Heldenname ist getrennt vom bestehenden Konto-Namen (`PlayerAccount`/`AccountPanel` bleibt unverändert) und erscheint im `HeroNameplates`-Nameplate.
@@ -33,8 +33,8 @@ In `unity-sandbox` (`sandbox/`, Unity 6000.0.85f2, URP, Cinderreach) die Charakt
 
 - `sandbox/Assets/Scripts/Menu/ClassSelectUI.cs` (Erstellungsschritt, Vorschau, Würfel/Editierfeld, `Loc`-Texte deutsch, Englisch-Fallback)
 - `sandbox/Assets/Scripts/Classes/ClassAppearance.cs` (+ neues Appearance-Profil: Gender-/Build-Presets, Haar-Aufsätze/Tints) — Klassen in `ClassCatalog` unverändert
-- `sandbox/Assets/Scripts/Save/SaveGame.cs` (`CurrentVersion` 13→14, neue Felder), `SaveMigrations.cs` (v13→v14), `SaveService`/`RunProfile` (Durchreichung)
-- `sandbox/Assets/Scripts/Net/` (`DiabloNetworkPlayer`-Profil-Replikation), `HeroNameplates.cs` (Heldenname)
+- `sandbox/Assets/Scripts/Save/SaveGame.cs` (`CurrentVersion` 13→14, neue Felder), `sandbox/Assets/Scripts/Save/SaveMigrations.cs` (v13→v14), `SaveService`/`RunProfile` (Durchreichung)
+- `sandbox/Assets/Scripts/Net/` (`DiabloNetworkPlayer`-Profil-Replikation), `sandbox/Assets/Scripts/Net/HeroNameplates.cs` (Heldenname)
 - Namenspools als Datenquelle (deutsch, genderbezogen + neutral, keine Fremd-IP)
 - Tests: `sandbox/Assets/Tests/{EditMode,PlayMode}`
 

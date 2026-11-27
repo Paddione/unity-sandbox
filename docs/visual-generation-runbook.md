@@ -6,23 +6,23 @@ Gilt für Sprites, Texture2D und PBR-Materialien aus Text-Prompts + Referenzbild
 
 ## Workflow (rosionssicher durch Import-Regeln)
 
-1. **Draft per Prompt:** Kurzbeschreibung + Stil-Anker (z. B. bestehende `Art/Zones/`-Textur nennen).
-2. **Stil fixieren:** 1–3 Referenzbilder aus dem Projekt (z. B. `Art/LocalArtPilot/`, `Resources/MenuArt/`)
+1. **Draft per Prompt:** Kurzbeschreibung + Stil-Anker (z. B. bestehende Ordner `Art` / `Zones`-Textur nennen).
+2. **Stil fixieren:** 1–3 Referenzbilder aus dem Projekt (z. B. Ordner `Art` / `LocalArtPilot`, Ordner `Resources` / `MenuArt`)
    als Variation-Input; verhindert Stil-Drift über Iterationen.
 3. **Material/Lighting im Generator:** Auflösung, Output-Count, Material-/Lichtdetails direkt im
    Generator-Fenster einstellen — nicht extern nachbearbeiten und re-importieren.
 4. **Nur Chosen-Preview upscalen:** Erst das gewählte Preview produktionsreif hochskalieren,
-   dann als Datei unter `Assets/Art/` (Texturen/Models) bzw. `Assets/Resources/MenuArt|SkillArt/`
+   dann als Datei unter Ordner `Assets` / `Art` (Texturen/Models) bzw. Ordner `Assets` / `Resources` (`MenuArt`, `SkillArt`)
    (Icons) ablegen. Der Import-Postprocessor (`AssetPipelineImportRules`) fixiert Sprite- vs.
-   Textur-Settings automatisch; `KayKitAssets`-Packs (`ThirdParty/`) bleiben unberührt.
+   Textur-Settings automatisch; `KayKitAssets`-Packs (Ordner `ThirdParty`) bleiben unberührt.
 
 ## Ablage-Konvention
 
-- Texturen/Models: `Assets/Art/<Zone|LocalArtPilot>/...` (+ `.meta` einchecken — `check-meta.py` ist fail-closed).
+- Texturen/Models: `Assets/Art/<Zone|LocalArtPilot>/...` (+ `.meta` einchecken — `scripts/check-meta.py` ist fail-closed).
 - Icons: `Assets/Resources/MenuArt|SkillArt/*.png` als Sprite/Single ohne Mipmap (lädt per
   `Resources.Load<Sprite>`; Drift repariert `MenuArtImporter.ImportAsSprites`).
 - Größen: Texturen ≤ 2048 (Postprocessor cappt), keine Hi-Res-Varianten für Doku/Demo einchecken
-  (siehe `asset-bloat-audit.py`).
+  (siehe `scripts/asset-bloat-audit.py`).
 
 ## Nicht-Ziele
 

@@ -36,7 +36,7 @@ Branch: `feature/unity-diablo-p2-multiplayer-loot-zone` (from `main` @ `ae40013`
   `[Net] Server started, listening for clients`.
 - Deployed per memorized convention (new persistent install, Greybox
   untouched): `rsync -az --delete builds/diablo-server/ gpu-metal:~/diablo-server/`
-  + `BUILD_INFO.json` (commit `2cb9a69`, scene `diablo-zone`).
+  + "BUILD_INFO.json" (commit `2cb9a69`, scene `diablo-zone`).
 - Unit `diablo-server.service` (enabled, Restart=always): port **7778/udp**
   (Greybox keeps 7777), UFW `ALLOW 100.64.0.0/10`, log `~/diablo-server/server.log`.
 - E2E proof: local zone client `--net-client --net-address 100.74.227.118

@@ -12,7 +12,7 @@ health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
 
 # cinderreach-gear-slots-flask — Implementation Plan
 
-[Ziel und Erfolgskriterien](../../goals/cinderreach-gear-slots-flask/GOAL.md). Planbasis `b2a2006`. Pfade relativ zu `sandbox/Assets/`.
+[Ziel und Erfolgskriterien](../../goals/cinderreach-gear-slots-flask/GOAL.md). Planbasis `b2a2006`. Pfade relativ zu Ordner `sandbox/Assets`.
 
 | Stufe | Zuständigkeit und Dateipfade | Prüfung |
 | --- | --- | --- |

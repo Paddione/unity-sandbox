@@ -53,8 +53,8 @@ dann hier durch S2.
 | Stufe | Inhalt | target_files |
 |---|---|---|
 | S1 regeln+inventur | Glättungsregeln + Beispiele, Voll-Inventur aller Zeilen (Bestand + Neutext-Bedarf) | `docs/story-bible.md` (§Ton-Fortschreibung), `docs/sprache-inventur.md` (neu) |
-| S2 text+voice | Glättung aller Loc-/Dialog-/Bark-Zeilen, Render + QA aller Clips | `Scripts/Localization/LocCatalog.Story.cs`, `Scripts/Localization/LocCatalog.Dialog.cs`, `Scripts/Story/StoryDialogs.cs`, `Scripts/Story/StoryBarks.cs`, `docs/audio/voices.json`, `Assets/Resources/Voice/*.ogg` (+ `.meta`), `Tests/EditMode/SpracheTests.cs` (neu: Glossar-/Anrede-/Zahlen-Regeln) |
-| S3 proof | Suiten, Voice-Gates, Regler-/Koop-Regression, Doku | `docs/qa_transcribe`-Belege, `docs/sprache-voice-run-log.md` (neu), `docs/dev-journal.md` |
+| S2 text+voice | Glättung aller Loc-/Dialog-/Bark-Zeilen, Render + QA aller Clips | `Scripts/Localization/LocCatalog.Story.cs`, `Scripts/Localization/LocCatalog.Dialog.cs`, `Scripts/Story/StoryDialogs.cs`, `Scripts/Story/StoryBarks.cs`, `docs/audio/voices.json`, `Assets/Resources/Voice/*.ogg` (+ `.meta`), "Tests/EditMode/SpracheTests.cs" (neu: Glossar-/Anrede-/Zahlen-Regeln) |
+| S3 proof | Suiten, Voice-Gates, Regler-/Koop-Regression, Doku | qa_transcribe-Belege, sprache-voice-run-log (neu unter `docs`) (neu), `docs/dev-journal.md` |
 
 ## Verify je Stufe (vor Commit, im Worktree-Root)
 

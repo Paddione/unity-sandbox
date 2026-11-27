@@ -31,7 +31,7 @@ Autoplay erreicht `complete` mit 0 Exceptions.
 
 ## Ausgangslage (Belege, HEAD `1ff1b95`, 2026-11-27, Plan-Rebase)
 
-- Haken unverändert: Story-Bibel §Ausblick nach Akt II (ab Zeile 328; Scherbe gegen Laterne, „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter.“). Kein Akt-III-Abschnitt, keine `Akt3*Tests`, kein `akt3-finale-run-log.md` — Goal 0 %.
+- Haken unverändert: Story-Bibel §Ausblick nach Akt II (ab Zeile 328; Scherbe gegen Laterne, „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter.“). Kein Akt-III-Abschnitt, keine `Akt3*Tests`, kein "akt3-finale-run-log.md" — Goal 0 %.
 - ID-Vertrag passt: Akt-I-S1 (`6646cff`) hat `h10–h13`/`n6–n7` im `StoryModel` ausdrücklich für Akt III freigehalten. Die H9-Varianten, an die H10 anschließt, entstehen erst in Akt-II-S1/S2 — daher bleibt S1 blockiert, bis Akt-II-S1 steht.
 - Freischalt-Muster: `ActProgress.cs` (Abbot→Kiln, Kilnmother→Brache; Plan-Muster `ActProgress*.cs` meint diese eine Datei), `ZoneGate`/`ZoneTravel`, Save v15 + Migrationskette (nicht mehr v14), Koop Host-Snapshot Max-Merge.
 - Gegner-Baukasten: Husks/Hüllen, Elite-Muster, Boss-Phasen (Phase 2 ab 50 %), Bossbalken, Barks. Seit Plan-Basis neu: Cutscene-/Showcase-System (`CutsceneDirector`, `71a6137`/`6c51287`) — der Finalboss in S3 nutzt das vorhandene Intro-/Phase-2-Muster statt eines eigenen Systems (Entscheid 2 bleibt).
@@ -53,10 +53,10 @@ ActProgress/Save/Koop), zuletzt Beweis bis `complete`.
 
 | Stufe | Inhalt | target_files |
 |---|---|---|
-| S1 bibel+akt | Akt-III-Tabellen (H10–H13/N6–N7), Boss-/Entscheidungs-Definition, ActProgress-Entwurf + Tests | `docs/story-bible.md` (§Akt III), `Scripts/Zones/ActProgress*.cs`, `Tests/EditMode/Akt3ModellTests.cs` (neu) |
-| S2 wacht | Wacht-Strang: H10, N6–N7, Ottilie/Merle/Ilsabe/Jorin-Dialoge + Tests | `Scripts/Story/StoryDialogs.cs` (Akt III Wacht), `Scripts/Story/StoryNpc.cs` (Wacht), `Localization/LocCatalog.Story.cs` (Akt-III-Wacht), `Tests/PlayMode/Akt3WachtTests.cs` (neu) |
-| S3 moortor | Moortor-Finale: H11-Rätsel, H12-Boss, H13-Entscheidung, Save-Migration, Koop-Buchung + Tests | `Scripts/Story/StoryDirector.cs` (Finale), `Scripts/Story/StoryPickup.cs` (Moortor-Rätsel), `Scripts/Save/*` (Migration), `Scripts/Zones/*Gate*.cs` (Moortor), `Tests/PlayMode/Akt3FinaleTests.cs` (neu) |
-| S4 proof | Autoplay bis complete, Voice neuer Zeilen, Doku | `Scripts/SessionAutoplay.cs`, `docs/akt3-finale-run-log.md` (neu), `docs/dev-journal.md`, `docs/mechanics-questions.md` + `docs/decision-log.md` (Finale-Entscheid) |
+| S1 bibel+akt | Akt-III-Tabellen (H10–H13/N6–N7), Boss-/Entscheidungs-Definition, ActProgress-Entwurf + Tests | `docs/story-bible.md` (§Akt III), `Scripts/Zones/ActProgress*.cs`, "Tests/EditMode/Akt3ModellTests.cs" (neu) |
+| S2 wacht | Wacht-Strang: H10, N6–N7, Ottilie/Merle/Ilsabe/Jorin-Dialoge + Tests | `Scripts/Story/StoryDialogs.cs` (Akt III Wacht), `Scripts/Story/StoryNpc.cs` (Wacht), `Localization/LocCatalog.Story.cs` (Akt-III-Wacht), "Tests/PlayMode/Akt3WachtTests.cs" (neu) |
+| S3 moortor | Moortor-Finale: H11-Rätsel, H12-Boss, H13-Entscheidung, Save-Migration, Koop-Buchung + Tests | `Scripts/Story/StoryDirector.cs` (Finale), `Scripts/Story/StoryPickup.cs` (Moortor-Rätsel), `Scripts/Save/*` (Migration), `Scripts/Zones/*Gate*.cs` (Moortor), "Tests/PlayMode/Akt3FinaleTests.cs" (neu) |
+| S4 proof | Autoplay bis complete, Voice neuer Zeilen, Doku | `Scripts/SessionAutoplay.cs`, akt3-finale-run-log (neu unter `docs`) (neu), `docs/dev-journal.md`, `docs/mechanics-questions.md` + `docs/decision-log.md` (Finale-Entscheid) |
 
 ## Verify je Stufe (vor Commit, im Worktree-Root)
 

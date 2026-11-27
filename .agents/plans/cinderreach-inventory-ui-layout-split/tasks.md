@@ -39,8 +39,8 @@ Gesamt-Gate S3: die 6 benannten Suites plus vollständige EditMode-/PlayMode-Sui
   Klasse heute `public sealed class DiabloInventoryUI : MonoBehaviour` (Zeile 16),
   noch nicht `partial`.
 - Vorbild im selben Verzeichnis: `DiabloNetworkPlayer.cs` ist
-  `public sealed partial class` mit `.Flask.cs`, `.Items.cs`, `.Names.cs`,
-  `.Story.cs` — Namens- und Partial-Muster werden übernommen, sonst nichts.
+  `public sealed partial class` mit ".Flask.cs", ".Items.cs", ".Names.cs",
+  ".Story.cs" — Namens- und Partial-Muster werden übernommen, sonst nichts.
 - Zu verschiebende Layout-Methoden (Ist-Zeilen): `BuildUI` (564), `MakePage` (616),
   `BuildInventoryPage` (638), `BuildCharacterColumn` (660), `BuildEquipSlot` (710),
   `MakeCard` (761, static), `Place` (772, static), `BuildBagColumn` (780),
@@ -93,7 +93,7 @@ keinen eigenen Nutzerwert, aber doppelte Testkosten.
 |---|---|---|
 | S1 baseline | 6 Suites auf `main` fahren, Ergebnis in PROGRESS.md | `.agents/goals/cinderreach-inventory-ui-layout-split/PROGRESS.md` (nur Beleg-Eintrag) |
 | S2 split | `partial`-Deklaration, 14 Methoden nach `DiabloInventoryUI.Layout.cs` verschieben, `.meta` erzeugen | `sandbox/Assets/Scripts/DiabloInventoryUI.cs`, `sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs` (neu), `sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs.meta` (neu) |
-| S3 proof | Voll-Suiten, `check-meta.py`, `KayKitAssets.Verify`, Inventar-Sichtprüfung, PROGRESS-Abschluss | `docs/cinderreach-inventory-shots/` (nur falls Sichtprüfung neue Shots liefert), `.agents/goals/cinderreach-inventory-ui-layout-split/PROGRESS.md` |
+| S3 proof | Voll-Suiten, `check-meta.py`, `KayKitAssets.Verify`, Inventar-Sichtprüfung, PROGRESS-Abschluss | Ordner `cinderreach-inventory-shots` unter `docs` (nur falls Sichtprüfung neue Shots liefert), `.agents/goals/cinderreach-inventory-ui-layout-split/PROGRESS.md` |
 
 S2 hängt an S1 (Baseline-Vergleich). S3 hängt an S2.
 
@@ -120,7 +120,7 @@ S2 hängt an S1 (Baseline-Vergleich). S3 hängt an S2.
   (UGUI-Aufbau/Styling) und Schwesterdatei (Lebenszyklus/Drag/Aktionen).
 - Prüfen, dass kein verschobener Block Hauptdatei-`private`-Helfer braucht, die
   nicht Felder sind; falls doch, Helfer mit verschieben und Umzug in `PROGRESS.md` begründen.
-- `DiabloInventoryUI.Layout.cs.meta` per Unity-Import erzeugen (Editor/Batchmode
+- Meta-Datei für `sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs` per Unity-Import erzeugen (Editor/Batchmode
   auf den Worktree), danach `python3 scripts/check-meta.py` grün.
 - Erster Compiler-Beleg: `unity --json recompile "$PWD/sandbox"` (laufender Editor)
   oder Batchmode-Testlauf; `data.errors` leer.
@@ -131,7 +131,7 @@ S2 hängt an S1 (Baseline-Vergleich). S3 hängt an S2.
   `python3 scripts/check-meta.py`, Verify aus `repo.yaml:verify`
   (`KayKitAssets.Verify`), `python3 ~/scripts/agent-workspace.py check` grün.
 - Sichtprüfung Inventar/Paperdoll (bestehende Shots unter
-  `docs/cinderreach-inventory-shots/` als Vergleich): 3 Tabs, Paperdoll,
+  Ordner `cinderreach-inventory-shots` unter `docs` als Vergleich): 3 Tabs, Paperdoll,
   Bag-Zellen und Drag-Ghost unverändert; Abweichung = Blocker, nicht „Kosmetik“.
 - `PROGRESS.md`: Zeilenzahl vorher/nachher je Datei, Suite-Belege, dann Goal auf
   100 % mit `Offene Punkte: Keine.`
