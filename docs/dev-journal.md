@@ -1018,3 +1018,14 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 - Gelernt: vLLM-Forward (`:8123`) war down — TTS-Render braucht ihn nicht (eigene venv, torch+CUDA).
   Health-Wait-Loop per `grep -q … && break` in Pipe läuft weiter (Subshell) — Fail ins Gewicht fiel es
   nicht, aber Loop besser ohne Pipe bauen.
+
+## 2026-11-27 — Akt-I-Vertiefung S4 (cinderreach-akt1-vertiefung, Abnahme)
+
+- Save v15 → v16: neue Questschritte brauchen keine gespeicherten Felder (generische `storyQuests`/`storyFlags`
+  + akt-getriebener Catch-up); Migration hebt nur die Version. Tests: `CurrentVersion_IsSixteen`,
+  `V15_KeepsStoryProgressAndOpensNewSteps` (inkl. Koop-Max-Merge `StoryState.Merge`, kein Regress).
+- Folgezeilen-Abgleich Bibel ↔ `StoryDialogs.cs` geprüft (N8→H2, N9→H3, N10→H4, N11→H5) — exakt verdrahtet, keine Bibel-Änderung.
+- Voice (37 S3-Clips, CPU-Render) in S4 nur verifiziert (`check-voice-lines` 180/0); GPU-Pfad (5070 Ti) aus dieser
+  Sandbox nicht erreichbar (`cuInit` 100, dxg ENODEV trotz Treiber mit CUDA UMD 13.5) — separater System-Task.
+- Gelernt: Worker-Sessions können mit transientem `tool_choice`-Harness-Fehler sterben und trotzdem brauchbare
+  Teilarbeit im Worktree hinterlassen (S3/S4 mehrfach) — adoptieren statt duplizieren; stale Locks per TTL-Reap lösbar.

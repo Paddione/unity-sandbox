@@ -140,7 +140,7 @@ public class GearSlotsTests
         var outcome = SaveMigrations.Migrate(json, out var save, out int from);
         Assert.AreEqual(SaveMigrations.Outcome.Migrated, outcome);
         Assert.AreEqual(14, from);
-        Assert.AreEqual(15, save.v);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
         Assert.AreEqual(10 + 3 * SaveMigrations.LegacyPotionRefund, save.gold);
         Assert.AreEqual(1, save.bag.Count);
         Assert.AreEqual(sword.instanceId, save.bag[0].instanceId);

@@ -1,6 +1,6 @@
 # Progress: cinderreach-akt1-vertiefung
 
-Prozent: 75 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -13,13 +13,12 @@ Prozent: 75 %
 
 
 - 2026-11-27: Plan auf `1ff1b95` rebased und als P1 priorisiert (Kettenkopf): S1 als erledigt markiert (`6646cff`), Save-Stand auf v15 korrigiert, `group-quest-map`-Abgleich für S3 und State/Director-Prüfung für S2 in den Plan aufgenommen. Prozent bleibt 25 %.
+- 2026-11-27 (S4 abnahme, dieser Branch): Save v15 → v16 (`V15ToV16`, nicht-nulle Listen + Versionshub; neue Schritte brauchen keine Felder — generische `storyQuests`/`storyFlags` + Catch-up); Tests `CurrentVersion_IsSixteen`, `V15_KeepsStoryProgressAndOpensNewSteps` (inkl. Koop-Max-Merge, kein Regress), `GearSlotsTests`-Assert generalisiert; Folgezeilen-Abgleich Bibel ↔ `StoryDialogs.cs` exakt (N8→H2 `|n8`, N9→H3 `|n9`, N10→H4 `|n10`, N11→H5 `|n11`/`|!n11`), keine Bibel-Änderung; Voice S4 Verify-only (`check-voice-lines` 180/0). Belege: EditMode 674/674, PlayMode 383/383, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, `check-meta` OK, Autoplay `-seed 0` Exit 0 / 0 Exceptions / 12 Phasen bis `complete` inkl. `actboss` (Linux-fps-gate FAIL advisory). Run-Log `docs/akt1-vertiefung-run-log.md` neu, Dev-Journal ergänzt.
 
 ## Nächste Schritte
 
-- S3: Ofen/Wacht-Strang (Rußbuch-/Siegel-Rätsel H16/H17, Jorin-/Ilsabe-Entscheidungen, H5-Finale mit N10/N11-Folgen).
-- S4: Abnahme (Autoplay bis actboss, Voice für neue Zeilen, Doku).
+- Abgeschlossen — Kette frei für P2 Akt-II S1.
 
 ## Offene Punkte
 
-- S2-Dialoge/Fundorte drin (R1/R2); R3 (Siegel-Entscheidung) plus Ofen-Fundstücke (Fuhrliste, Rußseite) kommen in S3.
-- S3-Umfang gegen `group-quest-map`-Stand abgleichen (S2 berührte ihn bereits: `h3.offer`-Zeilenanzahl).
+Keine.

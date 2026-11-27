@@ -77,10 +77,34 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsFifteen()
+    public void CurrentVersion_IsSixteen()
     {
-        Assert.AreEqual(15, SaveGame.CurrentVersion);
-        Assert.AreEqual(15, new SaveGame().v);
+        Assert.AreEqual(16, SaveGame.CurrentVersion);
+        Assert.AreEqual(16, new SaveGame().v);
+    }
+
+    [Test]
+    public void V15_KeepsStoryProgressAndOpensNewSteps()
+    {
+        // A pre-Vertiefung v15 save: old quest progress rides along, the new
+        // Akt I steps (h14-h17, n8-n11) start locked and open via the
+        // act-driven catch-up on first load. Host-snapshot Max-Merge carries
+        // the same entries to co-op clients (StoryState.Merge, generic).
+        const string json = @"{""v"":15,""level"":9,""gold"":120," +
+            @"""storyQuests"":[{""id"":""h2"",""status"":4,""counts"":[1,1]}],""storyFlags"":[]}";
+        Assert.AreEqual(SaveMigrations.Outcome.Migrated, SaveMigrations.Migrate(json, out var save, out var from));
+        Assert.AreEqual(15, from);
+        Assert.AreEqual(SaveGame.CurrentVersion, save.v);
+        Assert.IsNotNull(save.storyQuests);
+        Assert.IsNotNull(save.storyFlags);
+        var state = StoryState.FromSave(save.storyQuests, save.storyFlags);
+        Assert.AreEqual(StoryStatus.Done, state.Status("h2"));
+        foreach (var id in new[] { "h14", "h15", "h16", "h17", "n8", "n9", "n10", "n11" })
+            Assert.AreEqual(StoryStatus.Locked, state.Status(id), $"new step {id} starts locked");
+        // The host's snapshot max-merges onto a fresh client without regressing.
+        var client = new StoryState();
+        Assert.IsTrue(client.Merge(state.Snapshot()), "host snapshot moves the client");
+        Assert.AreEqual(StoryStatus.Done, client.Status("h2"), "max-merge never regresses");
     }
 
     [Test]

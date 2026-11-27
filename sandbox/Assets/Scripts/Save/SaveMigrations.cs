@@ -57,6 +57,7 @@ public static class SaveMigrations
         if (save.v == 12) V12ToV13(save);
         if (save.v == 13) V13ToV14(save);
         if (save.v == 14) V14ToV15(save);
+        if (save.v == 15) V15ToV16(save);
         return Outcome.Migrated;
     }
 
@@ -252,6 +253,20 @@ public static class SaveMigrations
         int refunded = RemovePotions(save.bag) + RemovePotions(save.stash);
         save.gold = System.Math.Max(0, save.gold) + refunded * LegacyPotionRefund;
         save.v = 15;
+    }
+
+/// <summary>
+/// v15 → v16 (cinderreach-akt1-vertiefung S4): v15 saves predate the doubled
+/// Akt I catalog. The new steps (h14–h17, n8–n11) need no stored fields — they
+/// ride the generic <c>storyQuests</c>/<c>storyFlags</c> lists and open via the
+/// act-driven catch-up in <c>StoryState.Refresh</c> on first load — so the
+/// migration only guarantees non-null lists and lifts the version.
+/// </summary>
+    static void V15ToV16(SaveGame save)
+    {
+        if (save.storyQuests == null) save.storyQuests = new System.Collections.Generic.List<StoryQuestEntry>();
+        if (save.storyFlags == null) save.storyFlags = new System.Collections.Generic.List<string>();
+        save.v = 16;
     }
 
     static int RemovePotions(System.Collections.Generic.List<ItemInstance> items)
