@@ -146,9 +146,9 @@
    "seconds": 6.18
   },
   "dlg.h10.offer.1": {
-   "hash": "e2ddac1f01f0",
+   "hash": "a4d2b3ac211d",
    "speaker": "ottilie",
-   "seconds": 8.96
+   "seconds": 8.41
   },
   "dlg.h10.offer.2": {
    "hash": "9cbef9304a58",
@@ -191,9 +191,9 @@
    "seconds": 6.86
   },
   "dlg.h10.talk.merle.2": {
-   "hash": "78efa474c100",
+   "hash": "41d8698e5ed7",
    "speaker": "merle",
-   "seconds": 6.75
+   "seconds": 5.7
   },
   "dlg.h10.talk.merle.3": {
    "hash": "0e118ddae3ff",
@@ -246,9 +246,9 @@
    "seconds": 3.25
   },
   "dlg.h14.offer.3": {
-   "hash": "8424906a98e4",
+   "hash": "1f46205a7e33",
    "speaker": "ottilie",
-   "seconds": 6.61
+   "seconds": 4.94
   },
   "dlg.h14.offer.4": {
    "hash": "3133fba783ae",
@@ -281,9 +281,9 @@
    "seconds": 5.1
   },
   "dlg.h15.talk.ottilie.2": {
-   "hash": "66adff73886f",
+   "hash": "45d76e09e2eb",
    "speaker": "ottilie",
-   "seconds": 8.45
+   "seconds": 6.95
   },
   "dlg.h15.talk.ottilie.3": {
    "hash": "2a2420e2b56d",
@@ -506,9 +506,9 @@
    "seconds": 8.05
   },
   "dlg.h3.talk.jorin.1": {
-   "hash": "1c6b7884cd0a",
+   "hash": "b80454f44181",
    "speaker": "jorin",
-   "seconds": 2.78
+   "seconds": 3.83
   },
   "dlg.h3.talk.jorin.2": {
    "hash": "dab6b41e87e7",
@@ -536,9 +536,9 @@
    "seconds": 4.65
   },
   "dlg.h4.done.2": {
-   "hash": "273cace2225b",
+   "hash": "583eb06ad49b",
    "speaker": "ottilie",
-   "seconds": 8.19
+   "seconds": 7.15
   },
   "dlg.h4.done.3": {
    "hash": "6e47136b167e",
@@ -711,9 +711,9 @@
    "seconds": 6.1
   },
   "dlg.h9.talk.merle.4": {
-   "hash": "e80245ce5bf7",
+   "hash": "6412d237f79e",
    "speaker": "merle",
-   "seconds": 3.22
+   "seconds": 3.14
   },
   "dlg.h9.talk.merle.5": {
    "hash": "2a46881528c8",
@@ -726,9 +726,9 @@
    "seconds": 4.88
   },
   "dlg.h9.talk.merle.7": {
-   "hash": "804824ed7912",
+   "hash": "024b34b69c4e",
    "speaker": "merle",
-   "seconds": 5.2
+   "seconds": 4.83
   },
   "dlg.h9.talk.ottilie.1": {
    "hash": "d45cbea7361f",
@@ -886,9 +886,9 @@
    "seconds": 4.25
   },
   "dlg.n12.done.2": {
-   "hash": "f3a768e67f5a",
+   "hash": "980111b1020a",
    "speaker": "merle",
-   "seconds": 3.68
+   "seconds": 3.98
   },
   "dlg.n12.hint.1": {
    "hash": "9d17e562f3fe",
@@ -921,9 +921,9 @@
    "seconds": 3.01
   },
   "dlg.n13.offer.1": {
-   "hash": "d786ca4f4786",
+   "hash": "b8fa78d8b8d7",
    "speaker": "ilsabe",
-   "seconds": 4.76
+   "seconds": 4.61
   },
   "dlg.n13.offer.2": {
    "hash": "68c302128b3f",
@@ -1061,9 +1061,9 @@
    "seconds": 4.83
   },
   "dlg.n4.offer.1": {
-   "hash": "520df4b964c6",
+   "hash": "222537ae69df",
    "speaker": "merle",
-   "seconds": 6.33
+   "seconds": 5.37
   },
   "dlg.n4.offer.2": {
    "hash": "0f458165971a",
@@ -1186,9 +1186,9 @@
    "seconds": 4.99
   },
   "dlg.n8.offer.2": {
-   "hash": "e1303b030f0d",
+   "hash": "6e3f76790533",
    "speaker": "ottilie",
-   "seconds": 2.95
+   "seconds": 4.61
   },
   "dlg.n9.done.1": {
    "hash": "a777fc64bc98",
