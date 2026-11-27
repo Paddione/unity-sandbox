@@ -5,7 +5,9 @@ branch: feature/cinderreach-skills-modularization-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
-start_condition: Stand gegen cinderreach-party-roles abgeglichen (GOAL-Abhängigkeit); kein paralleles Schreiben an DiabloSkills.cs; GOAL-Korrektur aus S1 ist gelandet
+priority: P4 (unabhängiges Refactoring, höheres Risiko Kampf-Autorität; parallel zur Story-Kette möglich, nach inventory-ui-layout-split)
+status: ready — cinderreach-party-roles ist 100 % (PROGRESS: Keine offenen Punkte), der S1-Abgleich ist damit nur noch lesende Kontrolle; Code-Basis seit Planerstellung unverändert
+start_condition: Stand gegen cinderreach-party-roles abgeglichen (GOAL-Abhängigkeit, erfüllt: 100 %); kein paralleles Schreiben an DiabloSkills.cs; GOAL-Korrektur aus S1 ist gelandet
 plan_refs: [.agents/goals/cinderreach-skills-modularization/GOAL.md]
 ---
 

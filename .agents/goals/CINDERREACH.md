@@ -11,10 +11,23 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 
 ## Aktive Goals
 
-| Goal | Stand | Nächster Schritt |
-|---|---|---|
-| [`cinderreach-party-roles`](cinderreach-party-roles/GOAL.md) | S1–S4 auf `main` (`1842d1f`, `75995ce`, `e388d05`, `e8a8b81`), S5 läuft im Worktree `feature/cinderreach-party-roles-s5`. `PROGRESS.md` ist noch nicht nachgezogen. | S5 Koop-Gruppe, dann S6 Nachweis |
-| [`cinderreach-itemization`](cinderreach-itemization/GOAL.md) | 50 %, S1–S3 auf `main` (`b079676`, `bf9db19`, `c94259d`) | S4 Rollen-Uniques (braucht Rogue-Skills aus Party Roles), S5 Präsentation, S6 Abnahme |
+| Prio | Goal | Stand | Nächster Schritt |
+|---|---|---|---|
+| P1 | [`cinderreach-akt1-vertiefung`](cinderreach-akt1-vertiefung/GOAL.md) | 25 %, S1 gelandet (`6646cff`) | S2 Moor/Beinhaus-Strang; Kettenkopf, entblockt Akt II/III und sprache-voice S2 |
+| P2 | [`cinderreach-akt2-vertiefung`](cinderreach-akt2-vertiefung/GOAL.md) | 0 %, Startbedingung Akt-I-S1 erfüllt | S1 Bibel+Modell, sobald `StoryModel`/`story-bible.md` frei sind (nach Akt-I-S2 empfohlen) |
+| P3 | [`cinderreach-inventory-ui-layout-split`](cinderreach-inventory-ui-layout-split/GOAL.md) | 0 %, startklar | S1 Baseline der 6 Suites, dann Partial-Split; unabhängig, parallel zur Story-Kette möglich |
+| P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 0 %, startklar (party-roles 100 %) | S1 GOAL-Korrektur (Enum 0..19) + Baseline, dann `BowStanceVisuals`/`SkillBarHud`; unabhängig, parallel möglich |
+| P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
+| P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 0 %, S1 startklar / S2 blockiert | S1 Regeln+Inventur jederzeit; S2 erst nach Akt-I/II/III-S1-Textständen |
+| P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 0 %, startklar | S1 frische `index_status`-Messung; unabhängig, keine Entblockung, jederzeit als Füller |
+
+Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
+(Story-Kette Akt I → II → III → Sprache), danach unabhängige Refactorings nach Risiko
+(Inventar mechanisch vor Skills/Kampf-Autorität), Kettenende und reine Hygiene. P3/P4/P7 sind dateidisjunkt zur Story-Kette und
+zueinander und können parallel laufen; die Story-Ziele teilen sich `StoryModel.cs` und
+`docs/story-bible.md` und bleiben seriell. `cinderreach-party-roles`, `cinderreach-itemization` und `cinderreach-hotpath-caching` (seit `a4d3dc3`) stehen in ihren `PROGRESS.md` auf 100 % (keine offenen Punkte);
+ihre Einarbeitung hier und das Entfernen der Goal-Verzeichnisse ist der noch ausstehende
+Konsolidierungsschritt nach der Regel unten, kein offenes Umsetzungsziel.
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
 Abgeschlossen: `cinderreach-class-kits-parity` (2026-11-27, `aaa2571`): Moorgänger und Schmuggler mit je 6 eigenen

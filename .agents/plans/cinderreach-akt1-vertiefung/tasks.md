@@ -5,7 +5,9 @@ branch: feature/cinderreach-akt1-vertiefung-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-start_condition: main @ 73ca3e2 sauber; kein anderes Quest-Goal schreibt gleichzeitig an StoryModel/StoryState (disjunkte Stufen, siehe Manifest)
+priority: P1 (Kettenkopf Story; entblockt Akt II, Akt III und sprache-voice S2)
+status: in_progress — S1 gelandet (6646cff, 25 %), nächster Schritt S2
+start_condition: main @ 1ff1b95 sauber; kein anderes Quest-Goal schreibt gleichzeitig an StoryModel/StoryState (disjunkte Stufen, siehe Manifest)
 plan_refs: [.agents/goals/cinderreach-akt1-vertiefung/GOAL.md]
 ---
 
@@ -28,11 +30,13 @@ Die sieben Erfolgskriterien aus GOAL.md, je Stufe unten mit Test-/Lauf-Beleg ver
 Gesamt-Gate S4: EditMode + PlayMode grün, `VerifyDiabloZone` + `KayKitAssets.Verify` grün,
 `check-meta.py` grün, Autoplay `-seed 0` bis `actboss` Exit 0 / 0 Exceptions.
 
-## Ausgangslage (Belege, HEAD `73ca3e2`, 2026-11-24)
+## Ausgangslage (Belege, HEAD `1ff1b95`, 2026-11-27, Plan-Rebase)
 
-- Story-SSOT `docs/story-bible.md` §§Akt I/Nebenaufgaben/Folgezeilen: H1–H5 + N1–N3, Anker (H2 öffnet Ofen, H4 schließt Akt I, H5 löscht Laterne), Folge-Mechanik `x|nK`/`x|!nK` über `StoryDialog.Visible`.
-- Code: `sandbox/Assets/Scripts/Story/` (`StoryModel`, `StoryState`, `StoryDirector`, `StoryDialogs`, `StoryBarks`, `StoryPickup`, `StoryNpc`, `StoryQuestUI`), `Localization/LocCatalog.Story.cs` + `LocCatalog.Dialog.cs`, Save v14 (`SaveGame`/`SaveMigrations`), Koop Host-Snapshot Max-Merge.
-- Tests: `StoryStateTests`, `LocalizationTests`, `StoryVoiceTests` (Muster für neue Quest-/Rätsel-Tests).
+- S1 ist gelandet (`6646cff`): Story-Bibel Akt I auf 16 Einträge erweitert (H14–H17, N8–N11, Rätsel R1–R3 in `docs/story-bible.md` §Akt I), `StoryModel.cs` + 8 Quests/6 Fundstück-Ids (IDs `h10–h13`/`n6–n7` für Akt III freigehalten), Titel/Ziele in `LocCatalog.Story.cs`, `Akt1ModellTests` (12 Fälle) + `QuestRuleTests`/`QuestJourneyTests` erweitert. Goal steht bei 25 %.
+- Abweichung zum ursprünglichen S1-Manifest: `StoryState.cs`/`StoryDirector.cs` wurden in S1 nicht angefasst. Ob Zustands-/Director-Erweiterungen für die neuen Schritte nötig sind, ist in S2 am Ist-Code zu prüfen und dort ggf. nachzuholen (kein stiller Scope-Verlust).
+- Seit der alten Plan-Basis (`73ca3e2`) gelandet: `cinderreach-group-quest-map` (`4434b6d`/`a2b36ca`) mit `StoryDialogShare`, `StoryTracking`, `QuestDestinations` und geänderter `StoryQuestUI.cs` — S3-Ziel `StoryQuestUI.cs` vor Start gegen diesen Stand abgleichen (neue Quests müssen in Tracker/Fuhrbuch/Karten auftauchen). `cinderreach-quest-interaktionen` (100 %) bleibt Ketten-Baseline.
+- Code: `sandbox/Assets/Scripts/Story/` (`StoryModel`, `StoryState`, `StoryDirector`, `StoryDialogs`, `StoryBarks`, `StoryPickup`, `StoryNpc`, `StoryQuestUI`), `Localization/LocCatalog.Story.cs` + `LocCatalog.Dialog.cs`, Save v15 (`SaveGame.CurrentVersion = 15`, gear-slots; nicht mehr v14), Koop Host-Snapshot Max-Merge.
+- Tests: `StoryStateTests`, `LocalizationTests`, `StoryVoiceTests` (Muster für neue Quest-/Rätsel-Tests), dazu die S1-Tests `Akt1ModellTests`, `QuestRuleTests`, `QuestJourneyTests` als Regressionsbasis für S2/S3.
 
 ## Entscheide (gelockt, Eigner 2026-11-24, setgoal-Runde)
 
@@ -51,7 +55,7 @@ dann Stränge (Moor/Beinhaus, Ofen/Wacht) auf denselben Pfaden wie Bestand, zule
 
 | Stufe | Inhalt | target_files |
 |---|---|---|
-| S1 bibel+modell | Akt-I-Tabellen neu (ca. +8), Rätsel-Definitionen, Model/State/Director-Erweiterung + Tests | `docs/story-bible.md` (§Akt I), `Scripts/Story/StoryModel.cs`, `Scripts/Story/StoryState.cs`, `Scripts/Story/StoryDirector.cs`, `Tests/EditMode/Akt1ModellTests.cs` (neu) |
+| S1 bibel+modell (erledigt, `6646cff`) | Akt-I-Tabellen neu (ca. +8), Rätsel-Definitionen, Model-Erweiterung + Tests; State/Director-Prüfung nach S2 verlegt (s. Ausgangslage) | `docs/story-bible.md` (§Akt I), `Scripts/Story/StoryModel.cs`, `Localization/LocCatalog.Story.cs`, `Tests/EditMode/Akt1ModellTests.cs`, `Tests/EditMode/QuestRuleTests.cs`, `Tests/PlayMode/QuestJourneyTests.cs` |
 | S2 moor-beinhaus | Moor/Beinhaus-Strang: H-Ergänzungen, Grabtafel-/Fuhrbrief-Rätsel, N-Folgen + Tests | `Scripts/Story/StoryDialogs.cs` (Akt-I-Moor/Beinhaus), `Scripts/Story/StoryPickup.cs`, `Scripts/Story/StoryNpc.cs` (Ottilie/Moor), `Localization/LocCatalog.Story.cs` (Moor/Beinhaus-Zeilen), `Tests/PlayMode/Akt1MoorTests.cs` (neu) |
 | S3 ofen-wacht | Ofen/Wacht-Strang: Rußbuch-/Siegel-Rätsel, Jorin-/Ilsabe-Entscheidungen, H5-Finale + Tests | `Scripts/Story/StoryDialogs.cs` (Akt-I-Ofen/Wacht), `Scripts/Story/StoryQuestUI.cs`, `Scripts/Story/StoryBarks.cs` (Akt-I-Zurufe), `Localization/LocCatalog.Dialog.cs` (Ofen/Wacht-Zeilen), `Tests/PlayMode/Akt1OfenTests.cs` (neu) |
 | S4 proof | Save-Migration, Koop-Buchung neuer Schritte, Autoplay bis actboss, Voice neuer Zeilen, Doku | `Scripts/Save/*` (Migration neuester Stand), `Scripts/SessionAutoplay.cs`, `docs/akt1-vertiefung-run-log.md` (neu), `docs/dev-journal.md`, `docs/story-bible.md` (Folgezeilen-Abgleich) |

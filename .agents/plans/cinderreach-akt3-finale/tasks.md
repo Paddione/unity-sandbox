@@ -5,7 +5,9 @@ branch: feature/cinderreach-akt3-finale-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-start_condition: main @ 73ca3e2 sauber; S1 erst nach Akt-I-S1 + Akt-II-S1 (H9→H10-Haken muss auf deren H9-Varianten passen)
+priority: P5 (Story-Kettenende vor sprache-voice S2; blockiert durch Akt-II-S1)
+status: blocked — Akt-I-S1 erfüllt (6646cff), Akt-II-S1 steht aus
+start_condition: main @ 1ff1b95 sauber; S1 erst nach Akt-I-S1 (erfüllt, 6646cff) + Akt-II-S1 (offen) — H9→H10-Haken muss auf deren H9-Varianten passen
 plan_refs: [.agents/goals/cinderreach-akt3-finale/GOAL.md]
 ---
 
@@ -27,11 +29,12 @@ Die fünf Erfolgskriterien aus GOAL.md. Gesamt-Gate S4: EditMode + PlayMode grü
 `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `check-meta.py` grün,
 Autoplay erreicht `complete` mit 0 Exceptions.
 
-## Ausgangslage (Belege, HEAD `73ca3e2`, 2026-11-24)
+## Ausgangslage (Belege, HEAD `1ff1b95`, 2026-11-27, Plan-Rebase)
 
-- Haken: Story-Bibel §Ausblick (Scherbe gegen Laterne, „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter.“).
-- Freischalt-Muster: `ActProgress` (Abbot→Kiln, Kilnmother→Brache), `ZoneGate`/`ZoneTravel`, Save v14 + Migrationskette, Koop Host-Snapshot Max-Merge.
-- Gegner-Baukasten: Husks/Hüllen, Elite-Muster, Boss-Phasen (Phase 2 ab 50 %), Bossbalken, Barks.
+- Haken unverändert: Story-Bibel §Ausblick nach Akt II (ab Zeile 328; Scherbe gegen Laterne, „Wenn wir sie zerschlagen, ist es dunkel. Wenn nicht, kommen sie weiter.“). Kein Akt-III-Abschnitt, keine `Akt3*Tests`, kein `akt3-finale-run-log.md` — Goal 0 %.
+- ID-Vertrag passt: Akt-I-S1 (`6646cff`) hat `h10–h13`/`n6–n7` im `StoryModel` ausdrücklich für Akt III freigehalten. Die H9-Varianten, an die H10 anschließt, entstehen erst in Akt-II-S1/S2 — daher bleibt S1 blockiert, bis Akt-II-S1 steht.
+- Freischalt-Muster: `ActProgress.cs` (Abbot→Kiln, Kilnmother→Brache; Plan-Muster `ActProgress*.cs` meint diese eine Datei), `ZoneGate`/`ZoneTravel`, Save v15 + Migrationskette (nicht mehr v14), Koop Host-Snapshot Max-Merge.
+- Gegner-Baukasten: Husks/Hüllen, Elite-Muster, Boss-Phasen (Phase 2 ab 50 %), Bossbalken, Barks. Seit Plan-Basis neu: Cutscene-/Showcase-System (`CutsceneDirector`, `71a6137`/`6c51287`) — der Finalboss in S3 nutzt das vorhandene Intro-/Phase-2-Muster statt eines eigenen Systems (Entscheid 2 bleibt).
 
 ## Entscheide (gelockt, Eigner 2026-11-24, setgoal-Runde)
 

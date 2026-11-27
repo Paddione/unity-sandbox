@@ -5,7 +5,9 @@ branch: feature/cinderreach-akt2-vertiefung-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO02, G-DIABLO03, G-DIABLO06]
-start_condition: main @ 73ca3e2 sauber; S1 erst nach Akt-I-S1-Modellstand (kein paralleles Schreiben an StoryModel/StoryState)
+priority: P2 (Story-Kette nach Akt I; entblockt Akt III und sprache-voice S2)
+status: ready — Startbedingung Akt-I-S1 erfüllt (6646cff), S1 startbar sobald StoryModel/story-bible frei sind (nach Akt-I-S2 empfohlen)
+start_condition: main @ 1ff1b95 sauber; Akt-I-S1-Modellstand gelandet (6646cff) — erfüllt; kein paralleles Schreiben an StoryModel/StoryState oder docs/story-bible.md mit einem Akt-I-Worktree
 plan_refs: [.agents/goals/cinderreach-akt2-vertiefung/GOAL.md]
 ---
 
@@ -27,10 +29,12 @@ Die sechs Erfolgskriterien aus GOAL.md. Gesamt-Gate S3: EditMode + PlayMode grü
 `VerifyDiabloZone` + `KayKitAssets.Verify` grün, `check-meta.py` grün,
 Autoplay `-seed 0` bis `boss3` Exit 0 / 0 Exceptions.
 
-## Ausgangslage (Belege, HEAD `73ca3e2`, 2026-11-24)
+## Ausgangslage (Belege, HEAD `1ff1b95`, 2026-11-27, Plan-Rebase)
 
-- Story-SSOT `docs/story-bible.md` §Akt II: H6–H9 + N4–N5, Wendung 3, H9 als Haken für Akt III.
-- Code/Test-Basis wie Akt-I-Plan; Zonen-Basis `cinderreach-akt2-opening` (`BarrensLayout`, `Barrens*Builder`, `Shardback`/`DuneAugur`/`GlassElite`, Glasswright 420 HP, Bracket 4).
+- Story-SSOT `docs/story-bible.md` §Akt II (Zeile 307): weiter H6–H9 + N4–N5 (6 Einträge), Wendung 3, H9 als Haken für Akt III. Keine `Akt2*Tests`, kein `akt2-vertiefung-run-log.md` — S1–S3 stehen vollständig aus, Goal 0 %.
+- Startbedingung erfüllt: Akt-I-S1 ist gelandet (`6646cff`, `StoryModel` inkl. freigehaltener IDs `h10–h13`/`n6–n7` für Akt III). Das Akt-I-Modell (Katalog-Reihenfolge, Folgezeilen-Mechanik) ist die verbindliche Datenbasis für S1.
+- Save-Stand ist v15 (`SaveGame.CurrentVersion = 15`), nicht v14 wie in älteren Vermerken; Bracket-4-/Unique-Regeln (Gear-Slots) bleiben unangetastet.
+- Code/Test-Basis wie Akt-I-Plan auf neuem Stand; Zonen-Basis `cinderreach-akt2-opening` (`BarrensLayout`, `Barrens*Builder`, `Shardback`/`DuneAugur`/`GlassElite`, Glasswright 420 HP, Bracket 4). `cinderreach-group-quest-map` (100 %) betrifft auch Akt-II-Tracking/Karten — neue Quests in S2 gegen `StoryTracking`/`QuestDestinations` prüfen.
 
 ## Entscheide (gelockt, Eigner 2026-11-24, setgoal-Runde)
 

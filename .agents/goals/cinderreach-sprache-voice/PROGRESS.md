@@ -8,6 +8,8 @@ Prozent: 0 %
 - 2026-11-24: Goal persistent angelegt (GOAL.md + PROGRESS.md, health_goals ab 0 %) und Ausführungsplan `.agents/plans/cinderreach-sprache-voice/tasks.md` geschrieben.
 - 2026-11-26: Status geprüft (main `5978149`): weiter 0 % — keine S-Stufe gelandet, kein `feature/cinderreach-sprache-voice-s<N>`-Branch. Kein `sprache-inventur.md`, keine `SpracheTests.cs`, kein `sprache-voice-run-log.md`; Zeilenstand weiter ca. 115+ Bestand (deutsch, 8 Stimmen, `check-voice-lines.py` als Gate). Plan-Basis (`73ca3e2`) überholt. Reihenfolge gilt gestaffelt: S2 erst nach Textständen aus Akt-I-S1, Akt-II-S1, Akt-III-S1 — alle drei stehen noch aus, daher S2 weiter blockiert.
 
+- 2026-11-27: Plan auf `1ff1b95` rebased und als P6 priorisiert: Akt-I-S1-Textstand steht (`6646cff`), Akt-II-S1 und Akt-III-S1 fehlen weiter — S1 (Regeln+Inventur) startbar, S2 bleibt gestaffelt blockiert; Zeilen-/Clip-Stand (115) auf aktuellem HEAD bestätigt. Prozent bleibt 0 %.
+
 ## Nächste Schritte
 
 - S1: Glättungsregeln (Ton-Fortschreibung + Beispiele) + Bestands-Inventur aller 115+ Zeilen — sofort startbar, entblockt nichts, wird aber erst mit den Quest-S1-Ständen vollständig.

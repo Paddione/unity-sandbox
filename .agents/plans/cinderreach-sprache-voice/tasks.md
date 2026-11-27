@@ -5,7 +5,9 @@ branch: feature/cinderreach-sprache-voice-s<N>
 repo_main: main
 tickets: none
 health_goals: [G-DIABLO03, G-DIABLO07]
-start_condition: main @ 73ca3e2 sauber; S2 erst nach Textständen aus Akt-I-S1, Akt-II-S1, Akt-III-S1 (gestaffelt)
+priority: P6 (Gesamtziel ans Kettenende; S1 jederzeit startbar, S2 erst nach Akt-III-S1)
+status: partially_ready — S1 startbar; S2 gestaffelt blockiert (Akt-I-S1 erfüllt, Akt-II-S1 und Akt-III-S1 offen)
+start_condition: main @ 1ff1b95 sauber; S2 erst nach Textständen aus Akt-I-S1 (erfüllt, 6646cff), Akt-II-S1 (offen), Akt-III-S1 (offen) — gestaffelt
 plan_refs: [.agents/goals/cinderreach-sprache-voice/GOAL.md]
 ---
 
@@ -27,11 +29,12 @@ Die fünf Erfolgskriterien aus GOAL.md. Gesamt-Gate S3: EditMode + PlayMode grü
 `check-meta.py` grün, `check-voice-lines.py` grün, Render- + QA-Belege, Voice-Regler und
 Koop-Bark-Regel erhalten.
 
-## Ausgangslage (Belege, HEAD `73ca3e2`, 2026-11-24)
+## Ausgangslage (Belege, HEAD `1ff1b95`, 2026-11-27, Plan-Rebase)
 
 - Ton-SSOT: Story-Bibel §Ton (düster/knapp/konkret, Anrede-, UI-, Zahlen-Regeln), Glossar (Orte/Gegner/Klassen/Systeme).
-- Textorte: `LocCatalog.Story.cs` + `LocCatalog.Dialog.cs`, `StoryDialogs.cs`, `StoryBarks.cs` (115 Zeilen inkl. `x|nK`-Varianten).
-- Voice: `docs/audio/voices.json` (8 Stimmen), Clips `sandbox/Assets/Resources/Voice/<key>.ogg`, Pipeline `scripts/voice/render_voices.py` + `qa_transcribe.py`, Gate `scripts/check-voice-lines.py`, Vertrag `scripts/check-audio-manifest.py` = G-DIABLO07.
+- Textorte: `LocCatalog.Story.cs` + `LocCatalog.Dialog.cs`, `StoryDialogs.cs`, `StoryBarks.cs` (115 Zeilen inkl. `x|nK`-Varianten). Seit Plan-Basis sind Akt-I-Neutexte dazugekommen (S1 `6646cff`: Titel/Ziele/Fundstücknamen zu H14–H17/N8–N11) — die S1-Inventur zählt den aktuellen Zeilenstand neu statt die 115 zu übernehmen.
+- Voice: `docs/audio/voices.json` (8 Stimmen), 115 Clips unter `sandbox/Assets/Resources/Voice/<key>.ogg` (gezählt auf `1ff1b95`), Pipeline `scripts/voice/render_voices.py` + `qa_transcribe.py`, Gate `scripts/check-voice-lines.py`, Vertrag `scripts/check-audio-manifest.py` = G-DIABLO07.
+- Staffelung konkret: Akt-I-S1-Textstand steht (`6646cff`), Akt-II-S1 und Akt-III-S1 fehlen. S1 (Regeln + Inventur des Bestands) ist sofort startbar und wird mit jedem Quest-S1 nachgezogen; S2 startet erst, wenn alle drei Textstände liegen — sonst würden Clips doppelt gerendert.
 
 ## Entscheide (gelockt, Eigner 2026-11-24, setgoal-Runde)
 
