@@ -31,7 +31,7 @@ public static class HuskModelLibrary
 
     /// <summary>Shared husk locomotion controller (null when never built).</summary>
     public static RuntimeAnimatorController HuskController() =>
-        Resources.Load<RuntimeAnimatorController>(HuskControllerPath);
+        Res.Get<RuntimeAnimatorController>(HuskControllerPath);
 
     /// <summary>
     /// Spawn a fighting husk: skeleton model when one is known (explicit

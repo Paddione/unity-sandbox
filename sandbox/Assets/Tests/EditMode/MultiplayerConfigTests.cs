@@ -29,8 +29,8 @@ public class MultiplayerConfigTests
     [Test]
     public void NetworkPlayerPrefab_HasNetworkObjectAndOwnerOnlyController()
     {
-        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/NetworkPlayer.prefab");
-        Assert.IsNotNull(prefab, "Assets/Resources/NetworkPlayer.prefab must exist.");
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/AddressableAssets/NetworkPlayer.prefab");
+        Assert.IsNotNull(prefab, "Assets/AddressableAssets/NetworkPlayer.prefab must exist.");
         Assert.IsNotNull(prefab.GetComponent<NetworkObject>(), "NetworkPlayer needs NetworkObject.");
         Assert.IsNotNull(prefab.GetComponent<ThirdPersonController>(), "NetworkPlayer needs ThirdPersonController.");
     }

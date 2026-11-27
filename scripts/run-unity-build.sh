@@ -135,6 +135,17 @@ if [ "${UNITY_CLEAN_BUILD:-0}" = "1" ]; then
   IFS=$OLDIFS
 fi
 
+# --- 2c. Unity Accelerator (opt-in) -------------------------------------------------
+# UNITY_ACCELERATOR=127.0.0.1:10080 routes asset pipeline traffic through the
+# shared cache (unity-build-speed-5x, Task 5). Unset = unchanged behavior.
+# Scripts/manage: bash scripts/unity-accelerator.sh up|status|down.
+ACCEL_ARGS=""
+if [ -n "${UNITY_ACCELERATOR:-}" ]; then
+  ACCEL_NS="${UNITY_ACCELERATOR_NAMESPACE:-unity-sandbox}"
+  ACCEL_ARGS="-cacheServerEndpoint $UNITY_ACCELERATOR -cacheServerNamespacePrefix $ACCEL_NS -cacheServerEnableDownload true -cacheServerEnableUpload true"
+  echo "run-unity-build: using Unity Accelerator $UNITY_ACCELERATOR (ns $ACCEL_NS)."
+fi
+
 # --- 3. Build with heartbeat, stall watchdog + hard timeout ----------------
 echo "run-unity-build: $METHOD (timeout ${TIMEOUT}s, stall ${UNITY_STALL_S}s, jobs $JOBS, log $LOG)"
 # UNITY_BUILD_EXTRA_ARGS: optional extra editor args, word-split on purpose
@@ -142,7 +153,7 @@ echo "run-unity-build: $METHOD (timeout ${TIMEOUT}s, stall ${UNITY_STALL_S}s, jo
 # shellcheck disable=SC2086
 unity_run_watched run-unity-build "$LOG" "$TIMEOUT" \
   "$EDITOR" -batchmode -nographics -quit -projectPath "$PROJECT" \
-  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" ${UNITY_BUILD_EXTRA_ARGS:-}
+  -job-worker-count "$JOBS" -executeMethod "$METHOD" -logFile "$LOG" ${UNITY_BUILD_EXTRA_ARGS:-} $ACCEL_ARGS
 RC=$UNITY_RUN_RC
 if [ "$UNITY_RUN_END" != done ]; then
   STRAGGLERS=$(live_holders || true)

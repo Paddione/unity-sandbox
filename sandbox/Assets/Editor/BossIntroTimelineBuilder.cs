@@ -8,7 +8,7 @@ public static class BossIntroTimelineBuilder
 {
     public static void Build()
     {
-        const string path = "Assets/Resources/Cutscene_BossIntro.playable";
+        const string path = "Assets/AddressableAssets/Cutscene_BossIntro.playable";
         if (AssetDatabase.LoadMainAssetAtPath(path) != null) return;
         var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
         AssetDatabase.CreateAsset(timeline, path);

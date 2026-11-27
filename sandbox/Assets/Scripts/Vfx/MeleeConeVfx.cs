@@ -160,7 +160,7 @@ public static class MeleeConeVfx
     static Material BaseMaterial()
     {
         if (baseMaterial != null) return baseMaterial;
-        var src = Resources.Load<Material>("SkillArt/FireAdditive");
+        var src = Res.Get<Material>("SkillArt/FireAdditive");
         if (src == null) return null;
         baseMaterial = new Material(src) { name = "MeleeDecal" };
         if (baseMaterial.HasProperty("_BaseMap")) baseMaterial.SetTexture("_BaseMap", Texture2D.whiteTexture);

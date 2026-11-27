@@ -106,7 +106,7 @@ public sealed class DiabloAmbience : MonoBehaviour
         main.maxParticles = max;
         var shape = ps.shape;
         shape.enabled = false;
-        var mat = Resources.Load<Material>(material);
+        var mat = Res.Get<Material>(material);
         if (mat != null) go.GetComponent<ParticleSystemRenderer>().sharedMaterial = mat;
         return ps;
     }

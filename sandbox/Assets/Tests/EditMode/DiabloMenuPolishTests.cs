@@ -27,7 +27,7 @@ public class DiabloMenuPolishTests
     public void MenuArt_All32SpritesLoadAsSpriteResources()
     {
         foreach (var name in AllBakedMenuSprites)
-            Assert.IsNotNull(Resources.Load<Sprite>("MenuArt/" + name), $"Missing Resources/MenuArt/{name} Sprite");
+            Assert.IsNotNull(Res.Get<Sprite>("MenuArt/" + name), $"Missing Resources/MenuArt/{name} Sprite");
     }
 
     [Test]

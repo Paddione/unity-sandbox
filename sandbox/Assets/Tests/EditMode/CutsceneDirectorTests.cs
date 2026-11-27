@@ -41,7 +41,7 @@ public class CutsceneDirectorTests
     [Test]
     public void AbbotTimeline_ContainsTwoShotsKayKitVoiceAndRelease()
     {
-        var timeline = Resources.Load<TimelineAsset>("Cutscene_BossIntro");
+        var timeline = Res.Get<TimelineAsset>("Cutscene_BossIntro");
         Assert.IsNotNull(timeline);
         var tracks = timeline.GetOutputTracks().ToArray();
         var shots = tracks.OfType<CinemachineTrack>().Single().GetClips().OrderBy(c => c.start).ToArray();

@@ -7,7 +7,7 @@ Run with a Python that has ``qwen_tts`` (the voice-tts box venv)::
 Step 1 designs a missing reference per speaker (docs/audio/voices/<id>/ref.ogg)
 from its ``instruct`` in docs/audio/voices.json. Step 2 clones every line whose
 text, speaker or reference changed (hash in docs/audio/voice-lines.lock.json)
-into sandbox/Assets/Resources/Voice/<key>.ogg. CPU by default (TTS_DEVICE=cuda:0
+into sandbox/Assets/AddressableAssets/Voice/<key>.ogg. CPU by default (TTS_DEVICE=cuda:0
 to use a GPU); threads follow OMP_NUM_THREADS.
 """
 from __future__ import annotations

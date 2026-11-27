@@ -19,7 +19,7 @@ Gilt für Sprites, Texture2D und PBR-Materialien aus Text-Prompts + Referenzbild
 ## Ablage-Konvention
 
 - Texturen/Models: `Assets/Art/<Zone|LocalArtPilot>/...` (+ `.meta` einchecken — `scripts/check-meta.py` ist fail-closed).
-- Icons: `Assets/Resources/MenuArt|SkillArt/*.png` als Sprite/Single ohne Mipmap (lädt per
+- Icons: `Assets/AddressableAssets/MenuArt|SkillArt/*.png` als Sprite/Single ohne Mipmap (lädt per
   `Resources.Load<Sprite>`; Drift repariert `MenuArtImporter.ImportAsSprites`).
 - Größen: Texturen ≤ 2048 (Postprocessor cappt), keine Hi-Res-Varianten für Doku/Demo einchecken
   (siehe `scripts/asset-bloat-audit.py`).

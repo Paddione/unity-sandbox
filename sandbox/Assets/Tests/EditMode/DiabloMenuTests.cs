@@ -53,7 +53,7 @@ public class DiabloMenuTests
     public void BakedIcons_LoadAsSprites()
     {
         foreach (var b in new[] { "ShortSword", "HeavyAxe", "Dagger", "ClothTunic", "LeatherVest", "Breastplate", "Hood", "Helm", "Circlet" })
-            Assert.IsNotNull(Resources.Load<Sprite>("MenuArt/" + b), b);
+            Assert.IsNotNull(Res.Get<Sprite>("MenuArt/" + b), b);
         Assert.IsNotNull(DiabloMenuArt.ItemIcon("Worn Short Sword", ItemRarity.Magic));
     }
 

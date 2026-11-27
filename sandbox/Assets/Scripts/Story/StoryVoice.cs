@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Spoken story lines (cinderreach-story-voice). Every dialog and bark line key
-/// has a German clip under <c>Resources/Voice/&lt;key&gt;</c>, rendered offline by
+/// has a German clip with address <c>Voice/&lt;key&gt;</c> (AddressableAssets/Voice), rendered offline by
 /// <c>scripts/voice/render_voices.py</c> (synthetic Qwen3-TTS voices, one per
 /// speaker, see <c>docs/audio/voices.json</c>). Only German is voiced; with
 /// <c>-lang en</c> the subtitles stay and the clips stay silent. One line plays
@@ -21,7 +21,7 @@ public static class StoryVoice
 
     /// <summary>The clip for a catalog line key, or null when none is rendered.</summary>
     public static AudioClip Clip(string key) =>
-        string.IsNullOrEmpty(key) ? null : Resources.Load<AudioClip>(ResourceFolder + key);
+        string.IsNullOrEmpty(key) ? null : Res.Get<AudioClip>(ResourceFolder + key);
 
     /// <summary>Whether voice playback applies at all (German, not muted, not batchmode).</summary>
     public static bool Active

@@ -1,4 +1,313 @@
 Asset	Herkunft	Einsatzort
+Assets/AddressableAssets/BillingMode.json	Cinderreach	Runtime asset: Assets/AddressableAssets/BillingMode.json
+Assets/AddressableAssets/CinderreachHeroArt.asset	Cinderreach	Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset
+Assets/AddressableAssets/Cutscene_BossIntro.playable	Cinderreach	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Assets/AddressableAssets/DiabloLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/AddressableAssets/HuskLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller
+Assets/AddressableAssets/MenuArt/BloodBanner.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/BloodBanner.png
+Assets/AddressableAssets/MenuArt/Breastplate.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Breastplate.png
+Assets/AddressableAssets/MenuArt/Circlet.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Circlet.png
+Assets/AddressableAssets/MenuArt/ClothTunic.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/ClothTunic.png
+Assets/AddressableAssets/MenuArt/CrestCinderreach.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/CrestCinderreach.png
+Assets/AddressableAssets/MenuArt/Dagger.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Dagger.png
+Assets/AddressableAssets/MenuArt/EmberCenser.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/EmberCenser.png
+Assets/AddressableAssets/MenuArt/GoldCoin.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/GoldCoin.png
+Assets/AddressableAssets/MenuArt/HealingPotion.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/HealingPotion.png
+Assets/AddressableAssets/MenuArt/HeavyAxe.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/HeavyAxe.png
+Assets/AddressableAssets/MenuArt/Helm.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Helm.png
+Assets/AddressableAssets/MenuArt/Hood.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Hood.png
+Assets/AddressableAssets/MenuArt/HoodedLantern.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/HoodedLantern.png
+Assets/AddressableAssets/MenuArt/Lantern.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/Lantern.png
+Assets/AddressableAssets/MenuArt/LeatherVest.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/LeatherVest.png
+Assets/AddressableAssets/MenuArt/LootChest.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/LootChest.png
+Assets/AddressableAssets/MenuArt/PortraitFenwalker.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/PortraitFenwalker.png
+Assets/AddressableAssets/MenuArt/PortraitLanternbearer.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/PortraitLanternbearer.png
+Assets/AddressableAssets/MenuArt/PortraitRogue.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/PortraitRogue.png
+Assets/AddressableAssets/MenuArt/PortraitVendor.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/PortraitVendor.png
+Assets/AddressableAssets/MenuArt/SettingsCog.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SettingsCog.png
+Assets/AddressableAssets/MenuArt/ShortBow.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/ShortBow.png
+Assets/AddressableAssets/MenuArt/ShortSword.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/ShortSword.png
+Assets/AddressableAssets/MenuArt/SkillArrow.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillArrow.png
+Assets/AddressableAssets/MenuArt/SkillBladeFlurry.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillBladeFlurry.png
+Assets/AddressableAssets/MenuArt/SkillBogCharge.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillBogCharge.png
+Assets/AddressableAssets/MenuArt/SkillCleave.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillCleave.png
+Assets/AddressableAssets/MenuArt/SkillFireball.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillFireball.png
+Assets/AddressableAssets/MenuArt/SkillIronVow.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillIronVow.png
+Assets/AddressableAssets/MenuArt/SkillLanternBolt.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillLanternBolt.png
+Assets/AddressableAssets/MenuArt/SkillMendingLight.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillMendingLight.png
+Assets/AddressableAssets/MenuArt/SkillMireGround.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillMireGround.png
+Assets/AddressableAssets/MenuArt/SkillMireHook.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillMireHook.png
+Assets/AddressableAssets/MenuArt/SkillPowderKeg.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillPowderKeg.png
+Assets/AddressableAssets/MenuArt/SkillQuickShot.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillQuickShot.png
+Assets/AddressableAssets/MenuArt/SkillRenewingCircle.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillRenewingCircle.png
+Assets/AddressableAssets/MenuArt/SkillSearingHalo.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillSearingHalo.png
+Assets/AddressableAssets/MenuArt/SkillSeismicSlam.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillSeismicSlam.png
+Assets/AddressableAssets/MenuArt/SkillShadowRoll.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillShadowRoll.png
+Assets/AddressableAssets/MenuArt/SkillSmokePot.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillSmokePot.png
+Assets/AddressableAssets/MenuArt/SkillVeilStep.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillVeilStep.png
+Assets/AddressableAssets/MenuArt/SkillVenomVial.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillVenomVial.png
+Assets/AddressableAssets/MenuArt/SkillWisps.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/SkillWisps.png
+Assets/AddressableAssets/MenuArt/StartupBackdrop.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/StartupBackdrop.png
+Assets/AddressableAssets/MenuArt/StashChestIcon.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/StashChestIcon.png
+Assets/AddressableAssets/MenuArt/TorchSconce.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/TorchSconce.png
+Assets/AddressableAssets/MenuArt/WaypointSigil.png	Cinderreach	Runtime asset: Assets/AddressableAssets/MenuArt/WaypointSigil.png
+Assets/AddressableAssets/NetworkLootDrop.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkLootDrop.prefab
+Assets/AddressableAssets/NetworkPlayer.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayer.prefab
+Assets/AddressableAssets/NetworkPlayerDiablo.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab
+Assets/AddressableAssets/SkillArt/CleaveArc.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab
+Assets/AddressableAssets/SkillArt/FireAdditive.mat	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireAdditive.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab
+Assets/AddressableAssets/SkillArt/FireSmoke.mat	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireSmoke.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab
+Assets/AddressableAssets/SkillArt/FireballBlast.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab
+Assets/AddressableAssets/SkillArt/FireballProjectile.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab
+Assets/AddressableAssets/SkillArt/HeroBow.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
+Assets/AddressableAssets/SkillArt/SoftParticle.png	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireAdditive.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireSmoke.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/SoftParticle.png
+Assets/AddressableAssets/VendorIdle.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/AddressableAssets/VendorIdle.controller
+Assets/AddressableAssets/Voice/bark.abbot.death.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.abbot.death.ogg
+Assets/AddressableAssets/Voice/bark.abbot.phase2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.abbot.phase2.ogg
+Assets/AddressableAssets/Voice/bark.glasswright.death.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.glasswright.death.ogg
+Assets/AddressableAssets/Voice/bark.glasswright.phase2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.glasswright.phase2.ogg
+Assets/AddressableAssets/Voice/bark.h4.start.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.h4.start.ogg
+Assets/AddressableAssets/Voice/bark.h7.done.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.h7.done.ogg
+Assets/AddressableAssets/Voice/bark.kilnmother.death.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.kilnmother.death.ogg
+Assets/AddressableAssets/Voice/bark.kilnmother.phase2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.kilnmother.phase2.ogg
+Assets/AddressableAssets/Voice/bark.lancer.fall.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.lancer.fall.ogg
+Assets/AddressableAssets/Voice/bark.scherben.find.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.scherben.find.ogg
+Assets/AddressableAssets/Voice/bark.sehglas.find.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.sehglas.find.ogg
+Assets/AddressableAssets/Voice/bark.thrall.fall.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/bark.thrall.fall.ogg
+Assets/AddressableAssets/Voice/dlg.h1.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h1.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h1.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h1.done.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.done.4.ogg
+Assets/AddressableAssets/Voice/dlg.h1.done.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.done.5.ogg
+Assets/AddressableAssets/Voice/dlg.h1.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h1.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h1.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h1.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h1.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h1.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.4.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.5.ogg
+Assets/AddressableAssets/Voice/dlg.h10.done.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.done.6.ogg
+Assets/AddressableAssets/Voice/dlg.h10.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h10.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.ilsabe.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.ilsabe.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.ilsabe.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.ilsabe.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.jorin.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.jorin.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.jorin.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.jorin.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.merle.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.merle.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.merle.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.merle.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.merle.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.merle.3.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.1.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.2.ogg
+Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h10.talk.ottilie.3.ogg
+Assets/AddressableAssets/Voice/dlg.h14.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h14.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h14.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h14.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h14.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h14.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h14.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h14.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h14.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h15.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h15.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h15.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h15.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.1.ogg
+Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.2.ogg
+Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h15.talk.ottilie.3.ogg
+Assets/AddressableAssets/Voice/dlg.h16.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h16.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h16.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h16.done.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.done.4.ogg
+Assets/AddressableAssets/Voice/dlg.h16.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h16.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h16.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h16.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h16.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h16.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h17.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h17.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h17.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.1.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.2.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.3.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ilsabe.4.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.1.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.2.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.3.ogg
+Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h17.talk.ottilie.4.ogg
+Assets/AddressableAssets/Voice/dlg.h18.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h18.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h18.talk.merle.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h18.talk.merle.1.ogg
+Assets/AddressableAssets/Voice/dlg.h18.talk.merle.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h18.talk.merle.2.ogg
+Assets/AddressableAssets/Voice/dlg.h18.talk.merle.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h18.talk.merle.3.ogg
+Assets/AddressableAssets/Voice/dlg.h18.talk.merle.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h18.talk.merle.4.ogg
+Assets/AddressableAssets/Voice/dlg.h19.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h19.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h2.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h2.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h2.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h2.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h2.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable | Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h2.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h2.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h2.offer.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h2.offer.5.ogg
+Assets/AddressableAssets/Voice/dlg.h3.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.5.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.6.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.7.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.7.ogg
+Assets/AddressableAssets/Voice/dlg.h3.offer.8.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.offer.8.ogg
+Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.1.ogg
+Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.2.ogg
+Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.3.ogg
+Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.4.ogg
+Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h3.talk.jorin.5.ogg
+Assets/AddressableAssets/Voice/dlg.h4.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h4.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h4.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h4.done.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.done.4.ogg
+Assets/AddressableAssets/Voice/dlg.h4.done.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.done.5.ogg
+Assets/AddressableAssets/Voice/dlg.h4.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h4.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.4.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.5.ogg
+Assets/AddressableAssets/Voice/dlg.h5.done.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.done.6.ogg
+Assets/AddressableAssets/Voice/dlg.h5.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.5.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.6.ogg
+Assets/AddressableAssets/Voice/dlg.h5.offer.7.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.offer.7.ogg
+Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.1.ogg
+Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.2.ogg
+Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.3.ogg
+Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h5.talk.ilsabe.4.ogg
+Assets/AddressableAssets/Voice/dlg.h6.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.4.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.5.ogg
+Assets/AddressableAssets/Voice/dlg.h6.offer.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h6.offer.6.ogg
+Assets/AddressableAssets/Voice/dlg.h7.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h7.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h8.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h8.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.1.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.2.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.3.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.4.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.5.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.6.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.merle.7.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.merle.7.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.1.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.2.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.3.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.4.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.4.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.5.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.5.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.6.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.6.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.7.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.7.ogg
+Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.8.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.h9.talk.ottilie.8.ogg
+Assets/AddressableAssets/Voice/dlg.idle.merle.1.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.idle.merle.1.1.ogg
+Assets/AddressableAssets/Voice/dlg.idle.ottilie.1.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.idle.ottilie.1.1.ogg
+Assets/AddressableAssets/Voice/dlg.idle.ottilie.2.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.idle.ottilie.2.1.ogg
+Assets/AddressableAssets/Voice/dlg.idle.ottilie.3.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.idle.ottilie.3.1.ogg
+Assets/AddressableAssets/Voice/dlg.n1.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n1.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n1.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n1.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n1.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n1.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n1.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n1.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.n10.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n10.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n10.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n10.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n10.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n10.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n10.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n10.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n10.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n10.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n11.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n11.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n11.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n11.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n11.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n11.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n11.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.n12.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n12.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n12.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n12.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n12.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n12.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n12.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n12.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n12.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n12.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n13.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n13.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n13.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n13.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n13.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n13.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n13.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n13.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n13.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n13.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n14.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n14.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n14.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n14.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n14.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n14.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n14.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n14.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n14.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n14.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n15.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n15.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n15.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n15.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n15.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n15.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n15.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n15.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n15.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n15.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n2.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n2.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n2.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n2.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n2.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n2.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n2.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n3.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n3.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n3.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n3.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n3.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n3.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n3.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n4.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n4.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n4.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n4.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n4.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n4.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n4.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n4.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.n5.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n5.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n5.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n5.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n5.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n5.offer.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n5.offer.3.ogg
+Assets/AddressableAssets/Voice/dlg.n6.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n6.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n6.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n6.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n6.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n6.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n6.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n7.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n7.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n7.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n7.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n7.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n7.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n7.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n8.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n8.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n8.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n8.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n8.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n8.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n8.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n8.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n8.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n8.offer.2.ogg
+Assets/AddressableAssets/Voice/dlg.n9.done.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.done.1.ogg
+Assets/AddressableAssets/Voice/dlg.n9.done.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.done.2.ogg
+Assets/AddressableAssets/Voice/dlg.n9.done.3.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.done.3.ogg
+Assets/AddressableAssets/Voice/dlg.n9.hint.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.hint.1.ogg
+Assets/AddressableAssets/Voice/dlg.n9.offer.1.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.offer.1.ogg
+Assets/AddressableAssets/Voice/dlg.n9.offer.2.ogg	Cinderreach	Runtime asset: Assets/AddressableAssets/Voice/dlg.n9.offer.2.ogg
+Assets/AddressableAssetsData/DefaultObject.asset	Cinderreach	Build configuration: Assets/AddressableAssetsData/DefaultObject.asset
 Assets/Art/BloodMoor/Materials/Blood.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/BloodMoor/Materials/Coal.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/BloodMoor/Materials/Flame.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
@@ -63,8 +372,10 @@ Assets/Art/Zones/Materials/KilnBasalt.mat	Cinderreach	Build scene: Assets/Scenes
 Assets/Art/Zones/Materials/KilnBrick.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Materials/Moss.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Materials/Planks.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/PortalVeil.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Materials/Slag.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Materials/Stone.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Materials/WaystoneRune.mat	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Bark_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Bark_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/BarrensSand_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
@@ -94,81 +405,33 @@ Assets/Art/Zones/Textures/Moss_Albedo.png	Cinderreach	Build scene: Assets/Scenes
 Assets/Art/Zones/Textures/Moss_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Planks_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Planks_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/PortalVeil_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/PortalVeil_Emission.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/PortalVeil_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Slag_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Slag_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Stone_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Art/Zones/Textures/Stone_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/WaystoneRune_Albedo.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/WaystoneRune_Emission.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Art/Zones/Textures/WaystoneRune_Height.png	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/DefaultNetworkPrefabs.asset	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
-Assets/InputSystem_Actions.inputactions	Cinderreach	Build configuration: Assets/InputSystem_Actions.inputactions
+Assets/InputSystem_Actions.inputactions	Cinderreach	Player preload: Assets/InputSystem_Actions.inputactions
 Assets/Resources/BillingMode.json	Cinderreach	Runtime asset: Assets/Resources/BillingMode.json
-Assets/Resources/CinderreachHeroArt.asset	Cinderreach	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
-Assets/Resources/DiabloLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Resources/HuskLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/Resources/HuskLocomotion.controller
-Assets/Resources/MenuArt/BloodBanner.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/BloodBanner.png
-Assets/Resources/MenuArt/Breastplate.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Breastplate.png
-Assets/Resources/MenuArt/Circlet.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Circlet.png
-Assets/Resources/MenuArt/ClothTunic.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ClothTunic.png
-Assets/Resources/MenuArt/CrestCinderreach.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/CrestCinderreach.png
-Assets/Resources/MenuArt/Dagger.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Dagger.png
-Assets/Resources/MenuArt/EmberCenser.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/EmberCenser.png
-Assets/Resources/MenuArt/GoldCoin.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/GoldCoin.png
-Assets/Resources/MenuArt/HealingPotion.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HealingPotion.png
-Assets/Resources/MenuArt/HeavyAxe.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HeavyAxe.png
-Assets/Resources/MenuArt/Helm.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Helm.png
-Assets/Resources/MenuArt/Hood.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Hood.png
-Assets/Resources/MenuArt/HoodedLantern.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/HoodedLantern.png
-Assets/Resources/MenuArt/Lantern.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/Lantern.png
-Assets/Resources/MenuArt/LeatherVest.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/LeatherVest.png
-Assets/Resources/MenuArt/LootChest.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/LootChest.png
-Assets/Resources/MenuArt/PortraitFenwalker.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitFenwalker.png
-Assets/Resources/MenuArt/PortraitLanternbearer.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitLanternbearer.png
-Assets/Resources/MenuArt/PortraitRogue.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitRogue.png
-Assets/Resources/MenuArt/PortraitVendor.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/PortraitVendor.png
-Assets/Resources/MenuArt/SettingsCog.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SettingsCog.png
-Assets/Resources/MenuArt/ShortBow.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ShortBow.png
-Assets/Resources/MenuArt/ShortSword.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/ShortSword.png
-Assets/Resources/MenuArt/SkillArrow.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillArrow.png
-Assets/Resources/MenuArt/SkillBladeFlurry.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillBladeFlurry.png
-Assets/Resources/MenuArt/SkillCleave.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillCleave.png
-Assets/Resources/MenuArt/SkillFireball.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillFireball.png
-Assets/Resources/MenuArt/SkillLanternBolt.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillLanternBolt.png
-Assets/Resources/MenuArt/SkillMendingLight.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillMendingLight.png
-Assets/Resources/MenuArt/SkillQuickShot.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillQuickShot.png
-Assets/Resources/MenuArt/SkillRenewingCircle.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillRenewingCircle.png
-Assets/Resources/MenuArt/SkillSearingHalo.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillSearingHalo.png
-Assets/Resources/MenuArt/SkillSeismicSlam.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillSeismicSlam.png
-Assets/Resources/MenuArt/SkillVeilStep.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillVeilStep.png
-Assets/Resources/MenuArt/SkillWisps.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/SkillWisps.png
-Assets/Resources/MenuArt/StartupBackdrop.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/StartupBackdrop.png
-Assets/Resources/MenuArt/StashChestIcon.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/StashChestIcon.png
-Assets/Resources/MenuArt/TorchSconce.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/TorchSconce.png
-Assets/Resources/MenuArt/WaypointSigil.png	Cinderreach	Runtime asset: Assets/Resources/MenuArt/WaypointSigil.png
-Assets/Resources/NetworkLootDrop.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
-Assets/Resources/NetworkPlayer.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab
-Assets/Resources/NetworkPlayerDiablo.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Resources/SkillArt/ArrowProjectile.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab
-Assets/Resources/SkillArt/CleaveArc.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab
-Assets/Resources/SkillArt/FireAdditive.mat	Cinderreach	Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
-Assets/Resources/SkillArt/FireSmoke.mat	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
-Assets/Resources/SkillArt/FireballBlast.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab
-Assets/Resources/SkillArt/FireballProjectile.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
-Assets/Resources/SkillArt/HeroBow.prefab	Cinderreach	Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
-Assets/Resources/SkillArt/SoftParticle.png	Cinderreach	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/SoftParticle.png
-Assets/Resources/VendorIdle.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Runtime asset: Assets/Resources/VendorIdle.controller
 Assets/Scenes/Diablo.unity	Cinderreach	Build scene: Assets/Scenes/Diablo.unity
 Assets/Scenes/DiabloZone.unity	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scenes/Greybox.unity	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
 Assets/Scripts/CampfireHeal.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/Classes/ClassAppearance.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/Classes/HeroArtSource.cs	Cinderreach	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
-Assets/Scripts/ConnectionStatusLogger.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/Classes/ClassAppearance.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/Classes/HeroArtSource.cs	Cinderreach	Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset
 Assets/Scripts/Contracts/ContractBoard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/DiabloAnimator.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/DiabloClickController.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/Core/HuskAnimator.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/Scripts/DiabloAnimator.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloClickController.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/Scripts/DiabloFire.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/DiabloInventoryUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/DiabloMelee.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/DiabloNetworkPlayer.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloInventoryUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloMelee.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/DiabloNetworkPlayer.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/Scripts/DiabloTargetBar.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/Enemies/AshLancer.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/Enemies/BossController.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
@@ -181,19 +444,19 @@ Assets/Scripts/Enemies/RangedCaster.cs	Cinderreach	Build scene: Assets/Scenes/Di
 Assets/Scripts/Enemies/ShardGuard.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/EnemyAttack.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/EnemyHealth.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/FpsReporter.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/HuskAnimator.cs	Cinderreach	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/Items/Equipment.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/Items/Inventory.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/Items/Wallet.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/Scripts/Loot/LootDrop.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
-Assets/Scripts/Loot/LootNetRelay.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab
+Assets/Scripts/Foundation/ConnectionStatusLogger.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
+Assets/Scripts/Foundation/FpsReporter.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/Foundation/Wallet.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/Items/Equipment.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/Items/Inventory.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/Scripts/Loot/LootDrop.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkLootDrop.prefab
+Assets/Scripts/Loot/LootNetRelay.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkLootDrop.prefab
 Assets/Scripts/MultiplayerAutoStarter.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
-Assets/Scripts/PlayerHealth.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/PlayerHealth.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/Scripts/Story/StoryNpc.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/Story/StoryPickup.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/Scripts/ThirdPersonController.cs	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab
-Assets/Scripts/Town/DiabloVendorUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/Scripts/ThirdPersonController.cs	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayer.prefab
+Assets/Scripts/Town/DiabloVendorUI.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/Scripts/Town/SmithStation.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/Town/StashChest.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scripts/Town/Vendor.cs	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
@@ -209,28 +472,28 @@ Assets/Settings/PC_RPAsset.asset	Cinderreach	ProjectSettings/GraphicsSettings.as
 Assets/Settings/PC_Renderer.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset
 Assets/Settings/SampleSceneProfile.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Assets/Settings/UniversalRenderPipelineGlobalSettings.asset	Cinderreach	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
-Assets/ThirdParty/KayKit/Adventurers/Accessories/arrow_bow.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab
-Assets/ThirdParty/KayKit/Adventurers/Accessories/barbarian_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
-Assets/ThirdParty/KayKit/Adventurers/Accessories/bow_withString.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
-Assets/ThirdParty/KayKit/Adventurers/Accessories/knight_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/Accessories/mage_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/Accessories/ranger_texture.png	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
-Assets/ThirdParty/KayKit/Adventurers/Accessories/rogue_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/ThirdParty/KayKit/Adventurers/Accessories/sword_1handed.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/Characters/Knight.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/Characters/Mage.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/Characters/Ranger.fbx	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
-Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue_Hooded.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/ThirdParty/KayKit/Adventurers/barbarian_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
-Assets/ThirdParty/KayKit/Adventurers/knight_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/mage_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/Adventurers/ranger_texture_URP.mat	KayKit/Adventurers	Runtime asset: Assets/Resources/CinderreachHeroArt.asset
-Assets/ThirdParty/KayKit/Adventurers/rogue_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity
-Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatMelee.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
-Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/VendorIdle.controller
-Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_MovementBasic.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/arrow_bow.fbx	KayKit/Adventurers	Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/barbarian_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/bow_withString.fbx	KayKit/Adventurers	Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/knight_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/mage_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/ranger_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/rogue_texture.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Accessories/sword_1handed.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Knight.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Mage.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Ranger.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue_Hooded.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/barbarian_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/knight_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/mage_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/ranger_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/rogue_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatMelee.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/VendorIdle.controller
+Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_MovementBasic.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Dungeon/KayKitURP.mat	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/barrel_small_stack.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/chest.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
@@ -239,6 +502,7 @@ Assets/ThirdParty/KayKit/Dungeon/Models/column.fbx	KayKit/Dungeon	Build scene: A
 Assets/ThirdParty/KayKit/Dungeon/Models/dungeon_texture.png	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/floor_tile_large.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/pillar.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Dungeon/Models/pillar_decorated.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/rubble_half.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/rubble_large.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/sword_shield_broken.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
@@ -252,6 +516,9 @@ Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Minion.fbx	KayKit/Skeleto
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Rogue.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Warrior.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/skeleton_texture_URP.mat	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.addressables/Editor/AddressableAssetSettingsDefaultObject.cs	com.unity.addressables	Build configuration: Assets/AddressableAssetsData/DefaultObject.asset
+Packages/com.unity.cinemachine/Runtime/Timeline/CinemachineShot.cs	com.unity.cinemachine	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.cinemachine/Runtime/Timeline/CinemachineTrack.cs	com.unity.cinemachine	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
 Packages/com.unity.cloud.gltfast/Editor/Scripts/GltfImporter.cs	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.cloud.gltfast/Runtime/Shader/Includes/Emission.cginc	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.cloud.gltfast/Runtime/Shader/Includes/Normal.cginc	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
@@ -264,16 +531,16 @@ Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/PBR_metallic_roughness
 Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/ScreenGrab.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.cloud.gltfast/Runtime/Shader/SubGraphs/TextureTransform.shadersubgraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.cloud.gltfast/Runtime/Shader/glTF-pbrMetallicRoughness.shadergraph	com.unity.cloud.gltfast	Build scene: Assets/Scenes/DiabloZone.unity
-Packages/com.unity.inputsystem/InputSystem/Editor/AssetImporter/InputActionImporter.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Editor/AssetImporter/InputActionImporter.cs	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity | Player preload: Assets/InputSystem_Actions.inputactions
 Packages/com.unity.inputsystem/InputSystem/Editor/Icons/InputSystemUIInputModule@64.png	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
-Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionAsset.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
-Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionReference.cs	com.unity.inputsystem	Build configuration: Assets/InputSystem_Actions.inputactions | Build scene: Assets/Scenes/DiabloZone.unity
+Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionAsset.cs	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity | Player preload: Assets/InputSystem_Actions.inputactions
+Packages/com.unity.inputsystem/InputSystem/Runtime/Actions/InputActionReference.cs	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity | Player preload: Assets/InputSystem_Actions.inputactions
 Packages/com.unity.inputsystem/InputSystem/Runtime/Plugins/PlayerInput/DefaultInputActions.inputactions	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.inputsystem/InputSystem/Runtime/Plugins/UI/InputSystemUIInputModule.cs	com.unity.inputsystem	Build scene: Assets/Scenes/DiabloZone.unity
-Packages/com.unity.netcode.gameobjects/Runtime/Components/NetworkTransform.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkPlayer.prefab | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Packages/com.unity.netcode.gameobjects/Runtime/Components/NetworkTransform.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayer.prefab | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Packages/com.unity.netcode.gameobjects/Runtime/Configuration/NetworkPrefabsList.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/Greybox.unity
 Packages/com.unity.netcode.gameobjects/Runtime/Core/NetworkManager.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
-Packages/com.unity.netcode.gameobjects/Runtime/Core/NetworkObject.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/Resources/NetworkLootDrop.prefab | Runtime asset: Assets/Resources/NetworkPlayer.prefab | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab
+Packages/com.unity.netcode.gameobjects/Runtime/Core/NetworkObject.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkLootDrop.prefab | Runtime asset: Assets/AddressableAssets/NetworkPlayer.prefab | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Packages/com.unity.netcode.gameobjects/Runtime/Transports/UTP/UnityTransport.cs	com.unity.netcode.gameobjects	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity
 Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/DynamicGI/DynamicGISkyOcclusion.urtshader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.core/Editor/Lighting/ProbeVolume/ProbeVolumeCellDilation.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
@@ -305,7 +572,7 @@ Packages/com.unity.render-pipelines.core/Runtime/STP/StpSetup.compute	com.unity.
 Packages/com.unity.render-pipelines.core/Runtime/STP/StpTaa.compute	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.core/Runtime/Volume/VolumeProfile.cs	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Packages/com.unity.render-pipelines.core/Shaders/CoreCopy.shader	com.unity.render-pipelines.core	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
-Packages/com.unity.render-pipelines.universal/Editor/AssetVersion.cs	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/CinderreachHeroArt.asset | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab
+Packages/com.unity.render-pipelines.universal/Editor/AssetVersion.cs	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireAdditive.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireSmoke.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
 Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/UniversalMetadata.cs	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/DiabloZone.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.universal/Editor/Volume/DefaultVolumeProfile.asset	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.universal/Runtime/2D/Data/Textures/FalloffLookupTexture.png	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
@@ -358,11 +625,11 @@ Packages/com.unity.render-pipelines.universal/Shaders/Debug/DebugReplacement.sha
 Packages/com.unity.render-pipelines.universal/Shaders/Debug/HDRDebugView.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Packages/com.unity.render-pipelines.universal/Shaders/Debug/ProbeVolumeSamplingDebugPositionNormal.compute	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Packages/com.unity.render-pipelines.universal/Shaders/Decal.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
-Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/CinderreachHeroArt.asset | Runtime asset: Assets/Resources/DiabloLocomotion.controller | Runtime asset: Assets/Resources/HuskLocomotion.controller | Runtime asset: Assets/Resources/NetworkPlayerDiablo.prefab | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/HeroBow.prefab | Runtime asset: Assets/Resources/VendorIdle.controller
+Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader	com.unity.render-pipelines.universal	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab | Runtime asset: Assets/AddressableAssets/VendorIdle.controller
 Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree7.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree8_PBRLit.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.render-pipelines.universal/Shaders/Nature/SpeedTree9_URP.shadergraph	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
-Packages/com.unity.render-pipelines.universal/Shaders/Particles/ParticlesUnlit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/Resources/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/Resources/SkillArt/CleaveArc.prefab | Runtime asset: Assets/Resources/SkillArt/FireAdditive.mat | Runtime asset: Assets/Resources/SkillArt/FireSmoke.mat | Runtime asset: Assets/Resources/SkillArt/FireballBlast.prefab | Runtime asset: Assets/Resources/SkillArt/FireballProjectile.prefab
+Packages/com.unity.render-pipelines.universal/Shaders/Particles/ParticlesUnlit.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireAdditive.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireSmoke.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab
 Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Bloom.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/BokehDepthOfField.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
 Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/CameraMotionBlur.shader	com.unity.render-pipelines.universal	ProjectSettings/GraphicsSettings.asset: Assets/Settings/PC_RPAsset.asset | ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | ProjectSettings/QualitySettings.asset: Assets/Settings/Mobile_RPAsset.asset
@@ -467,4 +734,12 @@ Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9CameraFacingL
 Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9Wind.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTree9Wind.shadersubgraph	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
 Packages/com.unity.shadergraph/ShaderGraphLibrary/Nature/SpeedTreeCommon.hlsl	com.unity.shadergraph	ProjectSettings/GraphicsSettings.asset: Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Packages/com.unity.timeline/Runtime/Animation/AnimationPlayableAsset.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Animation/AnimationTrack.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Audio/AudioPlayableAsset.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Audio/AudioTrack.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Events/SignalTrack.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Events/Signals/SignalAsset.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/Events/Signals/SignalEmitter.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
+Packages/com.unity.timeline/Runtime/TimelineAsset.cs	com.unity.timeline	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
 Packages/com.unity.ugui/Runtime/UGUI/EventSystem/EventSystem.cs	com.unity.ugui	Build scene: Assets/Scenes/DiabloZone.unity

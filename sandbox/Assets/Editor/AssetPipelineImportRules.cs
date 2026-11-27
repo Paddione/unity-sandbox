@@ -76,13 +76,13 @@ public class AssetPipelineImportRules : AssetPostprocessor
     }
 
     static bool IsVoiceOrMusic(string path) =>
-        path.StartsWith("Assets/Resources/Voice/", StringComparison.Ordinal)
-        || path.StartsWith("Assets/Resources/Music/", StringComparison.Ordinal)
+        path.StartsWith("Assets/AddressableAssets/Voice/", StringComparison.Ordinal)
+        || path.StartsWith("Assets/AddressableAssets/Music/", StringComparison.Ordinal)
         || path.StartsWith("Assets/StreamingAssets/", StringComparison.Ordinal);
 
     static bool IsUiSpriteFolder(string path) =>
-        path.StartsWith("Assets/Resources/MenuArt/", StringComparison.Ordinal)
-        || path.StartsWith("Assets/Resources/SkillArt/", StringComparison.Ordinal);
+        path.StartsWith("Assets/AddressableAssets/MenuArt/", StringComparison.Ordinal)
+        || path.StartsWith("Assets/AddressableAssets/SkillArt/", StringComparison.Ordinal);
 
     static bool IsArtFolder(string path) =>
         path.StartsWith("Assets/Art/", StringComparison.Ordinal);

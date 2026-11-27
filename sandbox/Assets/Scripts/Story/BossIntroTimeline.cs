@@ -15,7 +15,7 @@ public sealed class BossIntroTimeline : MonoBehaviour
     {
         if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-director-only") >= 0)
             return null;
-        var timeline = Resources.Load<TimelineAsset>("Cutscene_BossIntro");
+        var timeline = Res.Get<TimelineAsset>("Cutscene_BossIntro");
         if (!timeline) return null;
         var host = new GameObject("Abbot intro");
         var intro = host.AddComponent<BossIntroTimeline>();

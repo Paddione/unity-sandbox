@@ -204,7 +204,7 @@ public static class PresentationVfx
             new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0.8f, 0.6f), new GradientAlphaKey(0f, 1f) });
         col.color = g;
         var r = go.GetComponent<ParticleSystemRenderer>();
-        var mat = Resources.Load<Material>(material);
+        var mat = Res.Get<Material>(material);
         if (mat != null) r.sharedMaterial = mat;
         ps.Play();
         systems[name] = ps;

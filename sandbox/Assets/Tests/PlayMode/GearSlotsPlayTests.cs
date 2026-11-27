@@ -48,7 +48,7 @@ public sealed class GearSlotsPlayTests
     [UnityTest]
     public IEnumerator LimbGear_RendersOnEveryClassAndClearsOnUnequip()
     {
-        var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
+        var source = Res.Get<HeroArtSource>("CinderreachHeroArt");
         Assert.IsNotNull(source);
         var hero = Track(Object.Instantiate(source.LightClothing));
         var equipment = hero.AddComponent<Equipment>();

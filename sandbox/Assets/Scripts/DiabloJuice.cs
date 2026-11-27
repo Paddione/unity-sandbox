@@ -232,7 +232,7 @@ public static class DiabloJuice
             new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0.8f, 0.6f), new GradientAlphaKey(0f, 1f) });
         col.color = g;
         var r = go.GetComponent<ParticleSystemRenderer>();
-        var mat = Resources.Load<Material>(look.material);
+        var mat = Res.Get<Material>(look.material);
         if (mat != null) r.sharedMaterial = mat;
         ps.Play();
         systems[key] = ps;

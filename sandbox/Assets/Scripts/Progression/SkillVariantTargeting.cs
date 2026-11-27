@@ -142,7 +142,7 @@ public sealed class HaloZone : MonoBehaviour
     void SpawnWardVisual()
     {
         if (!Application.isPlaying) return;
-        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
         GameObject ring;
         if (prefab != null)
         {

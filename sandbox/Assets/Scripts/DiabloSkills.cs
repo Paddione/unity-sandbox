@@ -590,7 +590,7 @@ public sealed class DiabloSkills : MonoBehaviour
     void SpawnHaloVisual(float radius)
     {
         if (!Application.isPlaying) return;
-        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
         GameObject ring;
         if (prefab != null)
         {
@@ -957,7 +957,7 @@ public sealed class DiabloSkills : MonoBehaviour
     {
         PresentationVfx.CleaveArc(transform.position, radius);
         if (!Application.isPlaying) return; // headless/EditMode: no timed Destroy
-        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
         if (prefab == null) return;
         var arc = Instantiate(prefab, transform.position, Quaternion.identity);
         arc.transform.localScale = Vector3.one * (radius / cleaveBaseRadius);

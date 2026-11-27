@@ -23,7 +23,8 @@ public static class CinderreachAssetAudit
         foreach (var asset in AssetDatabase.GetAllAssetPaths())
         {
             if (!AssetDatabase.IsValidFolder(asset) && asset.StartsWith("Assets/", StringComparison.Ordinal)
-                && (asset.Contains("/Resources/") || asset.StartsWith("Assets/StreamingAssets/", StringComparison.Ordinal)))
+                && (asset.Contains("/Resources/") || asset.Contains("/AddressableAssets/")
+                    || asset.StartsWith("Assets/StreamingAssets/", StringComparison.Ordinal)))
                 roots[asset] = "Runtime asset";
         }
 

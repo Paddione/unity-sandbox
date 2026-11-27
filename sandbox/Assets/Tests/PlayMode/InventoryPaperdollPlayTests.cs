@@ -26,7 +26,7 @@ public sealed class InventoryPaperdollPlayTests
         RunProfile.Reset();
         if (EventSystem.current == null)
             eventSys = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
-        var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
+        var source = Res.Get<HeroArtSource>("CinderreachHeroArt");
         Assert.IsNotNull(source);
         hero = Object.Instantiate(source.LightClothing);
         hero.name = "PaperdollHero";

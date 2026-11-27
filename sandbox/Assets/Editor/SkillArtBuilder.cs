@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 /// </summary>
 public static class SkillArtBuilder
 {
-    const string Dir = "Assets/Resources/SkillArt";
+    const string Dir = "Assets/AddressableAssets/SkillArt";
     const string ArrowFbx = "Assets/ThirdParty/KayKit/Adventurers/Accessories/arrow_bow.fbx";
 
     [MenuItem("Sandbox/Diablo/Build Skill Art")]
@@ -37,7 +37,7 @@ public static class SkillArtBuilder
 
     // ---------- bow animation states ----------
 
-    const string HeroControllerPath = "Assets/Resources/DiabloLocomotion.controller";
+    const string HeroControllerPath = "Assets/AddressableAssets/DiabloLocomotion.controller";
     const string RangedFbx = "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx";
     public const string BowAimState = "BowAim";
     public const string BowShootState = "BowShoot";

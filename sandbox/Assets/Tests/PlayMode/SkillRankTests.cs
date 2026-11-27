@@ -114,7 +114,7 @@ public class SkillRankTests
     [Test]
     public void SkillArt_CleaveArcPrefabShips()
     {
-        var arc = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        var arc = Res.Get<GameObject>("SkillArt/CleaveArc");
         Assert.IsNotNull(arc, "Run SkillArtBuilder.Build.");
         Assert.Greater(arc.GetComponentsInChildren<ParticleSystem>().Length, 0,
             "Cleave needs its sweep ring.");

@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// One-time sprite import for the Blender-rendered menu icons
-/// (Assets/Resources/MenuArt/*.png). Unity imports fresh PNGs as plain
+/// (Assets/AddressableAssets/MenuArt/*.png). Unity imports fresh PNGs as plain
 /// textures; the menu loads them via Resources.Load&lt;Sprite&gt;, which needs
 /// TextureImporterType.Sprite. Run headless:
 ///   Unity -batchmode -nographics -quit -projectPath sandbox \
@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public static class MenuArtImporter
 {
-    const string Folder = "Assets/Resources/MenuArt";
+    const string Folder = "Assets/AddressableAssets/MenuArt";
 
     public static void ImportAsSprites()
     {

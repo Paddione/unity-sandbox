@@ -83,7 +83,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
     {
         if (item == null) return null;
         var nm = NetworkManager.Singleton;
-        var prefab = Resources.Load<GameObject>("NetworkLootDrop");
+        var prefab = Res.Get<GameObject>("NetworkLootDrop");
         if (networked && (nm == null || !nm.IsServer || !nm.IsListening || prefab == null))
             return null;
         item.EnsureIdentity();

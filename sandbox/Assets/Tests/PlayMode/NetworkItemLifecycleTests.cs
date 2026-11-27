@@ -75,7 +75,7 @@ public sealed class NetworkItemLifecycleTests
             port = (ushort)((System.Net.IPEndPoint)socket.Client.LocalEndPoint).Port;
 
         var host = NewManager("item ownership host", port);
-        var playerPrefab = Resources.Load<GameObject>("NetworkPlayerDiablo");
+        var playerPrefab = Res.Get<GameObject>("NetworkPlayerDiablo");
         host.NetworkConfig.PlayerPrefab = playerPrefab;
         Assert.That(host.StartHost(), Is.True);
         yield return null;
@@ -149,7 +149,7 @@ public sealed class NetworkItemLifecycleTests
         ushort port;
         using (var socket = new System.Net.Sockets.UdpClient(0))
             port = (ushort)((System.Net.IPEndPoint)socket.Client.LocalEndPoint).Port;
-        var playerPrefab = Resources.Load<GameObject>("NetworkPlayerDiablo");
+        var playerPrefab = Res.Get<GameObject>("NetworkPlayerDiablo");
         var host = NewManager("flask host", port);
         host.NetworkConfig.PlayerPrefab = playerPrefab;
         Assert.That(host.StartHost(), Is.True);

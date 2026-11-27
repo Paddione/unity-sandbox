@@ -24,7 +24,7 @@ Bewährtes Muster für alle drei Audio-Klassen:
 Finish-Schritte (aus der Referenz-Implementierung übernommen):
 
 1. Späte Impacts trimmen, Abschnitte per Blend in Loops überführen.
-2. Jede Dialogzeile als eigene Datei speichern → `Assets/Resources/Voice/*.ogg`
+2. Jede Dialogzeile als eigene Datei speichern → `Assets/AddressableAssets/Voice/*.ogg`
    (Per-Line-Import; `check-voice-lines.py` + `voice-lines.lock.json` bleiben maßgeblich).
 3. Import-Settings kommen aus `AssetPipelineImportRules.OnPreprocessAudio` (mono, Vorbis, 0.6),
    passend zu `docs/audio/manifest.json` (22050 Hz, mono, oggQuality 0.6, Budget ≤ 60 MB);

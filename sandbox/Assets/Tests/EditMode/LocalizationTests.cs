@@ -178,7 +178,7 @@ public static class LocLint
     static readonly string[] SkipMarkers =
     {
         "Debug.Log", "Debug.Assert", "Debug.LogWarning", "Debug.LogError", "[Header(", "[Tooltip(",
-        "[MenuItem(", "new GameObject(", "Resources.Load", ".Find(", "CompareTag", "Shader.Find",
+        "[MenuItem(", "new GameObject(", "Resources.Load", "Res.Get", ".Find(", "CompareTag", "Shader.Find",
         "Animator.StringToHash", "PlayerPrefs.", "Console.Write", "[assembly", "FindGameObjectsWithTag",
         "SetTrigger(", "SetBool(", "SetFloat(", "SetInteger(", "Play(\"", "LogWarning(", "LogError(",
     };

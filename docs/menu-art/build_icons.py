@@ -3,7 +3,7 @@
 Run headless from the repo root:
     blender -b --factory-startup --python-exit-code 1 -P docs/menu-art/build_icons.py
 
-Outputs 256x256 RGBA PNG sprites into sandbox/Assets/Resources/MenuArt/:
+Outputs 256x256 RGBA PNG sprites into sandbox/Assets/AddressableAssets/MenuArt/:
     ShortSword, HeavyAxe, Dagger,
     ClothTunic, LeatherVest, Breastplate,
     Hood, Helm, Circlet,
@@ -22,7 +22,7 @@ import bmesh
 from mathutils import Euler, Matrix, Vector
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "Resources", "MenuArt")
+OUT_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "AddressableAssets", "MenuArt")
 BPY_HELPERS_DIR = "/home/patrick/.local/share/muse/skills/bundled/muse-core~v1/skills/blender/scripts"
 if os.path.isdir(BPY_HELPERS_DIR) and BPY_HELPERS_DIR not in sys.path:
     sys.path.insert(0, BPY_HELPERS_DIR)

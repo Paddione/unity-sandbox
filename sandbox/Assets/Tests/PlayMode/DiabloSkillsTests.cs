@@ -106,9 +106,9 @@ public class DiabloSkillsTests
     [Test]
     public void SkillArt_PrefabsShipInResources()
     {
-        var fire = Resources.Load<GameObject>("SkillArt/FireballProjectile");
-        var arrow = Resources.Load<GameObject>("SkillArt/ArrowProjectile");
-        var blast = Resources.Load<GameObject>("SkillArt/FireballBlast");
+        var fire = Res.Get<GameObject>("SkillArt/FireballProjectile");
+        var arrow = Res.Get<GameObject>("SkillArt/ArrowProjectile");
+        var blast = Res.Get<GameObject>("SkillArt/FireballBlast");
         Assert.IsNotNull(fire, "Run SkillArtBuilder.Build.");
         Assert.IsNotNull(arrow);
         Assert.IsNotNull(blast);
@@ -197,7 +197,7 @@ public class DiabloSkillsTests
     [UnityTest]
     public IEnumerator Arrow_PlaysBowReleasePose_ThenAims()
     {
-        var ctrl = Resources.Load<RuntimeAnimatorController>("DiabloLocomotion");
+        var ctrl = Res.Get<RuntimeAnimatorController>("DiabloLocomotion");
         Assert.IsNotNull(ctrl, "Hero controller ships in Resources.");
         var animator = player.AddComponent<Animator>();
         animator.runtimeAnimatorController = ctrl;

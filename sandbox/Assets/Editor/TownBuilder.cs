@@ -282,7 +282,7 @@ public static class TownBuilder
             Debug.LogWarning("[TownBuilder] Idle_A take missing; vendor stays static.");
             return null;
         }
-        const string path = "Assets/Resources/VendorIdle.controller";
+        const string path = "Assets/AddressableAssets/VendorIdle.controller";
         AssetDatabase.DeleteAsset(path);
         var c = AnimatorController.CreateAnimatorControllerAtPath(path);
         var sm = c.layers[0].stateMachine;

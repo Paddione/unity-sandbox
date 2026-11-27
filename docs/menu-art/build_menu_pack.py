@@ -3,7 +3,7 @@
 Run headless from the repo root:
     blender -b --factory-startup --python-exit-code 1 -P docs/menu-art/build_menu_pack.py
 
-Outputs into sandbox/Assets/Resources/MenuArt/:
+Outputs into sandbox/Assets/AddressableAssets/MenuArt/:
     Portraits (256x256 RGBA):
         PortraitFenwalker, PortraitLanternbearer, PortraitVendor
     Skill Icons (256x256 RGBA):
@@ -25,7 +25,7 @@ import bmesh
 from mathutils import Euler, Vector
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT_DIR = os.environ.get("CINDERREACH_OUT_DIR") or os.path.join(REPO_ROOT, "sandbox", "Assets", "Resources", "MenuArt")
+OUT_DIR = os.environ.get("CINDERREACH_OUT_DIR") or os.path.join(REPO_ROOT, "sandbox", "Assets", "AddressableAssets", "MenuArt")
 ADV_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "ThirdParty", "KayKit", "Adventurers")
 DUN_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "ThirdParty", "KayKit", "Dungeon", "Models")
 MOOR_DIR = os.path.join(REPO_ROOT, "sandbox", "Assets", "Art", "BloodMoor")

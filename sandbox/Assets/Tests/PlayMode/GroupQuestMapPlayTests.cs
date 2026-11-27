@@ -52,7 +52,7 @@ public sealed class GroupQuestMapPlayTests
         {
             NetworkTransport = transport,
             EnableSceneManagement = false,
-            PlayerPrefab = Resources.Load<GameObject>("NetworkPlayerDiablo"),
+            PlayerPrefab = Res.Get<GameObject>("NetworkPlayerDiablo"),
         };
         DiabloNetworkBootstrap.RegisterLootPrefab(manager);
         return manager;

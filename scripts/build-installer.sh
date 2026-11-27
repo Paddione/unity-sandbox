@@ -14,7 +14,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-$REPO/builds/cinderreach-windows}"
 OUT_DIR="$REPO/builds/cinderreach-installer"
 ISS="$REPO/scripts/installer/cinderreach.iss"
-CREST="$REPO/sandbox/Assets/Resources/MenuArt/CrestCinderreach.png"
+CREST="$REPO/sandbox/Assets/AddressableAssets/MenuArt/CrestCinderreach.png"
 
 if [[ -z "${ISCC:-}" ]]; then
   win_local="$(wslpath "$(cmd.exe /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')")"

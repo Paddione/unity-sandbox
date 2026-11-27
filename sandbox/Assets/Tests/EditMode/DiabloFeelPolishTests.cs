@@ -9,13 +9,13 @@ using UnityEngine;
 public class DiabloFeelPolishTests
 {
     const string ZonePath = "Assets/Scenes/DiabloZone.unity";
-    const string ControllerPath = "Assets/Resources/HuskLocomotion.controller";
+    const string ControllerPath = "Assets/AddressableAssets/HuskLocomotion.controller";
 
     [Test]
     public void HuskController_HasAllStatesAndParams()
     {
         var c = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
-        Assert.IsNotNull(c, "Husk controller must be built into Resources.");
+        Assert.IsNotNull(c, "Husk controller must exist as addressable.");
         var states = c.layers[0].stateMachine.states.Select(s => s.state.name).ToArray();
         foreach (var name in new[] { "Idle", "Walk", "Attack", "Hit", HuskAnimator.DeathState })
             Assert.Contains(name, states, $"Husk controller lacks state '{name}'.");

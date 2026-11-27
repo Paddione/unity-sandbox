@@ -59,8 +59,8 @@ public class DiabloP2ConfigTests
                 $"Husk '{husk.name}' needs a NetworkObject (server-authoritative kills).");
 
         var diabloPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-            "Assets/Resources/NetworkPlayerDiablo.prefab");
-        Assert.IsNotNull(diabloPrefab, "NetworkPlayerDiablo prefab must exist in Resources.");
+            "Assets/AddressableAssets/NetworkPlayerDiablo.prefab");
+        Assert.IsNotNull(diabloPrefab, "NetworkPlayerDiablo prefab must exist as addressable.");
         var prefabTransform = diabloPrefab.GetComponent<NetworkTransform>();
         Assert.IsNotNull(prefabTransform, "Player prefab needs NetworkTransform.");
         Assert.AreEqual(NetworkTransform.AuthorityModes.Owner, prefabTransform.AuthorityMode,
@@ -149,8 +149,8 @@ public class DiabloP2ConfigTests
     public void NetworkPrefab_SpawnsAtStairs()
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-            "Assets/Resources/NetworkPlayerDiablo.prefab");
-        Assert.IsNotNull(prefab, "NetworkPlayerDiablo prefab must exist in Resources.");
+            "Assets/AddressableAssets/NetworkPlayerDiablo.prefab");
+        Assert.IsNotNull(prefab, "NetworkPlayerDiablo prefab must exist as addressable.");
         Assert.That(prefab.transform.position.z, Is.InRange(9f, 13f),
             "Network players must spawn at the south stairs, facing the zone.");
     }

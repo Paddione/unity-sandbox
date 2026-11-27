@@ -6,19 +6,19 @@
 | --- | --- |
 | `sandbox/Assets/Scenes/DiabloZone.unity` | Cinderreach-Player mit eingebetteten Zonen, Helden, Gegnern, Licht, Effekten und Menü |
 | `sandbox/Assets/Scenes/Diablo.unity` und `sandbox/Assets/Scenes/Greybox.unity` | Zusätzlich aktivierte Projekt- und Testspiel-Szenen mit eigenen Zeilenmarkierungen |
-| `Resources` und `StreamingAssets` | Assets für dynamisches Laden einschließlich Menü-Icons, Skill-Effekten, Netzwerk-Prefabs, Animation und Heldenkleidung |
+| `AddressableAssets` und `StreamingAssets` | Assets für dynamisches Laden einschließlich Menü-Icons, Skill-Effekten, Netzwerk-Prefabs, Animation und Heldenkleidung |
 | Build-Konfiguration, Grafik, Qualität und Player-Preloads | Unity- und Paketabhängigkeiten, einschließlich URP-Assets |
 
 `Assets/ThirdParty/KayKit` enthält die verwendeten Teile der KayKit-Pakete. Die übrigen Projektpfade gehören zum Cinderreach-Projekt. Unter Ordner `Packages` steht die jeweilige Paket-ID als Herkunft. Paket- und Projektassets können mehrere Einstiegspunkte haben.
 
-Der Export folgt Unitys transitiven Asset-Referenzen. Ein `Resources`-Eintrag benennt eine verfügbare Laufzeitressource. Ob er in einer bestimmten Spielsitzung tatsächlich geladen wird, hängt von Szenario, Menüpfad und Klasse ab. Unitys eingebaute Geometrie und prozedural erzeugte Renderobjekte haben keinen eigenen importierten Dateipfad. Hierzu gehören die Würfelbasis für Ausrüstungsteile und die zur Laufzeit erzeugten Unique-Meshes aus `sandbox/Assets/Scripts/Classes/HeroGearModels.cs`. Ein Player-Build kann Shader-Varianten entfernen und weitere interne Engine-Daten hinzufügen.
+Der Export folgt Unitys transitiven Asset-Referenzen. Ein `AddressableAssets`-Eintrag benennt eine verfügbare Laufzeitressource. Ob er in einer bestimmten Spielsitzung tatsächlich geladen wird, hängt von Szenario, Menüpfad und Klasse ab. Unitys eingebaute Geometrie und prozedural erzeugte Renderobjekte haben keinen eigenen importierten Dateipfad. Hierzu gehören die Würfelbasis für Ausrüstungsteile und die zur Laufzeit erzeugten Unique-Meshes aus `sandbox/Assets/Scripts/Classes/HeroGearModels.cs`. Ein Player-Build kann Shader-Varianten entfernen und weitere interne Engine-Daten hinzufügen.
 
 ## Laufzeit-Aufrufer
 
-- `DiabloMenuArt` löst Menü- und Gegenstandssprites unter `Resources/MenuArt` auf.
-- `DiabloSkills`, `DiabloProjectile` und die Darstellungs-VFX laden Waffen, Projektile, Material- und Effekt-Prefabs unter `Resources/SkillArt`.
+- `DiabloMenuArt` löst Menü- und Gegenstandssprites unter `AddressableAssets/MenuArt` (Adressen `MenuArt/...`, via `Res.Get`) auf.
+- `DiabloSkills`, `DiabloProjectile` und die Darstellungs-VFX laden Waffen, Projektile, Material- und Effekt-Prefabs unter `AddressableAssets/SkillArt` (via `Res.Get`).
 - `DiabloNetworkBootstrap` registriert die Player- und Loot-Prefabs. `LootDrop` verwendet das Loot-Prefab beim Erzeugen von Gegenständen.
-- `ClassAppearance` lädt `Resources/CinderreachHeroArt`. Dessen Ranger-Modell referenziert Rig und Material. Die Ausrüstungsmodelle werden aus dem Katalog erzeugt.
+- `ClassAppearance` lädt `AddressableAssets/CinderreachHeroArt` (via `Res.Get`). Dessen Ranger-Modell referenziert Rig und Material. Die Ausrüstungsmodelle werden aus dem Katalog erzeugt.
 
 ## Charaktere und Uniques
 

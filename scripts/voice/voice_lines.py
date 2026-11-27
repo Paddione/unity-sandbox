@@ -20,7 +20,7 @@ SCRIPTS = REPO / "sandbox" / "Assets" / "Scripts"
 DIALOGS_CS = SCRIPTS / "Story" / "StoryDialogs.cs"
 BARKS_CS = SCRIPTS / "Story" / "StoryBarks.cs"
 LOC_DIR = SCRIPTS / "Localization"
-VOICE_DIR = REPO / "sandbox" / "Assets" / "Resources" / "Voice"
+VOICE_DIR = REPO / "sandbox" / "Assets" / "AddressableAssets" / "Voice"
 VOICES_JSON = REPO / "docs" / "audio" / "voices.json"
 LOCK_JSON = REPO / "docs" / "audio" / "voice-lines.lock.json"
 

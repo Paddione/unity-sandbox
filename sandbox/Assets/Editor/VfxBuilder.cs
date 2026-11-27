@@ -16,8 +16,8 @@ using UnityEngine;
 public static class VfxBuilder
 {
     const string Dir = "Assets/Art/Vfx";
-    const string AdditivePath = "Assets/Resources/SkillArt/FireAdditive.mat";
-    const string SmokePath = "Assets/Resources/SkillArt/FireSmoke.mat";
+    const string AdditivePath = "Assets/AddressableAssets/SkillArt/FireAdditive.mat";
+    const string SmokePath = "Assets/AddressableAssets/SkillArt/FireSmoke.mat";
 
     [MenuItem("Sandbox/Diablo/Build Presentation VFX")]
     public static void Build()

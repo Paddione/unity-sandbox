@@ -48,7 +48,20 @@ linux 3,9 s). Import kostet bei warmer `Library/` ~0 (0 `Start Importing`-Zeilen
 
 ## 4. Accelerator + Library (Task 5)
 
-- (Wird hier ergänzt: Betriebsort, Cache-Hit-Beleg.)
+- Betriebsort: diese Maschine als Docker-Container (`unitytechnologies/accelerator`,
+  persistent in `~/.local/share/unity-accelerator`); Steuerung:
+  `bash scripts/unity-accelerator.sh up|status|down` (Cache-Port 127.0.0.1:10080,
+  Dashboard 127.0.0.1:10081).
+- Nutzung per Env (unset = unverändert): `UNITY_ACCELERATOR=127.0.0.1:10080
+  [UNITY_ACCELERATOR_NAMESPACE=unity-sandbox]` — `run-unity-build.sh` hängt dann
+  `-cacheServerEndpoint/-cacheServerNamespacePrefix` + Download/Upload-Flags an.
+  Beleg: `Using cacheserver namespaces - metadata:unity-build-speedmetadata,
+  artifacts:unity-build-speedartifacts` im Build-Log (CompileCheck-Probe).
+- `Library/` (Worktree: 4,3 GB, warm) wird nie gelöscht: kein Skript fasst sie an,
+  `UNITY_CLEAN_DIRS` verweigert sie explizit. Import kostet warm ~0 (0
+  `Start Importing`-Zeilen in allen Baseline-Builds); der Accelerator sichert
+  kalte Checkouts/CI ab. Builds laufen ohne Accelerator lauffähig (Cache ist
+  Beschleuniger, keine harte Abhängigkeit).
 
 ## 5. Addressables (Task 6)
 

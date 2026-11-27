@@ -2,7 +2,7 @@
 """Gate for the story voice clips (cinderreach-story-voice).
 
 Every dialog and bark line in the C# sources must have a rendered clip in
-sandbox/Assets/Resources/Voice/<key>.ogg whose lock hash matches the current
+sandbox/Assets/AddressableAssets/Voice/<key>.ogg whose lock hash matches the current
 text, speaker and reference voice; every speaker needs a voice definition and
 a reference; no orphan clips; total size within budget. Exit 0 = ok.
 """

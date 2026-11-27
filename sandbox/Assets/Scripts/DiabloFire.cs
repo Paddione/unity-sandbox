@@ -67,7 +67,7 @@ public sealed class DiabloFire : MonoBehaviour
         var sol = ps.sizeOverLifetime;
         sol.enabled = true;
         sol.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 1f, 1f, 0f));
-        var mat = Resources.Load<Material>("SkillArt/FireAdditive");
+        var mat = Res.Get<Material>("SkillArt/FireAdditive");
         if (mat != null) go.GetComponent<ParticleSystemRenderer>().sharedMaterial = mat;
         ps.Play();
     }

@@ -45,7 +45,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     public const float StuckArrowSeconds = 3f;
 
     /// <summary>
-    /// Spawn a projectile. Art comes from Resources/SkillArt (built by
+    /// Spawn a projectile. Art comes from AddressableAssets/SkillArt (built by
     /// SkillArtBuilder); a primitive stands in when the asset is missing.
     /// </summary>
     public static DiabloProjectile Spawn(DiabloSkills.Skill kind, Vector3 origin, Vector3 dir,
@@ -59,7 +59,7 @@ public sealed class DiabloProjectile : MonoBehaviour
         bool fire = kind == DiabloSkills.Skill.Fireball;
         bool lantern = kind == DiabloSkills.Skill.LanternBolt;
         var prefab = lantern ? null
-            : Resources.Load<GameObject>(fire ? "SkillArt/FireballProjectile" : "SkillArt/ArrowProjectile");
+            : Res.Get<GameObject>(fire ? "SkillArt/FireballProjectile" : "SkillArt/ArrowProjectile");
         GameObject go;
         if (lantern)
         {
@@ -387,7 +387,7 @@ public sealed class DiabloProjectile : MonoBehaviour
     public static GameObject SpawnBlast(Vector3 at, float radius)
     {
         DiabloJuice.OnBlast(at);
-        var prefab = Resources.Load<GameObject>("SkillArt/FireballBlast");
+        var prefab = Res.Get<GameObject>("SkillArt/FireballBlast");
         if (prefab == null) return Explosion.Spawn(at, radius);
         var go = Object.Instantiate(prefab, at, Quaternion.identity);
         go.name = "FireballBlast";

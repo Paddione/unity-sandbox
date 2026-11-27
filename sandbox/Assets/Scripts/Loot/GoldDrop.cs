@@ -43,7 +43,7 @@ public sealed class GoldDrop : MonoBehaviour
     public static GameObject SpawnPile(Vector3 pos, int amount)
     {
         var nmSpawn = NetworkManager.Singleton;
-        var prefab = Resources.Load<GameObject>("NetworkLootDrop");
+        var prefab = Res.Get<GameObject>("NetworkLootDrop");
         if (amount > 0 && nmSpawn != null && nmSpawn.IsListening && nmSpawn.IsServer
             && prefab != null && nmSpawn.NetworkConfig.Prefabs.Contains(prefab))
         {

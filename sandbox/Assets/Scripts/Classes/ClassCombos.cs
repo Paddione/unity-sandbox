@@ -605,7 +605,7 @@ public static class ComboVfx
     public static void Pool(Vector3 at, float radius, float seconds, Color color)
     {
         PresentationVfx.CleaveArc(at, radius);
-        var prefab = Resources.Load<GameObject>("SkillArt/CleaveArc");
+        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
         GameObject ring;
         if (prefab != null)
         {

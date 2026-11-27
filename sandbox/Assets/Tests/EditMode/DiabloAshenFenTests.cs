@@ -238,7 +238,7 @@ public class DiabloAshenFenTests
             $"Sword must sit in the hand, not at '{sword.parent.name}' (hip fallback is silent and wrong).");
 
         var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-            "Assets/Resources/NetworkPlayerDiablo.prefab");
+            "Assets/AddressableAssets/NetworkPlayerDiablo.prefab");
         Assert.IsNotNull(prefab.GetComponent<Inventory>(), "Net prefab needs a bag.");
         Assert.IsNotNull(prefab.GetComponent<PlayerHealth>(), "Net prefab needs HP.");
         Assert.IsNotNull(prefab.GetComponent<DiabloInventoryUI>(), "Net prefab needs the UI.");

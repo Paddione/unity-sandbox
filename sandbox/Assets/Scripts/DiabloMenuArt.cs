@@ -5,7 +5,7 @@ using UnityEngine;
 /// Cinderreach dark-fantasy UI art system. Combines 9-sliced procedural gothic
 /// chrome (beveled crypt slate panels, bronze trim with gold rivets, rarity
 /// slots, buttons, dividers, tooltips, slider tracks/knobs, progress bars)
-/// with 3D Blender-rendered sprites loaded from Resources/MenuArt.
+/// with 3D Blender-rendered sprites loaded from AddressableAssets/MenuArt (address "MenuArt/...").
 /// Headless-safe (EditMode & automated PlayMode tests call these cleanly).
 /// </summary>
 public static class DiabloMenuArt
@@ -338,11 +338,11 @@ public static class DiabloMenuArt
         });
     }
 
-    /// <summary>Loads a Blender-baked sprite from Resources/MenuArt (null only in isolated headless without assets).</summary>
+    /// <summary>Loads a Blender-baked sprite from AddressableAssets/MenuArt (null only in isolated headless without assets).</summary>
     public static Sprite MenuArtSprite(string resourceName)
     {
         if (string.IsNullOrEmpty(resourceName)) return null;
-        return Get($"menuart_{resourceName}", () => Resources.Load<Sprite>("MenuArt/" + resourceName));
+        return Get($"menuart_{resourceName}", () => Res.Get<Sprite>("MenuArt/" + resourceName));
     }
 
     public static Sprite ClassPortrait(string classId)
@@ -430,7 +430,7 @@ public static class DiabloMenuArt
                 ? UniqueBaseFor(item.uniqueId) ?? item.baseType : item.baseType);
             if (!string.IsNullOrEmpty(iconName))
             {
-                var baked = Resources.Load<Sprite>("MenuArt/" + iconName);
+                var baked = Res.Get<Sprite>("MenuArt/" + iconName);
                 if (baked != null) return baked;
             }
             return BuildGlyphSprite(item.baseType, item.uniqueId, item.rarity, size);
@@ -547,7 +547,7 @@ public static class DiabloMenuArt
 
     /// <summary>
     /// Blender-rendered icon when a baked sprite exists
-    /// (Assets/Resources/MenuArt), else the procedural glyph. Rarity tints
+    /// (Assets/AddressableAssets/MenuArt), else the procedural glyph. Rarity tints
     /// the slot frame, never the icon, so one bake serves all rarities.
     /// </summary>
     public static Sprite ItemIcon(string baseType, ItemRarity rarity, int size = 64)
@@ -558,7 +558,7 @@ public static class DiabloMenuArt
             string iconName = ResolveIconName(baseType);
             if (!string.IsNullOrEmpty(iconName))
             {
-                var baked = Resources.Load<Sprite>("MenuArt/" + iconName);
+                var baked = Res.Get<Sprite>("MenuArt/" + iconName);
                 if (baked != null) return baked;
             }
             var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);

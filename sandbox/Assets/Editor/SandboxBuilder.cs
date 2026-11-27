@@ -192,8 +192,8 @@ public static class SandboxBuilder
         // Same owner-authority fix as the DiabloZone prefab (no snap-back).
         netPlayer.AddComponent<NetworkTransform>().AuthorityMode = NetworkTransform.AuthorityModes.Owner;
         netPlayer.AddComponent<ThirdPersonController>();
-        const string prefabPath = "Assets/Resources/NetworkPlayer.prefab";
-        System.IO.Directory.CreateDirectory("Assets/Resources");
+        const string prefabPath = "Assets/AddressableAssets/NetworkPlayer.prefab";
+        System.IO.Directory.CreateDirectory("Assets/AddressableAssets");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);
         Object.DestroyImmediate(netPlayer);
         var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -976,7 +976,7 @@ public static class SandboxBuilder
 
     static RuntimeAnimatorController BuildLocomotionController(AnimationClip idle, AnimationClip run, AnimationClip strike)
     {
-        const string path = "Assets/Resources/DiabloLocomotion.controller";
+        const string path = "Assets/AddressableAssets/DiabloLocomotion.controller";
         AssetDatabase.DeleteAsset(path);
         var controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
         controller.AddParameter("Moving", AnimatorControllerParameterType.Bool);
@@ -1058,7 +1058,7 @@ public static class SandboxBuilder
             Debug.LogWarning("[SandboxBuilder] Husk takes missing; husks stay static.");
             return null;
         }
-        const string path = "Assets/Resources/HuskLocomotion.controller";
+        const string path = "Assets/AddressableAssets/HuskLocomotion.controller";
         AssetDatabase.DeleteAsset(path);
         var c = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);
         c.AddParameter(HuskAnimator.MoveParam, AnimatorControllerParameterType.Bool);
@@ -1227,11 +1227,11 @@ public static class SandboxBuilder
         AttachStarterSword(netPlayer);
         AddClassAppearance(netPlayer);
         SetLayerRecursive(netPlayer, LayerMask.NameToLayer("Ignore Raycast"));
-        const string prefabPath = "Assets/Resources/NetworkPlayerDiablo.prefab";
-        System.IO.Directory.CreateDirectory("Assets/Resources");
+        const string prefabPath = "Assets/AddressableAssets/NetworkPlayerDiablo.prefab";
+        System.IO.Directory.CreateDirectory("Assets/AddressableAssets");
         PrefabUtility.SaveAsPrefabAsset(netPlayer, prefabPath);
         Object.DestroyImmediate(netPlayer);
-        Debug.Log("[SandboxBuilder] NetworkPlayerDiablo prefab saved to Resources.");
+        Debug.Log("[SandboxBuilder] NetworkPlayerDiablo prefab saved to AddressableAssets.");
     }
 
     /// <summary>Headless proof for the Ashen Fen: camp, husks + elites, loot, netcode.</summary>

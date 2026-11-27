@@ -12,7 +12,7 @@ public sealed class HeroEquipmentAppearanceTests
     [UnityTest]
     public IEnumerator CatalogModelsReplaceEachOtherAndRestoreStarterArmor()
     {
-        var source = Resources.Load<HeroArtSource>("CinderreachHeroArt");
+        var source = Res.Get<HeroArtSource>("CinderreachHeroArt");
         Assert.IsNotNull(source);
         hero = Object.Instantiate(source.LightClothing);
         var equipment = hero.AddComponent<Equipment>();

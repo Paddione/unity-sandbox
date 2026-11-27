@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class CinderreachHeroArt
 {
-    const string SourcePath = "Assets/Resources/CinderreachHeroArt.asset";
+    const string SourcePath = "Assets/AddressableAssets/CinderreachHeroArt.asset";
 
     [MenuItem("Sandbox/Cinderreach/Configure Hero Art")]
     public static void Configure()

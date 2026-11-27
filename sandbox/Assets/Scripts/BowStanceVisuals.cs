@@ -53,7 +53,7 @@ public sealed class BowStanceVisuals
 
     GameObject CreateHeldBow()
     {
-        var prefab = Resources.Load<GameObject>("SkillArt/HeroBow");
+        var prefab = Res.Get<GameObject>("SkillArt/HeroBow");
         if (prefab == null) return null;
         // Bows sit in the off hand; KayKit rigs expose a "handslot.l" mount.
         var hand = FindDeep(hero, "handslot.l") ?? FindDeep(hero, "hand.l");
