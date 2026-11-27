@@ -48,6 +48,7 @@ public static partial class LocCatalog
         yield return Reward;
         yield return Unique;
         yield return Stat;
+        yield return StatBreakdown;
         yield return Affix;
         yield return Item;
         yield return Account;

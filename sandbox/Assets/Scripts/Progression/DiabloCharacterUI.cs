@@ -98,6 +98,7 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         if (IsOpen != open) DiabloAudio.PlayUIClick();
         IsOpen = open;
         if (open) DiabloUIFactory.CloseSecondaryPanels(gameObject, this);
+        else InfoTooltip.HideFor(gameObject);
         if (canvas != null) canvas.enabled = open;
         if (open) Refresh();
     }
@@ -341,11 +342,11 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         DiabloUIFactory.SetLayout(attrPointsText.gameObject, prefH: 24f, flexW: 1f);
 
         AddRow(panelGo.transform, "STR", null, out strengthText, out strPlusBtn, SpendStrength,
-            Loc.T("char.strength.tip"));
+            Loc.T("char.strength.tip"), infoProvider: () => StatHoverData("strength"));
         AddRow(panelGo.transform, "VIT", null, out vitalityText, out vitPlusBtn, SpendVitality,
-            Loc.T("char.vitality.tip"));
+            Loc.T("char.vitality.tip"), infoProvider: () => StatHoverData("vitality"));
         AddRow(panelGo.transform, "FOC", null, out focusText, out focPlusBtn, SpendFocus,
-            Loc.T("char.focus.tip"));
+            Loc.T("char.focus.tip"), infoProvider: () => StatHoverData("focus"));
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
 
@@ -398,24 +399,39 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         {
             var skill = cls.skills[i];
             var spr = DiabloMenuArt.SkillIcon(skill);
-            AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(skill),
-                Loc.F("char.skill.tip", cls.KeyLabel(i), DiabloSkills.SkillName(skill), CharacterSheet.MaxSkillRank)
-                    + "\n" + DiabloSkills.SkillDescription(skill), 44f);
-            skillRows.Add((skill, text, plus));
-            if (SkillVariantCatalog.VariantIds(cls.id, skill).Length >= 2)
+            var sk = skill;
+            AddRow(parent, cls.keys[i], spr, out Text text, out Button plus, () => SpendRank(sk),
+                Loc.F("char.skill.tip", cls.KeyLabel(i), DiabloSkills.SkillName(sk), CharacterSheet.MaxSkillRank)
+                    + "\n" + DiabloSkills.SkillDescription(sk), 44f, () => SkillHoverData(sk));
+            skillRows.Add((sk, text, plus));
+            if (SkillVariantCatalog.VariantIds(cls.id, sk).Length >= 2)
             {
-                var sk = skill;
                 var vBtn = DiabloUIFactory.MakeSmallButton(text.transform.parent, Loc.T("char.variant.btn"), () => CycleVariant(sk), 30f, 118f);
                 vBtn.gameObject.name = "VariantButton";
                 vBtn.transform.SetSiblingIndex(plus.transform.GetSiblingIndex());
-                variantButtons.Add((skill, vBtn, vBtn.GetComponentInChildren<Text>()));
+                variantButtons.Add((sk, vBtn, vBtn.GetComponentInChildren<Text>()));
             }
         }
         builtFor = cls.id;
     }
 
+    (string title, string meta, string body, string hint) StatHoverData(string id)
+    {
+        var entry = CharacterStatBreakdown.BuildFor(gameObject).Find(id);
+        return entry != null
+            ? (entry.name, entry.formula, entry.RenderTooltipBody(), entry.capNote)
+            : ("", "", "", "");
+    }
+
+    (string title, string meta, string body, string hint) SkillHoverData(DiabloSkills.Skill skill)
+    {
+        var data = SkillBreakdown.BuildFor(gameObject, skill);
+        return (data.title, data.meta, data.body, "");
+    }
+
     void AddRow(Transform parent, string key, Sprite iconSprite, out Text value, out Button plusBtn,
-        UnityEngine.Events.UnityAction onPlus, string tooltip, float height = 38f)
+        UnityEngine.Events.UnityAction onPlus, string tooltip, float height = 38f,
+        System.Func<(string title, string meta, string body, string hint)> infoProvider = null)
     {
         var row = new GameObject("Row" + key, typeof(RectTransform));
         row.transform.SetParent(parent, false);
@@ -458,12 +474,13 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         plusBtn = DiabloUIFactory.MakeButton(row.transform, "Plus", "+", 18, true, DiabloPalette.GoldBright, onPlus);
         DiabloUIFactory.SetLayout(plusBtn.gameObject, prefH: 30f, prefW: 38f);
 
-        if (EventSystem.current != null && !string.IsNullOrEmpty(tooltip))
+        if (!string.IsNullOrEmpty(tooltip) || infoProvider != null)
         {
-            var trig = row.AddComponent<EventTrigger>();
-            var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            entry.callback.AddListener(_ => { if (detailText != null) detailText.text = tooltip; });
-            trig.triggers.Add(entry);
+            var hover = row.AddComponent<HoverInfoSource>();
+            hover.Bind(gameObject, infoProvider, onEnter: () =>
+            {
+                if (detailText != null && !string.IsNullOrEmpty(tooltip)) detailText.text = tooltip;
+            });
         }
     }
 }

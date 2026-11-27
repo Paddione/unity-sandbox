@@ -40,7 +40,12 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
     Text bagCountText;
     Text bagDetailText;
     Text statsDetailText;
+    Transform paramContent;
+    Transform statsParamContent;
     Transform bagList;
+
+    /// <summary>Latest computed character parameter breakdown (test seam).</summary>
+    public CharacterStatBreakdown.CharacterStatSnapshot LastStatSnapshot { get; private set; }
     HeroPaperdollPreview paperdoll;
     Image dragGhost;
 
@@ -121,6 +126,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         {
             CancelDrag();
             ItemTooltip.HideFor(gameObject);
+            InfoTooltip.HideFor(gameObject);
         }
         if (open)
         {
@@ -145,6 +151,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
             else paperdoll.Hide();
         }
         if (!gear) ItemTooltip.HideFor(gameObject);
+        if (tab == MenuTab.Settings) InfoTooltip.HideFor(gameObject);
         PaintTabs();
         if (IsOpen) DiabloAudio.PlayUIClick();
     }
@@ -431,21 +438,31 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
                 Loc.F("inv.hero.header", DiabloPalette.ToHex(DiabloPalette.GoldBright), RunProfile.Class.displayName, lv, Loc.Display(RunProfile.Difficulty)) +
                 Loc.F("inv.hero.gold", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, flask.Charges, flask.MaxCharges);
 
+        LastStatSnapshot = CharacterStatBreakdown.BuildFor(gameObject);
+        RebuildParamRows(paramContent, LastStatSnapshot);
+        RebuildParamRows(statsParamContent, LastStatSnapshot);
+
         if (equipment != null)
         {
             foreach (var gear in Equipment.GearSlots)
                 if (slotTexts[(int)gear] != null)
                     slotTexts[(int)gear].text = SlotCaption(ItemText.Slot(gear), equipment.GetEquipped(gear));
+            var sheet = prog != null ? prog.Sheet : null;
+            int strBonus = sheet != null ? sheet.MeleeBonus() : 0;
+            float meleeDmg = Mathf.Max(1, Mathf.RoundToInt(equipment.GetDamage()) + strBonus);
+            float focusCd = sheet != null ? sheet.CooldownMultiplier() : 1f;
+            float totalCdr = (1f - focusCd * equipment.CooldownFactor()) * 100f;
             statsText.text =
                 Loc.T("inv.stats.combat") +
-                Loc.F("inv.stats.dmg", DiabloPalette.ToHex(DiabloPalette.TrimGold), equipment.GetDamage()) +
+                Loc.F("inv.stats.dmg", DiabloPalette.ToHex(DiabloPalette.TrimGold), meleeDmg) +
                 Loc.F("inv.stats.maxhp", BetterColor, equipment.GetMaxHP()) +
                 Loc.F("inv.stats.crit", equipment.GetCrit()) +
                 Loc.F("inv.stats.speed", equipment.GetMoveSpeed(), equipment.GetXPMul()) +
-                Loc.F("inv.stats.cdr", Mathf.Min(Equipment.MaxCooldownReductionPct, equipment.Total(AffixLibrary.CooldownReduction)));
+                Loc.F("inv.stats.cdr", totalCdr);
             foreach (var gear in Equipment.GearSlots) PaintEquipIcon((int)gear, equipment.GetEquipped(gear));
-            if (statsDetailText != null) statsDetailText.text = StatsBlock();
         }
+        if (statsDetailText != null && LastStatSnapshot != null)
+            statsDetailText.text = LastStatSnapshot.RenderPlainSummary() + "\n\n" + Loc.F("inv.stats.line6", DifficultyText());
         RebuildBag();
         if (noticeText != null) noticeText.text = Notice;
         foreach (var r in settingsRefreshes) r?.Invoke();

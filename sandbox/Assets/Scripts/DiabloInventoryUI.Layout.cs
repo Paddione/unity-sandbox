@@ -17,7 +17,7 @@ public sealed partial class DiabloInventoryUI
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 10);
         canvasRect = canvasGo.GetComponent<RectTransform>();
 
-        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(1120f, 820f), new Vector2(-18f, 0f));
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(1520f, 840f), new Vector2(-18f, 0f));
         var pr = panelGo.GetComponent<RectTransform>();
         pr.anchorMin = new Vector2(1f, 0.5f);
         pr.anchorMax = new Vector2(1f, 0.5f);
@@ -86,11 +86,153 @@ public sealed partial class DiabloInventoryUI
 
     void BuildInventoryPage()
     {
-        // Character column (left) and bag column (right) side by side.
-        var charCol = MakeColumn(inventoryPage.transform, "CharacterColumn", 470f, 0f);
+        // Paperdoll (left), live stat breakdown (middle), and bag (right).
+        var charCol = MakeColumn(inventoryPage.transform, "CharacterColumn", 456f, 0f);
+        var paramCol = MakeColumn(inventoryPage.transform, "ParametersColumn", 416f, 0f);
         var bagCol = MakeColumn(inventoryPage.transform, "BagColumn", -1f, 1f);
         BuildCharacterColumn(charCol.transform);
+        BuildParametersColumn(paramCol.transform);
         BuildBagColumn(bagCol.transform);
+    }
+
+    void BuildParametersColumn(Transform col)
+    {
+        var card = MakeCard(col, "ParametersCard", 686f);
+        var v = card.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(10, 10, 8, 8);
+        v.spacing = 4f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+
+        var title = DiabloUIFactory.MakeText(card.transform, "ParametersTitle", Loc.T("statbd.column.title"), 16, DiabloPalette.GoldBright, TextAnchor.MiddleLeft);
+        title.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(title.gameObject, prefH: 22f, flexW: 1f);
+
+        var hint = DiabloUIFactory.MakeText(card.transform, "ParametersHint", Loc.T("statbd.column.hint"), 11, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
+        DiabloUIFactory.SetLayout(hint.gameObject, prefH: 16f, flexW: 1f);
+
+        paramContent = MakeParamScroll(card.transform, "ParametersScroll", "ParametersContent", 624f, -1f, 1f);
+    }
+
+    static Transform MakeParamScroll(Transform parent, string scrollName, string contentName, float height, float width, float flexW)
+    {
+        var scrollGo = new GameObject(scrollName, typeof(RectTransform));
+        scrollGo.transform.SetParent(parent, false);
+        DiabloUIFactory.SetLayout(scrollGo, prefH: height, prefW: width, flexW: flexW);
+        var scrollBg = scrollGo.AddComponent<Image>();
+        scrollBg.color = new Color(0f, 0f, 0f, 0.16f);
+        scrollBg.raycastTarget = true;
+
+        var scroll = scrollGo.AddComponent<ScrollRect>();
+        scroll.horizontal = false;
+        scroll.vertical = true;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.scrollSensitivity = 28f;
+
+        var viewportGo = new GameObject("Viewport", typeof(RectTransform));
+        viewportGo.transform.SetParent(scrollGo.transform, false);
+        var vpRt = viewportGo.GetComponent<RectTransform>();
+        vpRt.anchorMin = Vector2.zero;
+        vpRt.anchorMax = Vector2.one;
+        vpRt.offsetMin = new Vector2(4f, 4f);
+        vpRt.offsetMax = new Vector2(-4f, -4f);
+        viewportGo.AddComponent<RectMask2D>();
+        var vpImg = viewportGo.AddComponent<Image>();
+        vpImg.color = new Color(0f, 0f, 0f, 0.01f);
+        vpImg.raycastTarget = true;
+        scroll.viewport = vpRt;
+
+        var contentGo = new GameObject(contentName, typeof(RectTransform));
+        contentGo.transform.SetParent(viewportGo.transform, false);
+        var cRt = contentGo.GetComponent<RectTransform>();
+        cRt.anchorMin = new Vector2(0f, 1f);
+        cRt.anchorMax = new Vector2(1f, 1f);
+        cRt.pivot = new Vector2(0.5f, 1f);
+        cRt.offsetMin = Vector2.zero;
+        cRt.offsetMax = Vector2.zero;
+
+        var cv = contentGo.AddComponent<VerticalLayoutGroup>();
+        cv.spacing = 2f;
+        cv.padding = new RectOffset(2, 2, 2, 4);
+        cv.childControlWidth = true;
+        cv.childControlHeight = false;
+        cv.childForceExpandWidth = true;
+        cv.childForceExpandHeight = false;
+
+        var fit = contentGo.AddComponent<ContentSizeFitter>();
+        fit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        scroll.content = cRt;
+        return contentGo.transform;
+    }
+
+    void RebuildParamRows(Transform content, CharacterStatBreakdown.CharacterStatSnapshot snapshot)
+    {
+        if (content == null || snapshot == null) return;
+        for (int i = content.childCount - 1; i >= 0; i--)
+        {
+            var go = content.GetChild(i).gameObject;
+            go.transform.SetParent(null, false);
+            if (Application.isPlaying) Destroy(go);
+            else DestroyImmediate(go);
+        }
+
+        CharacterStatBreakdown.StatCategory? lastCat = null;
+        for (int i = 0; i < snapshot.entries.Count; i++)
+        {
+            var entry = snapshot.entries[i];
+            if (!lastCat.HasValue || lastCat.Value != entry.category)
+            {
+                lastCat = entry.category;
+                MakeParamCategoryHeader(content, entry.category);
+            }
+            MakeParamRow(content, entry);
+        }
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content as RectTransform);
+    }
+
+    static void MakeParamCategoryHeader(Transform parent, CharacterStatBreakdown.StatCategory cat)
+    {
+        var go = new GameObject("ParamCat_" + cat, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        DiabloUIFactory.SetLayout(go, prefH: 22f, flexW: 1f);
+        var lbl = DiabloUIFactory.MakeText(go.transform, "Label", CharacterStatBreakdown.CategoryTitle(cat), 13, DiabloPalette.TrimGold, TextAnchor.MiddleLeft);
+        lbl.fontStyle = FontStyle.Bold;
+        var rt = lbl.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = new Vector2(4f, 2f);
+        rt.offsetMax = new Vector2(-4f, 0f);
+    }
+
+    void MakeParamRow(Transform parent, CharacterStatBreakdown.StatEntry entry)
+    {
+        var rowGo = new GameObject("ParamRow_" + entry.id, typeof(RectTransform));
+        rowGo.transform.SetParent(parent, false);
+        DiabloUIFactory.SetLayout(rowGo, prefH: 24f, flexW: 1f);
+
+        var bg = rowGo.AddComponent<Image>();
+        bg.color = new Color(0.12f, 0.10f, 0.08f, 0.38f);
+        bg.raycastTarget = true;
+
+        var hz = rowGo.AddComponent<HorizontalLayoutGroup>();
+        hz.padding = new RectOffset(6, 6, 2, 2);
+        hz.spacing = 6f;
+        hz.childAlignment = TextAnchor.MiddleLeft;
+        hz.childControlWidth = true;
+        hz.childControlHeight = true;
+        hz.childForceExpandWidth = false;
+
+        var nameLbl = DiabloUIFactory.MakeText(rowGo.transform, "Name", entry.name, 13, DiabloPalette.Parchment, TextAnchor.MiddleLeft);
+        DiabloUIFactory.SetLayout(nameLbl.gameObject, prefH: 20f, flexW: 1f);
+
+        var valLbl = DiabloUIFactory.MakeText(rowGo.transform, "Value", entry.displayValue, 13, DiabloPalette.GoldBright, TextAnchor.MiddleRight);
+        valLbl.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(valLbl.gameObject, prefH: 20f, prefW: 150f);
+
+        var captured = entry;
+        var hover = rowGo.AddComponent<HoverInfoSource>();
+        hover.Bind(gameObject, () => (captured.name, captured.formula, captured.RenderTooltipBody(), captured.capNote), bg);
     }
 
     static GameObject MakeColumn(Transform parent, string name, float width, float flexW)
@@ -292,12 +434,18 @@ public sealed partial class DiabloInventoryUI
         DiabloUIFactory.SetLayout(title.gameObject, prefH: 64f, flexW: 1f);
 
         var box = MakeCard(statsPage.transform, "StatsCard", 520f);
-        var v = box.AddComponent<VerticalLayoutGroup>();
-        v.padding = new RectOffset(20, 20, 16, 16);
-        v.childControlWidth = true;
-        v.childControlHeight = false;
-        statsDetailText = DiabloUIFactory.MakeText(box.transform, "StatsDetail", "", 16, DiabloPalette.Parchment, TextAnchor.UpperLeft);
-        DiabloUIFactory.SetLayout(statsDetailText.gameObject, prefH: 488f, flexW: 1f);
+        var sh = box.AddComponent<HorizontalLayoutGroup>();
+        sh.padding = new RectOffset(16, 16, 12, 12);
+        sh.spacing = 18f;
+        sh.childControlWidth = true;
+        sh.childControlHeight = true;
+        sh.childForceExpandWidth = false;
+
+        statsParamContent = MakeParamScroll(box.transform, "StatsScroll", "StatsContent", 496f, 680f, 0f);
+
+        statsDetailText = DiabloUIFactory.MakeText(box.transform, "StatsDetail", "", 13, DiabloPalette.Parchment, TextAnchor.UpperLeft);
+        DiabloUIFactory.FitToBox(statsDetailText, 14, 10);
+        DiabloUIFactory.SetLayout(statsDetailText.gameObject, prefH: 496f, flexW: 1f);
 
         var controlsBox = DiabloUIFactory.MakeText(statsPage.transform, "ControlsHint",
             Loc.T("inv.controls"),

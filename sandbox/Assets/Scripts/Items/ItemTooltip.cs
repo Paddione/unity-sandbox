@@ -96,6 +96,7 @@ public sealed class ItemTooltip : MonoBehaviour
     public void Show(ItemInstance shown, Equipment worn, string tag = null, GameObject from = null)
     {
         if (shown == null) { Hide(); return; }
+        InfoTooltip.HideFor(gameObject);
         EnsureBuilt();
         item = shown;
         source = from;
@@ -133,7 +134,7 @@ public sealed class ItemTooltip : MonoBehaviour
         hoverTitle.text = LootDrop.ItemLabel(item);
         hoverTitle.color = DiabloPalette.Rarity(item.rarity);
         hoverMeta.text = MetaLine(item);
-        hoverBody.text = compare ? CompareBody(item, worn) : PlainBody(item);
+        hoverBody.text = compare ? CompareBody(item, worn, equipment) : PlainBody(item, equipment);
         hoverHint.gameObject.SetActive(equippable && !compare && !ReferenceEquals(worn, item));
         hoverHint.text = Loc.T("inv.tip.shifthint");
 
@@ -144,7 +145,7 @@ public sealed class ItemTooltip : MonoBehaviour
             {
                 equippedTitle.text = LootDrop.ItemLabel(worn);
                 equippedTitle.color = DiabloPalette.Rarity(worn.rarity);
-                equippedBody.text = MetaLine(worn) + "\n" + PlainBody(worn);
+                equippedBody.text = MetaLine(worn) + "\n" + PlainBody(worn, equipment);
             }
             else
             {
@@ -162,25 +163,88 @@ public sealed class ItemTooltip : MonoBehaviour
         return Loc.F("inv.tip.meta", DiabloPalette.ToHex(DiabloPalette.ParchmentDim), ItemText.Rarity(it.rarity), ItemText.Slot(it.slot), level);
     }
 
-    static string PlainBody(ItemInstance it)
+    static string PlainBody(ItemInstance it, Equipment eq)
     {
         var sb = new System.Text.StringBuilder();
         AppendClassLock(sb, it);
         if (it.affixes == null || it.affixes.Count == 0) sb.AppendLine(Loc.T("item.card.norolls"));
         else
             foreach (var a in it.affixes)
-                sb.AppendLine(AffixLibrary.Describe(a));
+                sb.AppendLine(FormatAffixWithRange(a, it));
         AppendUnique(sb, it);
+        AppendCapAndSlotHints(sb, it, eq);
         return sb.ToString().TrimEnd();
     }
 
-    static string CompareBody(ItemInstance it, ItemInstance worn)
+    static string CompareBody(ItemInstance it, ItemInstance worn, Equipment eq)
     {
         var sb = new System.Text.StringBuilder();
         AppendClassLock(sb, it);
         sb.AppendLine(ItemCompare.ArrowLines(it, worn));
         AppendUnique(sb, it);
+        AppendCapAndSlotHints(sb, it, eq);
         return sb.ToString().TrimEnd();
+    }
+
+    static string FormatAffixWithRange(Affix a, ItemInstance it)
+    {
+        string text = AffixLibrary.Describe(a);
+        if (it == null || it.itemLevel <= 0) return text;
+        var def = AffixLibrary.Get(a.key);
+        if (def == null) return text;
+        int tier = DifficultyProfile.Current != null ? DifficultyProfile.Current.affixTier : 1;
+        def.Range(tier, it.itemLevel, out float min, out float max);
+        if (max <= 0f) return text;
+        string fmt = def.integer ? "0" : "0.##";
+        string dimHex = DiabloPalette.ToHex(DiabloPalette.ParchmentDim);
+        return Loc.F("statbd.item.range", text, dimHex, Loc.Num(min, fmt), Loc.Num(max, fmt));
+    }
+
+    static void AppendCapAndSlotHints(System.Text.StringBuilder sb, ItemInstance it, Equipment eq)
+    {
+        if (it == null) return;
+        string dimHex = DiabloPalette.ToHex(DiabloPalette.ParchmentDim);
+        if (it.slot == ItemSlot.Weapon && it.GetAffix(AffixLibrary.MaxHP) > 0f)
+            sb.AppendLine(Loc.F("statbd.item.weapon_hp_note", dimHex));
+        if (eq == null || it.affixes == null || it.affixes.Count == 0) return;
+
+        bool addedCrit = false, addedCdr = false, addedLs = false, addedArea = false;
+        foreach (var a in it.affixes)
+        {
+            if ((a.key == AffixLibrary.Crit || a.key == AffixLibrary.CritRating) && !addedCrit)
+            {
+                addedCrit = true;
+                float raw = Equipment.BaseCritChance + eq.Total(AffixLibrary.Crit) + eq.Total(AffixLibrary.CritRating) / 10f;
+                AppendCapLine(sb, AffixLibrary.StatName(AffixLibrary.Crit), raw, Equipment.MaxCritChance, dimHex);
+            }
+            else if (a.key == AffixLibrary.CooldownReduction && !addedCdr)
+            {
+                addedCdr = true;
+                float raw = eq.Total(AffixLibrary.CooldownReduction);
+                float cap = GearUniqueEffects.CooldownCap(eq, Equipment.MaxCooldownReductionPct);
+                AppendCapLine(sb, AffixLibrary.StatName(AffixLibrary.CooldownReduction), raw, cap, dimHex);
+            }
+            else if (a.key == AffixLibrary.LifeSteal && !addedLs)
+            {
+                addedLs = true;
+                float raw = eq.Total(AffixLibrary.LifeSteal);
+                AppendCapLine(sb, AffixLibrary.StatName(AffixLibrary.LifeSteal), raw, Equipment.MaxLifeStealPct, dimHex);
+            }
+            else if (a.key == AffixLibrary.IncreasedArea && !addedArea)
+            {
+                addedArea = true;
+                float raw = eq.Total(AffixLibrary.IncreasedArea);
+                AppendCapLine(sb, AffixLibrary.StatName(AffixLibrary.IncreasedArea), raw, Equipment.MaxIncreasedAreaPct, dimHex);
+            }
+        }
+    }
+
+    static void AppendCapLine(System.Text.StringBuilder sb, string label, float raw, float cap, string dimHex)
+    {
+        if (raw >= cap)
+            sb.AppendLine(Loc.F("statbd.item.cap_reached", DiabloInventoryUI.BetterColor, label, raw, cap));
+        else
+            sb.AppendLine(Loc.F("statbd.item.cap_hint", dimHex, label, raw, cap));
     }
 
     static void AppendClassLock(System.Text.StringBuilder sb, ItemInstance it)

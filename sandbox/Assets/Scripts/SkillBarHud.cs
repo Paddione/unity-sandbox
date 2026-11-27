@@ -74,7 +74,7 @@ public sealed class SkillBarHud
     {
         var canvasGo = new GameObject("SkillBarCanvas");
         canvasGo.transform.SetParent(owner, false);
-        DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: false);
+        DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: true);
 
         // Bronze HUD plate under skills, key labels and the XP bar (XpCanvas sorts above at 6),
         // so the bar reads against bright town paving and dark fen alike.
@@ -142,7 +142,15 @@ public sealed class SkillBarHud
             var frame = slot.AddComponent<Image>();
             frame.sprite = DiabloMenuArt.SlotBackground(sk == last ? ItemRarity.Rare : (ItemRarity?)null, 64);
             frame.type = Image.Type.Sliced;
-            frame.raycastTarget = false;
+            frame.raycastTarget = true;
+
+            var capturedSkill = sk;
+            var hover = slot.AddComponent<HoverInfoSource>();
+            hover.Bind(owner != null ? owner.gameObject : null, () =>
+            {
+                var data = SkillBreakdown.BuildFor(owner != null ? owner.gameObject : null, capturedSkill);
+                return (data.title, data.meta, data.body, "");
+            });
 
             var spr = DiabloMenuArt.SkillIcon(sk);
             if (spr != null)
