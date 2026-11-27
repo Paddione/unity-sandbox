@@ -131,6 +131,10 @@ for platform in "${platforms[@]}"; do
     echo "$platform $UNITY_RUN_END — infra hang (exit 2), safe to retry" >&2
     tail -n 60 "$log" >&2 || true
     exit 2
+  elif [ "$rc" -ge 128 ] && [ -s "$result" ]; then
+    # Known failure: the editor crashes by signal (e.g. SIGFPE, exit 136) while it shuts
+    # down after the run wrote its results. The report below still judges every test.
+    echo "run-unity-tests: WARNING $platform editor crashed in shutdown (exit $rc) after writing $result; judging the results."
   elif [ "$rc" -ne 0 ]; then
     echo "$platform editor/test process failed (exit $rc)" >&2
     tail -n 60 "$log" >&2 || true
