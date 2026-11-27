@@ -117,6 +117,12 @@ def test_build_out_for_targets():
     assert srv.endswith("builds/diablo-server/diablo-server")
 
 
+def test_default_metrics_path_is_versioned():
+    mod = load_module()
+    assert mod.DEFAULT_METRICS == mod.ROOT / "docs" / "build-metrics.jsonl"
+    assert "builds" not in mod.DEFAULT_METRICS.parts
+
+
 def test_cli_note_flag_exists():
     import subprocess
 

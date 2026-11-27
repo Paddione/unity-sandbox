@@ -4,8 +4,9 @@
 Faellt die Matrix (Linux-Player / Windows-Player / Linux-Server) ueber
 scripts/run-unity-build.sh, liest je Target totalTime/totalSize aus den
 [SandboxBuilder] ... build result:-Logzeilen und haengt JSON-Zeilen an
-builds/build-metrics.jsonl an (Felder: ts, label, target, duration_s,
-size_mb, commit, note).
+docs/build-metrics.jsonl an (Felder: ts, label, target, duration_s,
+size_mb, commit, note). Die Datei ist versioniert (Goal
+unity-projektstand-board, D2); builds/ bleibt gitignored.
 
 Usage (vom Repo-Root):
   python3 scripts/measure-build.py [--note TEXT] [--targets a,b]
@@ -26,6 +27,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_METRICS = ROOT / "docs" / "build-metrics.jsonl"
 
 # method | marker | artifact-dir | label | player-name — gespiegelt aus
 # run-unity-matrix.sh. Der Player landet per -buildOut im Worktree (kein
@@ -181,9 +183,7 @@ def main(argv=None):
     )
     parser.add_argument("--timeout", type=int, default=1500)
     parser.add_argument("--logdir", default=None)
-    parser.add_argument(
-        "--metrics", default=str(ROOT / "builds" / "build-metrics.jsonl")
-    )
+    parser.add_argument("--metrics", default=str(DEFAULT_METRICS))
     args = parser.parse_args(argv)
 
     wanted = {t.strip() for t in args.targets.split(",") if t.strip()}

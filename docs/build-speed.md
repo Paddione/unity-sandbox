@@ -13,8 +13,9 @@ linux 3,9 s). Import kostet bei warmer `Library/` ~0 (0 `Start Importing`-Zeilen
   (repo-relativ, Doppelpunkt-getrennt). Verweigert werden: absolute Pfade, `..`,
   `Library/`, `Assets/`, `ProjectSettings/`, `Packages/`, `sandbox/`, `scripts/`.
 - Matrix-Messung: `python3 scripts/measure-build.py [--note TEXT] [--targets …]`
-  hängt JSON-Zeilen an `builds/build-metrics.jsonl` an (ignored, Arbeitsdatei;
-  belegte Zahlen zusätzlich in die Goal-`PROGRESS.md` übernehmen).
+  hängt JSON-Zeilen an `docs/build-metrics.jsonl` an (versioniert seit Goal
+  unity-projektstand-board; Baseline/Final 2026-11-27 als Backfill enthalten).
+  Gitignorierte `builds/`-Artefakte bleiben ergänzende Live-Quelle.
 - Worktree-Builds landen per `-buildOut` im eigenen Worktree (`measure-build`
   setzt ihn automatisch); `SandboxBuilder.{BuildDiabloZoneBuild,BuildDiabloZoneWindows,
   BuildDiabloZoneServer}` akzeptieren `-buildOut <pfad>`.
