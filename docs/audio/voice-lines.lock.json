@@ -110,6 +110,111 @@
    "speaker": "ottilie",
    "seconds": 5.69
   },
+  "dlg.h10.done.1": {
+   "hash": "f03501738617",
+   "speaker": "narrator",
+   "seconds": 6.92
+  },
+  "dlg.h10.done.2": {
+   "hash": "7952fb0f3736",
+   "speaker": "ottilie",
+   "seconds": 6.44
+  },
+  "dlg.h10.done.3": {
+   "hash": "8b803648f377",
+   "speaker": "ottilie",
+   "seconds": 4.58
+  },
+  "dlg.h10.done.4": {
+   "hash": "1f9d67aabb0c",
+   "speaker": "ottilie",
+   "seconds": 3.51
+  },
+  "dlg.h10.done.5": {
+   "hash": "48fde28181d8",
+   "speaker": "jorin",
+   "seconds": 6.88
+  },
+  "dlg.h10.done.6": {
+   "hash": "9c6a3c1ce17c",
+   "speaker": "ilsabe",
+   "seconds": 4.69
+  },
+  "dlg.h10.hint.1": {
+   "hash": "47000a13f339",
+   "speaker": "ottilie",
+   "seconds": 6.18
+  },
+  "dlg.h10.offer.1": {
+   "hash": "e2ddac1f01f0",
+   "speaker": "ottilie",
+   "seconds": 8.96
+  },
+  "dlg.h10.offer.2": {
+   "hash": "9cbef9304a58",
+   "speaker": "ottilie",
+   "seconds": 6.1
+  },
+  "dlg.h10.offer.3": {
+   "hash": "8103384be75c",
+   "speaker": "ottilie",
+   "seconds": 6.61
+  },
+  "dlg.h10.offer.4": {
+   "hash": "284334950ae2",
+   "speaker": "ottilie",
+   "seconds": 6.71
+  },
+  "dlg.h10.talk.ilsabe.1": {
+   "hash": "ad848b0da941",
+   "speaker": "ilsabe",
+   "seconds": 8.75
+  },
+  "dlg.h10.talk.ilsabe.2": {
+   "hash": "4940826418c2",
+   "speaker": "ilsabe",
+   "seconds": 6.37
+  },
+  "dlg.h10.talk.jorin.1": {
+   "hash": "0877cd66d4a2",
+   "speaker": "jorin",
+   "seconds": 2.55
+  },
+  "dlg.h10.talk.jorin.2": {
+   "hash": "8b12c61f1b2e",
+   "speaker": "jorin",
+   "seconds": 4.79
+  },
+  "dlg.h10.talk.merle.1": {
+   "hash": "92612790c5cf",
+   "speaker": "merle",
+   "seconds": 6.86
+  },
+  "dlg.h10.talk.merle.2": {
+   "hash": "78efa474c100",
+   "speaker": "merle",
+   "seconds": 6.75
+  },
+  "dlg.h10.talk.merle.3": {
+   "hash": "0e118ddae3ff",
+   "speaker": "merle",
+   "seconds": 4.97
+  },
+  "dlg.h10.talk.ottilie.1": {
+   "hash": "6d255008995b",
+   "speaker": "ottilie",
+   "seconds": 9.23
+  },
+  "dlg.h10.talk.ottilie.2": {
+   "hash": "808088a4fde3",
+   "speaker": "ottilie",
+   "seconds": 5.3
+  },
+  "dlg.h10.talk.ottilie.3": {
+   "hash": "4e5be5d764e4",
+   "speaker": "ottilie",
+   "seconds": 6.44
+  },
   "dlg.h14.done.1": {
    "hash": "bd1db3a81c93",
    "speaker": "ottilie",
@@ -999,6 +1104,66 @@
    "hash": "7877020b154b",
    "speaker": "ilsabe",
    "seconds": 6.79
+  },
+  "dlg.n6.done.1": {
+   "hash": "da211f75e12f",
+   "speaker": "jorin",
+   "seconds": 2.36
+  },
+  "dlg.n6.done.2": {
+   "hash": "600654b7353e",
+   "speaker": "jorin",
+   "seconds": 5.55
+  },
+  "dlg.n6.done.3": {
+   "hash": "fd5192e1ed6f",
+   "speaker": "jorin",
+   "seconds": 5.11
+  },
+  "dlg.n6.hint.1": {
+   "hash": "95f6b55f1c17",
+   "speaker": "jorin",
+   "seconds": 5.38
+  },
+  "dlg.n6.offer.1": {
+   "hash": "bf7cd1852256",
+   "speaker": "jorin",
+   "seconds": 5.26
+  },
+  "dlg.n6.offer.2": {
+   "hash": "b3185237afa2",
+   "speaker": "jorin",
+   "seconds": 6.24
+  },
+  "dlg.n7.done.1": {
+   "hash": "1d9d25ae6872",
+   "speaker": "ilsabe",
+   "seconds": 4.58
+  },
+  "dlg.n7.done.2": {
+   "hash": "bc6678b25b2c",
+   "speaker": "ilsabe",
+   "seconds": 5.59
+  },
+  "dlg.n7.done.3": {
+   "hash": "8dae72b1beb6",
+   "speaker": "ilsabe",
+   "seconds": 7.66
+  },
+  "dlg.n7.hint.1": {
+   "hash": "d31fac9c2a94",
+   "speaker": "ilsabe",
+   "seconds": 6.18
+  },
+  "dlg.n7.offer.1": {
+   "hash": "bed1e38b7bc6",
+   "speaker": "ilsabe",
+   "seconds": 5.78
+  },
+  "dlg.n7.offer.2": {
+   "hash": "4bcb06c1fad3",
+   "speaker": "ilsabe",
+   "seconds": 5.89
   },
   "dlg.n8.done.1": {
    "hash": "d9300b3336e4",

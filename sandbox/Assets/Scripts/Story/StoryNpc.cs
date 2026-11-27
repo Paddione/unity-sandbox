@@ -3,7 +3,10 @@ using UnityEngine;
 /// <summary>
 /// A named story figure in the Hold (cinderreach-deutsch-story S4/S5): click
 /// opens its scripted talk, a floating mark shows an offer or a hand-in.
-/// Merle only stands in the Hold once Act I is done. Shops (Ilsabe, Jorin)
+/// Merle only stands in the Hold once Act I is done. In Act III all four
+/// Hold figures (Ottilie, Merle, Ilsabe, Jorin) carry the Wacht talks
+/// (H10/N6/N7); the "!" marker follows StoryDialogs.Plan, so no per-quest
+/// wiring is needed here. Shops (Ilsabe, Jorin)
 /// keep their own click handling and call the director first. Every use
 /// (click, use key, shop) turns an animated figure toward the hero
 /// (<see cref="FaceHero"/>); prop stand-ins without an Animator stay put.

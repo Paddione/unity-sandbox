@@ -153,6 +153,25 @@ public static class StoryDialogs
         new StoryDialog("n15.offer", I, I),
         new StoryDialog("n15.hint", I),
         new StoryDialog("n15.done", I, I),
+        // ---- Akt III Finale S2: Wacht (H10, N6, N7; Bibel §Akt III) ----
+        // H10 haengt an H9 (Modell in S3): vier Gespraeche in der Wacht plus
+        // Scherbe ans Licht. N6 (Jorin) / N7 (Ilsabe) laufen daneben; ihre
+        // Folgen stehen als Schlusszeilen auf h10.done (x|nK-Muster wie
+        // h9.talk.merle.7/ottilie.7-8). Die H13-Schlusszeilen (Naegel,
+        // Ilsabes Satz) gehoeren S3.
+        new StoryDialog("h10.offer", O, O, O, O),
+        new StoryDialog("h10.hint", O),
+        new StoryDialog("h10.done", N, O, O, O, J + "|n6", I + "|n7"),
+        new StoryDialog("h10.talk.ottilie", O, O, O),
+        new StoryDialog("h10.talk.merle", M, M, M),
+        new StoryDialog("h10.talk.ilsabe", I, I),
+        new StoryDialog("h10.talk.jorin", J, J),
+        new StoryDialog("n6.offer", J, J),
+        new StoryDialog("n6.hint", J),
+        new StoryDialog("n6.done", J, J, J),
+        new StoryDialog("n7.offer", I, I),
+        new StoryDialog("n7.hint", I),
+        new StoryDialog("n7.done", I, I, I),
         new StoryDialog("idle.ottilie.1", O),
         new StoryDialog("idle.ottilie.2", O),
         new StoryDialog("idle.ottilie.3", O),
