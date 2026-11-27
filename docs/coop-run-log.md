@@ -203,6 +203,7 @@ sterblich (`-coop-autoplay follow`). Sitzung `normal` aus frischen Saves, danach
 | run6 | Lead ohne `zone1` | Gegner haben keine NetworkTransform, die Client-Kopie driftete (~1200 Reichweiten-Ablehnungen): Server schickt nach einer Ablehnung die Server-Position an den Absender (`SnapEnemyClientRpc`, 0,5 s Drossel) |
 | run7 | normal PASS, kindled PASS | Lead 34/34, `1:Kilnmother:- 2:Glasswright:- 3:Thewes:-`, Follower 9/9 Phasen, alle drei Kindled freigeschaltet und gespeichert, Server Exit 0; Kindled: `[Difficulty] server adopts Kindled from client 1: hp x1.8 damage x1.8 gold x1.5 unique x2 affixTier 2, 70 enemies rescaled`, Lead 34/34, je 0 Exceptions (Normal 307 s, Kindled 414 s) |
 | run8 (nach Rebase auf `c0aad39`) | normal PASS, kindled Lead exit 1 | Lead 34/34, aber `caughtUp=[h19]`: der Client schloss H19 per lokalem Catch-up, bevor der Server-Broadcast H19 als gestartet zeigte (gespielt haben es die Follower). Koop-Clients wenden keinen Story-Catch-up mehr an (`StoryDirector.CatchUpHere`) |
+| CI 46058725563 (`369186f`) | normal PASS, kindled PASS | Workflow-Job 21 min; normal: Lead 34/34, fellLast, Clients 320/317/314 s, alle Kindled freigeschaltet und gespeichert; kindled: Server adoptiert Kindled (x1.8, 70 Gegner umgerechnet), Lead 34/34, alle exit 0 (405/402/399 s) |
 
 Regeln: Der dedizierte Server ist Story-Autorität (`StoryDirector.ServerTick`: Refresh, Moortor, Akt-Boss-Gate,
 Broadcast bei Änderung, Log `[Server] story gate`). Clients leiten Funde und Zonenbetreten weiter

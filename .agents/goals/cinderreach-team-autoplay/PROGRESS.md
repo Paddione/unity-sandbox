@@ -1,6 +1,6 @@
 # Progress: cinderreach-team-autoplay
 
-Prozent: 70 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -24,13 +24,21 @@ Prozent: 70 %
   `timeout-minutes: 300`), Host-Ablage `~/unity-sandbox-autoplay/<Datum>[-<run_id>]/{normal,kindled}/{server,client1..3}/`,
   `docs/ci-runner.md` aktualisiert.
 - 2026-11-27 K5 (Code): `G-DIABLO06` bewertet die Team-Verdicts (dotfiles-Worktree `fix/diablo06-team-autoplay`).
-
-## Nächste Schritte
-
-1. Landen (unity-sandbox, dann dotfiles `G-DIABLO06`).
-2. K6: `gh workflow run unity-tests.yml -f autoplay=true` auf `main`, Run-ID und Auszüge hier und in
-   `docs/coop-run-log.md`, `G-DIABLO06` grün.
+- 2026-11-27 gelandet: unity-sandbox `369186f` (Teamkampagne, Workflow-Job, Doku), dotfiles `cf40a98`
+  (`G-DIABLO06` auf Team-Verdicts).
+- 2026-11-27 K4/K6: `workflow_dispatch` Lauf 46058725563 auf `main` (`369186f`) grün: Unity Test Runner success,
+  „Session autoplay (team, dedicated server, Xvfb)“ success in 21 min (19:50–20:11 UTC, Limit 300 min), keine
+  Solo-Route, `COOP_DISPLAY=xvfb-gpu`. Ablage `~/unity-sandbox-autoplay/2026-11-27-46058725563/{normal,kindled}/
+  {server,client1,client2,client3}/` plus Artefakt `autoplay-46058725563`.
+  - normal PASS: Klassen fenwalker/lanternbearer/rogue, Lead 34/34 Quests,
+    `1:Kilnmother:- 2:Glasswright:- 3:Thewes:-` (fellLast), alle drei Clients exit 0, Thewes down, Kindled
+    freigeschaltet und gespeichert (320/317/314 s), Server beendet sich selbst.
+  - kindled PASS: dieselben Saves ohne `-difficulty`, `[Difficulty] server adopts Kindled from client 1: hp x1.8
+    damage x1.8 gold x1.5 unique x2 affixTier 2, 70 enemies rescaled`, alle Clients `difficulty=Kindled`, Lead 34/34,
+    fellLast, alle exit 0 (405/402/399 s).
+- 2026-11-27 K5: `G-DIABLO06` auf dem Host = 0 („2026-11-27-46058725563: Normal + Kindled grün, Quests 34/34,
+  Klassen fenwalker/lanternbearer/rogue“). Lokale Läufe und Befunde run1–run8 in `docs/coop-run-log.md`.
 
 ## Offene Punkte
 
-- K4 im CI unbelegt, K5 nach dem CI-Lauf zu prüfen, K6 offen.
+Keine.

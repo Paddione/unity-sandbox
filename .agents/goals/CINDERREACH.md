@@ -20,7 +20,6 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
 | P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
-| P9 | [`cinderreach-team-autoplay`](cinderreach-team-autoplay/GOAL.md) | 70 %, K1–K3 erledigt, lokal grün | K1 Kindled-Freischaltung auf Thewes, dann Teamlauf Server + 3 Clients (Normal → Kindled aus Saves) im CI |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
@@ -319,6 +318,15 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `scripts/publish-server-image.sh`, Ablauf in `docs/runbook.md`. Paketlimit 1200 Byte (`CompactPacketDriver`):
   die WireGuard-MTU 1420 des Clusters verwarf volle UTP-Pakete. Server-Build = Server-Subtarget ohne Shader,
   Laufzeit-Material-Code muss `Shader.Find` = null tolerieren. Belege: `docs/coop-run-log.md` (s1-1 bis s4-prod-1).
+- Teamkampagne auf dem dedizierten Server (cinderreach-team-autoplay, 2026-11-27): Der Server ist Story-Autorität
+  (`StoryDirector.ServerTick`: Refresh, Moortor, Akt-Boss-Gate, Broadcast bei Änderung), Clients leiten Funde und
+  Zonenbetreten weiter (`SubmitStoryEventServerRpc`) und wenden keinen Story-Catch-up selbst an
+  (`StoryDirector.CatchUpHere`). Clients verstecken Akt-Bosse erst nach deren Netz-Spawn (`ActBossGate.MayHide`,
+  NGO findet inaktive In-Scene-Objekte nicht). Weist der Server einen Treffer wegen Reichweite ab, setzt er die
+  Gegnerkopie des Absenders auf die Server-Position (`SnapEnemyClientRpc`). Der erste Join bestimmt die
+  Schwierigkeit des Servers, lebende Gegner werden umgerechnet (`DedicatedServer.AdoptPartyDifficulty`). Kindled
+  schaltet beim Thewes-Kill frei, für jeden Client in der Party (`BroadcastFinalBossKill`). Ein neuer Lauf auf
+  anderer Schwierigkeit startet die Kampagne neu und behält den Helden (`RunProfile.StartCampaign`).
 
 ### Konten, Namen und Cloud-Held (cinderreach-accounts, 2026-11-23)
 
@@ -497,3 +505,4 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-dedicated-server` | Server ohne Helden, Relay + Lobby, „Join Server“, devmesh-Pod, Paketlimit 1200 | `ae2222d` |
 | `cinderreach-accounts` | Auth-Profile, Spielernamen + Namensschilder, Konto mit Benutzer/Passwort, Cloud-Held | `02ece6d` |
 | `cinderreach-sound-audit-fix` | 35 warme SFX mit Varianten-/Material-Routing, 8 melodische 16-s-Zonenthemen, `G-DIABLO07`, Hörabnahme | `ea59d7b` |
+| `cinderreach-team-autoplay` | Kindled durch Thewes, CI-Autoplay als Team (Server + fenwalker/lanternbearer/rogue) Normal → Kindled aus Saves, `G-DIABLO06` auf Team-Verdicts | `369186f` |
