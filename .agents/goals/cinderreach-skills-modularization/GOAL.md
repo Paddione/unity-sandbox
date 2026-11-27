@@ -15,7 +15,7 @@ Die hochfrequente Kernklasse `DiabloSkills.cs` (1.304 Zeilen, 55 Methoden, 36 Co
 
 1. Bogen-/Schwert-Modellwechsel (`CreateHeldBow`, `HandMountRotation`, `LongAxis`, `SetSwordVisible`, `EnterBowStance`/`ExitBowStance`) ist in einen eigenständigen Helfer oder eine eigene Komponente (`BowStanceVisuals`) ausgelagert; `DiabloSkills.BowDrawn` und `ExitBowStance` bleiben als öffentliche Fassade erhalten.
 2. UGUI-Skillbar-Aufbau und Cooldown-Anzeige (`BuildHud`, `RebuildHudSlots`, `UpdateHud`, `HudLine`) sind in eine eigene Komponente (`SkillBarHud`) ausgelagert; Canvas-Name `SkillBarCanvas` und Child-Hierarchie für bestehende Tests bleiben unverändert.
-3. Alle Verträge bleiben strikt unverändert: `DiabloSkills.Skill` Wire-Int-Enum (`0..11`), öffentliche Balance-Felder, `Cast`, `CastToward`, `ServerExecuteSkill`, `PlayCosmetic` sowie alle 42 Aufrufer inkl. `DiabloNetworkPlayer.SubmitSkillCastServerRpc`, `PartyCompanion` und Autoplay.
+3. Alle Verträge bleiben strikt unverändert: `DiabloSkills.Skill` Wire-Int-Enum (`0..19`, Stand nach `aaa2571`), öffentliche Balance-Felder, `Cast`, `CastToward`, `ServerExecuteSkill`, `PlayCosmetic` sowie alle 59 referenzierenden Dateien (gezählt 2026-11-27 per `grep -rln DiabloSkills sandbox/Assets/Scripts sandbox/Assets/Tests`) inkl. `DiabloNetworkPlayer.SubmitSkillCastServerRpc`, `PartyCompanion` und Autoplay.
 4. Vollständige Verifikation grün: `DiabloSkillsTests`, `LanternSkillTests`, `PartySkillTests`, `SkillRankTests`, `BuildUniqueEffectTests`, `PartySkillFormulaTests`, `DiabloHdPlayTests`, komplette EditMode/PlayMode-Suiten (`bash scripts/run-unity-tests.sh`), `python3 scripts/check-meta.py` und `KayKitAssets.Verify`.
 
 ## Scope

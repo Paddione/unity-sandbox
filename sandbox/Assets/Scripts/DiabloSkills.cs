@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using Unity.Netcode;
 
 /// <summary>
@@ -203,11 +202,9 @@ public sealed class DiabloSkills : MonoBehaviour
     public static void ResetRun() { HealsCast = 0; HPRestored = 0f; ClassCombos.ResetRun(); }
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
-    Text hud;
-    Transform slotsContainer;
-    string hudBuiltFor = "";
-    readonly System.Collections.Generic.List<(Skill skill, Image frame, Image veil, Text cdText)> hudSlots =
-        new System.Collections.Generic.List<(Skill, Image, Image, Text)>();
+    SkillBarHud hud;
+    /// <summary>UGUI skill bar (cinderreach-skills-modularization S3), created on first use.</summary>
+    SkillBarHud Hud => hud ??= new SkillBarHud(transform, CooldownLeft, () => ActiveClass, () => lastUsed);
 
     void Awake()
     {
@@ -224,127 +221,26 @@ public sealed class DiabloSkills : MonoBehaviour
     /// <summary>Scene/prefab name of the builder-attached melee weapon.</summary>
     public const string SwordName = "StarterSword";
 
-    float bowUntil = float.NegativeInfinity;
-    GameObject heldBow;
-    Renderer[] bowRenderers;
-    bool showBowModel = true;
-    Renderer[] swordRenderers;
+    BowStanceVisuals bowStance;
+    /// <summary>Held weapon swap visuals (cinderreach-skills-modularization S2), created on first use.</summary>
+    BowStanceVisuals Stance => bowStance ??= new BowStanceVisuals(transform);
 
     /// <summary>True while the hero holds the bow instead of the sword.</summary>
-    public bool BowDrawn => heldBow != null && heldBow.activeSelf;
+    public bool BowDrawn => bowStance != null && bowStance.BowDrawn;
 
-    internal void SetStarterBowModelVisible(bool visible)
-    {
-        if (showBowModel == visible) return;
-        showBowModel = visible;
-        if (bowRenderers == null) return;
-        foreach (var renderer in bowRenderers)
-            renderer.enabled = visible;
-    }
+    internal void SetStarterBowModelVisible(bool visible) => Stance.SetStarterBowModelVisible(visible);
 
     /// <summary>Draw the bow (hide the sword) for BowStanceSeconds.</summary>
-    public void EnterBowStance()
-    {
-        bowUntil = Time.time + BowStanceSeconds;
-        if (heldBow == null) heldBow = CreateHeldBow();
-        if (heldBow != null) heldBow.SetActive(true);
-        SetSwordVisible(false);
-    }
+    public void EnterBowStance() => Stance.Enter();
 
     /// <summary>Put the bow away and show the sword again (melee strike or timeout).</summary>
-    public void ExitBowStance()
-    {
-        bowUntil = float.NegativeInfinity;
-        if (heldBow != null) heldBow.SetActive(false);
-        SetSwordVisible(true);
-    }
+    public void ExitBowStance() => Stance.Exit();
 
-    GameObject CreateHeldBow()
-    {
-        var prefab = Resources.Load<GameObject>("SkillArt/HeroBow");
-        if (prefab == null) return null;
-        // Bows sit in the off hand; KayKit rigs expose a "handslot.l" mount.
-        var hand = FindDeep(transform, "handslot.l") ?? FindDeep(transform, "hand.l");
-        var bow = Instantiate(prefab);
-        bow.name = "HeldBow";
-        if (hand != null)
-        {
-            bow.transform.SetParent(hand, false);
-            bow.transform.localPosition = Vector3.zero;
-            bow.transform.localRotation = HandMountRotation(bow);
-        }
-        else
-        {
-            bow.transform.SetParent(transform, false);
-            bow.transform.localPosition = new Vector3(-0.35f, 1.0f, 0.25f);
-            bow.transform.localRotation = Quaternion.identity;
-        }
-        bowRenderers = bow.GetComponentsInChildren<Renderer>(true);
-        foreach (var renderer in bowRenderers)
-            renderer.enabled = showBowModel;
-        return bow;
-    }
-
-    /// <summary>
-    /// KayKit's bow on handslot.l faces its string toward the target and its
-    /// arc toward the archer (seen in the shotcheck). Turn it 180° about its
-    /// own long axis so the arc leads and the string sits on the archer's side.
-    /// </summary>
-    public static Quaternion HandMountRotation(GameObject bow) =>
-        Quaternion.AngleAxis(180f, LongAxis(bow));
+    /// <summary>See <see cref="BowStanceVisuals.HandMountRotation"/>.</summary>
+    public static Quaternion HandMountRotation(GameObject bow) => BowStanceVisuals.HandMountRotation(bow);
 
     /// <summary>Longest mesh-bounds axis in the bow root's local space (limb to limb).</summary>
-    public static Vector3 LongAxis(GameObject bow)
-    {
-        var min = Vector3.positiveInfinity;
-        var max = Vector3.negativeInfinity;
-        foreach (var r in bow.GetComponentsInChildren<Renderer>(true))
-        {
-            Mesh mesh = null;
-            if (r is SkinnedMeshRenderer smr) mesh = smr.sharedMesh;
-            else
-            {
-                var mf = r.GetComponent<MeshFilter>();
-                if (mf != null) mesh = mf.sharedMesh;
-            }
-            if (mesh == null) continue;
-            var mb = mesh.bounds;
-            for (int i = 0; i < 8; i++)
-            {
-                var corner = mb.center + Vector3.Scale(mb.extents, new Vector3(
-                    (i & 1) == 0 ? -1f : 1f, (i & 2) == 0 ? -1f : 1f, (i & 4) == 0 ? -1f : 1f));
-                var local = bow.transform.InverseTransformPoint(r.transform.TransformPoint(corner));
-                min = Vector3.Min(min, local);
-                max = Vector3.Max(max, local);
-            }
-        }
-        if (float.IsInfinity(min.x)) return Vector3.up;
-        var size = max - min;
-        if (size.x >= size.y && size.x >= size.z) return Vector3.right;
-        return size.y >= size.z ? Vector3.up : Vector3.forward;
-    }
-
-    void SetSwordVisible(bool visible)
-    {
-        if (swordRenderers == null)
-        {
-            var sword = FindDeep(transform, SwordName);
-            swordRenderers = sword != null ? sword.GetComponentsInChildren<Renderer>(true) : new Renderer[0];
-        }
-        foreach (var r in swordRenderers)
-            if (r != null) r.enabled = visible;
-    }
-
-    static Transform FindDeep(Transform t, string name)
-    {
-        if (t.name == name) return t;
-        for (int i = 0; i < t.childCount; i++)
-        {
-            var hit = FindDeep(t.GetChild(i), name);
-            if (hit != null) return hit;
-        }
-        return null;
-    }
+    public static Vector3 LongAxis(GameObject bow) => BowStanceVisuals.LongAxis(bow);
 
     /// <summary>Base cooldown of a skill (before focus reduction).</summary>
     public float BaseCooldown(Skill s)
@@ -1200,7 +1096,7 @@ public sealed class DiabloSkills : MonoBehaviour
     void Update()
     {
         // Runs on mirrors too: remote casts draw the bow there as well.
-        if (BowDrawn && Time.time > bowUntil) ExitBowStance();
+        if (bowStance != null && bowStance.StanceExpired) ExitBowStance();
         if (IsRemoteMirror) return;
         if (controller == null || !controller.isActiveAndEnabled) return;
         if (DiabloClickController.ExternalDrive) { UpdateHud(); return; }
@@ -1225,35 +1121,10 @@ public sealed class DiabloSkills : MonoBehaviour
         UpdateHud();
     }
 
-    void UpdateHud()
-    {
-        if (hud == null) BuildHud();
-        if (hudBuiltFor != ActiveClass.id) RebuildHudSlots();
-        hud.text = HudLine();
-        foreach (var (skill, frame, veil, cdText) in hudSlots)
-        {
-            float left = CooldownLeft(skill);
-            bool onCd = left > 0f;
-            if (veil != null) veil.enabled = onCd;
-            if (cdText != null)
-            {
-                cdText.enabled = onCd;
-                if (onCd) cdText.text = $"{left:0.0}";
-            }
-            if (frame != null)
-                frame.color = skill == lastUsed ? DiabloPalette.GoldBright : Color.white;
-        }
-    }
+    void UpdateHud() => Hud.Update();
 
     /// <summary>Skill bar text from the class (Fenwalker keeps "Fireball / Bow / Cleave").</summary>
-    public string HudLine()
-    {
-        var cls = ActiveClass;
-        var parts = new System.Collections.Generic.List<string>();
-        for (int i = 0; i < cls.skills.Length; i++)
-            parts.Add(Slot(cls.KeyLabel(i), SkillName(cls.skills[i]), cls.skills[i]));
-        return string.Join("     ", parts.ToArray()) + Loc.T("hud.skillbar.thrust");
-    }
+    public string HudLine() => Hud.Line();
 
     public static string SkillName(Skill s)
     {
@@ -1284,131 +1155,4 @@ public sealed class DiabloSkills : MonoBehaviour
 
     /// <summary>One-line effect and combo text of a skill (character sheet tooltip).</summary>
     public static string SkillDescription(Skill s) => Loc.T("skill.desc." + s.ToString().ToLowerInvariant());
-
-    string Slot(string key, string name, Skill s)
-    {
-        float left = CooldownLeft(s);
-        return left > 0f ? $"[{key}] {name} {left:0.0}s" : $"[{key}] {name}";
-    }
-
-    void BuildHud()
-    {
-        var canvasGo = new GameObject("SkillBarCanvas");
-        canvasGo.transform.SetParent(transform, false);
-        DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 5, raycaster: false);
-
-        // Bronze HUD plate under skills, key labels and the XP bar (XpCanvas sorts above at 6),
-        // so the bar reads against bright town paving and dark fen alike.
-        var plateGo = new GameObject("HudPlate", typeof(RectTransform));
-        plateGo.transform.SetParent(canvasGo.transform, false);
-        var plate = plateGo.AddComponent<Image>();
-        plate.sprite = DiabloMenuArt.PanelBackground();
-        plate.type = Image.Type.Sliced;
-        plate.color = new Color(1f, 1f, 1f, 0.92f);
-        plate.raycastTarget = false;
-        var prt = plate.rectTransform;
-        prt.anchorMin = prt.anchorMax = prt.pivot = new Vector2(0.5f, 0f);
-        prt.sizeDelta = new Vector2(880f, 100f);
-        prt.anchoredPosition = new Vector2(0f, -6f);
-
-        var rowGo = new GameObject("SkillSlotsRow", typeof(RectTransform));
-        rowGo.transform.SetParent(canvasGo.transform, false);
-        var rrt = rowGo.GetComponent<RectTransform>();
-        rrt.anchorMin = rrt.anchorMax = rrt.pivot = new Vector2(0.5f, 0f);
-        rrt.sizeDelta = new Vector2(340f, 52f);
-        rrt.anchoredPosition = new Vector2(0f, 20f);
-        var hz = rowGo.AddComponent<HorizontalLayoutGroup>();
-        hz.spacing = 10f;
-        hz.childAlignment = TextAnchor.MiddleCenter;
-        hz.childControlWidth = false;
-        hz.childControlHeight = false;
-        slotsContainer = rowGo.transform;
-
-        var go = new GameObject("SkillBar");
-        go.transform.SetParent(canvasGo.transform, false);
-        hud = go.AddComponent<Text>();
-        hud.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        hud.fontSize = 14;
-        hud.alignment = TextAnchor.MiddleCenter;
-        hud.color = DiabloPalette.Parchment;
-        hud.horizontalOverflow = HorizontalWrapMode.Overflow;
-        hud.raycastTarget = false;
-        go.AddComponent<Shadow>();
-        var r = hud.rectTransform;
-        r.anchorMin = r.anchorMax = r.pivot = new Vector2(0.5f, 0f);
-        r.sizeDelta = new Vector2(920f, 20f);
-        r.anchoredPosition = new Vector2(0f, 2f);
-
-        RebuildHudSlots();
-    }
-
-    void RebuildHudSlots()
-    {
-        if (slotsContainer == null) return;
-        foreach (Transform c in slotsContainer)
-            if (Application.isPlaying) Destroy(c.gameObject);
-            else DestroyImmediate(c.gameObject);
-        hudSlots.Clear();
-
-        var cls = ActiveClass;
-        for (int i = 0; i < cls.skills.Length; i++)
-        {
-            var sk = cls.skills[i];
-            string key = cls.keys[i] == "Space" ? Loc.T("key.space.short") : cls.keys[i];
-
-            var slot = new GameObject($"SkillSlot_{sk}", typeof(RectTransform));
-            slot.transform.SetParent(slotsContainer, false);
-            slot.GetComponent<RectTransform>().sizeDelta = new Vector2(50f, 50f);
-            var frame = slot.AddComponent<Image>();
-            frame.sprite = DiabloMenuArt.SlotBackground(sk == lastUsed ? ItemRarity.Rare : (ItemRarity?)null, 64);
-            frame.type = Image.Type.Sliced;
-            frame.raycastTarget = false;
-
-            var spr = DiabloMenuArt.SkillIcon(sk);
-            if (spr != null)
-            {
-                var iGo = new GameObject("Icon", typeof(RectTransform));
-                iGo.transform.SetParent(slot.transform, false);
-                var iImg = iGo.AddComponent<Image>();
-                iImg.sprite = spr;
-                iImg.preserveAspect = true;
-                iImg.raycastTarget = false;
-                var ir = iGo.GetComponent<RectTransform>();
-                ir.anchorMin = Vector2.zero;
-                ir.anchorMax = Vector2.one;
-                ir.offsetMin = new Vector2(4f, 4f);
-                ir.offsetMax = new Vector2(-4f, -4f);
-            }
-
-            var veilGo = new GameObject("CooldownVeil", typeof(RectTransform));
-            veilGo.transform.SetParent(slot.transform, false);
-            var veil = veilGo.AddComponent<Image>();
-            veil.color = new Color(0.02f, 0.02f, 0.04f, 0.72f);
-            veil.raycastTarget = false;
-            var vr = veilGo.GetComponent<RectTransform>();
-            vr.anchorMin = Vector2.zero;
-            vr.anchorMax = Vector2.one;
-            vr.offsetMin = vr.offsetMax = Vector2.zero;
-            veil.enabled = false;
-
-            var cd = DiabloUIFactory.MakeText(slot.transform, "CdText", "", 15, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
-            cd.fontStyle = FontStyle.Bold;
-            var cdr = cd.rectTransform;
-            cdr.anchorMin = Vector2.zero;
-            cdr.anchorMax = Vector2.one;
-            cdr.offsetMin = cdr.offsetMax = Vector2.zero;
-            cd.enabled = false;
-
-            var keyLbl = DiabloUIFactory.MakeText(slot.transform, "KeyBadge", key, 11, DiabloPalette.TrimGold, TextAnchor.LowerRight);
-            keyLbl.fontStyle = FontStyle.Bold;
-            var kr = keyLbl.rectTransform;
-            kr.anchorMin = Vector2.zero;
-            kr.anchorMax = Vector2.one;
-            kr.offsetMin = new Vector2(2f, 2f);
-            kr.offsetMax = new Vector2(-4f, -2f);
-
-            hudSlots.Add((sk, frame, veil, cd));
-        }
-        hudBuiltFor = cls.id;
-    }
 }
