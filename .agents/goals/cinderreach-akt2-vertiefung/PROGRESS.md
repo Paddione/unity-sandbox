@@ -4,6 +4,7 @@ Prozent: 100 %
 
 ## Erledigt
 
+- 2026-11-27 (S3, gelandet als Proof-Commit, Abnahme): KEINE Save-Migration (S2 braucht keine persistierten Felder — generische `storyQuests`/`storyFlags` + `StoryState.Refresh`-Catch-up, V15→V16-Präzedenz; v16 bleibt); Koop code-verifiziert (generischer `BookTalk`→`SubmitStoryTalkServerRpc`→Host→`BroadcastStory`-Pfad, R4/R5-Barks via Host-Relay); Autoplay `-seed 0` Exit 0, 0 Exceptions, `duration_s=178.7`, 12 Phasen bis `boss3`+`complete` (huskKills=69, phaseTwo=1); Voice verify-only 211/0; Doku (`akt2-vertiefung-run-log.md`, Journal). Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, `check-meta` OK, Coverage 0 uncovered, Workspace-Check still.
 - 2026-11-27 (S2 brache, dieser Branch): H18/H19/N12–N15-Dialoge (29 Zeilen + H9-Folgen merle.7/ottilie.7-8) + 2 Wendung-3-Barks in `StoryBarks.cs`/`StoryDirector.cs` (R4/R5 beim Aufwachen), Loc-Texte de/en, 9 Brache-Pickups in `TownBuilder` + Szene rebuildet, `Akt2BrachenTests` (6 PlayMode-Reisen: H18/H19/N12/N13-N15/N14-Folge/Surfacing mit 43 Schlüssel-Assert), +4 Regel-Fälle in `QuestRuleTests` (H18-AutoAccept, N12-Sperre/150-Gold, R6-Pfadtrennung, N13-200-Gold), Voice-Clips gerendert. Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK (KayKit verified: Skeletons/CharacterAnimations, URP Lit + Atlas), `check-voice-lines` 211/0, `check-meta` OK, Coverage 0 uncovered. S2-Arbeit nach 2 Harness-Fehlern vom Primary übernommen (Teilarbeit adoptiert, Locks stale).
 - 2026-11-27: S1 gelandet (Worktree `feature/cinderreach-akt2-vertiefung-s1`, NICHT gemergt/gepusht — landet der Primary): Bibel §Akt II auf 12 Einträge (H18/H19 + N12–N15, Rätsel R4–R6, Wendung 3 geschärft, Anker H6/H8/H9 unangetastet), StoryModel +6 Quests +4 Items (h10–h13/n6–n7 frei, Save v16 unangetastet, State/Director generisch — keine Pfadänderung), LocCatalog.Story.cs +26 Zeilen Quest-/Item-Texte (Präzedenz Akt-I-S1 6646cff, verlangt von StoryStateTests), Akt2ModellTests neu (12/12). Belege: EditMode 686/686, PlayMode 383/383, VerifyDiabloZone OK, KayKitAssets.Verify OK, check-meta OK, workspace-check still. 1 Diagnose-Runde (Testfahrpläne), 0 Wiederholungs-Budget verbraucht für Modellfehler.
 
@@ -15,15 +16,8 @@ Prozent: 100 %
 
 ## Nächste Schritte
 
-- S2: Brachen-Strang in Abnahme (Suite + Voice-Gate + Commit) — läuft.
-- S3 (gelandet als Proof-Commit, Abnahme): KEINE Save-Migration (S2 braucht keine persistierten Felder —
-  generische `storyQuests`/`storyFlags` + `StoryState.Refresh`-Catch-up, V15→V16-Präzedenz; v16 bleibt);
-  Koop code-verifiziert (generischer `BookTalk`→`SubmitStoryTalkServerRpc`→Host→`BroadcastStory`-Pfad,
-  R4/R5-Barks via Host-Relay); Autoplay `-seed 0` Exit 0, 0 Exceptions, `duration_s=178.7`, 12 Phasen bis
-  `boss3`+`complete` (huskKills=69, phaseTwo=1); Voice verify-only 211/0; Doku (`akt2-vertiefung-run-log.md`,
-  Journal). Belege: EditMode 690/690, PlayMode 389/389, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK,
-  `check-meta` OK, Coverage 0 uncovered, Workspace-Check still.
+Keine.
 
 ## Offene Punkte
 
-Keine — alle 6 Erfolgskriterien aus GOAL.md erfüllt (Bibel 12 Einträge, Rätsel R4–R6, H9-Varianten, Anker erhalten, Save/Koop/Autoplay/Voice/Doku).
+Keine.

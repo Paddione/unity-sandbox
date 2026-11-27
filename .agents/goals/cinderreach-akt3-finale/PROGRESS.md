@@ -21,12 +21,8 @@ Prozent: 100 %
 
 ## Nächste Schritte
 
-- S1: Story-Bibel Akt III schreiben (H10–H13/N6–N7, Boss- und Entscheidungs-Definition) + ActProgress-Entwurf — nach Akt-I-S1 + Akt-II-S1.
-- S2: Wacht-Strang (H10, N6–N7, NPC-Dialoge Ottilie/Merle/Ilsabe/Jorin).
-- S3: Moortor-Finale + S3b-Szene + S3c-Auftritt — gelandet.
-- S4: Abnahme — gelandet (34/34 Exit 0). Akt III 100 %; Handoff an P6 S2 (Sprache/Voice).
+Keine.
 
 ## Offene Punkte
 
-- Boss-Name und -Mechanik stehen erst mit S1 (Story-Bibel Akt III).
-- S1-Start auf aktuellem main; Moortor-Logik (`*Gate*.cs`) gegen `group-quest-map`-Kartenstand abgleichen.
+Keine.
