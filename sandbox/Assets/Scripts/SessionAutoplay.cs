@@ -50,8 +50,6 @@ public sealed class SessionAutoplay : MonoBehaviour
     bool godMode;
     bool questMode;
     int startBosses;
-    bool lastPhaseOk;
-    bool lastWalkOk;
     readonly AutoplayResult result = new AutoplayResult();
     float startedAt;
     AutoplayMover mover;
@@ -147,58 +145,64 @@ public sealed class SessionAutoplay : MonoBehaviour
         mover = new AutoplayMover(new AutoplayNav(hero.transform));
         ledger = new AutoplayQuestLedger(RunProfile.Story);
 
-        int startHusks = CountHusks(excludeBoss: false);
-        yield return PhaseTownWaypoints(hero, deadline);
-        bool townOk = lastPhaseOk;
-        yield return PhaseFlask(hero);
-        if (townOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseTown);
+        int startHusks = AutoplayCombat.CountHusks(excludeBoss: false);
+        bool townOk = false;
+        yield return PhaseTownWaypoints(hero, deadline, ok => townOk = ok);
+        bool flaskOk = false;
+        yield return PhaseFlask(hero, ok => flaskOk = ok);
+        if (townOk && flaskOk) result.Reach(AutoplayResult.PhaseTown);
         if (questMode) yield return QuestRound(hero, deadline);
-        yield return FightLoop(hero, "fen", excludeBoss: true, maxDist: 40f, budget: 120f, deadline: deadline);
-        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseZone1);
+        bool fenOk = false;
+        yield return FightLoop(hero, "fen", excludeBoss: true, maxDist: 40f, budget: 120f, deadline: deadline, ok => fenOk = ok);
+        if (fenOk) result.Reach(AutoplayResult.PhaseZone1);
         if (questMode) yield return QuestRound(hero, deadline);
-        yield return PhaseGate(hero, ZoneGate.FenGateName, expectZone: 2, deadline);
-        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseGate);
+        bool fenGateOk = false;
+        yield return PhaseGate(hero, ZoneGate.FenGateName, expectZone: 2, deadline, ok => fenGateOk = ok);
+        if (fenGateOk) result.Reach(AutoplayResult.PhaseGate);
         if (questMode)
         {
             yield return DiscoverShrine(hero, "Ossuary", deadline);
             yield return QuestRound(hero, deadline);
         }
-        yield return FightLoop(hero, "ossuary", excludeBoss: true, maxDist: 80f, budget: 150f, deadline: deadline);
-        if (lastPhaseOk) result.Reach(AutoplayResult.PhaseZone2);
-        yield return PhaseBoss(hero, deadline);
-        bool bossOk = lastPhaseOk;
+        bool ossuaryOk = false;
+        yield return FightLoop(hero, "ossuary", excludeBoss: true, maxDist: 80f, budget: 150f, deadline: deadline, ok => ossuaryOk = ok);
+        if (ossuaryOk) result.Reach(AutoplayResult.PhaseZone2);
+        bool bossOk = false;
+        yield return PhaseBoss(hero, deadline, ok => bossOk = ok);
         if (bossOk) result.Reach(AutoplayResult.PhaseBoss);
         if (questMode) yield return QuestRound(hero, deadline);
         // act-one S5: the Abbot opened the Kiln gate; fight through zone 3 to the Kilnmother.
-        yield return PhaseGate(hero, ZoneGate.KilnGateName, expectZone: 3, deadline);
-        bool kilnGateOk = lastPhaseOk;
+        bool kilnGateOk = false;
+        yield return PhaseGate(hero, ZoneGate.KilnGateName, expectZone: 3, deadline, ok => kilnGateOk = ok);
         if (questMode)
         {
             yield return DiscoverShrine(hero, "Kiln", deadline);
             yield return QuestRound(hero, deadline);
         }
-        yield return FightLoop(hero, "kiln", excludeBoss: true, maxDist: 40f, budget: 180f, deadline: deadline);
-        if (kilnGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone3);
+        bool kilnOk = false;
+        yield return FightLoop(hero, "kiln", excludeBoss: true, maxDist: 40f, budget: 180f, deadline: deadline, ok => kilnOk = ok);
+        if (kilnGateOk && kilnOk) result.Reach(AutoplayResult.PhaseZone3);
         yield return QuestsUntilBoss(hero, 1, deadline);
-        yield return PhaseKilnmother(hero, deadline);
-        bool actOk = lastPhaseOk;
+        bool actOk = false;
+        yield return PhaseKilnmother(hero, deadline, ok => actOk = ok);
         if (actOk) result.Reach(AutoplayResult.PhaseActBoss);
         var kilnShrine = WaypointShrine.Find("Kiln");
         if (kilnShrine != null) kilnShrine.TryDiscover(hero.gameObject);
         if (questMode) yield return QuestRound(hero, deadline);
         // act-two-opening S5: the Kilnmother opened the Glass Barrens; fight through zone 4 to the Glasswright.
-        yield return PhaseGate(hero, ZoneGate.BarrensGateName, expectZone: ActProgress.Barrens, deadline);
-        bool barrensGateOk = lastPhaseOk;
+        bool barrensGateOk = false;
+        yield return PhaseGate(hero, ZoneGate.BarrensGateName, expectZone: ActProgress.Barrens, deadline, ok => barrensGateOk = ok);
         if (questMode)
         {
             yield return DiscoverShrine(hero, "Barrens", deadline);
             yield return QuestRound(hero, deadline);
         }
-        yield return FightLoop(hero, "barrens", excludeBoss: true, maxDist: 40f, budget: 260f, deadline: deadline);
-        if (barrensGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone4);
+        bool barrensOk = false;
+        yield return FightLoop(hero, "barrens", excludeBoss: true, maxDist: 40f, budget: 260f, deadline: deadline, ok => barrensOk = ok);
+        if (barrensGateOk && barrensOk) result.Reach(AutoplayResult.PhaseZone4);
         yield return QuestsUntilBoss(hero, 2, deadline);
-        yield return PhaseGlasswright(hero, deadline);
-        bool zoneBossOk = lastPhaseOk;
+        bool zoneBossOk = false;
+        yield return PhaseGlasswright(hero, deadline, ok => zoneBossOk = ok);
         if (zoneBossOk) result.Reach(AutoplayResult.PhaseBoss3);
         // Home by waypoint: Barrens → Lantern Hold.
         var barrensShrine = WaypointShrine.Find("Barrens");
@@ -219,7 +223,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log("phase actbosses: kills=[" + string.Join(" ", result.actBossKills) + "] spawns=" +
             string.Join(",", ActBossGate.Spawns) + " fellLast=" + result.ActBossesFellLast());
 
-        int huskKills = startHusks - CountHusks(excludeBoss: false);
+        int huskKills = startHusks - AutoplayCombat.CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
         DiabloClickController.ExternalDrive = false;
         result.huskKills = huskKills;
@@ -254,24 +258,25 @@ public sealed class SessionAutoplay : MonoBehaviour
 
     // ---------------------------------------------------------------- movement
 
-    /// <summary>Walk to <paramref name="dest"/> through <see cref="AutoplayMover"/>; sets <see cref="lastWalkOk"/>.</summary>
+    /// <summary>Walk to <paramref name="dest"/> through <see cref="AutoplayMover"/>; passes success to <paramref name="onResult"/>.</summary>
     IEnumerator Walk(DiabloClickController hero, Vector3 dest, float arrive, float budget, float deadline,
-        float planAccept = 0f, System.Func<bool> done = null)
+        float planAccept = 0f, System.Func<bool> done = null, System.Action<bool> onResult = null)
     {
         mover.Reset();
         float end = Time.realtimeSinceStartup + budget;
-        lastWalkOk = false;
+        bool ok = false;
         while (Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
         {
             TickGod(hero);
             if ((done != null && done()) || mover.Tick(hero, dest, arrive, null, planAccept))
             {
-                lastWalkOk = true;
+                ok = true;
                 break;
             }
             yield return null;
         }
         hero.SetDestination(hero.transform.position);
+        onResult?.Invoke(ok);
     }
 
     /// <summary>
@@ -286,19 +291,19 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (dist > hero.attackRange)
         {
             mover.Tick(hero, target.transform.position, hero.attackRange * 0.9f, target);
-            if (skills != null && dist < 18f) CastProfile(skills, toTarget, inRange: false);
+            if (skills != null && dist < 18f) AutoplayCombat.CastProfile(skills, toTarget, inRange: false);
         }
         else
         {
             hero.SetAimPoint(target.transform.position);
             hero.Strike();
-            if (skills != null) CastProfile(skills, toTarget, inRange: true, boss: boss);
+            if (skills != null) AutoplayCombat.CastProfile(skills, toTarget, inRange: true, boss: boss);
         }
     }
 
     // ------------------------------------------------------------------ phases
 
-    IEnumerator PhaseTownWaypoints(DiabloClickController hero, float deadline)
+    IEnumerator PhaseTownWaypoints(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
     {
         Log("phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)");
         string[] stops = { "Campfire", Vendor.VendorObjectName, "WaypointShrine_Town", "ZGatePillar_0" };
@@ -311,18 +316,19 @@ public sealed class SessionAutoplay : MonoBehaviour
                 Log($"phase town_waypoints: '{name}' not found, skipped");
                 continue;
             }
-            yield return Walk(hero, target.transform.position, 2f, 15f, deadline);
-            if (lastWalkOk) reached++;
-            Log($"phase town_waypoints: {name} reached={lastWalkOk}");
+            bool walked = false;
+            yield return Walk(hero, target.transform.position, 2f, 15f, deadline, onResult: ok => walked = ok);
+            if (walked) reached++;
+            Log($"phase town_waypoints: {name} reached={walked}");
         }
         var townShrine = WaypointShrine.Find("Town");
         if (townShrine != null) townShrine.TryDiscover(hero.gameObject);
         phasesDone++;
-        lastPhaseOk = reached > 0;
+        onResult?.Invoke(reached > 0);
         Log("phase town_waypoints done");
     }
 
-    IEnumerator PhaseFlask(DiabloClickController hero)
+    IEnumerator PhaseFlask(DiabloClickController hero, System.Action<bool> onResult = null)
     {
         Log("phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)");
         var flask = HealingFlask.For(hero.gameObject);
@@ -337,7 +343,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             yield return null;
         }
         Log($"phase flask: refilled={flask.IsFull}");
-        lastPhaseOk = drank && flask.IsFull;
+        onResult?.Invoke(drank && flask.IsFull);
         phasesDone++;
         Log("phase flask done");
         yield return null;
@@ -350,11 +356,11 @@ public sealed class SessionAutoplay : MonoBehaviour
     /// set aside and retried once nothing else is left.
     /// </summary>
     IEnumerator FightLoop(DiabloClickController hero, string label, bool excludeBoss,
-        float maxDist, float budget, float deadline)
+        float maxDist, float budget, float deadline, System.Action<bool> onResult = null)
     {
         Log($"phase combat_{label} start (excludeBoss={excludeBoss}) hero={Fmt(hero.transform.position)}");
         var skills = hero.GetComponent<DiabloSkills>();
-        int start = CountHusks(excludeBoss: excludeBoss);
+        int start = AutoplayCombat.CountHusks(excludeBoss: excludeBoss);
         float end = Time.realtimeSinceStartup + budget;
         bool cleared = false;
         int teleportsAtStart = ZoneGate.Teleports;
@@ -369,31 +375,31 @@ public sealed class SessionAutoplay : MonoBehaviour
             {
                 // A gate fired mid-fight: the zone is not cleared, it was left.
                 Log($"phase combat_{label}: FAIL hero left the zone mid-fight " +
-                    $"{HuskCensus(hero.transform.position, excludeBoss)}");
+                    $"{AutoplayCombat.HuskCensus(hero.transform.position, excludeBoss)}");
                 break;
             }
-            var husk = NearestHusk(hero.transform.position, maxDist, excludeBoss, aside);
+            var husk = AutoplayCombat.NearestHusk(hero.transform.position, maxDist, excludeBoss, aside);
             if (husk == null && aside.Count > 0)
             {
                 aside.Clear();
-                husk = NearestHusk(hero.transform.position, maxDist, excludeBoss, aside);
+                husk = AutoplayCombat.NearestHusk(hero.transform.position, maxDist, excludeBoss, aside);
             }
             if (husk == null)
             {
-                Log($"phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)}) " +
-                    $"{HuskCensus(hero.transform.position, excludeBoss)}");
+                Log($"phase combat_{label}: clear (kills={start - AutoplayCombat.CountHusks(excludeBoss: excludeBoss)}) " +
+                    $"{AutoplayCombat.HuskCensus(hero.transform.position, excludeBoss)}");
                 cleared = true;
                 break;
             }
             if (husk != current)
             {
                 current = husk;
-                currentHp = Hp(husk);
+                currentHp = AutoplayCombat.Hp(husk);
                 currentSince = Time.realtimeSinceStartup;
             }
-            else if (Hp(husk) < currentHp)
+            else if (AutoplayCombat.Hp(husk) < currentHp)
             {
-                currentHp = Hp(husk);
+                currentHp = AutoplayCombat.Hp(husk);
                 currentSince = Time.realtimeSinceStartup;
             }
             else if (Time.realtimeSinceStartup - currentSince > TargetStallSeconds)
@@ -406,23 +412,18 @@ public sealed class SessionAutoplay : MonoBehaviour
             FightTick(hero, skills, husk, boss: false);
             yield return null;
         }
-        if (!cleared) Log($"phase combat_{label}: not cleared, {HuskCensus(hero.transform.position, excludeBoss)}");
-        Log($"phase combat_{label} done (kills={start - CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})");
+        if (!cleared) Log($"phase combat_{label}: not cleared, {AutoplayCombat.HuskCensus(hero.transform.position, excludeBoss)}");
+        Log($"phase combat_{label} done (kills={start - AutoplayCombat.CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})");
         phasesDone++;
-        lastPhaseOk = cleared;
-    }
-
-    static float Hp(GameObject go)
-    {
-        var h = go != null ? go.GetComponent<EnemyHealth>() : null;
-        return h != null ? h.CurrentHP : 0f;
+        onResult?.Invoke(cleared);
     }
 
     /// <summary>Pass a ZoneGate (explicit Teleport, deterministic) and verify
     /// the zone stamp + autosave in the save file.</summary>
-    IEnumerator PhaseGate(DiabloClickController hero, string gateName, int expectZone, float deadline)
+    IEnumerator PhaseGate(DiabloClickController hero, string gateName, int expectZone, float deadline,
+        System.Action<bool> onResult = null)
     {
-        lastPhaseOk = false;
+        onResult?.Invoke(false);
         Log($"phase gate_{gateName} start (expect zoneReached={expectZone}) hero={Fmt(hero.transform.position)}");
         var gate = GameObject.Find(gateName);
         if (gate == null)
@@ -464,7 +465,7 @@ public sealed class SessionAutoplay : MonoBehaviour
             && System.IO.File.ReadAllText(SaveService.DefaultPath).Contains($"\"zoneReached\": {expectZone}");
         Log($"phase gate_{gateName}: teleports={ZoneGate.Teleports - before} zoneSaved={saved} (expectZone={expectZone})");
         phasesDone++;
-        lastPhaseOk = ZoneGate.Teleports > before && saved;
+        onResult?.Invoke(ZoneGate.Teleports > before && saved);
         Log($"phase gate_{gateName} done");
         yield return null;
     }
@@ -500,9 +501,9 @@ public sealed class SessionAutoplay : MonoBehaviour
 
     /// <summary>Walk to The Hollow Abbot and fight until BossesKilled ticks,
     /// then wait for the SessionComplete overlay.</summary>
-    IEnumerator PhaseBoss(DiabloClickController hero, float deadline)
+    IEnumerator PhaseBoss(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
     {
-        lastPhaseOk = false;
+        onResult?.Invoke(false);
         Log("phase boss start (The Hollow Abbot, phase 1 + 2)");
         var boss = GameObject.Find(BossController.BossName);
         if (boss == null)
@@ -519,13 +520,13 @@ public sealed class SessionAutoplay : MonoBehaviour
             yield return null;
         Log($"phase boss done (overlay={SessionComplete.Shown} summary='{SessionComplete.LastSummary}')");
         phasesDone++;
-        lastPhaseOk = bossKills >= 1;
+        onResult?.Invoke(bossKills >= 1);
     }
 
     /// <summary>act-one S5: fight The Kilnmother until she falls and the Act I screen shows.</summary>
-    IEnumerator PhaseKilnmother(DiabloClickController hero, float deadline)
+    IEnumerator PhaseKilnmother(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
     {
-        lastPhaseOk = false;
+        onResult?.Invoke(false);
         int startKills = KilnmotherController.Kills;
         Log("phase actboss start (The Kilnmother, phase 1 + 2)");
         var boss = GameObject.Find(KilnLayout.KilnmotherName);
@@ -539,7 +540,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         Log($"phase actboss: kills={kills} phaseTwo={KilnmotherController.PhaseTwoEntries} waves={KilnmotherController.WavesFired} " +
             $"act={RunProfile.Act.ActOneComplete} overlay={SessionComplete.ActOneMode}");
         phasesDone++;
-        lastPhaseOk = kills >= 1 && RunProfile.Act.ActOneComplete;
+        onResult?.Invoke(kills >= 1 && RunProfile.Act.ActOneComplete);
     }
 
     /// <summary>
@@ -547,9 +548,9 @@ public sealed class SessionAutoplay : MonoBehaviour
     /// first (they ward the boss), then the boss until it falls and the
     /// Barrens-cleared screen shows.
     /// </summary>
-    IEnumerator PhaseGlasswright(DiabloClickController hero, float deadline)
+    IEnumerator PhaseGlasswright(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
     {
-        lastPhaseOk = false;
+        onResult?.Invoke(false);
         int startKills = GlasswrightController.Kills;
         Log("phase boss3 start (The Glasswright, phase 1 + 2)");
         var boss = GameObject.Find(GlasswrightController.BossName);
@@ -558,21 +559,13 @@ public sealed class SessionAutoplay : MonoBehaviour
             Log("phase boss3: FAIL Glasswright not found");
             yield break;
         }
-        yield return BossFight(hero, "boss3", boss, () => GlasswrightController.Kills, GlassPillarOr, 260f, deadline);
+        yield return BossFight(hero, "boss3", boss, () => GlasswrightController.Kills, AutoplayCombat.GlassPillarOr, 260f, deadline);
         int kills = GlasswrightController.Kills - startKills;
         Log($"phase boss3: kills={kills} phaseTwo={GlasswrightController.PhaseTwoEntries} lances={GlasswrightController.LanceVolleys} " +
             $"novas={GlasswrightController.NovasFired} fields={GlasswrightController.FieldsCalled} warded={GlassWard.Warded} " +
             $"zoneBoss={RunProfile.Act.ZoneBossDefeated} drop={GlasswrightController.LastZoneUnique?.uniqueId} overlay={SessionComplete.ZoneBossMode}");
         phasesDone++;
-        lastPhaseOk = kills >= 1 && RunProfile.Act.ZoneBossDefeated;
-    }
-
-    static GameObject GlassPillarOr(GameObject boss)
-    {
-        foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
-            if (h != null && h.name.StartsWith(GlasswrightController.PillarPrefix) && h.GetComponent<EnemyHealth>() != null)
-                return h;
-        return boss;
+        onResult?.Invoke(kills >= 1 && RunProfile.Act.ZoneBossDefeated);
     }
 
     /// <summary>
@@ -599,9 +592,9 @@ public sealed class SessionAutoplay : MonoBehaviour
     }
 
     /// <summary>cinderreach-act-boss-gating: Thewes at the Moortor falls last in Act III (H12).</summary>
-    IEnumerator PhaseThewes(DiabloClickController hero, float deadline)
+    IEnumerator PhaseThewes(DiabloClickController hero, float deadline, System.Action<bool> onResult = null)
     {
-        lastPhaseOk = false;
+        onResult?.Invoke(false);
         Log("phase boss4 start (Thewes)");
         var boss = GameObject.Find(StoryIds.Thewes);
         if (boss == null)
@@ -624,7 +617,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         bool down = RunProfile.Finale.FinalBossDefeated;
         Log($"phase boss4: finalBoss={down} h12={RunProfile.Story.Status("h12")}");
         phasesDone++;
-        lastPhaseOk = down;
+        onResult?.Invoke(down);
         if (down) result.Reach(AutoplayResult.PhaseFinalBoss);
     }
 
@@ -764,11 +757,12 @@ public sealed class SessionAutoplay : MonoBehaviour
 
             if (npc != null)
             {
-                yield return Walk(hero, at, TalkReach, 45f, deadline);
+                bool walked = false;
+                yield return Walk(hero, at, TalkReach, 45f, deadline, onResult: ok => walked = ok);
                 int rev = RunProfile.Story.Revision;
                 var plan = StoryDirector.BookTalk(npc, hero.gameObject);
                 yield return null;
-                Log($"quest talk {npc}: {plan.kind} {plan.questId} walked={lastWalkOk}");
+                Log($"quest talk {npc}: {plan.kind} {plan.questId} walked={walked}");
                 if (RunProfile.Story.Revision == rev) asideNpc.Add(npc);
             }
             else if (obj.GetComponent<StoryPickup>() != null)
@@ -813,109 +807,11 @@ public sealed class SessionAutoplay : MonoBehaviour
         {
             if (e == null || !e.IsAlive || !e.gameObject.activeInHierarchy) continue;
             if (aside != null && aside.Contains(e.gameObject)) continue;
-            if (IsBoss(e.gameObject) || !wanted.Contains(StoryIds.KillTarget(e.gameObject.name))) continue;
+            if (AutoplayCombat.IsBoss(e.gameObject) || !wanted.Contains(StoryIds.KillTarget(e.gameObject.name))) continue;
             float d = Vector3.Distance(from, e.transform.position);
             if (d < bestD) { bestD = d; best = e.gameObject; }
         }
         return best;
-    }
-
-    // ----------------------------------------------------------------- combat
-
-    /// <summary>
-    /// Class combat profile (second-class S5, rogue party-roles S6, class-kits-parity).
-    /// Fenwalker: Mire Ground into packs, Seismic Slam (Fen Shackle), Cleave on
-    /// stunned husks (Shatter, Retribution after Iron Vow), Mire Hook and Bog
-    /// Charge to close distance. Lanternbearer: Wisps whenever ready, Searing
-    /// Halo with 3+ husks (or the boss), else Lantern Bolt. Rogue: Venom Vial,
-    /// Powder Keg onto venomed targets (Venom Burn), Smoke Pot into packs,
-    /// Blade Flurry into smoke (Throat Cut), Shadow Roll out of a crowd
-    /// (Ambush), else Quick Shot.
-    /// </summary>
-    static void CastProfile(DiabloSkills skills, Vector3 toTarget, bool inRange, bool boss = false)
-    {
-        bool Ready(DiabloSkills.Skill s) => skills.CooldownLeft(s) <= 0f;
-        bool Cast(DiabloSkills.Skill s) => Ready(s) && skills.CastToward(s, toTarget);
-        var pos = skills.transform.position;
-        float dist = new Vector3(toTarget.x, 0f, toTarget.z).magnitude;
-        var target = NearestHusk(pos + toTarget);
-        if (RunProfile.ClassId == ClassCatalog.RogueId)
-        {
-            int close = ClassCombos.HusksInRadius(pos, 2.2f).Count;
-            if (close >= 2 && Ready(DiabloSkills.Skill.ShadowRoll)
-                && skills.CastToward(DiabloSkills.Skill.ShadowRoll, -toTarget)) return;
-            if (target != null && EnemyStatus.Venom(target) >= ClassCombos.VenomStacksPerVial
-                && dist <= ClassCombos.PowderKegRange && Cast(DiabloSkills.Skill.PowderKeg)) return;
-            if (dist <= ClassCombos.VenomRange && Cast(DiabloSkills.Skill.VenomVial)) return;
-            if (dist <= ClassCombos.SmokeRange && (boss || ClassCombos.HusksInRadius(pos + toTarget, ClassCombos.SmokeRadius).Count >= 2)
-                && Cast(DiabloSkills.Skill.SmokePot)) return;
-            if (ClassCombos.HusksInRadius(pos, skills.flurryRadius).Count >= (boss ? 1 : 2)
-                && Cast(DiabloSkills.Skill.BladeFlurry)) return;
-            Cast(DiabloSkills.Skill.QuickShot);
-            return;
-        }
-        if (RunProfile.ClassId == ClassCatalog.LanternbearerId)
-        {
-            // coop-hp-sync: mend hurt allies first (co-op mirrors show their owner's HP).
-            if (Ready(DiabloSkills.Skill.RenewingCircle) && HurtAllies(skills) >= 2
-                && skills.CastToward(DiabloSkills.Skill.RenewingCircle, toTarget)) return;
-            if (Ready(DiabloSkills.Skill.MendingLight) && skills.CastToward(DiabloSkills.Skill.MendingLight, toTarget)) return;
-            if (Ready(DiabloSkills.Skill.Wisps)) { skills.CastToward(DiabloSkills.Skill.Wisps, toTarget); return; }
-            int near = 0;
-            foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
-            {
-                if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
-                var d = h.transform.position - skills.transform.position;
-                d.y = 0f;
-                if (d.magnitude <= skills.haloRadius) near++;
-            }
-            if (Ready(DiabloSkills.Skill.SearingHalo) && (near >= 3 || (boss && inRange)))
-            {
-                skills.CastToward(DiabloSkills.Skill.SearingHalo, toTarget);
-                return;
-            }
-            if (Ready(DiabloSkills.Skill.LanternBolt)) skills.CastToward(DiabloSkills.Skill.LanternBolt, toTarget);
-            return;
-        }
-        // Fenwalker (tank kit).
-        var hp = skills.GetComponent<PlayerHealth>();
-        if (hp != null && hp.CurrentHP < hp.MaxHP * 0.7f && Cast(DiabloSkills.Skill.IronVow)) return;
-        if (boss && inRange && Ready(DiabloSkills.Skill.IronVow) && Cast(DiabloSkills.Skill.IronVow)) return;
-        int nearPack = ClassCombos.HusksInRadius(pos, ClassCombos.MireGroundRadius).Count;
-        if (nearPack >= 2 && Cast(DiabloSkills.Skill.MireGround)) return;
-        if ((nearPack >= 2 || (boss && inRange)) && dist <= skills.slamRadius && Cast(DiabloSkills.Skill.SeismicSlam)) return;
-        if (dist <= skills.CleaveRadius && Cast(DiabloSkills.Skill.Cleave)) return;
-        if (dist > 3f && dist <= ClassCombos.BogChargeDistance && Cast(DiabloSkills.Skill.BogCharge)) return;
-        if (dist > 2.5f && dist <= ClassCombos.MireHookRange) Cast(DiabloSkills.Skill.MireHook);
-    }
-
-    static GameObject NearestHusk(Vector3 at)
-    {
-        GameObject best = null;
-        float bestD = 1.5f;
-        foreach (var h in GameObject.FindGameObjectsWithTag("Husk"))
-        {
-            if (h == null || h.GetComponent<EnemyHealth>() == null) continue;
-            var d = h.transform.position - at;
-            d.y = 0f;
-            if (d.magnitude < bestD) { bestD = d.magnitude; best = h; }
-        }
-        return best;
-    }
-
-    /// <summary>Hurt living allies (not the caster) inside the group-heal radius.</summary>
-    static int HurtAllies(DiabloSkills skills)
-    {
-        int n = 0;
-        foreach (var hp in Object.FindObjectsByType<PlayerHealth>(FindObjectsSortMode.None))
-        {
-            if (hp == null || hp.transform == skills.transform || !hp.gameObject.activeInHierarchy) continue;
-            if (hp.CurrentHP <= 0f || hp.CurrentHP >= hp.MaxHP) continue;
-            var d = hp.transform.position - skills.transform.position;
-            d.y = 0f;
-            if (d.magnitude <= skills.groupHealRadius) n++;
-        }
-        return n;
     }
 
     void TickGod(DiabloClickController hero)
@@ -923,59 +819,6 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (!godMode) return;
         var health = hero.GetComponent<PlayerHealth>();
         if (health != null && health.CurrentHP < health.MaxHP) health.Heal(health.MaxHP);
-    }
-
-    static bool IsBoss(GameObject go) =>
-        go != null && (go.GetComponent<BossController>() != null || go.GetComponent<KilnmotherController>() != null
-            || go.GetComponent<GlasswrightController>() != null || go.name == StoryIds.Thewes);
-
-    static int CountHusks(bool excludeBoss)
-    {
-        int n = 0;
-        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
-        {
-            if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
-            if (excludeBoss && IsBoss(husk)) continue;
-            n++;
-        }
-        return n;
-    }
-
-    /// <summary>Diagnostic: remaining husks, nearest planar/3D distance and its position.</summary>
-    static string HuskCensus(Vector3 from, bool excludeBoss)
-    {
-        int n = 0;
-        float best = float.PositiveInfinity;
-        Vector3 at = Vector3.zero;
-        string name = "-";
-        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
-        {
-            if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
-            if (excludeBoss && IsBoss(husk)) continue;
-            n++;
-            float d = Vector3.Distance(from, husk.transform.position);
-            if (d < best) { best = d; at = husk.transform.position; name = husk.name; }
-        }
-        return n == 0 ? "census: none left" : $"census: {n} left, nearest {name} {best:0.0} m at {Fmt(at)}";
-    }
-
-    static GameObject NearestHusk(Vector3 from, float maxDist, bool excludeBoss, HashSet<GameObject> aside = null)
-    {
-        GameObject best = null;
-        float bestDist = maxDist;
-        foreach (var husk in GameObject.FindGameObjectsWithTag("Husk"))
-        {
-            if (husk == null || husk.GetComponent<EnemyHealth>() == null) continue;
-            if (excludeBoss && IsBoss(husk)) continue;
-            if (aside != null && aside.Contains(husk)) continue;
-            float d = Vector3.Distance(from, husk.transform.position);
-            if (d < bestDist)
-            {
-                bestDist = d;
-                best = husk;
-            }
-        }
-        return best;
     }
 
     /// <summary>

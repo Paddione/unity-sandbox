@@ -31,6 +31,8 @@ public sealed class DiabloClickController : MonoBehaviour
     DiabloNetworkPlayer netPlayer;
     DiabloBlock block;
     DiabloInventoryUI cachedInventoryUi;
+    DiabloAnimator cachedAnimator;
+    DiabloSkills cachedSkills;
     Camera cachedCam;
     float verticalVelocity;
     float lastNetSwing = float.NegativeInfinity;
@@ -58,13 +60,15 @@ public sealed class DiabloClickController : MonoBehaviour
         melee = GetComponent<DiabloMelee>();
         netPlayer = GetComponent<DiabloNetworkPlayer>();
         cachedInventoryUi = GetComponent<DiabloInventoryUI>();
+        cachedAnimator = GetComponent<DiabloAnimator>();
+        // Ranged skills (Q fireball, E bow) ride on every hero, scene or prefab.
+        cachedSkills = GetComponent<DiabloSkills>();
+        if (cachedSkills == null) cachedSkills = gameObject.AddComponent<DiabloSkills>();
         block = GetComponent<DiabloBlock>();
         if (block == null) block = gameObject.AddComponent<DiabloBlock>();
         var fwd = transform.forward;
         fwd.y = 0f;
         AimDirection = fwd.sqrMagnitude > 0.0001f ? fwd.normalized : Vector3.forward;
-        // Ranged skills (Q fireball, E bow) ride on every hero, scene or prefab.
-        if (GetComponent<DiabloSkills>() == null) gameObject.AddComponent<DiabloSkills>();
         if (GetComponent<DiabloProgression>() == null) gameObject.AddComponent<DiabloProgression>();
         // S4 character sheet rides along too (runtime-built UI, C to open).
         if (GetComponent<DiabloCharacterUI>() == null) gameObject.AddComponent<DiabloCharacterUI>();
@@ -88,6 +92,20 @@ public sealed class DiabloClickController : MonoBehaviour
         if (cachedInventoryUi == null)
             cachedInventoryUi = GetComponent<DiabloInventoryUI>();
         return cachedInventoryUi;
+    }
+
+    DiabloAnimator ResolveAnimator()
+    {
+        if (cachedAnimator == null)
+            cachedAnimator = GetComponent<DiabloAnimator>();
+        return cachedAnimator;
+    }
+
+    DiabloSkills ResolveSkills()
+    {
+        if (cachedSkills == null)
+            cachedSkills = GetComponent<DiabloSkills>();
+        return cachedSkills;
     }
 
     /// <summary>
@@ -191,7 +209,7 @@ public sealed class DiabloClickController : MonoBehaviour
         if (IsBlocking()) return false;
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
-        var driver = GetComponent<DiabloAnimator>();
+        var driver = ResolveAnimator();
         if (driver != null) driver.OnStrike();
         SheatheBow();
         DiabloAudio.PlaySwing();
@@ -232,7 +250,7 @@ public sealed class DiabloClickController : MonoBehaviour
         if (IsBlocking()) return false;
         if (melee == null) melee = GetComponent<DiabloMelee>();
         if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
-        var driver = GetComponent<DiabloAnimator>();
+        var driver = ResolveAnimator();
         if (driver != null) driver.OnStrike();
         SheatheBow();
         DiabloAudio.PlaySwing();
@@ -269,88 +287,95 @@ public sealed class DiabloClickController : MonoBehaviour
         UpdateBlock();
 
         var cam = ResolveCamera();
-        var mouse = ExternalDrive ? null : Mouse.current;
-        if (mouse != null && cam != null)
-        {
-            // Aim tracks the cursor every frame (twin-stick feel).
-            var ray = cam.ScreenPointToRay(mouse.position.ReadValue());
-            if (Physics.Raycast(ray, out var aimHit, 200f))
-                SetAimPoint(aimHit.point);
-            // Modal checks only on click frames (they walk the hero's panels).
-            bool clicked = mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame;
-            if (clicked && !ShouldBlockClicks(ResolveInventoryUI())
-                && !DiabloUIFactory.IsWorldInputBlocked(gameObject))
-            {
-                if (mouse.leftButton.wasPressedThisFrame)
-                    Strike();
-                else if (mouse.rightButton.wasPressedThisFrame)
-                    Thrust();
-            }
-        }
+        HandleCursorInput(cam);
 
         float speed = walkSpeed * (IsBlocking() ? DiabloBlock.BlockMoveMultiplier : 1f);
         // WASD/arrows win over click orders; facing stays on the cursor.
         if (MoveInput.sqrMagnitude > 0.0001f)
-        {
             Move(MoveInput * speed);
-        }
-        // Driver/autoplay seam: approach until in range, then swing (cooldown
-        // gates repeats). Unity fake-null: a destroyed husk reads as null
-        // here and clears the order. Player clicks never set this.
         else if (attackTarget != null)
-        {
-            var toTarget = attackTarget.transform.position - transform.position;
-            toTarget.y = 0f;
-            if (toTarget.magnitude <= attackRange)
-            {
-                Face(toTarget);
-                // Lazy: Awake order vs. sibling AddComponent is not guaranteed.
-                if (melee == null) melee = GetComponent<DiabloMelee>();
-                if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
-                var driver = GetComponent<DiabloAnimator>();
-                var nm = NetworkManager.Singleton;
-                if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
-                {
-                    // Same cooldown as local swings: the server does not gate
-                    // client attack rate, so gate it here (also stops anim spam).
-                    float cd = melee != null ? melee.cooldown : 0.5f;
-                    if (Time.time - lastNetSwing >= cd)
-                    {
-                        lastNetSwing = Time.time;
-                        if (driver != null) driver.OnStrike();
-                        SheatheBow();
-                        netPlayer.Attack(attackTarget, melee, transform);
-                    }
-                }
-                else if (melee != null && melee.TryAttack(attackTarget, transform))
-                {
-                    // Visible swing: chase-kills used to die silently ("despawn").
-                    if (driver != null) driver.OnStrike();
-                    SheatheBow();
-                }
-                if (attackTarget == null) attackTarget = null;
-            }
-            else
-            {
-                Move(toTarget.normalized * speed);
-                Face(toTarget);
-            }
-        }
+            TickChaseAttack(speed);
         else if (hasDestination)
-        {
-            var toDest = destination - transform.position;
-            toDest.y = 0f;
-            if (toDest.magnitude <= stoppingDistance)
-            {
-                hasDestination = false;
-            }
-            else
-            {
-                Move(toDest.normalized * speed);
-                Face(toDest);
-            }
-        }
+            TickDestination(speed);
 
+        ApplyGravity();
+        UpdateCamera(cam);
+    }
+
+    void HandleCursorInput(Camera cam)
+    {
+        var mouse = ExternalDrive ? null : Mouse.current;
+        if (mouse == null || cam == null) return;
+        // Aim tracks the cursor every frame (twin-stick feel).
+        var ray = cam.ScreenPointToRay(mouse.position.ReadValue());
+        if (Physics.Raycast(ray, out var aimHit, 200f))
+            SetAimPoint(aimHit.point);
+        // Modal checks only on click frames (they walk the hero's panels).
+        bool clicked = mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame;
+        if (!clicked || ShouldBlockClicks(ResolveInventoryUI()) || DiabloUIFactory.IsWorldInputBlocked(gameObject))
+            return;
+        if (mouse.leftButton.wasPressedThisFrame)
+            Strike();
+        else if (mouse.rightButton.wasPressedThisFrame)
+            Thrust();
+    }
+
+    // Driver/autoplay seam: approach until in range, then swing (cooldown
+    // gates repeats). Unity fake-null: a destroyed husk reads as null
+    // here and clears the order. Player clicks never set this.
+    void TickChaseAttack(float speed)
+    {
+        var toTarget = attackTarget.transform.position - transform.position;
+        toTarget.y = 0f;
+        if (toTarget.magnitude > attackRange)
+        {
+            Move(toTarget.normalized * speed);
+            Face(toTarget);
+            return;
+        }
+        Face(toTarget);
+        // Lazy: Awake order vs. sibling AddComponent is not guaranteed.
+        if (melee == null) melee = GetComponent<DiabloMelee>();
+        if (netPlayer == null) netPlayer = GetComponent<DiabloNetworkPlayer>();
+        var driver = ResolveAnimator();
+        var nm = NetworkManager.Singleton;
+        if (netPlayer != null && nm != null && nm.IsListening && netPlayer.IsSpawned)
+        {
+            // Same cooldown as local swings: the server does not gate
+            // client attack rate, so gate it here (also stops anim spam).
+            float cd = melee != null ? melee.cooldown : 0.5f;
+            if (Time.time - lastNetSwing >= cd)
+            {
+                lastNetSwing = Time.time;
+                if (driver != null) driver.OnStrike();
+                SheatheBow();
+                netPlayer.Attack(attackTarget, melee, transform);
+            }
+            return;
+        }
+        if (melee != null && melee.TryAttack(attackTarget, transform))
+        {
+            // Visible swing: chase-kills used to die silently ("despawn").
+            if (driver != null) driver.OnStrike();
+            SheatheBow();
+        }
+    }
+
+    void TickDestination(float speed)
+    {
+        var toDest = destination - transform.position;
+        toDest.y = 0f;
+        if (toDest.magnitude <= stoppingDistance)
+        {
+            hasDestination = false;
+            return;
+        }
+        Move(toDest.normalized * speed);
+        Face(toDest);
+    }
+
+    void ApplyGravity()
+    {
         // Gravity (flat dungeon, no jump in P1).
         if (controller.isGrounded)
         {
@@ -361,8 +386,6 @@ public sealed class DiabloClickController : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
         }
         controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
-
-        UpdateCamera(cam);
     }
 
     /// <summary>WASD/arrows drive MoveInput; held keys cancel click orders.</summary>
@@ -395,7 +418,7 @@ public sealed class DiabloClickController : MonoBehaviour
     /// <summary>Melee swings put the bow away so the sword shows again.</summary>
     void SheatheBow()
     {
-        var skills = GetComponent<DiabloSkills>();
+        var skills = ResolveSkills();
         if (skills != null && skills.BowDrawn) skills.ExitBowStance();
     }
 

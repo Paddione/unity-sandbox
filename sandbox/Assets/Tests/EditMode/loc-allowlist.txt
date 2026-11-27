@@ -107,8 +107,8 @@ SessionAutoplay.cs	FAIL co-op: {(nm == null ? 0 : nm.ConnectedClientsIds.Count)}
 SessionAutoplay.cs	FAIL no controllable hero within 30 s
 SessionAutoplay.cs	Town
 SessionAutoplay.cs	act={RunProfile.Act.ActOneComplete} overlay={SessionComplete.ActOneMode}
-SessionAutoplay.cs	census: none left
-SessionAutoplay.cs	census: {n} left, nearest {name} {best:0.0} m at {Fmt(at)}
+Autoplay/AutoplayCombat.cs	census: none left
+Autoplay/AutoplayCombat.cs	census: {n} left, nearest {name} {best:0.0} m at ({at.x:0},{at.y:0},{at.z:0})
 SessionAutoplay.cs	co-op host: client joined ({nm.ConnectedClientsIds.Count} connected)
 SessionAutoplay.cs	co-op host: driving the owned network hero (solo hero stood down)
 SessionAutoplay.cs	combos={string.Join(
@@ -126,11 +126,11 @@ SessionAutoplay.cs	phase boss3: kills={kills} phaseTwo={GlasswrightController.Ph
 SessionAutoplay.cs	phase boss: FAIL boss not found
 SessionAutoplay.cs	phase boss: bossKills={bossKills} phaseTwo={BossController.PhaseTwoEntries} drop={BossController.LastBossDrop}
 SessionAutoplay.cs	phase boss: hero={Fmt(hero.transform.position)} boss={Fmt(boss.transform.position)}
-SessionAutoplay.cs	phase combat_{label} done (kills={start - CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})
+SessionAutoplay.cs	phase combat_{label} done (kills={start - AutoplayCombat.CountHusks(excludeBoss: excludeBoss)}, cleared={cleared})
 SessionAutoplay.cs	phase combat_{label} start (excludeBoss={excludeBoss}) hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phase combat_{label}: FAIL hero left the zone mid-fight 
-SessionAutoplay.cs	phase combat_{label}: clear (kills={start - CountHusks(excludeBoss: excludeBoss)}) 
-SessionAutoplay.cs	phase combat_{label}: not cleared, {HuskCensus(hero.transform.position, excludeBoss)}
+SessionAutoplay.cs	phase combat_{label}: clear (kills={start - AutoplayCombat.CountHusks(excludeBoss: excludeBoss)}) 
+SessionAutoplay.cs	phase combat_{label}: not cleared, {AutoplayCombat.HuskCensus(hero.transform.position, excludeBoss)}
 SessionAutoplay.cs	phase combat_{label}: target {husk.name} set aside (no damage in {TargetStallSeconds:0} s)
 SessionAutoplay.cs	phase flask done
 SessionAutoplay.cs	phase flask start (gear-slots S2 seam: HealingFlask.TryDrink)
@@ -145,14 +145,14 @@ SessionAutoplay.cs	phase quests: done={result.questsDone}/{result.questsTotal} o
 SessionAutoplay.cs	phase town_waypoints done
 SessionAutoplay.cs	phase town_waypoints start (Lantern Hold: campfire, vendor, gate pillars)
 SessionAutoplay.cs	phase town_waypoints: '{name}' not found, skipped
-SessionAutoplay.cs	phase town_waypoints: {name} reached={lastWalkOk}
+SessionAutoplay.cs	phase town_waypoints: {name} reached={walked}
 SessionAutoplay.cs	phase waypoint_home: travelled={home} hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phase {label}: fight ended kills={kills() - startKills} hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	phaseTwo={BossController.PhaseTwoEntries} overlay={SessionComplete.Shown} 
 SessionAutoplay.cs	quest find {item}: taken={!obj.activeInHierarchy}
 SessionAutoplay.cs	quest hunt {target}: killed={dead}
 SessionAutoplay.cs	quest shrine {id}: discovered={found}
-SessionAutoplay.cs	quest talk {npc}: {plan.kind} {plan.questId} walked={lastWalkOk}
+SessionAutoplay.cs	quest talk {npc}: {plan.kind} {plan.questId} walked={walked}
 SessionAutoplay.cs	quest travel to {ShrineFor(zone)}: ok={ok} hero={Fmt(hero.transform.position)}
 SessionAutoplay.cs	quests={result.questsDone}/{result.questsTotal} navPlans={result.navPlans} navWarps={result.navWarps} 
 SessionAutoplay.cs	result written: {result.WriteTo(dir)} exit={result.exit}

@@ -34,6 +34,38 @@ HOTPATH_RULES = [
                 r"\bGetComponent\s*<\s*DiabloInventoryUI\s*>\s*\(",
                 "GetComponent<DiabloInventoryUI>() lookup inside DiabloClickController.Update",
             ),
+            (
+                r"\bGetComponent\s*<\s*DiabloAnimator\s*>\s*\(",
+                "GetComponent<DiabloAnimator>() lookup inside DiabloClickController.Update",
+            ),
+            (
+                r"\bGetComponent\s*<\s*DiabloSkills\s*>\s*\(",
+                "GetComponent<DiabloSkills>() lookup inside DiabloClickController.Update",
+            ),
+        ],
+    ),
+    (
+        "sandbox/Assets/Scripts/DiabloClickController.cs",
+        "TickChaseAttack",
+        [
+            (
+                r"\bGetComponent\s*<\s*DiabloAnimator\s*>\s*\(",
+                "GetComponent<DiabloAnimator>() lookup inside DiabloClickController.TickChaseAttack",
+            ),
+            (
+                r"\bGetComponent\s*<\s*DiabloSkills\s*>\s*\(",
+                "GetComponent<DiabloSkills>() lookup inside DiabloClickController.TickChaseAttack",
+            ),
+        ],
+    ),
+    (
+        "sandbox/Assets/Scripts/DiabloClickController.cs",
+        "SheatheBow",
+        [
+            (
+                r"\bGetComponent\s*<\s*DiabloSkills\s*>\s*\(",
+                "GetComponent<DiabloSkills>() lookup inside DiabloClickController.SheatheBow",
+            ),
         ],
     ),
     (

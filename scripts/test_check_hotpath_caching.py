@@ -37,7 +37,15 @@ def _write_clean_fixture(root: Path) -> None:
             void Update() {
                 var cam = ResolveCamera();
                 if (ShouldBlockClicks(ResolveInventoryUI())) return;
+                TickChaseAttack(5f);
                 UpdateCamera(cam);
+            }
+            void TickChaseAttack(float speed) {
+                var driver = ResolveAnimator();
+                SheatheBow();
+            }
+            void SheatheBow() {
+                var skills = ResolveSkills();
             }
             void UpdateCamera(Camera cam) {
                 if (cam == null) return;
@@ -89,6 +97,8 @@ def test_flags_regressions_in_click_controller(tmp_path: Path):
                 var cam = Camera.main;
                 if (ShouldBlockClicks(GetComponent<DiabloInventoryUI>())) return;
             }
+            void TickChaseAttack(float speed) {}
+            void SheatheBow() {}
             void UpdateCamera() {
                 var c = Camera.main;
             }
@@ -98,6 +108,33 @@ def test_flags_regressions_in_click_controller(tmp_path: Path):
     )
     errors, _ = mod.audit_hotpaths(tmp_path)
     assert len(errors) == 3
+
+
+def test_flags_animator_and_skills_getcomponent_in_click_controller(tmp_path: Path):
+    mod = load_module()
+    _write_clean_fixture(tmp_path)
+    click = tmp_path / "sandbox/Assets/Scripts/DiabloClickController.cs"
+    click.write_text(
+        """
+        public class DiabloClickController {
+            void Update() {
+                var a = GetComponent<DiabloAnimator>();
+                var s = GetComponent<DiabloSkills>();
+            }
+            void TickChaseAttack(float speed) {
+                var a = GetComponent<DiabloAnimator>();
+                var s = GetComponent<DiabloSkills>();
+            }
+            void SheatheBow() {
+                var s = GetComponent<DiabloSkills>();
+            }
+            void UpdateCamera(Camera cam) {}
+        }
+        """,
+        encoding="utf-8",
+    )
+    errors, _ = mod.audit_hotpaths(tmp_path)
+    assert len(errors) == 5
 
 
 def test_missing_file_fails_closed(tmp_path: Path):

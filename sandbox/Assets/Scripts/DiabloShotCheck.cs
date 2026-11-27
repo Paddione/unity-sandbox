@@ -113,6 +113,24 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield break;
         }
 
+        yield return CoreCombatShots(hero, skills, baseDist, basePitch, camFwd, camRight);
+        yield return TownAndUiGalleryShots(hero);
+        GameObject boss = null;
+        yield return OssuaryAndAbbotShots(hero, camFwd, b => boss = b);
+        if (boss == null) yield break;
+        yield return ClassKitGalleryShots(hero, skills, boss);
+        yield return ActZoneBossShots(hero);
+        yield return ItemizationAndDeathShots(hero, baseDist, basePitch, camFwd);
+        yield return ReloadAndNewHeroShots(hero);
+
+        DiabloClickController.ExternalDrive = false;
+        Log($"DONE {index} shots");
+        Quit(0);
+    }
+
+    IEnumerator CoreCombatShots(DiabloClickController hero, DiabloSkills skills,
+        float baseDist, float basePitch, Vector3 camFwd, Vector3 camRight)
+    {
         // 1) Gameplay framing, idle with sword.
         yield return Shot("gameplay_idle");
 
@@ -207,7 +225,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
             yield return Wait(1.0f);
             yield return Shot("level_up_settled");
         }
+    }
 
+    IEnumerator TownAndUiGalleryShots(DiabloClickController hero)
+    {
         // 7) Lantern Hold town framing (S3): wide view over camp + vendor.
         hero.distance = 16f;
         yield return Wait(0.5f);
@@ -215,7 +236,6 @@ public sealed class DiabloShotCheck : MonoBehaviour
 
         // 8) Town & Sanctuary UI Gallery (Vendor, Stash, Waypoint, Inventory, Bag, Settings, Character, Pause).
         var bagComp = hero.GetComponent<Inventory>();
-        var eqComp = hero.GetComponent<Equipment>();
         var walComp = hero.GetComponent<Wallet>();
         if (walComp != null && walComp.Gold < 250) walComp.Add(250 - walComp.Gold);
         if (bagComp != null && bagComp.Count < 4)
@@ -329,7 +349,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
         Destroy(pauseGo);
         DiabloClickController.ExternalDrive = true;
         yield return Wait(0.2f);
+    }
 
+    IEnumerator OssuaryAndAbbotShots(DiabloClickController hero, Vector3 camFwd, System.Action<GameObject> onBoss)
+    {
         // 10) Sunken Ossuary arrival (S5): teleport the hero through the
         // FenGate destination like ZoneGate.Teleport does, wide shot.
         var ossuaryGate = GameObject.Find(ZoneGate.FenGateName);
@@ -415,7 +438,11 @@ public sealed class DiabloShotCheck : MonoBehaviour
         hero.distance = 10f;
         yield return Wait(1.0f);
         yield return Shot("abbot_phase2");
+        onBoss?.Invoke(boss);
+    }
 
+    IEnumerator ClassKitGalleryShots(DiabloClickController hero, DiabloSkills skills, GameObject boss)
+    {
         // 13a) Class select & Startup settings overlay (second-class S4).
         var selectGo = new GameObject("ClassSelect");
         var select = selectGo.AddComponent<ClassSelectUI>();
@@ -520,7 +547,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
         Debug.Log($"[ShotCheck] kit combos: {string.Join(",", ClassCombos.TriggeredLines())}");
         RunProfile.ClassId = ClassCatalog.FenwalkerId;
         if (look != null) look.Apply(ClassCatalog.Fenwalker);
+    }
 
+    IEnumerator ActZoneBossShots(DiabloClickController hero)
+    {
         // 14) act-one: Cinder Kiln entrance, a thrall pack, the Kilnmother in phase 2, the Act I screen.
         RunProfile.Act.Unlock(ActProgress.Kiln);
         keepAlive = hero.GetComponent<PlayerHealth>();
@@ -595,7 +625,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
         // cinderreach-act-boss-gating: Thewes at the Moortor after H10/H11/N6/N7.
         yield return SpawnCutsceneShot(3, "thewes_spawn_cutscene");
         keepAlive = null;
+    }
 
+    IEnumerator ItemizationAndDeathShots(DiabloClickController hero, float baseDist, float basePitch, Vector3 camFwd)
+    {
         // 13) SessionComplete overlay (S5 end screen, shown on boss death;
         // here opened directly as the visual proof — the gameplay proof is
         // the autoplay boss kill in docs/session-loop-run-log.md).
@@ -697,7 +730,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(1.7f);
         yield return Shot("death_veil_lifting");
         PlayerHealth.LastDeathTime = float.NegativeInfinity;
+    }
 
+    IEnumerator ReloadAndNewHeroShots(DiabloClickController hero)
+    {
         // In-game "New run" reloads the scene; the saved hero must come back (not a fresh level 1).
         var prog0 = hero.GetComponent<DiabloProgression>();
         var wallet0 = hero.GetComponent<Wallet>();
@@ -742,10 +778,6 @@ public sealed class DiabloShotCheck : MonoBehaviour
         bool freshOk = asked && RunProfile.ClassId == newId && freshLevel == 1 && RunProfile.Act.Waypoints.Count <= 1;
         Log($"NEW_HERO {(freshOk ? "PASS" : "FAIL")} asked={asked} class={RunProfile.ClassId} level={freshLevel} waypoints={RunProfile.Act.Waypoints.Count}");
         yield return Shot("after_new_hero");
-
-        DiabloClickController.ExternalDrive = false;
-        Log($"DONE {index} shots");
-        Quit(0);
     }
 
     /// <summary>cinderreach-group-quest-map: tracker, minimap, zone map, shared-dialog listener, log.</summary>
