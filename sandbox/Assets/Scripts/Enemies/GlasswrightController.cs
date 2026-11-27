@@ -157,6 +157,9 @@ public sealed class GlasswrightController : NetworkBehaviour, IEnemyDeathHook
         PhaseTwo = true;
         PhaseTwoEntries++;
         StoryBarks.Say("glasswright.phase2");
+        // Showcase only where the story layer ticks the director to its end (real scenes).
+        if (FindFirstObjectByType<StoryDirector>() != null)
+            CutsceneDirector.TryStartPhaseTwoShowcase("intro.glasswright", Time.time);
         DiabloJuice.OnBlast(transform.position);
         try { PresentationVfx.PhaseTwoBurst(transform.position); } catch { }
         if (IsSpawned && IsServer) Phase.Value = 2;

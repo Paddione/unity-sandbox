@@ -23,6 +23,7 @@ public class VfxSpawnTests
         PresentationVfx.ResetRun();
         MeleeConeVfx.ResetRun();
         BossController.ResetRun();
+        CutsceneDirector.ResetRun(); // a prior test's showcase must not hold this boss
         hero = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         hero.name = "Player";
         hero.transform.position = new Vector3(0f, 1.05f, 0f);
@@ -44,6 +45,7 @@ public class VfxSpawnTests
         EnemyHealth.ResetRun();
         PresentationVfx.ResetRun();
         BossController.ResetRun();
+        CutsceneDirector.ResetRun();
         RunProfile.Reset();
     }
 

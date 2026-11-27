@@ -106,6 +106,9 @@ public sealed class BossController : NetworkBehaviour
         try { MusicDirector.Ensure().PlayBoss(); } catch { }
         StoryBarks.Say("abbot.phase2");
         PresentationVfx.PhaseTwoBurst(transform.position);
+        // Showcase only where the story layer ticks the director to its end (real scenes).
+        if (FindFirstObjectByType<StoryDirector>() != null)
+            CutsceneDirector.TryStartPhaseTwoShowcase("intro.abbot", Time.time);
         if (IsSpawned)
         {
             if (!IsServer) return;

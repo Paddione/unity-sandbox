@@ -20,6 +20,7 @@ public class GlasswrightFightTests
         RunProfile.Reset();
         EnemyHealth.ResetRun();
         GlasswrightController.ResetRun();
+        CutsceneDirector.ResetRun(); // a prior test's showcase must not hold this boss
         GlassWard.ResetRun();
         ShardLance.ResetRun();
         SessionComplete.ResetRun();

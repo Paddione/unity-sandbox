@@ -45,7 +45,7 @@ public class CutsceneDirectorTests
         Assert.AreEqual("intro.abbot", CutsceneDirector.ActiveId);
         Assert.IsTrue(CutsceneDirector.HoldBosses);
         Assert.AreEqual(1, CutsceneDirector.Starts);
-        CutsceneDirector.Tick(10f + 4.5f + 0.5f);
+        CutsceneDirector.Tick(10f + 9f + 0.5f);
         Assert.IsFalse(CutsceneDirector.Active);
         Assert.AreEqual(1, CutsceneDirector.Completes);
         CutsceneDirector.Tick(30f);
@@ -102,6 +102,102 @@ public class CutsceneDirectorTests
         Assert.IsTrue(tpc.enabled);
         Assert.AreEqual(1, CutsceneDirector.Skips);
         Assert.IsFalse(CutsceneDirector.Skip(), "idle skip is a no-op");
+    }
+
+    [Test]
+    public void ShowcaseData_EveryBossHasAbilitiesAndResolvedCaptions()
+    {
+        Assert.AreEqual(3, CutsceneDirector.BossIntros.Length);
+        foreach (var intro in CutsceneDirector.BossIntros)
+        {
+            Assert.GreaterOrEqual(intro.duration, 8f, intro.id);
+            Assert.LessOrEqual(intro.duration, 12f, intro.id);
+            Assert.GreaterOrEqual(intro.phaseTwoDuration, 3f, intro.id);
+            Assert.LessOrEqual(intro.phaseTwoDuration, 5f, intro.id);
+            Assert.IsFalse(string.IsNullOrEmpty(intro.phaseTwoId), intro.id);
+            Assert.IsNotNull(intro.phaseOneAbilities, intro.id);
+            Assert.IsNotNull(intro.phaseTwoAbilities, intro.id);
+            Assert.GreaterOrEqual(intro.phaseOneAbilities.Length, 1, intro.id);
+            Assert.GreaterOrEqual(intro.phaseTwoAbilities.Length, 1, intro.id);
+            foreach (var key in intro.phaseOneAbilities)
+                Assert.AreNotEqual(key, Loc.T(key), key);
+            foreach (var key in intro.phaseTwoAbilities)
+                Assert.AreNotEqual(key, Loc.T(key), key);
+        }
+    }
+
+    [Test]
+    public void Intro_FiresEachPhaseOneShowcaseOnceAndHarmless()
+    {
+        SpawnBoss(BossController.BossName, new Vector3(10f, 0f, 0f));
+        hero.transform.position = new Vector3(5f, 0f, 0f);
+        float hpBefore = hero.GetComponent<PlayerHealth>().CurrentHP;
+        Assert.IsTrue(CutsceneDirector.TryStartBossIntro("intro.abbot", 10f));
+        CutsceneDirector.Tick(13f); // first step at 9 * 1/3 = 3 s
+        Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.slam"));
+        Assert.AreEqual("cutscene.ability.abbot.slam", CutsceneDirector.CurrentAbilityKey);
+        CutsceneDirector.Tick(16f); // second step at 9 * 2/3 = 6 s
+        Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.combo"));
+        Assert.AreEqual(2, CutsceneDirector.ShowcaseCasts);
+        CutsceneDirector.Tick(19.5f); // intro ends at 9 s
+        Assert.IsFalse(CutsceneDirector.Active);
+        Assert.AreEqual(hpBefore, hero.GetComponent<PlayerHealth>().CurrentHP, "demo casts never damage");
+        Assert.AreEqual(2, CutsceneDirector.ShowcaseCasts, "no cast repeats after the intro");
+    }
+
+    [Test]
+    public void GlasswrightIntro_SpawnsLanceTelegraphsAwayFromHero()
+    {
+        SpawnBoss(GlasswrightController.BossName, new Vector3(10f, 0f, 0f));
+        hero.transform.position = new Vector3(5f, 0f, 0f);
+        float hpBefore = hero.GetComponent<PlayerHealth>().CurrentHP;
+        Assert.IsTrue(CutsceneDirector.TryStartBossIntro("intro.glasswright", 10f));
+        CutsceneDirector.Tick(14.5f); // only step at 9 * 1/2 = 4.5 s
+        Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.glasswright.lances"));
+        int lances = 0;
+        foreach (var go in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
+        {
+            if (go == null) continue;
+            string n;
+            try { n = go.name; } catch { continue; } // destroyed by an earlier test in the full suite
+            if (n == "ShardLance") { lances++; Object.DestroyImmediate(go); }
+        }
+        Assert.AreEqual(3, lances, "fan of three telegraphs");
+        Assert.AreEqual(hpBefore, hero.GetComponent<PlayerHealth>().CurrentHP, "demo lances never damage");
+    }
+
+    [Test]
+    public void PhaseTwoShowcase_HoldsBossKeepsHeroControlAndRunsOnce()
+    {
+        SpawnBoss(BossController.BossName, new Vector3(10f, 0f, 0f));
+        hero.transform.position = new Vector3(5f, 0f, 0f);
+        var tpc = hero.AddComponent<ThirdPersonController>();
+        Assert.IsTrue(CutsceneDirector.TryStartPhaseTwoShowcase("intro.abbot", 20f));
+        Assert.AreEqual("phase2.abbot", CutsceneDirector.ActiveId);
+        Assert.IsTrue(CutsceneDirector.HoldBosses);
+        Assert.IsTrue(tpc.enabled, "hero keeps control during the phase-2 showcase");
+        CutsceneDirector.Tick(21.4f); // first step at 4 * 1/3
+        Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.summon"));
+        CutsceneDirector.Tick(22.7f); // second step at 4 * 2/3
+        Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.firefan"));
+        CutsceneDirector.Tick(24.5f);
+        Assert.IsFalse(CutsceneDirector.Active);
+        Assert.IsFalse(CutsceneDirector.HoldBosses);
+        Assert.IsFalse(CutsceneDirector.TryStartPhaseTwoShowcase("intro.abbot", 30f), "once per run");
+        CutsceneDirector.ResetRun();
+        Assert.IsTrue(CutsceneDirector.TryStartPhaseTwoShowcase("intro.abbot", 40f), "re-armed after reset");
+    }
+
+    [Test]
+    public void PhaseTwoShowcase_SkipEndsAndRestores()
+    {
+        SpawnBoss(KilnLayout.KilnmotherName, new Vector3(10f, 0f, 0f));
+        hero.transform.position = new Vector3(5f, 0f, 0f);
+        Assert.IsTrue(CutsceneDirector.TryStartPhaseTwoShowcase("intro.kilnmother", 10f));
+        Assert.IsTrue(CutsceneDirector.Skip());
+        Assert.IsFalse(CutsceneDirector.Active);
+        Assert.IsFalse(CutsceneDirector.HoldBosses);
+        Assert.AreEqual(1, CutsceneDirector.Skips);
     }
 
     [Test]
