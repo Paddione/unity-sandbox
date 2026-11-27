@@ -32,6 +32,10 @@ Write-Set nur diese Datei + `docs/dev-journal.md` (Anhang) + PROGRESS.
   n8.offer.2 0,00, n12.done.2 0,00, n13.offer.1 0,00, h10.offer.1 0,02, h10.merle.2 0,02).
   Exakt der S2-Beleg (mean CER 0,013). Hinweis: paralleler Voll-Transkriptionslauf über alle
   244 Clips lief zum Abnahmezeitpunkt noch — Stichprobe ist der S3-Gate-Beleg.
+  Nachtrag (Vollauf nach Landung eingelaufen, S3-Worker-Beleg): `clips 244,
+  mean CER 0.021, above 0.25: 3` — Ausreißer `dlg.h16.done.3` (1,065),
+  `dlg.h5.done.6` (0,338), `dlg.n10.offer.2` (0,292), alle außerhalb des
+  S2-Glättungsumfangs (Bestand-Notiz, kein Gate-Verstoß; Gate bleibt die grüne Stichprobe).
 - `python3 scripts/check-audio-manifest.py`: `check-audio-manifest: OK (43 cues, 8 tracks)` — S3-Rerun grün.
 - `python3 scripts/check-meta.py`: `check-meta: OK` — S3-Rerun grün.
 - `python3 scripts/check-quest-coverage.py`: `quest coverage: uncovered entries: 0` — S3-Rerun grün.
