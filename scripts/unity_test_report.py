@@ -9,18 +9,67 @@ $GITHUB_STEP_SUMMARY when set.
 Exit 0 only when the run passed with at least one test (or, with
 --allow-empty, when a filtered run matched nothing) and no test failed.
 
+--append-summary writes one versioned row per unfiltered full run to that
+JSONL file (Goal unity-projektstand-board, D2). Filtered runs (TEST_FILTER or
+TEST_CATEGORY set) and runs without tests append nothing.
+
 Usage: unity_test_report.py <result.xml> <platform> [--slowest N] [--allow-empty]
+       [--append-summary PATH]
 """
 from __future__ import annotations
 
 import argparse
+import datetime
+import json
 import os
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 FRAME = re.compile(r"\(at (Assets/[^)]+)\)")
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def git_commit() -> str:
+    try:
+        out = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+        )
+        sha = out.stdout.strip()
+        return sha if sha else "uncommitted"
+    except OSError:
+        return "uncommitted"
+
+
+def read_counts(path: Path) -> dict | None:
+    """Return total/passed/failed/skipped from a result XML, or None."""
+    if not path.is_file():
+        return None
+    root = ET.parse(path).getroot()
+    return {key: int(root.get(key, "0") or 0) for key in
+            ("total", "passed", "failed", "skipped")}
+
+
+def append_summary(path: Path, counts: dict, platform: str) -> dict:
+    """Append one unfiltered full-run row as JSON and return it."""
+    row = {
+        "ts": datetime.datetime.now(datetime.timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "commit": git_commit(),
+        "platform": platform,
+        "filter": "",
+        **counts,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as stream:
+        stream.write(json.dumps(row, sort_keys=True) + "\n")
+    return row
 
 
 def first_frame(stack: str) -> str | None:
@@ -69,9 +118,37 @@ def main(argv: list[str]) -> int:
     parser.add_argument("platform")
     parser.add_argument("--slowest", type=int, default=5)
     parser.add_argument("--allow-empty", action="store_true")
+    parser.add_argument(
+        "--append-summary",
+        type=Path,
+        default=None,
+        help="JSONL file for one row per unfiltered full run",
+    )
     args = parser.parse_args(argv)
     text, ok = summarize(args.result, args.platform, args.slowest, args.allow_empty)
     print(text)
+    if args.append_summary is not None:
+        filtered = args.allow_empty or bool(
+            os.environ.get("TEST_FILTER") or os.environ.get("TEST_CATEGORY")
+        )
+        counts = read_counts(args.result)
+        if filtered:
+            print(
+                "unity_test_report: summary not appended (filtered run)",
+                file=sys.stderr,
+            )
+        elif counts is None or counts["total"] < 1:
+            print(
+                "unity_test_report: summary not appended (no test results)",
+                file=sys.stderr,
+            )
+        else:
+            row = append_summary(args.append_summary, counts, args.platform)
+            print(
+                f"unity_test_report: summary appended to {args.append_summary} "
+                f"({row['platform']} {row['passed']}/{row['total']})",
+                file=sys.stderr,
+            )
     summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_file:
         with open(summary_file, "a", encoding="utf-8") as stream:

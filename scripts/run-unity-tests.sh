@@ -105,11 +105,15 @@ fi
 # A filter that matches nothing in a platform is not a failure there.
 filter_args=()
 report_args=(--slowest "${UNITY_TESTS_SLOWEST:-5}")
+summary_args=()
 if [ -n "${TEST_FILTER:-}" ]; then filter_args+=(-testFilter "$TEST_FILTER"); fi
 if [ -n "${TEST_CATEGORY:-}" ]; then filter_args+=(-testCategory "$TEST_CATEGORY"); fi
 if [ "${#filter_args[@]}" -gt 0 ]; then
   report_args+=(--allow-empty)
   echo "run-unity-tests: filtered run (${filter_args[*]}) — not a full gate."
+else
+  # Versioned evidence for the project board (Goal unity-projektstand-board, D2).
+  summary_args+=(--append-summary "$PWD/docs/test-runs.jsonl")
 fi
 
 failed=0
@@ -140,7 +144,7 @@ for platform in "${platforms[@]}"; do
     tail -n 60 "$log" >&2 || true
     failed=1
   fi
-  if ! python3 "$PWD/scripts/unity_test_report.py" "$result" "$platform" "${report_args[@]}"
+  if ! python3 "$PWD/scripts/unity_test_report.py" "$result" "$platform" "${report_args[@]}" "${summary_args[@]}"
   then
     [ "$failed" = 2 ] || failed=1
   fi

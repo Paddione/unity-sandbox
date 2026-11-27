@@ -1,5 +1,6 @@
 """Tests for unity_test_report.py (run: python3 -m pytest scripts -q)."""
 import importlib.util
+import json
 from pathlib import Path
 
 SPEC = importlib.util.spec_from_file_location(
@@ -56,3 +57,61 @@ def test_main_appends_step_summary(tmp_path, monkeypatch):
     path = write(tmp_path, PASS, 2, 2, 0, "Passed")
     assert report.main([str(path), "EditMode"]) == 0
     assert "EditMode: 2/2 passed" in summary.read_text(encoding="utf-8")
+
+
+def test_unfiltered_run_appends_versioned_row(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEST_FILTER", raising=False)
+    monkeypatch.delenv("TEST_CATEGORY", raising=False)
+    monkeypatch.setattr(report, "git_commit", lambda: "abc1234")
+    path = write(tmp_path, PASS, 2, 2, 0, "Passed")
+    summary = tmp_path / "docs" / "test-runs.jsonl"
+    assert report.main(
+        [str(path), "EditMode", "--append-summary", str(summary)]
+    ) == 0
+    rows = summary.read_text(encoding="utf-8").strip().splitlines()
+    assert len(rows) == 1
+    row = json.loads(rows[0])
+    assert set(row) == {
+        "ts", "commit", "platform", "filter", "total", "passed", "failed", "skipped"
+    }
+    assert row["commit"] == "abc1234"
+    assert row["platform"] == "EditMode"
+    assert row["filter"] == ""
+    assert (row["total"], row["passed"], row["failed"], row["skipped"]) == (2, 2, 0, 0)
+    assert row["ts"].endswith("Z")
+
+
+def test_filtered_run_does_not_append(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("TEST_FILTER", "A.Fast")
+    path = write(tmp_path, PASS, 2, 2, 0, "Passed")
+    summary = tmp_path / "test-runs.jsonl"
+    assert report.main(
+        [str(path), "EditMode", "--allow-empty", "--append-summary", str(summary)]
+    ) == 0
+    assert not summary.exists()
+    assert "not appended (filtered run)" in capsys.readouterr().err
+
+
+def test_failed_unfiltered_run_appends_red_row(tmp_path, monkeypatch):
+    monkeypatch.delenv("TEST_FILTER", raising=False)
+    monkeypatch.delenv("TEST_CATEGORY", raising=False)
+    monkeypatch.setattr(report, "git_commit", lambda: "abc1234")
+    path = write(tmp_path, PASS + FAIL, 3, 2, 1, "Failed(Child)")
+    summary = tmp_path / "test-runs.jsonl"
+    assert report.main(
+        [str(path), "EditMode", "--append-summary", str(summary)]
+    ) == 1
+    row = json.loads(summary.read_text(encoding="utf-8").strip())
+    assert (row["total"], row["passed"], row["failed"]) == (3, 2, 1)
+
+
+def test_empty_run_does_not_append(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("TEST_FILTER", raising=False)
+    monkeypatch.delenv("TEST_CATEGORY", raising=False)
+    path = write(tmp_path, "", 0, 0, 0, "Passed")
+    summary = tmp_path / "test-runs.jsonl"
+    assert report.main(
+        [str(path), "PlayMode", "--append-summary", str(summary)]
+    ) == 1
+    assert not summary.exists()
+    assert "not appended (no test results)" in capsys.readouterr().err
