@@ -1,7 +1,7 @@
 {
-  "note": "Synthetic voices for Cinderreach story lines (cinderreach-story-voice). No real person: each reference is designed by Qwen3-TTS-12Hz-1.7B-VoiceDesign from 'instruct', then every line is cloned from that reference with Qwen3-TTS-12Hz-0.6B-Base. Render: scripts/voice/render_voices.py. License: model outputs, generated locally.",
+  "note": "Synthetic voices for Cinderreach story lines (cinderreach-story-voice). No real person: each reference is designed by Qwen3-TTS-12Hz-1.7B-VoiceDesign from 'instruct', then every line is cloned from that reference with Qwen3-TTS-12Hz-1.7B-Base (GPU 0 via scripts/voice/render_voices.py). License: model outputs, generated locally.",
   "design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "clone_model": "Qwen/Qwen3-TTS-12Hz-0.6B-Base",
+  "clone_model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
   "pronounce": {
     "Moortor": "Moor-Tor",
     "Moortors": "Moor-Tors"

@@ -2,13 +2,14 @@
 
 Run with a Python that has ``qwen_tts`` (the voice-tts box venv)::
 
-    ~/unsloth-boxes/voice-tts/.venv/bin/python scripts/voice/render_voices.py [--only KEY ...] [--force]
+    ~/unsloth-boxes/voice-tts/.venv/bin/python scripts/voice/render_voices.py [--device auto|cuda:0|cpu] [--only KEY ...] [--force]
 
 Step 1 designs a missing reference per speaker (docs/audio/voices/<id>/ref.ogg)
 from its ``instruct`` in docs/audio/voices.json. Step 2 clones every line whose
 text, speaker or reference changed (hash in docs/audio/voice-lines.lock.json)
-into sandbox/Assets/AddressableAssets/Voice/<key>.ogg. CPU by default (TTS_DEVICE=cuda:0
-to use a GPU); threads follow OMP_NUM_THREADS.
+into sandbox/Assets/AddressableAssets/Voice/<key>.ogg. Uses GPU 0 (cuda:0 with
+CUDA_DEVICE_ORDER=PCI_BUS_ID) by default when CUDA is available, falling back
+to CPU (override via --device or TTS_DEVICE); threads follow OMP_NUM_THREADS.
 """
 from __future__ import annotations
 
@@ -21,15 +22,31 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
-import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import voice_lines as vl  # noqa: E402
 
 REF_DIR = vl.REPO / "docs" / "audio" / "voices"
-DEVICE = os.environ.get("TTS_DEVICE", "cpu")
-DTYPE = torch.float32 if DEVICE == "cpu" else torch.bfloat16
 SR_OUT = 24000
+
+
+def _configure_cuda_env(requested_device: str) -> None:
+    """Pin CUDA device ordering before importing torch so GPU 1 stays untouched."""
+    os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
+    if requested_device in ("auto", "cuda:0"):
+        os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
+
+
+def _resolve_device(requested_device: str):
+    _configure_cuda_env(requested_device)
+    import torch
+
+    if requested_device == "auto":
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    else:
+        device = requested_device
+    dtype = torch.float32 if device == "cpu" else torch.bfloat16
+    return torch, device, dtype
 
 
 def polish(wav: np.ndarray) -> np.ndarray:
@@ -53,16 +70,17 @@ def write_ogg(path: Path, wav: np.ndarray, sr: int) -> None:
     sf.write(str(path), wav, sr, format="OGG", subtype="VORBIS")
 
 
-def design_refs(voices: dict, force: bool) -> None:
+def design_refs(voices: dict, force: bool, device: str, dtype, torch_mod) -> None:
     todo = [v for v in voices if force or not (REF_DIR / v / "ref.ogg").exists()]
     if not todo:
         return
     from qwen_tts import Qwen3TTSModel
-    model = Qwen3TTSModel.from_pretrained(json.loads(vl.VOICES_JSON.read_text())["design_model"],
-                                          device_map=DEVICE, dtype=DTYPE, attn_implementation="sdpa")
+    model_id = json.loads(vl.VOICES_JSON.read_text(encoding="utf-8"))["design_model"]
+    print(f"[design] device={device} dtype={dtype} model={model_id}", flush=True)
+    model = Qwen3TTSModel.from_pretrained(model_id, device_map=device, dtype=dtype, attn_implementation="sdpa")
     for vid in todo:
         v = voices[vid]
-        torch.manual_seed(v.get("seed", 0))
+        torch_mod.manual_seed(v.get("seed", 0))
         t = time.time()
         wavs, sr = model.generate_voice_design(text=v["ref_text"], instruct=v["instruct"], language="German")
         write_ogg(REF_DIR / vid / "ref.ogg", polish(wavs[0]), sr)
@@ -71,7 +89,7 @@ def design_refs(voices: dict, force: bool) -> None:
     del model
 
 
-def render_lines(voices: dict, only: set[str], force: bool) -> None:
+def render_lines(voices: dict, only: set[str], force: bool, device: str, dtype, torch_mod) -> None:
     entries = vl.lines()
     lock = vl.load_lock()
     todo = []
@@ -85,8 +103,9 @@ def render_lines(voices: dict, only: set[str], force: bool) -> None:
     print(f"[render] {len(todo)} of {len(entries)} lines", flush=True)
     if todo:
         from qwen_tts import Qwen3TTSModel
-        model = Qwen3TTSModel.from_pretrained(json.loads(vl.VOICES_JSON.read_text())["clone_model"],
-                                              device_map=DEVICE, dtype=DTYPE, attn_implementation="sdpa")
+        model_id = json.loads(vl.VOICES_JSON.read_text(encoding="utf-8"))["clone_model"]
+        print(f"[render] device={device} dtype={dtype} model={model_id}", flush=True)
+        model = Qwen3TTSModel.from_pretrained(model_id, device_map=device, dtype=dtype, attn_implementation="sdpa")
         prompts = {}
         for n, (e, h, out) in enumerate(todo, 1):
             sp = e["speaker"]
@@ -94,7 +113,7 @@ def render_lines(voices: dict, only: set[str], force: bool) -> None:
                 ref, rsr = sf.read(str(REF_DIR / sp / "ref.ogg"), dtype="float32")
                 prompts[sp] = model.create_voice_clone_prompt(
                     ref_audio=(ref, rsr), ref_text=(REF_DIR / sp / "ref.txt").read_text(encoding="utf-8").strip())
-            torch.manual_seed(voices[sp].get("seed", 0) * 1000 + n)
+            torch_mod.manual_seed(voices[sp].get("seed", 0) * 1000 + n)
             t = time.time()
             wavs, sr = model.generate_voice_clone(text=vl.tts_text(e["text"]), language="German", voice_clone_prompt=prompts[sp])
             wav = polish(wavs[0])
@@ -113,16 +132,20 @@ def save_lock(lock: dict, entries: list) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--device", choices=["auto", "cuda:0", "cpu"],
+                    default=os.environ.get("TTS_DEVICE", "auto"),
+                    help="target device (default: auto -> cuda:0 on GPU 0, else cpu)")
     ap.add_argument("--only", nargs="*", default=[])
     ap.add_argument("--force", action="store_true", help="re-render selected lines even when unchanged")
     ap.add_argument("--redesign", action="store_true", help="re-design all reference voices")
     ap.add_argument("--design-only", action="store_true")
     args = ap.parse_args()
-    torch.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "6")))
+    torch_mod, device, dtype = _resolve_device(args.device)
+    torch_mod.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "6")))
     voices = vl.load_voices()
-    design_refs(voices, args.redesign)
+    design_refs(voices, args.redesign, device, dtype, torch_mod)
     if not args.design_only:
-        render_lines(voices, set(args.only), args.force)
+        render_lines(voices, set(args.only), args.force, device, dtype, torch_mod)
     return 0
 
 

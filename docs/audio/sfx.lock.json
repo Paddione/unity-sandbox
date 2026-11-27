@@ -1,0 +1,71 @@
+{
+ "model": "audio-cpp/audio.cpp-gguf/Stable-Audio-3-Small-SFX-GGUF",
+ "style_line": "dry, no reverb, close mic, dark medieval fantasy foley",
+ "clips": {
+  "Fireball": {
+   "cue": "Fireball",
+   "category": "combat",
+   "hash": "fc70fc968626",
+   "prompt": "fireball cast whoosh with ember ignition thump, dry, no reverb, close mic, dark medieval fantasy foley",
+   "seed": 1234,
+   "sr": 44100,
+   "duration_s": 1.5,
+   "lead_ms": 0.0,
+   "peak_dbfs": -1.07,
+   "rms_dbfs": -16.12,
+   "clipped": 0
+  },
+  "SwordHit1": {
+   "cue": "SwordHit1",
+   "category": "combat",
+   "hash": "09074c0b9061",
+   "prompt": "sword impact variant 1, crisp dark steel, dry, no reverb, close mic, dark medieval fantasy foley",
+   "seed": 1234,
+   "sr": 44100,
+   "duration_s": 1.5,
+   "lead_ms": 0.0,
+   "peak_dbfs": -3.65,
+   "rms_dbfs": -16.16,
+   "clipped": 0
+  },
+  "SwordHit2": {
+   "cue": "SwordHit2",
+   "category": "combat",
+   "hash": "3cdb111de372",
+   "prompt": "sword impact variant 2, mid steel, dry, no reverb, close mic, dark medieval fantasy foley",
+   "seed": 1234,
+   "sr": 44100,
+   "duration_s": 1.5,
+   "lead_ms": 0.0,
+   "peak_dbfs": -9.62,
+   "rms_dbfs": -18.54,
+   "clipped": 0
+  },
+  "SwordHit3": {
+   "cue": "SwordHit3",
+   "category": "combat",
+   "hash": "c2c62112053f",
+   "prompt": "sword impact variant 3, heavy cleave steel, dry, no reverb, close mic, dark medieval fantasy foley",
+   "seed": 1234,
+   "sr": 44100,
+   "duration_s": 1.5,
+   "lead_ms": 0.0,
+   "peak_dbfs": -4.38,
+   "rms_dbfs": -15.75,
+   "clipped": 0
+  },
+  "UIClick": {
+   "cue": "UIClick",
+   "category": "ui",
+   "hash": "57530b4803ab",
+   "prompt": "muted wood/leather UI tap routed through EffectiveUI, dry, no reverb, close mic, dark medieval fantasy foley",
+   "seed": 1234,
+   "sr": 44100,
+   "duration_s": 0.162,
+   "lead_ms": 0.0,
+   "peak_dbfs": -4.16,
+   "rms_dbfs": -18.2,
+   "clipped": 0
+  }
+ }
+}

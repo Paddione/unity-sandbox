@@ -2,15 +2,19 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Cinderreach combat & world SFX, fully synthesized at runtime (no third-party
-/// binary assets). 22050 Hz mono clips built once from phase-integrated,
-/// band-limited shapes; playback is a silent no-op headless.
-/// Static counters prove sounds fired in tests.
+/// Cinderreach combat & world SFX: resolves authored Addressable clips under
+/// <c>Assets/AddressableAssets/Sfx/</c> (<c>Res.TryGet&lt;AudioClip&gt;</c>) with
+/// automatic runtime synth fallback (22050 Hz mono clips built deterministically).
+/// Playback is a silent no-op headless; static counters prove sounds fired in tests.
 /// Play methods never log, so LogAssert suites stay clean.
 /// </summary>
 public static class DiabloAudio
 {
     public const int SampleRate = 22050;
+    public const string SfxAddressPrefix = "Sfx/";
+
+    /// <summary>When false, skips Addressable SFX lookup and uses overrides/synth fallback.</summary>
+    public static bool EnableAddressableSfx { get; set; } = true;
 
     /// <summary>S2 cue catalogue (>=20 SFX). Each maps to a Play* method.</summary>
     public enum Cue
@@ -127,13 +131,48 @@ public static class DiabloAudio
     }
     public static void ClearOverrides() { overrides.Clear(); }
 
-    /// <summary>Asset clip if registered, else synth + fallback counter.</summary>
+    /// <summary>Try test override first, then authored Addressable Sfx/&lt;key&gt; clip.</summary>
+    static bool TryResolveKey(string key, out AudioClip clip)
+    {
+        if (overrides.TryGetValue(key, out clip) && clip != null) return true;
+        if (EnableAddressableSfx && TryLoadSfxAsset(key, out clip)) return true;
+        clip = null;
+        return false;
+    }
+
+    static bool TryLoadSfxAsset(string key, out AudioClip clip)
+    {
+        clip = null;
+        if (string.IsNullOrEmpty(key)) return false;
+        try { return Res.TryGet(SfxAddressPrefix + key, out clip); }
+        catch { return false; }
+    }
+
+    /// <summary>Asset clip if registered or authored in Addressables, else synth + fallback counter.</summary>
     static AudioClip Resolve(string cueName, AudioClip synth)
     {
-        AudioClip clip;
-        if (overrides.TryGetValue(cueName, out clip) && clip != null) return clip;
+        if (TryResolveKey(cueName, out var clip)) return clip;
         soundedFallbacks++;
         lastFallbackCue = cueName;
+        return synth;
+    }
+
+    /// <summary>
+    /// Variant/surface-aware SFX resolution: checks surface+variant, surface,
+    /// variant, and base cue across overrides and Addressables before falling back to synth.
+    /// </summary>
+    static AudioClip ResolveVariant(string baseCue, string surfaceTag, int variantIdx, AudioClip synth)
+    {
+        AudioClip clip;
+        if (!string.IsNullOrEmpty(surfaceTag))
+        {
+            if (TryResolveKey(baseCue + "_" + surfaceTag + "_" + variantIdx, out clip)) return clip;
+            if (TryResolveKey(baseCue + "_" + surfaceTag, out clip)) return clip;
+        }
+        if (TryResolveKey(baseCue + "_" + variantIdx, out clip)) return clip;
+        if (TryResolveKey(baseCue, out clip)) return clip;
+        soundedFallbacks++;
+        lastFallbackCue = baseCue;
         return synth;
     }
 
@@ -240,7 +279,8 @@ public static class DiabloAudio
     {
         EnsureBuilt();
         soundedSwings++;
-        Varied(Resolve("Swing", PickVariant(swingVariants, ref lastSwingIdx)), 0.55f);
+        var chosen = PickVariant(swingVariants, ref lastSwingIdx);
+        Varied(ResolveVariant("Swing", null, lastVariantIndex, chosen), 0.55f);
     }
 
     public static void PlayHit()
@@ -248,7 +288,8 @@ public static class DiabloAudio
         EnsureBuilt();
         lastHitSurface = HitSurface.FleshBone;
         soundedHits++;
-        Varied(Resolve("Hit", PickVariant(hitFleshBoneVariants, ref lastHitIdx)), 0.68f);
+        var chosen = PickVariant(hitFleshBoneVariants, ref lastHitIdx);
+        Varied(ResolveVariant("Hit", HitSurface.FleshBone.ToString(), lastVariantIndex, chosen), 0.68f);
     }
 
     public static void PlayHitFor(GameObject target, Vector3 fromPos, bool melee = true)
@@ -257,7 +298,7 @@ public static class DiabloAudio
         var surface = SurfaceFor(target, fromPos);
         lastHitSurface = surface;
         var chosen = PickVariant(PoolFor(surface), ref lastHitIdx);
-        Varied(Resolve("Hit", chosen), surface == HitSurface.GlassShield ? 0.72f : 0.68f);
+        Varied(ResolveVariant("Hit", surface.ToString(), lastVariantIndex, chosen), surface == HitSurface.GlassShield ? 0.72f : 0.68f);
         soundedHits++;
         if (melee && surface == HitSurface.ArmorMetal) soundedSwordHits++;
     }
@@ -385,7 +426,8 @@ public static class DiabloAudio
         EnsureBuilt();
         lastGroundSurface = GroundSurface.Moor;
         soundedSteps++;
-        Varied(Resolve("Footstep", PickVariant(stepMoorVariants, ref lastStepIdx)), 0.24f);
+        var chosen = PickVariant(stepMoorVariants, ref lastStepIdx);
+        Varied(ResolveVariant("Footstep", GroundSurface.Moor.ToString(), lastVariantIndex, chosen), 0.24f);
     }
 
     public static void PlayFootstep(Vector3 worldPos)
@@ -395,7 +437,7 @@ public static class DiabloAudio
         lastGroundSurface = ground;
         soundedSteps++;
         var chosen = PickVariant(StepPoolFor(ground), ref lastStepIdx);
-        Varied(Resolve("Footstep", chosen), ground == GroundSurface.Stone ? 0.26f : 0.24f);
+        Varied(ResolveVariant("Footstep", ground.ToString(), lastVariantIndex, chosen), ground == GroundSurface.Stone ? 0.26f : 0.24f);
     }
 
     public static void PlayLevelUp() { EnsureBuilt(); soundedLevelUps++; PlaySfx(levelUpClip, "LevelUp", 0.68f); }

@@ -38,5 +38,13 @@ def test_hash_tracks_text_and_voice():
     assert h != vl.line_hash(dict(e, speaker="merle"), voices)
 
 
+def test_catalog_texts_decode_unicode_escapes():
+    entries = {e["key"]: e for e in vl.lines()}
+    for key, entry in entries.items():
+        assert "\\u" not in entry["text"], f"undecoded \\u escape in {key}: {entry['text']}"
+    assert "ö" in entries["dlg.h5.done.6"]["text"] and "ä" in entries["dlg.h5.done.6"]["text"]
+    assert "ä" in entries["dlg.n10.offer.2"]["text"] or "ö" in entries["dlg.n10.offer.2"]["text"] or "ü" in entries["dlg.n10.offer.2"]["text"] or "ß" in entries["dlg.n10.offer.2"]["text"]
+
+
 def test_repository_clips_are_complete():
     assert check.problems() == []

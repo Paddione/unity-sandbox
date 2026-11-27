@@ -12,6 +12,7 @@ public class AudioRoutingTests
     public void Setup()
     {
         DiabloAudio.MutePlayback = true;
+        DiabloAudio.EnableAddressableSfx = true;
         DiabloAudio.ResetRun();
         DiabloAudio.ClearOverrides();
         DiabloSettings.MasterVol = 0.8f;
@@ -22,6 +23,7 @@ public class AudioRoutingTests
     [TearDown]
     public void TearDown()
     {
+        DiabloAudio.EnableAddressableSfx = true;
         DiabloAudio.ClearOverrides();
         DiabloAudio.ResetRun();
         var md = Object.FindFirstObjectByType<MusicDirector>();
@@ -89,6 +91,53 @@ public class AudioRoutingTests
         {
             Object.DestroyImmediate(clip);
         }
+    }
+
+    [Test]
+    public void AuthoredAddressableSfx_ResolvesWithoutFallbackOrLogs()
+    {
+        int before = DiabloAudio.soundedFallbacks;
+        DiabloAudio.PlaySwordHit1();
+        DiabloAudio.PlaySwordHit2();
+        DiabloAudio.PlaySwordHit3();
+        DiabloAudio.PlayFireball();
+        DiabloAudio.PlayUIClick();
+        Assert.AreEqual(before, DiabloAudio.soundedFallbacks,
+            "Authored Addressable Sfx/* clips must resolve without synth fallback or log warnings.");
+    }
+
+    [Test]
+    public void SurfaceAndVariantOverrides_ResolveBeforeBaseCue()
+    {
+        var clip = AudioClip.Create("TestMetalHit", 128, 1, DiabloAudio.SampleRate, false);
+        var elite = new GameObject("Husk_Elite_OverrideTest");
+        elite.AddComponent<EnemyHealth>().SetTier(12, LootTier.Elite);
+        int before = DiabloAudio.soundedFallbacks;
+        try
+        {
+            DiabloAudio.RegisterOverride("Hit_ArmorMetal_0", clip);
+            DiabloAudio.RegisterOverride("Hit_ArmorMetal_1", clip);
+            DiabloAudio.RegisterOverride("Hit_ArmorMetal_2", clip);
+            DiabloAudio.PlayHitFor(elite, Vector3.zero, melee: true);
+            Assert.AreEqual(before, DiabloAudio.soundedFallbacks,
+                "Surface/variant override must resolve cleanly ahead of base cue.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(elite);
+            Object.DestroyImmediate(clip);
+        }
+    }
+
+    [Test]
+    public void DisabledAddressableSfx_ForcesSynthFallback()
+    {
+        DiabloAudio.EnableAddressableSfx = false;
+        int before = DiabloAudio.soundedFallbacks;
+        DiabloAudio.PlaySwordHit1();
+        Assert.Greater(DiabloAudio.soundedFallbacks, before,
+            "Disabling Addressable SFX must fall back cleanly to runtime synth.");
+        Assert.AreEqual("SwordHit1", DiabloAudio.lastFallbackCue);
     }
 
     [Test]

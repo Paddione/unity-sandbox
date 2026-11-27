@@ -29,8 +29,20 @@ _DIALOG = re.compile(r'new StoryDialog\("([^"]+)"((?:,\s*[^,)]+)*)\)')
 _BARK = re.compile(r'new StoryBark\("([^"]+)",\s*([^)]+)\)')
 _ENTRY = re.compile(r'E\("((?:dlg|bark)\.[^"]+)",\s*"((?:[^"\\]|\\.)*)"')
 _STRING_CONST = re.compile(r'(\w+)\s*=\s*(?:StoryIds\.(\w+)|"([^"]*)")')
+_CS_ESC = re.compile(r'\\(u[0-9a-fA-F]{4}|["\\ntr])')
 
 NPC_IDS = {"Ottilie": "ottilie", "Ilsabe": "ilsabe", "Jorin": "jorin", "Merle": "merle"}
+
+
+def _unescape_cs(raw: str) -> str:
+    """Decode C# string literal escape sequences (quotes, slashes, \\n/\\t/\\r, \\uXXXX)."""
+    def _sub(m: re.Match[str]) -> str:
+        tok = m.group(1)
+        if tok.startswith("u"):
+            return chr(int(tok[1:], 16))
+        return {'"': '"', "\\": "\\", "n": "\n", "t": "\t", "r": "\r"}[tok]
+
+    return _CS_ESC.sub(_sub, raw)
 
 
 def _consts(src: str) -> dict[str, str]:
@@ -55,7 +67,7 @@ def catalog_texts() -> dict[str, str]:
     texts: dict[str, str] = {}
     for cs in sorted(LOC_DIR.glob("LocCatalog*.cs")):
         for key, de in _ENTRY.findall(cs.read_text(encoding="utf-8")):
-            texts[key] = de.replace('\\"', '"')
+            texts[key] = _unescape_cs(de)
     return texts
 
 
