@@ -1,6 +1,11 @@
-# Goal: cinderreach-inventory-ui-layout-split
-
+---
+goal: cinderreach-inventory-ui-layout-split
+slug: cinderreach-inventory-ui-layout-split
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
+plan_refs: [.agents/plans/cinderreach-inventory-ui-layout-split/tasks.md]
+---
+
+# Goal: cinderreach-inventory-ui-layout-split
 
 ## Objective
 

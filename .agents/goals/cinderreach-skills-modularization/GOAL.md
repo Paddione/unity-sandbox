@@ -1,6 +1,11 @@
-# Goal: cinderreach-skills-modularization
-
+---
+goal: cinderreach-skills-modularization
+slug: cinderreach-skills-modularization
 health_goals: [G-DIABLO01, G-DIABLO02, G-DIABLO03, G-DIABLO06]
+plan_refs: [.agents/plans/cinderreach-skills-modularization/tasks.md]
+---
+
+# Goal: cinderreach-skills-modularization
 
 ## Objective
 

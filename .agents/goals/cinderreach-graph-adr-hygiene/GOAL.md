@@ -1,6 +1,11 @@
-# Goal: cinderreach-graph-adr-hygiene
-
+---
+goal: cinderreach-graph-adr-hygiene
+slug: cinderreach-graph-adr-hygiene
 health_goals: [G-GOALS01]
+plan_refs: [.agents/plans/cinderreach-graph-adr-hygiene/tasks.md]
+---
+
+# Goal: cinderreach-graph-adr-hygiene
 
 ## Objective
 
