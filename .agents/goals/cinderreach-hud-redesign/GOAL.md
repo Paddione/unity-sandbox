@@ -1,6 +1,7 @@
 # Goal: cinderreach-hud-redesign
 
 health_goals: [G-DIABLO01, G-DIABLO03, G-DIABLO05]
+plan_refs: [.agents/plans/cinderreach-hud-redesign/tasks.md]
 
 Ausgangslage: [`.agents/goals/CINDERREACH.md`](../CINDERREACH.md). Design-Vorlage: Canvas
 https://claude.ai/artifact/JHgZfCWrHt6N8P1cdHwR4G, Artboard „HUD im Spiel“ (`Main.dc.html`).
