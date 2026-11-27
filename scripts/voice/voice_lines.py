@@ -96,10 +96,15 @@ def tts_text(text: str) -> str:
     return text
 
 
-def line_hash(entry: dict[str, str], voices: dict) -> str:
+def clone_model() -> str:
+    return json.loads(VOICES_JSON.read_text(encoding="utf-8")).get("clone_model", "")
+
+
+def line_hash(entry: dict[str, str], voices: dict, model_id: str | None = None) -> str:
     voice = voices[entry["speaker"]]
+    model = clone_model() if model_id is None else model_id
     blob = json.dumps([tts_text(entry["text"]), entry["speaker"], voice.get("ref_text", ""), voice.get("seed", 0),
-                       voice.get("instruct", "")], ensure_ascii=False)
+                       voice.get("instruct", ""), model], ensure_ascii=False)
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 

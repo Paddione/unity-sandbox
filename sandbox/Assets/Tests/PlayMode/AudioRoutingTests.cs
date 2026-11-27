@@ -70,8 +70,9 @@ public class AudioRoutingTests
     [Test]
     public void MissingAssetClip_UsesSynthFallbackCounter()
     {
+        DiabloAudio.EnableAddressableSfx = false;
         int before = DiabloAudio.soundedFallbacks;
-        DiabloAudio.PlayGold(); // no override registered -> synth fallback
+        DiabloAudio.PlayGold(); // addressable SFX disabled & no override -> synth fallback
         Assert.Greater(DiabloAudio.soundedFallbacks, before, "Missing clip must bump the fallback counter.");
         Assert.AreEqual("Gold", DiabloAudio.lastFallbackCue);
     }
@@ -104,6 +105,45 @@ public class AudioRoutingTests
         DiabloAudio.PlayUIClick();
         Assert.AreEqual(before, DiabloAudio.soundedFallbacks,
             "Authored Addressable Sfx/* clips must resolve without synth fallback or log warnings.");
+    }
+
+    [Test]
+    public void EveryManifestCueAndVariant_HasAuthoredAddressableClip()
+    {
+        var missing = new System.Collections.Generic.List<string>();
+        foreach (string cue in System.Enum.GetNames(typeof(DiabloAudio.Cue)))
+        {
+            if (!Res.TryGet<AudioClip>(DiabloAudio.SfxAddressPrefix + cue, out var clip) || clip == null)
+                missing.Add(cue);
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            string swing = "Swing_" + i;
+            if (!Res.TryGet<AudioClip>(DiabloAudio.SfxAddressPrefix + swing, out var sc) || sc == null)
+                missing.Add(swing);
+            foreach (string surf in new[] { "FleshBone", "ArmorMetal", "StoneAsh", "Glass", "GlassShield" })
+            {
+                string hk = "Hit_" + surf + "_" + i;
+                if (!Res.TryGet<AudioClip>(DiabloAudio.SfxAddressPrefix + hk, out var hc) || hc == null)
+                    missing.Add(hk);
+            }
+            foreach (string ground in new[] { "Moor", "Stone", "Basalt", "Sand" })
+            {
+                string fk = "Footstep_" + ground + "_" + i;
+                if (!Res.TryGet<AudioClip>(DiabloAudio.SfxAddressPrefix + fk, out var fc) || fc == null)
+                    missing.Add(fk);
+            }
+        }
+        Assert.IsEmpty(missing, string.Join("\n", missing));
+
+        int before = DiabloAudio.soundedFallbacks;
+        DiabloAudio.PlaySwing();
+        DiabloAudio.PlayHit();
+        DiabloAudio.PlayFootstep();
+        DiabloAudio.PlayGold();
+        Assert.IsNotNull(DiabloAudio.ResolveAmbient());
+        Assert.AreEqual(before, DiabloAudio.soundedFallbacks,
+            "Full authored SFX catalogue must resolve with zero synth fallbacks.");
     }
 
     [Test]

@@ -2,11 +2,12 @@
 """Render and deterministically master Cinderreach HQ SFX via Unsloth Studio GPU 0.
 
 Pure Python stdlib (no numpy/ffmpeg dependency) so both rendering and unit tests
-run directly under system python3.
+run directly under system python3. Produces the full 73-clip catalogue:
+43 base cues from docs/audio/manifest.json + 30 surface/variant pool clips.
 
 Usage::
 
-    python3 scripts/audio/render_sfx.py [--only SwordHit1 Fireball ...] [--force] [--dry-run]
+    python3 scripts/audio/render_sfx.py [--only SwordHit1 Hit_Glass_0 ...] [--force] [--dry-run]
     python3 scripts/audio/render_sfx.py --from-wav SwordHit1=path/to/raw.wav
 """
 from __future__ import annotations
@@ -48,6 +49,11 @@ CATEGORY_TARGET_RMS_DB = {
 
 UI_CUES = {"UIClick", "VendorBuy", "VendorSell", "Loot", "Gold"}
 EVENT_CUES = {"RareDrop", "LevelUp", "Gate", "Heal", "Quest", "Shrine"}
+SHORT_COMBAT_CUES = {
+    "Swing", "Hit", "SwordHit1", "SwordHit2", "SwordHit3",
+    "Block", "Arrow", "Twang", "Crit", "Hurt", "Death",
+    "MireHook", "ShadowRoll", "VenomVial", "SmokePot",
+}
 DEFAULT_DURATION_BY_CAT = {
     "ui": 1.0,
     "combat": 1.5,
@@ -56,28 +62,149 @@ DEFAULT_DURATION_BY_CAT = {
     "ambient": 6.0,
 }
 
+# 30 surface/variant pool clips resolved dynamically by DiabloAudio.ResolveVariant
+SFX_VARIANTS: list[dict] = [
+    {"key": "Swing_0", "cue": "Swing", "category": "combat", "seed": 1244, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "light crisp weapon swing air whoosh, quick iron blade arc"},
+    {"key": "Swing_1", "cue": "Swing", "category": "combat", "seed": 1245, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "medium weight sword slash whoosh, balanced air cut"},
+    {"key": "Swing_2", "cue": "Swing", "category": "combat", "seed": 1246, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy warhammer or greatsword overhead swing air rush, low chesty whoosh"},
+
+    {"key": "Hit_FleshBone_0", "cue": "Hit", "category": "combat", "seed": 1250, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy melee thud into undead flesh and brittle dry bone crack"},
+    {"key": "Hit_FleshBone_1", "cue": "Hit", "category": "combat", "seed": 1251, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "melee cleave impact onto skeleton ribcage, dull thump and bone snap"},
+    {"key": "Hit_FleshBone_2", "cue": "Hit", "category": "combat", "seed": 1252, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy blunt strike onto corpse flesh and snapping knuckle bone"},
+
+    {"key": "Hit_ArmorMetal_0", "cue": "Hit", "category": "combat", "seed": 1260, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "sword blade biting into dark iron plate armor, tight steel ring"},
+    {"key": "Hit_ArmorMetal_1", "cue": "Hit", "category": "combat", "seed": 1261, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy steel strike deflecting off knight pauldrons, mid iron clang"},
+    {"key": "Hit_ArmorMetal_2", "cue": "Hit", "category": "combat", "seed": 1262, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "brutal iron mace blow against steel breastplate, low resonant metallic thud"},
+
+    {"key": "Hit_StoneAsh_0", "cue": "Hit", "category": "combat", "seed": 1270, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy weapon strike on cracked volcanic basalt and dry cinder ash"},
+    {"key": "Hit_StoneAsh_1", "cue": "Hit", "category": "combat", "seed": 1271, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "stone crust impact with crumbling kiln slag gravel burst"},
+    {"key": "Hit_StoneAsh_2", "cue": "Hit", "category": "combat", "seed": 1272, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "iron blade chopping into brittle charcoal rock and soot"},
+
+    {"key": "Hit_Glass_0", "cue": "Hit", "category": "combat", "seed": 1280, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "sharp strike shattering cursed crystal glass shard, crisp brittle crunch"},
+    {"key": "Hit_Glass_1", "cue": "Hit", "category": "combat", "seed": 1281, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "melee hit fracturing thick obsidian glass spire, crystalline crack"},
+    {"key": "Hit_Glass_2", "cue": "Hit", "category": "combat", "seed": 1282, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "heavy blow smashing fused glass shell with sharp glassy scatter"},
+
+    {"key": "Hit_GlassShield_0", "cue": "Hit", "category": "combat", "seed": 1290, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "glancing steel deflecting off thick crystal shield ward, resonant chime and knock"},
+    {"key": "Hit_GlassShield_1", "cue": "Hit", "category": "combat", "seed": 1291, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "blocked strike against hardened glass barrier, dull knock with harmonic glass ring"},
+    {"key": "Hit_GlassShield_2", "cue": "Hit", "category": "combat", "seed": 1292, "duration_s": 1.0, "max_duration_s": 0.55,
+     "prompt": "ricochet off magical prism buckler, hard deflect thud and short bell ping"},
+
+    {"key": "Footstep_Moor_0", "cue": "Footstep", "category": "step", "seed": 1300, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single heavy leather boot step onto damp dark peat moss and wet mud"},
+    {"key": "Footstep_Moor_1", "cue": "Footstep", "category": "step", "seed": 1301, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single armored boot step pressing into soft soggy moorland soil"},
+    {"key": "Footstep_Moor_2", "cue": "Footstep", "category": "step", "seed": 1302, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single muddy leather footstep squelching lightly in shallow bog turf"},
+
+    {"key": "Footstep_Stone_0", "cue": "Footstep", "category": "step", "seed": 1310, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single leather boot sole tap on cold cathedral flagstone floor"},
+    {"key": "Footstep_Stone_1", "cue": "Footstep", "category": "step", "seed": 1311, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single dry heel step onto worn limestone crypt slab"},
+    {"key": "Footstep_Stone_2", "cue": "Footstep", "category": "step", "seed": 1312, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single solid boot step on dusty ancient stone tile"},
+
+    {"key": "Footstep_Basalt_0", "cue": "Footstep", "category": "step", "seed": 1320, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single heavy boot step crunching volcanic basalt grit and slag"},
+    {"key": "Footstep_Basalt_1", "cue": "Footstep", "category": "step", "seed": 1321, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single boot step across brittle kiln cinders and charred rock"},
+    {"key": "Footstep_Basalt_2", "cue": "Footstep", "category": "step", "seed": 1322, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single leather step scraping hard black ashstone gravel"},
+
+    {"key": "Footstep_Sand_0", "cue": "Footstep", "category": "step", "seed": 1330, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single boot step sinking softly into coarse desert sand and glass grit"},
+    {"key": "Footstep_Sand_1", "cue": "Footstep", "category": "step", "seed": 1331, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single quick footstep crunching fine dry barrens sand"},
+    {"key": "Footstep_Sand_2", "cue": "Footstep", "category": "step", "seed": 1332, "duration_s": 1.0, "max_duration_s": 0.35,
+     "prompt": "single leather boot step brushing dry crystalline desert dunes"},
+]
+
 
 def cue_category(cue: str) -> str:
     if cue in UI_CUES:
         return "ui"
     if cue in EVENT_CUES:
         return "event"
-    if cue == "Footstep" or cue.startswith("Step"):
+    if cue == "Footstep" or cue.startswith("Footstep_") or cue.startswith("Step"):
         return "step"
     if cue == "Ambient":
         return "ambient"
     return "combat"
 
 
+def default_max_duration_s(key: str, category: str) -> float | None:
+    if category == "ambient":
+        return None
+    if key == "UIClick":
+        return 0.25
+    if category == "ui":
+        return 0.55
+    if category == "step":
+        return 0.35
+    if key in SHORT_COMBAT_CUES:
+        return 0.65
+    return 1.8
+
+
 def build_sfx_prompt(entry: dict) -> str:
     """Combine manifest cue description with consistent Cinderreach acoustic style line."""
-    base = entry.get("prompt", entry.get("cue", "")).strip()
+    base = entry.get("prompt", entry.get("cue", entry.get("key", ""))).strip()
     return f"{base}, {STYLE_LINE}" if base else STYLE_LINE
 
 
-def clip_hash(cue: str, prompt: str, seed: int, model: str) -> str:
-    blob = json.dumps([cue, prompt, seed, model, STYLE_LINE], ensure_ascii=False)
+def clip_hash(key: str, prompt: str, seed: int, model: str) -> str:
+    blob = json.dumps([key, prompt, seed, model, STYLE_LINE], ensure_ascii=False)
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
+
+
+def expected_clips(manifest: dict | None = None) -> list[dict]:
+    """Return all 73 expected SFX entries (43 base manifest cues + 30 variants)."""
+    if manifest is None:
+        manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
+    items: list[dict] = []
+    for entry in manifest.get("sfx", []):
+        cue = entry["cue"]
+        cat = cue_category(cue)
+        items.append({
+            "key": cue,
+            "cue": cue,
+            "category": cat,
+            "prompt": build_sfx_prompt(entry),
+            "seed": int(entry.get("seed", 1234)),
+            "duration_s": float(entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat])),
+            "loop": cat == "ambient",
+            "max_duration_s": entry.get("max_duration_s", default_max_duration_s(cue, cat)),
+        })
+    for var in SFX_VARIANTS:
+        key = var["key"]
+        cat = var["category"]
+        items.append({
+            "key": key,
+            "cue": var["cue"],
+            "category": cat,
+            "prompt": build_sfx_prompt(var),
+            "seed": int(var["seed"]),
+            "duration_s": float(var["duration_s"]),
+            "loop": False,
+            "max_duration_s": var.get("max_duration_s", default_max_duration_s(key, cat)),
+        })
+    return items
 
 
 def read_wav_mono(raw_bytes: bytes) -> tuple[list[float], int]:
@@ -220,19 +347,15 @@ def master_sfx(
     if not samples:
         raise ValueError("empty audio buffer")
 
-    # 1. DC-offset removal
     mean = sum(samples) / len(samples)
     data = [float(x) - mean for x in samples]
 
-    # 2. Trim silence / build seamless loop
     if loop:
         if max_duration_s is not None and max_duration_s > 0.0:
             limit = max(8, int(round(max_duration_s * sr)))
             data = data[:limit]
         xfade = min(int(round(0.5 * sr)), len(data) // 4)
         if xfade >= 4:
-            # Put equal-power blend from tail->head at start; boundary data[-1]->data[0]
-            # corresponds to consecutive source samples right before tail start.
             head = data[:xfade]
             mid = data[xfade : len(data) - xfade]
             tail = data[len(data) - xfade :]
@@ -262,7 +385,6 @@ def master_sfx(
         data = data[start:max(start + 1, end)]
         _apply_cosine_fades(data, sr, fade_in_ms=2.0 if start > 0 else 0.0, fade_out_ms=10.0)
 
-    # 3. Category loudness normalization + <= -1.0 dBFS True Peak ceiling
     target_db = CATEGORY_TARGET_RMS_DB.get(category, CATEGORY_TARGET_RMS_DB["combat"])
     target_rms = 10.0 ** (target_db / 20.0)
     rms = _active_rms(data, floor_amp=0.01)
@@ -276,13 +398,8 @@ def master_sfx(
         if cur_rms <= 1e-9 or abs(cur_rms - target_rms) / target_rms < 0.05:
             data = candidate
             break
-        peak_cand = max((abs(x) for x in candidate), default=0.0)
-        if peak_cand >= PEAK_CEILING_AMP * 0.995 and cur_rms < target_rms:
-            gain *= target_rms / cur_rms
-            data = candidate
-        else:
-            gain *= target_rms / cur_rms
-            data = candidate
+        gain *= target_rms / cur_rms
+        data = candidate
     else:
         data = _soft_limit(data, gain, PEAK_CEILING_AMP)
 
@@ -291,6 +408,13 @@ def master_sfx(
         scale = PEAK_CEILING_AMP / peak
         data = [x * scale for x in data]
         peak = PEAK_CEILING_AMP
+
+    if not loop:
+        first_loud = next((i for i, x in enumerate(data) if abs(x) > 0.01), 0)
+        if first_loud > int(round(0.003 * sr)):
+            cut = max(0, first_loud - int(round(0.0015 * sr)))
+            data = data[cut:]
+            _apply_cosine_fades(data, sr, fade_in_ms=1.0, fade_out_ms=0.0)
 
     clipped = sum(1 for x in data if abs(x) >= 0.9999)
     final_rms = _active_rms(data, floor_amp=0.01)
@@ -400,9 +524,10 @@ def load_lock() -> dict:
     return json.loads(LOCK_JSON.read_text(encoding="utf-8")).get("clips", {})
 
 
-def save_lock(model_id: str, clips: dict) -> None:
+def save_lock(model_id: str, clips: dict, valid_keys: set[str] | None = None) -> None:
     LOCK_JSON.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"model": model_id, "style_line": STYLE_LINE, "clips": {k: clips[k] for k in sorted(clips)}}
+    clean = {k: clips[k] for k in sorted(clips) if valid_keys is None or k in valid_keys}
+    payload = {"model": model_id, "style_line": STYLE_LINE, "clips": clean}
     LOCK_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
@@ -410,7 +535,7 @@ def _parse_from_wav(items: list[str]) -> dict[str, Path]:
     out: dict[str, Path] = {}
     for item in items:
         if "=" not in item:
-            raise SystemExit(f"--from-wav expects CUE=PATH, got {item!r}")
+            raise SystemExit(f"--from-wav expects KEY=PATH, got {item!r}")
         cue, p = item.split("=", 1)
         out[cue.strip()] = Path(p.strip())
     return out
@@ -418,84 +543,86 @@ def _parse_from_wav(items: list[str]) -> dict[str, Path]:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", nargs="*", default=[], help="render only named manifest cues")
+    ap.add_argument("--only", nargs="*", default=[], help="render only named manifest cues or variant keys")
     ap.add_argument("--force", action="store_true", help="re-render even when lock hash matches")
     ap.add_argument("--dry-run", action="store_true", help="print planned cues and exit without calling Studio")
     ap.add_argument("--keep-loaded", action="store_true", help="keep Studio audio model loaded after run")
-    ap.add_argument("--from-wav", nargs="*", default=[], help="master local raw WAV(s) as CUE=PATH without Studio")
+    ap.add_argument("--from-wav", nargs="*", default=[], help="master local raw WAV(s) as KEY=PATH without Studio")
     ap.add_argument("--url", default=os.environ.get("STUDIO_URL", DEFAULT_URL))
     ap.add_argument("--token-file", type=Path, default=DEFAULT_TOKEN_FILE)
     ap.add_argument("--model", default=DEFAULT_MODEL)
     args = ap.parse_args(argv)
 
-    manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-    by_cue = {item["cue"]: item for item in manifest.get("sfx", [])}
+    all_items = expected_clips()
+    by_key = {item["key"]: item for item in all_items}
+    valid_keys = set(by_key)
     only = set(args.only)
     from_wav = _parse_from_wav(args.from_wav)
-    selected_cues = [c for c in by_cue if not only or c in only]
     if only:
-        unknown = sorted(only - set(by_cue))
+        unknown = sorted(only - valid_keys)
         if unknown:
-            raise SystemExit(f"unknown manifest cue(s): {', '.join(unknown)}")
+            raise SystemExit(f"unknown SFX key(s): {', '.join(unknown)}")
+    selected = [item for item in all_items if not only or item["key"] in only]
 
     lock = load_lock()
-    todo: list[tuple[dict, str, str, int, Path]] = []
-    for cue in selected_cues:
-        entry = by_cue[cue]
-        prompt = build_sfx_prompt(entry)
-        seed = int(entry.get("seed", 1234))
-        h = clip_hash(cue, prompt, seed, args.model)
-        out_path = SFX_DIR / f"{cue}.wav"
-        if cue in from_wav or args.force or not out_path.exists() or lock.get(cue, {}).get("hash") != h:
-            todo.append((entry, prompt, h, seed, out_path))
+    todo: list[tuple[dict, str, Path]] = []
+    for item in selected:
+        key = item["key"]
+        h = clip_hash(key, item["prompt"], item["seed"], args.model)
+        out_path = SFX_DIR / f"{key}.wav"
+        if key in from_wav or args.force or not out_path.exists() or lock.get(key, {}).get("hash") != h:
+            todo.append((item, h, out_path))
 
-    print(f"[sfx] {len(todo)} of {len(selected_cues)} selected cues queued (model={args.model})", flush=True)
+    print(f"[sfx] {len(todo)} of {len(selected)} selected clips queued (model={args.model})", flush=True)
     if args.dry_run:
-        for entry, prompt, h, seed, out_path in todo:
-            cat = cue_category(entry["cue"])
-            print(f"  [dry-run] {entry['cue']} cat={cat} seed={seed} hash={h} -> {out_path.relative_to(REPO)}")
+        for item, h, out_path in todo:
+            print(
+                f"  [dry-run] {item['key']} (cue={item['cue']}, cat={item['category']}, "
+                f"seed={item['seed']}, hash={h}) -> {out_path.relative_to(REPO)}"
+            )
         return 0
 
     if not todo:
+        save_lock(args.model, lock, valid_keys)
         return 0
 
     client = None
-    loaded_by_us = False
-    need_studio = any(entry["cue"] not in from_wav for entry, *_ in todo)
+    need_studio = any(item["key"] not in from_wav for item, *_ in todo)
     if need_studio:
         client = StudioClient(args.url, _read_token(args.token_file))
-        loaded_by_us = client.ensure_loaded_gpu0(args.model)
+        client.ensure_loaded_gpu0(args.model)
 
     try:
-        for idx, (entry, prompt, h, seed, out_path) in enumerate(todo, 1):
-            cue = entry["cue"]
-            cat = cue_category(cue)
-            if cue in from_wav:
-                raw_bytes = from_wav[cue].read_bytes()
+        for idx, (item, h, out_path) in enumerate(todo, 1):
+            key = item["key"]
+            cat = item["category"]
+            if key in from_wav:
+                raw_bytes = from_wav[key].read_bytes()
             else:
-                dur = float(entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat]))
-                raw_bytes = client.generate_sfx(args.model, prompt, duration_s=dur, seed=seed, variations=1)
+                raw_bytes = client.generate_sfx(
+                    args.model, item["prompt"], duration_s=item["duration_s"], seed=item["seed"], variations=1
+                )
 
             mono, sr = read_wav_mono(raw_bytes)
             mastered, metrics = master_sfx(
                 mono,
                 sr,
                 category=cat,
-                loop=(cat == "ambient"),
-                max_duration_s=None if cat == "ambient" else entry.get("max_duration_s"),
+                loop=item["loop"],
+                max_duration_s=item["max_duration_s"],
             )
             write_wav_pcm16(out_path, mastered, sr)
-            lock[cue] = {
-                "cue": cue,
+            lock[key] = {
+                "cue": item["cue"],
                 "category": cat,
                 "hash": h,
-                "prompt": prompt,
-                "seed": seed,
+                "prompt": item["prompt"],
+                "seed": item["seed"],
                 **metrics,
             }
-            save_lock(args.model, lock)
+            save_lock(args.model, lock, valid_keys)
             print(
-                f"[sfx] {idx}/{len(todo)} {cue} ({cat}) {metrics['duration_s']:.2f}s "
+                f"[sfx] {idx}/{len(todo)} {key} ({cat}) {metrics['duration_s']:.2f}s "
                 f"lead={metrics['lead_ms']:.1f}ms peak={metrics['peak_dbfs']:.2f}dBFS "
                 f"rms={metrics['rms_dbfs']:.2f}dBFS",
                 flush=True,

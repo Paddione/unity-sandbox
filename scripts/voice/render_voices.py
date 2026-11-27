@@ -2,11 +2,11 @@
 
 Run with a Python that has ``qwen_tts`` (the voice-tts box venv)::
 
-    ~/unsloth-boxes/voice-tts/.venv/bin/python scripts/voice/render_voices.py [--device auto|cuda:0|cpu] [--only KEY ...] [--force]
+    ~/unsloth-boxes/voice-tts/.venv/bin/python scripts/voice/render_voices.py [--device auto|cuda:0|cuda:1|cpu] [--only KEY ...] [--force]
 
 Step 1 designs a missing reference per speaker (docs/audio/voices/<id>/ref.ogg)
 from its ``instruct`` in docs/audio/voices.json. Step 2 clones every line whose
-text, speaker or reference changed (hash in docs/audio/voice-lines.lock.json)
+text, speaker, reference or model changed (hash in docs/audio/voice-lines.lock.json)
 into sandbox/Assets/AddressableAssets/Voice/<key>.ogg. Uses GPU 0 (cuda:0 with
 CUDA_DEVICE_ORDER=PCI_BUS_ID) by default when CUDA is available, falling back
 to CPU (override via --device or TTS_DEVICE); threads follow OMP_NUM_THREADS.
@@ -14,6 +14,7 @@ to CPU (override via --device or TTS_DEVICE); threads follow OMP_NUM_THREADS.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import sys
@@ -28,12 +29,15 @@ import voice_lines as vl  # noqa: E402
 
 REF_DIR = vl.REPO / "docs" / "audio" / "voices"
 SR_OUT = 24000
+LOCK_FLOCK = Path("/tmp/cinderreach-voice-lines.flock")
 
 
 def _configure_cuda_env(requested_device: str) -> None:
-    """Pin CUDA device ordering before importing torch so GPU 1 stays untouched."""
-    os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
-    if requested_device in ("auto", "cuda:0"):
+    """Pin CUDA device ordering before importing torch so each worker uses one physical GPU."""
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    if requested_device == "cuda:1":
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    elif requested_device in ("auto", "cuda:0"):
         os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
 
 
@@ -43,10 +47,15 @@ def _resolve_device(requested_device: str):
 
     if requested_device == "auto":
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        label = device
+    elif requested_device == "cuda:1":
+        device = "cuda:0"
+        label = "cuda:1 (logical cuda:0)"
     else:
         device = requested_device
+        label = device
     dtype = torch.float32 if device == "cpu" else torch.bfloat16
-    return torch, device, dtype
+    return torch, device, label, dtype
 
 
 def polish(wav: np.ndarray) -> np.ndarray:
@@ -89,22 +98,24 @@ def design_refs(voices: dict, force: bool, device: str, dtype, torch_mod) -> Non
     del model
 
 
-def render_lines(voices: dict, only: set[str], force: bool, device: str, dtype, torch_mod) -> None:
+def render_lines(
+    voices: dict, only: set[str], force: bool, device: str, label: str, dtype, torch_mod, seed_offset: int = 0
+) -> None:
     entries = vl.lines()
     lock = vl.load_lock()
+    model_id = vl.clone_model()
     todo = []
     for e in entries:
         out = vl.VOICE_DIR / f"{e['key']}.ogg"
-        h = vl.line_hash(e, voices)
+        h = vl.line_hash(e, voices, model_id=model_id)
         if only and e["key"] not in only:
             continue
         if force or not out.exists() or lock.get(e["key"], {}).get("hash") != h:
             todo.append((e, h, out))
-    print(f"[render] {len(todo)} of {len(entries)} lines", flush=True)
+    print(f"[render] {len(todo)} of {len(entries)} lines on {label}", flush=True)
     if todo:
         from qwen_tts import Qwen3TTSModel
-        model_id = json.loads(vl.VOICES_JSON.read_text(encoding="utf-8"))["clone_model"]
-        print(f"[render] device={device} dtype={dtype} model={model_id}", flush=True)
+        print(f"[render] device={label} dtype={dtype} model={model_id}", flush=True)
         model = Qwen3TTSModel.from_pretrained(model_id, device_map=device, dtype=dtype, attn_implementation="sdpa")
         prompts = {}
         for n, (e, h, out) in enumerate(todo, 1):
@@ -113,39 +124,53 @@ def render_lines(voices: dict, only: set[str], force: bool, device: str, dtype, 
                 ref, rsr = sf.read(str(REF_DIR / sp / "ref.ogg"), dtype="float32")
                 prompts[sp] = model.create_voice_clone_prompt(
                     ref_audio=(ref, rsr), ref_text=(REF_DIR / sp / "ref.txt").read_text(encoding="utf-8").strip())
-            torch_mod.manual_seed(voices[sp].get("seed", 0) * 1000 + n)
+            torch_mod.manual_seed(voices[sp].get("seed", 0) * 1000 + n + seed_offset * 10000)
             t = time.time()
             wavs, sr = model.generate_voice_clone(text=vl.tts_text(e["text"]), language="German", voice_clone_prompt=prompts[sp])
             wav = polish(wavs[0])
             write_ogg(out, wav, sr)
-            lock[e["key"]] = {"hash": h, "speaker": sp, "seconds": round(wav.size / sr, 2)}
-            save_lock(lock, entries)
+            update_lock_entry(
+                e["key"],
+                {"hash": h, "speaker": sp, "model": model_id, "seconds": round(wav.size / sr, 2)},
+                entries,
+            )
             print(f"[render] {n}/{len(todo)} {e['key']} ({sp}) {wav.size / sr:.1f}s in {time.time() - t:.0f}s", flush=True)
-    save_lock(lock, entries)
+    elif not only:
+        update_lock_entry(None, None, entries)
 
 
-def save_lock(lock: dict, entries: list) -> None:
+def update_lock_entry(key: str | None, entry_data: dict | None, entries: list) -> None:
+    """Process-safe read-modify-write update of voice-lines.lock.json via flock."""
     keys = {e["key"] for e in entries}
-    clean = {k: lock[k] for k in sorted(lock) if k in keys}
-    vl.LOCK_JSON.write_text(json.dumps({"lines": clean}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    LOCK_FLOCK.parent.mkdir(parents=True, exist_ok=True)
+    with open(LOCK_FLOCK, "w", encoding="utf-8") as lf:
+        fcntl.flock(lf, fcntl.LOCK_EX)
+        lock = vl.load_lock()
+        if key is not None and entry_data is not None:
+            lock[key] = entry_data
+        clean = {k: lock[k] for k in sorted(lock) if k in keys}
+        tmp = vl.LOCK_JSON.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps({"lines": clean}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        os.replace(tmp, vl.LOCK_JSON)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--device", choices=["auto", "cuda:0", "cpu"],
+    ap.add_argument("--device", choices=["auto", "cuda:0", "cuda:1", "cpu"],
                     default=os.environ.get("TTS_DEVICE", "auto"),
                     help="target device (default: auto -> cuda:0 on GPU 0, else cpu)")
     ap.add_argument("--only", nargs="*", default=[])
     ap.add_argument("--force", action="store_true", help="re-render selected lines even when unchanged")
+    ap.add_argument("--seed-offset", type=int, default=0, help="deterministic seed offset for retries")
     ap.add_argument("--redesign", action="store_true", help="re-design all reference voices")
     ap.add_argument("--design-only", action="store_true")
     args = ap.parse_args()
-    torch_mod, device, dtype = _resolve_device(args.device)
+    torch_mod, device, label, dtype = _resolve_device(args.device)
     torch_mod.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "6")))
     voices = vl.load_voices()
     design_refs(voices, args.redesign, device, dtype, torch_mod)
     if not args.design_only:
-        render_lines(voices, set(args.only), args.force, device, dtype, torch_mod)
+        render_lines(voices, set(args.only), args.force, device, label, dtype, torch_mod, seed_offset=args.seed_offset)
     return 0
 
 

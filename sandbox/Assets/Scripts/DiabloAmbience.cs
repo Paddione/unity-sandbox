@@ -50,7 +50,7 @@ public sealed class DiabloAmbience : MonoBehaviour
     void Build()
     {
         bed = gameObject.AddComponent<AudioSource>();
-        bed.clip = DiabloAudio.AmbientClip;
+        bed.clip = DiabloAudio.ResolveAmbient();
         bed.loop = true;
         bed.volume = BedVolume * DiabloSettings.EffectiveMusic;
         bed.spatialBlend = 0f;

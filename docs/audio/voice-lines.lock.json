@@ -1,1224 +1,1468 @@
 {
  "lines": {
   "bark.abbot.death": {
-   "hash": "6c602b907d5c",
+   "hash": "4d8df6e7d6ab",
    "speaker": "abbot",
-   "seconds": 3.15
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.32
   },
   "bark.abbot.phase2": {
-   "hash": "d2df725a3937",
+   "hash": "bd3fc6c5ed78",
    "speaker": "abbot",
-   "seconds": 8.77
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.84
   },
   "bark.glasswright.death": {
-   "hash": "8557da46246a",
+   "hash": "9bb9cedf4c2a",
    "speaker": "glasswright",
-   "seconds": 4.09
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.12
   },
   "bark.glasswright.phase2": {
-   "hash": "11abf87ab842",
+   "hash": "50545545f91c",
    "speaker": "glasswright",
-   "seconds": 5.5
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.63
   },
   "bark.h4.start": {
-   "hash": "55dcd5f04097",
+   "hash": "11b5f99f5ffc",
    "speaker": "narrator",
-   "seconds": 6.17
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.74
   },
   "bark.h7.done": {
-   "hash": "1b61772d8cf0",
+   "hash": "98ae8cf0120c",
    "speaker": "narrator",
-   "seconds": 7.65
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.97
   },
   "bark.kilnmother.death": {
-   "hash": "9d6667af9950",
+   "hash": "d9dac5954e75",
    "speaker": "kilnmother",
-   "seconds": 5.44
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.63
   },
   "bark.kilnmother.phase2": {
-   "hash": "121d72d88a73",
+   "hash": "71443d3a8ced",
    "speaker": "kilnmother",
-   "seconds": 6.79
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.31
   },
   "bark.lancer.fall": {
-   "hash": "c33fb15002bc",
+   "hash": "20ff2950c652",
    "speaker": "narrator",
-   "seconds": 2.33
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.32
   },
   "bark.scherben.find": {
-   "hash": "243ea3909f7b",
+   "hash": "36880c114844",
    "speaker": "narrator",
-   "seconds": 5.11
-  },
-  "bark.sehglas.find": {
-   "hash": "dc32cd82298c",
-   "speaker": "narrator",
-   "seconds": 4.41
-  },
-  "bark.thrall.fall": {
-   "hash": "e38d41c75867",
-   "speaker": "narrator",
-   "seconds": 3.59
-  },
-  "dlg.h1.done.1": {
-   "hash": "219fa4ddbd28",
-   "speaker": "ottilie",
-   "seconds": 0.87
-  },
-  "dlg.h1.done.2": {
-   "hash": "bf92aefa6eae",
-   "speaker": "narrator",
-   "seconds": 5.58
-  },
-  "dlg.h1.done.3": {
-   "hash": "a7b2fec39cc9",
-   "speaker": "ottilie",
-   "seconds": 5.8
-  },
-  "dlg.h1.done.4": {
-   "hash": "5b27ec627626",
-   "speaker": "ottilie",
-   "seconds": 3.4
-  },
-  "dlg.h1.done.5": {
-   "hash": "bdadd1599497",
-   "speaker": "ottilie",
-   "seconds": 6.37
-  },
-  "dlg.h1.hint.1": {
-   "hash": "e699385ae157",
-   "speaker": "ottilie",
-   "seconds": 7.02
-  },
-  "dlg.h1.offer.1": {
-   "hash": "97deb691704c",
-   "speaker": "ottilie",
-   "seconds": 9.59
-  },
-  "dlg.h1.offer.2": {
-   "hash": "781bec81636a",
-   "speaker": "ottilie",
-   "seconds": 8.14
-  },
-  "dlg.h1.offer.3": {
-   "hash": "3808c79bb36b",
-   "speaker": "ottilie",
-   "seconds": 5.59
-  },
-  "dlg.h1.offer.4": {
-   "hash": "9a4aae6e6441",
-   "speaker": "ottilie",
-   "seconds": 5.69
-  },
-  "dlg.h10.done.1": {
-   "hash": "f03501738617",
-   "speaker": "narrator",
-   "seconds": 6.92
-  },
-  "dlg.h10.done.2": {
-   "hash": "7952fb0f3736",
-   "speaker": "ottilie",
-   "seconds": 6.44
-  },
-  "dlg.h10.done.3": {
-   "hash": "8b803648f377",
-   "speaker": "ottilie",
-   "seconds": 4.58
-  },
-  "dlg.h10.done.4": {
-   "hash": "1f9d67aabb0c",
-   "speaker": "ottilie",
-   "seconds": 3.51
-  },
-  "dlg.h10.done.5": {
-   "hash": "48fde28181d8",
-   "speaker": "jorin",
-   "seconds": 6.88
-  },
-  "dlg.h10.done.6": {
-   "hash": "9c6a3c1ce17c",
-   "speaker": "ilsabe",
-   "seconds": 4.69
-  },
-  "dlg.h10.hint.1": {
-   "hash": "47000a13f339",
-   "speaker": "ottilie",
-   "seconds": 6.18
-  },
-  "dlg.h10.offer.1": {
-   "hash": "a4d2b3ac211d",
-   "speaker": "ottilie",
-   "seconds": 8.41
-  },
-  "dlg.h10.offer.2": {
-   "hash": "9cbef9304a58",
-   "speaker": "ottilie",
-   "seconds": 6.1
-  },
-  "dlg.h10.offer.3": {
-   "hash": "8103384be75c",
-   "speaker": "ottilie",
-   "seconds": 6.61
-  },
-  "dlg.h10.offer.4": {
-   "hash": "284334950ae2",
-   "speaker": "ottilie",
-   "seconds": 6.71
-  },
-  "dlg.h10.talk.ilsabe.1": {
-   "hash": "ad848b0da941",
-   "speaker": "ilsabe",
-   "seconds": 8.75
-  },
-  "dlg.h10.talk.ilsabe.2": {
-   "hash": "4940826418c2",
-   "speaker": "ilsabe",
-   "seconds": 6.37
-  },
-  "dlg.h10.talk.jorin.1": {
-   "hash": "0877cd66d4a2",
-   "speaker": "jorin",
-   "seconds": 2.55
-  },
-  "dlg.h10.talk.jorin.2": {
-   "hash": "8b12c61f1b2e",
-   "speaker": "jorin",
-   "seconds": 4.79
-  },
-  "dlg.h10.talk.merle.1": {
-   "hash": "92612790c5cf",
-   "speaker": "merle",
-   "seconds": 6.86
-  },
-  "dlg.h10.talk.merle.2": {
-   "hash": "41d8698e5ed7",
-   "speaker": "merle",
-   "seconds": 5.7
-  },
-  "dlg.h10.talk.merle.3": {
-   "hash": "0e118ddae3ff",
-   "speaker": "merle",
-   "seconds": 4.97
-  },
-  "dlg.h10.talk.ottilie.1": {
-   "hash": "6d255008995b",
-   "speaker": "ottilie",
-   "seconds": 9.23
-  },
-  "dlg.h10.talk.ottilie.2": {
-   "hash": "808088a4fde3",
-   "speaker": "ottilie",
-   "seconds": 5.3
-  },
-  "dlg.h10.talk.ottilie.3": {
-   "hash": "4e5be5d764e4",
-   "speaker": "ottilie",
-   "seconds": 6.44
-  },
-  "dlg.h14.done.1": {
-   "hash": "bd1db3a81c93",
-   "speaker": "ottilie",
-   "seconds": 2.72
-  },
-  "dlg.h14.done.2": {
-   "hash": "d1346548c04a",
-   "speaker": "ottilie",
-   "seconds": 5.69
-  },
-  "dlg.h14.done.3": {
-   "hash": "2c9f91400178",
-   "speaker": "ottilie",
-   "seconds": 7.21
-  },
-  "dlg.h14.hint.1": {
-   "hash": "43ffb1b82e7d",
-   "speaker": "ottilie",
-   "seconds": 5.88
-  },
-  "dlg.h14.offer.1": {
-   "hash": "d4ee2b183559",
-   "speaker": "ottilie",
-   "seconds": 5.09
-  },
-  "dlg.h14.offer.2": {
-   "hash": "efceb494cfa6",
-   "speaker": "ottilie",
-   "seconds": 3.25
-  },
-  "dlg.h14.offer.3": {
-   "hash": "1f46205a7e33",
-   "speaker": "ottilie",
-   "seconds": 4.94
-  },
-  "dlg.h14.offer.4": {
-   "hash": "3133fba783ae",
-   "speaker": "ottilie",
-   "seconds": 6.06
-  },
-  "dlg.h15.hint.1": {
-   "hash": "dc95a36309e3",
-   "speaker": "ottilie",
-   "seconds": 6.55
-  },
-  "dlg.h15.offer.1": {
-   "hash": "976710d3bee4",
-   "speaker": "ottilie",
-   "seconds": 5.06
-  },
-  "dlg.h15.offer.2": {
-   "hash": "cfa0711cb796",
-   "speaker": "ottilie",
-   "seconds": 3.57
-  },
-  "dlg.h15.offer.3": {
-   "hash": "797be8224638",
-   "speaker": "ottilie",
-   "seconds": 7.03
-  },
-  "dlg.h15.talk.ottilie.1": {
-   "hash": "5b3d552806ea",
-   "speaker": "ottilie",
-   "seconds": 5.1
-  },
-  "dlg.h15.talk.ottilie.2": {
-   "hash": "45d76e09e2eb",
-   "speaker": "ottilie",
-   "seconds": 6.95
-  },
-  "dlg.h15.talk.ottilie.3": {
-   "hash": "2a2420e2b56d",
-   "speaker": "ottilie",
-   "seconds": 6.54
-  },
-  "dlg.h16.done.1": {
-   "hash": "d6fda4a3a524",
-   "speaker": "jorin",
-   "seconds": 5.25
-  },
-  "dlg.h16.done.2": {
-   "hash": "8cea50a6917e",
-   "speaker": "jorin",
-   "seconds": 6.89
-  },
-  "dlg.h16.done.3": {
-   "hash": "426c4aa506d7",
-   "speaker": "jorin",
-   "seconds": 6.99
-  },
-  "dlg.h16.done.4": {
-   "hash": "f3ed873b114c",
-   "speaker": "jorin",
-   "seconds": 6.34
-  },
-  "dlg.h16.hint.1": {
-   "hash": "706357c312cf",
-   "speaker": "jorin",
-   "seconds": 5.27
-  },
-  "dlg.h16.offer.1": {
-   "hash": "4c9d313e47b5",
-   "speaker": "jorin",
-   "seconds": 6.23
-  },
-  "dlg.h16.offer.2": {
-   "hash": "680f3196501d",
-   "speaker": "jorin",
-   "seconds": 5.68
-  },
-  "dlg.h16.offer.3": {
-   "hash": "9a48936a7e3f",
-   "speaker": "jorin",
-   "seconds": 8.3
-  },
-  "dlg.h16.offer.4": {
-   "hash": "68d0aed91de7",
-   "speaker": "jorin",
-   "seconds": 5.04
-  },
-  "dlg.h17.offer.1": {
-   "hash": "5556e04bc3a3",
-   "speaker": "ottilie",
-   "seconds": 5.4
-  },
-  "dlg.h17.offer.2": {
-   "hash": "ce3d7edffb27",
-   "speaker": "ottilie",
-   "seconds": 6.77
-  },
-  "dlg.h17.offer.3": {
-   "hash": "976cb78cfe64",
-   "speaker": "ottilie",
-   "seconds": 5.12
-  },
-  "dlg.h17.talk.ilsabe.1": {
-   "hash": "a14faa22c212",
-   "speaker": "ilsabe",
-   "seconds": 6.55
-  },
-  "dlg.h17.talk.ilsabe.2": {
-   "hash": "ed557bcf7d8d",
-   "speaker": "ilsabe",
-   "seconds": 4.51
-  },
-  "dlg.h17.talk.ilsabe.3": {
-   "hash": "fecb67961ef5",
-   "speaker": "ilsabe",
-   "seconds": 7.72
-  },
-  "dlg.h17.talk.ilsabe.4": {
-   "hash": "c0621a1236c4",
-   "speaker": "ilsabe",
-   "seconds": 5.8
-  },
-  "dlg.h17.talk.ottilie.1": {
-   "hash": "04d1b7a95353",
-   "speaker": "ottilie",
-   "seconds": 5.3
-  },
-  "dlg.h17.talk.ottilie.2": {
-   "hash": "735660eae4cf",
-   "speaker": "ottilie",
-   "seconds": 4.53
-  },
-  "dlg.h17.talk.ottilie.3": {
-   "hash": "bf0ba3848904",
-   "speaker": "ottilie",
-   "seconds": 3.83
-  },
-  "dlg.h17.talk.ottilie.4": {
-   "hash": "e4d2c75d0774",
-   "speaker": "ottilie",
-   "seconds": 3.88
-  },
-  "dlg.h18.hint.1": {
-   "hash": "4213cff4233e",
-   "speaker": "merle",
-   "seconds": 5.03
-  },
-  "dlg.h18.talk.merle.1": {
-   "hash": "2bd0476aaf35",
-   "speaker": "merle",
-   "seconds": 4.21
-  },
-  "dlg.h18.talk.merle.2": {
-   "hash": "7476244345f9",
-   "speaker": "merle",
-   "seconds": 4.88
-  },
-  "dlg.h18.talk.merle.3": {
-   "hash": "fa25ae2b2219",
-   "speaker": "merle",
-   "seconds": 5.1
-  },
-  "dlg.h18.talk.merle.4": {
-   "hash": "45852654cbef",
-   "speaker": "merle",
-   "seconds": 5.19
-  },
-  "dlg.h19.hint.1": {
-   "hash": "0b42d5ddb093",
-   "speaker": "merle",
-   "seconds": 4.72
-  },
-  "dlg.h2.done.1": {
-   "hash": "be5c84def312",
-   "speaker": "ottilie",
-   "seconds": 3.1
-  },
-  "dlg.h2.done.2": {
-   "hash": "74398d5e8428",
-   "speaker": "ottilie",
-   "seconds": 5.4
-  },
-  "dlg.h2.hint.1": {
-   "hash": "b0666160f53d",
-   "speaker": "ottilie",
-   "seconds": 6.66
-  },
-  "dlg.h2.offer.1": {
-   "hash": "8085dc81a409",
-   "speaker": "ottilie",
-   "seconds": 11.38
-  },
-  "dlg.h2.offer.2": {
-   "hash": "b69087291017",
-   "speaker": "ottilie",
-   "seconds": 7.49
-  },
-  "dlg.h2.offer.3": {
-   "hash": "4b3c4347ba77",
-   "speaker": "ottilie",
-   "seconds": 5.32
-  },
-  "dlg.h2.offer.4": {
-   "hash": "09a9615b0ae1",
-   "speaker": "ottilie",
-   "seconds": 7.07
-  },
-  "dlg.h2.offer.5": {
-   "hash": "306c219fbfc3",
-   "speaker": "ottilie",
-   "seconds": 7.31
-  },
-  "dlg.h3.hint.1": {
-   "hash": "b9a3249f3ead",
-   "speaker": "ottilie",
-   "seconds": 5.96
-  },
-  "dlg.h3.offer.1": {
-   "hash": "d7f21471eae4",
-   "speaker": "narrator",
-   "seconds": 4.64
-  },
-  "dlg.h3.offer.2": {
-   "hash": "c5e69eb0a2db",
-   "speaker": "ottilie",
-   "seconds": 7.9
-  },
-  "dlg.h3.offer.3": {
-   "hash": "a1ce0760b6f2",
-   "speaker": "ottilie",
-   "seconds": 4.23
-  },
-  "dlg.h3.offer.4": {
-   "hash": "b933a8df2423",
-   "speaker": "ottilie",
-   "seconds": 6.23
-  },
-  "dlg.h3.offer.5": {
-   "hash": "52b4fa9fe85a",
-   "speaker": "ottilie",
-   "seconds": 2.35
-  },
-  "dlg.h3.offer.6": {
-   "hash": "d512a8817fa4",
-   "speaker": "ottilie",
-   "seconds": 8.07
-  },
-  "dlg.h3.offer.7": {
-   "hash": "825a17ef0500",
-   "speaker": "ottilie",
-   "seconds": 7.28
-  },
-  "dlg.h3.offer.8": {
-   "hash": "d3d997dbbaab",
-   "speaker": "ottilie",
-   "seconds": 8.05
-  },
-  "dlg.h3.talk.jorin.1": {
-   "hash": "b80454f44181",
-   "speaker": "jorin",
-   "seconds": 3.83
-  },
-  "dlg.h3.talk.jorin.2": {
-   "hash": "dab6b41e87e7",
-   "speaker": "jorin",
-   "seconds": 6.01
-  },
-  "dlg.h3.talk.jorin.3": {
-   "hash": "b480aec9ef3a",
-   "speaker": "jorin",
-   "seconds": 8.3
-  },
-  "dlg.h3.talk.jorin.4": {
-   "hash": "3c8e971b17ea",
-   "speaker": "jorin",
-   "seconds": 8.53
-  },
-  "dlg.h3.talk.jorin.5": {
-   "hash": "509fad87a851",
-   "speaker": "jorin",
-   "seconds": 8.29
-  },
-  "dlg.h4.done.1": {
-   "hash": "3b5260f2152d",
-   "speaker": "ottilie",
-   "seconds": 4.65
-  },
-  "dlg.h4.done.2": {
-   "hash": "583eb06ad49b",
-   "speaker": "ottilie",
-   "seconds": 7.15
-  },
-  "dlg.h4.done.3": {
-   "hash": "6e47136b167e",
-   "speaker": "ottilie",
-   "seconds": 5.98
-  },
-  "dlg.h4.done.4": {
-   "hash": "55dc0ba6ca7d",
-   "speaker": "ottilie",
-   "seconds": 1.49
-  },
-  "dlg.h4.done.5": {
-   "hash": "217a07ad0c27",
-   "speaker": "ottilie",
-   "seconds": 8.84
-  },
-  "dlg.h4.hint.1": {
-   "hash": "f5fbc24f1294",
-   "speaker": "ottilie",
-   "seconds": 3.57
-  },
-  "dlg.h5.done.1": {
-   "hash": "ef6006b14278",
-   "speaker": "ottilie",
-   "seconds": 5.02
-  },
-  "dlg.h5.done.2": {
-   "hash": "2d9a076386c2",
-   "speaker": "narrator",
-   "seconds": 8.35
-  },
-  "dlg.h5.done.3": {
-   "hash": "7bf733df8ac0",
-   "speaker": "ottilie",
-   "seconds": 1.18
-  },
-  "dlg.h5.done.4": {
-   "hash": "0b98b8f2ba3f",
-   "speaker": "ottilie",
-   "seconds": 7.47
-  },
-  "dlg.h5.done.5": {
-   "hash": "95fb9d888f19",
-   "speaker": "ottilie",
-   "seconds": 6.19
-  },
-  "dlg.h5.done.6": {
-   "hash": "d3e82714c1c9",
-   "speaker": "ottilie",
-   "seconds": 5.71
-  },
-  "dlg.h5.hint.1": {
-   "hash": "feb1c64eeb9d",
-   "speaker": "ottilie",
-   "seconds": 4.23
-  },
-  "dlg.h5.offer.1": {
-   "hash": "26123eb84ddc",
-   "speaker": "narrator",
-   "seconds": 6.37
-  },
-  "dlg.h5.offer.2": {
-   "hash": "3ff0746fa6eb",
-   "speaker": "ottilie",
-   "seconds": 7.11
-  },
-  "dlg.h5.offer.3": {
-   "hash": "7bd9c9c9dea9",
-   "speaker": "ottilie",
-   "seconds": 8.46
-  },
-  "dlg.h5.offer.4": {
-   "hash": "5c7e0b57eeda",
-   "speaker": "ottilie",
-   "seconds": 2.34
-  },
-  "dlg.h5.offer.5": {
-   "hash": "ec35c04e43b8",
-   "speaker": "ottilie",
-   "seconds": 4.57
-  },
-  "dlg.h5.offer.6": {
-   "hash": "1cd97a182cad",
-   "speaker": "ottilie",
-   "seconds": 5.38
-  },
-  "dlg.h5.offer.7": {
-   "hash": "be7c6ae33aa3",
-   "speaker": "ottilie",
-   "seconds": 7.86
-  },
-  "dlg.h5.talk.ilsabe.1": {
-   "hash": "41faf1bb7c75",
-   "speaker": "ilsabe",
-   "seconds": 4.0
-  },
-  "dlg.h5.talk.ilsabe.2": {
-   "hash": "a138914f899d",
-   "speaker": "ilsabe",
-   "seconds": 7.77
-  },
-  "dlg.h5.talk.ilsabe.3": {
-   "hash": "3468699a191b",
-   "speaker": "ilsabe",
-   "seconds": 9.51
-  },
-  "dlg.h5.talk.ilsabe.4": {
-   "hash": "6a742a05ab0a",
-   "speaker": "ilsabe",
-   "seconds": 6.55
-  },
-  "dlg.h6.hint.1": {
-   "hash": "734272b66965",
-   "speaker": "merle",
-   "seconds": 3.74
-  },
-  "dlg.h6.offer.1": {
-   "hash": "249a4df32a75",
-   "speaker": "narrator",
-   "seconds": 6.63
-  },
-  "dlg.h6.offer.2": {
-   "hash": "35dd766d1aee",
-   "speaker": "merle",
-   "seconds": 7.46
-  },
-  "dlg.h6.offer.3": {
-   "hash": "2eeb97110709",
-   "speaker": "merle",
-   "seconds": 3.98
-  },
-  "dlg.h6.offer.4": {
-   "hash": "1c7217babc57",
-   "speaker": "merle",
-   "seconds": 8.03
-  },
-  "dlg.h6.offer.5": {
-   "hash": "713f4f56ac55",
-   "speaker": "merle",
-   "seconds": 8.13
-  },
-  "dlg.h6.offer.6": {
-   "hash": "225eda15aa7d",
-   "speaker": "merle",
-   "seconds": 4.24
-  },
-  "dlg.h7.hint.1": {
-   "hash": "c3740d31cc0d",
-   "speaker": "merle",
-   "seconds": 7.41
-  },
-  "dlg.h8.hint.1": {
-   "hash": "acfac6bb0ba2",
-   "speaker": "merle",
-   "seconds": 7.03
-  },
-  "dlg.h9.talk.merle.1": {
-   "hash": "89b815b321f9",
-   "speaker": "merle",
-   "seconds": 6.35
-  },
-  "dlg.h9.talk.merle.2": {
-   "hash": "23daffd8216f",
-   "speaker": "merle",
-   "seconds": 6.14
-  },
-  "dlg.h9.talk.merle.3": {
-   "hash": "a80b54c87660",
-   "speaker": "merle",
-   "seconds": 6.1
-  },
-  "dlg.h9.talk.merle.4": {
-   "hash": "6412d237f79e",
-   "speaker": "merle",
-   "seconds": 3.14
-  },
-  "dlg.h9.talk.merle.5": {
-   "hash": "2a46881528c8",
-   "speaker": "merle",
-   "seconds": 4.38
-  },
-  "dlg.h9.talk.merle.6": {
-   "hash": "fd3ff716f84b",
-   "speaker": "merle",
-   "seconds": 4.88
-  },
-  "dlg.h9.talk.merle.7": {
-   "hash": "024b34b69c4e",
-   "speaker": "merle",
-   "seconds": 4.83
-  },
-  "dlg.h9.talk.ottilie.1": {
-   "hash": "d45cbea7361f",
-   "speaker": "narrator",
-   "seconds": 5.89
-  },
-  "dlg.h9.talk.ottilie.2": {
-   "hash": "bfa5ab26f62e",
-   "speaker": "ottilie",
-   "seconds": 3.33
-  },
-  "dlg.h9.talk.ottilie.3": {
-   "hash": "d0d66769014b",
-   "speaker": "ottilie",
-   "seconds": 5.06
-  },
-  "dlg.h9.talk.ottilie.4": {
-   "hash": "ee1d654c5352",
-   "speaker": "ottilie",
-   "seconds": 6.59
-  },
-  "dlg.h9.talk.ottilie.5": {
-   "hash": "8be6879ad660",
-   "speaker": "narrator",
-   "seconds": 6.21
-  },
-  "dlg.h9.talk.ottilie.6": {
-   "hash": "d9b3733036dd",
-   "speaker": "ottilie",
-   "seconds": 2.42
-  },
-  "dlg.h9.talk.ottilie.7": {
-   "hash": "952f7ded6ef1",
-   "speaker": "ottilie",
-   "seconds": 6.24
-  },
-  "dlg.h9.talk.ottilie.8": {
-   "hash": "357fefc780c1",
-   "speaker": "ottilie",
-   "seconds": 5.9
-  },
-  "dlg.idle.merle.1.1": {
-   "hash": "1d1deecd1ce5",
-   "speaker": "merle",
-   "seconds": 4.6
-  },
-  "dlg.idle.ottilie.1.1": {
-   "hash": "42e55f5da37f",
-   "speaker": "ottilie",
-   "seconds": 4.36
-  },
-  "dlg.idle.ottilie.2.1": {
-   "hash": "c65cbbfac59f",
-   "speaker": "ottilie",
-   "seconds": 3.52
-  },
-  "dlg.idle.ottilie.3.1": {
-   "hash": "b84271ff4f0f",
-   "speaker": "ottilie",
-   "seconds": 4.36
-  },
-  "dlg.n1.done.1": {
-   "hash": "a358f783e0f1",
-   "speaker": "ilsabe",
-   "seconds": 4.28
-  },
-  "dlg.n1.done.2": {
-   "hash": "c0829ce0cd1c",
-   "speaker": "ilsabe",
-   "seconds": 8.23
-  },
-  "dlg.n1.done.3": {
-   "hash": "da2f586cef9e",
-   "speaker": "ilsabe",
-   "seconds": 2.66
-  },
-  "dlg.n1.hint.1": {
-   "hash": "679c4db225fc",
-   "speaker": "ilsabe",
-   "seconds": 5.28
-  },
-  "dlg.n1.offer.1": {
-   "hash": "588027b1c7f6",
-   "speaker": "ilsabe",
-   "seconds": 4.7
-  },
-  "dlg.n1.offer.2": {
-   "hash": "5784c5f31c46",
-   "speaker": "ilsabe",
-   "seconds": 7.47
-  },
-  "dlg.n1.offer.3": {
-   "hash": "d37054a3922a",
-   "speaker": "ilsabe",
-   "seconds": 5.5
-  },
-  "dlg.n10.done.1": {
-   "hash": "26238192f282",
-   "speaker": "jorin",
-   "seconds": 4.29
-  },
-  "dlg.n10.done.2": {
-   "hash": "71a2cf147906",
-   "speaker": "jorin",
-   "seconds": 8.95
-  },
-  "dlg.n10.hint.1": {
-   "hash": "23536aff6a69",
-   "speaker": "jorin",
-   "seconds": 5.51
-  },
-  "dlg.n10.offer.1": {
-   "hash": "1fc165a92ec5",
-   "speaker": "jorin",
-   "seconds": 3.84
-  },
-  "dlg.n10.offer.2": {
-   "hash": "ec2f08c05e79",
-   "speaker": "jorin",
-   "seconds": 6.81
-  },
-  "dlg.n11.done.1": {
-   "hash": "c0a6c9e4f968",
-   "speaker": "ilsabe",
-   "seconds": 5.02
-  },
-  "dlg.n11.done.2": {
-   "hash": "ae4dfb15bf5c",
-   "speaker": "ilsabe",
-   "seconds": 7.07
-  },
-  "dlg.n11.hint.1": {
-   "hash": "dd1e28ac073a",
-   "speaker": "ilsabe",
-   "seconds": 4.11
-  },
-  "dlg.n11.offer.1": {
-   "hash": "39427046e7f8",
-   "speaker": "ilsabe",
-   "seconds": 6.96
-  },
-  "dlg.n11.offer.2": {
-   "hash": "2568a2779a91",
-   "speaker": "ilsabe",
-   "seconds": 7.27
-  },
-  "dlg.n11.offer.3": {
-   "hash": "6df398511b9d",
-   "speaker": "ilsabe",
-   "seconds": 3.59
-  },
-  "dlg.n12.done.1": {
-   "hash": "433468ec3d05",
-   "speaker": "merle",
-   "seconds": 4.25
-  },
-  "dlg.n12.done.2": {
-   "hash": "980111b1020a",
-   "speaker": "merle",
-   "seconds": 3.98
-  },
-  "dlg.n12.hint.1": {
-   "hash": "9d17e562f3fe",
-   "speaker": "merle",
-   "seconds": 3.11
-  },
-  "dlg.n12.offer.1": {
-   "hash": "9334d42054b6",
-   "speaker": "merle",
-   "seconds": 3.82
-  },
-  "dlg.n12.offer.2": {
-   "hash": "d64652c9b9b0",
-   "speaker": "merle",
-   "seconds": 3.6
-  },
-  "dlg.n13.done.1": {
-   "hash": "5c942a622cec",
-   "speaker": "ilsabe",
-   "seconds": 2.75
-  },
-  "dlg.n13.done.2": {
-   "hash": "f1edb6c3a31e",
-   "speaker": "ilsabe",
-   "seconds": 4.07
-  },
-  "dlg.n13.hint.1": {
-   "hash": "3486293fba74",
-   "speaker": "ilsabe",
-   "seconds": 3.01
-  },
-  "dlg.n13.offer.1": {
-   "hash": "b8fa78d8b8d7",
-   "speaker": "ilsabe",
-   "seconds": 4.61
-  },
-  "dlg.n13.offer.2": {
-   "hash": "68c302128b3f",
-   "speaker": "ilsabe",
-   "seconds": 4.48
-  },
-  "dlg.n14.done.1": {
-   "hash": "8d6dbb9123b0",
-   "speaker": "merle",
-   "seconds": 4.47
-  },
-  "dlg.n14.done.2": {
-   "hash": "c9a084ac0823",
-   "speaker": "merle",
-   "seconds": 4.44
-  },
-  "dlg.n14.hint.1": {
-   "hash": "73752f9d8c8a",
-   "speaker": "merle",
-   "seconds": 5.03
-  },
-  "dlg.n14.offer.1": {
-   "hash": "6a302cdd7645",
-   "speaker": "merle",
-   "seconds": 3.74
-  },
-  "dlg.n14.offer.2": {
-   "hash": "d3343226cf4a",
-   "speaker": "merle",
-   "seconds": 3.81
-  },
-  "dlg.n15.done.1": {
-   "hash": "157055f12cd5",
-   "speaker": "ilsabe",
-   "seconds": 3.85
-  },
-  "dlg.n15.done.2": {
-   "hash": "211f0dda0ee1",
-   "speaker": "ilsabe",
-   "seconds": 3.82
-  },
-  "dlg.n15.hint.1": {
-   "hash": "15820a598daa",
-   "speaker": "ilsabe",
-   "seconds": 3.56
-  },
-  "dlg.n15.offer.1": {
-   "hash": "e3e722b9be32",
-   "speaker": "ilsabe",
-   "seconds": 4.07
-  },
-  "dlg.n15.offer.2": {
-   "hash": "3f604768acc1",
-   "speaker": "ilsabe",
-   "seconds": 3.89
-  },
-  "dlg.n2.done.1": {
-   "hash": "b3595da8db7f",
-   "speaker": "ottilie",
-   "seconds": 8.49
-  },
-  "dlg.n2.done.2": {
-   "hash": "5fb94f0f7963",
-   "speaker": "ottilie",
-   "seconds": 5.73
-  },
-  "dlg.n2.done.3": {
-   "hash": "2b27d6a6a1e0",
-   "speaker": "ottilie",
-   "seconds": 8.56
-  },
-  "dlg.n2.hint.1": {
-   "hash": "602c901d2d6b",
-   "speaker": "ottilie",
-   "seconds": 6.37
-  },
-  "dlg.n2.offer.1": {
-   "hash": "3628a1fd738d",
-   "speaker": "ottilie",
-   "seconds": 7.73
-  },
-  "dlg.n2.offer.2": {
-   "hash": "db973eb6e2c0",
-   "speaker": "ottilie",
-   "seconds": 4.08
-  },
-  "dlg.n3.done.1": {
-   "hash": "cbcd75830df1",
-   "speaker": "jorin",
-   "seconds": 0.83
-  },
-  "dlg.n3.done.2": {
-   "hash": "aea0e5f0b0fd",
-   "speaker": "jorin",
-   "seconds": 9.86
-  },
-  "dlg.n3.done.3": {
-   "hash": "c15f0ca2f727",
-   "speaker": "jorin",
-   "seconds": 5.99
-  },
-  "dlg.n3.hint.1": {
-   "hash": "234030570a5b",
-   "speaker": "jorin",
-   "seconds": 5.12
-  },
-  "dlg.n3.offer.1": {
-   "hash": "4fa5d33d743e",
-   "speaker": "jorin",
-   "seconds": 2.49
-  },
-  "dlg.n3.offer.2": {
-   "hash": "68c100d8b6c0",
-   "speaker": "jorin",
-   "seconds": 9.46
-  },
-  "dlg.n4.done.1": {
-   "hash": "1e5a15021a61",
-   "speaker": "narrator",
-   "seconds": 5.91
-  },
-  "dlg.n4.done.2": {
-   "hash": "48a766374b51",
-   "speaker": "merle",
-   "seconds": 1.72
-  },
-  "dlg.n4.done.3": {
-   "hash": "ad12de60f8bb",
-   "speaker": "merle",
-   "seconds": 3.65
-  },
-  "dlg.n4.hint.1": {
-   "hash": "d39f6f240bab",
-   "speaker": "merle",
-   "seconds": 4.83
-  },
-  "dlg.n4.offer.1": {
-   "hash": "222537ae69df",
-   "speaker": "merle",
-   "seconds": 5.37
-  },
-  "dlg.n4.offer.2": {
-   "hash": "0f458165971a",
-   "speaker": "merle",
-   "seconds": 4.12
-  },
-  "dlg.n4.offer.3": {
-   "hash": "0b3d0889fbc9",
-   "speaker": "merle",
-   "seconds": 4.07
-  },
-  "dlg.n5.done.1": {
-   "hash": "f7fbc0f10594",
-   "speaker": "ilsabe",
-   "seconds": 5.45
-  },
-  "dlg.n5.done.2": {
-   "hash": "2d200a0732c1",
-   "speaker": "ilsabe",
-   "seconds": 5.61
-  },
-  "dlg.n5.hint.1": {
-   "hash": "d718bafe0f2f",
-   "speaker": "ilsabe",
-   "seconds": 5.35
-  },
-  "dlg.n5.offer.1": {
-   "hash": "db495402a151",
-   "speaker": "ilsabe",
-   "seconds": 4.48
-  },
-  "dlg.n5.offer.2": {
-   "hash": "8dcb9ac382e7",
-   "speaker": "ilsabe",
-   "seconds": 7.87
-  },
-  "dlg.n5.offer.3": {
-   "hash": "7877020b154b",
-   "speaker": "ilsabe",
-   "seconds": 6.79
-  },
-  "dlg.n6.done.1": {
-   "hash": "da211f75e12f",
-   "speaker": "jorin",
-   "seconds": 2.36
-  },
-  "dlg.n6.done.2": {
-   "hash": "600654b7353e",
-   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
    "seconds": 5.55
   },
-  "dlg.n6.done.3": {
-   "hash": "fd5192e1ed6f",
-   "speaker": "jorin",
-   "seconds": 5.11
-  },
-  "dlg.n6.hint.1": {
-   "hash": "95f6b55f1c17",
-   "speaker": "jorin",
-   "seconds": 5.38
-  },
-  "dlg.n6.offer.1": {
-   "hash": "bf7cd1852256",
-   "speaker": "jorin",
-   "seconds": 5.26
-  },
-  "dlg.n6.offer.2": {
-   "hash": "b3185237afa2",
-   "speaker": "jorin",
-   "seconds": 6.24
-  },
-  "dlg.n7.done.1": {
-   "hash": "1d9d25ae6872",
-   "speaker": "ilsabe",
-   "seconds": 4.58
-  },
-  "dlg.n7.done.2": {
-   "hash": "bc6678b25b2c",
-   "speaker": "ilsabe",
-   "seconds": 5.59
-  },
-  "dlg.n7.done.3": {
-   "hash": "8dae72b1beb6",
-   "speaker": "ilsabe",
-   "seconds": 7.66
-  },
-  "dlg.n7.hint.1": {
-   "hash": "d31fac9c2a94",
-   "speaker": "ilsabe",
-   "seconds": 6.18
-  },
-  "dlg.n7.offer.1": {
-   "hash": "bed1e38b7bc6",
-   "speaker": "ilsabe",
-   "seconds": 5.78
-  },
-  "dlg.n7.offer.2": {
-   "hash": "4bcb06c1fad3",
-   "speaker": "ilsabe",
-   "seconds": 5.89
-  },
-  "dlg.n8.done.1": {
-   "hash": "d9300b3336e4",
-   "speaker": "ottilie",
-   "seconds": 2.95
-  },
-  "dlg.n8.done.2": {
-   "hash": "2f287fadde71",
-   "speaker": "ottilie",
-   "seconds": 5.11
-  },
-  "dlg.n8.hint.1": {
-   "hash": "791ed8510de1",
-   "speaker": "ottilie",
+  "bark.sehglas.find": {
+   "hash": "f97cdbaecce9",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
    "seconds": 4.22
   },
-  "dlg.n8.offer.1": {
-   "hash": "c24d908bf1fa",
-   "speaker": "ottilie",
-   "seconds": 4.99
+  "bark.thrall.fall": {
+   "hash": "6df1d2097857",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.06
   },
-  "dlg.n8.offer.2": {
-   "hash": "6e3f76790533",
+  "dlg.h1.done.1": {
+   "hash": "295a325f1a9a",
    "speaker": "ottilie",
-   "seconds": 4.61
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 0.88
   },
-  "dlg.n9.done.1": {
-   "hash": "a777fc64bc98",
-   "speaker": "ottilie",
-   "seconds": 3.64
+  "dlg.h1.done.2": {
+   "hash": "e7dc2d20fc52",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.13
   },
-  "dlg.n9.done.2": {
-   "hash": "64b7cf31e4be",
+  "dlg.h1.done.3": {
+   "hash": "0a7416c52d79",
    "speaker": "ottilie",
-   "seconds": 6.75
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.86
   },
-  "dlg.n9.done.3": {
-   "hash": "5a6deec240da",
+  "dlg.h1.done.4": {
+   "hash": "d395478e07d7",
    "speaker": "ottilie",
-   "seconds": 6.29
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.57
   },
-  "dlg.n9.hint.1": {
-   "hash": "a9e7a6226721",
+  "dlg.h1.done.5": {
+   "hash": "365650a759a7",
    "speaker": "ottilie",
-   "seconds": 4.81
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.56
   },
-  "dlg.n9.offer.1": {
-   "hash": "f00eeeb3e50d",
+  "dlg.h1.hint.1": {
+   "hash": "1de73f955ce2",
    "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.33
+  },
+  "dlg.h1.offer.1": {
+   "hash": "81044eb92f07",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.45
+  },
+  "dlg.h1.offer.2": {
+   "hash": "211402884388",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.2
+  },
+  "dlg.h1.offer.3": {
+   "hash": "5d5befb7cb43",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.86
+  },
+  "dlg.h1.offer.4": {
+   "hash": "15a674b1129c",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.49
+  },
+  "dlg.h10.done.1": {
+   "hash": "3f8fd30c9040",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.63
+  },
+  "dlg.h10.done.2": {
+   "hash": "fb11f3eff6b5",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.04
+  },
+  "dlg.h10.done.3": {
+   "hash": "fad6ccb3ff0e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.21
+  },
+  "dlg.h10.done.4": {
+   "hash": "6a5c93b8cb86",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.62
+  },
+  "dlg.h10.done.5": {
+   "hash": "1fcc70b0afd2",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.58
+  },
+  "dlg.h10.done.6": {
+   "hash": "604e9dfeaad5",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.09
+  },
+  "dlg.h10.hint.1": {
+   "hash": "3f9e231b3f1c",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.37
+  },
+  "dlg.h10.offer.1": {
+   "hash": "0fe13bb75f32",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.59
+  },
+  "dlg.h10.offer.2": {
+   "hash": "efffbf9ce456",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.39
+  },
+  "dlg.h10.offer.3": {
+   "hash": "bf7aa1660991",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.95
+  },
+  "dlg.h10.offer.4": {
+   "hash": "d6bfccbe2d0c",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.6
+  },
+  "dlg.h10.talk.ilsabe.1": {
+   "hash": "fa9791783d0d",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.96
+  },
+  "dlg.h10.talk.ilsabe.2": {
+   "hash": "4bd09a4424a8",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.21
+  },
+  "dlg.h10.talk.jorin.1": {
+   "hash": "4a03a6ffec8c",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.57
+  },
+  "dlg.h10.talk.jorin.2": {
+   "hash": "0adad22f6691",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.52
+  },
+  "dlg.h10.talk.merle.1": {
+   "hash": "8c87c612b666",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.23
+  },
+  "dlg.h10.talk.merle.2": {
+   "hash": "703707b2d441",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.9
+  },
+  "dlg.h10.talk.merle.3": {
+   "hash": "a24aef3a003d",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.75
+  },
+  "dlg.h10.talk.ottilie.1": {
+   "hash": "b60ebec43886",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.99
+  },
+  "dlg.h10.talk.ottilie.2": {
+   "hash": "193971d0118d",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.73
+  },
+  "dlg.h10.talk.ottilie.3": {
+   "hash": "c80b35af3b1a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.14
+  },
+  "dlg.h14.done.1": {
+   "hash": "ad39ef588eea",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.71
+  },
+  "dlg.h14.done.2": {
+   "hash": "7552ecd58e3a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.46
+  },
+  "dlg.h14.done.3": {
+   "hash": "df515ff6a5d0",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.2
+  },
+  "dlg.h14.hint.1": {
+   "hash": "a9b8f3553b67",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.74
+  },
+  "dlg.h14.offer.1": {
+   "hash": "bba13f8bd62b",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.27
+  },
+  "dlg.h14.offer.2": {
+   "hash": "424381776c85",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.71
+  },
+  "dlg.h14.offer.3": {
+   "hash": "43587599a5b7",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.28
+  },
+  "dlg.h14.offer.4": {
+   "hash": "a3970dbf036e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.4
+  },
+  "dlg.h15.hint.1": {
+   "hash": "825157a518fb",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.4
+  },
+  "dlg.h15.offer.1": {
+   "hash": "68f26041cfea",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.4
+  },
+  "dlg.h15.offer.2": {
+   "hash": "a4704a45b301",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.63
+  },
+  "dlg.h15.offer.3": {
+   "hash": "26e2ebf3617f",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.62
+  },
+  "dlg.h15.talk.ottilie.1": {
+   "hash": "f65459f2cd45",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.52
+  },
+  "dlg.h15.talk.ottilie.2": {
+   "hash": "710003ccfee0",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.69
+  },
+  "dlg.h15.talk.ottilie.3": {
+   "hash": "f628c195a3cc",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.63
+  },
+  "dlg.h16.done.1": {
+   "hash": "77041bad2136",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.55
+  },
+  "dlg.h16.done.2": {
+   "hash": "c0435cffda5b",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.94
+  },
+  "dlg.h16.done.3": {
+   "hash": "0f5fb56df06d",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.97
+  },
+  "dlg.h16.done.4": {
+   "hash": "b655ed6830a7",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.64
+  },
+  "dlg.h16.hint.1": {
+   "hash": "388dae873e09",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.56
+  },
+  "dlg.h16.offer.1": {
+   "hash": "40db3a7c556b",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.06
+  },
+  "dlg.h16.offer.2": {
+   "hash": "75fe13c06c07",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.36
+  },
+  "dlg.h16.offer.3": {
+   "hash": "9f4b2ae25708",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.99
+  },
+  "dlg.h16.offer.4": {
+   "hash": "e29c0fae2fd9",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.25
+  },
+  "dlg.h17.offer.1": {
+   "hash": "5a84e1767586",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.66
+  },
+  "dlg.h17.offer.2": {
+   "hash": "9dfca6bb96fa",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.17
+  },
+  "dlg.h17.offer.3": {
+   "hash": "122ca5197c4e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.97
+  },
+  "dlg.h17.talk.ilsabe.1": {
+   "hash": "e2d5dfa0faa5",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.06
+  },
+  "dlg.h17.talk.ilsabe.2": {
+   "hash": "3028aa6fb6a9",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.79
+  },
+  "dlg.h17.talk.ilsabe.3": {
+   "hash": "ebd349d5ca20",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.52
+  },
+  "dlg.h17.talk.ilsabe.4": {
+   "hash": "803397078ea4",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.61
+  },
+  "dlg.h17.talk.ottilie.1": {
+   "hash": "d37d8b5e69f5",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.29
+  },
+  "dlg.h17.talk.ottilie.2": {
+   "hash": "b55ae4a4197a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.27
+  },
+  "dlg.h17.talk.ottilie.3": {
+   "hash": "9a0f067738eb",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.92
+  },
+  "dlg.h17.talk.ottilie.4": {
+   "hash": "a78f9153dbd6",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.2
+  },
+  "dlg.h18.hint.1": {
+   "hash": "6938964951f0",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.0
+  },
+  "dlg.h18.talk.merle.1": {
+   "hash": "16eb285ea917",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.64
+  },
+  "dlg.h18.talk.merle.2": {
+   "hash": "00d7954404a3",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.72
+  },
+  "dlg.h18.talk.merle.3": {
+   "hash": "220bba5bd903",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.2
+  },
+  "dlg.h18.talk.merle.4": {
+   "hash": "5ce52645018f",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.56
+  },
+  "dlg.h19.hint.1": {
+   "hash": "6aacc309a4a9",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.67
+  },
+  "dlg.h2.done.1": {
+   "hash": "ec5de94ea904",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.25
+  },
+  "dlg.h2.done.2": {
+   "hash": "d8e0c53773b5",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.74
+  },
+  "dlg.h2.hint.1": {
+   "hash": "dea6127f5bad",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.18
+  },
+  "dlg.h2.offer.1": {
+   "hash": "d177f711c023",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 11.46
+  },
+  "dlg.h2.offer.2": {
+   "hash": "08c201b4e324",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.88
+  },
+  "dlg.h2.offer.3": {
+   "hash": "db7557d2437c",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.45
+  },
+  "dlg.h2.offer.4": {
+   "hash": "1447b15b6178",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.59
+  },
+  "dlg.h2.offer.5": {
+   "hash": "dcd5ac374857",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.68
+  },
+  "dlg.h3.hint.1": {
+   "hash": "c23684736fc7",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.93
+  },
+  "dlg.h3.offer.1": {
+   "hash": "237573ba2b6a",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.95
+  },
+  "dlg.h3.offer.2": {
+   "hash": "7e637ae635a8",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.41
+  },
+  "dlg.h3.offer.3": {
+   "hash": "030cb368fa54",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.41
+  },
+  "dlg.h3.offer.4": {
+   "hash": "ed3ec73e8b6e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.37
+  },
+  "dlg.h3.offer.5": {
+   "hash": "5b4c8fd13319",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.25
+  },
+  "dlg.h3.offer.6": {
+   "hash": "796e49cc5395",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.81
+  },
+  "dlg.h3.offer.7": {
+   "hash": "7e38ff9218de",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.66
+  },
+  "dlg.h3.offer.8": {
+   "hash": "f9f3a720582f",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.79
+  },
+  "dlg.h3.talk.jorin.1": {
+   "hash": "62b2d4c63cb3",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.37
+  },
+  "dlg.h3.talk.jorin.2": {
+   "hash": "e095738b137b",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.65
+  },
+  "dlg.h3.talk.jorin.3": {
+   "hash": "92a332da1643",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.05
+  },
+  "dlg.h3.talk.jorin.4": {
+   "hash": "39e76ecb671a",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.23
+  },
+  "dlg.h3.talk.jorin.5": {
+   "hash": "c66c35abda96",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.31
+  },
+  "dlg.h4.done.1": {
+   "hash": "b5db8b404a54",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.8
+  },
+  "dlg.h4.done.2": {
+   "hash": "616bf4da0b5a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.12
+  },
+  "dlg.h4.done.3": {
+   "hash": "d8f2203d7ec0",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.11
+  },
+  "dlg.h4.done.4": {
+   "hash": "4321bc34a766",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 1.44
+  },
+  "dlg.h4.done.5": {
+   "hash": "8c569e62bf0a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.01
+  },
+  "dlg.h4.hint.1": {
+   "hash": "343f6260e2e7",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.81
+  },
+  "dlg.h5.done.1": {
+   "hash": "2a707e6ec86d",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.49
+  },
+  "dlg.h5.done.2": {
+   "hash": "1ebaf5b75181",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.98
+  },
+  "dlg.h5.done.3": {
+   "hash": "f9504886c129",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 1.1
+  },
+  "dlg.h5.done.4": {
+   "hash": "d39813d60ca6",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.68
+  },
+  "dlg.h5.done.5": {
+   "hash": "3f63144d0c4e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.93
+  },
+  "dlg.h5.done.6": {
+   "hash": "1ddc928e7b3e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.5
+  },
+  "dlg.h5.hint.1": {
+   "hash": "01d1a28a286f",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.76
+  },
+  "dlg.h5.offer.1": {
+   "hash": "14fa213a95bc",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.03
+  },
+  "dlg.h5.offer.2": {
+   "hash": "bb513b99fc4f",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.63
+  },
+  "dlg.h5.offer.3": {
+   "hash": "3e51c45807ac",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.48
+  },
+  "dlg.h5.offer.4": {
+   "hash": "8135695bb4dc",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.03
+  },
+  "dlg.h5.offer.5": {
+   "hash": "187e1b328f82",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.13
+  },
+  "dlg.h5.offer.6": {
+   "hash": "ca4c09b065ee",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.24
+  },
+  "dlg.h5.offer.7": {
+   "hash": "913e0c27d230",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.34
+  },
+  "dlg.h5.talk.ilsabe.1": {
+   "hash": "34658bd02d80",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.84
+  },
+  "dlg.h5.talk.ilsabe.2": {
+   "hash": "c7c60972bc7b",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.59
+  },
+  "dlg.h5.talk.ilsabe.3": {
+   "hash": "25cb6e34e480",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.35
+  },
+  "dlg.h5.talk.ilsabe.4": {
+   "hash": "d1f685266726",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.21
+  },
+  "dlg.h6.hint.1": {
+   "hash": "3fc8b564216f",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.96
+  },
+  "dlg.h6.offer.1": {
+   "hash": "875a634d93d1",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.42
+  },
+  "dlg.h6.offer.2": {
+   "hash": "ae00295f4f67",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.38
+  },
+  "dlg.h6.offer.3": {
+   "hash": "1cfadd86cc6f",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.68
+  },
+  "dlg.h6.offer.4": {
+   "hash": "9588d007a8b9",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.07
+  },
+  "dlg.h6.offer.5": {
+   "hash": "86c497bb8e03",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.06
+  },
+  "dlg.h6.offer.6": {
+   "hash": "ad975232560a",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.78
+  },
+  "dlg.h7.hint.1": {
+   "hash": "cc8dd140e587",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.43
+  },
+  "dlg.h8.hint.1": {
+   "hash": "b7b22e392bc7",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.23
+  },
+  "dlg.h9.talk.merle.1": {
+   "hash": "1edf82ac445b",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.44
+  },
+  "dlg.h9.talk.merle.2": {
+   "hash": "fed79f83a5d1",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.07
+  },
+  "dlg.h9.talk.merle.3": {
+   "hash": "9512e60e14d1",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.4
+  },
+  "dlg.h9.talk.merle.4": {
+   "hash": "16618f21dab5",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.68
+  },
+  "dlg.h9.talk.merle.5": {
+   "hash": "d3534bd21c6e",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.73
+  },
+  "dlg.h9.talk.merle.6": {
+   "hash": "06cfece09b10",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.47
+  },
+  "dlg.h9.talk.merle.7": {
+   "hash": "71b601215b05",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.08
+  },
+  "dlg.h9.talk.ottilie.1": {
+   "hash": "64d5b5952989",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.71
+  },
+  "dlg.h9.talk.ottilie.2": {
+   "hash": "5068398c0b47",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.61
+  },
+  "dlg.h9.talk.ottilie.3": {
+   "hash": "9cc082696e12",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.66
+  },
+  "dlg.h9.talk.ottilie.4": {
+   "hash": "51dfc57250d0",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.73
+  },
+  "dlg.h9.talk.ottilie.5": {
+   "hash": "05f0402b5da0",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.17
+  },
+  "dlg.h9.talk.ottilie.6": {
+   "hash": "ef72184d1660",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.32
+  },
+  "dlg.h9.talk.ottilie.7": {
+   "hash": "52fc4acaf154",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.56
+  },
+  "dlg.h9.talk.ottilie.8": {
+   "hash": "5276b24c866a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.8
+  },
+  "dlg.idle.merle.1.1": {
+   "hash": "cc0274caf9bf",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.03
+  },
+  "dlg.idle.ottilie.1.1": {
+   "hash": "8274e80835f5",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.51
+  },
+  "dlg.idle.ottilie.2.1": {
+   "hash": "0710628eb443",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.97
+  },
+  "dlg.idle.ottilie.3.1": {
+   "hash": "08463681b00b",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.23
+  },
+  "dlg.n1.done.1": {
+   "hash": "7ec96233fd27",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.73
+  },
+  "dlg.n1.done.2": {
+   "hash": "beac1eb45c7e",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.67
+  },
+  "dlg.n1.done.3": {
+   "hash": "850e0472df12",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.31
+  },
+  "dlg.n1.hint.1": {
+   "hash": "b53b85a83d27",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.25
+  },
+  "dlg.n1.offer.1": {
+   "hash": "32702b14c562",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
    "seconds": 4.86
   },
-  "dlg.n9.offer.2": {
-   "hash": "beb77f2910c4",
+  "dlg.n1.offer.2": {
+   "hash": "b5ece5e5bf36",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.13
+  },
+  "dlg.n1.offer.3": {
+   "hash": "e513a64e208f",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.54
+  },
+  "dlg.n10.done.1": {
+   "hash": "2681d169d9bb",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.56
+  },
+  "dlg.n10.done.2": {
+   "hash": "c90cd701f5ce",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.99
+  },
+  "dlg.n10.hint.1": {
+   "hash": "0fe85b7f9d38",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.55
+  },
+  "dlg.n10.offer.1": {
+   "hash": "04ec7034bdb0",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.98
+  },
+  "dlg.n10.offer.2": {
+   "hash": "1c2dfe909ee1",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.09
+  },
+  "dlg.n11.done.1": {
+   "hash": "96164b062831",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.79
+  },
+  "dlg.n11.done.2": {
+   "hash": "45a922f28f0b",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.27
+  },
+  "dlg.n11.hint.1": {
+   "hash": "989167e2b82e",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.32
+  },
+  "dlg.n11.offer.1": {
+   "hash": "369ff2b6ecd3",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.3
+  },
+  "dlg.n11.offer.2": {
+   "hash": "ddfa89eae918",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.03
+  },
+  "dlg.n11.offer.3": {
+   "hash": "99a8fefd3964",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.68
+  },
+  "dlg.n12.done.1": {
+   "hash": "1f38e8b93a5d",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.78
+  },
+  "dlg.n12.done.2": {
+   "hash": "63f908ead9a4",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.11
+  },
+  "dlg.n12.hint.1": {
+   "hash": "43c612ce65aa",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.3
+  },
+  "dlg.n12.offer.1": {
+   "hash": "fd1fd8911f5d",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.6
+  },
+  "dlg.n12.offer.2": {
+   "hash": "fe3d3e4595ac",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.87
+  },
+  "dlg.n13.done.1": {
+   "hash": "fba98715f469",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.82
+  },
+  "dlg.n13.done.2": {
+   "hash": "6cc922baa1b9",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.75
+  },
+  "dlg.n13.hint.1": {
+   "hash": "892fa38d983b",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.57
+  },
+  "dlg.n13.offer.1": {
+   "hash": "9d776d90df2c",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.99
+  },
+  "dlg.n13.offer.2": {
+   "hash": "164799bee600",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.1
+  },
+  "dlg.n14.done.1": {
+   "hash": "db9504698e41",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.25
+  },
+  "dlg.n14.done.2": {
+   "hash": "ae5058a60034",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.36
+  },
+  "dlg.n14.hint.1": {
+   "hash": "d5d9b412feaa",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.72
+  },
+  "dlg.n14.offer.1": {
+   "hash": "83fac408748e",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.7
+  },
+  "dlg.n14.offer.2": {
+   "hash": "df0162adc227",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.25
+  },
+  "dlg.n15.done.1": {
+   "hash": "d5405cb1555f",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.44
+  },
+  "dlg.n15.done.2": {
+   "hash": "3ac9aa2586f4",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.49
+  },
+  "dlg.n15.hint.1": {
+   "hash": "8d31503d4823",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.21
+  },
+  "dlg.n15.offer.1": {
+   "hash": "aa1c11c4e7c8",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.66
+  },
+  "dlg.n15.offer.2": {
+   "hash": "d42014db8c70",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.32
+  },
+  "dlg.n2.done.1": {
+   "hash": "13c5cda50eca",
    "speaker": "ottilie",
-   "seconds": 4.3
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.08
+  },
+  "dlg.n2.done.2": {
+   "hash": "1216602beb77",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.08
+  },
+  "dlg.n2.done.3": {
+   "hash": "83a4cb296d29",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 7.91
+  },
+  "dlg.n2.hint.1": {
+   "hash": "293762b15ce0",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.82
+  },
+  "dlg.n2.offer.1": {
+   "hash": "0cf03b2b567a",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.34
+  },
+  "dlg.n2.offer.2": {
+   "hash": "a5ecd2e6801e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.99
+  },
+  "dlg.n3.done.1": {
+   "hash": "9b602e156fe6",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 0.95
+  },
+  "dlg.n3.done.2": {
+   "hash": "55f64a2c99d2",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 11.92
+  },
+  "dlg.n3.done.3": {
+   "hash": "ab94fc4fd891",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.05
+  },
+  "dlg.n3.hint.1": {
+   "hash": "e4eeae484c98",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.48
+  },
+  "dlg.n3.offer.1": {
+   "hash": "bbb2dcf9af42",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.38
+  },
+  "dlg.n3.offer.2": {
+   "hash": "ac7ed9b3daf4",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 9.82
+  },
+  "dlg.n4.done.1": {
+   "hash": "7f00f3dba136",
+   "speaker": "narrator",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.99
+  },
+  "dlg.n4.done.2": {
+   "hash": "037e07f417e2",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.11
+  },
+  "dlg.n4.done.3": {
+   "hash": "0a8af9ed9c6b",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.3
+  },
+  "dlg.n4.hint.1": {
+   "hash": "8340a5ce5db7",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.81
+  },
+  "dlg.n4.offer.1": {
+   "hash": "0171752d41bf",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.24
+  },
+  "dlg.n4.offer.2": {
+   "hash": "881cc3f3f64f",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.02
+  },
+  "dlg.n4.offer.3": {
+   "hash": "e1af7e9342f1",
+   "speaker": "merle",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.54
+  },
+  "dlg.n5.done.1": {
+   "hash": "84c3d3bc70d6",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.91
+  },
+  "dlg.n5.done.2": {
+   "hash": "0d912730617a",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.96
+  },
+  "dlg.n5.hint.1": {
+   "hash": "fe202e92924c",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.25
+  },
+  "dlg.n5.offer.1": {
+   "hash": "082b161e21e5",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.07
+  },
+  "dlg.n5.offer.2": {
+   "hash": "02b783f4e4fe",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.62
+  },
+  "dlg.n5.offer.3": {
+   "hash": "800edbcbe3ad",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.24
+  },
+  "dlg.n6.done.1": {
+   "hash": "8aace54214b6",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.2
+  },
+  "dlg.n6.done.2": {
+   "hash": "3f7bdd472fe6",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.26
+  },
+  "dlg.n6.done.3": {
+   "hash": "8a05b1be19af",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.18
+  },
+  "dlg.n6.hint.1": {
+   "hash": "da9156add20c",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.04
+  },
+  "dlg.n6.offer.1": {
+   "hash": "0b25783785b9",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.07
+  },
+  "dlg.n6.offer.2": {
+   "hash": "24925a3561d3",
+   "speaker": "jorin",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.09
+  },
+  "dlg.n7.done.1": {
+   "hash": "c4e80eaeb7ae",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.4
+  },
+  "dlg.n7.done.2": {
+   "hash": "314514bc798b",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.27
+  },
+  "dlg.n7.done.3": {
+   "hash": "16d4197214ce",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 8.69
+  },
+  "dlg.n7.hint.1": {
+   "hash": "559169cdf0d1",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.59
+  },
+  "dlg.n7.offer.1": {
+   "hash": "233579917119",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.81
+  },
+  "dlg.n7.offer.2": {
+   "hash": "c12025c2b6ec",
+   "speaker": "ilsabe",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.66
+  },
+  "dlg.n8.done.1": {
+   "hash": "26d432ca8bbd",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 2.75
+  },
+  "dlg.n8.done.2": {
+   "hash": "4c9dba2559eb",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.74
+  },
+  "dlg.n8.hint.1": {
+   "hash": "6e7dd2906660",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.76
+  },
+  "dlg.n8.offer.1": {
+   "hash": "902578a086a5",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.16
+  },
+  "dlg.n8.offer.2": {
+   "hash": "e15e6f6eae6e",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.18
+  },
+  "dlg.n9.done.1": {
+   "hash": "e5f9db2766f2",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 3.55
+  },
+  "dlg.n9.done.2": {
+   "hash": "c309f7a267a6",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.85
+  },
+  "dlg.n9.done.3": {
+   "hash": "7565debe75c8",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.66
+  },
+  "dlg.n9.hint.1": {
+   "hash": "331b13686fd4",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 6.19
+  },
+  "dlg.n9.offer.1": {
+   "hash": "a27e6c92c00b",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 4.4
+  },
+  "dlg.n9.offer.2": {
+   "hash": "7ab6c7968644",
+   "speaker": "ottilie",
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+   "seconds": 5.02
   }
  }
 }

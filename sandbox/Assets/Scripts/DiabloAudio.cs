@@ -118,8 +118,11 @@ public static class DiabloAudio
     public static AudioClip TwangClip { get { EnsureBuilt(); return twangClip; } }
     public static AudioClip CritClip { get { EnsureBuilt(); return critClip; } }
     public static AudioClip LevelUpClip { get { EnsureBuilt(); return levelUpClip; } }
-    /// <summary>Seamless moor wind + subtle sub floor loop (ambient bed).</summary>
+    /// <summary>Seamless moor wind + subtle sub floor loop (ambient bed synth clip).</summary>
     public static AudioClip AmbientClip { get { EnsureBuilt(); return ambientClip; } }
+
+    /// <summary>Authored Addressable ambient bed if present, else runtime synth fallback.</summary>
+    public static AudioClip ResolveAmbient() { EnsureBuilt(); return Resolve("Ambient", ambientClip); }
 
     static readonly System.Collections.Generic.Dictionary<string, AudioClip> overrides =
         new System.Collections.Generic.Dictionary<string, AudioClip>();
