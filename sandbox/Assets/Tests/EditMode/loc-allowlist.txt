@@ -351,3 +351,8 @@ Classes/HeroGearModels.cs	Anchor shank
 Classes/HeroGearModels.cs	Mire chain
 Classes/HeroGearModels.cs	Powder charge
 Classes/HeroGearModels.cs	Tarred limb
+SessionAutoplay.cs	phase actbosses: kills=[
+SessionAutoplay.cs	phase boss4 start (Thewes)
+SessionAutoplay.cs	phase boss4: FAIL Thewes not found
+SessionAutoplay.cs	phase boss4: finalBoss={down} h12={RunProfile.Story.Status(
+SessionAutoplay.cs	quest gate act {act}: ready={open.Count == 0} open=[{string.Join(

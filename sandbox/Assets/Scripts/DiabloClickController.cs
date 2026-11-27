@@ -420,6 +420,7 @@ public sealed class DiabloClickController : MonoBehaviour
     void UpdateCamera(Camera cam)
     {
         if (cam == null) return;
+        if (CutsceneDirector.OwnsCamera) return; // boss intro frames the boss; follow resumes after
         var pivot = transform.position + Vector3.up * 1f;
         var rot = Quaternion.Euler(pitch, yaw, 0f);
         cam.transform.position = pivot - rot * Vector3.forward * distance + DiabloJuice.ShakeOffset;

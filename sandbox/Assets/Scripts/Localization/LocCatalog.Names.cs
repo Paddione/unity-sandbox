@@ -30,6 +30,7 @@ public static partial class LocCatalog
         E("name.enemy.glasselite", "Glasvogt", "Glass Elite"),
         E("name.enemy.glasspillar", "Glassäule", "Glass Pillar"),
         E("name.enemy.glasswright", "Der Glasmacher", "The Glasswright"),
+        E("name.enemy.thewes", "Thewes, der Heimkehrer", "Thewes the Homecomer"),
 
         // Classes and roles
         E("name.class.fenwalker", "Moorgänger", "Fenwalker"),
@@ -64,17 +65,8 @@ public static partial class LocCatalog
         E("name.skill.thrust", "Stoß", "Thrust"),
         E("name.skill.block", "Block", "Block"),
 
-        // Boss ability showcase captions (cutscene.ability.*)
-        E("cutscene.ability.abbot.slam", "Erdschlag — raus aus dem Kreis!", "Ground Slam — leave the circle!"),
-        E("cutscene.ability.abbot.combo", "Nahkampf-Kombo — bleib in Bewegung!", "Melee Combo — keep moving!"),
-        E("cutscene.ability.abbot.summon", "Phase 2: Er ruft drei Hüllen zu Hilfe!", "Phase 2: He summons three Husks!"),
-        E("cutscene.ability.abbot.firefan", "Feuerfächer am Schlag — weiche seitlich aus!", "Fire Fan on the slam — dodge sideways!"),
-        E("cutscene.ability.kilnmother.wave", "Feuerwelle — stell dich in die Lücke!", "Fire Wave — stand in the gap!"),
-        E("cutscene.ability.kilnmother.field", "Phase 2: Brennender Boden unter deinen Füßen!", "Phase 2: Burning ground beneath your feet!"),
-        E("cutscene.ability.kilnmother.summon", "Sie ruft vier Schlackenknechte!", "She summons four Cinder Thralls!"),
-        E("cutscene.ability.glasswright.lances", "Scherbenlanzen — tritt seitlich aus der Linie!", "Shard Lances — step out of the line!"),
-        E("cutscene.ability.glasswright.pillars", "Phase 2: Glassäulen schirmen ihn ab — zerschlag sie!", "Phase 2: Glass Pillars ward him — shatter them!"),
-        E("cutscene.ability.glasswright.field", "Scherbenfelder unter dir — Entfacht droht die Splitternova!", "Shard fields beneath you — Kindled brings the Shatter Nova!"),
+        // Boss ability showcases (cutscene.ability.*) carry no captions since
+        // cinderreach-act-boss-gating: players read the abilities from the animation.
 
         // Difficulty
         E("name.difficulty.normal", "Normal", "Normal"),

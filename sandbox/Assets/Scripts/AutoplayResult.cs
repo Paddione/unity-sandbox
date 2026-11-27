@@ -25,12 +25,14 @@ public sealed class AutoplayResult
     public const string PhaseZone4 = "zone4";
     public const string PhaseBoss3 = "boss3";
     public const string PhaseComplete = "complete";
+    // cinderreach-act-boss-gating: Thewes falls last, after every other Act-III quest.
+    public const string PhaseFinalBoss = "boss4";
     /// <summary>autoplay-quests: every story quest played to Done (no catch-up). Only required in quest mode.</summary>
     public const string PhaseQuests = "quests";
 
     /// <summary>Canonical order; a full session reaches all of them.</summary>
     public static readonly string[] RequiredPhases =
-        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3, PhaseComplete };
+        { PhaseTown, PhaseZone1, PhaseGate, PhaseZone2, PhaseBoss, PhaseZone3, PhaseActBoss, PhaseZone4, PhaseBoss3, PhaseComplete, PhaseFinalBoss };
 
     public int schema = Schema;
     public string commit = "unknown";
@@ -60,7 +62,7 @@ public sealed class AutoplayResult
     public float hpRestored;
     /// <summary>Combo payoffs on the route, "Name=count" (class-kits-parity).</summary>
     public List<string> combos = new List<string>();
-    /// <summary>autoplay-quests: the run played the story quests (solo default; off with -autoplay-no-quests and in co-op).</summary>
+    /// <summary>autoplay-quests: the run played the story quests (solo and co-op host; act bosses need them).</summary>
     public bool questMode;
     /// <summary>Story quests in the catalog / Done at the end of the run.</summary>
     public int questsTotal;
@@ -71,6 +73,8 @@ public sealed class AutoplayResult
     public List<string> questsCaughtUp = new List<string>();
     /// <summary>Terrain navigation: path plans and last-resort warps onto validated cells.</summary>
     public int navPlans;
+    /// <summary>cinderreach-act-boss-gating: act-boss kills in order, "act:boss:open" ("-" = all other act quests were Done).</summary>
+    public List<string> actBossKills = new List<string>();
     public int navWarps;
 
     public const string RoleSolo = "solo";
@@ -114,7 +118,21 @@ public sealed class AutoplayResult
     {
         foreach (var p in RequiredFor(role))
             if (!phases.Contains(p)) return false;
+        if (role == RoleSolo || role == RoleHost)
+            if (!ActBossesFellLast()) return false;
         return !questMode || phases.Contains(PhaseQuests);
+    }
+
+    /// <summary>cinderreach-act-boss-gating: all three act bosses fell, each after every other quest of its act.</summary>
+    public bool ActBossesFellLast()
+    {
+        var acts = new HashSet<string>();
+        foreach (var k in actBossKills)
+        {
+            if (string.IsNullOrEmpty(k) || !k.EndsWith(":-")) return false;
+            acts.Add(k.Split(':')[0]);
+        }
+        return acts.Contains("1") && acts.Contains("2") && acts.Contains("3");
     }
 
     /// <summary>Exit code: 0 only with all phases and zero exceptions.</summary>

@@ -105,9 +105,9 @@ public class CutsceneDirectorTests
     }
 
     [Test]
-    public void ShowcaseData_EveryBossHasAbilitiesAndResolvedCaptions()
+    public void ShowcaseData_EveryBossHasAbilitiesWithoutCaptions()
     {
-        Assert.AreEqual(3, CutsceneDirector.BossIntros.Length);
+        Assert.AreEqual(4, CutsceneDirector.BossIntros.Length);
         foreach (var intro in CutsceneDirector.BossIntros)
         {
             Assert.GreaterOrEqual(intro.duration, 8f, intro.id);
@@ -119,10 +119,12 @@ public class CutsceneDirectorTests
             Assert.IsNotNull(intro.phaseTwoAbilities, intro.id);
             Assert.GreaterOrEqual(intro.phaseOneAbilities.Length, 1, intro.id);
             Assert.GreaterOrEqual(intro.phaseTwoAbilities.Length, 1, intro.id);
+            // cinderreach-act-boss-gating: abilities are read from the animation, no caption text exists.
             foreach (var key in intro.phaseOneAbilities)
-                Assert.AreNotEqual(key, Loc.T(key), key);
+                Assert.IsFalse(LocCatalog.TryGet(key, Loc.English, out _), key);
             foreach (var key in intro.phaseTwoAbilities)
-                Assert.AreNotEqual(key, Loc.T(key), key);
+                Assert.IsFalse(LocCatalog.TryGet(key, Loc.English, out _), key);
+            Assert.AreNotEqual(intro.bannerKey, Loc.T(intro.bannerKey), intro.bannerKey);
         }
     }
 
@@ -136,6 +138,7 @@ public class CutsceneDirectorTests
         CutsceneDirector.Tick(13f); // first step at 9 * 1/3 = 3 s
         Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.slam"));
         Assert.AreEqual("cutscene.ability.abbot.slam", CutsceneDirector.CurrentAbilityKey);
+        Assert.AreEqual(Loc.T("name.enemy.abbot"), CutsceneDirector.BannerText, "banner keeps the name, no caption");
         CutsceneDirector.Tick(16f); // second step at 9 * 2/3 = 6 s
         Assert.AreEqual(1, CutsceneDirector.ShowcaseCastCount("cutscene.ability.abbot.combo"));
         Assert.AreEqual(2, CutsceneDirector.ShowcaseCasts);

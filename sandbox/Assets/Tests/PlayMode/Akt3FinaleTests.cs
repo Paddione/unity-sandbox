@@ -434,62 +434,52 @@ public class Akt3FinaleTests
     }
 
     [UnityTest]
-    public IEnumerator Thewes_Auftritt_H11RespawnNachFruehemKill()
-    // quest:h11 quest:h12 quest:h13
-    // S3c: Thewes stirbt im Akt-II-Sweep vor H9, tritt aber erst mit H11
-    // am Moortor auf (Respawn bei H11-Aktivierung, genau 1x, kein Doppel).
+    public IEnumerator Thewes_ErscheintErstNachAllenAkt3Quests()
+    // quest:h11 quest:h12 quest:h13 quest:n6 quest:n7
+    // cinderreach-act-boss-gating: Thewes ruht, bis H10/H11/N6/N7 erledigt
+    // sind (ersetzt den H11-Auftritt aus S3c), erscheint genau 1x mit
+    // Spawn-Cutscene und faellt als letzte Akt-III-Aufgabe vor H13.
     {
+        ActBossGate.ResetRun();
         DriveToH11();
-        Assert.AreEqual(0, StoryDirector.ThewesEntranceEntries);
-        // Akt-II-Sweep: Thewes liegt schon tot da, kein Auftritt vor H11.
-        var early = MakeThewes(ThewesPos);
-        StoryDirector.BookKill(StoryIds.Thewes);
-        Object.DestroyImmediate(early);
-        Assert.AreEqual(StoryStatus.Active, S().Status("h11"));
-        // H11-Kante: Gate steht, dritte Spur nennt ihn — er erscheint neu.
-        var gate = MakeGate(ZoneGate.MoortorGateName, MoortorGatePos, MoortorArrival, ActProgress.Barrens);
+        CollectionAssert.AreEqual(new[] { "h10", "n6", "n7", "h11" }, ActBossGate.RequiredQuests(3));
+        var thewes = MakeThewes(ThewesPos);
         try
         {
-            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
-            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
-            Assert.AreEqual(StoryStatus.Active, S().Status("h11"));
-            StoryDirector.MaybeSpawnThewesAtH11();
-            Assert.AreEqual(1, StoryDirector.ThewesEntranceEntries, "Kante feuert genau 1x");
-            yield return null;
-            var foes = new System.Collections.Generic.List<EnemyHealth>(
-                Object.FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None));
-            int thewesCount = 0;
-            EnemyHealth thewes = null;
-            foreach (var h in foes)
-                if (h != null && h.name == StoryIds.Thewes) { thewesCount++; thewes = h; }
-            Assert.AreEqual(1, thewesCount, "genau ein Thewes nach Respawn");
-            Assert.IsNotNull(thewes);
-            Assert.AreEqual(LootTier.Boss, thewes.tier);
-            Assert.AreEqual(GlasswrightController.MaxHP, thewes.CurrentHP, "volles HP");
-            Assert.AreEqual(StoryIds.Thewes, thewes.name, "exakter Name");
-            // Lebendig: kein Doppel-Spawn, Kante bleibt bei 1x.
-            StoryDirector.MaybeSpawnThewesAtH11();
-            Assert.AreEqual(1, StoryDirector.ThewesEntranceEntries);
-            yield return null;
-            thewesCount = 0;
-            foreach (var h in Object.FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None))
-                if (h != null && h.name == StoryIds.Thewes) thewesCount++;
-            Assert.AreEqual(1, thewesCount, "kein Doppel-Spawn wenn lebendig");
-            // Dritte Spur: H12 wartet, Thewes faellt, H13 entscheidet.
-            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
+            ActBossGate.Tick(10f);
+            Assert.IsFalse(thewes.activeSelf, "ruht, solange Akt-III-Quests offen sind");
+            Assert.IsNull(GameObject.Find(StoryIds.Thewes));
+            for (int i = 0; i < 3; i++) Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Glutspur));
             Assert.AreEqual(StoryStatus.Done, S().Status("h11"));
             Assert.AreEqual(StoryStatus.Active, S().Status("h12"));
+            ActBossGate.Tick(11f);
+            Assert.IsFalse(thewes.activeSelf, "N6/N7 offen: weiter kein Thewes");
+            Assert.IsTrue(S().Accept("n6"));
+            for (int i = 0; i < 4; i++) Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Lanzenspitze));
+            StoryDirector.BookTalk(StoryIds.Jorin, hero);
+            Assert.IsTrue(S().Accept("n7"));
+            Assert.IsTrue(StoryDirector.BookCollect(StoryIds.Spendenseite));
+            StoryDirector.BookTalk(StoryIds.Ilsabe, hero);
+            Assert.AreEqual(StoryStatus.Done, S().Status("n6"));
+            Assert.AreEqual(StoryStatus.Done, S().Status("n7"));
+            ActBossGate.Tick(12f);
+            Assert.IsTrue(thewes.activeSelf, "alle anderen Akt-III-Quests erledigt");
+            Assert.AreEqual(1, ActBossGate.Spawns[2]);
+            Assert.AreEqual("intro.thewes", CutsceneDirector.ActiveId, "Spawn-Cutscene startet sofort");
+            Assert.IsTrue(S().Flags.Contains(ActBossGate.SpawnFlag(3)), "Cutscene gilt als gespielt (Save)");
+            ActBossGate.Tick(13f);
+            Assert.AreEqual(1, ActBossGate.Spawns[2], "genau 1x");
+            CutsceneDirector.Skip();
             StoryDirector.BookKill(thewes.name);
             Assert.AreEqual(StoryStatus.Done, S().Status("h12"));
+            CollectionAssert.AreEqual(new[] { "3:Thewes:-" }, ActBossGate.KillLog, "Thewes faellt zuletzt");
             Assert.AreEqual(StoryStatus.Active, S().Status("h13"));
             Assert.IsTrue(StoryDirector.BookDecision(true));
-            Assert.AreEqual(ActProgressAkt3.Shatter, RunProfile.Finale.Decision);
         }
         finally
         {
-            Object.DestroyImmediate(gate);
-            var foe = GameObject.Find(StoryIds.Thewes);
-            if (foe != null) Object.DestroyImmediate(foe);
+            Object.DestroyImmediate(thewes);
+            ActBossGate.ResetRun();
         }
         yield break;
     }

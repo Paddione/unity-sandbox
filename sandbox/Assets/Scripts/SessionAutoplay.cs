@@ -12,8 +12,9 @@ using UnityEngine;
 /// Cinder Kiln and The Kilnmother, BarrensGate → Glass Barrens and The
 /// Glasswright, then home by waypoint.
 ///
-/// Quest mode (solo default, off with <c>-autoplay-no-quests</c> and for the
-/// co-op host): around that route, <see cref="QuestRound"/> plays every story
+/// Quest mode (always on for solo and the co-op host, since
+/// cinderreach-act-boss-gating the act bosses only appear once every other
+/// quest of their act is done): around that route, <see cref="QuestRound"/> plays every story
 /// quest the way a player would: talks to the NPCs for offers, talk goals and
 /// hand-ins (<see cref="StoryDirector.BookTalk"/>), walks onto wanted finds,
 /// hunts wanted kill targets and travels between zones by waypoint whenever
@@ -36,8 +37,6 @@ public sealed class SessionAutoplay : MonoBehaviour
     public const string OutFlag = "-autoplay-out";
     /// <summary>Commit sha stamped into the result (the player cannot know it).</summary>
     public const string CommitFlag = "-autoplay-commit";
-    /// <summary>Skip the story quests (route and fights only, the pre-quest behaviour).</summary>
-    public const string NoQuestsFlag = "-autoplay-no-quests";
 
     /// <summary>Talk distance to a story NPC (inside <see cref="Vendor.InteractRadius"/>).</summary>
     const float TalkReach = 2.5f;
@@ -86,7 +85,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         result.commit = ArgValue(CommitFlag) ?? "unknown";
         bool coopHost = CoopAutoplay.Role == AutoplayResult.RoleHost;
         if (coopHost) result.role = AutoplayResult.RoleHost;
-        questMode = !coopHost && !HasArg(NoQuestsFlag);
+        questMode = true; // act bosses need their act's quests (solo and co-op host alike)
         result.questMode = questMode;
         Log($"start, god={(godMode ? "ON (deterministic cheat)" : "off")}, layout seed={LayoutSeeder.CurrentSeed} ({LayoutSeeder.Current})");
         Log("quest-mode:" + questMode);
@@ -180,6 +179,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         }
         yield return FightLoop(hero, "kiln", excludeBoss: true, maxDist: 40f, budget: 180f, deadline: deadline);
         if (kilnGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone3);
+        yield return QuestsUntilBoss(hero, 1, deadline);
         yield return PhaseKilnmother(hero, deadline);
         bool actOk = lastPhaseOk;
         if (actOk) result.Reach(AutoplayResult.PhaseActBoss);
@@ -196,7 +196,7 @@ public sealed class SessionAutoplay : MonoBehaviour
         }
         yield return FightLoop(hero, "barrens", excludeBoss: true, maxDist: 40f, budget: 260f, deadline: deadline);
         if (barrensGateOk && lastPhaseOk) result.Reach(AutoplayResult.PhaseZone4);
-        if (questMode) yield return QuestRound(hero, deadline);
+        yield return QuestsUntilBoss(hero, 2, deadline);
         yield return PhaseGlasswright(hero, deadline);
         bool zoneBossOk = lastPhaseOk;
         if (zoneBossOk) result.Reach(AutoplayResult.PhaseBoss3);
@@ -211,11 +211,13 @@ public sealed class SessionAutoplay : MonoBehaviour
         if (bossOk && actOk && zoneBossOk && home && RunProfile.Act.ActOneComplete
             && RunProfile.Act.ZoneBossDefeated && SessionComplete.ZoneBossMode)
             result.Reach(AutoplayResult.PhaseComplete);
-        if (questMode)
-        {
-            yield return QuestRound(hero, deadline);
-            ReportQuests();
-        }
+        yield return QuestsUntilBoss(hero, 3, deadline);
+        yield return PhaseThewes(hero, deadline);
+        yield return QuestRound(hero, deadline); // H13 homecoming after the final boss
+        ReportQuests();
+        result.actBossKills = new List<string>(ActBossGate.KillLog);
+        Log("phase actbosses: kills=[" + string.Join(" ", result.actBossKills) + "] spawns=" +
+            string.Join(",", ActBossGate.Spawns) + " fellLast=" + result.ActBossesFellLast());
 
         int huskKills = startHusks - CountHusks(excludeBoss: false);
         int bossKills = BossController.BossesKilled - startBosses;
@@ -573,6 +575,59 @@ public sealed class SessionAutoplay : MonoBehaviour
         return boss;
     }
 
+    /// <summary>
+    /// cinderreach-act-boss-gating: plays quest rounds until every other quest
+    /// of <paramref name="act"/> is Done, then waits for the boss to appear
+    /// and its spawn cutscene to end (the boss holds while it runs).
+    /// </summary>
+    IEnumerator QuestsUntilBoss(DiabloClickController hero, int act, float deadline)
+    {
+        for (int round = 0; round < 6 && !ActBossGate.Ready(RunProfile.Story, act)
+             && Time.realtimeSinceStartup < deadline; round++)
+            yield return QuestRound(hero, deadline);
+        var open = new List<string>();
+        foreach (var id in ActBossGate.RequiredQuests(act))
+            if (RunProfile.Story.Status(id) != StoryStatus.Done) open.Add(id);
+        var boss = ActBossGate.Bosses[act - 1];
+        float wait = Time.realtimeSinceStartup + 20f;
+        while (Time.realtimeSinceStartup < wait
+               && (GameObject.Find(boss.anchorName) == null || CutsceneDirector.Active))
+            yield return null;
+        Log($"quest gate act {act}: ready={open.Count == 0} open=[{string.Join(",", open)}] " +
+            $"boss={GameObject.Find(boss.anchorName) != null} spawns={ActBossGate.Spawns[act - 1]} " +
+            $"cutscene={CutsceneDirector.HasPlayed(boss.introId)}");
+    }
+
+    /// <summary>cinderreach-act-boss-gating: Thewes at the Moortor falls last in Act III (H12).</summary>
+    IEnumerator PhaseThewes(DiabloClickController hero, float deadline)
+    {
+        lastPhaseOk = false;
+        Log("phase boss4 start (Thewes)");
+        var boss = GameObject.Find(StoryIds.Thewes);
+        if (boss == null)
+        {
+            Log("phase boss4: FAIL Thewes not found");
+            yield break;
+        }
+        if (ZoneMap.IndexAt(hero.transform.position) != ActProgress.Barrens)
+            yield return TravelToZone(hero, ActProgress.Barrens);
+        var skills = hero.GetComponent<DiabloSkills>();
+        float end = Time.realtimeSinceStartup + 240f;
+        mover.Reset();
+        while (boss != null && boss.GetComponent<EnemyHealth>() is EnemyHealth eh && eh.IsAlive
+               && Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < deadline)
+        {
+            TickGod(hero);
+            FightTick(hero, skills, boss, boss: true);
+            yield return null;
+        }
+        bool down = RunProfile.Finale.FinalBossDefeated;
+        Log($"phase boss4: finalBoss={down} h12={RunProfile.Story.Status("h12")}");
+        phasesDone++;
+        lastPhaseOk = down;
+        if (down) result.Reach(AutoplayResult.PhaseFinalBoss);
+    }
+
     // ------------------------------------------------------------------ quests
 
     static string ShrineFor(int zone)
@@ -872,7 +927,7 @@ public sealed class SessionAutoplay : MonoBehaviour
 
     static bool IsBoss(GameObject go) =>
         go != null && (go.GetComponent<BossController>() != null || go.GetComponent<KilnmotherController>() != null
-            || go.GetComponent<GlasswrightController>() != null);
+            || go.GetComponent<GlasswrightController>() != null || go.name == StoryIds.Thewes);
 
     static int CountHusks(bool excludeBoss)
     {

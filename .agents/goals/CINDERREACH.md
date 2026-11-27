@@ -19,6 +19,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 100 %, S1–S4 gelandet | Abgeschlossen (Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
+| P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | läuft (S1 Gate + Spawn-Cutscene + Autoplay-Reihenfolge) | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
@@ -246,6 +247,15 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Akt-Kette `ActProgress`: Abbot-Kill öffnet den Kiln, Kilnmother-Kill setzt „Akt I abgeschlossen“
   und öffnet die Glass Barrens (`ActProgress.Barrens = 4`, Tor südlich des Kuppelrings), der
   Glasswright-Kill setzt `ZoneBossDefeated`. Keine Aufträge für Zone 4.
+- Akt-Bosse erscheinen erst nach allen übrigen Quests ihres Akts (`ActBossGate`, cinderreach-act-boss-gating):
+  Kilnmother (Akt I, H4) nach h1–h3/h14–h16/n1–n3/n8–n11, Glasswright (Akt II, H8) nach h6/h7/h18/n4/n5/n12–n15,
+  Thewes (Akt III, H12) nach h10/h11/n6/n7. Pflichtmenge aus dem Katalog (ohne Boss-Quest und Quests hinter ihr).
+  Bis dahin ist das Szenenobjekt inaktiv. Beim Freischalten erscheint der Boss genau einmal pro Lauf und spielt die
+  Spawn-Cutscene (Fernschnitt zur Arena im Spielwinkel, jede Phase-1-Fähigkeit als harmloser Cast, keine
+  Fähigkeits-Untertitel, nur Namensbanner, zurück zum Helden). Story-Flag `bossspawn.<akt>` verhindert die
+  Wiederholung nach dem Laden (kein Save-Feld, v16 bleibt). Besiegte Akte werden nie wieder gesperrt. Koop: der
+  Queststand des Hosts entscheidet (`NotifyActBossesClientRpc` mit jeder Story-Übertragung). Der Arena-Trigger
+  gilt nur noch für den Hollow Abbot. `StoryDirector.MaybeSpawnThewesAtH11` (akt3-finale S3c) ist entfallen.
 - Weltränder: jede Zone ist ummauert. Der Fen hat die `MoorEdge_*`-Erdwälle, Ossuary, Kiln und Barrens je vier
   `ZoneEdge_<Zone>_<Seite>`-Mauern (1,6 m, `ZoneEdgeBuilder`, Zonen-Texturen). Die begehbaren Rechtecke stehen
   in `Zones/WorldBounds` (SSOT für Builder, Begleiter-Clamp und `WorldEdgeTests`).
@@ -385,8 +395,11 @@ liest für Menüs ohne Nebenwirkung.
   dotfiles im selben Durchlauf nach.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   "autoplay-result.json" mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
-  complete` (Koop-Client siehe Koop-Paarlauf). Solo spielt der Autoplay seit 2026-11-27 alle Story-Quests
-  (Quest-Modus, aus mit `-autoplay-no-quests`, im Koop-Host aus): `QuestRound` spricht NPCs an (Angebote,
+  complete, boss4` (Koop-Client siehe Koop-Paarlauf). Solo und Koop-Host spielen alle Story-Quests
+  (Quest-Modus immer an, `-autoplay-no-quests` entfällt seit cinderreach-act-boss-gating): vor jedem Akt-Boss
+  spielt `QuestsUntilBoss` Questrunden, bis die Pflichtmenge des Akts erledigt ist, wartet Spawn und Cutscene ab;
+  `boss4` ist der Thewes-Kill. Das Ergebnisfeld `actBossKills` (`akt:boss:offen`, `-` = nichts offen) muss für alle
+  drei Akte `-` zeigen, sonst Exit 1 (`ActBossesFellLast`). `QuestRound` spricht NPCs an (Angebote,
   Gesprächsziele, Abgaben über `StoryDirector.BookTalk`), läuft gewollte Funde ab, jagt gewollte Kill-Ziele
   und reist per Wegschrein zwischen Siedlung und Zonen. Pflichtphase `quests` nur im Quest-Modus: alle
   Katalog-Quests `Done`, keine per Catch-up (`AutoplayQuestLedger`; Felder `questsDone`, `questsOpen`,

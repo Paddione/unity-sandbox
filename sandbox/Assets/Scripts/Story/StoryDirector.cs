@@ -46,6 +46,8 @@ public sealed class StoryDirector : MonoBehaviour
         State.Refresh(RunProfile.Act);
         State.TakeChanges();
         SyncDoneFlags();
+        // cinderreach-act-boss-gating: unreleased act bosses vanish before the first frame.
+        ActBossGate.Tick(Time.unscaledTime);
         lastRevision = State.Revision;
     }
 
@@ -113,9 +115,9 @@ public sealed class StoryDirector : MonoBehaviour
         // Akt III Finale S3: the Barrens boss opens the Moortor (Abbot→Kiln
         // pattern, idempotent; persists via the generic story lists, v16 stays).
         RunProfile.Finale.OpenMoortor(RunProfile.Act);
-        // Akt III Finale S3c: H11-Kante — Thewes tritt erst mit H11 am
-        // Moortor auf (Respawn, genau 1x pro Lauf).
-        MaybeSpawnThewesAtH11();
+        // cinderreach-act-boss-gating: act bosses appear once their act's
+        // other quests are done (replaces the H11 Thewes entrance of S3c).
+        ActBossGate.Tick(Time.unscaledTime);
         var zone = WorldBounds.ZoneAt(transform.position).name;
         if (lastZone != null && zone != lastZone) BookEnter(zone);
         lastZone = zone;
@@ -280,6 +282,7 @@ public sealed class StoryDirector : MonoBehaviour
     {
         string target = StoryIds.KillTarget(objectName ?? "");
         StoryBarks.OnKill(target);
+        ActBossGate.NoteKill(target, State);
         State.Apply(StoryObjectiveType.Kill, target);
         // Akt III Finale S3: Thewes down ends H12 and arms the H13 decision
         // (no new boss system: EnemyHealth books every kill through here).
@@ -359,39 +362,6 @@ public sealed class StoryDirector : MonoBehaviour
         return true;
     }
 
-    /// <summary>Run state: H11 edge fired (test seam, exactly once per run).</summary>
-    public static int ThewesEntranceEntries;
-    static bool thewesEntranceDone;
-
-    /// <summary>
-    /// Akt III Finale S3c (H11-Auftritt): Thewes tritt erst mit H11 am
-    /// Moortor auf. Feuert genau einmal pro Lauf, sobald h11 Active ist:
-    /// lebt ein Thewes, passiert nichts (kein Doppel-Spawn); fehlt er oder
-    /// liegt er tot da (Akt-II-Sweep vor H9), spawnt er neu mit vollem HP —
-    /// Laufzeit-Pfad wie der Kilnmother-Summon (HuskModelLibrary, Boss-Tier,
-    /// EnemyAttack + Husk-Rig, generisches BookKill). Position: am Moortor
-    /// (MoortorGate zur Laufzeit, sonst BarrensLayout-Fallback).
-    /// </summary>
-    public static void MaybeSpawnThewesAtH11()
-    {
-        if (thewesEntranceDone) return;
-        if (State.Status("h11") != StoryStatus.Active) return;
-        thewesEntranceDone = true;
-        ThewesEntranceEntries++;
-        var existing = GameObject.Find(StoryIds.Thewes);
-        var health = existing != null ? existing.GetComponent<EnemyHealth>() : null;
-        if (health != null && health.IsAlive) return;
-        if (existing != null) Object.Destroy(existing);
-        Vector3 pos = BarrensLayout.BarrensOffset + new Vector3(0f, 0.05f, -19f);
-        var gate = GameObject.Find(ZoneGate.MoortorGateName);
-        if (gate != null) pos = gate.transform.position + new Vector3(-4f, -0.95f, -3.5f);
-        var go = HuskModelLibrary.SpawnHusk(StoryIds.Thewes, pos, 2.2f,
-            GlasswrightController.MaxHP, LootTier.Boss, 3, model: null, netServer: false);
-        var attack = go.GetComponent<EnemyAttack>();
-        if (attack != null) { attack.damage = 3; attack.encounterGroup = EncounterLayout.FrontGroup; }
-        Debug.Log("[Finale] Thewes tritt am Moortor auf.");
-    }
-
     /// <summary>
     /// Akt III Finale S3 (H13): books the one closing line. Exactly once per
     /// run (<see cref="ActProgressAkt3.Decide"/>); the outcome flag rides the
@@ -410,8 +380,6 @@ public sealed class StoryDirector : MonoBehaviour
     {
         FinalBossPhaseTwoEntries = 0;
         finalBossPhaseTwo = false;
-        ThewesEntranceEntries = 0;
-        thewesEntranceDone = false;
     }
 
     /// <summary>Opens the dialog for <paramref name="npc"/> when one is scripted; shops only for pending talks.</summary>

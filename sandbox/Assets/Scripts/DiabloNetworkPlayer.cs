@@ -481,6 +481,15 @@ public sealed partial class DiabloNetworkPlayer : NetworkBehaviour
     {
         if (!IsServer || !IsSpawned) return;
         NotifyStoryClientRpc(snapshot ?? "");
+        // cinderreach-act-boss-gating: the host's quest state releases the act bosses for everyone.
+        NotifyActBossesClientRpc(ActBossGate.ReleasedMask(RunProfile.Story));
+    }
+
+    [ClientRpc]
+    void NotifyActBossesClientRpc(int mask)
+    {
+        if (IsServer) return; // the host gates from its own quest state
+        ActBossGate.HostMask = mask;
     }
 
     [ClientRpc]

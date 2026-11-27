@@ -10,14 +10,17 @@ using UnityEngine.UI;
 /// (explicit time, <see cref="ResetRun"/> seam) plus a thin per-frame
 /// <see cref="Tick"/> hook from <see cref="StoryDirector"/>.
 ///
+/// Act bosses (cinderreach-act-boss-gating, see <see cref="ActBossGate"/>) skip the
+/// arena trigger: they appear once their act's other quests are done and the
+/// spawn cutscene (<see cref="TryStartSpawnIntro"/>) cuts the camera to them.
 /// Boss intro: hero enters the arena trigger once per run — letterbox bars +
 /// boss name banner, camera dolly to a side framing, boss roar; movement and
 /// hero attacks freeze, the boss holds (see <see cref="HoldBosses"/>), skip
 /// (space/esc/click) or timeout releases everything and the fight starts.
 /// Ability showcases (diablo-ability-showcases): the intro is extended to
 /// 8–12 s and the boss demonstrates each phase-1 signature ability once as a
-/// harmless presentation cast (telegraph/VFX only, never damage) with a
-/// localized caption; at phase 2 a ~4 s showcase repeats the pattern for the
+/// harmless presentation cast (telegraph/VFX only, never damage) without any
+/// caption (players read it from the animation); at phase 2 a ~4 s showcase repeats the pattern for the
 /// new abilities while the boss holds and the hero keeps full control.
 /// Dialogue highlight: main-quest talks (see <see cref="StoryDirector.TryOpenTalk"/>)
 /// play inside the same letterbox and auto-advance on the voice length; the
@@ -56,12 +59,21 @@ public static class CutsceneDirector
             phaseOneAbilities = new[] { "cutscene.ability.glasswright.lances" },
             phaseTwoAbilities = new[] { "cutscene.ability.glasswright.pillars", "cutscene.ability.glasswright.field" },
             phaseTwoId = "phase2.glasswright", phaseTwoDuration = 4f },
+        // cinderreach-act-boss-gating: Thewes gets the same spawn cutscene as the other act bosses.
+        new BossIntro { id = "intro.thewes", anchorName = StoryIds.Thewes, triggerRange = 16f, bannerKey = "name.enemy.thewes", duration = 9f,
+            phaseOneAbilities = new[] { "cutscene.ability.thewes.strike" },
+            phaseTwoAbilities = new[] { "cutscene.ability.thewes.surge" },
+            phaseTwoId = "phase2.thewes", phaseTwoDuration = 4f },
     };
 
     /// <summary>True while a boss intro runs: the three boss brains hold still (no aggro, no attacks).</summary>
     public static bool HoldBosses { get; private set; }
     /// <summary>True while any sequence (boss intro or highlighted dialogue) runs.</summary>
     public static bool Active { get; private set; }
+    /// <summary>True while a boss intro drives the camera (gameplay cameras must not overwrite it).</summary>
+    public static bool OwnsCamera => Active && dialogUi == null && !phaseTwoMode;
+    /// <summary>True while the running intro is an act-boss spawn cutscene (remote cut to the arena).</summary>
+    public static bool SpawnMode { get; private set; }
     /// <summary>Sequence id, or "" when idle.</summary>
     public static string ActiveId { get; private set; } = "";
     /// <summary>Starts, skips and natural completions this run (test seams).</summary>
@@ -95,6 +107,9 @@ public static class CutsceneDirector
     static GameObject letterbox;
     static Text bannerText;
 
+    /// <summary>Text on the letterbox banner, or "" when hidden (test seam: never an ability caption).</summary>
+    public static string BannerText => bannerText != null && bannerText.enabled ? bannerText.text : "";
+
     /// <summary>Ids already played this run.</summary>
     public static bool HasPlayed(string id) => !string.IsNullOrEmpty(id) && played.Contains(id);
 
@@ -116,6 +131,7 @@ public static class CutsceneDirector
         CurrentAbilityKey = "";
         showcaseCounts.Clear();
         phaseTwoMode = false;
+        SpawnMode = false;
         showcaseStep = 0;
         played.Clear();
     }
@@ -140,7 +156,8 @@ public static class CutsceneDirector
         if (hero == null) return;
         foreach (var intro in BossIntros)
         {
-            if (HasPlayed(intro.id)) continue;
+            // Act bosses introduce themselves on spawn (ActBossGate), never on arena entry.
+            if (HasPlayed(intro.id) || ActBossGate.IsGated(intro.id)) continue;
             var anchor = GameObject.Find(intro.anchorName);
             if (anchor == null || !BossAlive(anchor)) continue;
             var d = anchor.transform.position - hero.position;
@@ -169,6 +186,44 @@ public static class CutsceneDirector
         if (hero == null) return false;
         StartSequence(intro, id, anchor, hero, now, phaseTwo: false);
         return true;
+    }
+
+    /// <summary>
+    /// cinderreach-act-boss-gating: spawn cutscene of an act boss. Cuts the
+    /// camera to the boss wherever the hero stands (gameplay angle, closer),
+    /// shows each phase-1 ability as a harmless cast without any caption and
+    /// returns to the hero. False when busy, unknown id, already played or the
+    /// boss is missing/dead.
+    /// </summary>
+    public static bool TryStartSpawnIntro(string id, float now)
+    {
+        if (Active) return false;
+        int idx = IndexOf(id);
+        if (idx < 0 || HasPlayed(id)) return false;
+        var intro = BossIntros[idx];
+        var anchor = GameObject.Find(intro.anchorName);
+        if (anchor == null || !BossAlive(anchor)) return false;
+        var hero = HeroLocator.Solo();
+        SpawnMode = true;
+        StartSequence(intro, id, anchor, hero, now, phaseTwo: false);
+        return true;
+    }
+
+    /// <summary>Spawn framing: the gameplay camera angle re-centred on the boss, pushing in from 17 m to 11 m.</summary>
+    static void FrameSpawn(Camera cam, Vector3 boss)
+    {
+        var rot = cam.transform.rotation;
+        var fwd = rot * Vector3.forward;
+        if (fwd.y > -0.2f) // not a top-down angle (tests, odd rigs): use the default iso pitch
+        {
+            rot = Quaternion.Euler(50f, rot.eulerAngles.y, 0f);
+            fwd = rot * Vector3.forward;
+        }
+        var focus = boss + Vector3.up * 1.2f;
+        dollyFrom = focus - fwd * 17f;
+        dollyTo = focus - fwd * 11f;
+        dollyFromRot = rot;
+        dollyToRot = rot;
     }
 
     /// <summary>Headless-callable phase-2 showcase, called from each boss's EnterPhaseTwo.
@@ -203,18 +258,29 @@ public static class CutsceneDirector
         CurrentAbilityKey = "";
         if (!phaseTwo)
         {
-            frozenTpc = hero.GetComponent<ThirdPersonController>();
-            if (frozenTpc != null) frozenTpc.enabled = false;
-            frozenMelee = hero.GetComponent<DiabloMelee>();
-            if (frozenMelee != null) frozenMelee.enabled = false;
+            if (hero != null)
+            {
+                frozenTpc = hero.GetComponent<ThirdPersonController>();
+                if (frozenTpc != null) frozenTpc.enabled = false;
+                frozenMelee = hero.GetComponent<DiabloMelee>();
+                if (frozenMelee != null) frozenMelee.enabled = false;
+            }
             var cam = Camera.main;
             if (cam != null)
             {
                 camPos = cam.transform.position;
                 camRot = cam.transform.rotation;
-                FrameBoss(cam, anchor.transform.position, hero.position);
-                dollyFrom = cam.transform.position;
-                dollyFromRot = cam.transform.rotation;
+                if (SpawnMode || hero == null)
+                {
+                    FrameSpawn(cam, anchor.transform.position);
+                    cam.transform.SetPositionAndRotation(dollyFrom, dollyFromRot); // hard cut to the arena
+                }
+                else
+                {
+                    FrameBoss(cam, anchor.transform.position, hero.position);
+                    dollyFrom = cam.transform.position;
+                    dollyFromRot = cam.transform.rotation;
+                }
             }
         }
         ShowLetterbox(Loc.T(intro.bannerKey));
@@ -227,7 +293,7 @@ public static class CutsceneDirector
         var intro = BossIntros[idx];
         var anchor = GameObject.Find(intro.anchorName);
         var hero = HeroLocator.Solo();
-        if (anchor == null || hero == null) { End(false); return; }
+        if (anchor == null || (hero == null && !SpawnMode)) { End(false); return; }
         if (!roared)
         {
             roared = true;
@@ -244,12 +310,16 @@ public static class CutsceneDirector
                 cam.transform.rotation = Quaternion.Slerp(dollyFromRot, dollyToRot, e);
             }
         }
-        TickShowcaseSteps(intro, anchor.transform.position, hero.position, now);
+        // Spawn mode: casts aim at a point in front of the boss so they stay on screen.
+        var bossPos = anchor.transform.position;
+        var aim = SpawnMode || hero == null ? bossPos + anchor.transform.forward * 5f : hero.position;
+        TickShowcaseSteps(intro, bossPos, aim, now);
         float duration = phaseTwoMode ? intro.phaseTwoDuration : intro.duration;
         if (SkipPressed() || now - t0 >= duration) End(SkipPressed());
     }
 
-    /// <summary>Fire each due showcase cast once: caption + harmless presentation at the boss.</summary>
+    /// <summary>Fire each due showcase cast once: harmless presentation at the boss, no caption
+    /// (players read the ability from the animation; the banner keeps the boss name).</summary>
     static void TickShowcaseSteps(BossIntro intro, Vector3 bossPos, Vector3 heroPos, float now)
     {
         var abilities = phaseTwoMode ? intro.phaseTwoAbilities : intro.phaseOneAbilities;
@@ -263,7 +333,6 @@ public static class CutsceneDirector
             CurrentAbilityKey = key;
             ShowcaseCasts++;
             showcaseCounts[key] = ShowcaseCastCount(key) + 1;
-            ShowLetterbox(Loc.T(key));
             PlayShowcaseVisual(key, bossPos, heroPos);
         }
     }
@@ -299,6 +368,10 @@ public static class CutsceneDirector
                             ShardLance.Spawn(bossPos, Quaternion.Euler(0f, i * GlasswrightController.LanceFanDegrees, 0f) * away);
                         break;
                     }
+                case "cutscene.ability.thewes.strike":
+                    PresentationVfx.CleaveArc(bossPos, 2.6f);
+                    PresentationVfx.BossTelegraph(bossPos, 2.2f);
+                    break;
                 case "cutscene.ability.glasswright.field":
                     PresentationVfx.BossTelegraph(heroPos, 2f);
                     break;
@@ -408,6 +481,7 @@ public static class CutsceneDirector
         ActiveId = "";
         HoldBosses = false;
         phaseTwoMode = false;
+        SpawnMode = false;
         dialogUi = null;
     }
 

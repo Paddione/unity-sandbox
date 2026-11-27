@@ -131,7 +131,8 @@ public class AutoplayNavQuestTests
     {
         var r = new AutoplayResult();
         foreach (var p in AutoplayResult.RequiredPhases) r.Reach(p);
-        Assert.AreEqual(0, r.ComputeExit(), "without quest mode the ten route phases suffice");
+        r.actBossKills.AddRange(new[] { "1:Kilnmother:-", "2:Glasswright:-", "3:Thewes:-" });
+        Assert.AreEqual(0, r.ComputeExit(), "without quest mode the route phases and the boss order suffice");
         r.questMode = true;
         Assert.AreEqual(1, r.ComputeExit());
         r.Reach(AutoplayResult.PhaseQuests);

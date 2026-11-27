@@ -60,6 +60,7 @@ public static class RunProfile
         Story = new StoryState();
         Finale = new ActProgressAkt3();
         StoryDirector.ResetFinaleForTests();
+        ActBossGate.ResetRun();
         SmithingMaterial = 0;
         RiskShrine.Reset();
         KindledRewardPending = false;

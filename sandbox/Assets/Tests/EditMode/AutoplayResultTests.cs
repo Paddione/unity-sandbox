@@ -17,10 +17,13 @@ public class AutoplayResultTests
         if (Directory.Exists(dir)) Directory.Delete(dir, true);
     }
 
+    static readonly string[] BossesLast = { "1:Kilnmother:-", "2:Glasswright:-", "3:Thewes:-" };
+
     static AutoplayResult FullRun()
     {
         var r = new AutoplayResult { commit = "abc123", started = "2026-11-18T03:30:00Z", duration_s = 73.5f };
         foreach (var p in AutoplayResult.RequiredPhases) r.Reach(p);
+        r.actBossKills.AddRange(BossesLast);
         r.fps_windows.Add(45f);
         r.fps_windows.Add(52.5f);
         return r;
@@ -59,10 +62,10 @@ public class AutoplayResultTests
     }
 
     [Test]
-    public void RequiredPhases_AreTheTenContractPhases()
+    public void RequiredPhases_AreTheElevenContractPhases()
     {
         CollectionAssert.AreEqual(
-            new[] { "town", "zone1", "gate", "zone2", "boss", "zone3", "actboss", "zone4", "boss3", "complete" },
+            new[] { "town", "zone1", "gate", "zone2", "boss", "zone3", "actboss", "zone4", "boss3", "complete", "boss4" },
             AutoplayResult.RequiredPhases);
     }
 
@@ -84,8 +87,26 @@ public class AutoplayResultTests
         Assert.IsFalse(r.AllPhasesReached(), "act-two-opening: the Barrens and the Glasswright are part of a full run");
         r.Reach(AutoplayResult.PhaseZone4);
         r.Reach(AutoplayResult.PhaseBoss3);
+        Assert.IsFalse(r.AllPhasesReached(), "act-boss-gating: Thewes is part of a full run");
+        r.Reach(AutoplayResult.PhaseFinalBoss);
+        Assert.IsFalse(r.AllPhasesReached(), "act-boss-gating: the kill order must be proven");
+        r.actBossKills.AddRange(BossesLast);
         Assert.IsTrue(r.AllPhasesReached());
         Assert.AreEqual(0, r.ComputeExit());
+    }
+
+    [Test]
+    public void ActBossKills_FailWhenABossFellBeforeItsActQuests()
+    {
+        var r = FullRun();
+        Assert.IsTrue(r.ActBossesFellLast());
+        r.actBossKills[1] = "2:Glasswright:n13";
+        Assert.IsFalse(r.ActBossesFellLast());
+        Assert.AreEqual(1, r.ComputeExit());
+        r.actBossKills.RemoveAt(1);
+        Assert.IsFalse(r.ActBossesFellLast(), "every act boss must fall");
+        var back = AutoplayResult.FromJson(FullRun().ToJson());
+        CollectionAssert.AreEqual(BossesLast, back.actBossKills);
     }
 
     [Test]
