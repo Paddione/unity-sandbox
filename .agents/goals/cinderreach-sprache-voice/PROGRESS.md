@@ -1,6 +1,6 @@
 # Progress: cinderreach-sprache-voice
 
-Prozent: 66 %
+Prozent: 100 %
 
 ## Erledigt
 
@@ -20,8 +20,21 @@ Prozent: 66 %
 ## Nächste Schritte
 
 - S2: erledigt (s. oben) — Text-Commit + Clip-Commit getrennt.
-- S3: Abnahme (Suiten, check-voice-lines, Doku).
+- S3: erledigt (s. unten) — Abnahme grün, Run-Log + PROGRESS 100 %.
+
+- 2026-11-27 (S3, Worktree `cinderreach-sprache-voice-s3`, Basis S2 `d3d522f`, kein Code angefasst):
+  Abnahme GRÜN. Volle `run-unity-tests.sh` (Unity 6000.0.85f2): EditMode 727/727 + PlayMode
+  410/410 (Save-State-Hygiene vorher, kein Flake, kein Code-Fix). Gates S3-Rerun:
+  `check-voice-lines` 244/0, QA-Stichprobe 12 S2-Clips mean CER 0,013 (0 über 0,25),
+  `check-audio-manifest` OK (43 cues, 8 tracks), `check-meta` OK, Quest-Coverage 0 uncovered,
+  `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK, workspace-check still.
+  Regler (`DiabloSettings.VoiceVol`/`EffectiveVoice`, Slider `DiabloUIFactory`+`MainMenu`) +
+  Koop (`StoryBarks.Relay`, `StoryDialogShare`) via Bestandssuite gedeckt (StoryVoice-,
+  AudioRouting-, GameSettings-, Coop-/GroupQuestMap-Tests in 727/410); kein dedizierter
+  VoiceVol-Test im Bestand — als Lücke benannt, kein neuer Test (Tests nicht im Write-Set).
+  Belege: `docs/sprache-voice-run-log.md` (neu). Prozent jetzt 100 %.
 
 ## Offene Punkte
 
-- Keine (S2): `dlg.h11–h13` + `bark.thewes.*` fehlen im Bestand — als Lücke an S4-Nachfolge/P6-S3 gemeldet, nicht erfunden.
+- Keine (S3): `dlg.h11–h13` + `bark.thewes.*` fehlen im Bestand — als Lücke an S4-Nachfolge
+  gemeldet, nicht erfunden; Abnahme bezieht sich auf den Bestand (244 Zeilen).

@@ -1128,3 +1128,19 @@ Autoplay `-seed 0`: Exit 0, 284,4 s, 0 Exceptions, `complete` + `quests` 34/34, 
 PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-Bedingung
 (H11 nennt ihn) gehört zum Spawn dazu, nicht nur zum Modell. P6 S2 übernimmt Textglättung
 + dlg.h11–h13/Voice auf diesem Drop.
+
+## 2026-11-27 — Sprache/Voice S3-Abnahme: GRÜN, PROGRESS → 100 % (cinderreach-sprache-voice-s3)
+
+- S3-Abnahmelauf auf Basis S2 `d3d522f` (kein Code angefasst, read-only): volle
+  `run-unity-tests.sh` (Unity 6000.0.85f2) EditMode **727/727** + PlayMode **410/410**,
+  Save-State-Hygiene vorher (`cinderreach-save.json` gelöscht, S1+S2-Präzedenz) — kein Flake.
+- Gates S3-Rerun: `check-voice-lines` 244/0, QA-Stichprobe 12 S2-Clips mean CER 0,013
+  (0 über 0,25), `check-audio-manifest` OK (43 cues, 8 tracks), `check-meta` OK,
+  Quest-Coverage 0 uncovered, `VerifyDiabloZone` OK, `KayKitAssets.Verify` OK,
+  workspace-check still.
+- Regler/Koop: `DiabloSettings.VoiceVol`/`EffectiveVoice` + Slider (`DiabloUIFactory`,
+  `MainMenu`), `StoryBarks.Relay`/`StoryDialogShare` — Suite deckt (StoryVoice-,
+  AudioRouting-, GameSettings-, Coop-/GroupQuestMap-Tests); kein dedizierter
+  VoiceVol-Test im Bestand → als Lücke benannt, kein neuer Test (nicht im Write-Set).
+- Lücke bleibt: `dlg.h11–h13` + `bark.thewes.*` fehlen (S2-Doku, nichts erfunden,
+  an S4-Nachfolge gemeldet). Belege: `docs/sprache-voice-run-log.md` (neu).
