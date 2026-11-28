@@ -23,9 +23,9 @@ public static class PlayerAccount
     /// <summary>PlayerPrefs key of the local fallback name (offline or before UGS answers).</summary>
     public const string LocalNameKey = "cinderreach.playerName";
 
-    /// <summary>Flags that mark a run as automation (no lasting identity).</summary>
-    static readonly string[] AutomationFlags =
-        { "-autoplay", "-coop-autoplay", "-shotcheck", "-server", "--net-server", "-server-relay", SaveService.SaveFileFlag };
+    /// <summary>Flags besides the automation drivers (<see cref="AutomationArgs.Drivers"/>) that mark a throwaway identity.</summary>
+    static readonly string[] ThrowawayFlags =
+        { DedicatedServer.Flag, DedicatedServer.LegacyFlag, ServerDirectory.RelayFlag, SaveService.SaveFileFlag };
 
     static bool ready;
     static Task<bool> initTask;
@@ -64,13 +64,11 @@ public static class PlayerAccount
         throwaway = false;
         for (int i = 0; i + 1 < args.Length; i++)
             if (args[i] == ProfileFlag && IsValidProfile(args[i + 1])) return args[i + 1];
-        foreach (var a in args)
-            foreach (var f in AutomationFlags)
-                if (a == f)
-                {
-                    throwaway = true;
-                    return "auto" + pid;
-                }
+        if (AutomationArgs.IsDriven(args) || AutomationArgs.Any(args, ThrowawayFlags))
+        {
+            throwaway = true;
+            return "auto" + pid;
+        }
         return DefaultProfile;
     }
 

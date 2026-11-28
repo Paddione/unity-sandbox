@@ -66,11 +66,12 @@ public static class DiabloSettings
     /// </summary>
     public static bool BootMayTouchDisplay(string[] args)
     {
+        if (AutomationArgs.IsDriven(args)
+            || AutomationArgs.Any(args, AutomationArgs.BatchMode, AutomationArgs.NoGraphics)) return false;
         foreach (var a in args)
         {
             if (a == null) continue;
-            if (a == "-autoplay" || a == "-shotcheck" || a == "-batchmode" || a == "-nographics"
-                || a.StartsWith("-screen-")) return false;
+            if (a.StartsWith("-screen-")) return false;
         }
         return true;
     }

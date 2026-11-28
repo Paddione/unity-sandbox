@@ -41,8 +41,8 @@ public sealed class JoinPanel : MonoBehaviour
     internal static void Boot()
     {
         // Hotkey host for F7; inert for automation runs.
-        foreach (var a in System.Environment.GetCommandLineArgs())
-            if (a == SessionAutoplay.Flag || a == CoopAutoplay.Flag || a == "-shotcheck" || a == "-batchmode") return;
+        var args = System.Environment.GetCommandLineArgs();
+        if (AutomationArgs.IsDriven(args) || AutomationArgs.Any(args, AutomationArgs.BatchMode)) return;
         if (Object.FindFirstObjectByType<MultiplayerAutoStarter>() == null) return;
         var panel = new GameObject(ObjectName).AddComponent<JoinPanel>();
         panel.SetOpen(false);

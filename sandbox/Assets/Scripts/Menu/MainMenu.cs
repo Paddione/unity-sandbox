@@ -22,15 +22,15 @@ public sealed class MainMenu : MonoBehaviour
     static void Boot()
     {
         var args = System.Environment.GetCommandLineArgs();
-        foreach (var a in args)
-            if (a == SessionAutoplay.Flag || a == "-shotcheck" || a == "-batchmode"
-                || a == "--net-client" || a == "--net-server" || a == DedicatedServer.Flag)
-                return; // automation boots straight into gameplay
+        if (SkippedFor(args)) return; // automation boots straight into gameplay
         if (Object.FindFirstObjectByType<MainMenu>(FindObjectsInactive.Include) != null) return;
         if (ClassSelectOwnsStart(args)) return;
         var go = new GameObject("MainMenu");
         go.AddComponent<MainMenu>().Open();
     }
+
+    /// <summary>Pure rule: automation, batch and explicit net launches never get the title screen.</summary>
+    public static bool SkippedFor(string[] args) => AutomationArgs.SkipsStartScreen(args);
 
     /// <summary>
     /// One start screen: in the game scene the startup/class screen

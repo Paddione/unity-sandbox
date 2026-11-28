@@ -154,11 +154,7 @@ public sealed class ClassSelectUI : MonoBehaviour
     /// <summary>Pure rule: no select screen for automation, co-op peers or an explicit class.</summary>
     public static bool ShouldShow(string[] args)
     {
-        foreach (var a in args)
-            if (a == SessionAutoplay.Flag || a == "-shotcheck" || a == ClassFlag
-                || a == "--net-client" || a == "--net-server" || a == DedicatedServer.Flag || a == "-batchmode"
-                || a == CoopAutoplay.Flag)
-                return false;
+        if (AutomationArgs.SkipsStartScreen(args) || AutomationArgs.Any(args, ClassFlag)) return false;
         return !MultiplayerAutoStarter.IsClone();
     }
 
