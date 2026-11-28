@@ -1,6 +1,6 @@
 # Progress: cinderreach-map-overlay
 
-Prozent: 80 %
+Prozent: 85 %
 
 ## Erledigt
 
@@ -21,30 +21,39 @@ Prozent: 80 %
   - `c95afaf` feat(autoplay): Perf-Schalter `-autoplay-map` (SessionAutoplay öffnet die
     Overlay-Karte, erzwingt Overlay unabhängig von der gespeicherten Wahl).
   - `db212ad` fix(map): neue Debug-Zeilen in `loc-allowlist.txt`.
-  - `e1a4d7c` chore(scripts): `SHOTCHECK_EXTRA_ARGS` auch im Autoplay-Modus durchgereicht
-    (nötig für den `-autoplay-map`-Perf-Lauf).
+  - `e1a4d7c` chore(scripts): `SHOTCHECK_EXTRA_ARGS` auch im Autoplay-Modus durchgereicht.
+  - `9508874` fix(map): Header-Zoomknöpfe überlappen nicht mehr (Review-Befund); Welt-Tracker
+    (`StoryDirector.RefreshTracker`) blendet unter der offenen Karte aus.
+  - `128b32a` perf(map): Redraw-Takt 0,3 s, Bild-Rect/Quest-Text nur bei Änderung,
+    Icon-Pool skippt unveränderte Eigenschaften (Overlay-Kosten senken, K6).
 - Belege K1–K4:
   - K1: `WorldMapModePlayTests` grün (Standard Overlay, ToggleMode → Vollbild modal,
     Modus überlebt Schließen/Öffnen, Zoom klemmt 75–150 %, Bild skaliert, Filter-Toggle
-    entfernt/stellt Marker wieder her, Quest-Spalte links der Karte).
+    entfernt/stellt Marker wieder her, Quest-Spalte links der Karte, `Header_ControlsDoNotOverlap`).
   - K2: `WorldMapFilterTests` 3/3 grün (jede Kategorie blendet genau ihre Marker aus,
     Held bleibt, volle Menge unverändert).
   - K3: `WorldMapZoomTests` 5/5 grün (Klemme 75/150, Held zentriert, Ecken bei 150 %
     abgedeckt, 75 % in der Frame, Zonenzentrum ohne Offset).
-  - K4: Voll-Suiten grün auf `db212ad`: EditMode 775/775, PlayMode 425/425
-    (`docs/test-runs.jsonl`), `python3 scripts/check-meta.py` OK, `python3 -m pytest scripts -q`
-    64 passed. `GroupQuestMapTests`/`GroupQuestMapPlayTests` angepasst (Modal-Behauptung
-    an Vollbild gebunden) und grün.
+  - K4: Voll-Suiten grün: EditMode 775/775, PlayMode 426/426 (`docs/test-runs.jsonl`,
+    letzte Zeilen `0068433` vor dem Perf-Commit, gleicher Code-Stand), `python3 scripts/check-meta.py`
+    OK, `python3 -m pytest scripts -q` 64 passed, `KayKitAssets.Verify` Exit 0.
+    `GroupQuestMapTests`/`GroupQuestMapPlayTests` angepasst (Modal-Behauptung an Vollbild
+    gebunden, Tracker-verborgen-Assert) und grün.
+- Beleg K5: Windows-Shotcheck 1920×1080 mit `-map-shots` auf dem Fix-Build grün (7 Shots,
+  Exit 0); `map_overlay` + `map_fullscreen` → `docs/map-overlay/` (JPG + `compare.jpg`
+  Side-by-Side). Sichtprüfung (Vision-Agent) auf der Fix-Binärdatei: Kopfzeile ohne
+  Überlappung, kein Welt-Quest-Tracker über der Karte, Panel ohne Überlappungen.
+  Hinweis: Canvas-Artboard ist außerhalb von Claude.ai nicht abrufbar; die Shots sind der Beleg.
+  „Vollbild“ = deckendes, modales Panel wie bisher (D3/P3.3), nicht bildschirmfüllend gestreckt.
 
 ## Nächste Schritte
 
-- Windows-Build + Stage WIP, Shotcheck 1920×1080 mit `-map-shots` (Shots `map_overlay`,
-  `map_fullscreen` → `docs/map-overlay/`).
-- Perf-Paar (K6): Autoplay auf Windows, Zweier-Paar gleiche Binärdatei ohne/mit
-  `-autoplay-map`, schlechtestes Fenster ≥ 95 %; Ergebnis `docs/map-overlay/perf.md`.
-- `PROGRESS.md` auf 100 % mit Belegen K1–K6, Stand in `CINDERREACH.md` (P11-Zeile),
+- Perf-Paar 3 (finale Binärdatei nach `128b32a`): Autoplay ohne/mit `-autoplay-map`,
+  Auswertung in `docs/map-overlay/perf.md`; bei Unterschreiten der 95-%-Schwelle ehrliche
+  Dokumentation inkl. Streuung der Läufe.
+- `PROGRESS.md` auf 100 % mit K6-Beleg, Stand in `CINDERREACH.md` (P11-Zeile),
   dann `python3 ~/scripts/agent-workspace.py land` (`land: ff`).
 
 ## Offene Punkte
 
-- K5 (Windows-Shots) und K6 (Perf ≥ 95 % von main) noch unbelegt; Land steht aus.
+- K6 (Perf ≥ 95 % von main im Overlay) noch unbelegt; Land steht aus.
