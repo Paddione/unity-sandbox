@@ -578,7 +578,7 @@ liest für Menüs ohne Nebenwirkung.
   Runner `unity-licensed`, Xvfb ohne Desktopfenster, kein Zeitplan seit 2026-11-25) als Teamlauf
   `scripts/run-team-autoplay.sh`: dedizierter Server + fenwalker-Lead (god, volle Route) + lanternbearer/rogue
   (sterblich), Sitzung Normal bis Thewes, dann Kindled aus denselben Saves (`team-verdict.json`, `docs/ci-runner.md`).
-  Solo-Lauf nur noch lokal. Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
+  Solo-Lauf nur noch lokal. 4×-Welt-Beleg 2026-11-28: `-seed 0` Exit 0 bis `complete` + `boss4`, 34/34 Quests ohne Catch-up, `actBossKills` je Akt `-` (126 navPlans/4 navWarps). Koop-Paarlauf `scripts/run-coop-pair.sh` (`COOP_RELAY=1` für Relay, `COOP_CLIENTS=2` für die
   Dreiergruppe, `COOP_CLIENT_GOD=0` für sterbliche Clients). Koop-Client-Phasen: `town, zone1, zone2,
   boss, zone3, actboss, zone4, boss3` (je Zone Treffer oder Angriffs-Casts, je Boss die gebuchte Kill-Meldung).
 - Installer: `scripts/build-installer.sh` (Inno Setup 6 per winget, `scripts/installer/cinderreach.iss`) packt

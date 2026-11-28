@@ -1191,3 +1191,10 @@ PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-B
 - Faced: Marker-Zeilen aus früheren Evidence-Merges lagen noch im Kopf von `test-runs.jsonl` und hätten jeden JSONL-Parse gebrochen.
 - Learned: Evidence-Zeilen immer gegen den Mess-Commit prüfen (`commit`-Feld vs. HEAD), Marker nie mit einchecken.
 - Next: `cinderreach-bigworld-nav-autoplay` (Erreichbarkeit alle Varianten + Autoplay `-seed 0` bis `complete`).
+
+## 2026-11-28 — bigworld-nav-autoplay: Navigation und Autoplay in der 4× Welt
+
+- Done: LayoutSeedTests 5/5 (81 Varianten erreichbar), Autoplay `-seed 0` Exit 0 bis `complete`+`boss4` (34/34 Quests, kein Catch-up, alle Akt-Bosse `-`), Voll-Suiten 791/791 + 432/432, Verifies grün.
+- Faced: Autoplay lief aus dem Encounter-Worktree und überlebte dessen Abräumung durch `land` — Ergebnisdatei blieb gültig, nur das advisory fps-gate fand sein Skript nicht mehr.
+- Learned: Hintergrund-Autoplay vor `land` beenden oder neu starten; Ergebnis immer an `autoplay-result.json`-Feldern (nicht nur Log-Tail) festmachen.
+- Next: keine — beide Bigworld-Goals gelandet; Eigner-Abnahmen (Playtest, Steam-Build) bleiben bewusst offen.
