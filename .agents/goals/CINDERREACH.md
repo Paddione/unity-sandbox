@@ -63,6 +63,39 @@ Abgeschlossen: `cinderreach-sprache-voice` (2026-11-27, S1 `a5087c8`): Ton-Forts
 (mean CER 0,013); Belege `docs/sprache-voice-run-log.md` (EditMode 727/727, PlayMode 410/410,
 `check-voice-lines` 244/0).
 
+Abgeschlossen: `cinderreach-inventory-ui-layout-split` (2026-11-27): `DiabloInventoryUI` (1.033 Zeilen, 14 Layout-Methoden)
+zum `partial`-Split — alle Layout-Methoden unverändert nach `sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs` (432 Zeilen)
+verschoben, alle 16 öffentlichen APIs und `DiabloMenuItemExt` unangetastet in `DiabloInventoryUI.cs` (611 Zeilen).
+Belege: gezielte Suites 39/39 (`ItemCompareTests`/`DiabloMenuTests`/`DiabloHdTests` 22/22,
+`InventoryPaperdollPlayTests`/`GearSlotsPlayTests`/`DiabloMenuPlayTests` 17/17), Voll-Suiten EditMode 674/674 +
+PlayMode 383/383, Shotcheck-Tabs gegen `docs/cinderreach-inventory-shots/`.
+
+Abgeschlossen: `cinderreach-skills-modularization` (2026-11-27, S1–S3-Land `71cb9eb`): `DiabloSkills.cs` 1.414 → 1.158
+Zeilen (−256, Logik byte-identisch extrahiert) — neu `BowStanceVisuals.cs` (140 Zeilen, Bogenhaltung) und
+`SkillBarHud.cs` (194 Zeilen, Skillbar-HUD über schmale Delegates); `Skill`-Enum `0..19` und
+`SubmitSkillCastServerRpc`-Vertrag unverändert. Belege: Voll-Suiten EditMode 673/673 + PlayMode 383/383,
+Autoplay `-seed 0` Exit 0 mit Combo-Zählern, Koop-Paar Host+Client Exit 0 bis `boss3`/`complete`,
+Shotcheck Bogen/Skillbar.
+
+Abgeschlossen: `cinderreach-graph-adr-hygiene` (2026-11-27, u. a. `dcb2367`): S1–S5 — `parse_partial: 0`,
+`doc_links.unresolved.missing`: 63 → 0, `ambiguous`: 260/309 → 229 (eindeutige repo-relative Pfade);
+ADR für `home-patrick-unity-sandbox` aktualisiert, neuer Runbook-Abschnitt „Code-Graph und ADR-Pflege“
+in `docs/runbook.md`. Belege: Re-Index (`10543` nodes, `57834` edges), `pytest scripts` 34/34,
+`check-meta` + Workspace-Check grün.
+
+Abgeschlossen: `cinderreach-inventory-redesign` (2026-11-28, Belege `d5e7731`): Dreispalten-Layout
+(Held 456 / Tasche flex / Tooltip 360) mit Kopf-/Fußzeile, Taschen-Grid optisch 8×5 (`Capacity = 20`
+unverändert, gesperrte `BagLocked`-Rahmen), Tooltip-Spalte mit Vergleich/Aktionen statt Floater,
+Verkauf über `VendorStock.TrySell`. Belege `InventoryTooltipColumnPlayTests` + `BagUpgradeMarkerTests`,
+Voll-Suiten EditMode 767/767 + PlayMode 422/422, Shots unter `docs/inventory-redesign/`.
+
+Abgeschlossen: `cinderreach-map-overlay` (2026-11-28, gelandet `002f485`): Zonenkarte auf M mit
+Overlay/Vollbild (`WorldMapMode`, modal nur im Vollbild), fünf Filter-Toggles (`WorldMapFilter`),
+Zoom 75–150 % (`WorldMapZoom`, Mausrad + Knöpfe), `-autoplay-map`-Schalter, Redraw-Takt 0,3 s mit Icon-Pool.
+Belege `WorldMapModePlayTests` + `WorldMapFilterTests` 3/3 + `WorldMapZoomTests` 5/5, Voll-Suiten
+EditMode 775/775 + PlayMode 426/426, Windows-Shotcheck + Perf-Paar (98,6 %, fps-gate PASS) unter
+`docs/map-overlay/`.
+
 Abgeschlossen: `cinderreach-class-kits-parity` (2026-11-27, `aaa2571`): Moorgänger und Schmuggler mit je 6 eigenen
 Skills, 7 Combos über `EnemyStatus`, Schnellschuss-Fächer als Variante, Matrix-Uniques auf Combos ausgerichtet plus
 Combo-Waffen `moorvogt-anchor`/`smugglers-fuse`, Rang-Rückerstattung beim Laden (Details unter „Klassen und Skills“
