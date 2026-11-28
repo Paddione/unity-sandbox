@@ -48,7 +48,7 @@ rm -rf "$GAME/shotcheck"
 if [ "$MODE" = "autoplay" ]; then
   echo "shotcheck: launching $EXE -autoplay (${SIZE}, timeout ${TIMEOUT}s)"
   rc=0
-  (cd "$GAME" && timeout "$TIMEOUT" cmd.exe /c "$EXE -autoplay -autoplay-out autoplay -save-file automation-save.json -screen-fullscreen 0 -screen-width ${SIZE%x*} -screen-height ${SIZE#*x} -logFile autoplay.log" >/dev/null 2>&1) || rc=$?
+  (cd "$GAME" && timeout "$TIMEOUT" cmd.exe /c "$EXE -autoplay $EXTRA -autoplay-out autoplay -save-file automation-save.json -screen-fullscreen 0 -screen-width ${SIZE%x*} -screen-height ${SIZE#*x} -logFile autoplay.log" >/dev/null 2>&1) || rc=$?
   if [ "$rc" -eq 124 ]; then
     taskkill.exe /IM "$EXE" /F >/dev/null 2>&1 || true
     echo "shotcheck: autoplay timed out after ${TIMEOUT}s" >&2
