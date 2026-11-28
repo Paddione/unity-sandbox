@@ -1,6 +1,6 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-28 (zuletzt `cinderreach-model-realism`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-28 (zuletzt Story-Kette Akt I–III + Sprache/Voice, HUD, Inventar, Karte, Levelup, Ability-VFX). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte "ROADMAP.md". Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -11,28 +11,57 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 
 ## Aktive Goals
 
-| Prio | Goal | Stand | Nächster Schritt |
-|---|---|---|---|
-| P1 | [`cinderreach-akt1-vertiefung`](cinderreach-akt1-vertiefung/GOAL.md) | 50 %, S1+S2 gelandet (`6646cff`, `16833a6`) | S3 Ofen/Wacht-Strang läuft; Kettenkopf, entblockt Akt II/III und sprache-voice S2 |
-| P2 | [`cinderreach-akt2-vertiefung`](cinderreach-akt2-vertiefung/GOAL.md) | 0 %, Startbedingung Akt-I-S1 erfüllt | S1 Bibel+Modell, sobald `StoryModel`/`docs/story-bible.md` frei sind (nach Akt-I-S3 empfohlen) |
-| P3 | [`cinderreach-inventory-ui-layout-split`](cinderreach-inventory-ui-layout-split/GOAL.md) | 100 %, S1–S3 gelandet | Abgeschlossen (`sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs`, 39/39 + Voll-Suiten + Shotcheck grün) |
-| P4 | [`cinderreach-skills-modularization`](cinderreach-skills-modularization/GOAL.md) | 100 %, S1–S4 gelandet | Abgeschlossen (Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
-| P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
-| P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
-| P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
-| P9 | [`cinderreach-hud-redesign`](cinderreach-hud-redesign/GOAL.md) | 100 %, gelandet `7176e5a` | HUD nach Canvas-Artboard „HUD im Spiel“ plus Gruppenrahmen; liefert Fonts/Stilbausteine für P10/P11 |
-| P10 | [`cinderreach-inventory-redesign`](cinderreach-inventory-redesign/GOAL.md) | 100 %, umgesetzt (Branch `feature/cinderreach-inventory-redesign`), Land ausstehend | Inventar nach Artboard „Inventar (I)“: 3 Spalten, feste Tooltip-Spalte, 8×5-Grid, Verkauf; Belege `InventoryTooltipColumnPlayTests`, `BagUpgradeMarkerTests`, `docs/inventory-redesign/` |
-| P11 | [`cinderreach-map-overlay`](cinderreach-map-overlay/GOAL.md) | 100 %, gelandet `002f485` | Zonenkarte M mit Overlay/Vollbild, Filtern, Zoom; Belege `WorldMapModePlayTests`, `WorldMapFilterTests`, `WorldMapZoomTests`, `docs/map-overlay/` |
-| P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
+Keine — alle zuletzt aktiven Goals stehen in ihren `PROGRESS.md` auf 100 % (keine offenen Punkte):
 
-Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
-(Story-Kette Akt I → II → III → Sprache), danach unabhängige Refactorings nach Risiko
-(Inventar mechanisch vor Skills/Kampf-Autorität), Kettenende und reine Hygiene. P3/P4/P7 sind dateidisjunkt zur Story-Kette und
-zueinander und können parallel laufen; die Story-Ziele teilen sich `sandbox/Assets/Scripts/Story/StoryModel.cs` und
-`docs/story-bible.md` und bleiben seriell. `cinderreach-party-roles`, `cinderreach-itemization` und `cinderreach-hotpath-caching` (seit `a4d3dc3`) stehen in ihren `PROGRESS.md` auf 100 % (keine offenen Punkte);
-ihre Einarbeitung hier und das Entfernen der Goal-Verzeichnisse ist der noch ausstehende
+| Goal | Stand |
+|---|---|
+| `cinderreach-akt1-vertiefung` | 100 %, S1–S4 gelandet (Bibel + Modell `6646cff`, S2 `16833a6`, S4 `e66fc60`; EditMode 674/674, PlayMode 383/383, Autoplay `-seed 0` Exit 0 bis `complete`) |
+| `cinderreach-akt2-vertiefung` | 100 %, S1–S3 gelandet (keine Save-Migration, v16 bleibt; EditMode 690/690, PlayMode 389/389, Autoplay `-seed 0` Exit 0 bis `boss3`+`complete`) |
+| `cinderreach-inventory-ui-layout-split` | 100 %, S1–S3 gelandet (unverändert: `sandbox/Assets/Scripts/DiabloInventoryUI.Layout.cs`, 39/39 + Voll-Suiten + Shotcheck grün) |
+| `cinderreach-skills-modularization` | 100 %, S1–S4 gelandet (unverändert: Suiten, Autoplay, Koop-Paar, Shotcheck grün) |
+| `cinderreach-akt3-finale` | 100 %, S1–S4 (+S3b/S3c) gelandet (Save ohne Migration, v16 bleibt; EditMode 716/716, PlayMode 410/410, Autoplay `-seed 0` Exit 0, Quests 34/34) |
+| `cinderreach-sprache-voice` | 100 %, S1–S3 gelandet (Ton-Fortschreibung + Inventur `a5087c8`, 238 Zeilen; EditMode 727/727, PlayMode 410/410, `check-voice-lines` 244/0) |
+| `cinderreach-act-boss-gating` | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün (unverändert) |
+| `cinderreach-hud-redesign` | 100 %, gelandet `7176e5a` (unverändert) |
+| `cinderreach-inventory-redesign` | 100 %, Belege gelandet `d5e7731` (Branch-Arbeit abgeschlossen, unverändert) |
+| `cinderreach-map-overlay` | 100 %, gelandet `002f485` (unverändert) |
+| `cinderreach-graph-adr-hygiene` | 100 %, S1–S5 gelandet (unverändert: `parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
+
+Priorisierung (erledigt 2026-11-27/28): Die Story-Kette Akt I → II → III → Sprache ist vollständig gelandet,
+die übrigen Refactorings (Inventar, Skills, Bosse, HUD, Karte, Hygiene) ebenfalls. Es gibt kein offenes
+Umsetzungsziel mehr; die serielle Schreibsperre auf `sandbox/Assets/Scripts/Story/StoryModel.cs` und
+`docs/story-bible.md` ist damit aufgehoben. `cinderreach-party-roles`, `cinderreach-itemization`,
+`cinderreach-hotpath-caching` sowie die oben abgeschlossenen Story-/Voice-Goals stehen in ihren `PROGRESS.md`
+auf 100 % (keine offenen Punkte); ihre Goal-Verzeichnisse samt Plänen zu entfernen ist der noch ausstehende
 Konsolidierungsschritt nach der Regel unten, kein offenes Umsetzungsziel.
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
+
+Abgeschlossen: `cinderreach-akt1-vertiefung` (2026-11-27, S4 `e66fc60`): Akt-I-Bibel auf 16 Einträge erweitert
+(H14–H17, N8–N11, Rätsel R1–R3 mit Folgezeilen-Mapping N8→H2/N9→H3/N10→H4/N11→H5); `StoryModel.cs` + 8 Quests
+und 6 Fundstück-Ids (Anker H2/H4/H5 unangetastet, h10–h13/n6–n7 für Akt III freigehalten); R1/R2 als
+Fundstück-Rätsel (7 Pickups Moor/Beinhaus), R3 als Dialog-Entscheidung (H17) mit Ofen-Fundstücken (H16),
+Rußseiten (N11), Jorin-Einschmelzen (H16) und Schlackenknechten (N10); Save v15 → v16; Belege
+`docs/akt1-vertiefung-run-log.md` (EditMode 674/674, PlayMode 383/383, `VerifyDiabloZone` +
+`KayKitAssets.Verify` grün, Autoplay `-seed 0` Exit 0 / 12 Phasen bis `complete` inkl. `actboss`).
+
+Abgeschlossen: `cinderreach-akt2-vertiefung` (2026-11-27): Bibel §Akt II auf 12 Einträge (H18/H19 + N12–N15,
+Rätsel R4–R6, Wendung 3 geschärft, Anker H6/H8/H9 unangetastet); `StoryModel.cs` + 6 Quests + 4 Items
+(h10–h13/n6–n7 für Akt III freigehalten, keine Save-Migration, v16 bleibt); H18/H19/N12–N15-Dialoge (29 Zeilen
++ H9-Folgen) mit Wendung-3-Barks R4/R5, 9 Brache-Pickups; Belege `docs/akt2-vertiefung-run-log.md`
+(EditMode 690/690, PlayMode 389/389, Autoplay `-seed 0` Exit 0 bis `boss3`+`complete`, Voice 211/0).
+
+Abgeschlossen: `cinderreach-akt3-finale` (2026-11-27): Bibel §Akt III „Was nach Hause will“ (H10 Letzte Nacht
+in der Wacht / H11 Glut am Moortor mit Rätsel R7 / H12 Finalboss Thewes der Heimkehrer / H13 Entscheidung;
+N6 Jorins Einschmelzen / N7 Ilsabes letztes Angebot); `ActProgressAkt3.cs` + Moortor-Gates + Thewes-Auftritt
+ab H11-Kante (Respawn nach frühem Barrens-Sweep); Save ohne Migration (v16 bleibt); Belege
+`docs/akt3-finale-run-log.md` (EditMode 716/716, PlayMode 410/410, Autoplay `-seed 0` Exit 0, 34/34 Quests,
+Voice 244/0).
+
+Abgeschlossen: `cinderreach-sprache-voice` (2026-11-27, S1 `a5087c8`): Ton-Fortschreibung in `docs/story-bible.md`
+(8 Glättungsregeln) + Voll-Inventur `docs/sprache-inventur.md` (238 Textzeilen, 115/115 Clips); S2-Glättung
+12 Zeilen mit CPU-Re-Render exakt dieser Clips (`SpracheTests.cs`, 11 Fälle); S3-Abnahme mit QA-Stichprobe
+(mean CER 0,013); Belege `docs/sprache-voice-run-log.md` (EditMode 727/727, PlayMode 410/410,
+`check-voice-lines` 244/0).
 
 Abgeschlossen: `cinderreach-class-kits-parity` (2026-11-27, `aaa2571`): Moorgänger und Schmuggler mit je 6 eigenen
 Skills, 7 Combos über `EnemyStatus`, Schnellschuss-Fächer als Variante, Matrix-Uniques auf Combos ausgerichtet plus
