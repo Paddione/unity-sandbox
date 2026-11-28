@@ -203,3 +203,32 @@ def render_turn(rig_name, out_path, size=800):
         for o in hidden:
             o.hide_render = False
     return out_path
+
+
+def braid(name, material, arm, points, radius=0.06, head_z=1.3):
+    """Hair braid as a chain of low-poly beads; beads above head_z follow the
+    head bone, lower ones the chest so the braid swings with the torso."""
+    obs = []
+    for i, (x, y, z) in enumerate(points):
+        r = radius * (1.0 - 0.5 * i / max(1, len(points) - 1))
+        bone = "head" if z >= head_z else "chest"
+        obs.append(ball(f"{name}{i}", material, arm, [bone], (x, y, z), (r, r, r * 1.3), segs=6, rings=4))
+    return obs
+
+
+def import_base(fbx, rig_name, location):
+    """Import a KayKit character into SCENE, rename its armature, place it."""
+    before = set(bpy.data.objects.keys())
+    with bpy.context.temp_override(window=bpy.context.window, scene=scene()):
+        bpy.ops.import_scene.fbx(filepath=fbx)
+    new = [bpy.data.objects[n] for n in set(bpy.data.objects.keys()) - before]
+    rig = [o for o in new if o.type == "ARMATURE"][0]
+    rig.name = rig_name
+    rig.location = location
+    return rig, [o for o in new if o.type == "MESH"]
+
+
+def hide_meshes(obs):
+    for o in obs:
+        o.hide_render = True
+        o.hide_viewport = True
