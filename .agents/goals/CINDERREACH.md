@@ -193,8 +193,11 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 
 ### Progression, Beute und Wirtschaft
 
-- Level-Up: 1 Attributpunkt (Strength/Vitality/Focus) + 1 Skillpunkt (Rang 1–5, +20 %/Rang),
-  `DiabloCharacterUI` (C).
+- Level-Up (cinderreach-levelup-empower, 2026-11-28): 5 Attributpunkte automatisch nach Klassen-Template
+  (Fenwalker 2 Stärke/2 Vitalität/1 Fokus, Rogue 2/1/2, Laternenträger 1/1/3) + 1 freier Skillpunkt
+  (Rang 1–5, +20 %/Rang); Rang 5 = **Empowert** (Multiplikator ×2,5 statt ×2,0, Weiß-Gold-Burst im
+  zentralen VFX-Pfad, Marker im Bogen). Manuelle Attributvergabe entfällt; freie Attributpunkte alter
+  Saves werden beim Laden automatisch nach Template verteilt. `DiabloCharacterUI` (C).
 - Beute: nur Rare und Unique (seit 2026-11-23). `ItemRarity.Magic` bleibt als Enum-Wert (Netz-/Save-Vertrag),
   wird aber nie erzeugt: Magic-Gewicht der Droptabellen ging an Rare (Normal 0/98/2, Elite 0/90/10, Unique-Raten
   unverändert, Magic Find skaliert nur noch Unique), Händler 5 Rare + 1 Unique, Startwaffen Rare, `ItemDatabase.RetireMagic` hebt

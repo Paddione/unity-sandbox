@@ -27,6 +27,7 @@ public static class PresentationVfx
     public static int LevelUpPillars;
     public static int RareBeams;
     public static int VeilPuffs;
+    public static int EmpowerBursts;
 
     static readonly Dictionary<string, ParticleSystem> systems = new Dictionary<string, ParticleSystem>();
 
@@ -148,6 +149,34 @@ public static class PresentationVfx
                 Color.Lerp(DiabloPalette.ParchmentDim, DiabloPalette.Parchment, Random.value));
     }
 
+    /// <summary>
+    /// Empowered cast (cinderreach-levelup-empower D5): bigger, brighter
+    /// white-gold shock ring with an upward spark shower — one generic layer
+    /// shared by every rank-5 skill, fired by <see cref="DiabloSkills"/>.
+    /// </summary>
+    public static void EmpowerBurst(Vector3 at)
+    {
+        EmpowerBursts++;
+        var ps = SystemFor("EmpowerBurst", "SkillArt/FireAdditive", 400, 0.1f);
+        if (ps == null) return;
+        for (int i = 0; i < 36; i++)
+        {
+            float a = i * Mathf.PI * 2f / 36;
+            var rim = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+            Emit(ps, at + Vector3.up * 0.25f + rim * 0.8f, rim * 4.2f + Vector3.up * 0.5f,
+                Random.Range(0.5f, 0.7f), Random.Range(0.28f, 0.42f),
+                Color.Lerp(new Color(1f, 0.98f, 0.85f, 1f), DiabloPalette.TrimGold, Random.value * 0.45f));
+        }
+        for (int i = 0; i < 26; i++)
+        {
+            var ring = Random.insideUnitCircle * 0.6f;
+            Emit(ps, at + new Vector3(ring.x, Random.Range(0.1f, 0.5f), ring.y),
+                new Vector3(ring.x * 0.5f, Random.Range(2.5f, 5.5f), ring.y * 0.5f),
+                Random.Range(0.6f, 0.9f), Random.Range(0.18f, 0.34f),
+                Color.Lerp(DiabloPalette.TrimGold, new Color(1f, 0.98f, 0.85f, 1f), Random.value * 0.7f));
+        }
+    }
+
     /// <summary>Only Rare+ drops earn a beam (Magic stays quiet).</summary>
     public static bool ShouldBeamFor(ItemRarity rarity) =>
         rarity == ItemRarity.Rare || rarity == ItemRarity.Unique;
@@ -165,7 +194,7 @@ public static class PresentationVfx
     public static void ResetRun()
     {
         FireballTrails = ArrowTrails = CleaveArcs = BossTelegraphs = 0;
-        PhaseTwoBursts = LevelUpPillars = RareBeams = VeilPuffs = 0;
+        PhaseTwoBursts = LevelUpPillars = RareBeams = VeilPuffs = EmpowerBursts = 0;
     }
 
     static ParticleSystem SystemFor(string name, string material, int max, float gravity)

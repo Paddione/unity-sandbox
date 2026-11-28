@@ -1169,3 +1169,18 @@ PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-B
   `Spawn-Cutscene intro.kilnmother/intro.glasswright (authority=False)`.
 - Lektion: Ein Kamera-Override in `Update` hängt von der Skriptreihenfolge ab. Eine Sequenz, die die
   Kamera führt, braucht ein explizites Besitz-Flag, das die Folgekamera respektiert.
+
+## 2026-11-28 — Auto-Attribute je Klasse + Empower bei Rang 5 (cinderreach-levelup-empower)
+
+- Done: `CharacterSheet.AwardLevel(ClassDefinition)` verteilt 5 Attributpunkte automatisch nach
+  Klassen-Template (Fenwalker 2/2/1, Rogue 2/1/2, Laternenträger 1/1/3) + 1 freier Skillpunkt;
+  `DistributeFreeAttributes` wandelt freie Attributpunkte alter Saves beim Laden um (D3);
+  Rang 5 = „Empowert": `RankMultiplier` ×2,5 statt ×2,0 (`EmpowerDamageBonus 0.5f`), Gear-Rangbonus
+  empowert nicht (`IsEmpowered` liest nur gesetzte Ränge). `PresentationVfx.EmpowerBurst` als zentrale
+  Weiß-Gold-Schicht, gefeuert aus `DiabloSkills.EmpowerFor` im Cast-Pfad. `DiabloCharacterUI` ohne
+  Attribut-+-Buttons, mit Template-Zeile und „✦ Empowert"-Marker; Banner `hud.levelup.gains` neu.
+- Faced: `freeAttributePoints` bleibt als Save-Feld (v15-Vertrag), obwohl nichts mehr Punkte vergibt —
+  die Load-Zeit-Verteilung ersetzt die Migration auf eine neue Save-Version.
+- Learned: Eine „veraltete" Währung im Save-Vertrag kostet weniger als eine Versionsmigration, wenn die
+  Verteilung deterministisch (Template-Reihenfolge) und idempotent ist.
+- Next: Balancing-Goal nach Eigner-Spieltest (D6), ggf. individuellere Empower-VFX je Skill.

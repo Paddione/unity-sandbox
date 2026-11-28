@@ -14,6 +14,7 @@ public class DiabloRichFeelTests
     public void Setup()
     {
         HitStop.Enabled = false;
+        RunProfile.Reset();
         EnemyHealth.ResetRun();
         DiabloMelee.ResetRun();
         DiabloAudio.ResetRun();
@@ -153,7 +154,11 @@ public class DiabloRichFeelTests
         Assert.AreEqual(2, prog.Level);
         Assert.AreEqual(1, DiabloProgression.LevelUps);
         Assert.AreEqual(1, DiabloAudio.soundedLevelUps);
-        Assert.AreEqual(baseMax + DiabloProgression.LifePerLevel, hp.MaxHP, 0.001f);
+        // cinderreach-levelup-empower: +3 base life plus the class template's
+        // vitality (Fenwalker 2 × +5) applied automatically on level-up.
+        Assert.AreEqual(baseMax + DiabloProgression.LifePerLevel
+            + RunProfile.Class.attrVitalityPerLevel * CharacterSheet.VitalityLifePerPoint,
+            hp.MaxHP, 0.001f);
         Assert.AreEqual(hp.MaxHP, hp.CurrentHP, 0.001f, "Level-up must refill life.");
     }
 

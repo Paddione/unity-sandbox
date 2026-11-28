@@ -25,9 +25,6 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     Text focusText;
     Text detailText;
     Image portraitImg;
-    Button strPlusBtn;
-    Button vitPlusBtn;
-    Button focPlusBtn;
     readonly List<(DiabloSkills.Skill skill, Text label, Button plus)> skillRows = new List<(DiabloSkills.Skill, Text, Button)>();
     string builtFor = "";
     Text variantText;
@@ -81,13 +78,10 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         }
         if (!IsOpen || building) return;
         var sheet = prog != null ? prog.Sheet : null;
-        if (sheet != null && sheet.HasUnspent)
+        if (sheet != null && sheet.freeSkillPoints > 0 && skillPointsText != null)
         {
             float s = 1f + 0.06f * Mathf.Sin(Time.unscaledTime * 5f);
-            if (attrPointsText != null && sheet.freeAttributePoints > 0)
-                attrPointsText.rectTransform.localScale = Vector3.one * s;
-            if (skillPointsText != null && sheet.freeSkillPoints > 0)
-                skillPointsText.rectTransform.localScale = Vector3.one * s;
+            skillPointsText.rectTransform.localScale = Vector3.one * s;
         }
     }
 
@@ -116,15 +110,11 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         if (headerSubText != null)
             headerSubText.text = Loc.F("char.header", RunProfile.Class.displayName, lv);
 
-        attrPointsText.text = Loc.F("char.attrpoints", sheet.freeAttributePoints);
-        attrPointsText.color = sheet.freeAttributePoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
+        attrPointsText.text = Loc.F("char.attr.auto",
+            RunProfile.Class.attrStrengthPerLevel, RunProfile.Class.attrVitalityPerLevel,
+            RunProfile.Class.attrFocusPerLevel);
         skillPointsText.text = Loc.F("char.skillpoints", sheet.freeSkillPoints);
         skillPointsText.color = sheet.freeSkillPoints > 0 ? DiabloPalette.GoldBright : DiabloPalette.ParchmentDim;
-
-        bool canAttr = sheet.freeAttributePoints > 0;
-        if (strPlusBtn != null) strPlusBtn.interactable = canAttr;
-        if (vitPlusBtn != null) vitPlusBtn.interactable = canAttr;
-        if (focPlusBtn != null) focPlusBtn.interactable = canAttr;
 
         strengthText.text = Loc.F("char.strength.line", sheet.strength, sheet.strength * CharacterSheet.StrengthMeleePerPoint);
         vitalityText.text = Loc.F("char.vitality.line", sheet.vitality, sheet.VitalityLife());
@@ -149,6 +139,8 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     {
         int rank = sheet.GetRank(skill);
         string line = $"{DiabloSkills.SkillName(skill)}  {RankPips(rank)}";
+        if (sheet.IsEmpowered(skill))
+            line += "  " + Loc.T("char.skill.empowered");
         if (skill == DiabloSkills.Skill.Cleave)
         {
             string variant = RunProfile.GetSkillVariant(RunProfile.Class.id, skill);
@@ -184,19 +176,10 @@ public sealed class DiabloCharacterUI : MonoBehaviour
         return sb.ToString();
     }
 
-    public void SpendStrength() => Spend(CharacterSheet.Attribute.Strength);
-    public void SpendVitality() => Spend(CharacterSheet.Attribute.Vitality);
-    public void SpendFocus() => Spend(CharacterSheet.Attribute.Focus);
     public void SpendFireball() => SpendRank(DiabloSkills.Skill.Fireball);
     public void SpendArrow() => SpendRank(DiabloSkills.Skill.Arrow);
     public void SpendCleave() => SpendRank(DiabloSkills.Skill.Cleave);
     public void SpendSkill(DiabloSkills.Skill skill) => SpendRank(skill);
-
-    void Spend(CharacterSheet.Attribute attribute)
-    {
-        EnsureBuilt();
-        if (prog != null && prog.SpendAttributePoint(attribute)) { DiabloAudio.PlayUIClick(); Refresh(); }
-    }
 
     void SpendRank(DiabloSkills.Skill skill)
     {
@@ -337,15 +320,15 @@ public sealed class DiabloCharacterUI : MonoBehaviour
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
 
-        attrPointsText = DiabloUIFactory.MakeText(panelGo.transform, "AttrPoints", Loc.T("char.attrpoints.zero"), 16, DiabloPalette.GoldBright);
+        attrPointsText = DiabloUIFactory.MakeText(panelGo.transform, "AttrTemplate", Loc.T("char.attrpoints.zero"), 16, DiabloPalette.GoldBright);
         attrPointsText.fontStyle = FontStyle.Bold;
         DiabloUIFactory.SetLayout(attrPointsText.gameObject, prefH: 24f, flexW: 1f);
 
-        AddRow(panelGo.transform, "STR", null, out strengthText, out strPlusBtn, SpendStrength,
+        AddLabelRow(panelGo.transform, "STR", out strengthText,
             Loc.T("char.strength.tip"), infoProvider: () => StatHoverData("strength"));
-        AddRow(panelGo.transform, "VIT", null, out vitalityText, out vitPlusBtn, SpendVitality,
+        AddLabelRow(panelGo.transform, "VIT", out vitalityText,
             Loc.T("char.vitality.tip"), infoProvider: () => StatHoverData("vitality"));
-        AddRow(panelGo.transform, "FOC", null, out focusText, out focPlusBtn, SpendFocus,
+        AddLabelRow(panelGo.transform, "FOC", out focusText,
             Loc.T("char.focus.tip"), infoProvider: () => StatHoverData("focus"));
 
         DiabloUIFactory.MakeDivider(panelGo.transform);
@@ -427,6 +410,41 @@ public sealed class DiabloCharacterUI : MonoBehaviour
     {
         var data = SkillBreakdown.BuildFor(gameObject, skill);
         return (data.title, data.meta, data.body, "");
+    }
+
+    /// <summary>
+    /// Attribute row without a spend button (cinderreach-levelup-empower D3):
+    /// auto-assigned values stay read-only, only the hover breakdown remains.
+    /// </summary>
+    void AddLabelRow(Transform parent, string key, out Text value, string tooltip,
+        System.Func<(string title, string meta, string body, string hint)> infoProvider = null)
+    {
+        var row = new GameObject("Row" + key, typeof(RectTransform));
+        row.transform.SetParent(parent, false);
+        DiabloUIFactory.SetLayout(row, prefH: 38f, flexW: 1f);
+        var bg = row.AddComponent<Image>();
+        bg.sprite = DiabloMenuArt.TooltipBackground();
+        bg.type = Image.Type.Sliced;
+
+        var hz = row.AddComponent<HorizontalLayoutGroup>();
+        hz.padding = new RectOffset(8, 8, 4, 4);
+        hz.spacing = 8f;
+        hz.childAlignment = TextAnchor.MiddleLeft;
+        hz.childControlWidth = true;
+        hz.childControlHeight = false;
+        hz.childForceExpandWidth = false;
+
+        value = DiabloUIFactory.MakeText(row.transform, "ValueLabel", "", 15, DiabloPalette.Parchment);
+        DiabloUIFactory.SetLayout(value.gameObject, prefH: 30f, flexW: 1f);
+
+        if (!string.IsNullOrEmpty(tooltip) || infoProvider != null)
+        {
+            var hover = row.AddComponent<HoverInfoSource>();
+            hover.Bind(gameObject, infoProvider, onEnter: () =>
+            {
+                if (detailText != null && !string.IsNullOrEmpty(tooltip)) detailText.text = tooltip;
+            });
+        }
     }
 
     void AddRow(Transform parent, string key, Sprite iconSprite, out Text value, out Button plusBtn,

@@ -110,19 +110,11 @@ public sealed class DiabloProgression : MonoBehaviour
         sheet.vitality = Mathf.Max(0, vitality);
         sheet.focus = Mathf.Max(0, focus);
         sheet.FromEntries(ranks);
+        // cinderreach-levelup-empower: old saves may still carry free attribute
+        // points; auto-assign them per the class template on load (D3).
+        sheet.DistributeFreeAttributes(RunProfile.Class);
         var hp = GetComponent<PlayerHealth>();
         if (hp != null) hp.Refresh();
-    }
-
-    /// <summary>Spend one attribute point (persists immediately).</summary>
-    public bool SpendAttributePoint(CharacterSheet.Attribute attribute)
-    {
-        var sheet = Sheet ?? (Sheet = new CharacterSheet());
-        if (!sheet.SpendAttribute(attribute)) return false;
-        var hp = GetComponent<PlayerHealth>();
-        if (hp != null) hp.Refresh();
-        if (!IsCompanion && Diablo.IsLocalAuthority()) SaveService.SaveNow(gameObject);
-        return true;
     }
 
     /// <summary>Spend one skill point on a rank (persists immediately).</summary>
@@ -206,7 +198,7 @@ public sealed class DiabloProgression : MonoBehaviour
         }
         if (Level >= MaxLevel) Xp = 0;
         if (Sheet == null) Sheet = new CharacterSheet();
-        for (int i = 0; i < gained; i++) Sheet.AwardLevel();
+        for (int i = 0; i < gained; i++) Sheet.AwardLevel(RunProfile.Class);
         if (gained > 0) OnLevelUp();
         else TweenFill(Fill);
     }
@@ -257,7 +249,7 @@ public sealed class DiabloProgression : MonoBehaviour
         StartCoroutine(Tween(0.1f, t => SetAlpha(flash, 0.6f * (1f - OutCubic(t)))));
         yield return new WaitForSecondsRealtime(0.05f);
         banner.text = Loc.F("hud.levelup.title", Level);
-        bannerSub.text = Loc.F("hud.levelup.gains", LifePerLevel);
+        bannerSub.text = Loc.F("hud.levelup.gains", LifePerLevel, CharacterSheet.AttributesPerLevel);
         banner.enabled = true;
         bannerSub.enabled = true;
         DiabloAmbience.LevelPillar(transform.position);

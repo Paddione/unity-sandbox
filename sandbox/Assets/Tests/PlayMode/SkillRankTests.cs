@@ -89,8 +89,8 @@ public class SkillRankTests
         int baseDmg = skills.EffectiveDamage(DiabloSkills.Skill.Fireball);
         DiabloSkills.ApplyHit(plain, baseDmg, player.transform.position, 0f, player.transform);
 
-        prog.Sheet.AwardLevel();
-        prog.Sheet.AwardLevel();
+        prog.Sheet.AwardLevel(RunProfile.Class);
+        prog.Sheet.AwardLevel(RunProfile.Class);
         Assert.IsTrue(prog.SpendSkillPoint(DiabloSkills.Skill.Fireball));
         Assert.IsTrue(prog.SpendSkillPoint(DiabloSkills.Skill.Fireball));
         int rankedDmg = skills.EffectiveDamage(DiabloSkills.Skill.Fireball);

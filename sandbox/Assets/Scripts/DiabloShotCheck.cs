@@ -1246,11 +1246,9 @@ public sealed class DiabloShotCheck : MonoBehaviour
         var prog = hero.GetComponent<DiabloProgression>();
         if (prog != null && prog.Sheet != null)
         {
-            for (int i = 0; i < 4; i++) prog.Sheet.AwardLevel();
-            prog.Sheet.SpendAttribute(CharacterSheet.Attribute.Strength);
-            prog.Sheet.SpendAttribute(CharacterSheet.Attribute.Strength);
-            prog.Sheet.SpendAttribute(CharacterSheet.Attribute.Vitality);
-            prog.Sheet.SpendAttribute(CharacterSheet.Attribute.Focus);
+            // cinderreach-levelup-empower: attributes come from the class template,
+            // only skill ranks are still spent manually (D2/D3).
+            for (int i = 0; i < 4; i++) prog.Sheet.AwardLevel(RunProfile.Class);
             prog.Sheet.SpendSkill(RunProfile.Class.skills[0]);
             prog.Sheet.SpendSkill(RunProfile.Class.skills[2]);
         }

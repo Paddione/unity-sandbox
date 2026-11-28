@@ -140,7 +140,7 @@ public class SkillVariantTests
         hero = Hero();
         hero.transform.position = HoldPos;
         var prog = hero.GetComponent<DiabloProgression>();
-        prog.SetState(3, 0, 1, 1, 2, 1, 0,
+        prog.SetState(3, 0, 0, 1, 2, 1, 0,
             new System.Collections.Generic.List<SkillRankEntry>
                 { new SkillRankEntry { skill = "Cleave", rank = 2 } });
         var ui = hero.GetComponent<DiabloCharacterUI>();

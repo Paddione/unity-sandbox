@@ -405,6 +405,10 @@ public sealed class DiabloSkills : MonoBehaviour
         else lastLantern[s] = Time.time;
         lastUsed = s;
 
+        // cinderreach-levelup-empower (D5): a rank-5 cast fires the shared
+        // white-gold empower burst once per successful cast, for every skill.
+        EmpowerFor(s);
+
         // S3 co-op intent: a networked client never applies damage itself. It
         // sends skill + anchor + facing (never a damage number); the host
         // validates and executes authoritatively. Locally only the cosmetic
@@ -490,6 +494,17 @@ public sealed class DiabloSkills : MonoBehaviour
         if (netPlayer != null && netPlayer.IsSpawned && nm != null && nm.IsListening)
             netPlayer.BroadcastCast((int)s, origin2, dir);
         return true;
+    }
+
+    /// <summary>
+    /// cinderreach-levelup-empower (D5): one shared burst for every empowered
+    /// (rank-5) cast, driven by the local sheet so only real investments glow.
+    /// </summary>
+    public void EmpowerFor(Skill s)
+    {
+        var sheet = CharacterSheet.For(gameObject);
+        if (sheet != null && sheet.IsEmpowered(s))
+            PresentationVfx.EmpowerBurst(transform.position);
     }
 
     /// <summary>S3: cosmetic half of a cast for intent-sending clients (no damage, no cooldown).</summary>

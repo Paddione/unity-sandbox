@@ -126,4 +126,45 @@ public class ClassSheetUiTests
         Assert.AreEqual(1, prog.Sheet.haloRank);
         Assert.AreEqual(0, prog.Sheet.freeSkillPoints);
     }
+
+    [Test]
+    public void CharacterPanel_HasNoAttributeSpendButtons_AndShowsTemplate()
+    {
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        var ui = hero.AddComponent<DiabloCharacterUI>();
+        ui.Refresh();
+        // Attribute rows carry no "Plus" button anymore (auto-assignment, D3).
+        foreach (var row in new[] { "RowSTR", "RowVIT", "RowFOC" })
+        {
+            var rowGo = ui.transform.Find("CharacterCanvas/Panel/" + row);
+            Assert.IsNotNull(rowGo, row + " exists");
+            var plus = rowGo.Find("Plus");
+            Assert.IsNull(plus, row + " has no spend button");
+        }
+        bool sawTemplate = false;
+        foreach (var t in hero.GetComponentsInChildren<Text>())
+            if (t.text.Contains("Attribute je Stufe") && t.text.Contains("+2 Stärke"))
+                sawTemplate = true;
+        Assert.IsTrue(sawTemplate, "class template line rendered");
+    }
+
+    [Test]
+    public void CharacterPanel_MarksEmpoweredSkillAtRankFive()
+    {
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        var prog = hero.GetComponent<DiabloProgression>();
+        prog.Sheet.cleaveRank = 5;
+        var ui = hero.AddComponent<DiabloCharacterUI>();
+        ui.Refresh();
+        bool sawEmpowered = false;
+        foreach (var t in hero.GetComponentsInChildren<Text>())
+            if (t.text.Contains("Spalten") && t.text.Contains("Empowert"))
+                sawEmpowered = true;
+        Assert.IsTrue(sawEmpowered, "rank-5 row shows the empowered marker");
+        prog.Sheet.cleaveRank = 4;
+        ui.Refresh();
+        foreach (var t in hero.GetComponentsInChildren<Text>())
+            Assert.IsFalse(t.text.Contains("Spalten") && t.text.Contains("Empowert"),
+                "rank 4 must not show the empowered marker");
+    }
 }

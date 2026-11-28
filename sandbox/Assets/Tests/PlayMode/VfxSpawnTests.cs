@@ -167,6 +167,33 @@ public class VfxSpawnTests
     }
 
     [UnityTest]
+    public IEnumerator EmpoweredCast_FiresBurst_PlainCastDoesNot()
+    {
+        yield return null;
+        Assert.AreEqual(0, PresentationVfx.EmpowerBursts);
+
+        // Rank-0 cast: no empower layer (D5).
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Fireball, Vector3.forward));
+        yield return null;
+        Assert.AreEqual(0, PresentationVfx.EmpowerBursts, "unranked casts stay plain");
+
+        // Rank-5 cast: one empower burst per cast (wait out the 1 s fireball cooldown).
+        // DiabloClickController auto-adds a DiabloProgression on the hero, so
+        // reuse it instead of stacking a second component.
+        var prog = hero.GetComponent<DiabloProgression>();
+        if (prog == null) prog = hero.AddComponent<DiabloProgression>();
+        prog.Sheet.fireballRank = 5;
+        Assert.IsTrue(prog.Sheet.IsEmpowered(DiabloSkills.Skill.Fireball), "sheet flags rank 5");
+        skills.EmpowerFor(DiabloSkills.Skill.Fireball);
+        Assert.AreEqual(1, PresentationVfx.EmpowerBursts, "EmpowerFor fires directly");
+        PresentationVfx.ResetRun();
+        yield return new WaitForSeconds(1.2f);
+        Assert.IsTrue(skills.CastToward(DiabloSkills.Skill.Fireball, Vector3.forward));
+        yield return null;
+        Assert.AreEqual(1, PresentationVfx.EmpowerBursts, "rank-5 casts fire the empower layer");
+    }
+
+    [UnityTest]
     public IEnumerator LootDrop_RarePlusSpawnsBeam()
     {
         yield return null;

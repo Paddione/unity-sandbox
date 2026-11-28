@@ -19,14 +19,14 @@ public static class ClassCatalog
         new[] { DiabloSkills.Skill.Cleave, DiabloSkills.Skill.MireHook, DiabloSkills.Skill.SeismicSlam, DiabloSkills.Skill.BogCharge, DiabloSkills.Skill.MireGround, DiabloSkills.Skill.IronVow },
         new[] { "Q", "E", "R", "Space", "F", "G" },
         1f, 1f, "Adventurers/Characters/Knight.fbx",
-        ClassDefinition.PartyRole.Tank, 1f);
+        ClassDefinition.PartyRole.Tank, 1f, 2, 2, 1);
 
     public static readonly ClassDefinition Lanternbearer = new ClassDefinition(
         LanternbearerId,
         new[] { DiabloSkills.Skill.LanternBolt, DiabloSkills.Skill.Wisps, DiabloSkills.Skill.SearingHalo, DiabloSkills.Skill.VeilStep, DiabloSkills.Skill.MendingLight, DiabloSkills.Skill.RenewingCircle },
         new[] { "Q", "E", "R", "Space", "F", "G" },
         1.5f, 0.5f, "Adventurers/Characters/Mage.fbx",
-        ClassDefinition.PartyRole.Healer, 1.5f);
+        ClassDefinition.PartyRole.Healer, 1.5f, 1, 1, 3);
 
     /// <summary>Rogue (party-roles S1/S3, class-kits-parity): ranged/melee DPS built on venom, smoke and powder.</summary>
     public static readonly ClassDefinition Rogue = new ClassDefinition(
@@ -34,7 +34,7 @@ public static class ClassCatalog
         new[] { DiabloSkills.Skill.QuickShot, DiabloSkills.Skill.BladeFlurry, DiabloSkills.Skill.SmokePot, DiabloSkills.Skill.ShadowRoll, DiabloSkills.Skill.VenomVial, DiabloSkills.Skill.PowderKeg },
         new[] { "Q", "E", "R", "Space", "F", "G" },
         1.5f, 1.5f, "Adventurers/Characters/Rogue.fbx",
-        ClassDefinition.PartyRole.Dps, 1.5f);
+        ClassDefinition.PartyRole.Dps, 1.5f, 2, 1, 2);
 
     public static readonly ClassDefinition[] All = { Fenwalker, Lanternbearer, Rogue };
 

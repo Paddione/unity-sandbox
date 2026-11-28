@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// S4 point-spend choices (pure C# logic, no MonoBehaviour): one attribute
-/// point (Strength → melee damage, Vitality → life, Focus → skill damage and
-/// cooldown) and one skill point (rank 1–5 per skill, +20 % damage per rank)
-/// per level on top of the flat <c>+3 Life/Level</c> base. Owned by
+/// S4 point-spend choices, cinderreach-levelup-empower: attribute points are
+/// auto-assigned per class template (5/level) while one skill point per level
+/// stays manual (rank 1–5 per skill, +20 % damage per rank, rank 5 adds the
+/// empowered bonus on top) over the flat <c>+3 Life/Level</c> base. Owned by
 /// <see cref="DiabloProgression"/> (one sheet per hero, solo-local like the
 /// rest of the session state) and persisted through <see cref="SaveGame"/>
 /// (S2 fields, filled by S4).
@@ -16,6 +16,10 @@ public sealed class CharacterSheet
     public const int MaxSkillRank = 5;
     /// <summary>Damage bonus per skill rank (multiplicative with focus).</summary>
     public const float RankDamageBonus = 0.20f;
+    /// <summary>Extra multiplier on top of rank 5 for empowered skills (cinderreach-levelup-empower: ×2.5 instead of ×2.0).</summary>
+    public const float EmpowerDamageBonus = 0.5f;
+    /// <summary>Attribute points auto-assigned per level-up (cinderreach-levelup-empower).</summary>
+    public const int AttributesPerLevel = 5;
     /// <summary>Melee damage per Strength point.</summary>
     public const int StrengthMeleePerPoint = 1;
     /// <summary>Max-life per Vitality point.</summary>
@@ -79,25 +83,49 @@ public sealed class CharacterSheet
 
     public bool HasUnspent => freeAttributePoints > 0 || freeSkillPoints > 0;
 
-    /// <summary>One level grants one attribute and one skill point.</summary>
-    public void AwardLevel()
+    /// <summary>
+    /// One level-up grants one skill point and auto-assigns
+    /// <see cref="AttributesPerLevel"/> attribute points per the class template
+    /// (cinderreach-levelup-empower). A null class leaves free points untouched
+    /// (test/shotcheck seams set fields directly).
+    /// </summary>
+    public void AwardLevel(ClassDefinition cls)
     {
-        freeAttributePoints++;
         freeSkillPoints++;
+        if (cls != null) ApplyTemplate(cls);
     }
 
-    /// <summary>Spend one attribute point. False when none is free.</summary>
-    public bool SpendAttribute(Attribute attribute)
+    /// <summary>Apply one full class template (five attribute points, D2/D8).</summary>
+    void ApplyTemplate(ClassDefinition cls)
     {
-        if (freeAttributePoints <= 0) return false;
-        freeAttributePoints--;
+        foreach (var attribute in cls.LevelUpSequence()) AddAttribute(attribute);
+    }
+
+    /// <summary>
+    /// Distribute leftover free attribute points of old saves on load (D3):
+    /// deterministic, template-ordered, idempotent (points are zero afterwards).
+    /// </summary>
+    public void DistributeFreeAttributes(ClassDefinition cls)
+    {
+        if (cls == null || freeAttributePoints <= 0) return;
+        var seq = cls.LevelUpSequence();
+        int i = 0;
+        while (freeAttributePoints > 0)
+        {
+            AddAttribute(seq[i % seq.Length]);
+            freeAttributePoints--;
+            i++;
+        }
+    }
+
+    void AddAttribute(Attribute attribute)
+    {
         switch (attribute)
         {
             case Attribute.Strength: strength++; break;
             case Attribute.Vitality: vitality++; break;
             default: focus++; break;
         }
-        return true;
     }
 
     /// <summary>Current rank of a skill (0 = unranked, still castable).</summary>
@@ -151,9 +179,13 @@ public sealed class CharacterSheet
     public int EffectiveRank(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
         GetRank(skill) + System.Math.Max(0, gearRankBonus);
 
-    /// <summary>Rank multiplier for a skill (1 + 20 % per effective rank).</summary>
+    /// <summary>Rank multiplier for a skill (1 + 20 % per effective rank, +50 %-Punkte extra bei Rang 5 „Empowert").</summary>
     public float RankMultiplier(DiabloSkills.Skill skill, int gearRankBonus = 0) =>
-        1f + RankDamageBonus * EffectiveRank(skill, gearRankBonus);
+        1f + RankDamageBonus * EffectiveRank(skill, gearRankBonus)
+           + (IsEmpowered(skill) ? EmpowerDamageBonus : 0f);
+
+    /// <summary>True when the skill carries 5 invested (spent) ranks — Empower state (D4/D7: gear bonus does not empower).</summary>
+    public bool IsEmpowered(DiabloSkills.Skill skill) => GetRank(skill) >= MaxSkillRank;
 
     /// <summary>Focus skill-damage multiplier (1 + 8 % per point).</summary>
     public float FocusSkillMultiplier() => 1f + FocusSkillDamagePerPoint * focus;
