@@ -63,17 +63,21 @@ public sealed class DiabloProjectile : MonoBehaviour
         GameObject go;
         if (lantern)
         {
-            go = LanternShape();
+            go = ClassAbilityVfx.InstantiateLanternBolt(origin, dir) ?? LanternShape();
             go.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(dir));
         }
         else if (prefab != null)
         {
             go = Object.Instantiate(prefab, origin, Quaternion.LookRotation(dir));
+            if (kind == DiabloSkills.Skill.QuickShot)
+                ClassAbilityVfx.AttachQuickShotTrail(go.transform);
         }
         else
         {
             go = FallbackShape(fire);
             go.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(dir));
+            if (kind == DiabloSkills.Skill.QuickShot)
+                ClassAbilityVfx.AttachQuickShotTrail(go.transform);
         }
         go.name = lantern ? "LanternBolt" : fire ? "Fireball" : "Arrow";
 

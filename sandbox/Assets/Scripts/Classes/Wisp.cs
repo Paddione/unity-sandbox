@@ -26,28 +26,34 @@ public sealed class Wisp : MonoBehaviour
 
     public static Wisp Spawn(Transform owner, int index, int count, int damage, float lifetime, bool cosmetic)
     {
-        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        go.name = $"Wisp_{index}";
-        var col = go.GetComponent<Collider>();
-        if (Application.isPlaying) Object.Destroy(col); else Object.DestroyImmediate(col);
-        go.transform.localScale = Vector3.one * 0.22f;
-        var r = go.GetComponent<Renderer>();
-        if (r != null)
+        var go = new GameObject($"Wisp_{index}");
+        var vfx = ClassAbilityVfx.AttachWispVisual(go.transform);
+        if (vfx == null)
         {
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader != null)
+            var fallback = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            fallback.name = "WispOrbFallback";
+            var col = fallback.GetComponent<Collider>();
+            if (Application.isPlaying) Object.Destroy(col); else Object.DestroyImmediate(col);
+            fallback.transform.SetParent(go.transform, false);
+            fallback.transform.localScale = Vector3.one * 0.22f;
+            var r = fallback.GetComponent<Renderer>();
+            if (r != null)
             {
-                var mat = new Material(shader) { color = new Color(1f, 0.95f, 0.7f) };
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.45f) * 2f);
-                r.sharedMaterial = mat;
+                var shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader != null)
+                {
+                    var mat = new Material(shader) { color = new Color(1f, 0.95f, 0.7f) };
+                    mat.EnableKeyword("_EMISSION");
+                    mat.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.45f) * 2f);
+                    r.sharedMaterial = mat;
+                }
             }
+            var light = go.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.85f, 0.5f);
+            light.range = 3f;
+            light.intensity = 1.5f;
         }
-        var light = go.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(1f, 0.85f, 0.5f);
-        light.range = 3f;
-        light.intensity = 1.5f;
         var w = go.AddComponent<Wisp>();
         w.owner = owner;
         w.damage = damage;
@@ -105,6 +111,7 @@ public sealed class Wisp : MonoBehaviour
         if (haloPick != null) best = haloPick;
         lastStrike = now;
         Strikes++;
+        ClassAbilityVfx.SpawnWispStrike(transform.position, best.transform.position);
         if (!cosmetic) DiabloSkills.ApplyHit(best, damage, center, 0f, owner);
         return best;
     }

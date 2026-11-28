@@ -199,7 +199,7 @@ public sealed class DiabloSkills : MonoBehaviour
     public static float HPRestored;
 
     /// <summary>Reset run counters (scene load / headless tests).</summary>
-    public static void ResetRun() { HealsCast = 0; HPRestored = 0f; ClassCombos.ResetRun(); }
+    public static void ResetRun() { HealsCast = 0; HPRestored = 0f; ClassCombos.ResetRun(); ClassAbilityVfx.ResetRun(); }
     DiabloClickController controller;
     DiabloNetworkPlayer netPlayer;
     SkillBarHud hud;
@@ -589,26 +589,7 @@ public sealed class DiabloSkills : MonoBehaviour
 
     void SpawnHaloVisual(float radius)
     {
-        if (!Application.isPlaying) return;
-        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
-        GameObject ring;
-        if (prefab != null)
-        {
-            ring = Instantiate(prefab, transform.position, Quaternion.identity);
-            ring.transform.localScale = Vector3.one * (radius / cleaveBaseRadius);
-            foreach (var r in ring.GetComponentsInChildren<Renderer>())
-                r.material.color = new Color(1f, 0.85f, 0.45f, r.material.color.a);
-        }
-        else ring = new GameObject("SearingHalo");
-        ring.name = "SearingHalo";
-        // Explicit check: GetComponent returns a Unity fake-null in the editor, so "??" would not fall back.
-        var light = ring.GetComponent<Light>();
-        if (light == null) light = ring.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(1f, 0.8f, 0.4f);
-        light.range = radius * 2f;
-        light.intensity = 4f;
-        Destroy(ring, 0.6f);
+        ClassAbilityVfx.SpawnSearingHalo(transform.position, radius);
     }
 
     /// <summary>
@@ -673,15 +654,7 @@ public sealed class DiabloSkills : MonoBehaviour
 
     void SpawnSlamVisual(float radius)
     {
-        if (!Application.isPlaying) return;
-        var go = new GameObject("SeismicSlam");
-        go.transform.position = transform.position + Vector3.up * 0.2f;
-        var light = go.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(0.7f, 0.6f, 0.5f);
-        light.range = radius * 2f;
-        light.intensity = 3f;
-        Destroy(go, 0.4f);
+        ClassAbilityVfx.SpawnSeismicSlam(transform.position, radius);
     }
 
     // ---------- Rogue + Healer (party-roles S3) ----------
@@ -724,9 +697,12 @@ public sealed class DiabloSkills : MonoBehaviour
                 ReduceCooldown(Skill.ShadowRoll, BuildUniqueEffects.ShadowstrideRollCut * hits);
             DiabloAudio.PlayWhoosh();
             PresentationVfx.CleaveArc(transform.position, radius);
+            ClassAbilityVfx.SpawnBladeFlurry(transform.position, dir, radius);
             return hits;
         }
-        PresentationVfx.CleaveArc(transform.position, ScaledArea(flurryRadius));
+        float cosmeticRadius = ScaledArea(flurryRadius);
+        PresentationVfx.CleaveArc(transform.position, cosmeticRadius);
+        ClassAbilityVfx.SpawnBladeFlurry(transform.position, dir, cosmeticRadius);
         return hits;
     }
 
@@ -767,7 +743,8 @@ public sealed class DiabloSkills : MonoBehaviour
                 target.GrantShield(BuildUniqueEffects.MercyShieldAmount, BuildUniqueEffects.MercyShieldSeconds);
             if (restored > 0f) { HealsCast++; HPRestored += restored; DiabloAudio.PlayHeal(); }
         }
-        SpawnHealVisual(targetHealRange);
+        Vector3 healAt = target != null ? target.transform.position : transform.position;
+        SpawnTargetHealVisual(healAt, targetHealRange);
         return restored;
     }
 
@@ -812,7 +789,7 @@ public sealed class DiabloSkills : MonoBehaviour
             }
             if (restored > 0f) { HealsCast++; HPRestored += restored; DiabloAudio.PlayHeal(); }
         }
-        SpawnHealVisual(radius);
+        SpawnGroupHealVisual(radius);
         return restored;
     }
 
@@ -834,18 +811,16 @@ public sealed class DiabloSkills : MonoBehaviour
         else netPlayer.SubmitHealServerRpc(targetNb.NetworkObjectId, amount, (int)kind);
     }
 
-    void SpawnHealVisual(float radius)
+    void SpawnTargetHealVisual(Vector3 targetPos, float radius)
     {
         PresentationVfx.CleaveArc(transform.position, radius);
-        if (!Application.isPlaying) return;
-        var go = new GameObject("MendingLight");
-        go.transform.position = transform.position + Vector3.up * 1.2f;
-        var light = go.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(0.5f, 1f, 0.6f);
-        light.range = radius;
-        light.intensity = 2.5f;
-        Destroy(go, 0.5f);
+        ClassAbilityVfx.SpawnMendingLight(transform.position, targetPos);
+    }
+
+    void SpawnGroupHealVisual(float radius)
+    {
+        PresentationVfx.CleaveArc(transform.position, radius);
+        ClassAbilityVfx.SpawnRenewingCircle(transform.position, radius);
     }
 
     /// <summary>
@@ -866,6 +841,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (cc != null) cc.enabled = true;
         SpawnVeilPuff(from);
         SpawnVeilPuff(transform.position);
+        ClassAbilityVfx.SpawnVeilStep(from, transform.position);
         DiabloAudio.PlayVeil();
         return dist;
     }
@@ -917,6 +893,7 @@ public sealed class DiabloSkills : MonoBehaviour
         string variant = ActiveVariantId(Skill.Cleave);
         float radius = ScaledArea(SkillVariantCatalog.CleaveRadiusFor(this, variant));
         float arc = SkillVariantCatalog.CleaveArcFor(variant);
+        bool retributionFlash = false;
         if (!cosmetic)
         {
             ExitBowStance();
@@ -943,25 +920,24 @@ public sealed class DiabloSkills : MonoBehaviour
                 ApplyHit(husk, ClassCombos.CleaveDamageOn(blow, stunned, ward, retribution),
                     transform.position, cleaveKnockback, transform);
             }
-            if (retribution > 0) ClassCombos.Note(ClassCombos.Retribution);
+            if (retribution > 0)
+            {
+                retributionFlash = true;
+                ClassCombos.Note(ClassCombos.Retribution);
+            }
             if (retribution > 0 && Application.isPlaying)
                 ComboVfx.Flash(transform.position, new Color(0.75f, 0.8f, 1f), radius * 2f, 0.4f);
             // Build unique (lancer-ward S2): at most one interrupt per cast, variant-independent.
             BuildUniqueEffects.TryInterruptCharge(transform, GetComponent<Equipment>(), radius);
             DiabloAudio.PlayWhoosh();
         }
-        SpawnCleaveVisual(radius);
+        SpawnCleaveVisual(dir, radius, arc, retributionFlash);
     }
 
-    void SpawnCleaveVisual(float radius)
+    void SpawnCleaveVisual(Vector3 dir, float radius, float arc, bool retribution)
     {
         PresentationVfx.CleaveArc(transform.position, radius);
-        if (!Application.isPlaying) return; // headless/EditMode: no timed Destroy
-        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
-        if (prefab == null) return;
-        var arc = Instantiate(prefab, transform.position, Quaternion.identity);
-        arc.transform.localScale = Vector3.one * (radius / cleaveBaseRadius);
-        Destroy(arc, 0.6f);
+        ClassAbilityVfx.SpawnCleave(transform.position, dir, radius, arc, retribution);
     }
 
     /// <summary>
@@ -972,7 +948,7 @@ public sealed class DiabloSkills : MonoBehaviour
     {
         if (s == Skill.Cleave)
         {
-            SpawnCleaveVisual(CleaveRadius);
+            SpawnCleaveVisual(dir, CleaveRadius, 360f, false);
             return null;
         }
         if (s == Skill.SearingHalo) { DoHalo(cosmetic: true); return null; }
@@ -981,7 +957,7 @@ public sealed class DiabloSkills : MonoBehaviour
         if (s == Skill.BladeFlurry) { DoFlurry(dir, cosmetic: true); return null; }
         if (s == Skill.MendingLight) { DoTargetHeal(cosmetic: true); return null; }
         if (s == Skill.RenewingCircle) { DoGroupHeal(cosmetic: true); return null; }
-        if (s == Skill.VeilStep) { SpawnVeilPuff(origin); return null; }
+        if (s == Skill.VeilStep) { SpawnVeilPuff(origin); ClassAbilityVfx.SpawnVeilStep(origin, origin); return null; }
         if (ClassKitSkills.Handles(s)) { ClassKitSkills.ShowRemote(this, s, origin, dir); return null; }
         return Launch(s, origin, dir, cosmetic: true);
     }
@@ -1017,6 +993,7 @@ public sealed class DiabloSkills : MonoBehaviour
             {
                 float yaw = fan ? (i - (bolts - 1) * 0.5f) * SkillVariantCatalog.FanSpreadDegrees : 0f;
                 var bdir = Quaternion.AngleAxis(yaw, Vector3.up) * dir;
+                ClassAbilityVfx.NoteQuickShotMuzzle(origin, bdir);
                 var b = DiabloProjectile.Spawn(s, origin, bdir, transform, qdmg,
                     quickShotSpeed, quickShotRange, 0f, cosmetic);
                 // S4 nightfang: the rogue specialty pierces one extra target.

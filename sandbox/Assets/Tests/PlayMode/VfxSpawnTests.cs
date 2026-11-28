@@ -21,6 +21,7 @@ public class VfxSpawnTests
         EnemyHealth.ResetRun();
         DiabloJuice.ResetRun();
         PresentationVfx.ResetRun();
+        ClassAbilityVfx.ResetRun();
         MeleeConeVfx.ResetRun();
         BossController.ResetRun();
         CutsceneDirector.ResetRun(); // a prior test's showcase must not hold this boss
@@ -44,6 +45,7 @@ public class VfxSpawnTests
         DiabloTestFixture.CleanupTestScene(hero);
         EnemyHealth.ResetRun();
         PresentationVfx.ResetRun();
+        ClassAbilityVfx.ResetRun();
         BossController.ResetRun();
         CutsceneDirector.ResetRun();
         RunProfile.Reset();
@@ -208,5 +210,68 @@ public class VfxSpawnTests
         yield return null;
         Assert.LessOrEqual(PresentationVfx.ActiveParticles(), PresentationVfx.MaxBudget,
             $"Live particles must stay under budget ({PresentationVfx.MaxBudget}).");
+    }
+
+    [UnityTest]
+    public IEnumerator All18ClassAbilities_SpawnDedicatedVfxAndStayUnderBudget()
+    {
+        yield return null;
+        var dummy = MakeHusk(new Vector3(0f, 1.05f, 3f));
+        var allyGo = new GameObject("InjuredAlly");
+        allyGo.transform.position = new Vector3(1.5f, 1.05f, 1.5f);
+        var allyHp = allyGo.AddComponent<PlayerHealth>();
+        allyHp.TakeDamage(5f);
+
+        // Fenwalker (6)
+        RunProfile.ClassId = ClassCatalog.FenwalkerId;
+        RunProfile.SkillVariants[ClassCatalog.FenwalkerId + ":" + DiabloSkills.Skill.Cleave] = SkillVariantCatalog.CleaveFrontalId;
+        skills.DoCleave(Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.MireHook, Vector3.forward, cosmetic: true);
+        skills.DoSlam(cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.BogCharge, Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.MireGround, Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.IronVow, Vector3.forward, cosmetic: true);
+
+        // Lanternbearer (6)
+        RunProfile.ClassId = ClassCatalog.LanternbearerId;
+        skills.ShowRemoteCast(DiabloSkills.Skill.LanternBolt, hero.transform.position + Vector3.up, Vector3.forward);
+        skills.SummonWisps(cosmetic: true);
+        RunProfile.SkillVariants[ClassCatalog.LanternbearerId + ":" + DiabloSkills.Skill.SearingHalo] = SkillVariantCatalog.HaloWardId;
+        skills.DoHalo(cosmetic: true);
+        ClassAbilityVfx.AttachHaloWard(hero.transform, 3.5f, 1f);
+        skills.DoVeilStep(Vector3.forward);
+        skills.DoTargetHeal(cosmetic: true);
+        skills.DoGroupHeal(cosmetic: true);
+
+        // Rogue (6)
+        RunProfile.ClassId = ClassCatalog.RogueId;
+        skills.ShowRemoteCast(DiabloSkills.Skill.QuickShot, hero.transform.position + Vector3.up, Vector3.forward);
+        skills.DoFlurry(Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.SmokePot, Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.ShadowRoll, Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.VenomVial, Vector3.forward, cosmetic: true);
+        ClassKitSkills.Execute(skills, DiabloSkills.Skill.PowderKeg, Vector3.forward, cosmetic: true);
+
+        yield return null;
+
+        DiabloSkills.Skill[] all18 =
+        {
+            DiabloSkills.Skill.Cleave, DiabloSkills.Skill.MireHook, DiabloSkills.Skill.SeismicSlam,
+            DiabloSkills.Skill.BogCharge, DiabloSkills.Skill.MireGround, DiabloSkills.Skill.IronVow,
+            DiabloSkills.Skill.LanternBolt, DiabloSkills.Skill.Wisps, DiabloSkills.Skill.SearingHalo,
+            DiabloSkills.Skill.VeilStep, DiabloSkills.Skill.MendingLight, DiabloSkills.Skill.RenewingCircle,
+            DiabloSkills.Skill.QuickShot, DiabloSkills.Skill.BladeFlurry, DiabloSkills.Skill.SmokePot,
+            DiabloSkills.Skill.ShadowRoll, DiabloSkills.Skill.VenomVial, DiabloSkills.Skill.PowderKeg,
+        };
+        foreach (var s in all18)
+            Assert.Greater(ClassAbilityVfx.CountFor(s), 0, $"Expected ClassAbilityVfx spawn for {s}");
+
+        Assert.AreEqual(1f, dummy.HPFraction(), 0.0001f, "Cosmetic casts must deal zero damage.");
+        Assert.LessOrEqual(PresentationVfx.ActiveParticles(), PresentationVfx.MaxBudget,
+            "18-skill burst must stay within particle budget.");
+
+        Wisp.ResetRun();
+        Object.DestroyImmediate(allyGo);
+        RunProfile.Reset();
     }
 }

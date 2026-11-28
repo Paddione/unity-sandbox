@@ -433,7 +433,7 @@ public sealed class MireZone : MonoBehaviour
         z.endTime = Time.time + duration;
         z.nextTick = Time.time;
         Active.Add(z);
-        if (Application.isPlaying) ComboVfx.Pool(at, radius, duration, new Color(0.35f, 0.3f, 0.15f));
+        ClassAbilityVfx.AttachMireGround(go.transform, radius, duration);
         return z;
     }
 
@@ -485,7 +485,7 @@ public sealed class SmokeCloud : MonoBehaviour
         c.nextTick = Time.time;
         Active.Add(c);
         c.Tick();
-        if (Application.isPlaying) ComboVfx.Pool(at, radius, duration, new Color(0.55f, 0.55f, 0.6f));
+        ClassAbilityVfx.AttachSmokePot(go.transform, radius, duration);
         return c;
     }
 
@@ -550,7 +550,8 @@ public sealed class PowderKeg : MonoBehaviour
         k.radius = radius;
         k.fuseEnd = Time.time + fuse;
         Active.Add(k);
-        if (Application.isPlaying) ComboVfx.Keg(go.transform);
+        var body = ClassAbilityVfx.AttachPowderKeg(go.transform);
+        if (body == null && Application.isPlaying) ComboVfx.Keg(go.transform);
         return k;
     }
 
@@ -580,17 +581,18 @@ public sealed class PowderKeg : MonoBehaviour
         bool fuse = BuildUniqueEffects.HasSmugglersFuse(eq) && SmokeCloud.Covers(transform.position);
         float r = fuse ? radius * BuildUniqueEffects.FuseRadiusFactor : radius;
         int total = 0;
+        bool burnedVenom = false;
         foreach (var husk in ClassCombos.HusksInRadius(transform.position, r))
         {
             int stacks = EnemyStatus.ConsumeVenom(husk);
-            if (stacks > 0) ClassCombos.Note(ClassCombos.VenomBurn);
+            if (stacks > 0) { burnedVenom = true; ClassCombos.Note(ClassCombos.VenomBurn); }
             int dmg = ClassCombos.KegDamageOn(blast, stacks, ignited);
             DiabloSkills.ApplyHit(husk, dmg, transform.position, 0.8f, owner);
             if (fuse) EnemyStatus.AddVenom(husk, owner, BuildUniqueEffects.FuseVenomStacks);
             total += dmg;
         }
         DiabloAudio.PlayPowderKeg();
-        if (Application.isPlaying) ComboVfx.Blast(transform.position, r);
+        ClassAbilityVfx.SpawnPowderKegBlast(transform.position, r, burnedVenom);
         Active.Remove(this);
         if (Application.isPlaying) Destroy(gameObject); else DestroyImmediate(gameObject);
         return total;

@@ -110,8 +110,9 @@ Shader "Cinderreach/VFX/AbilityMesh"
                 float val = mainSample.r * lerp(0.45, 1.25, noiseSample);
                 float ew = max(_EdgeWidth, 0.005);
                 float cut = _Dissolve * 1.30;
+                float dissolveActive = step(0.001, _Dissolve);
                 float alphaClip = smoothstep(cut, cut + ew, val);
-                float edgeBand = saturate(smoothstep(cut - ew, cut, val) - alphaClip);
+                float edgeBand = saturate(smoothstep(cut - ew, cut, val) - alphaClip) * dissolveActive;
 
                 float3 viewDir = normalize(GetWorldSpaceViewDir(IN.positionWS));
                 float ndotv = saturate(abs(dot(normalize(IN.normalWS), viewDir)));
@@ -121,7 +122,8 @@ Shader "Cinderreach/VFX/AbilityMesh"
                 rgb += _EdgeColor.rgb * (edgeBand * 1.4 + fresnel);
                 rgb *= _Intensity;
 
-                half alpha = saturate((alphaClip * mainSample.a + edgeBand * 0.45) * IN.color.a * _Color.a);
+                float softShape = _FresnelIntensity < 0.01 ? smoothstep(0.03, 0.38, mainSample.r) : 1.0;
+                half alpha = saturate((alphaClip * mainSample.a * softShape + edgeBand * 0.45) * IN.color.a * _Color.a);
                 return half4(rgb, alpha);
             }
             ENDHLSL

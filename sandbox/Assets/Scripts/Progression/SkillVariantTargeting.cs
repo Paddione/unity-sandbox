@@ -141,25 +141,7 @@ public sealed class HaloZone : MonoBehaviour
 
     void SpawnWardVisual()
     {
-        if (!Application.isPlaying) return;
-        var prefab = Res.Get<GameObject>("SkillArt/CleaveArc");
-        GameObject ring;
-        if (prefab != null)
-        {
-            ring = Object.Instantiate(prefab, anchor, Quaternion.identity);
-            ring.transform.localScale = Vector3.one * (radius / 2.6f);
-            foreach (var r in ring.GetComponentsInChildren<Renderer>())
-                r.material.color = new Color(1f, 0.7f, 0.3f, r.material.color.a);
-        }
-        else ring = new GameObject("HaloWardRing");
-        ring.name = "HaloWardRing";
-        ring.transform.SetParent(transform, true);
-        var light = ring.GetComponent<Light>() ?? ring.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(1f, 0.8f, 0.4f);
-        light.range = radius * 2f;
-        light.intensity = 4f;
-        Object.Destroy(ring, duration);
+        ClassAbilityVfx.AttachHaloWard(transform, radius, duration);
     }
 
     void OnDestroy()

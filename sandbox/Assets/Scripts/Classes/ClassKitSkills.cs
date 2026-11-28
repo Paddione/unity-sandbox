@@ -38,22 +38,29 @@ public static class ClassKitSkills
         }
     }
 
-    /// <summary>Mirror rendering of another player's kit cast: light and ring only.</summary>
+    /// <summary>Mirror rendering of another player's kit cast via ClassAbilityVfx.</summary>
     public static void ShowRemote(DiabloSkills skills, DiabloSkills.Skill s, Vector3 origin, Vector3 dir)
     {
-        if (!Application.isPlaying) return;
         dir = Flat(dir, skills.transform);
-        var c = CastColor(s);
+        var pos = skills.transform.position;
         switch (s)
         {
+            case DiabloSkills.Skill.MireHook:
+                ClassAbilityVfx.SpawnMireHook(pos, pos + dir * ClassCombos.MireHookRange, hit: false); break;
+            case DiabloSkills.Skill.BogCharge:
+                ClassAbilityVfx.SpawnBogCharge(pos, pos + dir * ClassCombos.BogChargeDistance, dir); break;
             case DiabloSkills.Skill.MireGround:
-                ComboVfx.Pool(skills.transform.position, skills.ScaledArea(ClassCombos.MireGroundRadius), 1f, c); break;
+                ClassAbilityVfx.SpawnMireGround(pos, skills.ScaledArea(ClassCombos.MireGroundRadius), ClassCombos.MireGroundDuration); break;
+            case DiabloSkills.Skill.IronVow:
+                ClassAbilityVfx.SpawnIronVow(skills.transform, skills.ScaledArea(ClassCombos.IronVowTauntRadius), ClassCombos.IronVowSeconds); break;
             case DiabloSkills.Skill.SmokePot:
+                ClassAbilityVfx.SpawnSmokePot(ThrowTarget(skills.transform, dir, ClassCombos.SmokeRange), skills.ScaledArea(ClassCombos.SmokeRadius), ClassCombos.SmokeDuration); break;
+            case DiabloSkills.Skill.ShadowRoll:
+                ClassAbilityVfx.SpawnShadowRoll(pos, pos + dir * ClassCombos.ShadowRollDistance, dir); break;
             case DiabloSkills.Skill.VenomVial:
+                ClassAbilityVfx.SpawnVenomVial(pos, ThrowTarget(skills.transform, dir, ClassCombos.VenomRange), skills.ScaledArea(ClassCombos.VenomRadius)); break;
             case DiabloSkills.Skill.PowderKeg:
-                ComboVfx.Flash(ThrowTarget(skills.transform, dir, RangeOf(s)), c, 4f, 0.5f); break;
-            default:
-                ComboVfx.Flash(origin, c, 4f, 0.4f); break;
+                ClassAbilityVfx.SpawnPowderKegCosmetic(ThrowTarget(skills.transform, dir, ClassCombos.PowderKegRange), ClassCombos.PowderKegFuse); break;
         }
     }
 
@@ -78,11 +85,8 @@ public static class ClassKitSkills
             float d = ClassCombos.SegmentDistance(from, to, husk.transform.position, out float t);
             if (d <= ClassCombos.MireHookHitRadius && t < bestT) { bestT = t; target = husk; }
         }
-        if (Application.isPlaying)
-        {
-            var end = target != null ? target.transform.position : to;
-            for (int i = 1; i <= 4; i++) PresentationVfx.ArrowTrail(Vector3.Lerp(from, end, i / 4f) + Vector3.up);
-        }
+        var end = target != null ? target.transform.position : to;
+        ClassAbilityVfx.SpawnMireHook(from, end, hit: target != null);
         if (cosmetic) return target;
         DiabloAudio.PlayMireHook();
         skills.PlayStrike();
@@ -124,11 +128,7 @@ public static class ClassKitSkills
         if (cc != null) cc.enabled = false;
         hero.position = from + dir * dist;
         if (cc != null) cc.enabled = true;
-        if (Application.isPlaying)
-        {
-            PresentationVfx.CleaveArc(hero.position, 1.5f);
-            ComboVfx.Flash(hero.position, CastColor(DiabloSkills.Skill.BogCharge), 4f, 0.35f);
-        }
+        ClassAbilityVfx.SpawnBogCharge(from, hero.position, dir);
         if (cosmetic) return 0;
         DiabloAudio.PlayBogCharge();
         skills.PlayStrike();
@@ -162,7 +162,7 @@ public static class ClassKitSkills
         float radius = skills.ScaledArea(ClassCombos.MireGroundRadius);
         if (cosmetic)
         {
-            if (Application.isPlaying) ComboVfx.Pool(skills.transform.position, radius, 1f, CastColor(DiabloSkills.Skill.MireGround));
+            ClassAbilityVfx.SpawnMireGround(skills.transform.position, radius, ClassCombos.MireGroundDuration);
             return null;
         }
         DiabloAudio.PlayMireGround();
@@ -178,7 +178,7 @@ public static class ClassKitSkills
     public static int IronVow(DiabloSkills skills, bool cosmetic)
     {
         var hero = skills.transform;
-        if (Application.isPlaying) ComboVfx.Flash(hero.position, CastColor(DiabloSkills.Skill.IronVow), 6f, 0.6f);
+        ClassAbilityVfx.SpawnIronVow(hero, skills.ScaledArea(ClassCombos.IronVowTauntRadius), ClassCombos.IronVowSeconds);
         if (cosmetic) return 0;
         DiabloAudio.PlayIronVow();
         var hp = hero.GetComponent<PlayerHealth>();
@@ -202,7 +202,7 @@ public static class ClassKitSkills
         float radius = skills.ScaledArea(ClassCombos.SmokeRadius);
         if (cosmetic)
         {
-            if (Application.isPlaying) ComboVfx.Pool(at, radius, 1f, CastColor(DiabloSkills.Skill.SmokePot));
+            ClassAbilityVfx.SpawnSmokePot(at, radius, ClassCombos.SmokeDuration);
             return null;
         }
         DiabloAudio.PlaySmokePot();
@@ -223,10 +223,8 @@ public static class ClassKitSkills
         hero.position = from + dir * dist;
         if (cc != null) cc.enabled = true;
         if (Application.isPlaying)
-        {
             PresentationVfx.VeilPuff(from);
-            ComboVfx.Flash(hero.position, CastColor(DiabloSkills.Skill.ShadowRoll), 3f, 0.3f);
-        }
+        ClassAbilityVfx.SpawnShadowRoll(from, hero.position, dir);
         if (cosmetic) return dist;
         DiabloAudio.PlayShadowRoll();
         HeroComboState.For(hero.gameObject).ArmAmbush(ClassCombos.AmbushWindow(skills.GetComponent<Equipment>()));
@@ -239,11 +237,7 @@ public static class ClassKitSkills
         var hero = skills.transform;
         var at = ThrowTarget(hero, dir, ClassCombos.VenomRange);
         float radius = skills.ScaledArea(ClassCombos.VenomRadius);
-        if (Application.isPlaying)
-        {
-            PresentationVfx.CleaveArc(at, radius);
-            ComboVfx.Flash(at, CastColor(DiabloSkills.Skill.VenomVial), radius * 2f, 0.5f);
-        }
+        ClassAbilityVfx.SpawnVenomVial(hero.position, at, radius);
         if (cosmetic) return 0;
         DiabloAudio.PlayVenomVial();
         int blow = skills.EffectiveDamage(DiabloSkills.Skill.VenomVial);
@@ -265,7 +259,7 @@ public static class ClassKitSkills
         var at = ThrowTarget(hero, dir, ClassCombos.PowderKegRange);
         if (cosmetic)
         {
-            if (Application.isPlaying) ComboVfx.Flash(at, CastColor(DiabloSkills.Skill.PowderKeg), 3f, 0.4f);
+            ClassAbilityVfx.SpawnPowderKegCosmetic(at, ClassCombos.PowderKegFuse);
             return null;
         }
         DiabloAudio.PlayTwang();
