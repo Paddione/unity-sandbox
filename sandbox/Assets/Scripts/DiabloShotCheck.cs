@@ -343,9 +343,13 @@ public sealed class DiabloShotCheck : MonoBehaviour
                     yield return Wait(0.2f);
                 }
                 // Unique selection: the fixed tooltip column shows the unique effect.
+                // Autoloot can fill the bag during the waits above: displace the last
+                // item if full and restore it afterwards so the pose always runs.
                 var unique = GalleryItem(baseType, ItemRarity.Unique, (AffixLibrary.Damage, 9f), (AffixLibrary.Crit, 5f));
                 unique.uniqueId = ItemDatabase.LancerWardId;
                 unique.itemLevel = 12;
+                ItemInstance displaced = null;
+                if (bag.Count >= Inventory.Capacity) { displaced = bag.Get(bag.Count - 1); bag.RemoveAt(bag.Count - 1); }
                 if (bag.Add(unique))
                 {
                     invUI.Refresh();
@@ -355,6 +359,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
                     invUI.Refresh();
                     yield return Wait(0.2f);
                 }
+                if (displaced != null) bag.Add(displaced);
             }
         }
         invUI.ShowTab(DiabloInventoryUI.MenuTab.Bag);
