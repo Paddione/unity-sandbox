@@ -10,6 +10,13 @@ import bpy
 from mathutils import Matrix, Vector
 
 COLL = "Redesign"
+# The shared Blender can host other sessions' scenes and switch the window
+# scene; always target this scene explicitly, never bpy.context.scene.
+SCENE = "Scene"
+
+
+def scene():
+    return bpy.data.scenes[SCENE]
 
 
 def mat(name, rgb, rough=0.8, metal=0.0, emit=None):
@@ -37,7 +44,7 @@ def collection():
     c = bpy.data.collections.get(COLL)
     if not c:
         c = bpy.data.collections.new(COLL)
-        bpy.context.scene.collection.children.link(c)
+        scene().collection.children.link(c)
     return c
 
 
@@ -153,5 +160,46 @@ def cloak(name, material, arm, top_z, bottom_z, width, y, teeth=7, depth_jag=0.0
 def hide_originals(prefix):
     for o in bpy.data.objects:
         if o.type == "MESH" and o.name.startswith(prefix):
-            o.hide_set(True)
             o.hide_render = True
+            o.hide_viewport = True
+
+
+def render_turn(rig_name, out_path, size=800):
+    """Render the rig's visible parts from a 3/4 front view to a PNG (approval evidence)."""
+    scn = scene()
+    rig = bpy.data.objects[rig_name]
+    cam = scn.camera
+    if cam is None:
+        cam = bpy.data.objects.new("RenderCam", bpy.data.cameras.new("RenderCam"))
+        scn.collection.objects.link(cam)
+        scn.camera = cam
+    base = rig.matrix_world.translation
+    cam.location = base + Vector((3.2, -4.4, 2.6))
+    look = (base + Vector((0, 0, 1.0))) - cam.location
+    cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
+    cam.data.lens = 50
+    # Cycles on CPU: EEVEE/Workbench read back black under WSLg.
+    scn.render.engine = "CYCLES"
+    scn.cycles.device = "CPU"
+    scn.cycles.samples = 48
+    scn.cycles.use_denoising = False  # Ubuntu build ships without OIDN
+    if scn.world is None:
+        scn.world = bpy.data.worlds.new("World")
+    scn.world.use_nodes = True
+    scn.world.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
+    scn.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.25, 0.25, 0.28, 1)
+    scn.render.resolution_x = scn.render.resolution_y = size
+    scn.render.film_transparent = False
+    scn.render.image_settings.file_format = "PNG"
+    scn.render.filepath = out_path
+    hidden = []
+    for o in scn.objects:
+        if o.type == "MESH" and not o.hide_render and o.parent is not rig:
+            o.hide_render = True
+            hidden.append(o)
+    try:
+        bpy.ops.render.render(write_still=True, scene=scn.name)
+    finally:
+        for o in hidden:
+            o.hide_render = False
+    return out_path

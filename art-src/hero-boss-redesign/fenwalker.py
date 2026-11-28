@@ -10,7 +10,7 @@ import sys
 import bpy
 from mathutils import Matrix, Vector
 
-sys.path.insert(0, "/home/patrick/.worktrees/unity-sandbox-3c21c090/feature/hero-boss-redesign-art/art-src/hero-boss-redesign")
+sys.path.insert(0, __import__("os").path.dirname(__file__))
 import hero_kit as K  # noqa: E402
 
 importlib.reload(K)
