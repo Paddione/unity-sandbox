@@ -1,6 +1,7 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-28 (zuletzt Story-Kette Akt I–III + Sprache/Voice, HUD, Inventar, Karte, Levelup, Ability-VFX). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-28 (zuletzt Story-Kette Akt I–III + Sprache/Voice, HUD, Inventar, Karte, Levelup, Ability-VFX;
+alle 20 Rest-Goals konsolidiert, Verzeichnisse + Pläne entfernt). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte "ROADMAP.md". Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -30,10 +31,10 @@ Keine — alle zuletzt aktiven Goals stehen in ihren `PROGRESS.md` auf 100 % (ke
 Priorisierung (erledigt 2026-11-27/28): Die Story-Kette Akt I → II → III → Sprache ist vollständig gelandet,
 die übrigen Refactorings (Inventar, Skills, Bosse, HUD, Karte, Hygiene) ebenfalls. Es gibt kein offenes
 Umsetzungsziel mehr; die serielle Schreibsperre auf `sandbox/Assets/Scripts/Story/StoryModel.cs` und
-`docs/story-bible.md` ist damit aufgehoben. `cinderreach-party-roles`, `cinderreach-itemization`,
-`cinderreach-hotpath-caching` sowie die oben abgeschlossenen Story-/Voice-Goals stehen in ihren `PROGRESS.md`
-auf 100 % (keine offenen Punkte); ihre Goal-Verzeichnisse samt Plänen zu entfernen ist der noch ausstehende
-Konsolidierungsschritt nach der Regel unten, kein offenes Umsetzungsziel.
+`docs/story-bible.md` ist damit aufgehoben. Alle 20 Rest-Goals (`cinderreach-party-roles`,
+`cinderreach-itemization`, `cinderreach-hotpath-caching` u. a.) stehen in ihren `PROGRESS.md`
+auf 100 % (keine offenen Punkte) und sind oben bzw. in der Konsolidierungs-Tabelle eingearbeitet;
+ihre Goal-Verzeichnisse samt Plänen sind mit dieser Konsolidierung entfernt.
 Bewusst offen ohne Goal: Eigner- bzw. 5-Personen-Playtest, Steam-Build.
 
 Abgeschlossen: `cinderreach-akt1-vertiefung` (2026-11-27, S4 `e66fc60`): Akt-I-Bibel auf 16 Einträge erweitert
@@ -149,6 +150,72 @@ Animation die Hüfte (`hips`) in die gemessene Laufrichtung, `spine`/`chest` dre
 die Root-Ausrichtung behält (Held: Maus, Gegner: Held). Mehr als 100° gegen die Blickrichtung läuft rückwärts
 (Float `MoveSpeed` = −1 als Zustands-Speed auf `Run`/`Walk`, Hysterese 80°). `Moving` gilt auch bei gemessener
 Bewegung (Koop-Spiegel, Lanzer, Wirker). NPCs (`StoryNpc` mit Animator) drehen sich bei Klick oder `T` zum Helden.
+
+Abgeschlossen: `cinderreach-party-team` (2026-11-19): Ein Join/Leave-Pfad für Host und Tests
+(`PartyRoster.ApplyRemoteRoles`, Overfull `-1` ohne Mutation), Spawn mit `Equipment` vor `PlayerHealth` +
+Level-Mirror, `SyncCompanionLevels` im `Update`, `PartyCompanion.Gear`/`Equip` mit Klassenbindung,
+`DiabloProgression.MirrorHeroProgress` + Companion-Guards. Belege `PartyTeamLifecycleTests` 5/5 +
+`PartyGearLevelTests` 4/4, Voll-Suiten EditMode 358/358 + PlayMode 262/262, `KayKitAssets.Verify` Exit 0,
+Q12 in `docs/mechanics-questions.md`.
+
+Abgeschlossen: `cinderreach-companion-rendering` (2026-11-24): Begleiter rendern als Helden
+(`CompanionFactory.cs` neu: Klon des Live-Helden-Rigs + Gameplay-Strip; `PartyRoster` ohne
+Kapsel-Primitive; `HeroNameplates` zeigt Begleiter-Namen), Platzhalter ersetzt (`HuskModelLibrary.cs` neu:
+Builder-Modell, sonst Szenen-Template, sonst URP-Kapsel, nie bare; RiskShrine-Elite, Boss-Summons,
+Kilnmother-Thralls), Gender-Basen mit stabiler Skin-Wurzel (`ClassAppearance.SkinModelPath`/`ClearSkin`/
+`MapSkin`), Erstellungs-Vorschau (`HeroPreviewView.cs`: Bühnen-Kamera + RenderTexture + Drehteller),
+`DiabloZone.unity` + `NetworkPlayerDiablo.prefab` kanonisch neu gebaut (Blob-Delta 0,2 %). Belege EditMode
+539/539 + PlayMode 303/303, `VerifyDiabloZone` OK (67 Husks bewaffnet); offen nur als Follow-up (kein
+Kriterium): visueller Windows-GPU-Playtest per `shotcheck-windows.sh --autoplay`.
+
+Abgeschlossen: `cinderreach-equipment-art` (2026-11-24): Asset-Inventar mit 469 Pfaden aus 62
+Einstiegspunkten (`docs/cinderreach-asset-inventory.tsv`); einheitliche Ranger-Kleidung zurückgenommen
+(Nutzerwunsch: Klassen unterscheidbar), alle 16 sichtbaren Uniques mit eigener Geometrie an der passenden
+Körperstelle; `KayKitAssets.Verify` validiert Modellabdeckung/Slots/Geometrie/Materialien; Linux-Player
+grün, Equipment-Shotcheck mit 19 Aufnahmen (`docs/cinderreach-equipment-shots/`). Belege EditMode 496/496 +
+PlayMode 287/287 (Anlegen/Wechseln/Ablegen + serverseitige Item-ID).
+
+Abgeschlossen: `cinderreach-gear-slots-flask` (2026-11-25, Vollauf `710be00`): Sechs Ausrüstungsplätze
+(neu Gloves/Boots/Belt mit je 3 Basen, Affix-Pools + `FlaskHealing` nur auf Gürteln), Bone-Space-3D-Modelle
+für alle Basen und Rollen-Uniques, `HealingFlask` auf Taste 1 (40 % max. HP in 10 Ticks/5 s, 60 s Cooldown,
+Refill in Lantern Hold und an Risk-Shrines, Host-gegranted im Koop), Kauftrank entfernt, Save v15 (Pity,
+Trank-Erstatung 2 Gold), 18 Uniques (`GearUniqueEffects`), Slotgewichte 25/20/15/15/15/10 mit Pity 40
+(effektive Unique-Quote ≈ 3,6 %). Belege EditMode 586/586 + PlayMode 354/354, Autoplay normal + kindled
+Exit 0 (Flasche `drank/refilled`), Koop-Paar Exit 0, Windows-Shotcheck beider Auflösungen, Ablage
+`~/unity-sandbox/artifacts/gear-slots-flask/`.
+
+Abgeschlossen: `cinderreach-inventory-stat-breakdown-tooltips` (2026-11-27): Live-Aufschlüsselung aller
+21 Charakterparameter in 4 Kategorien (`CharacterStatBreakdown.cs`, alle 17 `AffixLibrary`-Einträge) und je
+Skill (`SkillBreakdown.cs`: Basis + Waffenbonus, Rang + Gear-`SkillRank`, Fokus × Klassenfaktor, CDR,
+Wirkfläche), schwebender `InfoTooltip` auf eigenem HD-Overlay-Canvas, Item-Rollspannen `[Min–Max]` +
+Cap-Hinweise, 3-Spalten-Inventar mit Parität zu `MenuTab.Stats`, Skill-/Attribut-Tooltips im Charakterblatt
+und auf der HUD-Skillbar, DE/EN-Loc-Domäne. Belege EditMode 695/695 + PlayMode 392/392, Windows-Build +
+WIP-Stage (`Games/cinderreach-wip`) + 4 geprüfte Shots, `check-hotpath-caching.py` OK.
+
+Abgeschlossen: `cinderreach-local-art` (2026-11-19, PR #1): Lokale FLUX.2/TRELLIS.2-Pipeline bis in den
+Build — S1 Generierung (Truhe/Banner/Hund/Icon, VRAM-Peaks im 16-GB-Budget, re-queuebare Workflows,
+Serving danach verifiziert wiederhergestellt), S2 Truhe→3k Tris + Banner-Stoffplane mit Alpha-Maske
+(glTFast 6.21.0, Wrapper-Prefabs + URP/Lit-Materialien), S3 Hund→12k-Tris-Retopo + FK-Rig (20 Bones) +
+Run/Attack-NLA als Fen-Brute-Kind, S4 Linux-Player-Build (140 MB) + 15 Spielkamera-Shots
+(`docs/world-art/local-art-pilot/`). Belege EditMode 344/344 + PlayMode 204/204.
+
+Abgeschlossen: `cinderreach-quest-interaktionen` (2026-11-24, `1a3d1a4`): Inventar aus Spielinhalten
+(`scripts/check-quest-coverage.py`): 14 Quests + 24 Platzierungen, jede Zeile mit ausführbarem Testfall;
+`QuestJourneyTests` 14/14 über echte Auslöser bis zum sichtbaren Abschluss, `WorldInteractionTests` 24/24
+je Platzierung, `QuestRuleTests` 26 Fälle (Verläufe, Gates, einmalige Belohnungen, Save/Load), volle Suiten
+EditMode 565/565 + PlayMode 341/341, Health-Probe G-QUESTCOVER01 null (Negativkontrollen belegt).
+
+Abgeschlossen: `cinderreach-voice-batch` (2026-11-24): Stale-0-Befund (`check-voice-lines.py` 115/115,
+Lock `docs/audio/voice-lines.lock.json`), lokales Qwen-TTS bestätigt (kein Cloud-TTS), B2-GPU-Fenster auf
+Eigner-Go (Inkling-Pause → `TTS_DEVICE=cuda:0`-Render `[render] 0 of 115 lines`, Exit 0 → Restart +
+`/health` ok). Belege `docs/voice-batch-preflight.md`, `docs/voice-batch-render.log`.
+
+Abgeschlossen: `diablo-ability-showcases` (2026-11-27): `CutsceneDirector` mit Showcase-Daten je Boss
+(Intro 9 s + Phase-2 4 s, schadlose Demo-Casts, `TryStartPhaseTwoShowcase` ohne Kontrollverlust, nur echte
+Story-Szenen), 10 neue Loc-Keys `cutscene.ability.*` (DE/EN), `G-DIABLO07`-Probe in Dotfiles erweitert.
+Belege `CutsceneDirectorTests` 13/13, volle Suiten EditMode 619/620 + PlayMode 362/363 (2 Rest-Fehlschläge
+als Basis-Befunde belegt: Allowlist-Fix bereits auf `origin/main`, 1 vorbestehender PlayMode-Fehlschlag
+laut CI-Artefakt), `check-voice-lines` 115/0, Dotfiles `test_diablo_unity_health` 30 grün.
 
 ## Gebietsgrößen und Begegnungen
 
@@ -594,3 +661,11 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-team-autoplay` | Kindled durch Thewes, CI-Autoplay als Team (Server + fenwalker/lanternbearer/rogue) Normal → Kindled aus Saves, `G-DIABLO06` auf Team-Verdicts | `369186f` |
 | `cinderreach-vfx-tooling` | O1+Flipbook-VFX-Pipeline (Blender 4.2.9 Meshes + 4×4-Flipbooks, Material Maker 1.8 `.ptex`, 3 URP-Basisshader unter `Assets/Art/SkillVfx/`, `docs/skill-vfx/README.md`) | `547c798` |
 | `cinderreach-class-ability-vfx` | 22 VFX-Prefabs (`SkillVfx/`, `ClassAbilityVfxBuilder.cs`, `ClassAbilityVfx.cs`, `AbilityVfxAnim.cs`), alle 18 Klassen-Skills + Varianten + Co-op-Cosmetic-Parität, Bildtafeln `docs/ability-vfx-shots/` | 2026-11-28 |
+| `cinderreach-party-team` | Ein Join/Leave-Pfad, Spawn mit Equipment + Level-Mirror, Gear mit Klassenbindung, `MirrorHeroProgress` | 2026-11-19 |
+| `cinderreach-companion-rendering` | Begleiter als Helden-Klone, `HuskModelLibrary` (nie bare), Gender-Basen, `HeroPreviewView` | 2026-11-24 |
+| `cinderreach-equipment-art` | 469-Pfad-Inventar, klasseneigene Modelle, 16 Uniques mit Geometrie, 19 Equipment-Shots | 2026-11-24 |
+| `cinderreach-quest-interaktionen` | 14 Quests + 24 Platzierungen mit Testfall-Inventar, G-QUESTCOVER01 null | 2026-11-24 |
+| `cinderreach-voice-batch` | Stale-0-Befund, lokales Qwen-TTS-GPU-Fenster, alle 115 Clips vorhanden | 2026-11-24 |
+| `cinderreach-gear-slots-flask` | 6 Slots, 3D-Modelle, `HealingFlask`, Save v15, 18 Uniques, Pity 40 | 2026-11-25 |
+| `cinderreach-inventory-stat-breakdown-tooltips` | 21-Parameter- + Skill-Aufschlüsselung, Item-Rollspannen, 3-Spalten-Inventar, 4 Shots | 2026-11-27 |
+| `diablo-ability-showcases` | Boss-Showcases (Intro + Phase-2, schadlos), 10 Loc-Keys, `G-DIABLO07`-Probe erweitert | 2026-11-27 |
