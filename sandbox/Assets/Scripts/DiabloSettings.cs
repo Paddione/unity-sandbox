@@ -37,6 +37,11 @@ public static class DiabloSettings
         (1600, 900),
         (1280, 720),
         (2560, 1440),
+        // Intel iGPU fallbacks: HD 620 class targets 960x540 for 30fps,
+        // Iris Xe class targets 1280x720 (index 2). Kept at the end so
+        // existing saves (0..3) keep their resolution.
+        (960, 540),
+        (854, 480),
     };
 
     static DiabloSettings() { Load(); }
@@ -46,6 +51,7 @@ public static class DiabloSettings
     {
         if (!Application.isPlaying) return;
         Load();
+        AutoPickIntelGpuIfFresh();
         ApplyAudioAndFeel();
         bool savedResolution = false;
         try { savedResolution = PlayerPrefs.HasKey(Prefix + "Resolution"); } catch { }
@@ -226,6 +232,7 @@ public static class DiabloSettings
                     QualitySettings.SetQualityLevel(target, true);
                 }
                 QualitySettings.vSyncCount = VSync ? 1 : 0;
+                ApplyTierTweaks(QualityLevel);
             }
         }
         catch { }
@@ -238,5 +245,117 @@ public static class DiabloSettings
             }
         }
         catch { }
+    }
+
+    /// <summary>
+    /// Intel iGPU tiers for 30fps+: tier 0 = Potato (HD 620 class, i5-7200U),
+    /// tier 1 = Low (Iris Xe class, i7-1165G7), tier 2 = High (discrete).
+    /// Tiers 1/2 share the PC RPAsset, so the split is applied here at runtime
+    /// (renderScale via reflection so this compiles without the URP package
+    /// reference; everything else is plain QualitySettings). Headless-safe.
+    /// </summary>
+    static void ApplyTierTweaks(int level)
+    {
+        try
+        {
+            switch (level)
+            {
+                case 0: // Potato: HD 620 — no shadows, half render scale.
+                    QualitySettings.shadows = ShadowQuality.Disable;
+                    QualitySettings.shadowDistance = 0f;
+                    QualitySettings.shadowCascades = 0;
+                    QualitySettings.pixelLightCount = 0;
+                    QualitySettings.antiAliasing = 0;
+                    QualitySettings.softParticles = false;
+                    QualitySettings.lodBias = 0.7f;
+                    TrySetRenderScale(0.5f);
+                    break;
+                case 1: // Low: Iris Xe — hard shadows only, reduced scale/distance.
+                    QualitySettings.shadows = ShadowQuality.HardOnly;
+                    QualitySettings.shadowDistance = 20f;
+                    QualitySettings.shadowCascades = 1;
+                    QualitySettings.pixelLightCount = 1;
+                    QualitySettings.antiAliasing = 0;
+                    QualitySettings.softParticles = false;
+                    QualitySettings.lodBias = 1f;
+                    TrySetRenderScale(0.65f);
+                    break;
+                default: // High: asset defaults (PC RPAsset, scale 1.0).
+                    QualitySettings.shadows = ShadowQuality.All;
+                    QualitySettings.shadowDistance = 40f;
+                    QualitySettings.shadowCascades = 2;
+                    QualitySettings.pixelLightCount = 2;
+                    TrySetRenderScale(1f);
+                    break;
+            }
+        }
+        catch { }
+    }
+
+    /// <summary>Sets URP renderScale on the active RPAsset via reflection (no URP compile dependency).</summary>
+    static void TrySetRenderScale(float v)
+    {
+        try
+        {
+            var rp = QualitySettings.renderPipeline;
+            if (rp == null) return;
+            var p = rp.GetType().GetProperty("renderScale");
+            if (p != null && p.CanWrite) p.SetValue(rp, Mathf.Clamp(v, 0.25f, 1f), null);
+        }
+        catch { }
+    }
+
+    /// <summary>
+    /// First-boot guard: when no quality choice was saved yet, pick a tier +
+    /// resolution from the GPU name. Existing saves are never touched.
+    /// i5-7200U/HD 620 -&gt; Potato + 960x540 windowed, VSync off.
+    /// i7-1165G7/Iris Xe -&gt; Low + 1280x720, VSync on.
+    /// </summary>
+    static void AutoPickIntelGpuIfFresh()
+    {
+        try
+        {
+            if (PlayerPrefs.HasKey(Prefix + "Quality")) return;
+            string gpu = "";
+            try { gpu = SystemInfo.graphicsDeviceName ?? ""; } catch { }
+            int q = RecommendQualityLevel(gpu);
+            int r = RecommendResolutionIndex(gpu);
+            QualityLevel = q;
+            if (r >= 0) ResolutionIndex = r;
+            if (q == 0) { VSync = false; Fullscreen = false; }
+            Save();
+        }
+        catch { }
+    }
+
+    /// <summary>Pure GPU-string -&gt; quality tier mapping (test seam, no Unity state).</summary>
+    public static int RecommendQualityLevel(string gpuName)
+    {
+        string g = (gpuName ?? "").ToLowerInvariant();
+        if (g.Contains("hd 620") || g.Contains("hd 520") || g.Contains("hd 530") ||
+            g.Contains("hd 515") || g.Contains("hd 615") || g.Contains("uhd 610") ||
+            g.Contains("uhd 600") || g.Contains("bay trail") || g.Contains("cherry trail"))
+            return 0;
+        if (g.Contains("iris xe") || g.Contains("iris plus") || g.Contains("iris pro") ||
+            g.Contains("uhd 7") || g.Contains("uhd 6") || g.Contains("arc ") ||
+            (g.Contains("intel") && (g.Contains("xe") || g.Contains("uhd"))))
+            return 1;
+        if (g.Contains("intel")) return 1; // unknown Intel iGPU: safe Low.
+        return 2;
+    }
+
+    /// <summary>Pure GPU-string -&gt; resolution index mapping. -1 = keep default.</summary>
+    public static int RecommendResolutionIndex(string gpuName)
+    {
+        string g = (gpuName ?? "").ToLowerInvariant();
+        if (g.Contains("hd 620") || g.Contains("hd 520") || g.Contains("hd 530") ||
+            g.Contains("hd 515") || g.Contains("hd 615") || g.Contains("uhd 610") ||
+            g.Contains("uhd 600") || g.Contains("bay trail") || g.Contains("cherry trail"))
+            return 4; // 960x540
+        if (g.Contains("iris xe") || g.Contains("iris plus") || g.Contains("iris pro") ||
+            g.Contains("uhd 7") || g.Contains("uhd 6") || g.Contains("arc ") ||
+            g.Contains("intel"))
+            return 2; // 1280x720
+        return -1;
     }
 }
