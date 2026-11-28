@@ -477,7 +477,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         // Inspection comparison box
         var inspBox = new GameObject("InspectBox", typeof(RectTransform));
         inspBox.transform.SetParent(panelGo.transform, false);
-        DiabloUIFactory.SetLayout(inspBox, prefH: 128f, flexW: 1f);
+        DiabloUIFactory.SetLayout(inspBox, prefH: 88f, flexW: 1f); // 40 px went to the sell-all row
         var ibImg = inspBox.AddComponent<Image>();
         ibImg.sprite = DiabloMenuArt.TooltipBackground();
         ibImg.type = Image.Type.Sliced;
@@ -487,7 +487,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         iv.childControlHeight = false;
         inspectText = DiabloUIFactory.MakeText(inspBox.transform, "InspectText",
             Loc.T("vendor.hint"), 14, DiabloPalette.Parchment);
-        DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 112f, flexW: 1f);
+        DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 72f, flexW: 1f);
         DiabloUIFactory.FitToBox(inspectText, 14);
 
         // cinderreach-vendor-sell-all: one button sells every Rare in the bag after a confirm with the gold sum.
