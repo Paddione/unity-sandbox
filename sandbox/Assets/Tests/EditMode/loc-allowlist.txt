@@ -41,17 +41,17 @@ DiabloMenuArt.cs	slider_fill_{w}x{h}
 DiabloMenuArt.cs	slider_track_{w}x{h}
 DiabloMenuArt.cs	tab_off_{w}x{h}
 DiabloMenuArt.cs	tab_on_{w}x{h}
-DiabloShotCheck.cs	)} asked={asked} class={RunProfile.ClassId} level={freshLevel} waypoints={RunProfile.Act.Waypoints.Count}
-DiabloShotCheck.cs	)} level {levelBefore}->{levelAfter} gold {goldBefore}->{goldAfter}
-DiabloShotCheck.cs	Cryptwarden Plate
+DiabloShotCheck.Gallery.cs	)} asked={asked} class={RunProfile.ClassId} level={freshLevel} waypoints={RunProfile.Act.Waypoints.Count}
+DiabloShotCheck.Gallery.cs	)} level {levelBefore}->{levelAfter} gold {goldBefore}->{goldAfter}
+DiabloShotCheck.Gallery.cs	Cryptwarden Plate
 DiabloShotCheck.cs	DONE {index} shots
-DiabloShotCheck.cs	Emberbrand Blade
-DiabloShotCheck.cs	FAIL no Bone Warden found
-DiabloShotCheck.cs	FAIL no FenGate with ZoneGate for the ossuary leg
-DiabloShotCheck.cs	FAIL no Hollow Abbot found
+DiabloShotCheck.Gallery.cs	Emberbrand Blade
+DiabloShotCheck.Gallery.cs	FAIL no Bone Warden found
+DiabloShotCheck.Gallery.cs	FAIL no FenGate with ZoneGate for the ossuary leg
+DiabloShotCheck.Gallery.cs	FAIL no Hollow Abbot found
 DiabloShotCheck.cs	FAIL no controllable hero within 30 s
-DiabloShotCheck.cs	NEW_HERO {(freshOk ? 
-DiabloShotCheck.cs	RELOAD_CONTINUE {(resumed ? 
+DiabloShotCheck.Gallery.cs	NEW_HERO {(freshOk ? 
+DiabloShotCheck.Gallery.cs	RELOAD_CONTINUE {(resumed ? 
 DiabloShotCheck.cs	start, output {dir}
 Net/AccountSmoke.cs	account hero arrived (lv {arrived?.level}, {arrived?.gold} gold)
 Net/AccountSmoke.cs	account user={PlayerAccount.Username}
@@ -281,7 +281,7 @@ Classes/HeroGearModels.cs	Tall shield breastplate
 Classes/HeroGearModels.cs	Tomb plate
 Classes/HeroGearModels.cs	Yellow chest guard
 DiabloShotCheck.cs	DONE {index} equipment shots
-DiabloShotCheck.cs	bones {tag}: state={state} t={nt:F2} speed={(anim != null ? anim.GetFloat(LocomotionTwist.MoveSpeedParam) : 0f):F1} twist={(twist != null ? twist.Twist : 0f):F0} back={(twist != null && twist.Backpedaling)} vel={(twist != null ? twist.Velocity.magnitude : 0f):F1} hips={H(
+DiabloShotCheck.Locomotion.cs	bones {tag}: state={state} t={nt:F2} speed={(anim != null ? anim.GetFloat(LocomotionTwist.MoveSpeedParam) : 0f):F1} twist={(twist != null ? twist.Twist : 0f):F0} back={(twist != null && twist.Backpedaling)} vel={(twist != null ? twist.Velocity.magnitude : 0f):F1} hips={H(
 DiabloShotCheck.cs	DONE {index} locomotion shots
 Net/JoinArgs.cs	-join unity.korczewski.de
 Classes/HeroEquipmentAppearance.cs	Left wrist art
@@ -326,22 +326,22 @@ Classes/HeroGearModels.cs	Shin plate
 Classes/HeroGearModels.cs	Toe strap
 Classes/HeroGearModels.cs	Wisp echo
 Classes/HeroGearModels.cs	Wrap tie
-DiabloShotCheck.cs	FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges} cooldown={flask.CooldownRemaining:0.0}
-DiabloShotCheck.cs	gearset_{cls.id}_back
-DiabloShotCheck.cs	gearset_{cls.id}_front
-DiabloShotCheck.cs	gearset_{cls.id}_paperdoll
+DiabloShotCheck.Gallery.cs	FLASK drank={drank} charges={flask.Charges}/{flask.MaxCharges} cooldown={flask.CooldownRemaining:0.0}
+DiabloShotCheck.Equipment.cs	gearset_{cls.id}_back
+DiabloShotCheck.Equipment.cs	gearset_{cls.id}_front
+DiabloShotCheck.Equipment.cs	gearset_{cls.id}_paperdoll
 DiabloShotCheck.cs	DONE {index} map shots
-DiabloShotCheck.cs	MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}
-DiabloShotCheck.cs	MAP zone={map.ViewZone} icons={map.IconsShown} mode={map.Mode} zoom={map.Zoom}
-DiabloShotCheck.cs	MAP mode={map.Mode} backing={map.BackingAlpha}
+DiabloShotCheck.Map.cs	MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}
+DiabloShotCheck.Map.cs	MAP zone={map.ViewZone} icons={map.IconsShown} mode={map.Mode} zoom={map.Zoom}
+DiabloShotCheck.Map.cs	MAP mode={map.Mode} backing={map.BackingAlpha}
 SessionAutoplay.cs	perf: zone map open, mode={map.Mode}
 SessionAutoplay.cs	perf: no WorldMapUI on the hero, map stays closed
-DiabloShotCheck.cs	)} controller={(ctrl != null)} camDist={camDist:0.0} pause={pause} class={RunProfile.ClassId} name={RunProfile.Hero.heroName}
+DiabloShotCheck.CharSelect.cs	)} controller={(ctrl != null)} camDist={camDist:0.0} pause={pause} class={RunProfile.ClassId} name={RunProfile.Hero.heroName}
 DiabloShotCheck.cs	DONE {index} charselect shots
-DiabloShotCheck.cs	NEW_HERO_RELOAD {(ok ? 
+DiabloShotCheck.CharSelect.cs	NEW_HERO_RELOAD {(ok ? 
 Menu/ClassSelectUI.cs	[Class] Fresh hero stands after the reload.
 Menu/ClassSelectUI.cs	[Class] Resumed the saved hero after the reload.
-DiabloShotCheck.cs	solo before new hero: {Diablo.IsSolo()}
+DiabloShotCheck.CharSelect.cs	solo before new hero: {Diablo.IsSolo()}
 Classes/HeroGearModels.cs	Anchor fluke
 Classes/HeroGearModels.cs	Anchor shank
 Classes/HeroGearModels.cs	Mire chain
@@ -361,7 +361,7 @@ SessionAutoplay.cs	phase boss: already down (party kill)
 SessionAutoplay.cs	phase actboss: already down (party kill)
 SessionAutoplay.cs	phase boss3: already down (party kill)
 SessionAutoplay.cs	phase boss4: already down (party kill)
-DiabloShotCheck.cs	Ash Elite_0
+DiabloShotCheck.Gallery.cs	Ash Elite_0
 DiabloTargetBar.cs	ELITE
 PartyFramesHud.cs	PartyFrame
 PartyFramesHud.cs	PartyFrameOwn
