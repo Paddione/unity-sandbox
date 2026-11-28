@@ -1,7 +1,7 @@
 # Cinderreach – Story-Bibel
 
 Stand: 2026-11-23 (Goal `cinderreach-deutsch-story`, S3; Folgezeilen, Zurufe und Sprachausgabe aus `cinderreach-story-voice`). Diese Datei ist die SSOT für Welt, Figuren,
-Aufgaben und Begriffe. Spieltexte in Ordner `Localization` und die Questdaten in Ordner `Story` folgen ihr.
+Begriffe und den erzählerischen Hintergrund. Die aktuellen Questregeln stehen im [Questinventar](quest-inventory.md), das aus dem Spielkatalog erzeugt wird.
 Änderungen an Namen erst hier, dann im Code.
 
 ## Prämisse in drei Sätzen
