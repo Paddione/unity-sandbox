@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 =======
 >>>>>>> d7b382a (chore(evidence): Voll-Suiten-Zeilen für map-overlay (EditMode 775, PlayMode 425))
+>>>>>>> 0068433 (chore(evidence): Voll-Suiten-Zeilen nach Header-/Tracker-Fix (EditMode 775, PlayMode 426))
 {"commit": "8da58bf", "failed": 0, "filter": "", "passed": 756, "platform": "EditMode", "skipped": 0, "total": 756, "ts": "2026-11-27T21:49:40Z"}
 {"commit": "8da58bf", "failed": 0, "filter": "", "passed": 412, "platform": "PlayMode", "skipped": 0, "total": 412, "ts": "2026-11-27T21:53:26Z"}
 {"commit": "c74e766", "failed": 0, "filter": "", "passed": 756, "platform": "EditMode", "skipped": 0, "total": 756, "ts": "2026-11-27T22:16:41Z"}
