@@ -33,8 +33,8 @@ Alle lokalen Audio-Workflows laufen ausschließlich auf **GPU 0 (`RTX 3060 Ti`, 
 - `AssetPipelineImportRules` (`1.1`) erzwingt beim Import:
   - `Assets/AddressableAssets/Sfx/`: Mono, Vorbis `0.75`, `DecompressOnLoad` für One-Shots (`CompressedInMemory` für `Ambient*`).
   - `Assets/AddressableAssets/{Voice,Music}/`: Mono, Vorbis `0.6`, `CompressedInMemory`.
-- Neue Dateien über Unity `AddressablesSetup.Ensure` in `game-content` registrieren (Adressen `Sfx/<key>`, `Voice/<key>`).
-- Laufzeit (`DiabloAudio`, `DiabloAmbience.ResolveAmbient()`): `Res.TryGet<AudioClip>("Sfx/...")` lädt vorhandene Clips logfrei
+- Neue Dateien über Unity `AddressablesSetup.Ensure` in `game-content` registrieren (Adressen „Sfx/<key>“, „Voice/<key>“).
+- Laufzeit (`DiabloAudio`, ResolveAmbient in `sandbox/Assets/Scripts/DiabloAmbience.cs`): `Res.TryGet<AudioClip>("Sfx/...")` lädt vorhandene Clips logfrei
   (Priorität: Test-Override → Oberfläche+Variante → Oberfläche → Variante → Basis-Cue); ohne Asset greift
   nahtlos die deterministische 22050-Hz-Laufzeitsynthese.
 

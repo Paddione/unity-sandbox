@@ -185,5 +185,5 @@ gegen Erzeuger `scripts/quest_inventory.py` und Kataloge `StoryModel.cs`/`LocCat
 ### Leere Teilmengen (mit Suchumfang belegt)
 
 - Keine zwei `.md` pflegen dieselbe ausführbare Regel: einzige generierte `.md` ist `quest-inventory.md` (Erzeuger `scripts/quest_inventory.py`); kein zweiter Generator, keine Hand-Kopie der Regeltabellen gefunden (`H1`-Titel nur in `quest-inventory.md` + erzählerisch in `story-bible.md`, siehe B4).
-- Keine widersprüchlichen Pläne: `.agents/plans/` existiert am geprüften Commit nicht (Gegenprobe `ls`); einzige Plan-Datei ist das archivierte `docs/multiplayer-plan.md` (B3).
+- Keine widersprüchlichen Pläne: „.agents/plans/“ existiert am geprüften Commit nicht (Gegenprobe `ls`); einzige Plan-Datei ist das archivierte `docs/multiplayer-plan.md` (B3).
 - `CLAUDE.md` (11 Bytes) ist reiner Verweis, keine Inhaltsdopplung zu `AGENTS.md`.

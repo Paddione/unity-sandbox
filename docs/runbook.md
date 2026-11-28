@@ -96,4 +96,4 @@ Der Code-Graph (`home-patrick-unity-sandbox`) und das Architektur-Entscheidungsp
   2. Betroffene ADR-Abschnitte gezielt pflegen: `manage_adr(project="home-patrick-unity-sandbox", mode="set_sections", section_updates={...})` (oder `mode="update"` bei Vollerneuerung).
   3. Stand prüfen: `index_status(project="home-patrick-unity-sandbox", diagnostics="full")` — Pflichtwerte `adr_present: true`, `parse_partial.count == 0` und `doc_links.unresolved.missing == 0`.
 - **Doku-Konvention:** Repo-Dateien in aktiven Goals und Doku möglichst mit eindeutigem repo-relativem Pfad referenzieren; Laufzeitartefakte oder Dateien aus anderen Repos (`"cinderreach-save.json"`, `"autoplay-result.json"`, Dotfiles-Pfade) nicht als repo-lokale Code-Links formatieren.
-- **Nachweis:** Live-ADR-Update inkl. Abschluss des Refactoring-Backlogs (`CA-01`–`CA-03`) in `.agents/goals/cinderreach-graph-adr-hygiene/PROGRESS.md` dokumentiert.
+- **Nachweis:** Live-ADR-Update inkl. Abschluss des Refactoring-Backlogs (`CA-01`–`CA-03`) in der Git-Historie des Goals cinderreach-graph-adr-hygiene dokumentiert. Die konsolidierten Ergebnisse stehen in `.agents/goals/CINDERREACH.md`.

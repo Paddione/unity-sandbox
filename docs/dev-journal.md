@@ -748,7 +748,7 @@ anything outside Q1–Q3 greybox goes to won't-have, not into the scene.
 
 - Anlass: Eigner-Nachfrage auf party-roles (100 %) — Spawn/Despawn der KI-Begleiter zusammen mit
   Teamplay testen; Team ausrüstbar machen und auf Protagonisten-Level halten. Goal
-  `.agents/goals/cinderreach-party-team/` (Q12), Plan `.agents/plans/cinderreach-party-team/tasks.md`.
+  „.agents/goals/cinderreach-party-team/“ (Q12), Plan `.agents/plans/cinderreach-party-team/tasks.md`.
 - Done: `PartyRoster.ApplyRemoteRoles` (Join/Leave-Seam, `-1` bei Join-Gate; `ServerReconcile`
   delegiert dorthin — ein Pfad für Host und Tests); Spawn-Reihenfolge `Equipment` vor
   `PlayerHealth` + sofortiger Level-Mirror; `SyncCompanionLevels` im `Update` (Key-gecacht);

@@ -10,7 +10,7 @@ das Design. Umsetzung: Goal `cinderreach-hud-redesign` (100 %, gelandet
 
 ## Grundbausteine (gelten auch für Inventar + Karte)
 
-- Fonts (OFL, `sandbox/Assets/Resources/Fonts/`): **Cinzel Bold** als
+- Fonts (OFL, „sandbox/Assets/Resources/Fonts/“): **Cinzel Bold** als
   `DisplayFont` (Überschriften, Zahlen), **Alegreya Sans Regular/Bold** als
   `BodyFont` (Fließtext). Legacy-`Text` bleibt, kein TMP-Umstieg.
 - Farben (`DiabloPalette.cs`): Panel #14101A (α 0,9), PanelEdge #3A2E22,

@@ -69,7 +69,7 @@ zum `partial`-Split — alle Layout-Methoden unverändert nach `sandbox/Assets/S
 verschoben, alle 16 öffentlichen APIs und `DiabloMenuItemExt` unangetastet in `DiabloInventoryUI.cs` (611 Zeilen).
 Belege: gezielte Suites 39/39 (`ItemCompareTests`/`DiabloMenuTests`/`DiabloHdTests` 22/22,
 `InventoryPaperdollPlayTests`/`GearSlotsPlayTests`/`DiabloMenuPlayTests` 17/17), Voll-Suiten EditMode 674/674 +
-PlayMode 383/383, Shotcheck-Tabs gegen `docs/cinderreach-inventory-shots/`.
+PlayMode 383/383, Shotcheck-Tabs gegen „docs/cinderreach-inventory-shots/“.
 
 Abgeschlossen: `cinderreach-skills-modularization` (2026-11-27, S1–S3-Land `71cb9eb`): `DiabloSkills.cs` 1.414 → 1.158
 Zeilen (−256, Logik byte-identisch extrahiert) — neu `BowStanceVisuals.cs` (140 Zeilen, Bogenhaltung) und
@@ -172,7 +172,7 @@ Abgeschlossen: `cinderreach-equipment-art` (2026-11-24): Asset-Inventar mit 469 
 Einstiegspunkten (`docs/cinderreach-asset-inventory.tsv`); einheitliche Ranger-Kleidung zurückgenommen
 (Nutzerwunsch: Klassen unterscheidbar), alle 16 sichtbaren Uniques mit eigener Geometrie an der passenden
 Körperstelle; `KayKitAssets.Verify` validiert Modellabdeckung/Slots/Geometrie/Materialien; Linux-Player
-grün, Equipment-Shotcheck mit 19 Aufnahmen (`docs/cinderreach-equipment-shots/`). Belege EditMode 496/496 +
+grün, Equipment-Shotcheck mit 19 Aufnahmen („docs/cinderreach-equipment-shots/“). Belege EditMode 496/496 +
 PlayMode 287/287 (Anlegen/Wechseln/Ablegen + serverseitige Item-ID).
 
 Abgeschlossen: `cinderreach-gear-slots-flask` (2026-11-25, Vollauf `710be00`): Sechs Ausrüstungsplätze
@@ -424,7 +424,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   KayKits Idle-Animation und die deutsche Zeile `dlg.h2.offer.2`. Das Endsignal gibt die
   Steuerung frei. Der Director übernimmt im Batchmode und mit `-director-only` beide Einstellungen.
 - Im Play Mode öffnet **Cinderreach → Trailers → Preview Ossuary** den dreisekündigen Blender-Trailer.
-  **Record three seconds of Game view** zeichnet den aktuellen Game View als WebM unter `Recordings/` auf.
+  **Record three seconds of Game view** zeichnet den aktuellen Game View als WebM unter „Recordings/“ auf.
   Für einen neuen Trailer aus dem Zonen-Blockout im Repo-Root `blender -b -P scripts/render-ossuary-trailer.py`
   ausführen. Der Encoder wird über `FFMPEG` oder den Suchpfad gefunden.
 - Weltränder: jede Zone ist ummauert. Der Fen hat die `MoorEdge_*`-Erdwälle, Ossuary, Kiln und Barrens je vier
@@ -688,7 +688,7 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-sound-audit-fix` | 35 warme SFX mit Varianten-/Material-Routing, 8 melodische 16-s-Zonenthemen, `G-DIABLO07`, Hörabnahme | `ea59d7b` |
 | `cinderreach-team-autoplay` | Kindled durch Thewes, CI-Autoplay als Team (Server + fenwalker/lanternbearer/rogue) Normal → Kindled aus Saves, `G-DIABLO06` auf Team-Verdicts | `369186f` |
 | `cinderreach-vfx-tooling` | O1+Flipbook-VFX-Pipeline (Blender 4.2.9 Meshes + 4×4-Flipbooks, Material Maker 1.8 `.ptex`, 3 URP-Basisshader unter `Assets/Art/SkillVfx/`, `docs/skill-vfx/README.md`) | `547c798` |
-| `cinderreach-class-ability-vfx` | 22 VFX-Prefabs (`SkillVfx/`, `ClassAbilityVfxBuilder.cs`, `ClassAbilityVfx.cs`, `AbilityVfxAnim.cs`), alle 18 Klassen-Skills + Varianten + Co-op-Cosmetic-Parität, Bildtafeln `docs/ability-vfx-shots/` | 2026-11-28 |
+| `cinderreach-class-ability-vfx` | 22 VFX-Prefabs („sandbox/Assets/AddressableAssets/SkillVfx/“, `ClassAbilityVfxBuilder.cs`, `ClassAbilityVfx.cs`, `AbilityVfxAnim.cs`), alle 18 Klassen-Skills + Varianten + Co-op-Cosmetic-Parität, Bildtafeln „docs/ability-vfx-shots/“ | 2026-11-28 |
 | `cinderreach-party-team` | Ein Join/Leave-Pfad, Spawn mit Equipment + Level-Mirror, Gear mit Klassenbindung, `MirrorHeroProgress` | 2026-11-19 |
 | `cinderreach-companion-rendering` | Begleiter als Helden-Klone, `HuskModelLibrary` (nie bare), Gender-Basen, `HeroPreviewView` | 2026-11-24 |
 | `cinderreach-equipment-art` | 469-Pfad-Inventar, klasseneigene Modelle, 16 Uniques mit Geometrie, 19 Equipment-Shots | 2026-11-24 |
