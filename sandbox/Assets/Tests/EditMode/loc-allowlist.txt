@@ -332,7 +332,10 @@ DiabloShotCheck.cs	gearset_{cls.id}_front
 DiabloShotCheck.cs	gearset_{cls.id}_paperdoll
 DiabloShotCheck.cs	DONE {index} map shots
 DiabloShotCheck.cs	MAP marks={marks} minimapIcons={hero.GetComponent<MinimapHud>().IconsShown} renders={ZoneMap.Renders}
-DiabloShotCheck.cs	MAP zone={map.ViewZone} icons={map.IconsShown}
+DiabloShotCheck.cs	MAP zone={map.ViewZone} icons={map.IconsShown} mode={map.Mode} zoom={map.Zoom}
+DiabloShotCheck.cs	MAP mode={map.Mode} backing={map.BackingAlpha}
+SessionAutoplay.cs	perf: zone map open, mode={map.Mode}
+SessionAutoplay.cs	perf: no WorldMapUI on the hero, map stays closed
 DiabloShotCheck.cs	)} controller={(ctrl != null)} camDist={camDist:0.0} pause={pause} class={RunProfile.ClassId} name={RunProfile.Hero.heroName}
 DiabloShotCheck.cs	DONE {index} charselect shots
 DiabloShotCheck.cs	NEW_HERO_RELOAD {(ok ? 
