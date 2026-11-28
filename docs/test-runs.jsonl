@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
->>>>>>> d7b382a (chore(evidence): Voll-Suiten-Zeilen für map-overlay (EditMode 775, PlayMode 425))
->>>>>>> 0068433 (chore(evidence): Voll-Suiten-Zeilen nach Header-/Tracker-Fix (EditMode 775, PlayMode 426))
->>>>>>> 128b32a (perf(map): Redraw-Takt 0,3 s, Bild-/Quest-Text nur bei Änderung, Icon-Pool skippt unveränderte Eigenschaften)
 {"commit": "8da58bf", "failed": 0, "filter": "", "passed": 756, "platform": "EditMode", "skipped": 0, "total": 756, "ts": "2026-11-27T21:49:40Z"}
 {"commit": "8da58bf", "failed": 0, "filter": "", "passed": 412, "platform": "PlayMode", "skipped": 0, "total": 412, "ts": "2026-11-27T21:53:26Z"}
 {"commit": "c74e766", "failed": 0, "filter": "", "passed": 756, "platform": "EditMode", "skipped": 0, "total": 756, "ts": "2026-11-27T22:16:41Z"}
@@ -43,3 +38,5 @@
 {"commit": "11f1d10", "failed": 0, "filter": "", "passed": 429, "platform": "PlayMode", "skipped": 0, "total": 429, "ts": "2026-11-28T03:58:29Z"}
 {"commit": "2578868", "failed": 0, "filter": "", "passed": 791, "platform": "EditMode", "skipped": 0, "total": 791, "ts": "2026-11-28T05:26:14Z"}
 {"commit": "2578868", "failed": 0, "filter": "", "passed": 432, "platform": "PlayMode", "skipped": 0, "total": 432, "ts": "2026-11-28T05:30:04Z"}
+{"commit": "850e4ee", "failed": 0, "filter": "", "passed": 791, "platform": "EditMode", "skipped": 0, "total": 791, "ts": "2026-11-28T06:03:11Z"}
+{"commit": "850e4ee", "failed": 0, "filter": "", "passed": 432, "platform": "PlayMode", "skipped": 0, "total": 432, "ts": "2026-11-28T06:06:57Z"}
