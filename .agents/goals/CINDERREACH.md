@@ -382,8 +382,17 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Rect-Größe, weil die Panels mit `childControlHeight = false` stapeln; Item-Karten per `FitToBox`.
   Sprites aus Blender (`docs/menu-art/build_menu_pack.py`, `build_icons*.py`): Portraits aller drei
   Klassen, Icons für alle 20 Skills, Startbild 1920×1080. Spielernamen über `LootDrop.PrettyName`.
-- HUD: Lebenskugel mit Todesschleier („YOU HAVE FALLEN“, rein präsentativ), Bronzeplatte unter
-  Skill- und XP-Leiste. Charakterblatt mit Varianten-Umschalter (solo im Lantern Hold),
+- HUD (`cinderreach-hud-redesign`, 2026-11-28, Vorlage Canvas-Artboard „HUD im Spiel“): unterer Block aus
+  Lebenskugel 176 px (Zahl in Cinzel, Schild-Chip darüber), Skillplatte 604 px (6 Slots à 72 px mit Taste,
+  Name, radialem Cooldown-Sweep, Heilflasche als 7. Zelle, EP-Leiste mit „Stufe N“ und „x / y EP“) und
+  Gold-/Menüspalte (Goldkarte, Tasten I/C/M/Esc als echte Buttons); Geometrie in `HudLayout`, Bausteine in
+  `HudChrome`. Oben: Zielbalken mit Tier-Plakette und Prozent, runde Minimap mit Zonenname, Fuhrbuch-Panel
+  darunter (Text bleibt `StoryCanvas/StoryTracker`), Gruppenrahmen oben links (`PartyFramesHud`, 10 Hz;
+  Netzhelden über `hpState` und neue `heroLevel`-NetworkVariable, Solo-Begleiter direkt). Fonts unter
+  `Resources/Fonts`: Cinzel Bold (`DiabloUIFactory.DisplayFont`) und „Cinderreach Sans“ (Alegreya Sans mit
+  verbreitertem Leerzeichen, `BodyFont`, `MODIFIED-AlegreyaSans.txt`). Belege `HudThemeTests`,
+  `HudLayoutPlayTests`, `PartyFramesPlayTests`, Windows-Shots `hud_*` und `docs/hud-redesign/`.
+  Todesschleier („YOU HAVE FALLEN“, rein präsentativ) unverändert. Charakterblatt mit Varianten-Umschalter (solo im Lantern Hold),
   Waypoint-Fenster mit gesperrten Schreinen („not attuned“/„sealed“), „Press On“ nach dem Abbot.
   Zielbalken mit Anzeigenamen (`DiabloTargetBar.DisplayName`, Tier-Farbe), Bossbalken mit Phase
   (Boss/ActBoss im Umkreis 24 m), Alt zeigt Loot-Namen am Boden (`DiabloLootLabels`, `LootDrop.Live`).
