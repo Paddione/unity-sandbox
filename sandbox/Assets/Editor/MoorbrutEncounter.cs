@@ -46,7 +46,7 @@ public static class MoorbrutEncounter
         combat.model = model;
         combat.flankOffset = (index - 1.5f) * 18f;
         var attack = host.AddComponent<EnemyAttack>();
-        attack.damage = tank ? 4 : 1;
+        attack.damage = tank ? 2 : 1;
         attack.turnRate = tank ? 3f : 12f;
     }
 

@@ -37,13 +37,20 @@ public class DiabloFeelPolishTests
         foreach (var h in husks)
         {
             if (h.GetComponent<EnemyHealth>() == null) continue;
+            Assert.IsNotNull(h.GetComponent<EnemyHealth>().corpseModel,
+                $"{h.name} needs a corpse model (host-safe corpse path).");
+            if (h.TryGetComponent<MoorbrutCombat>(out var brood))
+            {
+                Assert.IsNotNull(brood.model.GetClip("Walk"), h.name);
+                Assert.IsNotNull(brood.model.GetClip("Strike"), h.name);
+                Assert.IsFalse(brood.model.playAutomatically, h.name);
+                continue;
+            }
             Assert.IsNotNull(h.GetComponent<HuskAnimator>(), $"{h.name} needs HuskAnimator.");
             var a = h.GetComponent<Animator>();
             Assert.IsNotNull(a, $"{h.name} needs an Animator.");
             Assert.IsNotNull(a.runtimeAnimatorController, $"{h.name} needs the husk controller.");
             Assert.IsFalse(a.applyRootMotion, $"{h.name}: root motion would fight the approach.");
-            Assert.IsNotNull(h.GetComponent<EnemyHealth>().corpseModel,
-                $"{h.name} needs a corpse model (host-safe corpse path).");
         }
     }
 
