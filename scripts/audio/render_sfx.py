@@ -136,6 +136,28 @@ SFX_VARIANTS: list[dict] = [
 ]
 
 
+# Pilot refresh (Nov 2026): distinct seeds + plain-Foley prompts for the first
+# test batch. All 43 base cues shared seed 1234 (same latent start) and several
+# prompts carried procedural-synth jargon ("phase-integrated", "LP 460Hz")
+# that the text encoder does not understand -- event cues rendered as uniform
+# wash (Gate lead_rms == total_rms, crest ~1.4 dB) and mastering then boosted
+# the wash to full RMS (audible disturbance/hiss). Pilot cues get concrete
+# physical descriptions with an explicit clean-recording tail.
+PILOT_PROMPT_OVERRIDES: dict[str, str] = {
+    "Gate": "massive ancient stone portal grinding open, deep rock rumble with heavy iron mechanism clunk, single event, close perspective, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "Swing": "single fast sword swing whoosh, sharp air cut with thin metallic whistle, one quick motion, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "Heal": "warm magical healing chime, soft glass bell with gentle shimmer decay, single spell, clean studio recording, no background noise, no voices",
+}
+PILOT_SEED_OVERRIDES: dict[str, int] = {
+    "Gate": 7101,
+    "Swing": 7102,
+    "Heal": 7103,
+}
+PILOT_DURATION_OVERRIDES: dict[str, float] = {
+    # Generate Swing close to its 0.65 s cap so the transient lands in-frame
+    # instead of somewhere in a 1.5 s bed that gets trimmed away.
+    "Swing": 1.0,
+}
 # Concrete Studio prompts for base cues whose manifest text is engine/meta
 # (material lists, rotation notes, runtime references) rather than a sound.
 # Without this the model renders quiet mush (e.g. Hit peak -15 dBFS).
@@ -176,6 +198,9 @@ def default_max_duration_s(key: str, category: str) -> float | None:
 def build_sfx_prompt(entry: dict) -> str:
     """Combine manifest cue description with consistent Cinderreach acoustic style line."""
     key = entry.get("key", entry.get("cue", ""))
+    if key in PILOT_PROMPT_OVERRIDES:
+        # Pilot prompts already carry their own clean-recording tail.
+        return PILOT_PROMPT_OVERRIDES[key]
     if key in STUDIO_PROMPT_OVERRIDES:
         base = STUDIO_PROMPT_OVERRIDES[key]
     else:
@@ -207,8 +232,9 @@ def expected_clips(manifest: dict | None = None) -> list[dict]:
             "cue": cue,
             "category": cat,
             "prompt": build_sfx_prompt(entry),
-            "seed": int(entry.get("seed", 1234)),
-            "duration_s": float(entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat])),
+            "seed": int(PILOT_SEED_OVERRIDES.get(cue, entry.get("seed", 1234))),
+            "duration_s": float(PILOT_DURATION_OVERRIDES.get(
+                cue, entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat]))),
             "loop": cat == "ambient",
             "max_duration_s": entry.get("max_duration_s", default_max_duration_s(cue, cat)),
         })
