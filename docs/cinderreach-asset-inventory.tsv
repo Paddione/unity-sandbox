@@ -1,5 +1,4 @@
 Asset	Herkunft	Einsatzort
-Assets/AddressableAssets/BillingMode.json	Cinderreach	Runtime asset: Assets/AddressableAssets/BillingMode.json
 Assets/AddressableAssets/CinderreachHeroArt.asset	Cinderreach	Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset
 Assets/AddressableAssets/Cutscene_BossIntro.playable	Cinderreach	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
 Assets/AddressableAssets/DiabloLocomotion.controller	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
@@ -54,6 +53,79 @@ Assets/AddressableAssets/MenuArt/WaypointSigil.png	Cinderreach	Runtime asset: As
 Assets/AddressableAssets/NetworkLootDrop.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkLootDrop.prefab
 Assets/AddressableAssets/NetworkPlayer.prefab	Cinderreach	Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayer.prefab
 Assets/AddressableAssets/NetworkPlayerDiablo.prefab	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/AddressableAssets/Sfx/Ambient.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Ambient.wav
+Assets/AddressableAssets/Sfx/Arrow.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Arrow.wav
+Assets/AddressableAssets/Sfx/Blast.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Blast.wav
+Assets/AddressableAssets/Sfx/Block.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Block.wav
+Assets/AddressableAssets/Sfx/BogCharge.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/BogCharge.wav
+Assets/AddressableAssets/Sfx/BossRoar.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/BossRoar.wav
+Assets/AddressableAssets/Sfx/Cleave.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Cleave.wav
+Assets/AddressableAssets/Sfx/Crit.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Crit.wav
+Assets/AddressableAssets/Sfx/Death.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Death.wav
+Assets/AddressableAssets/Sfx/Fireball.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Fireball.wav
+Assets/AddressableAssets/Sfx/Footstep.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep.wav
+Assets/AddressableAssets/Sfx/Footstep_Basalt_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Basalt_0.wav
+Assets/AddressableAssets/Sfx/Footstep_Basalt_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Basalt_1.wav
+Assets/AddressableAssets/Sfx/Footstep_Basalt_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Basalt_2.wav
+Assets/AddressableAssets/Sfx/Footstep_Moor_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Moor_0.wav
+Assets/AddressableAssets/Sfx/Footstep_Moor_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Moor_1.wav
+Assets/AddressableAssets/Sfx/Footstep_Moor_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Moor_2.wav
+Assets/AddressableAssets/Sfx/Footstep_Sand_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Sand_0.wav
+Assets/AddressableAssets/Sfx/Footstep_Sand_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Sand_1.wav
+Assets/AddressableAssets/Sfx/Footstep_Sand_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Sand_2.wav
+Assets/AddressableAssets/Sfx/Footstep_Stone_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Stone_0.wav
+Assets/AddressableAssets/Sfx/Footstep_Stone_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Stone_1.wav
+Assets/AddressableAssets/Sfx/Footstep_Stone_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Footstep_Stone_2.wav
+Assets/AddressableAssets/Sfx/Gate.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Gate.wav
+Assets/AddressableAssets/Sfx/Gold.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Gold.wav
+Assets/AddressableAssets/Sfx/Halo.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Halo.wav
+Assets/AddressableAssets/Sfx/Heal.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Heal.wav
+Assets/AddressableAssets/Sfx/Hit.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit.wav
+Assets/AddressableAssets/Sfx/Hit_ArmorMetal_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_ArmorMetal_0.wav
+Assets/AddressableAssets/Sfx/Hit_ArmorMetal_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_ArmorMetal_1.wav
+Assets/AddressableAssets/Sfx/Hit_ArmorMetal_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_ArmorMetal_2.wav
+Assets/AddressableAssets/Sfx/Hit_FleshBone_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_FleshBone_0.wav
+Assets/AddressableAssets/Sfx/Hit_FleshBone_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_FleshBone_1.wav
+Assets/AddressableAssets/Sfx/Hit_FleshBone_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_FleshBone_2.wav
+Assets/AddressableAssets/Sfx/Hit_GlassShield_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_GlassShield_0.wav
+Assets/AddressableAssets/Sfx/Hit_GlassShield_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_GlassShield_1.wav
+Assets/AddressableAssets/Sfx/Hit_GlassShield_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_GlassShield_2.wav
+Assets/AddressableAssets/Sfx/Hit_Glass_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_Glass_0.wav
+Assets/AddressableAssets/Sfx/Hit_Glass_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_Glass_1.wav
+Assets/AddressableAssets/Sfx/Hit_Glass_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_Glass_2.wav
+Assets/AddressableAssets/Sfx/Hit_StoneAsh_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_StoneAsh_0.wav
+Assets/AddressableAssets/Sfx/Hit_StoneAsh_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_StoneAsh_1.wav
+Assets/AddressableAssets/Sfx/Hit_StoneAsh_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hit_StoneAsh_2.wav
+Assets/AddressableAssets/Sfx/Hurt.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Hurt.wav
+Assets/AddressableAssets/Sfx/HuskGrowl.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/HuskGrowl.wav
+Assets/AddressableAssets/Sfx/IronVow.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/IronVow.wav
+Assets/AddressableAssets/Sfx/Lantern.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Lantern.wav
+Assets/AddressableAssets/Sfx/LevelUp.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/LevelUp.wav
+Assets/AddressableAssets/Sfx/Loot.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Loot.wav
+Assets/AddressableAssets/Sfx/MireGround.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/MireGround.wav
+Assets/AddressableAssets/Sfx/MireHook.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/MireHook.wav
+Assets/AddressableAssets/Sfx/PlayerDeath.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/PlayerDeath.wav
+Assets/AddressableAssets/Sfx/PowderKeg.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/PowderKeg.wav
+Assets/AddressableAssets/Sfx/Quest.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Quest.wav
+Assets/AddressableAssets/Sfx/RareDrop.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/RareDrop.wav
+Assets/AddressableAssets/Sfx/ShadowRoll.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/ShadowRoll.wav
+Assets/AddressableAssets/Sfx/Shrine.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Shrine.wav
+Assets/AddressableAssets/Sfx/SmokePot.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/SmokePot.wav
+Assets/AddressableAssets/Sfx/Swing.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Swing.wav
+Assets/AddressableAssets/Sfx/Swing_0.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Swing_0.wav
+Assets/AddressableAssets/Sfx/Swing_1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Swing_1.wav
+Assets/AddressableAssets/Sfx/Swing_2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Swing_2.wav
+Assets/AddressableAssets/Sfx/SwordHit1.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/SwordHit1.wav
+Assets/AddressableAssets/Sfx/SwordHit2.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/SwordHit2.wav
+Assets/AddressableAssets/Sfx/SwordHit3.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/SwordHit3.wav
+Assets/AddressableAssets/Sfx/Twang.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Twang.wav
+Assets/AddressableAssets/Sfx/UIClick.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/UIClick.wav
+Assets/AddressableAssets/Sfx/Veil.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Veil.wav
+Assets/AddressableAssets/Sfx/VendorBuy.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/VendorBuy.wav
+Assets/AddressableAssets/Sfx/VendorSell.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/VendorSell.wav
+Assets/AddressableAssets/Sfx/VenomVial.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/VenomVial.wav
+Assets/AddressableAssets/Sfx/WardenTaunt.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/WardenTaunt.wav
+Assets/AddressableAssets/Sfx/Whoosh.wav	Cinderreach	Runtime asset: Assets/AddressableAssets/Sfx/Whoosh.wav
 Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab
 Assets/AddressableAssets/SkillArt/CleaveArc.prefab	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab
 Assets/AddressableAssets/SkillArt/FireAdditive.mat	Cinderreach	Runtime asset: Assets/AddressableAssets/SkillArt/CleaveArc.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireAdditive.mat | Runtime asset: Assets/AddressableAssets/SkillArt/FireballBlast.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/FireballProjectile.prefab
@@ -485,10 +557,15 @@ Assets/ThirdParty/KayKit/Adventurers/Characters/Mage.fbx	KayKit/Adventurers	Buil
 Assets/ThirdParty/KayKit/Adventurers/Characters/Ranger.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/Characters/Rogue_Hooded.fbx	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/barbarian_surface.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
 Assets/ThirdParty/KayKit/Adventurers/barbarian_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/ArrowProjectile.prefab | Runtime asset: Assets/AddressableAssets/SkillArt/HeroBow.prefab
+Assets/ThirdParty/KayKit/Adventurers/knight_surface.png	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/knight_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/mage_surface.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/mage_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/ranger_surface.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/ranger_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/CinderreachHeroArt.asset | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
+Assets/ThirdParty/KayKit/Adventurers/rogue_surface.png	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/Adventurers/rogue_texture_URP.mat	KayKit/Adventurers	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatMelee.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/HuskLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
 Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_CombatRanged.fbx	KayKit/CharacterAnimations	Build scene: Assets/Scenes/DiabloZone.unity | Build scene: Assets/Scenes/Greybox.unity | Runtime asset: Assets/AddressableAssets/DiabloLocomotion.controller | Runtime asset: Assets/AddressableAssets/NetworkPlayerDiablo.prefab
@@ -510,11 +587,13 @@ Assets/ThirdParty/KayKit/Dungeon/Models/torch_lit.fbx	KayKit/Dungeon	Build scene
 Assets/ThirdParty/KayKit/Dungeon/Models/wall.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/wall_broken.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Dungeon/Models/wall_corner.fbx	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity
+Assets/ThirdParty/KayKit/Dungeon/dungeon_surface.png	KayKit/Dungeon	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Accessories/skeleton_texture.png	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Mage.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Minion.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Rogue.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/Characters/Skeleton_Warrior.fbx	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
+Assets/ThirdParty/KayKit/Skeletons/skeleton_surface.png	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Assets/ThirdParty/KayKit/Skeletons/skeleton_texture_URP.mat	KayKit/Skeletons	Build scene: Assets/Scenes/Diablo.unity | Build scene: Assets/Scenes/DiabloZone.unity
 Packages/com.unity.addressables/Editor/AddressableAssetSettingsDefaultObject.cs	com.unity.addressables	Build configuration: Assets/AddressableAssetsData/DefaultObject.asset
 Packages/com.unity.cinemachine/Runtime/Timeline/CinemachineShot.cs	com.unity.cinemachine	Runtime asset: Assets/AddressableAssets/Cutscene_BossIntro.playable
