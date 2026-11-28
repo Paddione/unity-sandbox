@@ -328,17 +328,33 @@ public sealed class DiabloShotCheck : MonoBehaviour
             string baseType = prevWeapon != null ? prevWeapon.baseType : ItemDatabase.StarterSwordBase;
             var worn = GalleryItem(baseType, ItemRarity.Magic, (AffixLibrary.Damage, 4f), (AffixLibrary.Crit, 6f), (AffixLibrary.MaxHP, 10f));
             var rival = GalleryItem(baseType, ItemRarity.Rare, (AffixLibrary.Damage, 7f), (AffixLibrary.Crit, 2f), (AffixLibrary.MaxHP, 10f), (AffixLibrary.LifeSteal, 3f));
-            if (eq != null && bag != null && bag.Add(rival))
+            if (eq != null && bag != null)
             {
-                eq.Equip(worn);
-                invUI.Refresh();
-                yield return Wait(0.5f);
-                yield return CompareShot(hero.gameObject, "InventoryCanvas", rival, "inventory_compare", $"BagButton{bag.Count - 1}");
-                bag.RemoveAt(bag.Count - 1);
-                if (prevWeapon != null) eq.Equip(prevWeapon);
-                else if (eq.UnequipTo(ItemSlot.Weapon, bag)) bag.RemoveAt(bag.Count - 1);
-                invUI.Refresh();
-                yield return Wait(0.2f);
+                if (bag.Add(rival))
+                {
+                    eq.Equip(worn);
+                    invUI.Refresh();
+                    yield return Wait(0.5f);
+                    yield return Shot("inventory_compare");
+                    bag.RemoveAt(bag.Count - 1);
+                    if (prevWeapon != null) eq.Equip(prevWeapon);
+                    else if (eq.UnequipTo(ItemSlot.Weapon, bag)) bag.RemoveAt(bag.Count - 1);
+                    invUI.Refresh();
+                    yield return Wait(0.2f);
+                }
+                // Unique selection: the fixed tooltip column shows the unique effect.
+                var unique = GalleryItem(baseType, ItemRarity.Unique, (AffixLibrary.Damage, 9f), (AffixLibrary.Crit, 5f));
+                unique.uniqueId = ItemDatabase.LancerWardId;
+                unique.itemLevel = 12;
+                if (bag.Add(unique))
+                {
+                    invUI.Refresh();
+                    yield return Wait(0.5f);
+                    yield return Shot("inventory_unique_selected");
+                    bag.RemoveAt(bag.Count - 1);
+                    invUI.Refresh();
+                    yield return Wait(0.2f);
+                }
             }
         }
         invUI.ShowTab(DiabloInventoryUI.MenuTab.Bag);
@@ -1245,11 +1261,11 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.45f);
         yield return Shot("stat_breakdown_inventory");
 
-        // Parameter tooltip pinned next to ParametersColumn.
+        // Parameter tooltip pinned next to the Stats tab breakdown row.
         var infoTip = InfoTooltip.For(hero.gameObject);
         var snap = CharacterStatBreakdown.BuildFor(hero.gameObject);
         var cdrEntry = snap.Find("cooldown_reduction") ?? snap.Find("max_hp");
-        var paramRow = hero.transform.Find("InventoryCanvas/Panel/InventoryPage/ParametersColumn/ParametersCard/ParametersScroll/Viewport/ParametersContent/ParamRow_" + cdrEntry.id) as RectTransform;
+        var paramRow = hero.transform.Find("InventoryCanvas/Panel/StatsPage/StatsCard/StatsScroll/Viewport/StatsContent/ParamRow_" + cdrEntry.id) as RectTransform;
         infoTip.PinnedScreen = paramRow != null ? (Vector2)paramRow.position : new Vector2(Screen.width * 0.50f, Screen.height * 0.55f);
         infoTip.Show(cdrEntry.name, cdrEntry.formula, cdrEntry.RenderTooltipBody(), paramRow != null ? paramRow.gameObject : null, cdrEntry.capNote);
         yield return Wait(0.35f);
