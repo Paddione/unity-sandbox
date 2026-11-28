@@ -1184,3 +1184,10 @@ PASS. Lektion: Einmal-Spawner + frühe Erreichbarkeit = Quest-Falle; Auftritts-B
 - Learned: Eine „veraltete" Währung im Save-Vertrag kostet weniger als eine Versionsmigration, wenn die
   Verteilung deterministisch (Template-Reihenfolge) und idempotent ist.
 - Next: Balancing-Goal nach Eigner-Spieltest (D6), ggf. individuellere Empower-VFX je Skill.
+
+## 2026-11-28 — bigworld-encounters: Tests in der 4× Welt (Encounter-Sicherheit)
+
+- Done: `docs/test-runs.jsonl` Merge-Marker entfernt (wieder gültiges JSONL), WorldEdgeTests 7/7, VerifyDiabloZone + KayKitAssets.Verify + check-meta grün, Voll-Suiten EditMode 791/791 + PlayMode 432/432.
+- Faced: Marker-Zeilen aus früheren Evidence-Merges lagen noch im Kopf von `test-runs.jsonl` und hätten jeden JSONL-Parse gebrochen.
+- Learned: Evidence-Zeilen immer gegen den Mess-Commit prüfen (`commit`-Feld vs. HEAD), Marker nie mit einchecken.
+- Next: `cinderreach-bigworld-nav-autoplay` (Erreichbarkeit alle Varianten + Autoplay `-seed 0` bis `complete`).

@@ -219,7 +219,7 @@ laut CI-Artefakt), `check-voice-lines` 115/0, Dotfiles `test_diablo_unity_health
 
 ## Gebietsgrößen und Begegnungen
 
-Seit 2578868 messen die begehbaren Quadrate zwischen den Wandinnenkanten in Ashen Fen 70 m, in Sunken Ossuary und Cinder Kiln je 56 m und in Glass Barrens 76 m pro Seite. Lantern Holds Palisadenring hat 12 m Radius. In bisher freien Kampfabschnitten und auf den neuen Außenflächen stehen 35 zusätzliche Gegnerpaare (8/9/9/9). Ihre Aufstellung hält die Aggro-Reichweiten zu Toren, Ankünften, Wegpunkten und Händlern ein. Die Regressionen stehen in WorldEdgeTests und LayoutSeedTests.
+Seit 2578868 messen die begehbaren Quadrate zwischen den Wandinnenkanten in Ashen Fen 70 m, in Sunken Ossuary und Cinder Kiln je 56 m und in Glass Barrens 76 m pro Seite. Lantern Holds Palisadenring hat 12 m Radius. In bisher freien Kampfabschnitten und auf den neuen Außenflächen stehen 35 zusätzliche Gegnerpaare (8/9/9/9). Ihre Aufstellung hält die Aggro-Reichweiten zu Toren, Ankünften, Wegpunkten und Händlern ein. Die Regressionen stehen in WorldEdgeTests und LayoutSeedTests. Encounter-Sicherheit ist per Regression gesperrt (2026-11-28): WorldEdgeTests 7/7, Voll-Suiten EditMode 791/791 + PlayMode 432/432.
 
 ## Spiel in einem Absatz
 
@@ -247,7 +247,7 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
 - Assets: KayKit (Dungeon 211 Modelle, Adventurers 6, Skeletons 4, Rig_Medium-Animationen) plus
   Blender-Pipeline (`docs/world-art`, `docs/menu-art`). Keine Fremd-IP, kein Asset-Store-Kauf ohne Freigabe.
 - Tests: `sandbox/Assets/Tests/{EditMode,PlayMode}`, gemeinsame Helfer in `sandbox/Assets/Tests/PlayMode/DiabloTestFixture.cs`.
-  Letzter voller Lauf (menu-flow-polish): EditMode 378/378, PlayMode 268/268.
+  Letzter voller Lauf (bigworld-encounters, 2026-11-28): EditMode 791/791, PlayMode 432/432.
 
 ## Systeme (Ist-Stand)
 
