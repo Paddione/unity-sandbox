@@ -47,6 +47,10 @@ public sealed class WorldMapUI : MonoBehaviour
     MapIconLayer layer;
     StoryDirector director;
     float tick;
+    Vector2 lastPicSize = Vector2.zero;
+    Vector2 lastPicPos = new Vector2(float.NaN, float.NaN);
+    int lastQuestRevision = -1;
+    int lastQuestZone = -1;
     readonly List<MapIcon> icons = new List<MapIcon>();
     readonly List<MapIcon> filtered = new List<MapIcon>();
     readonly Dictionary<MapCategory, Text> filterLabels = new Dictionary<MapCategory, Text>();
@@ -74,7 +78,7 @@ public sealed class WorldMapUI : MonoBehaviour
             if (Mathf.Abs(scroll) > 0.01f) SetZoom(Zoom + scroll * 0.001f);
         }
         tick -= Time.unscaledDeltaTime;
-        if (tick <= 0f) { tick = 0.15f; Redraw(); }
+        if (tick <= 0f) { tick = 0.3f; Redraw(); }
     }
 
     public void SetOpen(bool open)
@@ -198,11 +202,21 @@ public sealed class WorldMapUI : MonoBehaviour
         WorldMapFilter.Apply(icons, EnabledCategories, filtered);
         var z = ZoneMap.Zone(ViewZone);
         var centre = ViewZone == heroZone ? ZoneMap.ToMap(transform.position, z) : new Vector2(0.5f, 0.5f);
-        var pr = picture.rectTransform;
-        pr.sizeDelta = new Vector2(MapPx * Zoom, MapPx * Zoom);
-        pr.anchoredPosition = WorldMapZoom.Offset(centre, Zoom, MapPx);
+        // cinderreach-map-overlay perf: RectTransform writes dirty the whole
+        // canvas; touch the picture only when zoom/zone/centre actually moved.
+        var picSize = new Vector2(MapPx * Zoom, MapPx * Zoom);
+        if (picSize != lastPicSize) { picture.rectTransform.sizeDelta = picSize; lastPicSize = picSize; }
+        var picPos = WorldMapZoom.Offset(centre, Zoom, MapPx);
+        if (picPos != lastPicPos) { picture.rectTransform.anchoredPosition = picPos; lastPicPos = picPos; }
         layer.Draw(filtered, w => WorldMapZoom.ToLocal(ZoneMap.ToMap(w, z), centre, Zoom, MapPx), new Vector2(MapPx * 0.5f, MapPx * 0.5f));
-        questList.text = QuestLines(StoryDirector.State, marks);
+        // The quest list only changes with story state or the viewed zone.
+        int rev = StoryDirector.State != null ? StoryDirector.State.Revision : -1;
+        if (rev != lastQuestRevision || ViewZone != lastQuestZone)
+        {
+            questList.text = QuestLines(StoryDirector.State, marks);
+            lastQuestRevision = rev;
+            lastQuestZone = ViewZone;
+        }
     }
 
     /// <summary>Tracked tasks with the zone each leads to (test seam).</summary>

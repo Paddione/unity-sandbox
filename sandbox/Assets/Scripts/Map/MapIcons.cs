@@ -170,15 +170,26 @@ public sealed class MapIconLayer
                 shape = MapIconShape.Arrow;
             }
             var img = Get(n++);
-            img.sprite = MapIcons.For(shape);
-            img.color = icon.color;
+            while (last.Count <= n - 1) last.Add(new IconState());
+            var st = last[n - 1];
+            var sprite = MapIcons.For(shape);
+            // cinderreach-map-overlay perf: setting sprite/color/rect dirty the
+            // canvas each tick; skip unchanged properties (icons pool per map).
+            if (st.sprite != sprite) { img.sprite = sprite; st.sprite = sprite; }
+            if (st.color != icon.color) { img.color = icon.color; st.color = icon.color; }
             var rt = img.rectTransform;
-            rt.anchoredPosition = p;
-            rt.sizeDelta = new Vector2(size, size);
-            rt.localRotation = Quaternion.Euler(0f, 0f, rot);
+            if (st.pos != p) { rt.anchoredPosition = p; st.pos = p; }
+            if (st.size != size) { rt.sizeDelta = new Vector2(size, size); st.size = size; }
+            if (st.rot != rot) { rt.localRotation = Quaternion.Euler(0f, 0f, rot); st.rot = rot; }
+            if (!st.enabled) { st.enabled = true; }
             if (!img.enabled) img.enabled = true;
+            last[n - 1] = st;
         }
-        for (int i = n; i < pool.Count; i++) if (pool[i].enabled) pool[i].enabled = false;
+        for (int i = n; i < pool.Count; i++)
+        {
+            if (pool[i].enabled) pool[i].enabled = false;
+            if (last.Count > i) { var s = last[i]; s.enabled = false; last[i] = s; }
+        }
         Shown = n;
     }
 
@@ -196,6 +207,18 @@ public sealed class MapIconLayer
         }
         return pool[i];
     }
+
+    struct IconState
+    {
+        public Vector2 pos;
+        public float size;
+        public float rot;
+        public Sprite sprite;
+        public Color color;
+        public bool enabled;
+    }
+
+    readonly List<IconState> last = new List<IconState>();
 }
 
 /// <summary>
