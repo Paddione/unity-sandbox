@@ -43,19 +43,37 @@ def _mats():
     return m
 
 
-def _head(P, arm, m, skin, brow_mat, jaw=1.0, eye_scale=1.0, smile=0.0, ears=True):
-    """Chibi head with brows, eyes, nose, mouth; jaw >1 widens the lower face."""
-    K.ball(P + "Head", skin, arm, ["head"], (0, -0.02, HEAD_Z), (0.36, 0.34, 0.37), segs=14, rings=10)
+def _head(P, arm, m, skin, brow_mat, jaw=1.0, eye_scale=1.0, smile=0.0, ears=True,
+          shape=(1.0, 1.0, 1.0), eye_gap=0.12, eye_h=1.0, brow=(1.0, 0.12, 0.1), nose=1.0,
+          teeth=False, cleft=False, iris=None, smirk=0.0):
+    """Caricature head. shape scales the skull (x width, y depth, z height);
+    brow = (thickness, tilt, lift); eye_h stretches eye height; iris tints the
+    pupil ring; teeth adds a white grin band; cleft adds a chin dimple."""
+    sx, sy, sz = shape
+    hx, hy, hz = 0.36 * sx, 0.34 * sy, 0.37 * sz
+    front = -0.02 - hy
+    K.ball(P + "Head", skin, arm, ["head"], (0, -0.02, HEAD_Z), (hx, hy, hz), segs=14, rings=10)
     if jaw > 1.0:
-        K.box(P + "Jaw", skin, arm, ["head"], (0, 0.0, HEAD_Z - 0.17), (0.5 * jaw, 0.6, 0.22), taper=1.2, bevel=0.06)
+        K.box(P + "Jaw", skin, arm, ["head"], (0, 0.0, HEAD_Z - 0.17 * sz), (0.5 * jaw * sx, 0.6 * sy, 0.22), taper=1.2, bevel=0.06)
     for side, s in (("L", 1), ("R", -1)):
-        K.box(P + "EyeWhite" + side, m["white"], arm, ["head"], (0.12 * s, -0.33, HEAD_Z + 0.02), (0.1 * eye_scale, 0.03, 0.07 * eye_scale), bevel=0.0)
-        K.box(P + "Pupil" + side, m["eye"], arm, ["head"], (0.12 * s, -0.345, HEAD_Z + 0.02), (0.045 * eye_scale, 0.02, 0.055 * eye_scale), bevel=0.0)
-        K.box(P + "Brow" + side, brow_mat, arm, ["head"], (0.12 * s, -0.33, HEAD_Z + 0.1), (0.13, 0.03, 0.03), rot=Matrix.Rotation(0.12 * s, 3, "Y"), bevel=0.0)
+        ex, ez = eye_gap * s, HEAD_Z + 0.02
+        K.box(P + "EyeWhite" + side, m["white"], arm, ["head"], (ex, front + 0.035, ez), (0.1 * eye_scale, 0.03, 0.07 * eye_scale * eye_h), bevel=0.0)
+        if iris is not None:
+            K.box(P + "Iris" + side, iris, arm, ["head"], (ex, front + 0.022, ez), (0.06 * eye_scale, 0.02, 0.06 * eye_scale * min(eye_h, 1.1)), bevel=0.0)
+        K.box(P + "Pupil" + side, m["eye"], arm, ["head"], (ex, front + 0.015, ez), (0.035 * eye_scale, 0.02, 0.045 * eye_scale), bevel=0.0)
+        K.box(P + "Glint" + side, m["white"], arm, ["head"], (ex + 0.015, front + 0.008, ez + 0.015), (0.015, 0.01, 0.015), bevel=0.0)
+        th, tilt, lift = brow
+        K.box(P + "Brow" + side, brow_mat, arm, ["head"], (ex, front + 0.035, ez + lift * eye_h), (0.14, 0.04, 0.03 * th), rot=Matrix.Rotation(tilt * s, 3, "Y"), bevel=0.0)
         if ears:
-            K.ball(P + "Ear" + side, skin, arm, ["head"], (0.355 * s, -0.02, HEAD_Z), (0.05, 0.08, 0.09), segs=6, rings=4)
-    K.box(P + "Nose", skin, arm, ["head"], (0, -0.36, HEAD_Z - 0.05), (0.06, 0.06, 0.1), taper=0.7, bevel=0.01)
-    K.box(P + "Mouth", m["mouth"], arm, ["head"], (0.02 * smile, -0.355, HEAD_Z - 0.15), (0.14 + 0.06 * abs(smile), 0.03, 0.03), rot=Matrix.Rotation(-0.25 * smile, 3, "Y"), bevel=0.0)
+            K.ball(P + "Ear" + side, skin, arm, ["head"], ((hx - 0.005) * s, -0.02, HEAD_Z), (0.05, 0.08, 0.09), segs=6, rings=4)
+    K.box(P + "Nose", skin, arm, ["head"], (0, front - 0.01, HEAD_Z - 0.05), (0.06 * nose, 0.07 * nose, 0.11 * nose), taper=0.7, bevel=0.01)
+    mouth_w = 0.14 + 0.06 * abs(smile)
+    tilt = Matrix.Rotation(-0.25 * smirk, 3, "Y")
+    K.box(P + "Mouth", m["mouth"], arm, ["head"], (0.03 * smirk, front + 0.005, HEAD_Z - 0.15 * sz), (mouth_w, 0.03, 0.05 if teeth else 0.03), rot=tilt, bevel=0.0)
+    if teeth:
+        K.box(P + "Teeth", m["white"], arm, ["head"], (0.03 * smirk, front - 0.005, HEAD_Z - 0.145 * sz), (mouth_w * 0.85, 0.02, 0.025), rot=tilt, bevel=0.0)
+    if cleft:
+        K.box(P + "Cleft", m["mouth"], arm, ["head"], (0, front + 0.02, HEAD_Z - 0.28 * sz), (0.012, 0.02, 0.05), bevel=0.0)
 
 
 def _body(P, arm, top, sleeve, legs, feet, hands, slim=1.0, jacket=None, jacket_open=True):
@@ -80,10 +98,12 @@ def musk(arm, P="EM_"):
     hair = K.mat("em_hair", K.hexrgb("#3b2a20"), 0.6)
     blazer = K.mat("em_blazer", K.hexrgb("#222326"), 0.7)
     _body(P, arm, m["black"], blazer, m["black"], m["shoe"], m["skin"], slim=1.08, jacket=blazer)
-    _head(P, arm, m, m["skin"], hair, jaw=1.25, eye_scale=0.85, smile=0.6)
+    _head(P, arm, m, m["skin"], hair, jaw=1.0, eye_scale=0.8, smile=0.4, smirk=0.8, shape=(1.08, 1.0, 1.02), eye_h=0.6, brow=(1.6, -0.05, 0.08), nose=1.25, cleft=True)
     # Swept-back hair, high hairline (starts well behind the forehead).
-    K.dome(P + "Hair", hair, arm, ["head"], (0, 0.06, HEAD_Z + 0.05), (0.37, 0.33, 0.33), segs=12)
-    K.box(P + "HairSweep", hair, arm, ["head"], (0, -0.12, HEAD_Z + 0.3), (0.5, 0.24, 0.12), taper=0.8, rot=Matrix.Rotation(0.25, 3, "X"), bevel=0.04)
+    K.dome(P + "Hair", hair, arm, ["head"], (0, 0.05, HEAD_Z + 0.07), (0.4, 0.36, 0.34), segs=12)
+    # Voluminous swept-back top with a slight front quiff.
+    K.box(P + "HairSweep", hair, arm, ["head"], (0, -0.04, HEAD_Z + 0.36), (0.6, 0.5, 0.18), taper=0.75, rot=Matrix.Rotation(0.18, 3, "X"), bevel=0.06)
+    K.box(P + "HairQuiff", hair, arm, ["head"], (0.04, -0.26, HEAD_Z + 0.4), (0.36, 0.16, 0.12), taper=0.7, rot=Matrix.Rotation(-0.3, 3, "X"), bevel=0.04)
     return len([o for o in bpy.data.objects if o.name.startswith(P)])
 
 
@@ -94,7 +114,7 @@ def altman(arm, P="SA_"):
     sweater = K.mat("sa_sweater", K.hexrgb("#7d8084"), 0.95)
     _body(P, arm, sweater, sweater, m["jeans"], m["sneaker"], m["skin"], slim=0.9)
     K.cyl(P + "Collar", sweater, arm, ["chest"], (0, 0, 1.24), 0.2, 0.06, verts=10)
-    _head(P, arm, m, m["skin"], hair, jaw=1.0, eye_scale=1.3, smile=0.2)
+    _head(P, arm, m, m["skin"], hair, jaw=1.0, eye_scale=1.45, smile=0.1, shape=(0.92, 1.0, 1.06), eye_h=1.25, brow=(0.9, -0.18, 0.13), nose=0.9, iris=K.mat("sa_iris", K.hexrgb("#4f7a9a"), 0.3))
     # Short tousled hair: dome plus a few tufts on top and the fringe.
     K.dome(P + "Hair", hair, arm, ["head"], (0, 0.0, HEAD_Z + 0.08), (0.38, 0.37, 0.32), segs=12)
     for i, (x, y) in enumerate(((-0.15, -0.2), (0.0, -0.26), (0.15, -0.2), (-0.08, 0.0), (0.1, 0.05))):
@@ -106,15 +126,15 @@ def amodei(arm, P="DA_"):
     K.clear(P)
     m = _mats()
     hair = K.mat("da_hair", K.hexrgb("#2a1f1a"), 0.85)
-    stubble = K.mat("da_stubble", K.hexrgb("#9c7a66"), 0.95)
+    stubble = K.mat("da_stubble", K.hexrgb("#4e3c32"), 0.95)
     navy = K.mat("da_blazer", K.hexrgb("#24304a"), 0.75)
     tee = K.mat("da_tee", K.hexrgb("#5e6a78"), 0.9)
     frame = K.mat("da_frames", K.hexrgb("#1a1a1a"), 0.3, 0.6)
     _body(P, arm, tee, navy, m["jeans"], m["shoe"], m["skin"], slim=0.98, jacket=navy)
-    _head(P, arm, m, m["skin"], hair, jaw=1.0, eye_scale=1.0, smile=0.15)
+    _head(P, arm, m, m["skin"], hair, jaw=1.0, eye_scale=1.0, smile=0.15, shape=(1.0, 1.0, 1.04), brow=(1.3, 0.1, 0.11), iris=K.mat("da_iris", K.hexrgb("#5a4030"), 0.3))
     # Dark stubble over the lower face.
     # Thin shell hugging the lower face, below the mouth line.
-    K.ball(P + "Stubble", stubble, arm, ["head"], (0, -0.02, HEAD_Z - 0.2), (0.37, 0.335, 0.18), segs=14, rings=10)
+    K.ball(P + "Stubble", stubble, arm, ["head"], (0, -0.02, HEAD_Z - 0.22), (0.365, 0.33, 0.14), segs=14, rings=10)
     # Big curls: a ring of bumpy balls over the scalp.
     K.dome(P + "Hair", hair, arm, ["head"], (0, 0.02, HEAD_Z + 0.06), (0.39, 0.38, 0.34), segs=12)
     curls = [(-0.26, -0.18), (-0.1, -0.27), (0.08, -0.27), (0.25, -0.18), (-0.3, 0.05), (0.3, 0.05),
@@ -138,7 +158,7 @@ def huang(arm, P="JH_"):
     K.box(P + "Zip", zip_, arm, ["chest"], (0.12, -0.215, 1.0), (0.015, 0.01, 0.4), bevel=0.0)
     K.box(P + "CollarL", leather, arm, ["chest"], (0.16, -0.12, 1.25), (0.14, 0.18, 0.06), rot=Matrix.Rotation(-0.5, 3, "Y"), bevel=0.0)
     K.box(P + "CollarR", leather, arm, ["chest"], (-0.16, -0.12, 1.25), (0.14, 0.18, 0.06), rot=Matrix.Rotation(0.5, 3, "Y"), bevel=0.0)
-    _head(P, arm, m, m["skin_tan"], K.mat("jh_brow", K.hexrgb("#4a4440"), 0.6), jaw=1.08, eye_scale=0.8, smile=1.0)
+    _head(P, arm, m, m["skin_tan"], K.mat("jh_brow", K.hexrgb("#4a4440"), 0.6), jaw=1.12, eye_scale=0.8, smile=1.6, shape=(1.08, 1.0, 0.96), eye_h=0.55, brow=(1.2, 0.0, 0.09), teeth=True)
     # Swept silver hair with volume on top and short sides.
     K.dome(P + "Hair", hair, arm, ["head"], (0, 0.02, HEAD_Z + 0.07), (0.38, 0.36, 0.3), segs=12)
     K.box(P + "HairWave", hair, arm, ["head"], (0.04, -0.1, HEAD_Z + 0.3), (0.52, 0.3, 0.13), taper=0.75, rot=Matrix.Rotation(0.2, 3, "X") @ Matrix.Rotation(-0.08, 3, "Y"), bevel=0.04)

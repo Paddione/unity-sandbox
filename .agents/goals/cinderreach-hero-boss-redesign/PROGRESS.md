@@ -7,7 +7,7 @@ Prozent: 20 %
 
 ## Nächste Schritte
 - Kriterium 2: Fenwalker v2 und Lanternbearer v1 freigegeben (2026-11-28, „awesome“). Rogue v2 (Kapuzenspitze, Fass an der Hüfte) und weibliche Varianten (Fenwalker F auf Ranger-Basis, Lanternbearer F, Rogue F auf Rogue_Hooded-Basis) gebaut, Renders `docs/hero-boss-redesign/01`–`06`; Freigabe der vier neuen Entwürfe offen.
-- Kriterium 3 (geändert, D7/D8): v1-Bosse verworfen. Menschformen v1 A1 Musk, A2 Altman, A3 Amodei, A4 Huang gebaut (`art-src/hero-boss-redesign/ceo_bosses.py`), Renders `10`–`13`; Eigner-Feedback offen, danach Monsterformen.
+- Kriterium 3 (geändert, D7/D8): v1-Bosse verworfen. Menschformen v2 mit Karikatur-Gesichtsbaukasten (Kopfform, Augen mit Iris/Glanz, Brauen, Nase, Zähne, Kinngrübchen, Smirk) — `art-src/hero-boss-redesign/ceo_bosses.py`, Renders `10`–`13` (`_v2`), Nahaufnahme `14_ceo_faces_v2_closeup.png`; Eigner-Feedback zur Erkennbarkeit offen, danach Monsterformen.
 - Kriterium 6 (neu): Voiceline-Entwürfe DE+EN zur Auswahl vorgelegt; Verwandlung im Spawn-Intro folgt nach Modellfreigabe.
 - Builder: `art-src/hero-boss-redesign/build_heroes.py` baut alle sechs Varianten (`build(arm, prefix, female)` je Klasse).
 
