@@ -67,10 +67,43 @@ public sealed class LocomotionTwist : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-        hips = FindDeep(transform, "hips");
-        spine = hips != null ? FindDeep(hips, "spine") : null;
-        chest = spine != null ? FindDeep(spine, "chest") : null;
+        ResolveBones();
         lastPos = transform.position;
+    }
+
+    /// <summary>
+    /// (Re-)resolve the split-body bones. KayKit Adventurers share one rig,
+    /// but import variants and skin swaps differ in case; companions are
+    /// re-skinned after Awake, so a lazy re-resolve keeps every class footed.
+    /// </summary>
+    public bool ResolveBones()
+    {
+        hips = FindBone(transform, HipNames);
+        spine = hips != null ? FindBone(hips, SpineNames) : null;
+        chest = spine != null ? FindBone(spine, ChestNames) : null;
+        return hips != null && spine != null;
+    }
+
+    static readonly string[] HipNames = { "hips", "hip", "pelvis", "pelvis.l", "root_hips" };
+    static readonly string[] SpineNames = { "spine", "spine1", "spine01", "torso", "chest1" };
+    static readonly string[] ChestNames = { "chest", "chest1", "upper_chest", "spine2", "spine02" };
+
+    /// <summary>True once hips+spine resolved (chest is optional); false = twist parks safely.</summary>
+    public bool HasFooting => hips != null && spine != null;
+
+    /// <summary>
+    /// Ensure split-body footwork on a hero, companion, mirror or husk:
+    /// adds <see cref="LocomotionTwist"/> whenever an Animator stands.
+    /// Idempotent; returns the twist or null when no Animator exists.
+    /// </summary>
+    public static LocomotionTwist Ensure(GameObject go)
+    {
+        if (go == null) return null;
+        if (go.GetComponent<Animator>() == null) return null;
+        var twist = go.GetComponent<LocomotionTwist>();
+        if (twist == null) twist = go.AddComponent<LocomotionTwist>();
+        else twist.ResolveBones();
+        return twist;
     }
 
     void Start()
@@ -83,6 +116,7 @@ public sealed class LocomotionTwist : MonoBehaviour
 
     void LateUpdate()
     {
+        if (hips == null || spine == null) ResolveBones();
         float dt = Time.deltaTime;
         var pos = transform.position;
         var delta = pos - lastPos;
@@ -140,10 +174,20 @@ public sealed class LocomotionTwist : MonoBehaviour
 
     static Transform FindDeep(Transform t, string name)
     {
-        if (t.name == name) return t;
+        if (string.Equals(t.name, name, System.StringComparison.OrdinalIgnoreCase)) return t;
         foreach (Transform c in t)
         {
             var hit = FindDeep(c, name);
+            if (hit != null) return hit;
+        }
+        return null;
+    }
+
+    static Transform FindBone(Transform root, string[] names)
+    {
+        foreach (var n in names)
+        {
+            var hit = FindDeep(root, n);
             if (hit != null) return hit;
         }
         return null;

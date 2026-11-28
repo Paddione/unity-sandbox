@@ -43,7 +43,27 @@ public static class CompanionFactory
             look.autoApply = false; // the clone keeps this look; Start must not snap it to the hero
             look.Apply(cls, profile);
         }
+        EnsureFootwork(go);
         return go;
+    }
+
+    /// <summary>
+    /// Footwork + worn gear on a companion body (all classes): the clone
+    /// keeps the hero's Animator/controller/look, but <see cref="StripGameplay"/>
+    /// removes the gear art; re-attach it so boots/gloves/belts and unique
+    /// weapon models show on companions exactly like on heroes. Twist is
+    /// re-resolved after the class re-skin so Mage/Rogue footing never lags.
+    /// </summary>
+    static void EnsureFootwork(GameObject go)
+    {
+        if (go == null) return;
+        DiabloAnimator.EnsureFootwork(go);
+        var twist = go.GetComponent<LocomotionTwist>();
+        if (twist != null) twist.ResolveBones();
+        // Worn gear mounts are initialized by PartyCompanion.Start (single
+        // owner) so re-skins never stack duplicate "Chest art" anchors.
+        if (go.GetComponent<HeroEquipmentAppearance>() == null)
+            go.AddComponent<HeroEquipmentAppearance>();
     }
 
     /// <summary>
@@ -167,6 +187,11 @@ public static class CompanionFactory
         go.AddComponent<DiabloMelee>();
         var look = go.AddComponent<ClassAppearance>();
         look.Apply(cls, CompanionProfile(cls, 0));
+        // Headless/test fallback has no rig bones, but still carries the
+        // locomotion components so class-agnostic footwork checks pass and a
+        // later re-skin finds its footing without extra wiring.
+        go.AddComponent<Animator>();
+        DiabloAnimator.EnsureFootwork(go);
         return go;
     }
 

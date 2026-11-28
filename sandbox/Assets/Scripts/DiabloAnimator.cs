@@ -39,8 +39,19 @@ public sealed class DiabloAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
         controller = GetComponent<DiabloClickController>();
         skills = GetComponent<DiabloSkills>();
-        twist = GetComponent<LocomotionTwist>();
-        if (twist == null && animator != null) twist = gameObject.AddComponent<LocomotionTwist>();
+        twist = LocomotionTwist.Ensure(gameObject);
+    }
+
+    /// <summary>
+    /// Ensure hero footwork on any hero-like body (hero, companion clone,
+    /// co-op mirror): Animator driver + split-body twist. Idempotent.
+    /// </summary>
+    public static void EnsureFootwork(GameObject go)
+    {
+        if (go == null) return;
+        if (go.GetComponent<Animator>() == null) return;
+        if (go.GetComponent<DiabloAnimator>() == null) go.AddComponent<DiabloAnimator>();
+        LocomotionTwist.Ensure(go);
     }
 
     /// <summary>Controllers built before the bow states lack these params: skip silently.</summary>

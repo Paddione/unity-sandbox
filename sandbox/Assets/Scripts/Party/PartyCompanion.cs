@@ -109,6 +109,10 @@ public sealed class PartyCompanion : MonoBehaviour
     PlayerHealth hp;
     Animator animator;
     DiabloAnimator animDriver;
+    LocomotionTwist twist;
+    HeroEquipmentAppearance gearAppearance;
+    bool wantMoving;
+    float stepAccum;
 
     /// <summary>Time.time when a dead companion may rejoin; negative while alive.</summary>
     float rejoinAt = float.NegativeInfinity;
@@ -123,6 +127,17 @@ public sealed class PartyCompanion : MonoBehaviour
         hp = GetComponent<PlayerHealth>();
         animator = GetComponent<Animator>();
         animDriver = GetComponent<DiabloAnimator>();
+        // Clones and fallback bodies arrive with different component sets;
+        // every class gets the same locomotion + worn-gear footwork.
+        DiabloAnimator.EnsureFootwork(gameObject);
+        animator = GetComponent<Animator>();
+        animDriver = GetComponent<DiabloAnimator>();
+        twist = GetComponent<LocomotionTwist>();
+        if (twist != null) twist.ResolveBones();
+        gearAppearance = GetComponent<HeroEquipmentAppearance>();
+        if (gearAppearance == null) gearAppearance = gameObject.AddComponent<HeroEquipmentAppearance>();
+        var look = GetComponent<ClassAppearance>();
+        if (look != null) gearAppearance.Initialize(look);
         if (skills != null) skills.classOverride = Role;
         if (!Live.Contains(this)) Live.Add(this);
     }
@@ -135,8 +150,33 @@ public sealed class PartyCompanion : MonoBehaviour
     /// <summary>Locomotion bool the companion drives itself (DiabloAnimator has no click controller here).</summary>
     void SetMoving(bool value)
     {
+        wantMoving = value;
+        ApplyMoving();
+    }
+
+    void LateUpdate()
+    {
+        // Measured motion (catch-up slides, knockbacks, ports) animates the
+        // legs even when the brain ordered idle — same rule as the hero.
+        ApplyMoving();
+    }
+
+    void ApplyMoving()
+    {
         if (animator == null || animator.runtimeAnimatorController == null) return;
-        animator.SetBool(animDriver != null ? animDriver.moveParam : "Moving", value);
+        bool moving = wantMoving || (twist != null && twist.MovingMeasured);
+        animator.SetBool(animDriver != null ? animDriver.moveParam : "Moving", moving);
+        if (moving && animator.isActiveAndEnabled)
+        {
+            // Audible footwork, same stride as the hero; silent while idle.
+            stepAccum += MoveSpeed * Time.deltaTime;
+            if (stepAccum >= DiabloClickController.StepStride)
+            {
+                stepAccum = 0f;
+                DiabloAudio.PlayFootstep(transform.position);
+            }
+        }
+        else stepAccum = 0f;
     }
 
     void Update()

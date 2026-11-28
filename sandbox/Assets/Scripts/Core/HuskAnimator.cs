@@ -26,11 +26,7 @@ public sealed class HuskAnimator : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-        if (animator != null)
-        {
-            twist = GetComponent<LocomotionTwist>();
-            if (twist == null) twist = gameObject.AddComponent<LocomotionTwist>();
-        }
+        twist = LocomotionTwist.Ensure(gameObject);
     }
 
     void LateUpdate()
