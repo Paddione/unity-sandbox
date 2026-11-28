@@ -29,7 +29,7 @@ public sealed partial class DiabloInventoryUI
         canvas = DiabloUIFactory.ConfigureOverlayCanvas(canvasGo, sortingOrder: 10);
         canvasRect = canvasGo.GetComponent<RectTransform>();
 
-        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(1520f, 840f), new Vector2(-18f, 0f));
+        var panelGo = DiabloUIFactory.MakePanel(canvasGo.transform, "Panel", new Vector2(1520f, 840f), new Vector2(-280f, 0f));
         var pr = panelGo.GetComponent<RectTransform>();
         pr.anchorMin = new Vector2(1f, 0.5f);
         pr.anchorMax = new Vector2(1f, 0.5f);
