@@ -41,6 +41,25 @@ public sealed class Inventory : MonoBehaviour
         return true;
     }
 
+    /// <summary>Swap bag[a] and bag[b] (cursor item). False when either index is empty.</summary>
+    public bool Swap(int a, int b)
+    {
+        if (a < 0 || b < 0 || a >= bag.Count || b >= bag.Count) return false;
+        if (a == b) return true;
+        (bag[a], bag[b]) = (bag[b], bag[a]);
+        return true;
+    }
+
+    /// <summary>Move bag[index] behind the last item (cursor item dropped on an empty cell).</summary>
+    public bool MoveToEnd(int index)
+    {
+        if (index < 0 || index >= bag.Count) return false;
+        var item = bag[index];
+        bag.RemoveAt(index);
+        bag.Add(item);
+        return true;
+    }
+
     /// <summary>Add loot to the bag. False when full (caller keeps the loot).</summary>
     public bool Add(ItemInstance item)
     {

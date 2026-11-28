@@ -45,7 +45,7 @@ public static partial class LocCatalog
         E("inv.btn.potion", "Flasche trinken (1)", "Drink Flask (1)"),
         E("inv.notice.equiprejected", "Anlegen abgelehnt: {0}.", "Equip rejected: {0}."),
         E("inv.btn.equip", "Auswahl anlegen", "Equip selected"),
-        E("inv.equiphint", "Ziehen dreht den Helden  •  Gegenstände auf Plätze ziehen  •  Rechtsklick tauscht  •  Umschalt vergleicht", "Drag to turn the hero  •  Drag items onto slots  •  Right-click swaps  •  Shift compares"),
+        E("inv.equiphint", "Ziehen dreht den Helden  •  Klick nimmt Gegenstand auf, Klick legt ab  •  Rechtsklick tauscht  •  Umschalt vergleicht", "Drag to turn the hero  •  Click picks an item up, click places it  •  Right-click swaps  •  Shift compares"),
         E("inv.notice.equipping", "Lege {0} an … (der Leiter bestätigt)", "Equipping {0}… (host confirms)"),
         E("inv.baghint", "Gegenstand in der Tasche überfahren oder anklicken, um ihn anzusehen oder anzulegen.", "Hover or click a bag item to inspect or equip."),
         E("inv.notice.gone", "Der Gegenstand ist nicht mehr in der Tasche.", "Item is no longer in the bag."),
@@ -76,7 +76,7 @@ public static partial class LocCatalog
         E("inv.tc.discard", "Wegwerfen", "Discard"),
         E("inv.tc.compare", "Vergleich mit Angelegtem", "Compared to equipped"),
         E("inv.tc.legend", "▲ besser   •   ▼ schlechter", "▲ better   •   ▼ worse"),
-        E("inv.footer.hint", "I/B Tasche   •   Rechtsklick tauscht   •   Umschalt vergleicht", "I/B Bag   •   Right-click swaps   •   Shift compares"),
+        E("inv.footer.hint", "I/B Tasche   •   Klick nimmt auf/legt ab   •   Rechtsklick tauscht   •   Umschalt vergleicht", "I/B Bag   •   Click picks up/places   •   Right-click swaps   •   Shift compares"),
         E("inv.notice.sold", "{0} verkauft (+{1} Gold).", "Sold {0} (+{1} gold)."),
         E("inv.notice.nosell", "{0} lässt sich nicht verkaufen.", "Cannot sell {0}."),
     };

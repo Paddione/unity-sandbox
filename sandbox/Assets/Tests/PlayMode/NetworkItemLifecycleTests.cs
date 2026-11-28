@@ -131,6 +131,31 @@ public sealed class NetworkItemLifecycleTests
         Assert.That(wallet.Gold, Is.EqualTo(before + VendorStock.SellPrice(item)));
     }
 
+    [UnityTest]
+    public IEnumerator CursorItem_EquipsThroughTheAuthoritativeItemPath()
+    {
+        ushort port;
+        using (var socket = new System.Net.Sockets.UdpClient(0))
+            port = (ushort)((System.Net.IPEndPoint)socket.Client.LocalEndPoint).Port;
+        var host = NewManager("cursor item host", port);
+        host.NetworkConfig.PlayerPrefab = Res.Get<GameObject>("NetworkPlayerDiablo");
+        Assert.That(host.StartHost(), Is.True);
+        yield return null;
+        var hero = host.SpawnManager.GetLocalPlayerObject();
+        var player = hero.GetComponent<DiabloNetworkPlayer>();
+        var inventory = hero.GetComponent<Inventory>();
+        var ui = hero.GetComponent<DiabloInventoryUI>() ?? hero.gameObject.AddComponent<DiabloInventoryUI>();
+        var armor = ItemDatabase.CreateUnique(ItemDatabase.ShardbackAegisId);
+        Assert.That(inventory.Add(armor), Is.True);
+        ui.SetOpen(true);
+        ui.ClickBag(inventory.Count - 1);
+        Assert.That(ui.IsHolding, Is.True);
+        ui.ClickSlot(ItemSlot.Armor);
+        Assert.That(ui.IsHolding, Is.False);
+        Assert.That(player.visualArmor.Value.ToString(), Is.EqualTo(armor.uniqueId), "cursor equip went through RequestItemAction");
+        ui.SetOpen(false);
+    }
+
     [Test]
     public void ImportedEquipmentRejectsDuplicateAndKeepsClassSpecificBases()
     {

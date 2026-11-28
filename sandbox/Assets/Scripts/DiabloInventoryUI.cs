@@ -98,6 +98,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
     {
         if (DiabloUIFactory.IsRemoteMirror(this)) return;
         if (IsOpen) PaintSlotTints();
+        TickCursorItem();
         var kb = Keyboard.current;
         if (kb == null) return;
         if (kb.iKey.wasPressedThisFrame || kb.bKey.wasPressedThisFrame)
@@ -108,6 +109,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         if (kb.escapeKey.wasPressedThisFrame && IsOpen)
         {
             if (IsDragging) { CancelDrag(); DiabloUIFactory.MarkEscConsumed(); return; }
+            if (IsHolding) { ReleaseHold(); DiabloUIFactory.MarkEscConsumed(); return; }
             SetOpen(false);
             DiabloUIFactory.MarkEscConsumed();
             return;
@@ -129,6 +131,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         if (!open)
         {
             CancelDrag();
+            ReleaseHold();
             ItemTooltip.HideFor(gameObject);
             InfoTooltip.HideFor(gameObject);
         }
@@ -343,6 +346,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         if (cell.kind == InventoryCell.Kind.Doll) return;
         var item = ItemAt(cell);
         if (item == null || dragGhost == null) return;
+        ReleaseHold();
         dragSource = cell;
         ItemTooltip.HideFor(gameObject);
         dragGhost.sprite = DiabloMenuArt.ItemIcon(item.baseType, item.rarity);
@@ -381,7 +385,7 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
     void CancelDrag()
     {
         dragSource = null;
-        if (dragGhost != null) dragGhost.gameObject.SetActive(false);
+        if (dragGhost != null && !held.HasValue) dragGhost.gameObject.SetActive(false);
     }
 
     ItemInstance ItemAt(InventoryCell cell)

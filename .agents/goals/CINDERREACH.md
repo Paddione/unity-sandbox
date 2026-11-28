@@ -362,6 +362,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `ItemTooltip` für Inventar, Truhe, Händler und Schmied; Umschalt zeigt die angelegte Karte daneben und je
   abweichendem Wert grünes ▲ / rotes ▼ mit Delta (`ItemCompare`). Ziehen Tasche ↔ Platz bzw. auf den Helden
   (falscher Platz blinkt rot), Rechtsklick tauscht sofort; alles über den autoritativen Equip-Pfad.
+  Cursor-Item (cinderreach-inventory-cursor-item, 2026-11-28): Linksklick hebt ein Taschen- oder angelegtes Item an den
+  Mauszeiger (`DiabloInventoryUI.Cursor.cs`, Item bleibt bis zur Ablage in seinem Platz). Klick auf leere Zelle schiebt
+  ans Ende, auf belegte Zelle tauscht (verdrängtes Item hängt am Cursor), auf Platz oder Helden legt an (altes Item hängt
+  am Cursor), falscher Platz blinkt rot. Klick außerhalb, Esc oder Schließen legen zurück (`InventoryOutsideClick`).
 - Itemlevel aus der Dropquelle (Fen 1, Ossuary 5, Kiln 10, Barrens 15; Elite +1, Boss +2), Roll-Brackets
   pro Itemlevel (Bracket 4 ab 15 mit ×1,75), Uniques an der Bracket-Obergrenze. Zonen-Uniques
   **Shardback Aegis** (Rüstung) und **Glasswright Prism** (Helm) nur aus Bracket-4-Quellen (50 % der

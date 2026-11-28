@@ -28,7 +28,9 @@ public sealed class InventoryCell : MonoBehaviour,
 
     public void OnPointerClick(PointerEventData e)
     {
-        if (owner != null && e.button == PointerEventData.InputButton.Right) owner.CellRightClick(this);
+        if (owner == null) return;
+        if (e.button == PointerEventData.InputButton.Right) owner.CellRightClick(this);
+        else if (e.button == PointerEventData.InputButton.Left) owner.CellLeftClick(this);
     }
 
     public void OnBeginDrag(PointerEventData e)

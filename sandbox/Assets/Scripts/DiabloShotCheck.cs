@@ -788,6 +788,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
                     invUi.Refresh();
                     yield return Wait(0.4f);
                     yield return Shot("s5_inventory_details");
+                    invUi.ClickBag(0); // cinderreach-inventory-cursor-item: item rides the cursor
+                    yield return Wait(0.2f);
+                    yield return Shot("inventory_cursor_item");
+                    invUi.ClickOutside();
                     invUi.SetOpen(false);
                 }
                 var vendorUi = hero.GetComponent<DiabloVendorUI>();
