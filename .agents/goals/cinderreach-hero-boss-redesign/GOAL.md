@@ -22,6 +22,7 @@ Die drei Klassen (Fenwalker, Lanternbearer, Rogue) und die drei Akt-Bosse (Kilnm
 - D8 (2026-11-28, Eigner) Jeder Boss hat eine Menschform und eine neu entworfene Monsterform (auch A1–A3, Jensen als Monster in Lederjacke). Verwandlung im Spawn-Intro: Menschform erscheint, sagt eine Voiceline, verwandelt sich; gekämpft wird nur gegen die Monsterform.
 - D9 (2026-11-28, Eigner) Voicelines: Agent schreibt Parodie-Entwürfe DE+EN zur Auswahl, Vertonung mit generischen Stimmen der Voice-Pipeline, keine Imitation echter Stimmen, keine erfundenen Tatsachenbehauptungen über die Personen.
 - D10 (2026-11-28, Eigner) Akt IV (Zone, Quests, Story-Anschluss) wird ein eigenes Folge-Goal; hier entstehen nur Jensens Modelle und Verwandlung. Hinweis: Erkennbare Abbilder realer Personen sind bei öffentlicher oder kommerzieller Verbreitung rechtlich heikel (Persönlichkeitsrecht); der Stand gilt für private Builds.
+- D11 (Eigner 2026-11-28) Priorität: Gesichter der Menschformen zuerst deutlich erkennbarer machen, dann Monsterformen. Spiel heißt künftig „Sloplike“ (Goal `sloplike-rebrand`); Klassen-Redesign für die neue Story folgt als eigenes Goal.
 - D6 Blender-Quelldateien (`.blend`) und Export-FBX liegen im Repo unter „sandbox/Assets/Art/Characters/“ bzw. „art-src/“; kein Fremd-IP, keine Asset-Store-Käufe.
 
 ## Erfolgskriterien
