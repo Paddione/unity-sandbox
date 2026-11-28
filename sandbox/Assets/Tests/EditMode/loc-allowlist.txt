@@ -362,3 +362,12 @@ DiabloShotCheck.cs	Ash Elite_0
 DiabloTargetBar.cs	ELITE
 PartyFramesHud.cs	PartyFrame
 PartyFramesHud.cs	PartyFrameOwn
+# Mesh and scene hierarchy names for model inspection.
+Classes/HeroGearModels.cs	Bail left
+Classes/HeroGearModels.cs	Bail right
+Classes/HeroGearModels.cs	Bail top
+Classes/HeroGearModels.cs	Brass foot
+Classes/HeroGearModels.cs	Chamfered gear fitting
+Classes/HeroGearModels.cs	Corner stay
+Classes/HeroGearModels.cs	Vented cap
+Story/StoryFindArt.cs	Ridged fragment
