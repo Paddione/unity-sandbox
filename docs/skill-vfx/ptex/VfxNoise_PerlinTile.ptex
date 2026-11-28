@@ -1,0 +1,79 @@
+{
+	"connections": [
+		{
+			"from": "fbm2_0",
+			"from_port": 0,
+			"to": "tones_0",
+			"to_port": 0
+		},
+		{
+			"from": "tones_0",
+			"from_port": 0,
+			"to": "Material",
+			"to_port": 0
+		}
+	],
+	"label": "Graph",
+	"name": "VfxNoise_PerlinTile",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"nodes": [
+		{
+			"name": "fbm2_0",
+			"node_position": {
+				"x": -300,
+				"y": 0
+			},
+			"parameters": {
+				"folds": 0,
+				"iterations": 4,
+				"noise": 2,
+				"offset": 0,
+				"persistence": 0.55,
+				"scale_x": 4,
+				"scale_y": 4
+			},
+			"seed_int": 101,
+			"type": "fbm2"
+		},
+		{
+			"name": "tones_0",
+			"node_position": {
+				"x": -80,
+				"y": 0
+			},
+			"parameters": {
+				"in_max": { "a": 1, "b": 0.85, "g": 0.85, "r": 0.85 },
+				"in_mid": { "a": 0.5, "b": 0.48, "g": 0.48, "r": 0.48 },
+				"in_min": { "a": 0, "b": 0.15, "g": 0.15, "r": 0.15 },
+				"out_max": { "a": 1, "b": 1, "g": 1, "r": 1 },
+				"out_min": { "a": 1, "b": 0, "g": 0, "r": 0 }
+			},
+			"type": "tones"
+		},
+		{
+			"name": "Material",
+			"node_position": {
+				"x": 200,
+				"y": 0
+			},
+			"parameters": {
+				"albedo_color": { "a": 1, "b": 1, "g": 1, "r": 1, "type": "Color" },
+				"ao_light_affect": 1,
+				"depth_scale": 0,
+				"emission_energy": 0,
+				"metallic": 0,
+				"normal_scale": 1,
+				"resolution": 1,
+				"roughness": 1,
+				"size": 9,
+				"subsurf_scatter_strength": 0
+			},
+			"type": "material"
+		}
+	],
+	"parameters": {},
+	"type": "graph"
+}

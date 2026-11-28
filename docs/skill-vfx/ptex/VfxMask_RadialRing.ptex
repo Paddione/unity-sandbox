@@ -1,0 +1,136 @@
+{
+	"connections": [
+		{
+			"from": "shape_inner",
+			"from_port": 0,
+			"to": "tones_inv",
+			"to_port": 0
+		},
+		{
+			"from": "shape_outer",
+			"from_port": 0,
+			"to": "blend_0",
+			"to_port": 0
+		},
+		{
+			"from": "tones_inv",
+			"from_port": 0,
+			"to": "blend_0",
+			"to_port": 1
+		},
+		{
+			"from": "blend_0",
+			"from_port": 0,
+			"to": "tones_0",
+			"to_port": 0
+		},
+		{
+			"from": "tones_0",
+			"from_port": 0,
+			"to": "Material",
+			"to_port": 0
+		}
+	],
+	"label": "Graph",
+	"name": "VfxMask_RadialRing",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"nodes": [
+		{
+			"name": "shape_outer",
+			"node_position": {
+				"x": -480,
+				"y": -80
+			},
+			"parameters": {
+				"edge": 0.1,
+				"radius": 0.94,
+				"shape": 0,
+				"sides": 3
+			},
+			"seed_int": 501,
+			"type": "shape"
+		},
+		{
+			"name": "shape_inner",
+			"node_position": {
+				"x": -480,
+				"y": 100
+			},
+			"parameters": {
+				"edge": 0.16,
+				"radius": 0.72,
+				"shape": 0,
+				"sides": 3
+			},
+			"seed_int": 502,
+			"type": "shape"
+		},
+		{
+			"name": "tones_inv",
+			"node_position": {
+				"x": -260,
+				"y": 100
+			},
+			"parameters": {
+				"in_max": { "a": 1, "b": 1, "g": 1, "r": 1 },
+				"in_mid": { "a": 0.5, "b": 0.5, "g": 0.5, "r": 0.5 },
+				"in_min": { "a": 0, "b": 0, "g": 0, "r": 0 },
+				"out_max": { "a": 1, "b": 0.18, "g": 0.18, "r": 0.18 },
+				"out_min": { "a": 1, "b": 1, "g": 1, "r": 1 }
+			},
+			"type": "tones"
+		},
+		{
+			"name": "blend_0",
+			"node_position": {
+				"x": -60,
+				"y": 0
+			},
+			"parameters": {
+				"amount": 1.0,
+				"blend_type": 2
+			},
+			"type": "blend"
+		},
+		{
+			"name": "tones_0",
+			"node_position": {
+				"x": 110,
+				"y": 0
+			},
+			"parameters": {
+				"in_max": { "a": 1, "b": 0.95, "g": 0.95, "r": 0.95 },
+				"in_mid": { "a": 0.5, "b": 0.45, "g": 0.45, "r": 0.45 },
+				"in_min": { "a": 0, "b": 0.05, "g": 0.05, "r": 0.05 },
+				"out_max": { "a": 1, "b": 1, "g": 1, "r": 1 },
+				"out_min": { "a": 1, "b": 0, "g": 0, "r": 0 }
+			},
+			"type": "tones"
+		},
+		{
+			"name": "Material",
+			"node_position": {
+				"x": 320,
+				"y": 0
+			},
+			"parameters": {
+				"albedo_color": { "a": 1, "b": 1, "g": 1, "r": 1, "type": "Color" },
+				"ao_light_affect": 1,
+				"depth_scale": 0,
+				"emission_energy": 0,
+				"metallic": 0,
+				"normal_scale": 1,
+				"resolution": 1,
+				"roughness": 1,
+				"size": 9,
+				"subsurf_scatter_strength": 0
+			},
+			"type": "material"
+		}
+	],
+	"parameters": {},
+	"type": "graph"
+}
