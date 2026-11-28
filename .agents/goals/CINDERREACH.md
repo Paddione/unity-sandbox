@@ -1,6 +1,6 @@
 # Cinderreach — Ist-Stand und Ausgangspunkt
 
-Stand: 2026-11-27 (zuletzt `diablo-cutscene-v2`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
+Stand: 2026-11-28 (zuletzt `cinderreach-model-realism`). Dieses Dokument ersetzt alle abgeschlossenen Cinderreach-Goals,
 ihre Stufenpläne und die alte "ROADMAP.md". Neue Arbeit beginnt hier: neues Goal unter
 `.agents/goals/<slug>/` anlegen und dieses Dokument als Ausgangslage referenzieren. Nach dem Abschluss
 eines Goals seinen Stand hier einarbeiten und das Goal-Verzeichnis samt Plan entfernen.
@@ -479,6 +479,10 @@ Bekannte Fallen: `Camera.main` und `GameObject.Find` pro Frame kosten messbar FP
 zuerst). `Diablo.IsSolo` zählt den Server nicht mit. Library nie bei laufendem
 `unity-sandbox-editor.service` kopieren. Synth-Audio und Ambience sind in Testläufen stumm geschaltet.
 
+## Modellgestaltung
+
+Die 53 verwendeten importierten Modelle haben überarbeitete Geometrien oder Oberflächen. Die Ausrüstung verwendet profilierte Platten und Beschläge sowie materialspezifischen Glanz. Die 15 Story-Fundarten erhalten beim Spielstart eigene Meshes auf ihren bestehenden Triggerobjekten. [Modellvergleich und Bildtafeln](../../docs/world-art/model-realism/README.md).
+
 ## Belege und Doku
 
 - Design: `docs/one-page-gdd.md`, `docs/mechanics-questions.md` (Q1–Q10), `docs/decision-log.md`,
@@ -494,6 +498,7 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 
 | Goal | Kern | Abschluss |
 |---|---|---|
+| `cinderreach-model-realism` | 53 importierte Modelle, 45 Ausrüstungsvarianten, 15 Storyfunde mit Bildvergleich | `c2a73e4`, `445a8aa` |
 | `unity-diablo-prototype` (dotfiles) | Click-to-Move, Melee, 3 Gegner, Orb-Loot | `4f00920` |
 | `unity-diablo-d2-combat-feel` | Treffer-Feel, Gegenangriff, Zielbalken | `ec7d503` |
 | `unity-diablo-feel-polish` | Husk-Animation, Leichen, Steering, Hit-Stop | 2026-11-17 |
