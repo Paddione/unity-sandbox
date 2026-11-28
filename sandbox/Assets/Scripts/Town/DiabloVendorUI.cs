@@ -142,6 +142,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
 
     public void SetOpen(bool open)
     {
+        if (!open) ShowSellConfirm(false);
         EnsureBuilt();
         if (DiabloUIFactory.IsRemoteMirror(this)) open = false;
         if (IsOpen == open) return;
@@ -248,6 +249,68 @@ public sealed class DiabloVendorUI : MonoBehaviour
         }
         else SetNotice(Loc.T("vendor.notice.salerejected"));
         Refresh();
+    }
+
+    Button sellAllButton, sellYesButton, sellNoButton;
+    Text sellConfirmText;
+
+    /// <summary>True while the sell-all confirmation is showing.</summary>
+    public bool SellAllConfirmVisible { get; private set; }
+
+    void ShowSellConfirm(bool show)
+    {
+        SellAllConfirmVisible = show;
+        if (sellConfirmText != null) sellConfirmText.gameObject.SetActive(show);
+        if (sellYesButton != null) sellYesButton.gameObject.SetActive(show);
+        if (sellNoButton != null) sellNoButton.gameObject.SetActive(show);
+        if (sellAllButton != null) sellAllButton.gameObject.SetActive(!show);
+    }
+
+    /// <summary>
+    /// "Alle Rares verkaufen": shows the confirmation with count and gold sum.
+    /// Returns the previewed gold (0 = nothing to sell, a notice explains it).
+    /// </summary>
+    public int RequestSellAllRares()
+    {
+        EnsureBuilt();
+        int gold = VendorStock.PreviewSellAllRares(inventory, out int count);
+        if (count == 0)
+        {
+            ShowSellConfirm(false);
+            SetNotice(Loc.T("vendor.sellall.none"));
+            Refresh();
+            return 0;
+        }
+        if (sellConfirmText != null) sellConfirmText.text = Loc.F("vendor.sellall.confirm", count, gold);
+        ShowSellConfirm(true);
+        return gold;
+    }
+
+    /// <summary>Confirmed: sell every Rare in the bag (co-op: the host applies it).</summary>
+    public void ConfirmSellAllRares()
+    {
+        EnsureBuilt();
+        ShowSellConfirm(false);
+        var relay = GetComponent<DiabloNetworkPlayer>();
+        if (relay != null && relay.IsSpawned && CoopSessionRunning())
+        {
+            relay.RequestItemAction(DiabloNetworkPlayer.ItemAction.SellRares);
+            Refresh();
+            return;
+        }
+        int gold = VendorStock.SellAllRares(wallet, inventory, out int count);
+        if (count > 0)
+        {
+            DiabloAudio.PlayVendorSell();
+            SetNotice(Loc.F("vendor.sellall.done", count, gold));
+        }
+        else SetNotice(Loc.T("vendor.sellall.none"));
+        Refresh();
+    }
+
+    public void CancelSellAllRares()
+    {
+        ShowSellConfirm(false);
     }
 
     /// <summary>True while a co-op session replicates (host + client alike).</summary>
@@ -426,6 +489,18 @@ public sealed class DiabloVendorUI : MonoBehaviour
             Loc.T("vendor.hint"), 14, DiabloPalette.Parchment);
         DiabloUIFactory.SetLayout(inspectText.gameObject, prefH: 112f, flexW: 1f);
         DiabloUIFactory.FitToBox(inspectText, 14);
+
+        // cinderreach-vendor-sell-all: one button sells every Rare in the bag after a confirm with the gold sum.
+        var sellRow = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "SellAllRow", 8f, 34f);
+        sellAllButton = DiabloUIFactory.MakeSmallButton(sellRow.transform, Loc.T("vendor.sellall"), () => RequestSellAllRares(), 32f);
+        sellAllButton.name = "SellAllRaresButton";
+        sellConfirmText = DiabloUIFactory.MakeText(sellRow.transform, "SellAllConfirmText", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(sellConfirmText.gameObject, prefH: 32f, flexW: 2f);
+        sellYesButton = DiabloUIFactory.MakeSmallButton(sellRow.transform, Loc.T("vendor.sellall.yes"), () => ConfirmSellAllRares(), 32f);
+        sellYesButton.name = "SellAllYesButton";
+        sellNoButton = DiabloUIFactory.MakeSmallButton(sellRow.transform, Loc.T("vendor.sellall.no"), () => CancelSellAllRares(), 32f);
+        sellNoButton.name = "SellAllNoButton";
+        ShowSellConfirm(false);
 
         noticeText = DiabloUIFactory.MakeText(panelGo.transform, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
         DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);

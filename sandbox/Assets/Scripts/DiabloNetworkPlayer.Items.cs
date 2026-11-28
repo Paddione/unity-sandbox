@@ -5,7 +5,7 @@ using UnityEngine;
 
 public sealed partial class DiabloNetworkPlayer
 {
-    public enum ItemAction { Equip, Unequip, Store, Take, Sell, Discard, Buy }
+    public enum ItemAction { Equip, Unequip, Store, Take, Sell, Discard, Buy, SellRares }
 
     public readonly NetworkVariable<FixedString64Bytes> visualArmor = new NetworkVariable<FixedString64Bytes>();
     public readonly NetworkVariable<FixedString64Bytes> visualWeapon = new NetworkVariable<FixedString64Bytes>();
@@ -111,6 +111,10 @@ public sealed partial class DiabloNetworkPlayer
             case ItemAction.Sell:
                 changed = InRange(Vendor.VendorObjectName, TradeValidator.VendorRange)
                     && VendorStock.TrySell(index, wallet, inventory);
+                break;
+            case ItemAction.SellRares:
+                changed = InRange(Vendor.VendorObjectName, TradeValidator.VendorRange)
+                    && VendorStock.SellAllRares(wallet, inventory, out _) > 0;
                 break;
             case ItemAction.Discard:
                 changed = item != null

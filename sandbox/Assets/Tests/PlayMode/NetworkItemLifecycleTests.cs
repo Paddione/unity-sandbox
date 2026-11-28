@@ -156,6 +156,39 @@ public sealed class NetworkItemLifecycleTests
         ui.SetOpen(false);
     }
 
+    [UnityTest]
+    public IEnumerator SellAllRares_IsHostValidatedAndSellsOnce()
+    {
+        ushort port;
+        using (var socket = new System.Net.Sockets.UdpClient(0))
+            port = (ushort)((System.Net.IPEndPoint)socket.Client.LocalEndPoint).Port;
+        var host = NewManager("sell all host", port);
+        host.NetworkConfig.PlayerPrefab = Res.Get<GameObject>("NetworkPlayerDiablo");
+        Assert.That(host.StartHost(), Is.True);
+        yield return null;
+        var hero = host.SpawnManager.GetLocalPlayerObject();
+        var player = hero.GetComponent<DiabloNetworkPlayer>();
+        var inventory = hero.GetComponent<Inventory>();
+        var wallet = Wallet.EnsureWallet(hero.gameObject);
+        while (inventory.Count > 0) inventory.RemoveAt(0);
+        var rare = ItemDatabase.CreateStarterSword();
+        rare.rarity = ItemRarity.Rare;
+        var unique = ItemDatabase.CreateUnique(ItemDatabase.ShardbackAegisId);
+        inventory.Add(rare);
+        inventory.Add(unique);
+
+        Assert.That(player.RequestItemAction(DiabloNetworkPlayer.ItemAction.SellRares), Is.False, "out of vendor range: rejected");
+        var vendor = new GameObject(Vendor.VendorObjectName);
+        vendor.transform.position = hero.transform.position;
+        managers.Add(vendor);
+        int before = wallet.Gold;
+        Assert.That(player.RequestItemAction(DiabloNetworkPlayer.ItemAction.SellRares), Is.True);
+        Assert.That(wallet.Gold, Is.EqualTo(before + VendorStock.SellPrice(rare)));
+        Assert.That(inventory.Count, Is.EqualTo(1));
+        Assert.That(player.RequestItemAction(DiabloNetworkPlayer.ItemAction.SellRares), Is.False, "nothing left: no double sale");
+        Assert.That(wallet.Gold, Is.EqualTo(before + VendorStock.SellPrice(rare)));
+    }
+
     [Test]
     public void ImportedEquipmentRejectsDuplicateAndKeepsClassSpecificBases()
     {

@@ -811,6 +811,10 @@ public sealed class DiabloShotCheck : MonoBehaviour
                     vendorUi.SetOpen(true);
                     yield return Wait(0.4f);
                     yield return Shot("s5_vendor");
+                    vendorUi.RequestSellAllRares(); // cinderreach-vendor-sell-all: confirm with count + gold
+                    yield return Wait(0.2f);
+                    yield return Shot("vendor_sell_all_confirm");
+                    vendorUi.CancelSellAllRares();
                     vendorUi.SetOpen(false);
                 }
             }

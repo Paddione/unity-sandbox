@@ -393,6 +393,10 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   `StoryDirector.SyncBagSlots` mit Toast). Save v17 speichert `bagSlots` (v16 → 20), der Koop-Snapshot
   `NetworkItemOwnership.State.bagSlots` trägt sie mit. Inventar-Raster 10×10, nicht verdiente Plätze `BagLocked`.
   Linksklick auf Taschenzellen legt nicht mehr an (Cursor-Item), Anlegen per Rechtsklick, Aktion oder Platzklick.
+- Sammelverkauf (cinderreach-vendor-sell-all, 2026-11-28): Händlerfenster-Zeile „Alle Rares verkaufen“ mit
+  Bestätigung (Anzahl + Goldsumme), verkauft alle Rares (und Alt-Magic) der Tasche zum Einzelpreis
+  (`VendorStock.SellAllRares`); Uniques, Verbrauchsgüter, Ausrüstung und Truhe bleiben. Koop über
+  `ItemAction.SellRares` (Host prüft Händlerreichweite, kein Doppelverkauf).
 - Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %),
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).

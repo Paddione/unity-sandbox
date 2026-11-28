@@ -100,6 +100,51 @@ public sealed class VendorStock
         return true;
     }
 
+    /// <summary>Sell-all rule (cinderreach-vendor-sell-all): Rare (and legacy Magic) gear; Uniques and consumables stay.</summary>
+    public static bool IsBulkSellable(ItemInstance item) =>
+        item != null && item.slot != ItemSlot.Consumable
+        && (item.rarity == ItemRarity.Rare || item.rarity == ItemRarity.Magic);
+
+    /// <summary>What "sell all Rares" would do right now: item count and total gold.</summary>
+    public static int PreviewSellAllRares(Inventory inv, out int count)
+    {
+        count = 0;
+        int gold = 0;
+        if (inv == null) return 0;
+        for (int i = 0; i < inv.Count; i++)
+        {
+            var item = inv.Get(i);
+            if (!IsBulkSellable(item)) continue;
+            count++;
+            gold += SellPrice(item);
+        }
+        return gold;
+    }
+
+    /// <summary>
+    /// Sell every bulk-sellable bag item (same 25 % price as single sales).
+    /// Returns the gold credited; <paramref name="count"/> is the number sold.
+    /// Worn gear and the stash are never touched.
+    /// </summary>
+    public static int SellAllRares(Wallet wallet, Inventory inv, out int count)
+    {
+        count = 0;
+        if (wallet == null || inv == null) return 0;
+        int gold = 0;
+        for (int i = inv.Count - 1; i >= 0; i--)
+        {
+            var item = inv.Get(i);
+            if (!IsBulkSellable(item)) continue;
+            int price = SellPrice(item);
+            if (!inv.RemoveAt(i)) continue;
+            gold += price;
+            count++;
+        }
+        if (gold > 0) wallet.Add(gold);
+        Debug.Log($"[Vendor] Sold {count} Rare item(s) for {gold} gold.");
+        return gold;
+    }
+
     /// <summary>
     /// Sell bag[bagIndex] back for 25 % of its buy price. False when the slot
     /// is empty (nothing credited).
