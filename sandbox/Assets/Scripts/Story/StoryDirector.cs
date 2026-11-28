@@ -259,12 +259,18 @@ public sealed class StoryDirector : MonoBehaviour
     {
         if (trackerText == null) return;
         trackerText.text = TrackerText(State, World, Marks, transform.position);
+        // cinderreach-map-overlay: the zone map (M) draws its own quest column
+        // and legend; the world HUD tracker (sorting order 25 > map 24) must not
+        // bleed over the open map panel.
+        var map = GetComponent<WorldMapUI>();
+        bool mapOpen = map != null && map.IsOpen;
         if (trackerPanel != null)
         {
             bool any = !string.IsNullOrEmpty(trackerText.text);
-            trackerPanel.gameObject.SetActive(any);
+            trackerPanel.gameObject.SetActive(any && !mapOpen);
             if (any) trackerPanel.sizeDelta = new Vector2(TrackerWidth, 36f + trackerText.preferredHeight + 12f);
         }
+        trackerText.enabled = !mapOpen;
     }
 
     /// <summary>

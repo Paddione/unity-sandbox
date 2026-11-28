@@ -112,6 +112,36 @@ public sealed class WorldMapModePlayTests
     }
 
     [UnityTest]
+    public IEnumerator Header_ControlsDoNotOverlap()
+    {
+        hero = MakeHero(new Vector3(0f, 1f, 8f));
+        RunProfile.Story.Refresh(RunProfile.Act);
+        yield return DiabloTestFixture.WaitSeconds(0.4f);
+        var map = hero.GetComponent<WorldMapUI>();
+        map.SetOpen(true);
+        yield return null;
+
+        // All header controls are anchored to the right edge; each one must end
+        // left of the next control's start (review finding: '+' was covered by
+        // the mode button before the fix).
+        var zoomOut = (RectTransform)hero.transform.Find("WorldMapCanvas/MapPanel/Header/MapZoomOut");
+        var label = (RectTransform)hero.transform.Find("WorldMapCanvas/MapPanel/Header/MapZoomLabel");
+        var zoomIn = (RectTransform)hero.transform.Find("WorldMapCanvas/MapPanel/Header/MapZoomIn");
+        var mode = (RectTransform)hero.transform.Find("WorldMapCanvas/MapPanel/Header/MapModeButton");
+        Assert.IsNotNull(zoomOut, "zoom − button exists");
+        Assert.IsNotNull(label, "zoom label exists");
+        Assert.IsNotNull(zoomIn, "zoom + button exists");
+        Assert.IsNotNull(mode, "mode button exists");
+        Assert.LessOrEqual(zoomOut.anchoredPosition.x, label.anchoredPosition.x - label.sizeDelta.x,
+            "zoom − clears the zoom label");
+        Assert.LessOrEqual(label.anchoredPosition.x, zoomIn.anchoredPosition.x - zoomIn.sizeDelta.x,
+            "zoom label clears the + button");
+        Assert.LessOrEqual(zoomIn.anchoredPosition.x, mode.anchoredPosition.x - mode.sizeDelta.x,
+            "+ clears the mode button");
+        map.SetOpen(false);
+    }
+
+    [UnityTest]
     public IEnumerator QuestColumn_StandsOnTheLeft()
     {
         hero = MakeHero(new Vector3(0f, 1f, 8f));

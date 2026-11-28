@@ -164,6 +164,11 @@ public sealed class GroupQuestMapPlayTests
         yield return null;
         Assert.IsFalse(mini.Visible, "the minimap hides under the zone map");
         Assert.That(map.IconsShown, Is.GreaterThanOrEqualTo(3));
+        yield return DiabloTestFixture.WaitSeconds(0.4f); // StoryDirector poll hides the tracker
+        var worldTracker = hero.transform.Find("StoryCanvas/StoryTracker");
+        Assert.IsNotNull(worldTracker, "the world quest tracker exists");
+        Assert.IsFalse(worldTracker.GetComponent<UnityEngine.UI.Text>().enabled,
+            "the world tracker hides under the open zone map (map draws its own quest column)");
         map.Cycle(1);
         Assert.AreEqual(ActProgress.Ossuary, map.ViewZone, "the Ossuary is open from the start");
         map.Cycle(1);

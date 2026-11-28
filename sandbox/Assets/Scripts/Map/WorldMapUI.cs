@@ -265,13 +265,13 @@ public sealed class WorldMapUI : MonoBehaviour
         var next = DiabloUIFactory.MakeButton(header.transform, "MapNext", "▶", 16, false, DiabloPalette.Parchment, () => Cycle(1));
         Place((RectTransform)next.transform, new Vector2(0f, 0.5f), new Vector2(58f, 0f), new Vector2(40f, 32f));
         var zoomOut = DiabloUIFactory.MakeButton(header.transform, "MapZoomOut", "−", 16, false, DiabloPalette.Parchment, () => ZoomBy(-0.25f));
-        Place((RectTransform)zoomOut.transform, new Vector2(1f, 0.5f), new Vector2(-304f, 0f), new Vector2(40f, 32f));
+        Place((RectTransform)zoomOut.transform, new Vector2(1f, 0.5f), new Vector2(-308f, 0f), new Vector2(40f, 32f));
         zoomLabel = DiabloUIFactory.MakeText(header.transform, "MapZoomLabel", "100%", 14, DiabloPalette.TrimGold, TextAnchor.MiddleCenter, font: DiabloUIFactory.BodyFont);
-        Place(zoomLabel.rectTransform, new Vector2(1f, 0.5f), new Vector2(-252f, 0f), new Vector2(56f, 32f));
+        Place(zoomLabel.rectTransform, new Vector2(1f, 0.5f), new Vector2(-240f, 0f), new Vector2(56f, 32f));
         var zoomIn = DiabloUIFactory.MakeButton(header.transform, "MapZoomIn", "+", 16, false, DiabloPalette.Parchment, () => ZoomBy(0.25f));
-        Place((RectTransform)zoomIn.transform, new Vector2(1f, 0.5f), new Vector2(-200f, 0f), new Vector2(40f, 32f));
+        Place((RectTransform)zoomIn.transform, new Vector2(1f, 0.5f), new Vector2(-188f, 0f), new Vector2(40f, 32f));
         var modeBtn = DiabloUIFactory.MakeButton(header.transform, "MapModeButton", "", 14, false, DiabloPalette.Parchment, ToggleMode);
-        Place((RectTransform)modeBtn.transform, new Vector2(1f, 0.5f), new Vector2(-112f, 0f), new Vector2(120f, 32f));
+        Place((RectTransform)modeBtn.transform, new Vector2(1f, 0.5f), new Vector2(-56f, 0f), new Vector2(120f, 32f));
         modeLabel = modeBtn.GetComponentInChildren<Text>();
 
         // Tracked tasks on the left (GOAL: links steht die verfolgte Quest).
