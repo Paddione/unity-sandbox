@@ -374,3 +374,8 @@ Classes/HeroGearModels.cs	Chamfered gear fitting
 Classes/HeroGearModels.cs	Corner stay
 Classes/HeroGearModels.cs	Vented cap
 Story/StoryFindArt.cs	Ridged fragment
+DiabloSettings.cs	bay trail
+DiabloSettings.cs	cherry trail
+DiabloSettings.cs	iris plus
+DiabloSettings.cs	iris pro
+DiabloSettings.cs	iris xe

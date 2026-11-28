@@ -186,8 +186,11 @@ public static class SaveService
         save.uniquePity = UniquePity.Current;
         var inv = hero.GetComponent<Inventory>();
         if (inv != null)
+        {
+            save.bagSlots = inv.Slots;
             for (int i = 0; i < inv.Count; i++)
                 save.bag.Add(inv.Get(i));
+        }
         return save;
     }
 
@@ -225,6 +228,7 @@ public static class SaveService
         var inv = hero.GetComponent<Inventory>();
         if (inv != null) UnityEngine.Object.DestroyImmediate(inv);
         inv = hero.AddComponent<Inventory>();
+        inv.RaiseSlots(save.bagSlots);
         if (save.bag != null)
             foreach (var item in save.bag)
                 if (item != null) inv.Add(item);

@@ -16,6 +16,8 @@ public static class NetworkItemOwnership
         public ItemInstance boots;
         public ItemInstance belt;
         public int gold;
+        /// <summary>Bag slots (cinderreach-bag-quest-upgrades; 0 = old client, means 20).</summary>
+        public int bagSlots;
     }
 
     public static State Capture(GameObject hero, Stash stash)
@@ -24,6 +26,7 @@ public static class NetworkItemOwnership
         return new State
         {
             bag = hero.GetComponent<Inventory>()?.Contents(),
+            bagSlots = hero.GetComponent<Inventory>()?.Slots ?? Inventory.Capacity,
             stash = stash?.ToList(),
             armor = eq?.armor,
             weapon = eq?.weapon,

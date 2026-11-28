@@ -119,12 +119,15 @@ public sealed class StoryQuest
     public readonly StoryGate catchUp;
     public readonly StoryReward reward;
     public readonly int rewardGold;
+    /// <summary>Completing this quest adds <see cref="Inventory.SlotStep"/> bag slots (cinderreach-bag-quest-upgrades).</summary>
+    public readonly bool bagUpgrade;
 
     public StoryQuest(string id, int act, bool main, string giver, StoryObjective[] objectives,
         string prereq = null, int prereqStatus = StoryStatus.Done, StoryGate gate = StoryGate.None,
         bool autoAccept = false, bool turnIn = true, StoryGate catchUp = StoryGate.None,
-        StoryReward reward = StoryReward.None, int rewardGold = 0)
+        StoryReward reward = StoryReward.None, int rewardGold = 0, bool bagUpgrade = false)
     {
+        this.bagUpgrade = bagUpgrade;
         this.id = id;
         this.act = act;
         this.main = main;
@@ -182,7 +185,7 @@ public static class StoryCatalog
         new StoryQuest("n1", 1, false, StoryIds.Ilsabe, new[]
         {
             Collect(StoryIds.Lieferbuch, 1, "quest.n1.obj.ledger"),
-        }, prereq: "h1", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 150),
+        }, prereq: "h1", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 150, bagUpgrade: true),
         new StoryQuest("n2", 1, false, StoryIds.Ottilie, new[]
         {
             Collect(StoryIds.Grabtafel, 3, "quest.n2.obj.tablets"),
@@ -213,7 +216,7 @@ public static class StoryCatalog
         new StoryQuest("n4", 2, false, StoryIds.Merle, new[]
         {
             Kill(StoryIds.GlassElite, 1, "quest.n4.obj.tamm"),
-        }, prereq: "h6", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 250),
+        }, prereq: "h6", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 250, bagUpgrade: true),
         new StoryQuest("n5", 2, false, StoryIds.Ilsabe, new[]
         {
             Kill(StoryIds.DuneAugur, 4, "quest.n5.obj.augurs"),
@@ -250,7 +253,7 @@ public static class StoryCatalog
         new StoryQuest("n9", 1, false, StoryIds.Ottilie, new[]
         {
             Collect(StoryIds.Grablicht, 1, "quest.n9.obj.licht"),
-        }, prereq: "h2", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 60),
+        }, prereq: "h2", prereqStatus: StoryStatus.Active, reward: StoryReward.Gold, rewardGold: 60, bagUpgrade: true),
         new StoryQuest("n10", 1, false, StoryIds.Jorin, new[]
         {
             Kill(StoryIds.CinderThrall, 4, "quest.n10.obj.thralls"),
@@ -309,7 +312,7 @@ public static class StoryCatalog
         new StoryQuest("n6", 3, false, StoryIds.Jorin, new[]
         {
             Collect(StoryIds.Lanzenspitze, 4, "quest.n6.obj.spitzen"),
-        }, prereq: "h10", prereqStatus: StoryStatus.Active, reward: StoryReward.SmithKit),
+        }, prereq: "h10", prereqStatus: StoryStatus.Active, reward: StoryReward.SmithKit, bagUpgrade: true),
         new StoryQuest("n7", 3, false, StoryIds.Ilsabe, new[]
         {
             Collect(StoryIds.Spendenseite, 1, "quest.n7.obj.seite"),

@@ -34,7 +34,8 @@ public sealed partial class DiabloNetworkPlayer
             eq.gloves = NetworkItemOwnership.Validate(report.gloves, ids);
             eq.boots = NetworkItemOwnership.Validate(report.boots, ids);
             eq.belt = NetworkItemOwnership.Validate(report.belt, ids);
-            inventory.SetContents(ValidateList(imported?.bag, Inventory.Capacity, ids));
+            inventory.RaiseSlots(imported?.bagSlots ?? Inventory.Capacity);
+            inventory.SetContents(ValidateList(imported?.bag, inventory.Slots, ids));
             ownedStash = Stash.FromList(ValidateList(imported?.stash, Stash.Capacity, ids));
             Wallet.EnsureWallet(gameObject).SetGold(Mathf.Clamp(imported?.gold ?? 0, 0, 1_000_000));
         }
@@ -189,7 +190,9 @@ public sealed partial class DiabloNetworkPlayer
     {
         if (!IsOwner || IsServer) return;
         var state = JsonUtility.FromJson<NetworkItemOwnership.State>(json);
-        (GetComponent<Inventory>() ?? gameObject.AddComponent<Inventory>()).SetContents(state.bag);
+        var ownBag = GetComponent<Inventory>() ?? gameObject.AddComponent<Inventory>();
+        ownBag.RaiseSlots(state.bagSlots);
+        ownBag.SetContents(state.bag);
         var eq = GetComponent<Equipment>();
         eq.armor = state.armor;
         eq.weapon = state.weapon;

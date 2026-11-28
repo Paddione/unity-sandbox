@@ -359,7 +359,7 @@ public sealed class DiabloShotCheck : MonoBehaviour
                 unique.uniqueId = ItemDatabase.LancerWardId;
                 unique.itemLevel = 12;
                 ItemInstance displaced = null;
-                if (bag.Count >= Inventory.Capacity) { displaced = bag.Get(bag.Count - 1); bag.RemoveAt(bag.Count - 1); }
+                if (bag.Count >= bag.Slots) { displaced = bag.Get(bag.Count - 1); bag.RemoveAt(bag.Count - 1); }
                 if (bag.Add(unique))
                 {
                     invUI.Refresh();
@@ -794,6 +794,15 @@ public sealed class DiabloShotCheck : MonoBehaviour
                     yield return Shot("inventory_cursor_item");
                     invUi.ClickOutside();
                     DiabloInventoryUI.CursorScreenOverride = null;
+                    // cinderreach-bag-quest-upgrades: the 10x10 grid at the 100-slot cap.
+                    var shotBag = hero.GetComponent<Inventory>();
+                    if (shotBag != null)
+                    {
+                        shotBag.RaiseSlots(Inventory.MaxSlots);
+                        invUi.Refresh();
+                        yield return Wait(0.3f);
+                        yield return Shot("bag_slots_100");
+                    }
                     invUi.SetOpen(false);
                 }
                 var vendorUi = hero.GetComponent<DiabloVendorUI>();

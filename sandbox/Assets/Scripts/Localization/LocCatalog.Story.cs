@@ -49,6 +49,7 @@ public static partial class LocCatalog
         E("story.quest.done", "Aufgabe erledigt: {0}", "Task done: {0}"),
         E("story.tracker.ready", "{0} — bei {1} abgeben", "{0} — hand in to {1}"),
         E("story.reward.gold", "+{0} Gold", "+{0} gold"),
+        E("story.reward.bag", "Tasche erweitert: +{0} Plätze ({1} gesamt)", "Bag expanded: +{0} slots ({1} total)"),
         E("story.reward.item", "Erhalten: {0}", "Received: {0}"),
         E("story.reward.material", "+{0} Material", "+{0} material"),
         E("story.dialog.continue", "Weiter", "Continue"),

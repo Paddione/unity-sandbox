@@ -168,8 +168,27 @@ public sealed class StoryDirector : MonoBehaviour
             if (State.Status(q.id) == StoryStatus.Done) State.Flags.Add(q.id);
     }
 
+    /// <summary>Completed bag quests in <paramref name="state"/> (cinderreach-bag-quest-upgrades).</summary>
+    public static int BagQuestsDone(StoryState state)
+    {
+        int n = 0;
+        foreach (var q in StoryCatalog.All)
+            if (q.bagUpgrade && state != null && state.Status(q.id) == StoryStatus.Done) n++;
+        return n;
+    }
+
+    /// <summary>Raise the hero's bag to what the finished bag quests earned; toast each new step once.</summary>
+    void SyncBagSlots()
+    {
+        var inv = GetComponent<Inventory>();
+        if (inv == null) return;
+        if (inv.RaiseSlots(Inventory.SlotsFor(BagQuestsDone(State))))
+            Toast(Loc.F("story.reward.bag", Inventory.SlotStep, inv.Slots));
+    }
+
     void GrantRewards()
     {
+        SyncBagSlots();
         foreach (var q in StoryCatalog.All)
         {
             if (State.Status(q.id) != StoryStatus.Done || q.reward == StoryReward.None) continue;

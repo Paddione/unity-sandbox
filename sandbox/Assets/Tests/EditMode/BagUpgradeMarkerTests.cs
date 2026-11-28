@@ -105,7 +105,17 @@ public sealed class BagUpgradeMarkerTests
             if (c.name == "BagLocked") locked++;
         }
         Assert.AreEqual(Inventory.Capacity, usable);
-        Assert.AreEqual(40 - Inventory.Capacity, locked);
+        Assert.AreEqual(DiabloInventoryUI.BagGridCells - Inventory.Capacity, locked, "10x10 grid: unearned slots render locked");
+        go.GetComponent<Inventory>().RaiseSlots(60);
+        ui.Refresh();
+        usable = 0; locked = 0;
+        foreach (Transform c in go.GetComponentsInChildren<Transform>(true))
+        {
+            if (c.name.StartsWith("BagButton") || c.name == "BagEmpty") usable++;
+            if (c.name == "BagLocked") locked++;
+        }
+        Assert.AreEqual(60, usable, "earned slots become usable cells");
+        Assert.AreEqual(DiabloInventoryUI.BagGridCells - 60, locked);
         foreach (var c in go.GetComponentsInChildren<InventoryCell>(true))
             Assert.AreNotEqual("BagLocked", c.name, "Locked frames carry no InventoryCell.");
     }

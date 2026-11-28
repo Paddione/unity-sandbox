@@ -93,7 +93,7 @@ public sealed class DiabloStashUI : MonoBehaviour
 
     /// <summary>Header line (test seam).</summary>
     public string CountLine() =>
-        Loc.F("stash.count", RunProfile.Stash.Count, Stash.Capacity, (inventory != null ? inventory.Count : 0), Inventory.Capacity);
+        Loc.F("stash.count", RunProfile.Stash.Count, Stash.Capacity, (inventory != null ? inventory.Count : 0), inventory != null ? inventory.Slots : Inventory.Capacity);
 
     public void Refresh()
     {

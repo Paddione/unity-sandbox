@@ -365,6 +365,12 @@ public sealed partial class DiabloInventoryUI
         rt.sizeDelta = size;
     }
 
+    public const int BagGridColumns = 10;
+    public const int BagGridCells = Inventory.MaxSlots;
+    const float BagCellSize = 56f;
+    const float BagCellGap = 5f;
+    const float BagGridHeight = BagCellSize * 10f + BagCellGap * 9f + 8f;
+
     void BuildBagColumn(Transform col)
     {
         var topRow = DiabloUIFactory.MakeHorizontalRow(col, "BagTopRow", 8f, 30f);
@@ -378,7 +384,7 @@ public sealed partial class DiabloInventoryUI
 
         var gridGo = new GameObject("BagGrid", typeof(RectTransform));
         gridGo.transform.SetParent(col, false);
-        DiabloUIFactory.SetLayout(gridGo, prefH: 440f, flexW: 1f);
+        DiabloUIFactory.SetLayout(gridGo, prefH: BagGridHeight, flexW: 1f);
         // Transparent backdrop: a worn item dropped anywhere on the grid goes back into the bag.
         var gridBg = gridGo.AddComponent<Image>();
         gridBg.color = new Color(0f, 0f, 0f, 0.18f);
@@ -388,9 +394,10 @@ public sealed partial class DiabloInventoryUI
         gridCell.owner = this;
         var grid = gridGo.AddComponent<GridLayoutGroup>();
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        grid.constraintCount = 8;
-        grid.cellSize = new Vector2(72f, 80f);
-        grid.spacing = new Vector2(8f, 8f);
+        // 10x10 (cinderreach-bag-quest-upgrades): up to 100 slots, unearned ones render locked.
+        grid.constraintCount = BagGridColumns;
+        grid.cellSize = new Vector2(BagCellSize, BagCellSize);
+        grid.spacing = new Vector2(BagCellGap, BagCellGap);
         grid.padding = new RectOffset(4, 4, 4, 4);
         grid.childAlignment = TextAnchor.UpperCenter;
         bagList = gridGo.transform;
@@ -580,7 +587,8 @@ public sealed partial class DiabloInventoryUI
         cell.owner = this;
         if (item != null)
         {
-            button.onClick.AddListener(() => EquipIndex(bagIndex));
+            // Left click lifts the item onto the cursor (InventoryCell → CellLeftClick);
+            // equipping is right click, the Equip action or a click on the slot.
 
             var iconGo = new GameObject("Icon", typeof(RectTransform));
             iconGo.transform.SetParent(go.transform, false);
@@ -591,10 +599,10 @@ public sealed partial class DiabloInventoryUI
             var ir = iconGo.GetComponent<RectTransform>();
             ir.anchorMin = new Vector2(0.5f, 0.60f);
             ir.anchorMax = new Vector2(0.5f, 0.60f);
-            ir.sizeDelta = new Vector2(50f, 50f);
+            ir.sizeDelta = new Vector2(40f, 40f);
             ir.anchoredPosition = Vector2.zero;
 
-            var label = DiabloUIFactory.MakeText(go.transform, "ItemLabel", ShortLabel(item), 11, DiabloPalette.Rarity(item.rarity),
+            var label = DiabloUIFactory.MakeText(go.transform, "ItemLabel", ShortLabel(item, 9), 10, DiabloPalette.Rarity(item.rarity),
                 TextAnchor.LowerCenter, shadow: true);
             label.raycastTarget = false;
             var lr = label.GetComponent<RectTransform>();

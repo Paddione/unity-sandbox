@@ -388,6 +388,11 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Unique“ (ausgefilterte Items ohne Schild, per Symbol weiter klickbar), „Nur mit Taste looten“ (Standard aus) mit
   frei belegbarer Taste (Standard Alt, `LootKeyBindButton`). Keine Goldhaufen mehr: `GoldDrop.AwardKillGold`
   schreibt Kill-Gold samt Gold Find direkt dem Töter gut (Fallback nächster Held, Koop über `GrantPickupGold`).
+- Taschenerweiterung (cinderreach-bag-quest-upgrades, 2026-11-28): Nebenquests n1, n9 (Akt I), n4 (Akt II) und n6
+  (Akt III) tragen `bagUpgrade` und geben je +20 Plätze (`Inventory.Slots` 20..100, wächst nur,
+  `StoryDirector.SyncBagSlots` mit Toast). Save v17 speichert `bagSlots` (v16 → 20), der Koop-Snapshot
+  `NetworkItemOwnership.State.bagSlots` trägt sie mit. Inventar-Raster 10×10, nicht verdiente Plätze `BagLocked`.
+  Linksklick auf Taschenzellen legt nicht mehr an (Cursor-Item), Anlegen per Rechtsklick, Aktion oder Platzklick.
 - Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %),
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).

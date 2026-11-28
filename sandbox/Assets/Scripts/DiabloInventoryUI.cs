@@ -679,18 +679,20 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         }
         int count = inventory != null ? inventory.Count : 0;
         if (bagCountText != null)
-            bagCountText.text = Loc.F("inv.bag.countshort", count, Inventory.Capacity);
-        for (int i = 0; i < Inventory.Capacity; i++)
+            bagCountText.text = Loc.F("inv.bag.countshort", count, BagSlots);
+        for (int i = 0; i < BagSlots; i++)
         {
             var item = inventory != null && i < inventory.Count ? inventory.Get(i) : null;
             var cell = MakeBagCell(item, i);
             cell.transform.SetParent(bagList, false);
         }
-        // Artboard grid is 8x5 with Capacity usable cells; the rest renders locked.
-        for (int i = Inventory.Capacity; i < 40; i++)
+        // 10x10 grid: earned slots are usable, the rest renders locked until a bag quest opens it.
+        for (int i = BagSlots; i < BagGridCells; i++)
             MakeLockedCell().transform.SetParent(bagList, false);
         if (selectedIndex >= count) selectedIndex = -1;
     }
+
+    int BagSlots => inventory != null ? inventory.Slots : Inventory.Capacity;
 
     int SelectedOrLast() =>
         inventory == null ? -1 : selectedIndex >= 0 && selectedIndex < inventory.Count ? selectedIndex : inventory.Count - 1;

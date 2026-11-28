@@ -207,6 +207,8 @@ public class Akt1OfenTests
             Assert.AreEqual(StoryStatus.Done, S().Status("n11"));
             yield return RunDirector();
             Assert.AreEqual(320, hero.GetComponent<Wallet>().Gold, "n3 (50) + n1 (150) + n11 (120)");
+            Assert.AreEqual(Inventory.Capacity + Inventory.SlotStep, hero.GetComponent<Inventory>().Slots,
+                "quest:n1 is a bag quest: +20 slots once it is done (cinderreach-bag-quest-upgrades)");
             // Jorins Entscheidung: zwei Lanzer, dann das Einschmelzen.
             StoryDirector.BookKill("Ash Lancer_0");
             StoryDirector.BookKill("Ash Lancer_0");

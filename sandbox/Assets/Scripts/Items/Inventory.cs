@@ -9,9 +9,31 @@ using UnityEngine;
 /// </summary>
 public sealed class Inventory : MonoBehaviour
 {
+    /// <summary>Starting bag size (fresh heroes, old saves).</summary>
     public const int Capacity = 20;
+    /// <summary>Bag size after all four bag quests (cinderreach-bag-quest-upgrades).</summary>
+    public const int MaxSlots = 100;
+    /// <summary>Slots per bag-quest reward.</summary>
+    public const int SlotStep = 20;
 
     readonly List<ItemInstance> bag = new List<ItemInstance>();
+    int slots = Capacity;
+
+    /// <summary>Usable bag slots for this hero (20..100, only ever grows).</summary>
+    public int Slots => slots;
+
+    /// <summary>Raise the bag to <paramref name="target"/> slots (clamped to 20..100); never shrinks. True when it grew.</summary>
+    public bool RaiseSlots(int target)
+    {
+        int next = Mathf.Clamp(target, Capacity, MaxSlots);
+        if (next <= slots) return false;
+        slots = next;
+        return true;
+    }
+
+    /// <summary>Bag size earned from <paramref name="bagQuestsDone"/> completed bag quests.</summary>
+    public static int SlotsFor(int bagQuestsDone) =>
+        Mathf.Clamp(Capacity + SlotStep * Mathf.Max(0, bagQuestsDone), Capacity, MaxSlots);
 
     public int Count => bag.Count;
 
@@ -25,7 +47,7 @@ public sealed class Inventory : MonoBehaviour
 
     internal int IndexOf(string instanceId) =>
         string.IsNullOrEmpty(instanceId) ? -1 : bag.FindIndex(item => item.instanceId == instanceId);
-    public int FreeSlots => Capacity - bag.Count;
+    public int FreeSlots => slots - bag.Count;
 
     public ItemInstance Get(int index)
     {
@@ -63,11 +85,11 @@ public sealed class Inventory : MonoBehaviour
     /// <summary>Add loot to the bag. False when full (caller keeps the loot).</summary>
     public bool Add(ItemInstance item)
     {
-        if (item == null || bag.Count >= Capacity) return false;
+        if (item == null || bag.Count >= slots) return false;
         item.EnsureIdentity();
         bag.Add(item);
         Debug.Log($"[Loot] Bagged {item.rarity} {item.slot} ({LootDrop.ItemLabel(item)}). " +
-                  $"({bag.Count}/{Capacity}).");
+                  $"({bag.Count}/{slots}).");
         return true;
     }
 

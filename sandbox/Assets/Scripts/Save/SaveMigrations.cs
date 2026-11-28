@@ -58,6 +58,7 @@ public static class SaveMigrations
         if (save.v == 13) V13ToV14(save);
         if (save.v == 14) V14ToV15(save);
         if (save.v == 15) V15ToV16(save);
+        if (save.v == 16) V16ToV17(save);
         return Outcome.Migrated;
     }
 
@@ -267,6 +268,18 @@ public static class SaveMigrations
         if (save.storyQuests == null) save.storyQuests = new System.Collections.Generic.List<StoryQuestEntry>();
         if (save.storyFlags == null) save.storyFlags = new System.Collections.Generic.List<string>();
         save.v = 16;
+    }
+
+    /// <summary>
+    /// v16 → v17 (cinderreach-bag-quest-upgrades): bag slots become a saved field.
+    /// Old saves start at 20 (never below the stored bag); finished bag quests
+    /// raise it on load via <c>StoryDirector</c>'s reward sync.
+    /// </summary>
+    static void V16ToV17(SaveGame save)
+    {
+        int held = save.bag != null ? save.bag.Count : 0;
+        save.bagSlots = Mathf.Clamp(Mathf.Max(Inventory.Capacity, held), Inventory.Capacity, Inventory.MaxSlots);
+        save.v = 17;
     }
 
     static int RemovePotions(System.Collections.Generic.List<ItemInstance> items)

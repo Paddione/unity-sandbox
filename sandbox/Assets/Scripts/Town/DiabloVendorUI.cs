@@ -211,7 +211,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
     {
         if (stock == null || index < 0 || index >= stock.offers.Count) return Loc.T("vendor.notice.gone");
         if (inventory != null && inventory.FreeSlots <= 0)
-            return Loc.F("vendor.notice.bagfull", Inventory.Capacity, Inventory.Capacity);
+            return Loc.F("vendor.notice.bagfull", inventory != null ? inventory.Slots : Inventory.Capacity, inventory != null ? inventory.Slots : Inventory.Capacity);
         if (wallet != null) return Loc.F("vendor.notice.needgold", stock.offers[index].price);
         return Loc.T("vendor.notice.cannotbuy");
     }
@@ -325,7 +325,7 @@ public sealed class DiabloVendorUI : MonoBehaviour
         if (bagDetailText != null)
             bagDetailText.text = inventory.Count == 0
                 ? Loc.T("vendor.bag.empty")
-                : Loc.F("vendor.bag.header", inventory.Count, Inventory.Capacity);
+                : Loc.F("vendor.bag.header", inventory.Count, inventory.Slots);
         for (int i = 0; i < inventory.Count; i++)
         {
             int index = i;

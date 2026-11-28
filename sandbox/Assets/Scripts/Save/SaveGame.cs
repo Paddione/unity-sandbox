@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public sealed class SaveGame
 {
-    public const int CurrentVersion = 16;
+    public const int CurrentVersion = 17;
 
     public int v = CurrentVersion;
     public int level = 1;
@@ -50,6 +50,9 @@ public sealed class SaveGame
 
     // v6 (smithing S1): reforge material.
     public int smithingMaterial;
+
+    // v17 (cinderreach-bag-quest-upgrades): bag slots earned from bag quests (20..100).
+    public int bagSlots = Inventory.Capacity;
 
     // v7 (skill-variants S1): variant picks by class+skill.
     public List<SkillVariantEntry> skillVariants = new List<SkillVariantEntry>();
