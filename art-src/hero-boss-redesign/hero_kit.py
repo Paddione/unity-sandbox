@@ -232,3 +232,29 @@ def hide_meshes(obs):
     for o in obs:
         o.hide_render = True
         o.hide_viewport = True
+
+
+def ring(name, material, arm, bones, center, radius, thickness, segs=12, axis="Y"):
+    """Wire ring (glasses rims, hoops): torus built in bmesh."""
+    import math
+    bm = bmesh.new()
+    minor = 6
+    rows = []
+    for i in range(segs):
+        a = 2 * math.pi * i / segs
+        c, s = math.cos(a), math.sin(a)
+        row = []
+        for j in range(minor):
+            b = 2 * math.pi * j / minor
+            r = radius + thickness * math.cos(b)
+            row.append(bm.verts.new((r * c, r * s, thickness * math.sin(b))))
+        rows.append(row)
+    for i in range(segs):
+        for j in range(minor):
+            a, b = rows[i][j], rows[i][(j + 1) % minor]
+            c2, d = rows[(i + 1) % segs][(j + 1) % minor], rows[(i + 1) % segs][j]
+            bm.faces.new((a, b, c2, d))
+    rot = {"Z": Matrix.Identity(3), "X": Matrix.Rotation(1.5708, 3, "Y"), "Y": Matrix.Rotation(1.5708, 3, "X")}[axis]
+    for v in bm.verts:
+        v.co = rot @ v.co + Vector(center)
+    return _finish(name, bm, material, arm, bones, None, 0.0)
