@@ -490,6 +490,11 @@ Assets/Art/Zones/Textures/WaystoneRune_Height.png	Cinderreach	Build scene: Asset
 Assets/DefaultNetworkPrefabs.asset	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
 Assets/InputSystem_Actions.inputactions	Cinderreach	Player preload: Assets/InputSystem_Actions.inputactions
 Assets/Resources/BillingMode.json	Cinderreach	Runtime asset: Assets/Resources/BillingMode.json
+Assets/Resources/Fonts/AlegreyaSans-Bold.ttf	Cinderreach	Runtime asset: Assets/Resources/Fonts/AlegreyaSans-Bold.ttf
+Assets/Resources/Fonts/AlegreyaSans-Regular.ttf	Cinderreach	Runtime asset: Assets/Resources/Fonts/AlegreyaSans-Regular.ttf
+Assets/Resources/Fonts/Cinzel-Bold.ttf	Cinderreach	Runtime asset: Assets/Resources/Fonts/Cinzel-Bold.ttf
+Assets/Resources/Fonts/OFL-AlegreyaSans.txt	Cinderreach	Runtime asset: Assets/Resources/Fonts/OFL-AlegreyaSans.txt
+Assets/Resources/Fonts/OFL-Cinzel.txt	Cinderreach	Runtime asset: Assets/Resources/Fonts/OFL-Cinzel.txt
 Assets/Scenes/Diablo.unity	Cinderreach	Build scene: Assets/Scenes/Diablo.unity
 Assets/Scenes/DiabloZone.unity	Cinderreach	Build scene: Assets/Scenes/DiabloZone.unity
 Assets/Scenes/Greybox.unity	Cinderreach	Build scene: Assets/Scenes/Greybox.unity
