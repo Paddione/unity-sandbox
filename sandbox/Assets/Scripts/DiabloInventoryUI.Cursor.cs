@@ -20,6 +20,9 @@ public sealed partial class DiabloInventoryUI
     }
 
     HeldRef? held;
+
+    /// <summary>Cursor position override (shotcheck: the real mouse sits outside the window).</summary>
+    public static Vector2? CursorScreenOverride;
     Image cursorBackdrop;
 
     /// <summary>True while an item rides the cursor.</summary>
@@ -89,8 +92,9 @@ public sealed partial class DiabloInventoryUI
     {
         if (!IsHolding || dragGhost == null || canvasRect == null) return;
         var mouse = Mouse.current;
-        if (mouse == null) return;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, mouse.position.ReadValue(), null, out var local))
+        if (mouse == null && !CursorScreenOverride.HasValue) return;
+        var screen = CursorScreenOverride ?? mouse.position.ReadValue();
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out var local))
             dragGhost.rectTransform.anchoredPosition = local;
     }
 
