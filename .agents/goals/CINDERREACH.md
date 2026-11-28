@@ -20,8 +20,8 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P5 | [`cinderreach-akt3-finale`](cinderreach-akt3-finale/GOAL.md) | 0 %, blockiert durch Akt-II-S1 | S1 Bibel+Akt erst nach Akt-II-S1 (H9→H10-Haken) |
 | P6 | [`cinderreach-sprache-voice`](cinderreach-sprache-voice/GOAL.md) | 33 %, S1 gelandet (`a5087c8`, 238 Zeilen) | S2 erst nach Akt-II/III-S1-Textständen (Akt-I steht) |
 | P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
-| P9 | [`cinderreach-hud-redesign`](cinderreach-hud-redesign/GOAL.md) | 0 %, angelegt 2026-11-27 | HUD nach Canvas-Artboard „HUD im Spiel“ plus Gruppenrahmen; liefert Fonts/Stilbausteine für P10/P11 |
-| P10 | [`cinderreach-inventory-redesign`](cinderreach-inventory-redesign/GOAL.md) | 0 %, blockiert durch P9 | Inventar nach Artboard „Inventar (I)“, 3D-Held bleibt, feste Tooltip-Spalte |
+| P9 | [`cinderreach-hud-redesign`](cinderreach-hud-redesign/GOAL.md) | 100 %, gelandet `7176e5a` | HUD nach Canvas-Artboard „HUD im Spiel“ plus Gruppenrahmen; liefert Fonts/Stilbausteine für P10/P11 |
+| P10 | [`cinderreach-inventory-redesign`](cinderreach-inventory-redesign/GOAL.md) | 100 %, umgesetzt (Branch `feature/cinderreach-inventory-redesign`), Land ausstehend | Inventar nach Artboard „Inventar (I)“: 3 Spalten, feste Tooltip-Spalte, 8×5-Grid, Verkauf; Belege `InventoryTooltipColumnPlayTests`, `BagUpgradeMarkerTests`, `docs/inventory-redesign/` |
 | P11 | [`cinderreach-map-overlay`](cinderreach-map-overlay/GOAL.md) | 0 %, blockiert durch P9 | Zonenkarte M mit Overlay/Vollbild, Filtern, Zoom |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
