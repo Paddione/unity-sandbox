@@ -935,14 +935,22 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Shot("map_minimap_tracker");
 
         var map = hero.GetComponent<WorldMapUI>();
+        bool savedMapFullscreen = DiabloSettings.MapFullscreen;
+        DiabloSettings.MapFullscreen = false;
         map.SetOpen(true);
         yield return Wait(0.6f);
-        Log($"MAP zone={map.ViewZone} icons={map.IconsShown}");
+        Log($"MAP zone={map.ViewZone} icons={map.IconsShown} mode={map.Mode} zoom={map.Zoom}");
+        yield return Shot("map_overlay");
         yield return Shot("map_zone_fen");
+        map.ToggleMode();
+        yield return Wait(0.6f);
+        Log($"MAP mode={map.Mode} backing={map.BackingAlpha}");
+        yield return Shot("map_fullscreen");
         map.Cycle(1);
         yield return Wait(0.6f);
         yield return Shot("map_zone_ossuary");
         map.SetOpen(false);
+        DiabloSettings.MapFullscreen = savedMapFullscreen;
         yield return Wait(0.3f);
 
         StoryDialogShare.Receive(99, "Alrik", SharedDialogOp.Open, "h1.offer", StoryIds.Ottilie, "0,1,2,3", 1);

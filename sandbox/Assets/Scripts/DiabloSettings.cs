@@ -19,6 +19,8 @@ public static class DiabloSettings
     public static bool VSync = true;
     public static bool Fullscreen = true;
     public static int ResolutionIndex = 0; // 0=1920x1080, 1=1600x900, 2=1280x720, 3=2560x1440
+    /// <summary>Zone map (M) opens fullscreen when true; overlay is the default (cinderreach-map-overlay D2).</summary>
+    public static bool MapFullscreen = false;
 
     const string Prefix = "DiabloMenu_";
     static readonly (int w, int h)[] Resolutions =
@@ -77,6 +79,7 @@ public static class DiabloSettings
             VSync = PlayerPrefs.GetInt(Prefix + "VSync", 1) == 1;
             Fullscreen = PlayerPrefs.GetInt(Prefix + "Fullscreen", 1) == 1;
             ResolutionIndex = PlayerPrefs.GetInt(Prefix + "Resolution", 0);
+            MapFullscreen = PlayerPrefs.GetInt(Prefix + "MapFullscreen", 0) == 1;
         }
         catch { /* headless PlayerPrefs unavailable — keep defaults */ }
         Clamp();
@@ -100,6 +103,7 @@ public static class DiabloSettings
             PlayerPrefs.SetInt(Prefix + "VSync", VSync ? 1 : 0);
             PlayerPrefs.SetInt(Prefix + "Fullscreen", Fullscreen ? 1 : 0);
             PlayerPrefs.SetInt(Prefix + "Resolution", ResolutionIndex);
+            PlayerPrefs.SetInt(Prefix + "MapFullscreen", MapFullscreen ? 1 : 0);
             PlayerPrefs.Save();
         }
         catch { /* headless — ignore */ }
@@ -120,6 +124,7 @@ public static class DiabloSettings
         VSync = true;
         Fullscreen = true;
         ResolutionIndex = 0;
+        MapFullscreen = false;
         Save();
         Apply();
     }

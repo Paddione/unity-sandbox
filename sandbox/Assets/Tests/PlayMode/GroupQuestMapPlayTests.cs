@@ -150,11 +150,17 @@ public sealed class GroupQuestMapPlayTests
         Assert.That(mini.IconsShown, Is.GreaterThanOrEqualTo(3), "hero, Ottilie and her offer");
 
         var map = hero.GetComponent<WorldMapUI>();
+        bool savedMapFullscreen = DiabloSettings.MapFullscreen;
+        DiabloSettings.MapFullscreen = false;
         map.SetOpen(true);
         yield return null;
         Assert.IsTrue(map.IsOpen);
         Assert.AreEqual(ActProgress.Town, map.ViewZone);
-        Assert.IsTrue(DiabloUIFactory.IsAnyModalOpen(hero), "the zone map is a modal panel");
+        Assert.AreEqual(WorldMapMode.Overlay, map.Mode, "the map opens as overlay by default");
+        Assert.IsFalse(DiabloUIFactory.IsAnyModalOpen(hero), "the overlay map does not block the world");
+        map.SetMode(WorldMapMode.Fullscreen);
+        Assert.IsTrue(DiabloUIFactory.IsAnyModalOpen(hero), "the fullscreen zone map is a modal panel");
+        DiabloSettings.MapFullscreen = savedMapFullscreen;
         yield return null;
         Assert.IsFalse(mini.Visible, "the minimap hides under the zone map");
         Assert.That(map.IconsShown, Is.GreaterThanOrEqualTo(3));

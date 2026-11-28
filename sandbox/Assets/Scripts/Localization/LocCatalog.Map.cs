@@ -17,6 +17,13 @@ public static partial class LocCatalog
         E("map.legend.enemy", "Gegner", "Enemy"),
         E("map.legend.gate", "Tor", "Gate"),
         E("map.legend.waypoint", "Wegschrein", "Waypoint"),
-        E("map.hint", "◀ ▶ wechselt die Zone  •  M oder Esc schließt", "◀ ▶ switch zone  •  M or Esc closes"),
+        E("map.hint", "◀ ▶ wechselt die Zone  •  Tab wechselt Overlay/Vollbild  •  Mausrad zoomt  •  M oder Esc schließt", "◀ ▶ switch zone  •  Tab switches overlay/fullscreen  •  Mouse wheel zooms  •  M or Esc closes"),
+        E("map.mode.overlay", "Overlay", "Overlay"),
+        E("map.mode.fullscreen", "Vollbild", "Fullscreen"),
+        E("map.filter.quests", "Aufgaben", "Quests"),
+        E("map.filter.party", "Gruppe", "Party"),
+        E("map.filter.waypoints", "Wegpunkte & Rast", "Waypoints & rest"),
+        E("map.filter.persons", "Personen", "People"),
+        E("map.filter.elites", "Elitegegner", "Elite enemies"),
     };
 }

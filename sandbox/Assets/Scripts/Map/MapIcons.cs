@@ -4,6 +4,19 @@ using UnityEngine.UI;
 
 public enum MapIconShape { Dot, Diamond, Arrow, Ring, Square }
 
+/// <summary>Legend filter categories on the zone map (cinderreach-map-overlay). None = always shown (hero).</summary>
+[System.Flags]
+public enum MapCategory
+{
+    None = 0,
+    Quests = 1 << 0,
+    Party = 1 << 1,
+    Waypoints = 1 << 2,
+    Persons = 1 << 3,
+    Elites = 1 << 4,
+    All = Quests | Party | Waypoints | Persons | Elites,
+}
+
 /// <summary>One live map icon at a world position.</summary>
 public struct MapIcon
 {
@@ -15,6 +28,49 @@ public struct MapIcon
     public float rotation;
     /// <summary>Quest icons stay on the minimap edge as an arrow when their place is out of view.</summary>
     public bool pinToEdge;
+    /// <summary>Legend category this marker belongs to; None is never filtered out.</summary>
+    public MapCategory category;
+}
+
+/// <summary>Pure legend filtering for the zone map: a category toggle hides exactly its markers.</summary>
+public static class WorldMapFilter
+{
+    public static bool IsVisible(MapIcon icon, MapCategory enabled)
+        => icon.category == MapCategory.None || (enabled & icon.category) != 0;
+
+    public static void Apply(List<MapIcon> icons, MapCategory enabled, List<MapIcon> into)
+    {
+        into.Clear();
+        if (icons == null) return;
+        foreach (var icon in icons)
+            if (IsVisible(icon, enabled)) into.Add(icon);
+    }
+}
+
+/// <summary>Pure zoom math for the zone map: 75–150 %, centred on the hero (cinderreach-map-overlay).</summary>
+public static class WorldMapZoom
+{
+    public const float MinZoom = 0.75f;
+    public const float MaxZoom = 1.5f;
+
+    public static float ClampZoom(float zoom) => Mathf.Clamp(zoom, MinZoom, MaxZoom);
+
+    /// <summary>
+    /// Picture offset in pixels (frame-centre pivot) so the hero at
+    /// <paramref name="heroMap"/> (0..1) sits in the middle, clamped so a
+    /// zoomed-in picture always covers the frame and a zoomed-out one stays inside it.
+    /// </summary>
+    public static Vector2 Offset(Vector2 heroMap, float zoom, float mapPx)
+    {
+        float z = ClampZoom(zoom);
+        var raw = (new Vector2(0.5f, 0.5f) - heroMap) * (mapPx * z);
+        float limit = Mathf.Abs(mapPx * z - mapPx) * 0.5f;
+        return new Vector2(Mathf.Clamp(raw.x, -limit, limit), Mathf.Clamp(raw.y, -limit, limit));
+    }
+
+    /// <summary>Local pixel position of a 0..1 map point when the view is centred on <paramref name="centerMap"/>.</summary>
+    public static Vector2 ToLocal(Vector2 map01, Vector2 centerMap, float zoom, float mapPx)
+        => (map01 - new Vector2(0.5f, 0.5f)) * (mapPx * ClampZoom(zoom)) + Offset(centerMap, zoom, mapPx);
 }
 
 /// <summary>Procedural icon sprites (no texture assets): dot, diamond, arrow, ring, square.</summary>
@@ -182,18 +238,18 @@ public static class MapScene
         {
             if (g == null || !g.gameObject.activeInHierarchy || ZoneMap.IndexAt(g.transform.position) != zone) continue;
             into.Add(new MapIcon { world = g.transform.position, shape = MapIconShape.Ring,
-                color = g.Locked ? MapIcons.GateLocked : MapIcons.Gate, size = 16f });
+                color = g.Locked ? MapIcons.GateLocked : MapIcons.Gate, size = 16f, category = MapCategory.Waypoints });
         }
         foreach (var w in waypoints)
         {
             if (w == null || !w.gameObject.activeInHierarchy || ZoneMap.IndexAt(w.transform.position) != zone) continue;
-            into.Add(new MapIcon { world = w.transform.position, shape = MapIconShape.Diamond, color = MapIcons.Waypoint, size = 11f });
+            into.Add(new MapIcon { world = w.transform.position, shape = MapIconShape.Diamond, color = MapIcons.Waypoint, size = 11f, category = MapCategory.Waypoints });
         }
         foreach (var n in npcs)
         {
             if (n == null || !n.isActiveAndEnabled || ZoneMap.IndexAt(n.transform.position) != zone) continue;
             if (n.npcId == StoryIds.Merle && !RunProfile.Act.ActOneComplete) continue;
-            into.Add(new MapIcon { world = n.transform.position, shape = MapIconShape.Dot, color = MapIcons.Npc, size = 9f });
+            into.Add(new MapIcon { world = n.transform.position, shape = MapIconShape.Dot, color = MapIcons.Npc, size = 9f, category = MapCategory.Persons });
         }
         if (withEnemies)
             foreach (var e in enemies)
@@ -202,12 +258,12 @@ public static class MapScene
                 var p = e.transform.position;
                 if (ZoneMap.IndexAt(p) != zone) continue;
                 bool big = e.tier != LootTier.Normal;
-                into.Add(new MapIcon { world = p, shape = MapIconShape.Dot, color = MapIcons.Enemy, size = big ? 9f : 6f });
+                into.Add(new MapIcon { world = p, shape = MapIconShape.Dot, color = MapIcons.Enemy, size = big ? 9f : 6f, category = MapCategory.Elites });
             }
         foreach (var h in HeroLocator.AllHeroes())
         {
             if (h == null || h == self || ZoneMap.IndexAt(h.position) != zone) continue;
-            into.Add(new MapIcon { world = h.position, shape = MapIconShape.Dot, color = MapIcons.Ally, size = 10f });
+            into.Add(new MapIcon { world = h.position, shape = MapIconShape.Dot, color = MapIcons.Ally, size = 10f, category = MapCategory.Party });
         }
         if (marks != null)
             foreach (var m in marks)
@@ -230,11 +286,11 @@ public static class MapScene
         switch (m.kind)
         {
             case QuestMarkKind.Offer:
-                return new MapIcon { world = at, shape = MapIconShape.Diamond, color = MapIcons.Offer, size = 14f, pinToEdge = true };
+                return new MapIcon { world = at, shape = MapIconShape.Diamond, color = MapIcons.Offer, size = 14f, pinToEdge = true, category = MapCategory.Quests };
             case QuestMarkKind.TurnIn:
-                return new MapIcon { world = at, shape = MapIconShape.Square, color = m.main ? MapIcons.QuestMain : MapIcons.QuestSide, size = 14f, pinToEdge = true };
+                return new MapIcon { world = at, shape = MapIconShape.Square, color = m.main ? MapIcons.QuestMain : MapIcons.QuestSide, size = 14f, pinToEdge = true, category = MapCategory.Quests };
             default:
-                return new MapIcon { world = at, shape = MapIconShape.Diamond, color = m.main ? MapIcons.QuestMain : MapIcons.QuestSide, size = 15f, pinToEdge = true };
+                return new MapIcon { world = at, shape = MapIconShape.Diamond, color = m.main ? MapIcons.QuestMain : MapIcons.QuestSide, size = 15f, pinToEdge = true, category = MapCategory.Quests };
         }
     }
 }

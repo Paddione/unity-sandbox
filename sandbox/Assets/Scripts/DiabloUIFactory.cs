@@ -94,7 +94,7 @@ public static class DiabloUIFactory
             var wp = hero.GetComponent<DiabloWaypointUI>();
             if (wp != null && wp.IsOpen) return true;
             var map = hero.GetComponent<WorldMapUI>();
-            if (map != null && map.IsOpen) return true;
+            if (map != null && map.BlocksWorld) return true;
         }
         return false;
     }
