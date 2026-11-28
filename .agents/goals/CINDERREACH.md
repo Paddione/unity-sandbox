@@ -22,7 +22,7 @@ Laufprotokolle bleiben unter `docs/` (siehe „Belege und Doku“).
 | P8 | [`cinderreach-act-boss-gating`](cinderreach-act-boss-gating/GOAL.md) | 100 %, gelandet `54ae7f2`, CI-Autoplay 3/3 grün | Akt-Bosse erst nach allen übrigen Akt-Quests; Abnahme per Autoplay, Koop-Paar, Windows-Shotcheck |
 | P9 | [`cinderreach-hud-redesign`](cinderreach-hud-redesign/GOAL.md) | 100 %, gelandet `7176e5a` | HUD nach Canvas-Artboard „HUD im Spiel“ plus Gruppenrahmen; liefert Fonts/Stilbausteine für P10/P11 |
 | P10 | [`cinderreach-inventory-redesign`](cinderreach-inventory-redesign/GOAL.md) | 100 %, umgesetzt (Branch `feature/cinderreach-inventory-redesign`), Land ausstehend | Inventar nach Artboard „Inventar (I)“: 3 Spalten, feste Tooltip-Spalte, 8×5-Grid, Verkauf; Belege `InventoryTooltipColumnPlayTests`, `BagUpgradeMarkerTests`, `docs/inventory-redesign/` |
-| P11 | [`cinderreach-map-overlay`](cinderreach-map-overlay/GOAL.md) | 100 %, umgesetzt (Branch `feature/cinderreach-map-overlay`), Land ausstehend | Zonenkarte M mit Overlay/Vollbild, Filtern, Zoom; Belege `WorldMapModePlayTests`, `WorldMapFilterTests`, `WorldMapZoomTests`, `docs/map-overlay/` |
+| P11 | [`cinderreach-map-overlay`](cinderreach-map-overlay/GOAL.md) | 100 %, gelandet `002f485` | Zonenkarte M mit Overlay/Vollbild, Filtern, Zoom; Belege `WorldMapModePlayTests`, `WorldMapFilterTests`, `WorldMapZoomTests`, `docs/map-overlay/` |
 | P7 | [`cinderreach-graph-adr-hygiene`](cinderreach-graph-adr-hygiene/GOAL.md) | 100 %, S1–S5 gelandet | Abgeschlossen (`parse_partial: 0`, `missing: 0`, `ambiguous: 229`, ADR + `docs/runbook.md` aktualisiert) |
 
 Priorisierung (2026-11-27, Plan-Rebase auf `a4d3dc3`): Reihenfolge nach Entblockung
