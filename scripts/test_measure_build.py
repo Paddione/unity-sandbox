@@ -110,7 +110,7 @@ def test_build_out_for_targets():
     flag, path = mod.build_out_for("linux-player")
     assert flag == "-buildOut"
     assert path.endswith("builds/diablo-zone/diablo-zone")
-    assert "home/patrick/unity-sandbox" not in path
+    assert Path(path).is_relative_to(mod.ROOT)
     _, win = mod.build_out_for("windows-player")
     assert win.endswith(".exe")
     _, srv = mod.build_out_for("linux-server")
