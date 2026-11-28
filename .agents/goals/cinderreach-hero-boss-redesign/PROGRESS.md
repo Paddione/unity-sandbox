@@ -7,7 +7,7 @@ Prozent: 20 %
 
 ## Nächste Schritte
 - Kriterium 2: Fenwalker v2 und Lanternbearer v1 freigegeben (2026-11-28, „awesome“). Rogue v2 (Kapuzenspitze, Fass an der Hüfte) und weibliche Varianten (Fenwalker F auf Ranger-Basis, Lanternbearer F, Rogue F auf Rogue_Hooded-Basis) gebaut, Renders `docs/hero-boss-redesign/01`–`06`; Freigabe der vier neuen Entwürfe offen.
-- Bosse Kilnmother, Glasswright, Thewes (Kriterium 3) auf KayKit-Skelett-Rigs.
+- Kriterium 3: Bosse v1 gebaut (`art-src/hero-boss-redesign/bosses.py`, Skeleton_Warrior-Rig), Renders `07_kilnmother_v1.png`, `08_glasswright_v1.png`, `09_thewes_v1.png`; Eigner-Freigabe offen.
 - Builder: `art-src/hero-boss-redesign/build_heroes.py` baut alle sechs Varianten (`build(arm, prefix, female)` je Klasse).
 
 ## Offene Punkte
