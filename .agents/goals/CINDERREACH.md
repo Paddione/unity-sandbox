@@ -697,3 +697,14 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-gear-slots-flask` | 6 Slots, 3D-Modelle, `HealingFlask`, Save v15, 18 Uniques, Pity 40 | 2026-11-25 |
 | `cinderreach-inventory-stat-breakdown-tooltips` | 21-Parameter- + Skill-Aufschlüsselung, Item-Rollspannen, 3-Spalten-Inventar, 4 Shots | 2026-11-27 |
 | `diablo-ability-showcases` | Boss-Showcases (Intro + Phase-2, schadlos), 10 Loc-Keys, `G-DIABLO07`-Probe erweitert | 2026-11-27 |
+
+## Architekturgraph, 28. November 2026
+
+Der Live-ADR im Projekt home-patrick-unity-sandbox dokumentiert Save v17, die
+Inventar- und Koop-Verträge sowie die neuen Assembly-, Build- und Inhaltsgrenzen.
+Der Vollindex des geprüften Arbeitsstands deckt alle 451 versionierten C#-Dateien
+unter sandbox/Assets ab. 27 Verweise auf geplante, historische, externe oder
+generierte Ziele sowie Assembly- und Addressables-Namen wurden geprüft.
+Fehlende Verweise und partielle Parsergebnisse liegen bei null. Der Indexer
+erkennt das Ereignis CloudHeroSync.Conflict im XML-Kommentar nicht als Ziel.
+Die Aktualisierung folgt dem Graph-Abschnitt in `docs/runbook.md`.
