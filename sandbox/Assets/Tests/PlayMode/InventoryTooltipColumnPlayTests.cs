@@ -120,8 +120,13 @@ public sealed class InventoryTooltipColumnPlayTests
         ui.SetOpen(true);
         yield return null;
 
+        // Cursor item (cinderreach-inventory-cursor-item): click lifts, click on the slot equips.
         Click(BagCell(0));
-        Assert.AreSame(sword, equipment.weapon, "Click equips on the authoritative path.");
+        Assert.IsTrue(ui.IsHolding, "Click lifts the bag item onto the cursor.");
+        var weaponSlot = hero.GetComponentsInChildren<InventoryCell>(true)
+            .First(c => c.kind == InventoryCell.Kind.Equip && c.Slot == ItemSlot.Weapon).gameObject;
+        Click(weaponSlot);
+        Assert.AreSame(sword, equipment.weapon, "Click on the slot equips on the authoritative path.");
         yield return null;
 
         // Hovering the worn slot shows it with an Unequip action.
