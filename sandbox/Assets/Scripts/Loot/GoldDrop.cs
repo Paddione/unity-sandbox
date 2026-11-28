@@ -2,21 +2,19 @@ using UnityEngine;
 using Unity.Netcode;
 
 /// <summary>
-/// Gold pickup (S2 economy). Spawned beside the item orb by
-/// <see cref="LootDrop.SpawnLoot"/> on an independent per-tier roll
-/// (constants in <see cref="DroptableDatabase"/>). Local-only like the
-/// legacy pickup orbs. S4 co-op: the host owns every pile (spawned with a
-/// <see cref="LootNetRelay"/>, like item loot); clients request pickup per
-/// ServerRpc and are credited per ClientRpc, so a shared pile pays exactly
-/// once. Solo/offline keeps the direct local path.
+/// Kill gold (cinderreach-loot-click-filter D1): no ground piles any more.
+/// <see cref="LootDrop.SpawnLoot"/> rolls the per-tier gold table and
+/// credits the amount straight to the hero who landed the kill (fallback:
+/// the nearest hero), Gold Find included. Host/solo only: in co-op the
+/// server credits through <see cref="DiabloNetworkPlayer.GrantPickupGold"/>,
+/// which replicates the purse to the owner.
 /// </summary>
-public sealed class GoldDrop : MonoBehaviour
+public static class GoldDrop
 {
-    public int amount;
-    public bool collected;
-
-    /// <summary>Piles spawned this run (test seam; item orbs use their own counters).</summary>
-    public static int PilesDropped;
+    /// <summary>Gold awards this run (test seam).</summary>
+    public static int Awards;
+    /// <summary>Raw gold rolled this run before Gold Find (test seam).</summary>
+    public static int AwardedRaw;
 
     /// <summary>Independent gold roll for the tier (Normal 70 %, Elite/Chest 100 %).</summary>
     public static bool RollDrops(LootTier tier, System.Random rng)
@@ -32,89 +30,70 @@ public sealed class GoldDrop : MonoBehaviour
         return min + rng.Next(max - min + 1);
     }
 
-    /// <summary>Roll the tier table and spawn a pile; null when nothing drops.</summary>
-    public static GameObject SpawnGold(Vector3 pos, LootTier tier, System.Random rng)
+    /// <summary>Roll the tier table and credit the killer; returns the raw amount (0 = no gold).</summary>
+    public static int AwardKillGold(Vector3 pos, LootTier tier, System.Random rng, Transform killer = null)
     {
-        if (!RollDrops(tier, rng)) return null;
-        return SpawnPile(pos, DifficultyProfile.Current.ScaleGold(RollAmount(tier, rng)));
+        if (!RollDrops(tier, rng)) return 0;
+        int amount = DifficultyProfile.Current.ScaleGold(RollAmount(tier, rng));
+        var hero = killer != null ? HeroRoot(killer) : null;
+        if (hero == null) hero = NearestHero(pos);
+        return Credit(hero, amount, pos) ? amount : 0;
     }
 
-    /// <summary>Spawn a fixed-amount pile (deterministic tests + callers).</summary>
-    public static GameObject SpawnPile(Vector3 pos, int amount)
+    /// <summary>Credit a fixed amount to <paramref name="hero"/> (Gold Find applies).</summary>
+    public static bool Credit(GameObject hero, int amount, Vector3 at)
     {
-        var nmSpawn = NetworkManager.Singleton;
-        var prefab = Res.Get<GameObject>("NetworkLootDrop");
-        if (amount > 0 && nmSpawn != null && nmSpawn.IsListening && nmSpawn.IsServer
-            && prefab != null && nmSpawn.NetworkConfig.Prefabs.Contains(prefab))
-        {
-            var netPile = Instantiate(prefab, pos, Quaternion.identity);
-            netPile.GetComponent<LootNetRelay>().SetGold(amount);
-            netPile.GetComponent<NetworkObject>().Spawn();
-            netPile.name = $"GoldPile_{++PilesDropped}";
-            Debug.Log($"[Gold] Dropped {amount} gold.");
-            return netPile;
-        }
-        var pile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        PilesDropped++;
-        pile.name = $"GoldPile_{PilesDropped}";
-        pile.transform.position = pos;
-        pile.transform.localScale = new Vector3(0.35f, 0.22f, 0.35f);
-        var shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader != null) // dedicated server builds ship no shaders
-            pile.GetComponent<Renderer>().sharedMaterial = new Material(shader) { color = new Color(1f, 0.8f, 0.2f) };
-        pile.GetComponent<BoxCollider>().isTrigger = true;
-        var drop = pile.AddComponent<GoldDrop>();
-        drop.amount = Mathf.Max(0, amount);
-        Debug.Log($"[Gold] Dropped {drop.amount} gold.");
-        return pile;
-    }
-
-    internal static void ShowNetworkPile(GameObject pickup, int amount)
-    {
-        var gold = pickup.AddComponent<GoldDrop>();
-        gold.amount = amount;
-        var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        visual.transform.SetParent(pickup.transform, false);
-        visual.transform.localScale = new Vector3(0.35f, 0.22f, 0.35f);
-        Destroy(visual.GetComponent<Collider>());
-        var color = new MaterialPropertyBlock();
-        color.SetColor("_BaseColor", new Color(1f, 0.8f, 0.2f));
-        visual.GetComponent<Renderer>().SetPropertyBlock(color);
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (collected || other == null || other.gameObject == null) return;
-        var go = other.gameObject;
-        if (go.name != "Player" && !go.CompareTag("Player")) return;
-        CollectLocal(go);
-    }
-
-    /// <summary>Host/solo apply: purse credit on this process, then converge.</summary>
-    public void CollectLocal(GameObject go)
-    {
-        if (collected || go == null) return;
-        var relay = GetComponent<LootNetRelay>();
-        if (relay != null && relay.IsSpawned)
-        {
-            if (go.GetComponent<DiabloNetworkPlayer>() is { IsOwner: true })
-                relay.RequestGoldServerRpc();
-            return;
-        }
-        collected = true;
-        var wallet = Wallet.EnsureWallet(go);
-        var eq = go.GetComponent<Equipment>();
-        if (wallet != null) wallet.Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
-        DiabloAudio.PlayGold();
-        var netObj = GetComponent<NetworkObject>();
+        if (hero == null || amount <= 0) return false;
+        var player = hero.GetComponent<DiabloNetworkPlayer>();
         var nm = NetworkManager.Singleton;
-        if (netObj != null && netObj.IsSpawned && nm != null && nm.IsServer) netObj.Despawn();
-        else Destroy(gameObject);
+        if (player != null && player.IsSpawned && nm != null && nm.IsListening)
+        {
+            if (!player.GrantPickupGold(amount)) return false;
+        }
+        else
+        {
+            var eq = hero.GetComponent<Equipment>();
+            Wallet.EnsureWallet(hero).Add(Equipment.ApplyGoldFind(amount, eq != null ? eq.GoldFindPct() : 0f));
+            DiabloAudio.PlayGold();
+        }
+        Awards++;
+        AwardedRaw += amount;
+        DiabloJuice.ShowText(at + Vector3.up * 2.0f, Loc.F("hud.gold.gain", amount), DiabloPalette.TrimGold);
+        Debug.Log($"[Gold] Credited {amount} gold to {hero.name}.");
+        return true;
+    }
+
+    static GameObject HeroRoot(Transform t)
+    {
+        var p = t.GetComponentInParent<DiabloNetworkPlayer>();
+        if (p != null) return p.gameObject;
+        var w = t.GetComponentInParent<Equipment>();
+        return w != null ? w.gameObject : null;
+    }
+
+    /// <summary>Nearest hero to <paramref name="pos"/> (network players, else the local "Player").</summary>
+    public static GameObject NearestHero(Vector3 pos)
+    {
+        var nm = NetworkManager.Singleton;
+        GameObject best = null;
+        float bestSq = float.MaxValue;
+        if (nm != null && nm.IsListening && nm.SpawnManager != null)
+        {
+            foreach (var kv in nm.SpawnManager.SpawnedObjects)
+            {
+                var nb = kv.Value;
+                if (nb == null || !nb.IsPlayerObject) continue;
+                float sq = (nb.transform.position - pos).sqrMagnitude;
+                if (sq < bestSq) { bestSq = sq; best = nb.gameObject; }
+            }
+        }
+        return best != null ? best : GameObject.Find(DiabloNetworkPlayer.HeroName);
     }
 
     /// <summary>Reset run state (scene load / headless tests).</summary>
     public static void ResetRun()
     {
-        PilesDropped = 0;
+        Awards = 0;
+        AwardedRaw = 0;
     }
 }

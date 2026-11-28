@@ -377,6 +377,13 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Nachtzahn vergiftet, Schattenschrittweste verkürzt die Schattenrolle (0,5 s/Treffer), Scharfer Takt
   verlängert Hinterhalt auf 4 s. Laterne-Uniques geprüft, unverändert (Docht = Combo-Waffe, Gnadentuch/Reif
   der Frühe verstärken die Heilungen). Dazu „Lantern of the Hold“.
+- Beute aufheben (cinderreach-loot-click-filter, 2026-11-28): Überlaufen hebt keine Items mehr auf (Truhen öffnen
+  weiter beim Betreten). Linksklick auf das Bodensymbol oder das Namensschild (`LootClick.DropAt`,
+  `DiabloLootLabels.PlateAt`) hebt in Reichweite sofort auf, sonst läuft der Held hin (`DiabloClickController.OrderPickup`).
+  Einstellungen (`DiabloSettings`, PlayerPrefs): Schilder immer an (Standard, sonst Alt), Beutefilter „Alles / Nur
+  Unique“ (ausgefilterte Items ohne Schild, per Symbol weiter klickbar), „Nur mit Taste looten“ (Standard aus) mit
+  frei belegbarer Taste (Standard Alt, `LootKeyBindButton`). Keine Goldhaufen mehr: `GoldDrop.AwardKillGold`
+  schreibt Kill-Gold samt Gold Find direkt dem Töter gut (Fallback nächster Held, Koop über `GrantPickupGold`).
 - Gold (`Wallet`, `GoldDrop`), Vendor im Lantern Hold (`VendorStock`, Verkauf 25 %),
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).

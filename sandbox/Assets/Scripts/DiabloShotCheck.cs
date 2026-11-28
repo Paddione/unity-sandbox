@@ -775,6 +775,11 @@ public sealed class DiabloShotCheck : MonoBehaviour
                 yield return Wait(0.2f);
                 yield return Shot("loot_labels_alt");
                 DiabloLootLabels.ForceShow = false;
+                bool savedFilter = DiabloSettings.LootFilterUniqueOnly;
+                DiabloSettings.LootFilterUniqueOnly = true; // cinderreach-loot-click-filter: Rare plates hidden
+                yield return Wait(0.2f);
+                yield return Shot("loot_filter_unique");
+                DiabloSettings.LootFilterUniqueOnly = savedFilter;
                 var invUi = hero.GetComponent<DiabloInventoryUI>();
                 if (invUi != null)
                 {

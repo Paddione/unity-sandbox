@@ -21,6 +21,14 @@ public static class DiabloSettings
     public static int ResolutionIndex = 0; // 0=1920x1080, 1=1600x900, 2=1280x720, 3=2560x1440
     /// <summary>Zone map (M) opens fullscreen when true; overlay is the default (cinderreach-map-overlay D2).</summary>
     public static bool MapFullscreen = false;
+    /// <summary>Ground loot names always shown; off = only while Alt is held (cinderreach-loot-click-filter D2).</summary>
+    public static bool LootLabelsAlways = true;
+    /// <summary>Clicks pick up loot only while <see cref="LootKey"/> is held (D2, default off).</summary>
+    public static bool LootRequiresKey = false;
+    /// <summary>Loot key for <see cref="LootRequiresKey"/>; rebindable in the settings panel.</summary>
+    public static UnityEngine.InputSystem.Key LootKey = UnityEngine.InputSystem.Key.LeftAlt;
+    /// <summary>Loot filter: true hides Rare (and Magic) ground labels, Uniques stay (D3).</summary>
+    public static bool LootFilterUniqueOnly = false;
 
     const string Prefix = "DiabloMenu_";
     static readonly (int w, int h)[] Resolutions =
@@ -80,6 +88,10 @@ public static class DiabloSettings
             Fullscreen = PlayerPrefs.GetInt(Prefix + "Fullscreen", 1) == 1;
             ResolutionIndex = PlayerPrefs.GetInt(Prefix + "Resolution", 0);
             MapFullscreen = PlayerPrefs.GetInt(Prefix + "MapFullscreen", 0) == 1;
+            LootLabelsAlways = PlayerPrefs.GetInt(Prefix + "LootLabels", 1) == 1;
+            LootRequiresKey = PlayerPrefs.GetInt(Prefix + "LootRequiresKey", 0) == 1;
+            LootKey = (UnityEngine.InputSystem.Key)PlayerPrefs.GetInt(Prefix + "LootKey", (int)UnityEngine.InputSystem.Key.LeftAlt);
+            LootFilterUniqueOnly = PlayerPrefs.GetInt(Prefix + "LootFilter", 0) == 1;
         }
         catch { /* headless PlayerPrefs unavailable — keep defaults */ }
         Clamp();
@@ -104,6 +116,10 @@ public static class DiabloSettings
             PlayerPrefs.SetInt(Prefix + "Fullscreen", Fullscreen ? 1 : 0);
             PlayerPrefs.SetInt(Prefix + "Resolution", ResolutionIndex);
             PlayerPrefs.SetInt(Prefix + "MapFullscreen", MapFullscreen ? 1 : 0);
+            PlayerPrefs.SetInt(Prefix + "LootLabels", LootLabelsAlways ? 1 : 0);
+            PlayerPrefs.SetInt(Prefix + "LootRequiresKey", LootRequiresKey ? 1 : 0);
+            PlayerPrefs.SetInt(Prefix + "LootKey", (int)LootKey);
+            PlayerPrefs.SetInt(Prefix + "LootFilter", LootFilterUniqueOnly ? 1 : 0);
             PlayerPrefs.Save();
         }
         catch { /* headless — ignore */ }
@@ -125,6 +141,10 @@ public static class DiabloSettings
         Fullscreen = true;
         ResolutionIndex = 0;
         MapFullscreen = false;
+        LootLabelsAlways = true;
+        LootRequiresKey = false;
+        LootKey = UnityEngine.InputSystem.Key.LeftAlt;
+        LootFilterUniqueOnly = false;
         Save();
         Apply();
     }
@@ -138,6 +158,7 @@ public static class DiabloSettings
         VoiceVol = Mathf.Clamp01(VoiceVol);
         QualityLevel = Mathf.Clamp(QualityLevel, 0, 2);
         ResolutionIndex = ((ResolutionIndex % Resolutions.Length) + Resolutions.Length) % Resolutions.Length;
+        if (!LootClick.IsBindable(LootKey)) LootKey = UnityEngine.InputSystem.Key.LeftAlt;
     }
 
     public static string QualityName => QualityLevel == 0 ? Loc.T("settings.quality.low") : QualityLevel == 1 ? Loc.T("settings.quality.med") : Loc.T("settings.quality.high");

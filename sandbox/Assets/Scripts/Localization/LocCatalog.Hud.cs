@@ -32,7 +32,8 @@ public static partial class LocCatalog
         E("hud.death.sub", "Das Laternenlicht holt dich zurück in die Laternenwacht. Irgendjemand bezahlt dafür.", "The lantern light carries you back to Lantern Hold."),
         E("hud.death.title", "DU BIST GEFALLEN", "YOU HAVE FALLEN"),
         E("hud.zonetoast.title", "LATERNENWACHT  •  ASCHENMOOR", "LANTERN HOLD  •  THE ASHEN FEN"),
-        E("hud.zonetoast.keys", "WASD Laufen  •  Klick Schlagen  •  Q/E/R Fertigkeiten  •  I Tasche  •  C Figur  •  J Fuhrbuch  •  M Karte  •  Alt Beutenamen  •  Esc Pause", "WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  J Log  •  M Map  •  Alt Loot names  •  Esc Pause"),
+        E("hud.zonetoast.keys", "WASD Laufen  •  Klick Schlagen  •  Q/E/R Fertigkeiten  •  I Tasche  •  C Figur  •  J Fuhrbuch  •  M Karte  •  Klick auf Beute Aufheben  •  Esc Pause", "WASD Move  •  Click Strike  •  Q/E/R Skills  •  I Bag  •  C Character  •  J Log  •  M Map  •  Click loot to pick up  •  Esc Pause"),
         E("hud.xp.gain", "+{0} EP", "+{0} XP"),
+        E("hud.gold.gain", "+{0} Gold", "+{0} gold"),
     };
 }

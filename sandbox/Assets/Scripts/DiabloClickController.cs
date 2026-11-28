@@ -130,6 +130,7 @@ public sealed class DiabloClickController : MonoBehaviour
     /// <summary>Order movement to a ground point (clears attack target).</summary>
     public void SetDestination(Vector3 point)
     {
+        pendingLoot = null;
         destination = point;
         hasDestination = true;
         attackTarget = null;
@@ -147,6 +148,45 @@ public sealed class DiabloClickController : MonoBehaviour
     }
 
     public bool HasDestination => hasDestination;
+
+    LootDrop pendingLoot;
+    /// <summary>Item the hero walks to and picks up on arrival (click-to-loot).</summary>
+    public LootDrop PendingLoot => pendingLoot;
+
+    /// <summary>
+    /// Click-to-loot order (cinderreach-loot-click-filter): pick up at once
+    /// when in reach, otherwise walk there and pick up on arrival.
+    /// </summary>
+    public void OrderPickup(LootDrop drop)
+    {
+        if (!LootClick.Pickable(drop)) return;
+        attackTarget = null;
+        if (LootClick.PlanarDistance(transform.position, drop.transform.position) <= LootClick.CollectReach)
+        {
+            pendingLoot = null;
+            hasDestination = false;
+            drop.TryCollect(gameObject);
+            return;
+        }
+        pendingLoot = drop;
+        destination = drop.transform.position;
+        hasDestination = true;
+    }
+
+    void TickPendingLoot()
+    {
+        if (pendingLoot == null) return;
+        if (!LootClick.Pickable(pendingLoot)) { pendingLoot = null; return; }
+        if (LootClick.PlanarDistance(transform.position, pendingLoot.transform.position) > LootClick.CollectReach)
+        {
+            if (!hasDestination) pendingLoot = null; // order replaced or cancelled
+            return;
+        }
+        var drop = pendingLoot;
+        pendingLoot = null;
+        hasDestination = false;
+        drop.TryCollect(gameObject);
+    }
     public GameObject CurrentTarget => attackTarget;
 
     /// <summary>
@@ -298,6 +338,7 @@ public sealed class DiabloClickController : MonoBehaviour
         else if (hasDestination)
             TickDestination(speed);
 
+        TickPendingLoot();
         ApplyGravity();
         UpdateCamera(cam);
     }
@@ -315,7 +356,13 @@ public sealed class DiabloClickController : MonoBehaviour
         if (!clicked || ShouldBlockClicks(ResolveInventoryUI()) || DiabloUIFactory.IsWorldInputBlocked(gameObject))
             return;
         if (mouse.leftButton.wasPressedThisFrame)
-            Strike();
+        {
+            // Click-to-loot: a click on an item's symbol or name plate picks it up
+            // (with the optional loot-key gate); everything else swings as before.
+            var drop = LootClick.GateOpen() ? LootClick.DropAt(cam, mouse.position.ReadValue()) : null;
+            if (drop != null) OrderPickup(drop);
+            else Strike();
+        }
         else if (mouse.rightButton.wasPressedThisFrame)
             Thrust();
     }
@@ -401,6 +448,7 @@ public sealed class DiabloClickController : MonoBehaviour
         if (ix == 0f && iy == 0f) return;
         MoveInput = MapInput(new Vector2(ix, iy), yaw);
         hasDestination = false;
+        pendingLoot = null;
         attackTarget = null;
     }
 

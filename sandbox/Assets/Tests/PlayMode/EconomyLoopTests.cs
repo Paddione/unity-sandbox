@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -29,10 +30,6 @@ public class EconomyLoopTests
         player.AddComponent<Equipment>();
         player.AddComponent<Inventory>();
         player.AddComponent<Wallet>();
-        // Earlier suites' kills drop gold piles their teardowns predate:
-        // clear them so pickup asserts start from zero.
-        foreach (var gold in GameObject.FindObjectsOfType<GoldDrop>())
-            if (gold != null) Object.DestroyImmediate(gold.gameObject);
         path = Path.Combine(Path.GetTempPath(), $"cinderreach-test-{System.Guid.NewGuid():N}.json");
     }
 
@@ -42,8 +39,6 @@ public class EconomyLoopTests
         DiabloTestFixture.CleanupTestScene(player);
         var ambience = GameObject.Find("DiabloAmbience");
         if (ambience != null) Object.DestroyImmediate(ambience);
-        foreach (var gold in GameObject.FindObjectsOfType<GoldDrop>())
-            if (gold != null) Object.DestroyImmediate(gold.gameObject);
         GoldDrop.ResetRun();
         Wallet.ResetRun();
         DiabloProgression.ResetRun();
@@ -54,38 +49,40 @@ public class EconomyLoopTests
     }
 
     [UnityTest]
-    public IEnumerator GoldPickup_AddsPileAmountToWallet()
+    public IEnumerator KillGold_CreditsWalletDirectly_NoGroundPile()
     {
         var wallet = player.GetComponent<Wallet>();
         Assert.AreEqual(0, wallet.Gold);
-        var pile = GoldDrop.SpawnPile(new Vector3(0f, 0.5f, 0f), 7);
-        Assert.IsNotNull(pile);
-        // Walk the hero onto the pile until the trigger fires (proven pattern).
-        DiabloTestFixture.TeleportHero(player, pile.transform.position);
-        float wait = 0f;
-        while (wallet.Gold == 0 && wait < 2f)
-        {
-            yield return null;
-            wait += Time.deltaTime;
-        }
-        Assert.AreEqual(7, wallet.Gold, "Walking over a 7-gold pile must credit exactly 7.");
+        Assert.IsTrue(GoldDrop.Credit(player, 7, Vector3.zero));
+        Assert.AreEqual(7, wallet.Gold, "Kill gold must land in the purse without a pickup.");
         Assert.AreEqual(7, Wallet.GoldEarned);
+        yield return null;
     }
 
     [UnityTest]
-    public IEnumerator Kill_DropsGoldBesideItemOrb()
+    public IEnumerator Kill_AwardsGoldToKiller_AtNormalRate()
     {
-        int pilesBefore = GoldDrop.PilesDropped;
+        var wallet = player.GetComponent<Wallet>();
         var rng = new System.Random(99);
-        int goldSpawns = 0;
+        int awards = 0;
         const int kills = 40;
         for (int i = 0; i < kills; i++)
-            if (GoldDrop.SpawnGold(Vector3.zero, LootTier.Normal, rng) != null) goldSpawns++;
-        Assert.Greater(GoldDrop.PilesDropped - pilesBefore, 0, "40 normal kills must drop some gold.");
-        Assert.That((float)goldSpawns / kills, Is.InRange(0.5f, 0.9f),
-            "Normal gold rate over 40 rolls must sit near 70 %.");
-        foreach (var gold in GameObject.FindObjectsOfType<GoldDrop>())
-            Object.DestroyImmediate(gold.gameObject);
+            if (GoldDrop.AwardKillGold(Vector3.zero, LootTier.Normal, rng, player.transform) > 0) awards++;
+        Assert.That((float)awards / kills, Is.InRange(0.5f, 0.9f),
+            "Normal gold rate over 40 kills must sit near 70 %.");
+        Assert.AreEqual(GoldDrop.AwardedRaw, wallet.Gold, "Every awarded coin lands in the killer's purse (no Gold Find gear).");
+        Assert.AreEqual(0, Object.FindObjectsByType<Collider>(FindObjectsSortMode.None)
+            .Count(c => c != null && c.name.StartsWith("GoldPile")), "No gold piles on the ground.");
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator KillGold_AppliesGoldFind()
+    {
+        var eq = player.GetComponent<Equipment>();
+        int expected = Equipment.ApplyGoldFind(100, eq.GoldFindPct());
+        GoldDrop.Credit(player, 100, Vector3.zero);
+        Assert.AreEqual(expected, player.GetComponent<Wallet>().Gold);
         yield return null;
     }
 

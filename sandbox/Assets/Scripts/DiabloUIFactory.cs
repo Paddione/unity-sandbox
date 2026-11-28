@@ -489,6 +489,40 @@ public static class DiabloUIFactory
             RefreshAll(refreshActions);
         }, 32f);
 
+        // cinderreach-loot-click-filter: name plates, loot filter, optional loot key.
+        var lRow = MakeHorizontalRow(parent, "LootRow", 6f, 34f);
+        var lootLabelsBtn = MakeSmallButton(lRow.transform, Loc.T("settings.loot.labels"), () =>
+        {
+            DiabloAudio.PlayUIClick();
+            DiabloSettings.LootLabelsAlways = !DiabloSettings.LootLabelsAlways;
+            DiabloSettings.Save();
+            RefreshAll(refreshActions);
+        }, 32f);
+        lootLabelsBtn.gameObject.name = "LootLabelsButton";
+        var lootFilterBtn = MakeSmallButton(lRow.transform, Loc.T("settings.loot.filter"), () =>
+        {
+            DiabloAudio.PlayUIClick();
+            DiabloSettings.LootFilterUniqueOnly = !DiabloSettings.LootFilterUniqueOnly;
+            DiabloSettings.Save();
+            RefreshAll(refreshActions);
+        }, 32f);
+        lootFilterBtn.gameObject.name = "LootFilterButton";
+        var lootGateBtn = MakeSmallButton(lRow.transform, Loc.T("settings.loot.gate"), () =>
+        {
+            DiabloAudio.PlayUIClick();
+            DiabloSettings.LootRequiresKey = !DiabloSettings.LootRequiresKey;
+            DiabloSettings.Save();
+            RefreshAll(refreshActions);
+        }, 32f);
+        lootGateBtn.gameObject.name = "LootKeyGateButton";
+        var lootKeyBtn = MakeSmallButton(lRow.transform, Loc.T("settings.loot.key"), () =>
+        {
+            DiabloAudio.PlayUIClick();
+            LootClick.CapturingKey = !LootClick.CapturingKey;
+        }, 32f);
+        lootKeyBtn.gameObject.name = "LootKeyButton";
+        lootKeyBtn.gameObject.AddComponent<LootKeyBindButton>().button = lootKeyBtn;
+
         Text diffText = null;
         Button kindledBtn = null;
         if (onStartNewRun != null)
@@ -535,6 +569,11 @@ public static class DiabloUIFactory
             StyleButtonActive(shakeBtn, DiabloSettings.ScreenShake, Loc.F("settings.shake.state", OnOff(DiabloSettings.ScreenShake)));
             StyleButtonActive(hitBtn, DiabloSettings.HitStop, Loc.F("settings.hitstop.state", OnOff(DiabloSettings.HitStop)));
             StyleButtonActive(dmgBtn, DiabloSettings.ShowDamageNumbers, Loc.F("settings.dmgnums.state", OnOff(DiabloSettings.ShowDamageNumbers)));
+            StyleButtonActive(lootLabelsBtn, DiabloSettings.LootLabelsAlways, Loc.F("settings.loot.labels.state", OnOff(DiabloSettings.LootLabelsAlways)));
+            StyleButtonActive(lootFilterBtn, DiabloSettings.LootFilterUniqueOnly, Loc.F("settings.loot.filter.state",
+                DiabloSettings.LootFilterUniqueOnly ? Loc.T("settings.loot.filter.unique") : Loc.T("settings.loot.filter.all")));
+            StyleButtonActive(lootGateBtn, DiabloSettings.LootRequiresKey, Loc.F("settings.loot.gate.state", OnOff(DiabloSettings.LootRequiresKey)));
+            LootKeyBindButton.Style(lootKeyBtn);
 
             if (diffText != null) diffText.text = DiabloInventoryUI.DifficultyText();
             if (kindledBtn != null)
@@ -566,4 +605,34 @@ public static class DiabloUIFactory
     {
         foreach (var a in actions) a?.Invoke();
     }
+}
+
+/// <summary>
+/// Settings button that rebinds the loot key: click arms capture, the next
+/// key press binds (Escape cancels). Polls itself so capture also works in
+/// menus without a hero (cinderreach-loot-click-filter D2).
+/// </summary>
+public sealed class LootKeyBindButton : MonoBehaviour
+{
+    public Button button;
+    bool wasCapturing;
+
+    public static string Label() => LootClick.CapturingKey
+        ? Loc.T("settings.loot.key.capture")
+        : Loc.F("settings.loot.key.state", LootClick.KeyName(DiabloSettings.LootKey));
+
+    public static void Style(Button b)
+    {
+        if (b != null) DiabloUIFactory.StyleButtonActive(b, LootClick.CapturingKey, Label());
+    }
+
+    void Update()
+    {
+        // The arming click itself must not bind (mouse is no key, but stay safe).
+        if (LootClick.CapturingKey && wasCapturing) LootClick.PollKeyCapture();
+        if (wasCapturing != LootClick.CapturingKey || LootClick.CapturingKey) Style(button);
+        wasCapturing = LootClick.CapturingKey;
+    }
+
+    void OnDisable() => LootClick.CapturingKey = false;
 }

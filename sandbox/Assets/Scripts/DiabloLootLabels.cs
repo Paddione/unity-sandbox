@@ -4,9 +4,12 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Ground loot names while Alt is held: one rarity-colored label above each
-/// item drop near the hero, pooled, display-only (no raycasts). Reads the
-/// <see cref="LootDrop.Live"/> registry instead of scanning the scene.
+/// Ground loot names: one rarity-colored plate above each item drop near the
+/// hero, pooled. Always shown by default (<see cref="DiabloSettings.LootLabelsAlways"/>),
+/// otherwise while Alt is held. The loot filter hides non-Unique plates
+/// (<see cref="DiabloSettings.LootFilterUniqueOnly"/>). Plates are click targets
+/// for <see cref="LootClick"/> via <see cref="PlateAt"/> (screen rects, no UI raycasts).
+/// Reads the <see cref="LootDrop.Live"/> registry instead of scanning the scene.
 /// </summary>
 public sealed class DiabloLootLabels : MonoBehaviour
 {
@@ -14,6 +17,23 @@ public sealed class DiabloLootLabels : MonoBehaviour
     public const float LabelLift = 1.7f; // above the item art, not on it
     /// <summary>Show without Alt (tests, shotcheck).</summary>
     public static bool ForceShow;
+
+    /// <summary>Screen rects of the plates shown last frame (click targets).</summary>
+    static readonly List<(LootDrop drop, Rect rect)> plates = new List<(LootDrop, Rect)>();
+    static readonly Vector3[] corners = new Vector3[4];
+
+    /// <summary>Plates shown last frame (test seam).</summary>
+    public static int PlateCount => plates.Count;
+    /// <summary>Screen rect of plate <paramref name="i"/> (test seam).</summary>
+    public static Rect PlateRect(int i) => plates[i].rect;
+
+    /// <summary>The drop whose visible plate contains <paramref name="screen"/>, else null.</summary>
+    public static LootDrop PlateAt(Vector2 screen)
+    {
+        for (int i = plates.Count - 1; i >= 0; i--)
+            if (plates[i].rect.Contains(screen) && LootClick.Pickable(plates[i].drop)) return plates[i].drop;
+        return null;
+    }
 
     Canvas canvas;
     RectTransform root;
@@ -26,7 +46,7 @@ public sealed class DiabloLootLabels : MonoBehaviour
 
     public static bool Wanted()
     {
-        if (ForceShow) return true;
+        if (ForceShow || DiabloSettings.LootLabelsAlways) return true;
         var kb = Keyboard.current;
         return kb != null && (kb.leftAltKey.isPressed || kb.rightAltKey.isPressed);
     }
@@ -34,9 +54,14 @@ public sealed class DiabloLootLabels : MonoBehaviour
     /// <summary>Label text and color for a drop (null text = no label: chests, empty drops).</summary>
     public static (string text, Color color) LabelFor(LootDrop drop)
     {
-        if (drop == null || drop.isChest || drop.item == null || Equipment.IsBlank(drop.item)) return (null, Color.white);
+        if (drop == null || drop.isChest || drop.collected || drop.item == null || Equipment.IsBlank(drop.item)) return (null, Color.white);
+        if (!PassesFilter(drop.item.rarity, DiabloSettings.LootFilterUniqueOnly)) return (null, Color.white);
         return (LootDrop.ItemLabel(drop.item), DiabloPalette.Rarity(drop.item.rarity));
     }
+
+    /// <summary>Loot filter rule: "Unique only" hides every other rarity's plate.</summary>
+    public static bool PassesFilter(ItemRarity rarity, bool uniqueOnly) =>
+        !uniqueOnly || rarity == ItemRarity.Unique;
 
     void Awake()
     {
@@ -49,6 +74,8 @@ public sealed class DiabloLootLabels : MonoBehaviour
     void LateUpdate()
     {
         ShownCount = 0;
+        LootClick.PollKeyCapture();
+        plates.Clear();
         if (!Wanted() || LootDrop.Live.Count == 0) { HideFrom(0); return; }
         var hero = GameObject.Find(DiabloNetworkPlayer.HeroName);
         if (cam == null || !cam.isActiveAndEnabled) cam = Camera.main;
@@ -87,6 +114,9 @@ public sealed class DiabloLootLabels : MonoBehaviour
             plate.sizeDelta = new Vector2(label.preferredWidth + 18f, 26f);
             plate.anchoredPosition = visible[i].pos;
             if (!plate.gameObject.activeSelf) plate.gameObject.SetActive(true);
+            // Overlay canvas: world corners are screen pixels.
+            plate.GetWorldCorners(corners);
+            plates.Add((visible[i].drop, Rect.MinMaxRect(corners[0].x, corners[0].y, corners[2].x, corners[2].y)));
         }
         ShownCount = visible.Count;
         HideFrom(visible.Count);

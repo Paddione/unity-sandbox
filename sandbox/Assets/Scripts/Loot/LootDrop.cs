@@ -27,7 +27,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
         Usables.Unregister(this);
     }
 
-    /// <summary>Use key: chests open like walking into them; item orbs stay walk-over.</summary>
+    /// <summary>Use key: chests open like walking into them; items are picked up by click (<see cref="LootClick"/>).</summary>
     public float UseRadius => 2.5f;
     public string UseLabel => isChest && !collected ? Loc.T("use.chest") : null;
 
@@ -42,9 +42,8 @@ public sealed class LootDrop : MonoBehaviour, IUsable
     /// <summary>Roll the tier table and spawn loot; null when nothing drops.</summary>
     public static GameObject SpawnLoot(Vector3 pos, LootTier tier, System.Random rng, bool networked)
     {
-        // S2 economy: independent gold roll beside the item orb (local-only
-        // pickup, own counters — item-orb counts stay exact for the Q5 loop).
-        GoldDrop.SpawnGold(pos, tier, rng);
+        // Kill gold goes straight into the killer's purse (cinderreach-loot-click-filter D1).
+        GoldDrop.AwardKillGold(pos, tier, rng, DiabloJuice.StrikerThisFrame());
         var profile = DifficultyProfile.Current;
         var roll = UniquePity.Apply(LootTable.Roll(tier, rng, Equipment.LocalMagicFind(), profile.uniqueMul));
         if (!roll.drops) return null;
@@ -241,7 +240,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
         if (collected || other == null || other.gameObject == null) return;
         var go = other.gameObject;
         if (go.name != "Player" && !go.CompareTag("Player")) return;
-        if (isChest)
+        if (!isChest) return; // items: click to pick up (LootClick)
         {
             var nmChest = NetworkManager.Singleton;
             bool netChest = nmChest != null && nmChest.IsListening;
@@ -259,29 +258,39 @@ public sealed class LootDrop : MonoBehaviour, IUsable
             Debug.Log("[Loot] Chest opened (guaranteed Rare+).");
             return;
         }
-        if (item == null) return;
+    }
+
+    /// <summary>
+    /// Pick this item up for <paramref name="hero"/> (click path, cinderreach-loot-click-filter):
+    /// co-op clients ask the host, solo/host apply directly. Walking over an item no longer collects it.
+    /// </summary>
+    public bool TryCollect(GameObject hero)
+    {
+        if (isChest || collected || item == null || hero == null) return false;
         var relay = GetComponent<LootNetRelay>();
         if (relay != null && relay.IsSpawned)
         {
-            var player = go.GetComponent<DiabloNetworkPlayer>();
-            if (player != null && player.IsOwner) relay.RequestPickupServerRpc();
-            return;
+            var player = hero.GetComponent<DiabloNetworkPlayer>();
+            if (player == null || !player.IsOwner) return false;
+            relay.RequestPickupServerRpc();
+            return true;
         }
-        var inv = go.GetComponent<Inventory>();
-        var equipment = go.GetComponent<Equipment>();
+        var inv = hero.GetComponent<Inventory>();
+        var equipment = hero.GetComponent<Equipment>();
         if (inv != null)
         {
-            if (!inv.Add(item)) return;
+            if (!inv.Add(item)) return false;
         }
         else
         {
-            if (equipment == null || !Equipment.CanEquip(item, RunProfile.ClassId)) return;
+            if (equipment == null || !Equipment.CanEquip(item, RunProfile.ClassId)) return false;
             equipment.Equip(item);
         }
         collected = true;
         RecordPickup();
         DiabloAudio.PlayLoot();
-        GetComponent<Collider>().enabled = false;
+        var col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
         foreach (var n in new[] { "LootVisual", "LootBall", "ItemIcon", "RarityGlow", "GroundGlow", "BallMesh" })
         {
             var visual = transform.Find(n);
@@ -293,5 +302,7 @@ public sealed class LootDrop : MonoBehaviour, IUsable
                 if (nested != null) nested.gameObject.SetActive(false);
             }
         }
+        Live.Remove(this);
+        return true;
     }
 }
