@@ -70,38 +70,39 @@ public sealed class InventoryStatBreakdownPlayTests
         LayoutRebuilder.ForceRebuildLayoutImmediate(page);
 
         var charCol = page.Find("CharacterColumn") as RectTransform;
-        var paramCol = page.Find("ParametersColumn") as RectTransform;
         var bagCol = page.Find("BagColumn") as RectTransform;
+        var tipCol = page.Find("TooltipColumn") as RectTransform;
         Assert.IsNotNull(charCol);
-        Assert.IsNotNull(paramCol);
         Assert.IsNotNull(bagCol);
+        Assert.IsNotNull(tipCol);
+        Assert.IsNull(page.Find("ParametersColumn"), "ParametersColumn moved to the Stats tab (redesign).");
         Assert.IsTrue(charCol.gameObject.activeInHierarchy);
-        Assert.IsTrue(paramCol.gameObject.activeInHierarchy);
         Assert.IsTrue(bagCol.gameObject.activeInHierarchy);
+        Assert.IsTrue(tipCol.gameObject.activeInHierarchy);
 
-        Vector3[] cCorners = new Vector3[4], pCorners = new Vector3[4], bCorners = new Vector3[4];
+        Vector3[] cCorners = new Vector3[4], bCorners = new Vector3[4], tCorners = new Vector3[4];
         charCol.GetWorldCorners(cCorners);
-        paramCol.GetWorldCorners(pCorners);
         bagCol.GetWorldCorners(bCorners);
+        tipCol.GetWorldCorners(tCorners);
         Assert.Greater(charCol.rect.width, 400f);
-        Assert.Greater(paramCol.rect.width, 380f);
         Assert.Greater(bagCol.rect.width, 500f);
-        Assert.LessOrEqual(cCorners[2].x, pCorners[0].x + 1f, "CharacterColumn must not overlap ParametersColumn.");
-        Assert.LessOrEqual(pCorners[2].x, bCorners[0].x + 1f, "ParametersColumn must not overlap BagColumn.");
+        Assert.Greater(tipCol.rect.width, 300f);
+        Assert.LessOrEqual(cCorners[2].x, bCorners[0].x + 1f, "CharacterColumn must not overlap BagColumn.");
+        Assert.LessOrEqual(bCorners[2].x, tCorners[0].x + 1f, "BagColumn must not overlap TooltipColumn.");
 
-        // Check live update on EquipIndex and UnequipSlot.
-        var dmgVal = paramCol.Find("ParametersCard/ParametersScroll/Viewport/ParametersContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
+        // Check live update on EquipIndex and UnequipSlot (breakdown lives on Stats tab).
+        var dmgVal = hero.transform.Find("InventoryCanvas/Panel/StatsPage/StatsCard/StatsScroll/Viewport/StatsContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
         Assert.IsNotNull(dmgVal);
         Assert.AreEqual("1", dmgVal.text);
 
         invUi.EquipIndex(0);
         yield return null;
-        dmgVal = paramCol.Find("ParametersCard/ParametersScroll/Viewport/ParametersContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
+        dmgVal = hero.transform.Find("InventoryCanvas/Panel/StatsPage/StatsCard/StatsScroll/Viewport/StatsContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
         Assert.AreEqual("8", dmgVal.text, "Equipping +7 Damage weapon updates parameter row immediately.");
 
         invUi.UnequipSlot((int)ItemSlot.Weapon);
         yield return null;
-        dmgVal = paramCol.Find("ParametersCard/ParametersScroll/Viewport/ParametersContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
+        dmgVal = hero.transform.Find("InventoryCanvas/Panel/StatsPage/StatsCard/StatsScroll/Viewport/StatsContent/ParamRow_melee_damage/Value")?.GetComponent<Text>();
         Assert.AreEqual("1", dmgVal.text, "Unequipping reverts parameter row immediately.");
     }
 
@@ -113,9 +114,10 @@ public sealed class InventoryStatBreakdownPlayTests
         inventory.Add(sword);
 
         invUi.SetOpen(true);
+        invUi.ShowTab(DiabloInventoryUI.MenuTab.Stats);
         yield return null;
 
-        var row = hero.transform.Find("InventoryCanvas/Panel/InventoryPage/ParametersColumn/ParametersCard/ParametersScroll/Viewport/ParametersContent/ParamRow_max_hp")?.gameObject;
+        var row = hero.transform.Find("InventoryCanvas/Panel/StatsPage/StatsCard/StatsScroll/Viewport/StatsContent/ParamRow_max_hp")?.gameObject;
         Assert.IsNotNull(row);
         ExecuteEvents.Execute(row, Pointer(), ExecuteEvents.pointerEnterHandler);
         var infoTip = hero.GetComponent<InfoTooltip>();
@@ -123,14 +125,18 @@ public sealed class InventoryStatBreakdownPlayTests
         Assert.IsTrue(infoTip.IsVisible);
         StringAssert.Contains(Loc.T("statbd.src.base"), infoTip.BodyText);
 
-        // Hovering a bag item opens ItemTooltip and closes InfoTooltip.
+        // Hovering a bag item fills the fixed tooltip column and closes InfoTooltip.
+        invUi.ShowTab(DiabloInventoryUI.MenuTab.Inventory);
+        yield return null;
         var bagCell = hero.GetComponentsInChildren<InventoryCell>(true)
             .First(c => c.kind == InventoryCell.Kind.Bag && c.index == 0 && c.name == "BagButton0").gameObject;
         ExecuteEvents.Execute(bagCell, Pointer(), ExecuteEvents.pointerEnterHandler);
         var itemTip = hero.GetComponent<ItemTooltip>();
-        Assert.IsNotNull(itemTip);
-        Assert.IsTrue(itemTip.IsVisible);
+        Assert.IsFalse(itemTip != null && itemTip.IsVisible, "No floating tooltip in the inventory (redesign).");
         Assert.IsFalse(infoTip.IsVisible);
+        var colTitle = hero.transform.Find("InventoryCanvas/Panel/InventoryPage/TooltipColumn/TooltipCard/TooltipTitle")?.GetComponent<Text>();
+        Assert.IsNotNull(colTitle);
+        StringAssert.Contains(LootDrop.ItemLabel(inventory.Get(0)), colTitle.text);
 
         // Stats tab parameter row hover also works.
         invUi.ShowTab(DiabloInventoryUI.MenuTab.Stats);

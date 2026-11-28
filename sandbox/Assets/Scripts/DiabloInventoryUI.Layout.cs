@@ -10,6 +10,18 @@ public sealed partial class DiabloInventoryUI
 {
     // ── Build ────────────────────────────────────────────────────────────
 
+    /// <summary>Footer line (P1 shell, wired in P2): gold/flask and difficulty.</summary>
+    Text footerGoldText;
+    Text footerDiffText;
+    /// <summary>Fixed tooltip column (P1 shell, filled in P2).</summary>
+    Text tcTitleText;
+    Text tcMetaText;
+    Text tcBodyText;
+    Text tcCompareText;
+    Button tcEquipButton;
+    Button tcSellButton;
+    Button tcDiscardButton;
+
     void BuildUI()
     {
         var canvasGo = new GameObject("InventoryCanvas");
@@ -29,28 +41,52 @@ public sealed partial class DiabloInventoryUI
         layout.childControlWidth = true;
         layout.childControlHeight = false;
 
-        DiabloUIFactory.MakeHeader(panelGo.transform, Loc.T("inv.title"), DiabloMenuArt.MenuArtSprite("CrestCinderreach"), () => SetOpen(false));
-
-        // Tab Bar: gear-and-bag, stats, settings.
-        var tabGo = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "TabBar", 6f, 38f);
+        // Header row (redesign): crest + hero name (DisplayFont) + tabs + close button.
+        var headerGo = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "HeaderRow", 12f, 56f);
+        var hhz = headerGo.GetComponent<HorizontalLayoutGroup>();
+        hhz.childForceExpandWidth = false;
+        var crestGo = new GameObject("Crest", typeof(RectTransform));
+        crestGo.transform.SetParent(headerGo.transform, false);
+        DiabloUIFactory.SetLayout(crestGo, prefH: 44f, prefW: 44f);
+        var crest = crestGo.AddComponent<Image>();
+        crest.sprite = DiabloMenuArt.MenuArtSprite("CrestCinderreach");
+        crest.preserveAspect = true;
+        crest.raycastTarget = false;
+        heroHeaderText = DiabloUIFactory.MakeText(headerGo.transform, "HeroHeaderText", "", 20, DiabloPalette.Parchment,
+            TextAnchor.MiddleLeft, font: DiabloUIFactory.DisplayFont);
+        heroHeaderText.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(heroHeaderText.gameObject, prefH: 48f, flexW: 1f);
         string[] names = { Loc.T("inv.tab.inventory"), Loc.T("inv.tab.stats"), Loc.T("inv.tab.settings") };
         MenuTab[] targets = { MenuTab.Inventory, MenuTab.Stats, MenuTab.Settings };
         for (int i = 0; i < tabButtons.Length; i++)
         {
             var target = targets[i];
-            var b = MakeTabButton(tabGo.transform, names[i], i == 0);
-            DiabloUIFactory.SetLayout(b.gameObject, prefH: 36f, flexW: 1f);
+            var b = MakeTabButton(headerGo.transform, names[i], i == 0);
+            DiabloUIFactory.SetLayout(b.gameObject, prefH: 44f, prefW: 210f);
             b.onClick.AddListener(() => ShowTab(target));
             tabButtons[i] = b;
         }
+        DiabloUIFactory.MakeSmallButton(headerGo.transform, "X", () => SetOpen(false), 44f, 64f).name = "CloseButton";
 
-        inventoryPage = MakePage(panelGo.transform, "InventoryPage", 690f, columns: true);
-        statsPage = MakePage(panelGo.transform, "StatsPage", 690f);
-        settingsPage = MakePage(panelGo.transform, "SettingsPage", 690f);
+        inventoryPage = MakePage(panelGo.transform, "InventoryPage", 710f, columns: true);
+        statsPage = MakePage(panelGo.transform, "StatsPage", 710f);
+        settingsPage = MakePage(panelGo.transform, "SettingsPage", 710f);
 
         BuildInventoryPage();
         BuildStatsPage();
         BuildSettingsPage();
+
+        // Footer row (redesign): gold/flask, difficulty, control hints.
+        var footerGo = DiabloUIFactory.MakeHorizontalRow(panelGo.transform, "FooterRow", 12f, 30f);
+        footerGoldText = DiabloUIFactory.MakeText(footerGo.transform, "FooterGold", "", 13, DiabloPalette.TrimGold,
+            TextAnchor.MiddleLeft, shadow: false, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(footerGoldText.gameObject, prefH: 28f, flexW: 1f);
+        footerDiffText = DiabloUIFactory.MakeText(footerGo.transform, "FooterDifficulty", "", 13, DiabloPalette.ParchmentDim,
+            TextAnchor.MiddleLeft, shadow: false, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(footerDiffText.gameObject, prefH: 28f, flexW: 1f);
+        var footerHint = DiabloUIFactory.MakeText(footerGo.transform, "FooterHint", Loc.T("inv.equiphint"), 12, DiabloPalette.ParchmentDim,
+            TextAnchor.MiddleRight, shadow: false, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(footerHint.gameObject, prefH: 28f, flexW: 2f);
 
         var ghostGo = new GameObject("DragGhost", typeof(RectTransform));
         ghostGo.transform.SetParent(canvasGo.transform, false);
@@ -86,32 +122,14 @@ public sealed partial class DiabloInventoryUI
 
     void BuildInventoryPage()
     {
-        // Paperdoll (left), live stat breakdown (middle), and bag (right).
+        // Hero (left), bag (middle), fixed tooltip column (right); the live stat
+        // breakdown lives on the Stats tab (StatsContent), not here (redesign).
         var charCol = MakeColumn(inventoryPage.transform, "CharacterColumn", 456f, 0f);
-        var paramCol = MakeColumn(inventoryPage.transform, "ParametersColumn", 416f, 0f);
         var bagCol = MakeColumn(inventoryPage.transform, "BagColumn", -1f, 1f);
+        var tipCol = MakeColumn(inventoryPage.transform, "TooltipColumn", 360f, 0f);
         BuildCharacterColumn(charCol.transform);
-        BuildParametersColumn(paramCol.transform);
         BuildBagColumn(bagCol.transform);
-    }
-
-    void BuildParametersColumn(Transform col)
-    {
-        var card = MakeCard(col, "ParametersCard", 686f);
-        var v = card.AddComponent<VerticalLayoutGroup>();
-        v.padding = new RectOffset(10, 10, 8, 8);
-        v.spacing = 4f;
-        v.childControlWidth = true;
-        v.childControlHeight = false;
-
-        var title = DiabloUIFactory.MakeText(card.transform, "ParametersTitle", Loc.T("statbd.column.title"), 16, DiabloPalette.GoldBright, TextAnchor.MiddleLeft);
-        title.fontStyle = FontStyle.Bold;
-        DiabloUIFactory.SetLayout(title.gameObject, prefH: 22f, flexW: 1f);
-
-        var hint = DiabloUIFactory.MakeText(card.transform, "ParametersHint", Loc.T("statbd.column.hint"), 11, DiabloPalette.ParchmentDim, TextAnchor.MiddleLeft);
-        DiabloUIFactory.SetLayout(hint.gameObject, prefH: 16f, flexW: 1f);
-
-        paramContent = MakeParamScroll(card.transform, "ParametersScroll", "ParametersContent", 624f, -1f, 1f);
+        BuildTooltipColumn(tipCol.transform);
     }
 
     static Transform MakeParamScroll(Transform parent, string scrollName, string contentName, float height, float width, float flexW)
@@ -250,16 +268,9 @@ public sealed partial class DiabloInventoryUI
 
     void BuildCharacterColumn(Transform col)
     {
-        var heroBox = MakeCard(col, "HeroCard", 58f);
-        var hbV = heroBox.AddComponent<VerticalLayoutGroup>();
-        hbV.padding = new RectOffset(12, 12, 6, 6);
-        hbV.childControlWidth = true;
-        hbV.childControlHeight = false;
-        heroHeaderText = DiabloUIFactory.MakeText(heroBox.transform, "HeroHeaderText", "", 15, DiabloPalette.Parchment);
-        DiabloUIFactory.SetLayout(heroHeaderText.gameObject, prefH: 46f, flexW: 1f);
-
         // Paperdoll: the live 3D hero with Helmet/Armor/Belt left and
-        // Gloves/Weapon/Boots right (gear-slots S1).
+        // Gloves/Weapon/Boots right (gear-slots S1). The header row carries
+        // the hero line now; the stat breakdown lives on the Stats tab.
         var doll = MakeCard(col, "Paperdoll", 470f);
         var stage = new GameObject("PaperdollStage", typeof(RectTransform));
         stage.transform.SetParent(doll.transform, false);
@@ -367,7 +378,7 @@ public sealed partial class DiabloInventoryUI
 
         var gridGo = new GameObject("BagGrid", typeof(RectTransform));
         gridGo.transform.SetParent(col, false);
-        DiabloUIFactory.SetLayout(gridGo, prefH: 400f, flexW: 1f);
+        DiabloUIFactory.SetLayout(gridGo, prefH: 440f, flexW: 1f);
         // Transparent backdrop: a worn item dropped anywhere on the grid goes back into the bag.
         var gridBg = gridGo.AddComponent<Image>();
         gridBg.color = new Color(0f, 0f, 0f, 0.18f);
@@ -377,36 +388,77 @@ public sealed partial class DiabloInventoryUI
         gridCell.owner = this;
         var grid = gridGo.AddComponent<GridLayoutGroup>();
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        grid.constraintCount = 5;
-        grid.cellSize = new Vector2(104f, 92f);
+        grid.constraintCount = 8;
+        grid.cellSize = new Vector2(72f, 80f);
         grid.spacing = new Vector2(8f, 8f);
         grid.padding = new RectOffset(4, 4, 4, 4);
         grid.childAlignment = TextAnchor.UpperCenter;
         bagList = gridGo.transform;
 
-        var tipBox = MakeCard(col, "BagTooltipBox", 152f);
-        var tv = tipBox.AddComponent<VerticalLayoutGroup>();
-        tv.padding = new RectOffset(12, 12, 8, 8);
-        tv.childControlWidth = true;
-        tv.childControlHeight = false;
-        bagDetailText = DiabloUIFactory.MakeText(tipBox.transform, "BagTooltip", "", 13, DiabloPalette.Parchment, TextAnchor.UpperLeft);
-        DiabloUIFactory.FitToBox(bagDetailText, 13);
-        DiabloUIFactory.SetLayout(bagDetailText.gameObject, prefH: 136f, flexW: 1f);
+        noticeText = DiabloUIFactory.MakeText(col, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
+        DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);
+    }
 
-        // S5: visible separate actions for the selected (hovered, else newest) bag item.
-        var actionRow = DiabloUIFactory.MakeHorizontalRow(col, "BagActions", 8f, 34f);
-        DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.btn.equip"), () =>
+    /// <summary>
+    /// Display-only locked cell: the bag holds <see cref="Inventory.Capacity"/> items
+    /// (GOAL cinderreach-inventory-redesign, no gameplay change); the Artboard grid is
+    /// 8x5, so remaining frames render as locked, non-interactive "BagLocked" frames.
+    /// They are siblings after the usable cells, never counted as cells (tests assert
+    /// BagButton*/BagEmpty == Capacity; BagLocked is intentionally distinct).
+    /// </summary>
+    static GameObject MakeLockedCell()
+    {
+        var go = new GameObject("BagLocked", typeof(RectTransform));
+        var frame = go.AddComponent<Image>();
+        frame.sprite = DiabloMenuArt.SlotBackground(null);
+        frame.type = Image.Type.Sliced;
+        frame.color = new Color(1f, 1f, 1f, 0.30f);
+        frame.raycastTarget = false;
+        return go;
+    }
+
+    /// <summary>Fixed tooltip column (redesign): selection detail, comparison, actions.</summary>
+    void BuildTooltipColumn(Transform col)
+    {
+        var card = HudChrome.Panel(col, "TooltipCard", new Vector2(360f, 706f), goldTop: true);
+        DiabloUIFactory.SetLayout(card.gameObject, prefH: 706f, flexW: 1f);
+        var v = card.gameObject.AddComponent<VerticalLayoutGroup>();
+        v.padding = new RectOffset(12, 12, 10, 10);
+        v.spacing = 6f;
+        v.childControlWidth = true;
+        v.childControlHeight = false;
+
+        tcTitleText = DiabloUIFactory.MakeText(card.transform, "TooltipTitle", Loc.T("inv.tc.title"), 18,
+            DiabloPalette.TrimGold, TextAnchor.MiddleLeft, font: DiabloUIFactory.DisplayFont);
+        tcTitleText.fontStyle = FontStyle.Bold;
+        DiabloUIFactory.SetLayout(tcTitleText.gameObject, prefH: 28f, flexW: 1f);
+        tcMetaText = DiabloUIFactory.MakeText(card.transform, "TooltipMeta", "", 13, DiabloPalette.ParchmentDim,
+            TextAnchor.MiddleLeft, shadow: false, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(tcMetaText.gameObject, prefH: 20f, flexW: 1f);
+        var scroll = MakeParamScroll(card.transform, "TooltipScroll", "TooltipContent", 396f, -1f, 1f);
+        tcBodyText = DiabloUIFactory.MakeText(scroll, "TooltipBody", Loc.T("inv.baghint"), 13, DiabloPalette.Parchment,
+            TextAnchor.UpperLeft, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(tcBodyText.gameObject, prefH: 120f, flexW: 1f);
+        tcCompareText = DiabloUIFactory.MakeText(card.transform, "TooltipCompare", "", 13, DiabloPalette.Parchment,
+            TextAnchor.UpperLeft, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(tcCompareText.gameObject, prefH: 120f, flexW: 1f);
+
+        var actionRow = DiabloUIFactory.MakeHorizontalRow(card.transform, "TooltipActions", 8f, 44f);
+        tcEquipButton = DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.tc.equip"), () =>
         {
             int i = SelectedOrLast();
             if (i >= 0) EquipIndex(i);
-        });
-        DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.btn.discard"), () =>
+        }, 44f);
+        tcSellButton = DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.tc.sell"), null, 44f);
+        tcDiscardButton = DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.tc.discard"), () =>
         {
             int i = SelectedOrLast();
             if (i >= 0) DiscardIndex(i);
-        });
-        noticeText = DiabloUIFactory.MakeText(col, "Notice", "", 14, DiabloPalette.GoldBright, TextAnchor.MiddleCenter);
-        DiabloUIFactory.SetLayout(noticeText.gameObject, prefH: 22f, flexW: 1f);
+        }, 44f);
+
+        var legend = DiabloUIFactory.MakeText(card.transform, "TooltipLegend", Loc.T("inv.tc.legend"), 12,
+            DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter, shadow: false, font: DiabloUIFactory.BodyFont);
+        DiabloUIFactory.SetLayout(legend.gameObject, prefH: 20f, flexW: 1f);
     }
 
     void BuildStatsPage()

@@ -66,5 +66,18 @@ public static partial class LocCatalog
         E("inv.notice.equipped.plain", "Angelegt.", "Equipped."),
         E("inv.stats.crit", "Krit {0:0.#} %\\n", "Crit {0:0.#}%\\n"),
         E("inv.stats.cdr", "Abklingzeit -{0:0.#} %", "CDR {0:0.#}%"),
+        // cinderreach-inventory-redesign: feste Tooltip-Spalte, Kopf-/Fußzeile, Aktionen.
+        E("inv.bag.countshort", "Tasche: {0} / {1}", "Bag: {0} / {1}"),
+        E("inv.tc.title", "AUSWAHL", "SELECTION"),
+        E("inv.tc.empty", "Nichts ausgewählt.", "Nothing selected."),
+        E("inv.tc.equip", "Anlegen", "Equip"),
+        E("inv.tc.unequip", "Ablegen", "Unequip"),
+        E("inv.tc.sell", "Verkaufen", "Sell"),
+        E("inv.tc.discard", "Wegwerfen", "Discard"),
+        E("inv.tc.compare", "Vergleich mit Angelegtem", "Compared to equipped"),
+        E("inv.tc.legend", "▲ besser   •   ▼ schlechter", "▲ better   •   ▼ worse"),
+        E("inv.footer.hint", "I/B Tasche   •   Rechtsklick tauscht   •   Umschalt vergleicht", "I/B Bag   •   Right-click swaps   •   Shift compares"),
+        E("inv.notice.sold", "{0} verkauft (+{1} Gold).", "Sold {0} (+{1} gold)."),
+        E("inv.notice.nosell", "{0} lässt sich nicht verkaufen.", "Cannot sell {0}."),
     };
 }
