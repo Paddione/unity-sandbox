@@ -37,6 +37,8 @@ public sealed class SessionAutoplay : MonoBehaviour
     public const string OutFlag = "-autoplay-out";
     /// <summary>Commit sha stamped into the result (the player cannot know it).</summary>
     public const string CommitFlag = "-autoplay-commit";
+    /// <summary>Perf runs only: keep the zone map open as overlay while playing (cinderreach-map-overlay K6).</summary>
+    public const string MapFlag = "-autoplay-map";
 
     /// <summary>Talk distance to a story NPC (inside <see cref="Vendor.InteractRadius"/>).</summary>
     const float TalkReach = 2.5f;
@@ -125,6 +127,14 @@ public sealed class SessionAutoplay : MonoBehaviour
             Log("FAIL no controllable hero within 30 s");
             Finish(1);
             yield break;
+        }
+        if (HasArg(MapFlag))
+        {
+            // Perf proof with the overlay map open: force overlay (not the saved fullscreen choice).
+            DiabloSettings.MapFullscreen = false;
+            var map = hero.GetComponent<WorldMapUI>();
+            if (map != null) { map.SetOpen(true); Log($"perf: zone map open, mode={map.Mode}"); }
+            else Log("perf: no WorldMapUI on the hero, map stays closed");
         }
         if (coopHost)
         {
