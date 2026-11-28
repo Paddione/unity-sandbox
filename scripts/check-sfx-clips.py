@@ -32,7 +32,9 @@ def problems() -> list[str]:
             out.append(f"{key}: clip missing (render_sfx.py)")
             continue
         entry = lock.get(key)
-        expected_hash = rsfx.clip_hash(key, item["prompt"], item["seed"], rsfx.DEFAULT_MODEL)
+        expected_hash = rsfx.clip_hash(
+            key, item["prompt"], item["seed"], item.get("model", rsfx.DEFAULT_MODEL)
+        )
         if not entry or entry.get("hash") != expected_hash:
             out.append(f"{key}: clip stale or missing in sfx.lock.json (render_sfx.py)")
             continue

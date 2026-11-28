@@ -36,6 +36,17 @@ DEFAULT_MODEL = "audio-cpp/audio.cpp-gguf/Stable-Audio-3-Small-SFX-GGUF"
 DEFAULT_TOKEN_FILE = Path.home() / ".config" / "remote-workspace" / "studio-mcp.token"
 STYLE_LINE = "dry, no reverb, close mic, dark medieval fantasy foley"
 
+# Deterministic procedural synth for tonal/swell event cues that the SFX
+# model cannot render (prompt- and seed-independent full-scale noise wash,
+# crest ~1.5 dB). synth_events.synth_event(key) is fully deterministic, so
+# these cues use a fixed seed and their own model tag in the lock hash.
+try:
+    from synth_events import synth_event
+except ImportError:  # pragma: no cover - CLI fallback when run elsewhere
+    synth_event = None  # type: ignore[assignment]
+SYNTH_EVENT_KEYS = {"Gate", "Heal", "Quest", "RareDrop", "LevelUp", "Shrine"}
+SYNTH_MODEL_TAG = "local-synth-v1"
+
 PEAK_CEILING_DBFS = -1.0
 PEAK_CEILING_AMP = 10.0 ** (-1.0 / 20.0)  # ~=0.8913, hard cap checked by gate
 
@@ -52,7 +63,7 @@ EVENT_CUES = {"RareDrop", "LevelUp", "Gate", "Heal", "Quest", "Shrine"}
 SHORT_COMBAT_CUES = {
     "Swing", "Hit", "SwordHit1", "SwordHit2", "SwordHit3",
     "Block", "Arrow", "Twang", "Crit", "Hurt", "Death",
-    "MireHook", "ShadowRoll", "VenomVial", "SmokePot",
+    "MireHook", "ShadowRoll", "VenomVial", "SmokePot", "Cleave",
 }
 DEFAULT_DURATION_BY_CAT = {
     "ui": 1.0,
@@ -110,7 +121,7 @@ SFX_VARIANTS: list[dict] = [
      "prompt": "single heavy leather boot step onto damp dark peat moss and wet mud"},
     {"key": "Footstep_Moor_1", "cue": "Footstep", "category": "step", "seed": 1301, "duration_s": 1.0, "max_duration_s": 0.35,
      "prompt": "single armored boot step pressing into soft soggy moorland soil"},
-    {"key": "Footstep_Moor_2", "cue": "Footstep", "category": "step", "seed": 1302, "duration_s": 1.0, "max_duration_s": 0.35,
+    {"key": "Footstep_Moor_2", "cue": "Footstep", "category": "step", "seed": 1303, "duration_s": 1.0, "max_duration_s": 0.35,
      "prompt": "single muddy leather footstep squelching lightly in shallow bog turf"},
 
     {"key": "Footstep_Stone_0", "cue": "Footstep", "category": "step", "seed": 1310, "duration_s": 1.0, "max_duration_s": 0.35,
@@ -144,20 +155,36 @@ SFX_VARIANTS: list[dict] = [
 # the wash to full RMS (audible disturbance/hiss). Pilot cues get concrete
 # physical descriptions with an explicit clean-recording tail.
 PILOT_PROMPT_OVERRIDES: dict[str, str] = {
-    "Gate": "massive ancient stone portal grinding open, deep rock rumble with heavy iron mechanism clunk, single event, close perspective, clean studio foley recording, no background noise, no hiss, no voices, no music",
     "Swing": "single fast sword swing whoosh, sharp air cut with thin metallic whistle, one quick motion, clean studio foley recording, no background noise, no hiss, no voices, no music",
-    "Heal": "warm magical healing chime, soft glass bell with gentle shimmer decay, single spell, clean studio recording, no background noise, no voices",
 }
-PILOT_SEED_OVERRIDES: dict[str, int] = {
-    "Gate": 7101,
-    "Swing": 7102,
-    "Heal": 7103,
+# Full-batch refresh: plain-Foley replacements for every remaining base-cue
+# prompt that carries procedural-synth jargon ("phase-integrated", "2-pole
+# lowpass", "band-passed", engine routing notes). Proven by the Swing pilot
+# (crest 7.1 -> 15.3 dB).
+FULL_PROMPT_OVERRIDES: dict[str, str] = {
+    "Death": "creature death rattle, wet guttural exhale collapsing into dry bone crackle, single death, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "Loot": "leather pouch rustle with two soft wooden token clicks, single pickup, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "UIClick": "muted wooden UI tap, short soft knock, single click, clean studio recording, no background noise, no hiss, no voices, no music",
+    "Hurt": "heavy body blow thud with strained exhale grunt, single hit, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "PlayerDeath": "armored body collapsing onto stone with single mournful low bell toll, clean studio recording, no background noise, no hiss, no voices",
+    "Whoosh": "magical spell whoosh, airy rushing surge with deep shimmer core, single cast, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "Blast": "deep underground explosion boom with rolling rock rumble, single blast, close perspective, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "HuskGrowl": "guttural undead husk growl, wet rasping snarl from deep chest, single growl, clean studio foley recording, no background noise, no hiss, no voices, no music",
+    "IronVow": "solemn low iron bell toll, deep metallic oath gong with long dark decay, single strike, clean studio recording, no background noise, no hiss, no voices, no music",
 }
 PILOT_DURATION_OVERRIDES: dict[str, float] = {
-    # Generate Swing close to its 0.65 s cap so the transient lands in-frame
-    # instead of somewhere in a 1.5 s bed that gets trimmed away.
+    # Generate short one-shots close to their 0.65 s cap so the transient
+    # lands in-frame instead of somewhere in a 1.5 s bed that gets trimmed
+    # away (Swing pilot: 0.65 s wash -> 0.21 s transient).
     "Swing": 1.0,
 }
+# Fresh-seed series for the full batch (all base cues shared seed 1234).
+# Swing keeps its proven pilot seed: the 72xx-series seed rendered digital
+# silence (peak -39.8 dBFS), while 7102 gave a real transient (crest 15.3 dB).
+# Ambient keeps seed 1234: its wash is an intentional breeze bed, untouched.
+BASE_SEED_START = 7200
+SEED_OVERRIDES = {"Swing": 7102, "Ambient": 1234}
+VARIANT_SEED_BUMP = 200
 # Concrete Studio prompts for base cues whose manifest text is engine/meta
 # (material lists, rotation notes, runtime references) rather than a sound.
 # Without this the model renders quiet mush (e.g. Hit peak -15 dBFS).
@@ -201,6 +228,8 @@ def build_sfx_prompt(entry: dict) -> str:
     if key in PILOT_PROMPT_OVERRIDES:
         # Pilot prompts already carry their own clean-recording tail.
         return PILOT_PROMPT_OVERRIDES[key]
+    if key in FULL_PROMPT_OVERRIDES:
+        return FULL_PROMPT_OVERRIDES[key]
     if key in STUDIO_PROMPT_OVERRIDES:
         base = STUDIO_PROMPT_OVERRIDES[key]
     else:
@@ -224,19 +253,34 @@ def expected_clips(manifest: dict | None = None) -> list[dict]:
     if manifest is None:
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
     items: list[dict] = []
-    for entry in manifest.get("sfx", []):
+    for idx, entry in enumerate(manifest.get("sfx", [])):
         cue = entry["cue"]
         cat = cue_category(cue)
+        cap = entry.get("max_duration_s", default_max_duration_s(cue, cat))
+        dur = float(PILOT_DURATION_OVERRIDES.get(
+            cue, entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat])))
+        if cap is not None and cap <= 0.65:
+            # Short one-shot: generate close to the cap (Studio minimum is
+            # 1.0 s) so the transient lands in-frame.
+            dur = min(dur, 1.0)
+        if cue in SYNTH_EVENT_KEYS:
+            prompt = f"procedural {cue} recipe ({SYNTH_MODEL_TAG})"
+            seed = 1
+            model_tag = SYNTH_MODEL_TAG
+        else:
+            prompt = build_sfx_prompt(entry)
+            seed = SEED_OVERRIDES.get(cue, BASE_SEED_START + idx)
+            model_tag = DEFAULT_MODEL
         items.append({
             "key": cue,
             "cue": cue,
             "category": cat,
-            "prompt": build_sfx_prompt(entry),
-            "seed": int(PILOT_SEED_OVERRIDES.get(cue, entry.get("seed", 1234))),
-            "duration_s": float(PILOT_DURATION_OVERRIDES.get(
-                cue, entry.get("duration_s", DEFAULT_DURATION_BY_CAT[cat]))),
+            "prompt": prompt,
+            "seed": seed,
+            "model": model_tag,
+            "duration_s": dur,
             "loop": cat == "ambient",
-            "max_duration_s": entry.get("max_duration_s", default_max_duration_s(cue, cat)),
+            "max_duration_s": cap,
         })
     for var in SFX_VARIANTS:
         key = var["key"]
@@ -246,7 +290,8 @@ def expected_clips(manifest: dict | None = None) -> list[dict]:
             "cue": var["cue"],
             "category": cat,
             "prompt": build_sfx_prompt(var),
-            "seed": int(var["seed"]),
+            "seed": int(var["seed"]) + VARIANT_SEED_BUMP,
+            "model": DEFAULT_MODEL,
             "duration_s": float(var["duration_s"]),
             "loop": False,
             "max_duration_s": var.get("max_duration_s", default_max_duration_s(key, cat)),
@@ -666,7 +711,7 @@ def main(argv: list[str] | None = None) -> int:
     todo: list[tuple[dict, str, Path]] = []
     for item in selected:
         key = item["key"]
-        h = clip_hash(key, item["prompt"], item["seed"], args.model)
+        h = clip_hash(key, item["prompt"], item["seed"], item.get("model", args.model))
         out_path = SFX_DIR / f"{key}.wav"
         if key in from_wav or args.force or not out_path.exists() or lock.get(key, {}).get("hash") != h:
             todo.append((item, h, out_path))
@@ -685,7 +730,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     client = None
-    need_studio = any(item["key"] not in from_wav for item, *_ in todo)
+    need_studio = any(
+        item["key"] not in from_wav and item.get("model", args.model) != SYNTH_MODEL_TAG
+        for item, *_ in todo
+    )
     if need_studio:
         client = StudioClient(args.url, _read_token(args.token_file))
         client.ensure_loaded_gpu0(args.model)
@@ -696,12 +744,16 @@ def main(argv: list[str] | None = None) -> int:
             cat = item["category"]
             if key in from_wav:
                 raw_bytes = from_wav[key].read_bytes()
+                mono, sr = read_wav_mono(raw_bytes)
+            elif item.get("model") == SYNTH_MODEL_TAG:
+                if synth_event is None:
+                    raise SystemExit(f"synth_events module unavailable for {key}")
+                mono, sr = synth_event(key)
             else:
                 raw_bytes = client.generate_sfx(
                     args.model, item["prompt"], duration_s=item["duration_s"], seed=item["seed"], variations=1
                 )
-
-            mono, sr = read_wav_mono(raw_bytes)
+                mono, sr = read_wav_mono(raw_bytes)
             mastered, metrics = master_sfx(
                 mono,
                 sr,
