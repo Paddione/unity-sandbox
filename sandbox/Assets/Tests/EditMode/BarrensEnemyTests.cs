@@ -186,7 +186,7 @@ public class BarrensEnemyTests
                 Assert.AreEqual(ShardGuard.EliteArc, h.GetComponent<ShardGuard>().arcDegrees, 0.001f, h.name);
             }
         }
-        Assert.AreEqual(BarrensLayout.ShardbackCount, shardbacks);
+        Assert.AreEqual(BarrensLayout.ShardbackCount + 18, shardbacks, "Nine pairs guard the empty Barrens pockets.");
         Assert.AreEqual(BarrensLayout.AugurCount, augurs);
         Assert.AreEqual(BarrensLayout.EliteCount, elites);
         Assert.AreEqual("Dünenseher", DiabloTargetBar.DisplayName("Dune Augur_3"));

@@ -366,8 +366,9 @@ public static class WorldArtBuilder
     {
         for (int tries = 0; tries < 40; tries++)
         {
-            var p = new Vector3(Jitter(rng, 16.5f), 0f, Jitter(rng, 16.5f));
-            if (Vector2.Distance(new Vector2(p.x, p.z), new Vector2(0f, 11f)) < 6.8f) continue; // camp
+            float limit = WorldBounds.Zones[0].halfExtent - 1f;
+            var p = new Vector3(Jitter(rng, limit), 0f, Jitter(rng, limit));
+            if (Vector2.Distance(new Vector2(p.x, p.z), new Vector2(0f, 17f)) < 12.8f) continue; // camp
             if (Mathf.Abs(p.x) < 3f && p.z > -8f && p.z < -4f) continue; // crypt gate pad
             if (Mathf.Abs(p.x + 12f) < 3.2f && Mathf.Abs(p.z) < 3.2f) continue; // alcove tiles
             return p;

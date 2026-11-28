@@ -28,7 +28,7 @@ public static class BarrensBuilder
         var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
         floor.name = "BarrensFloor";
         floor.transform.SetParent(root.transform, false);
-        floor.transform.localScale = new Vector3(4f, 1f, 4f);
+        floor.transform.localScale = new Vector3(8f, 1f, 8f);
         Paint(floor, new Color(0.52f, 0.5f, 0.46f));
 
         // Glassed scar through the middle: a slightly raised, glossy strip.
@@ -145,6 +145,9 @@ public static class BarrensBuilder
         for (int i = 0; i < BarrensLayout.ShardbackCount; i++)
             SpawnShardback(BarrensLayout.ShardbackPrefix + i, BarrensLayout.ShardbackAnchor(0, i), 14, LootTier.Normal, 1f, 1,
                 ShardGuard.DefaultArc, parent);
+        EncounterBuilder.PlacePairs(BarrensLayout.BarrensOffset, EncounterBuilder.BarrensPacks, (i, pos) =>
+            SpawnShardback(BarrensLayout.ShardbackPrefix + (BarrensLayout.ShardbackCount + i), pos, 14, LootTier.Normal, 1f, 1,
+                ShardGuard.DefaultArc, parent));
         for (int i = 0; i < BarrensLayout.EliteCount; i++)
             SpawnShardback(BarrensLayout.ElitePrefix + i, BarrensLayout.EliteAnchor(0, i), 30, LootTier.Elite, 1.3f, 2,
                 ShardGuard.EliteArc, parent);
@@ -339,7 +342,7 @@ public static class BarrensBuilder
                   $"shardbacks={shardbacks} augurs={augurs} elites={elites} glasswright={glasswright}");
         if (!root || spires != BarrensLayout.ShardSpires || lights != BarrensLayout.GlassLights
             || dunes != BarrensLayout.Dunes || !gate || !hint || !ret || !shrine
-            || shardbacks != BarrensLayout.ShardbackCount || augurs != BarrensLayout.AugurCount
+            || shardbacks != BarrensLayout.ShardbackCount + 2 * EncounterBuilder.BarrensPacks.Length || augurs != BarrensLayout.AugurCount
             || elites != BarrensLayout.EliteCount || !glasswright)
             throw new System.Exception("Barrens verify failed: zone 4 inventory incomplete.");
         Debug.Log("[BarrensBuilder] Verify: OK (glass barrens + gates present).");

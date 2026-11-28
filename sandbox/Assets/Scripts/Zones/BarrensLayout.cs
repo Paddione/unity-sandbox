@@ -17,8 +17,8 @@ public static class BarrensLayout
     public const int ShardSpires = 10;
     public const int GlassLights = 6;
     public const int Dunes = 5;
-    /// <summary>Half-extent of the Barrens floor (plane scale 4 = 40 m).</summary>
-    public const float Extent = 20f;
+    /// <summary>Half-extent of the Barrens floor (plane scale 8 = 80 m).</summary>
+    public const float Extent = 40f;
 
     /// <summary>Kiln-side gate, south of the dome ring and west of the Kilnmother's dais.</summary>
     public static readonly Vector3 BarrensGatePos = KilnOffset + new Vector3(-6f, 1f, -13.5f);

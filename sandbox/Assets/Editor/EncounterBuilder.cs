@@ -10,6 +10,39 @@ public static class EncounterBuilder
 {
     public const string CoverPrefix = "EncounterCover_O_";
 
+    // Local pack centres. The first position in each zone fills a previously
+    // empty pocket inside the old rim; the others cover the new flanks.
+    public static readonly Vector2[] FenPacks =
+    {
+        new(15, 10), new(-27, 24), new(-27, 3), new(-24, -24), new(0, -27),
+        new(25, -24), new(28, -2), new(27, 24),
+    };
+    public static readonly Vector2[] OssuaryPacks =
+    {
+        new(-12, -12), new(-23, -19), new(-22, 2), new(-21, 22),
+        new(7, 25), new(23, 21), new(24, 1), new(22, -22), new(-3, -26),
+    };
+    public static readonly Vector2[] KilnPacks =
+    {
+        new(-12, 11), new(-22, 22), new(-23, 0), new(-21, -21),
+        new(1, -23), new(23, -20), new(24, 1), new(24, 24), new(-4, 23),
+    };
+    public static readonly Vector2[] BarrensPacks =
+    {
+        new(16, 10), new(-29, 27), new(-31, 1), new(-27, -27),
+        new(0, -32), new(29, -29), new(31, 1), new(29, 28), new(0, 32),
+    };
+
+    public static void PlacePairs(Vector3 zoneCenter, Vector2[] packs, System.Action<int, Vector3> spawn)
+    {
+        for (int i = 0; i < packs.Length; i++)
+        {
+            var anchor = zoneCenter + new Vector3(packs[i].x, 0.05f, packs[i].y);
+            spawn(2 * i, anchor + Vector3.left);
+            spawn(2 * i + 1, anchor + Vector3.right);
+        }
+    }
+
     /// <summary>Place one cover block per variant pair on the arrival sight axis.</summary>
     public static void EnsureCover(Transform root)
     {

@@ -13,7 +13,7 @@ public class LayoutSeedTests
 {
     const string ZonePath = "Assets/Scenes/DiabloZone.unity";
     const float Step = 0.5f;
-    const float Half = 17.5f;
+    static float Half => WorldBounds.Zones[0].halfExtent;
     const float HeroRadius = 0.35f;
 
     [Test]
@@ -94,6 +94,14 @@ public class LayoutSeedTests
             foreach (var c in go.GetComponentsInChildren<Collider>()) c.enabled = false;
         foreach (var c in player.GetComponentsInChildren<Collider>()) c.enabled = false;
 
+        var fixedHusks = new List<GameObject>();
+        foreach (var go in GameObject.FindGameObjectsWithTag("Husk"))
+            if (go.name.StartsWith("Husk_") && int.TryParse(go.name.Substring(5), out int index)
+                && index >= LayoutSeeder.HuskCount)
+                fixedHusks.Add(go);
+
+        // Actors have no colliders in this check. Only the prop variant changes the flood.
+        var floods = new Dictionary<int, bool[,]>();
         var failures = new List<string>();
         for (int h = 0; h < 3; h++)
         for (int e = 0; e < 3; e++)
@@ -103,7 +111,11 @@ public class LayoutSeedTests
             var layout = new LayoutSeeder.Layout { husks = h, elite = e, brute = b, props = p };
             LayoutSeeder.Apply(layout);
             Physics.SyncTransforms();
-            var reach = FloodFrom(player.transform.position);
+            if (!floods.TryGetValue(p, out var reach))
+            {
+                reach = FloodFrom(player.transform.position);
+                floods.Add(p, reach);
+            }
             void Need(string what, Vector3 pos)
             {
                 if (!Reachable(reach, pos)) failures.Add($"{layout}: {what} @ {pos}");
@@ -113,6 +125,7 @@ public class LayoutSeedTests
             for (int i = 0; i < LayoutSeeder.HuskCount; i++) Need($"Husk_{i}", LayoutSeeder.HuskSets[h][i]);
             Need("elite", LayoutSeeder.EliteSpots[e]);
             Need("brute", LayoutSeeder.BruteSpots[b]);
+            foreach (var go in fixedHusks) Need(go.name, go.transform.position);
         }
         Assert.IsEmpty(failures, string.Join("\n", failures.GetRange(0, Mathf.Min(10, failures.Count))));
     }

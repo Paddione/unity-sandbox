@@ -29,7 +29,7 @@ public static class KilnBuilder
         var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
         floor.name = "KilnFloor";
         floor.transform.SetParent(root.transform, false);
-        floor.transform.localScale = new Vector3(3f, 1f, 3f);
+        floor.transform.localScale = new Vector3(6f, 1f, 6f);
         Paint(floor, new Color(0.17f, 0.13f, 0.11f));
 
         // Kiln domes: squat cylinder + half-buried sphere, glowing mouth.
@@ -101,6 +101,9 @@ public static class KilnBuilder
             SpawnEnemy("Skeletons/Characters/Skeleton_Warrior.fbx", KilnLayout.ElitePrefix + i,
                 EncounterLayout.KilnEliteAnchor(0, i), 24, LootTier.Elite, 1.25f, root.transform, thrall: true,
                 group: EncounterLayout.BackGroup);
+        EncounterBuilder.PlacePairs(KilnLayout.KilnOffset, EncounterBuilder.KilnPacks, (i, pos) =>
+            SpawnEnemy("Skeletons/Characters/Skeleton_Minion.fbx", KilnLayout.ThrallPrefix + (KilnLayout.ThrallCount + i),
+                pos, 6, LootTier.Normal, 0.9f, root.transform, thrall: true));
         SpawnKilnWardens(root.transform); // S1 hunter group: lancers + zone-bound wardens
 
         // S4: The Kilnmother at the north end of the ring.
@@ -282,7 +285,7 @@ public static class KilnBuilder
         Debug.Log($"[KilnBuilder] Verify: root={root} domes={domes} embers={embers} gate={gate} hint={hint} ret={ret} " +
                   $"thralls={thralls} lancers={lancers} elites={elites} kilnmother={mother} shrines={shrines}");
         if (!root || domes < KilnDomes || embers < EmberLights || !gate || !hint || !ret
-            || thralls != KilnLayout.ThrallCount || lancers != KilnLayout.LancerCount
+            || thralls != KilnLayout.ThrallCount + 2 * EncounterBuilder.KilnPacks.Length || lancers != KilnLayout.LancerCount
             || elites != KilnLayout.EliteCount || !mother || shrines != KilnLayout.Shrines.Length)
             throw new System.Exception("Kiln verify failed: zone 3 inventory incomplete.");
         Debug.Log("[KilnBuilder] Verify: OK (cinder kiln + gates present).");

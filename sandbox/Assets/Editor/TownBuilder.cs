@@ -18,23 +18,23 @@ public static class TownBuilder
         "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx";
 
     /// <summary>
-    /// Camp: palisade ring (center 0,11, radius 6, north gap), campfire stone
+    /// Camp: palisade ring (center 0,17, radius 12, north gap), campfire stone
     /// + ember + logs + heal trigger, camp torches (ZTorch_*). Moved
     /// verbatim from BuildMoorField — do not rename (verify counts them).
     /// </summary>
     public static void BuildCamp()
     {
-        // Palisade ring around the camp (center 0,11, radius 6, gap north).
+        // Expand towards the rear meadow, keeping the entrance at z=5.
         var wood = new Color(0.35f, 0.24f, 0.13f);
         int logs = 0;
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 40; i++)
         {
-            float a = i * Mathf.PI * 2f / 20f;
+            float a = i * Mathf.PI * 2f / 40f;
             float sx = Mathf.Cos(a), sz = Mathf.Sin(a);
             if (sz < -0.7f) continue; // north gate toward the moor
             var log = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             log.name = $"Palisade_{logs}";
-            log.transform.position = new Vector3(sx * 6f, 1.25f, 11f + sz * 6f);
+            log.transform.position = new Vector3(sx * 12f, 1.25f, 17f + sz * 12f);
             log.transform.localScale = new Vector3(0.5f, 2.5f, 0.5f);
             Paint(log, wood);
             logs++;

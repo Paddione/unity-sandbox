@@ -22,12 +22,12 @@ public static class OssuaryBuilder
         var root = new GameObject(RootName);
         root.transform.position = OssuaryOffset;
 
-        // Floor plate + pillar ring (crypt hall, 30×30 m).
+        // Floor plate + pillar ring (crypt hall, 60×60 m).
         var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
         floor.name = "OssuaryFloor";
         floor.transform.SetParent(root.transform, false);
         floor.transform.localPosition = Vector3.zero;
-        floor.transform.localScale = new Vector3(3f, 1f, 3f);
+        floor.transform.localScale = new Vector3(6f, 1f, 6f);
         Paint(floor, new Color(0.13f, 0.12f, 0.16f));
         for (int i = 0; i < 8; i++)
         {
@@ -79,6 +79,8 @@ public static class OssuaryBuilder
         for (int i = 0; i < CasterCount; i++)
             SpawnCaster("Bone Warden", EncounterLayout.OssuaryRingAnchor(i),
                 12, LootTier.Normal, 1f, root.transform);
+        EncounterBuilder.PlacePairs(OssuaryOffset, EncounterBuilder.OssuaryPacks, (i, pos) =>
+            SpawnCaster("Bone Warden", pos, 12, LootTier.Normal, 1f, root.transform));
         EncounterBuilder.EnsureCover(root.transform);
         SpawnCaster("Bone Warden Elite", OssuaryOffset + new Vector3(-5f, 0.05f, -8f),
             24, LootTier.Elite, 1.2f, root.transform);

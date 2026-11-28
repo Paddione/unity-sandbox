@@ -76,7 +76,7 @@ public static class KilnLayout
     public const float ArrivalPlazaRadius = 5f;
     /// <summary>Planar distance from the Kiln center beyond which the hero
     /// counts as gone (no latch change out there).</summary>
-    public const float KilnExtent = 25f;
+    public const float KilnExtent = 42f;
 
     static bool plazaBreached;
 

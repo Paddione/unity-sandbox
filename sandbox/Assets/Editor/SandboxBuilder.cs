@@ -620,7 +620,7 @@ public static class SandboxBuilder
 
         var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
         ground.name = "Ground";
-        ground.transform.localScale = new Vector3(4f, 1f, 4f);
+        ground.transform.localScale = new Vector3(8f, 1f, 8f);
         Paint(ground, new Color(0.20f, 0.28f, 0.17f));
 
         BuildMoorField();
@@ -765,6 +765,10 @@ public static class SandboxBuilder
             SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{i}",
                 huskSpots[i], 5, LootTier.Normal, 1f, null);
 
+        EncounterBuilder.PlacePairs(Vector3.zero, EncounterBuilder.FenPacks, (i, pos) =>
+            SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{LayoutSeeder.HuskCount + i}",
+                pos, 5, LootTier.Normal, 1f, null));
+
         // Elite (west alcove).
         SpawnZoneHusk("Skeletons/Characters/Skeleton_Minion.fbx", "Ash Elite",
             new Vector3(-12f, 0.05f, 3f), 15, LootTier.Elite, 1.3f,
@@ -883,13 +887,15 @@ public static class SandboxBuilder
     /// </summary>
     static void BuildMoorField()
     {
-        // Earthwork bounds (keeps the hero on the 40 m plane).
+        // Keep the inside faces of the earthworks on the playable Fen boundary.
+        float rim = WorldBounds.Zones[0].halfExtent + WorldBounds.WallThickness / 2f;
+        float span = 2f * rim + WorldBounds.WallThickness;
         var bounds = new[]
         {
-            ("MoorEdge_N", new Vector3(0f, 1f, -18f), new Vector3(40f, 2f, 1f)),
-            ("MoorEdge_S", new Vector3(0f, 1f, 18f), new Vector3(40f, 2f, 1f)),
-            ("MoorEdge_E", new Vector3(18f, 1f, 0f), new Vector3(1f, 2f, 40f)),
-            ("MoorEdge_W", new Vector3(-18f, 1f, 0f), new Vector3(1f, 2f, 40f)),
+            ("MoorEdge_N", new Vector3(0f, 1f, -rim), new Vector3(span, 2f, 1f)),
+            ("MoorEdge_S", new Vector3(0f, 1f, rim), new Vector3(span, 2f, 1f)),
+            ("MoorEdge_E", new Vector3(rim, 1f, 0f), new Vector3(1f, 2f, span)),
+            ("MoorEdge_W", new Vector3(-rim, 1f, 0f), new Vector3(1f, 2f, span)),
         };
         foreach (var (name, pos, scale) in bounds)
         {

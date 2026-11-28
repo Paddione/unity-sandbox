@@ -198,12 +198,12 @@ public class DiabloAshenFenTests
         {
             if (!go.name.StartsWith("Palisade_")) continue;
             logs++;
-            // Position tolerance mirrors the builder (ring center 0,11 radius 6,
+            // The doubled radius preserves the camp entrance at z=5 (center 0,17,
             // north gate): blind placement drifts show up here, not just in counts.
             var p = go.transform.position;
-            float ringDist = Mathf.Sqrt(p.x * p.x + (p.z - 11f) * (p.z - 11f));
-            Assert.GreaterOrEqual(ringDist, 5.5f, $"{go.name} must sit on the ring (r>=5.5).");
-            Assert.LessOrEqual(ringDist, 6.5f, $"{go.name} must sit on the ring (r<=6.5).");
+            float ringDist = Mathf.Sqrt(p.x * p.x + (p.z - 17f) * (p.z - 17f));
+            Assert.GreaterOrEqual(ringDist, 11.95f, $"{go.name} is inside the new palisade ring.");
+            Assert.LessOrEqual(ringDist, 12.05f, $"{go.name} is outside the new palisade ring.");
             Assert.GreaterOrEqual(p.y, 0.75f, $"{go.name} must stand upright (y>=0.75).");
             Assert.LessOrEqual(p.y, 1.75f, $"{go.name} must stand upright (y<=1.75).");
         }

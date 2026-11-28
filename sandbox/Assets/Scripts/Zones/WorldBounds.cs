@@ -32,16 +32,15 @@ public static class WorldBounds
     public const float WallThickness = 1f;
 
     /// <summary>
-    /// Fen: inner face of the MoorEdge earthworks (centred ±18, 1 m thick) on
-    /// the 40 m plane. Ossuary and Kiln: 30 m plates, walls 1 m inside the rim.
-    /// Barrens: 40 m plate, walls 1 m inside the rim.
+    /// Walkable half-extents end at the inner wall faces. The ground planes
+    /// extend beyond them so the edge walls stand on solid ground.
     /// </summary>
     public static readonly Zone[] Zones =
     {
-        new Zone("Fen", Vector3.zero, 17.5f),
-        new Zone("Ossuary", KilnLayout.OssuaryOffset, 14f),
-        new Zone("Kiln", KilnLayout.KilnOffset, 14f),
-        new Zone("Barrens", BarrensLayout.BarrensOffset, 19f),
+        new Zone("Fen", Vector3.zero, 35f),
+        new Zone("Ossuary", KilnLayout.OssuaryOffset, 28f),
+        new Zone("Kiln", KilnLayout.KilnOffset, 28f),
+        new Zone("Barrens", BarrensLayout.BarrensOffset, 38f),
     };
 
     /// <summary>Zone whose floor holds <paramref name="p"/>, else the one with the nearest centre.</summary>
