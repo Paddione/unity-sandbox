@@ -509,6 +509,17 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
             Loc.F("inv.stats.line6", DifficultyText());
     }
 
+    /// <summary>
+    /// Upgrade marker score (redesign, testable): net stats of <paramref name="item"/> vs. the
+    /// worn item, 0 when the class-lock badge, consumables, or nothing equipped apply instead.
+    /// </summary>
+    public static int UpgradeMarkScore(ItemInstance item, Equipment eq)
+    {
+        if (item == null || eq == null || item.slot == ItemSlot.Consumable) return 0;
+        if (!Equipment.CanEquip(item, RunProfile.ClassId)) return 0;
+        return ItemCompare.Score(item, eq.GetEquipped(item.slot));
+    }
+
     /// <summary>Two-line caption under a paperdoll slot: slot name, then the worn item.</summary>
     static string SlotCaption(string slot, ItemInstance item)
     {
@@ -656,9 +667,12 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
     void RebuildBag()
     {
         if (bagList == null) return;
-        foreach (Transform child in bagList)
-            if (Application.isPlaying) Destroy(child.gameObject);
-            else DestroyImmediate(child.gameObject);
+        for (int i = bagList.childCount - 1; i >= 0; i--)
+        {
+            var child = bagList.GetChild(i).gameObject;
+            if (Application.isPlaying) Destroy(child);
+            else DestroyImmediate(child);
+        }
         int count = inventory != null ? inventory.Count : 0;
         if (bagCountText != null)
             bagCountText.text = Loc.F("inv.bag.countshort", count, Inventory.Capacity);

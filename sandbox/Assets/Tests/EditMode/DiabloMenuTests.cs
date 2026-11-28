@@ -87,7 +87,8 @@ public class DiabloMenuTests
         ui.ShowTab(DiabloInventoryUI.MenuTab.Stats);
         ui.ShowTab(DiabloInventoryUI.MenuTab.Settings);
         Assert.AreEqual(DiabloInventoryUI.MenuTab.Settings, ui.CurrentTab);
-        // Bag grid always holds all 20 cells (filled + empty frames).
+        // Bag grid always holds all Capacity usable cells (filled + empty frames);
+        // locked display frames ("BagLocked") are not counted here.
         int cells = 0;
         foreach (Transform c in go.GetComponentsInChildren<Transform>(true))
             if (c.name.StartsWith("BagButton") || c.name == "BagEmpty") cells++;

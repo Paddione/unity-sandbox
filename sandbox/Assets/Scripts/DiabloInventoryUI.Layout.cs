@@ -449,12 +449,15 @@ public sealed partial class DiabloInventoryUI
             int i = SelectedOrLast();
             if (i >= 0) EquipIndex(i);
         }, 44f);
+        tcEquipButton.name = "TooltipEquipButton";
         tcSellButton = DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.tc.sell"), null, 44f);
+        tcSellButton.name = "TooltipSellButton";
         tcDiscardButton = DiabloUIFactory.MakeSmallButton(actionRow.transform, Loc.T("inv.tc.discard"), () =>
         {
             int i = SelectedOrLast();
             if (i >= 0) DiscardIndex(i);
         }, 44f);
+        tcDiscardButton.name = "TooltipDiscardButton";
 
         var legend = DiabloUIFactory.MakeText(card.transform, "TooltipLegend", Loc.T("inv.tc.legend"), 12,
             DiabloPalette.ParchmentDim, TextAnchor.MiddleCenter, shadow: false, font: DiabloUIFactory.BodyFont);
@@ -559,6 +562,11 @@ public sealed partial class DiabloInventoryUI
         return button;
     }
 
+    /// <summary>
+    /// One bag cell: "BagButton{i}" for items, "BagEmpty" for empty usable cells
+    /// (both counted against <see cref="Inventory.Capacity"/>). The remaining 8x5
+    /// frames are display-only "BagLocked" (see <see cref="MakeLockedCell"/>).
+    /// </summary>
     GameObject MakeBagCell(ItemInstance item, int bagIndex)
     {
         var go = new GameObject(item == null ? "BagEmpty" : $"BagButton{bagIndex}", typeof(RectTransform));
@@ -605,10 +613,10 @@ public sealed partial class DiabloInventoryUI
                 br.offsetMin = Vector2.zero;
                 br.offsetMax = new Vector2(-5f, -3f);
             }
-            else if (item.slot != ItemSlot.Consumable && equipment != null)
+            else
             {
                 // Upgrade marker: net-better stats than the worn item in that slot.
-                int score = ItemCompare.Score(item, equipment.GetEquipped(item.slot));
+                int score = UpgradeMarkScore(item, equipment);
                 if (score != 0)
                 {
                     var mark = DiabloUIFactory.MakeText(go.transform, "UpgradeMark",
