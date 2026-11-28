@@ -289,6 +289,21 @@ public sealed class DiabloShotCheck : MonoBehaviour
         yield return Wait(0.5f);
         yield return Shot("town_lantern_hold");
 
+        // cinderreach-town-npc-identity: hero among the Hold figures; each wears its own look and turns to the hero.
+        var townBack = hero.transform.position;
+        var townCc = hero.GetComponent<CharacterController>();
+        if (townCc != null) townCc.enabled = false;
+        hero.transform.position = new Vector3(1f, townBack.y, 11.5f);
+        if (townCc != null) townCc.enabled = true;
+        hero.distance = 11f;
+        yield return Wait(1.2f);
+        yield return Shot("town_npcs_facing");
+        if (townCc != null) townCc.enabled = false;
+        hero.transform.position = townBack;
+        if (townCc != null) townCc.enabled = true;
+        hero.distance = 16f;
+        yield return Wait(0.3f);
+
         // 8) Town & Sanctuary UI Gallery (Vendor, Stash, Waypoint, Inventory, Bag, Settings, Character, Pause).
         var bagComp = hero.GetComponent<Inventory>();
         var walComp = hero.GetComponent<Wallet>();

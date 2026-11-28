@@ -12,7 +12,7 @@ using UnityEngine;
 public static class TownBuilder
 {
     /// <summary>Vendor model: a hooded trader, distinct from the Knight hero.</summary>
-    public const string VendorModelPath = "Adventurers/Characters/Rogue_Hooded.fbx";
+    public static string VendorModelPath => NpcModelPath(StoryIds.Ilsabe);
 
     const string RigGeneralPath =
         "Assets/ThirdParty/KayKit/CharacterAnimations/Rig_Medium/Rig_Medium_General.fbx";
@@ -92,7 +92,7 @@ public static class TownBuilder
     /// </summary>
     public static void SpawnVendor()
     {
-        var prefab = LoadModel(VendorModelPath);
+        var prefab = LoadModel(NpcModelPath(StoryIds.Ilsabe));
         var vendor = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         vendor.name = Vendor.VendorObjectName;
         vendor.transform.position = new Vector3(-3.5f, 0f, 11f);
@@ -105,6 +105,7 @@ public static class TownBuilder
         npc.npcId = StoryIds.Ilsabe;
         npc.shopNpc = true;
         WireVendorIdle(vendor);
+        DressNpc(vendor, StoryIds.Ilsabe);
     }
 
     /// <summary>
@@ -114,13 +115,28 @@ public static class TownBuilder
     /// </summary>
     public static void SpawnStoryNpcs()
     {
-        SpawnStoryNpc("Mage.fbx", StoryIds.Ottilie, new Vector3(1.5f, 0f, 14.5f), false);
-        SpawnStoryNpc("Rogue.fbx", StoryIds.Merle, new Vector3(-2f, 0f, 16f), false);
+        SpawnStoryNpc(StoryIds.Ottilie, new Vector3(1.5f, 0f, 14.5f), false);
+        SpawnStoryNpc(StoryIds.Merle, new Vector3(-2f, 0f, 16f), false);
     }
 
-    static void SpawnStoryNpc(string model, string npcId, Vector3 pos, bool shop)
+    /// <summary>Body of a named NPC (cinderreach-town-npc-identity, <see cref="NpcAppearance"/>).</summary>
+    public static string NpcModelPath(string npcId)
     {
-        var prefab = LoadModel("Adventurers/Characters/" + model);
+        if (!NpcAppearance.TryGet(npcId, out var look))
+            throw new System.Exception($"Town build: no NPC look for {npcId}");
+        return "Adventurers/Characters/" + look.model;
+    }
+
+    /// <summary>Own tint plus hero-watching turn for a Hold figure.</summary>
+    static void DressNpc(GameObject figure, string npcId)
+    {
+        figure.AddComponent<NpcLook>().npcId = npcId;
+        figure.AddComponent<NpcFacing>();
+    }
+
+    static void SpawnStoryNpc(string npcId, Vector3 pos, bool shop)
+    {
+        var prefab = LoadModel(NpcModelPath(npcId));
         var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         go.name = "StoryNpc_" + npcId;
         go.transform.position = pos;
@@ -132,6 +148,7 @@ public static class TownBuilder
         npc.npcId = npcId;
         npc.shopNpc = shop;
         WireVendorIdle(go);
+        DressNpc(go, npcId);
     }
 
     /// <summary>
@@ -255,7 +272,19 @@ public static class TownBuilder
         var npc = post.AddComponent<StoryNpc>();
         npc.npcId = StoryIds.Jorin;
         npc.shopNpc = true;
+
+        // cinderreach-town-npc-identity: Jorin himself stands behind his anvil
+        // (the anvil block stays the click target; the figure is dressing).
+        var smith = (GameObject)PrefabUtility.InstantiatePrefab(LoadModel(NpcModelPath(StoryIds.Jorin)));
+        smith.name = SmithFigureName;
+        smith.transform.position = new Vector3(5.5f, 0f, 12.4f);
+        smith.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        WireVendorIdle(smith);
+        DressNpc(smith, StoryIds.Jorin);
     }
+
+    /// <summary>Scene name of Jorin's figure behind the anvil.</summary>
+    public const string SmithFigureName = "SmithFigure_jorin";
 
     /// <summary>Idle-only Mecanim rig (shared controller, built once per session).</summary>
     static void WireVendorIdle(GameObject vendor)

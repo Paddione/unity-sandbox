@@ -401,6 +401,11 @@ drei Rollen auf. Im Koop spielen bis zu vier Spieler host-autoritativ über NGO.
   Truhe `StashChest` mit 40 Plätzen, Schmiede `SmithStation` (Verwerten 1/3 Material, Umschmieden
   3 Material + 50 Gold, ein Affix-Slot pro Gegenstand dauerhaft, Uniques ausgenommen).
 
+- Hold-Figuren (cinderreach-town-npc-identity, 2026-11-28): eigene KayKit-Körper und Tönung je NPC
+  (`NpcAppearance`: Ilsabe Rogue_Hooded/Pflaume, Ottilie Mage/Moos, Merle Rogue/Asche, Jorin Barbarian/Ruß,
+  `NpcLook` per MaterialPropertyBlock). Jorin steht als Figur `SmithFigure_jorin` hinter dem Amboss (Amboss bleibt
+  Klickziel). `NpcFacing`: in 6 m dreht sich jede Figur zum nächsten Helden, sonst zurück in die Ruhepose.
+
 ### Zonen, Akt und Wiederspielbarkeit
 
 - Akt-Kette `ActProgress`: Abbot-Kill öffnet den Kiln, Kilnmother-Kill setzt „Akt I abgeschlossen“
