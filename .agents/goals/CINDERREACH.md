@@ -557,6 +557,9 @@ liest für Menüs ohne Nebenwirkung.
   neueste Testergebnisse, `G-DIABLO04` Runner- und Editor-Dienst, `G-DIABLO05` Windows-Stage-Parität,
   `G-DIABLO06` neuester Autoplay. Neue Prefabs, Skripte oder Pflichtphasen ziehen den Vertrag in
   dotfiles im selben Durchlauf nach.
+  SSOT-Inventar aller Unity-Health-Verträge (Observer vs. Gates, `R1–R7`-Abgrenzung,
+  Collector→`/unity`-Pfad): `dotfiles:apps/agent-board/docs/unity-health-inventory.md`.
+  Diese Datei bleibt die Spiel-Ist-Stand-Quelle; die Vertragstabelle lebt nur dort.
 - Autoplay: `SessionAutoplay` (`-autoplay`, `-autoplay-god`, `-seed`, `-difficulty`, `-class`) schreibt
   "autoplay-result.json" mit den Phasen `town, zone1, gate, zone2, boss, zone3, actboss, zone4, boss3,
   complete, boss4` (Koop-Client siehe Koop-Paarlauf). Solo und Koop-Host spielen alle Story-Quests
