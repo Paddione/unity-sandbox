@@ -38,11 +38,15 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
     const int SlotArraySize = (int)ItemSlot.Belt + 1;
     Text statsText;
     Text bagCountText;
-    Text bagDetailText;
     Text statsDetailText;
     Transform paramContent;
     Transform statsParamContent;
     Transform bagList;
+
+    /// <summary>Tooltip column selection (redesign): shown bag index or equipped slot.</summary>
+    int tcBagIndex = -1;
+    ItemSlot? tcSlot;
+    bool tcWired;
 
     /// <summary>Latest computed character parameter breakdown (test seam).</summary>
     public CharacterStatBreakdown.CharacterStatSnapshot LastStatSnapshot { get; private set; }
@@ -314,20 +318,17 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
 
     internal void CellHover(InventoryCell cell, bool enter)
     {
-        if (!enter)
-        {
-            ItemTooltip.HideFor(gameObject);
-            return;
-        }
+        // Redesign: hover/click fills the fixed tooltip column (no floating
+        // ItemTooltip in the inventory; stash/vendor/smith keep it). The column
+        // persists after hover exit; only dragging hides the floaters.
+        if (!enter) return;
         var item = ItemAt(cell);
-        if (cell.kind == InventoryCell.Kind.Bag && item != null)
-        {
-            selectedIndex = cell.index;
-            if (bagDetailText != null) bagDetailText.text = DetailFor(item);
-        }
+        if (cell.kind == InventoryCell.Kind.Bag && item != null) selectedIndex = cell.index;
         if (item == null || IsDragging) return;
-        var tip = ItemTooltip.For(gameObject);
-        if (tip != null) tip.Show(item, equipment, null, cell.gameObject);
+        ItemTooltip.HideFor(gameObject);
+        InfoTooltip.HideFor(gameObject);
+        if (cell.kind == InventoryCell.Kind.Bag) FillTooltipColumn(item, cell.index, null);
+        else if (cell.kind == InventoryCell.Kind.Equip) FillTooltipColumn(item, -1, cell.Slot);
     }
 
     internal void CellRightClick(InventoryCell cell)
@@ -465,6 +466,11 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
             statsDetailText.text = LastStatSnapshot.RenderPlainSummary() + "\n\n" + Loc.F("inv.stats.line6", DifficultyText());
         RebuildBag();
         if (noticeText != null) noticeText.text = Notice;
+        WireTooltipActions();
+        if (footerGoldText != null)
+            footerGoldText.text = Loc.F("inv.hero.gold", DiabloPalette.ToHex(DiabloPalette.TrimGold), gold, flask.Charges, flask.MaxCharges);
+        if (footerDiffText != null) footerDiffText.text = DifficultyText();
+        FillTooltipColumnForSelection();
         foreach (var r in settingsRefreshes) r?.Invoke();
         PaintTabs();
         PaintSlotTints();
@@ -520,6 +526,104 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
         return ItemDetailsView.Render(item, equipped);
     }
 
+    /// <summary>Wire the tooltip column Sell button once (Equip/Discard are wired at build).</summary>
+    void WireTooltipActions()
+    {
+        if (tcWired || tcSellButton == null) { tcWired = tcSellButton != null; return; }
+        tcWired = true;
+        tcSellButton.onClick.AddListener(() =>
+        {
+            int i = tcBagIndex;
+            if (i < 0 || inventory == null || wallet == null) return;
+            var it = inventory.Get(i);
+            if (it == null) { SetNotice(Loc.T("inv.notice.gone")); Refresh(); return; }
+            int price = VendorStock.SellPrice(it);
+            if (VendorStock.TrySell(i, wallet, inventory))
+            {
+                DiabloAudio.PlayVendorSell();
+                SetNotice(Loc.F("inv.notice.sold", LootDrop.ItemLabel(it), price));
+            }
+            else SetNotice(Loc.F("inv.notice.nosell", LootDrop.ItemLabel(it)));
+            Refresh();
+        });
+    }
+
+    /// <summary>Show the current bag selection in the fixed tooltip column.</summary>
+    void FillTooltipColumnForSelection()
+    {
+        if (inventory != null && inventory.Count > 0)
+        {
+            int i = SelectedOrLast();
+            if (i >= 0)
+            {
+                var it = inventory.Get(i);
+                if (it != null) { FillTooltipColumn(it, i, null); return; }
+            }
+        }
+        FillTooltipColumn(null, -1, null);
+    }
+
+    /// <summary>
+    /// Fill the fixed tooltip column: title, rarity/slot/level, detail card,
+    /// comparison against the worn item, and context actions (Anlegen/Ablegen,
+    /// Verkaufen, Wegwerfen) on the authoritative equip path.
+    /// </summary>
+    void FillTooltipColumn(ItemInstance item, int bagIndex, ItemSlot? slot)
+    {
+        tcBagIndex = bagIndex;
+        tcSlot = slot;
+        if (item == null)
+        {
+            if (tcTitleText != null)
+            {
+                tcTitleText.text = Loc.T("inv.tc.title");
+                tcTitleText.color = DiabloPalette.ParchmentDim;
+            }
+            if (tcMetaText != null) tcMetaText.text = "";
+            if (tcBodyText != null) tcBodyText.text = Loc.T("inv.tc.empty");
+            if (tcCompareText != null) tcCompareText.text = "";
+            SetTcLabel(tcEquipButton, Loc.T("inv.tc.equip"));
+            return;
+        }
+        var equipped = equipment != null && item.slot != ItemSlot.Consumable
+            ? equipment.GetEquipped(item.slot) : null;
+        if (tcTitleText != null)
+        {
+            tcTitleText.text = LootDrop.ItemLabel(item);
+            tcTitleText.color = DiabloPalette.Rarity(item.rarity);
+        }
+        if (tcMetaText != null)
+        {
+            string level = item.itemLevel <= 0 ? Loc.T("item.card.ilvl_legacy") : Loc.F("item.card.ilvl", item.itemLevel);
+            tcMetaText.text = Loc.F("inv.tip.meta", DiabloPalette.ToHex(DiabloPalette.ParchmentDim),
+                ItemText.Rarity(item.rarity), ItemText.Slot(item.slot), level);
+        }
+        if (tcBodyText != null) tcBodyText.text = ItemDetailsView.Render(item, equipped);
+        if (tcCompareText != null)
+        {
+            string cmp = CompareSummary(item, equipped);
+            tcCompareText.text = string.IsNullOrEmpty(cmp)
+                ? Loc.T("inv.nobonus")
+                : Loc.T("inv.tc.compare") + "\n" + cmp;
+        }
+        bool worn = slot.HasValue;
+        SetTcLabel(tcEquipButton, Loc.T(worn ? "inv.tc.unequip" : "inv.tc.equip"));
+        var equipBtn = tcEquipButton;
+        if (equipBtn != null)
+        {
+            equipBtn.onClick.RemoveAllListeners();
+            if (worn) equipBtn.onClick.AddListener(() => UnequipSlot((int)slot.Value));
+            else equipBtn.onClick.AddListener(() => { if (tcBagIndex >= 0) EquipIndex(tcBagIndex); });
+        }
+    }
+
+    static void SetTcLabel(Button b, string text)
+    {
+        if (b == null) return;
+        var label = b.GetComponentInChildren<Text>();
+        if (label != null) label.text = text;
+    }
+
     public const string BetterColor = "#6fd36f";
     public const string WorseColor = "#e05a4a";
 
@@ -556,21 +660,18 @@ public sealed partial class DiabloInventoryUI : MonoBehaviour
             if (Application.isPlaying) Destroy(child.gameObject);
             else DestroyImmediate(child.gameObject);
         int count = inventory != null ? inventory.Count : 0;
-        var bagFlask = HealingFlask.For(gameObject);
         if (bagCountText != null)
-            bagCountText.text = Loc.F("inv.bag.count", count, Inventory.Capacity, (wallet != null ? wallet.Gold : 0), bagFlask.Charges, bagFlask.MaxCharges);
+            bagCountText.text = Loc.F("inv.bag.countshort", count, Inventory.Capacity);
         for (int i = 0; i < Inventory.Capacity; i++)
         {
             var item = inventory != null && i < inventory.Count ? inventory.Get(i) : null;
             var cell = MakeBagCell(item, i);
             cell.transform.SetParent(bagList, false);
         }
+        // Artboard grid is 8x5 with Capacity usable cells; the rest renders locked.
+        for (int i = Inventory.Capacity; i < 40; i++)
+            MakeLockedCell().transform.SetParent(bagList, false);
         if (selectedIndex >= count) selectedIndex = -1;
-        if (bagDetailText != null)
-        {
-            if (count > 0) bagDetailText.text = DetailFor(inventory.Get(SelectedOrLast()));
-            else bagDetailText.text = Loc.T("inv.bag.empty");
-        }
     }
 
     int SelectedOrLast() =>

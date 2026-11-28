@@ -171,24 +171,25 @@ public sealed class InventoryPaperdollPlayTests
     }
 
     [UnityTest]
-    public IEnumerator Hover_ShowsTooltipAndShiftCompares()
+    public IEnumerator Hover_FillsTooltipColumnWithComparison()
     {
         equipment.Equip(Item(ItemSlot.Weapon, 2));
         inventory.Add(Item(ItemSlot.Weapon, 5));
         ui.SetOpen(true);
         yield return null;
-        try
-        {
-            ItemTooltip.ShiftOverride = true;
-            ExecuteEvents.Execute(BagCell(0), Pointer(PointerEventData.InputButton.Left), ExecuteEvents.pointerEnterHandler);
-            var tip = hero.GetComponent<ItemTooltip>();
-            Assert.IsNotNull(tip);
-            Assert.IsTrue(tip.IsVisible);
-            Assert.IsTrue(tip.IsComparing);
-            StringAssert.Contains($"<color={DiabloInventoryUI.BetterColor}>{ItemCompare.UpArrow}", tip.HoverText);
-            ExecuteEvents.Execute(BagCell(0), Pointer(PointerEventData.InputButton.Left), ExecuteEvents.pointerExitHandler);
-            Assert.IsFalse(tip.IsVisible);
-        }
-        finally { ItemTooltip.ShiftOverride = null; }
+        ExecuteEvents.Execute(BagCell(0), Pointer(PointerEventData.InputButton.Left), ExecuteEvents.pointerEnterHandler);
+        var col = hero.transform.Find("InventoryCanvas/Panel/InventoryPage/TooltipColumn/TooltipCard");
+        Assert.IsNotNull(col, "Fixed tooltip column exists.");
+        var title = col.Find("TooltipTitle")?.GetComponent<Text>();
+        Assert.IsNotNull(title);
+        StringAssert.Contains(LootDrop.ItemLabel(inventory.Get(0)), title.text);
+        var compare = col.Find("TooltipCompare")?.GetComponent<Text>();
+        Assert.IsNotNull(compare);
+        StringAssert.Contains(DiabloInventoryUI.BetterColor, compare.text, "Positive delta renders green in the comparison.");
+        // The column persists after hover exit (no floating tooltip in the inventory).
+        ExecuteEvents.Execute(BagCell(0), Pointer(PointerEventData.InputButton.Left), ExecuteEvents.pointerExitHandler);
+        var tip = hero.GetComponent<ItemTooltip>();
+        Assert.IsFalse(tip != null && tip.IsVisible);
+        Assert.AreEqual(title.text, col.Find("TooltipTitle")?.GetComponent<Text>().text);
     }
 }
