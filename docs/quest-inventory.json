@@ -1,0 +1,871 @@
+{
+  "source": "StoryCatalog.All + LocCatalog.Story.cs",
+  "quests": {
+    "h1": {
+      "id": "h1",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Die dunkle Tür",
+      "prereq": null,
+      "prereqStatus": null,
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "KilnOpen",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Fuhrbrief",
+          "count": 1,
+          "label": "Den Fuhrbrief am Totenkarren im Aschenmoor finden"
+        },
+        {
+          "type": "Kill",
+          "target": "FenBrute",
+          "count": 1,
+          "label": "Den Moorschläger am Karren erschlagen"
+        }
+      ]
+    },
+    "h2": {
+      "id": "h2",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Die Siegel vom Stillen Grund",
+      "prereq": "H1",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "KilnOpen",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Enter",
+          "target": "ZoneOssuary",
+          "count": 1,
+          "label": "Das Versunkene Beinhaus betreten"
+        },
+        {
+          "type": "Kill",
+          "target": "BoneWarden",
+          "count": 4,
+          "label": "Knochenwächter zerschlagen"
+        },
+        {
+          "type": "Kill",
+          "target": "Abbot",
+          "count": 1,
+          "label": "Den Hohlen Abt bezwingen"
+        }
+      ]
+    },
+    "h3": {
+      "id": "h3",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Lest die Namen",
+      "prereq": "H2",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": false,
+      "catchUp": "ActOneComplete",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Jorin",
+          "count": 1,
+          "label": "Mit Jorin Hagedorn an der Schmiede sprechen"
+        },
+        {
+          "type": "Enter",
+          "target": "ZoneKiln",
+          "count": 1,
+          "label": "Den Glutofen betreten"
+        }
+      ]
+    },
+    "h4": {
+      "id": "h4",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Asche schuldet niemand",
+      "prereq": "H3",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": true,
+      "catchUp": "ActOneComplete",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "Kilnmother",
+          "count": 1,
+          "label": "Die Ofenmutter bezwingen"
+        }
+      ]
+    },
+    "h5": {
+      "id": "h5",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Siebenundvierzig",
+      "prereq": "H4",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Ilsabe",
+          "count": 1,
+          "label": "Mit Ilsabe Krumm an ihrem Stand sprechen"
+        }
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "act": 1,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Ilsabes Lieferbuch",
+      "prereq": "H1",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 150,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Lieferbuch",
+          "count": 1,
+          "label": "Ilsabes Lieferbuch bei der Kiste im Aschenmoor bergen"
+        }
+      ]
+    },
+    "n2": {
+      "id": "n2",
+      "act": 1,
+      "main": false,
+      "giver": "Ottilie",
+      "title": "Die stillen Brüder",
+      "prereq": "H2",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "RareHelm",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Grabtafel",
+          "count": 3,
+          "label": "Grabtafeln im Beinhaus lesen"
+        }
+      ]
+    },
+    "n3": {
+      "id": "n3",
+      "act": 1,
+      "main": false,
+      "giver": "Jorin",
+      "title": "Hagedorns Spitzen",
+      "prereq": null,
+      "prereqStatus": null,
+      "gate": "KilnOpen",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "SmithKit",
+      "rewardGold": 50,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "AshLancer",
+          "count": 6,
+          "label": "Aschenlanzer im Glutofen erschlagen"
+        }
+      ]
+    },
+    "h6": {
+      "id": "h6",
+      "act": 2,
+      "main": true,
+      "giver": "Merle",
+      "title": "Die letzte Fuhre",
+      "prereq": null,
+      "prereqStatus": null,
+      "gate": "ActOneComplete",
+      "autoAccept": false,
+      "turnIn": false,
+      "catchUp": "ZoneBossDefeated",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Enter",
+          "target": "ZoneBarrens",
+          "count": 1,
+          "label": "Die Glasbrache betreten"
+        }
+      ]
+    },
+    "h7": {
+      "id": "h7",
+      "act": 2,
+      "main": true,
+      "giver": "Merle",
+      "title": "Scherben lesen",
+      "prereq": "H6",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "ZoneBossDefeated",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "DuneAugur",
+          "count": 3,
+          "label": "Dünenseher erschlagen"
+        }
+      ]
+    },
+    "h8": {
+      "id": "h8",
+      "act": 2,
+      "main": true,
+      "giver": "Merle",
+      "title": "Nicht loslassen",
+      "prereq": "H7",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "ZoneBossDefeated",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "Glasswright",
+          "count": 1,
+          "label": "Den Glasmacher bezwingen"
+        }
+      ]
+    },
+    "h9": {
+      "id": "h9",
+      "act": 2,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Wessen Licht",
+      "prereq": "H8",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Merle",
+          "count": 1,
+          "label": "Mit Merle Sandkamp sprechen"
+        },
+        {
+          "type": "Talk",
+          "target": "Ottilie",
+          "count": 1,
+          "label": "Mit Ottilie Wachs sprechen"
+        }
+      ]
+    },
+    "n4": {
+      "id": "n4",
+      "act": 2,
+      "main": false,
+      "giver": "Merle",
+      "title": "Tamm",
+      "prereq": "H6",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 250,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "GlassElite",
+          "count": 1,
+          "label": "Einen Glasvogt in der Glasbrache bezwingen"
+        }
+      ]
+    },
+    "n5": {
+      "id": "n5",
+      "act": 2,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Was die Seher sahen",
+      "prereq": "H5",
+      "prereqStatus": "Done",
+      "gate": "ActOneComplete",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "SeerCirclet",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "DuneAugur",
+          "count": 4,
+          "label": "Dünenseher in der Glasbrache erschlagen"
+        }
+      ]
+    },
+    "h14": {
+      "id": "h14",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Der zweite Karren",
+      "prereq": "H1",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "KilnOpen",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Fuhrfetzen",
+          "count": 2,
+          "label": "Fuhrfetzen am zweiten Karren im Aschenmoor finden"
+        },
+        {
+          "type": "Kill",
+          "target": "FenBrute",
+          "count": 1,
+          "label": "Den Moorschläger am zweiten Karren erschlagen"
+        }
+      ]
+    },
+    "h15": {
+      "id": "h15",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Die siebte Tafel",
+      "prereq": "H2",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": false,
+      "catchUp": "KilnOpen",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Tafelbruch",
+          "count": 3,
+          "label": "Tafelbruchstücke im Beinhaus bergen"
+        },
+        {
+          "type": "Talk",
+          "target": "Ottilie",
+          "count": 1,
+          "label": "Mit Ottilie Wachs sprechen"
+        }
+      ]
+    },
+    "h16": {
+      "id": "h16",
+      "act": 1,
+      "main": true,
+      "giver": "Jorin",
+      "title": "Jorins Liste",
+      "prereq": "H3",
+      "prereqStatus": "Active",
+      "gate": "KilnOpen",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "ActOneComplete",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Fuhrliste",
+          "count": 1,
+          "label": "Die Fuhrliste im Glutofen finden"
+        },
+        {
+          "type": "Kill",
+          "target": "AshLancer",
+          "count": 2,
+          "label": "Aschenlanzer im Glutofen erschlagen"
+        }
+      ]
+    },
+    "h17": {
+      "id": "h17",
+      "act": 1,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Das zweite Siegel",
+      "prereq": "H4",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": false,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Ilsabe",
+          "count": 1,
+          "label": "Mit Ilsabe Krumm sprechen"
+        },
+        {
+          "type": "Talk",
+          "target": "Ottilie",
+          "count": 1,
+          "label": "Mit Ottilie Wachs sprechen"
+        }
+      ]
+    },
+    "n8": {
+      "id": "n8",
+      "act": 1,
+      "main": false,
+      "giver": "Ottilie",
+      "title": "Vogts Bote",
+      "prereq": "H1",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 100,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Siegelband",
+          "count": 1,
+          "label": "Das Siegelband am zweiten Karren bergen"
+        }
+      ]
+    },
+    "n9": {
+      "id": "n9",
+      "act": 1,
+      "main": false,
+      "giver": "Ottilie",
+      "title": "Thewes' Licht",
+      "prereq": "H2",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 60,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Grablicht",
+          "count": 1,
+          "label": "Thewes' Grablicht im Beinhaus bergen"
+        }
+      ]
+    },
+    "n10": {
+      "id": "n10",
+      "act": 1,
+      "main": false,
+      "giver": "Jorin",
+      "title": "Schlackeglut",
+      "prereq": null,
+      "prereqStatus": null,
+      "gate": "KilnOpen",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 80,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "CinderThrall",
+          "count": 4,
+          "label": "Schlackenknechte im Glutofen erschlagen"
+        }
+      ]
+    },
+    "n11": {
+      "id": "n11",
+      "act": 1,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Ilsabes Preis",
+      "prereq": "H3",
+      "prereqStatus": "Active",
+      "gate": "KilnOpen",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 120,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Russseite",
+          "count": 1,
+          "label": "Die lose Rußseite im Glutofen bergen"
+        }
+      ]
+    },
+    "h18": {
+      "id": "h18",
+      "act": 2,
+      "main": true,
+      "giver": "Merle",
+      "title": "Was im Glas liegt",
+      "prereq": "H7",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "ZoneBossDefeated",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Sehglas",
+          "count": 2,
+          "label": "Sehgläser der Dünenseher bergen"
+        },
+        {
+          "type": "Talk",
+          "target": "Merle",
+          "count": 1,
+          "label": "Mit Merle sprechen"
+        }
+      ]
+    },
+    "h19": {
+      "id": "h19",
+      "act": 2,
+      "main": true,
+      "giver": "Merle",
+      "title": "Die Ordnung der Scherben",
+      "prereq": "H8",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "ZoneBossDefeated",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Glasscherbe",
+          "count": 3,
+          "label": "Glasscherben an den Glassäulen bergen"
+        }
+      ]
+    },
+    "n12": {
+      "id": "n12",
+      "act": 2,
+      "main": false,
+      "giver": "Merle",
+      "title": "Tamms Rad",
+      "prereq": "N4",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 150,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Speichenrad",
+          "count": 1,
+          "label": "Das Speichenrad in der Glasbrache bergen"
+        },
+        {
+          "type": "Talk",
+          "target": "Merle",
+          "count": 1,
+          "label": "Zu Merle bringen"
+        }
+      ]
+    },
+    "n13": {
+      "id": "n13",
+      "act": 2,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Das fünfte Glas",
+      "prereq": "N5",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 200,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Sehglas",
+          "count": 1,
+          "label": "Das fünfte Sehglas bergen"
+        }
+      ]
+    },
+    "n14": {
+      "id": "n14",
+      "act": 2,
+      "main": false,
+      "giver": "Merle",
+      "title": "Tamms Scherbe",
+      "prereq": "H18",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 100,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Glasscherbe",
+          "count": 1,
+          "label": "Tamms Scherbe an den Glassäulen bergen"
+        }
+      ]
+    },
+    "n15": {
+      "id": "n15",
+      "act": 2,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Die nächste Spende",
+      "prereq": "N5",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 150,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Spendenseite",
+          "count": 1,
+          "label": "Die Spendenseite in der Glasbrache bergen"
+        }
+      ]
+    },
+    "h10": {
+      "id": "h10",
+      "act": 3,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Die letzte Nacht in der Wacht",
+      "prereq": "H9",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Ottilie",
+          "count": 1,
+          "label": "Mit Ottilie sprechen"
+        },
+        {
+          "type": "Talk",
+          "target": "Merle",
+          "count": 1,
+          "label": "Mit Merle sprechen"
+        },
+        {
+          "type": "Talk",
+          "target": "Ilsabe",
+          "count": 1,
+          "label": "Mit Ilsabe sprechen"
+        },
+        {
+          "type": "Talk",
+          "target": "Jorin",
+          "count": 1,
+          "label": "Mit Jorin sprechen"
+        }
+      ]
+    },
+    "n6": {
+      "id": "n6",
+      "act": 3,
+      "main": false,
+      "giver": "Jorin",
+      "title": "Jorins Einschmelzen",
+      "prereq": "H10",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "SmithKit",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Lanzenspitze",
+          "count": 4,
+          "label": "Lanzenspitzen an der Schmiede abgeben"
+        }
+      ]
+    },
+    "n7": {
+      "id": "n7",
+      "act": 3,
+      "main": false,
+      "giver": "Ilsabe",
+      "title": "Ilsabes letztes Angebot",
+      "prereq": "H10",
+      "prereqStatus": "Active",
+      "gate": "None",
+      "autoAccept": false,
+      "turnIn": true,
+      "catchUp": "None",
+      "reward": "Gold",
+      "rewardGold": 200,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Spendenseite",
+          "count": 1,
+          "label": "Die letzte Spendenseite zu Ilsabe bringen"
+        }
+      ]
+    },
+    "h11": {
+      "id": "h11",
+      "act": 3,
+      "main": true,
+      "giver": "Merle",
+      "title": "Glut am Moortor",
+      "prereq": "H10",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Collect",
+          "target": "Glutspur",
+          "count": 3,
+          "label": "Drei Glutspuren am Moortor deuten"
+        }
+      ]
+    },
+    "h12": {
+      "id": "h12",
+      "act": 3,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Die Heimkehr",
+      "prereq": "H11",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Kill",
+          "target": "Thewes",
+          "count": 1,
+          "label": "Thewes, den Heimkehrer, am Moortor bezwingen"
+        }
+      ]
+    },
+    "h13": {
+      "id": "h13",
+      "act": 3,
+      "main": true,
+      "giver": "Ottilie",
+      "title": "Zerschlagen oder halten",
+      "prereq": "H12",
+      "prereqStatus": "Done",
+      "gate": "None",
+      "autoAccept": true,
+      "turnIn": false,
+      "catchUp": "None",
+      "reward": "None",
+      "rewardGold": 0,
+      "objectives": [
+        {
+          "type": "Talk",
+          "target": "Ottilie",
+          "count": 1,
+          "label": "In die Wacht zurückkehren und entscheiden"
+        }
+      ]
+    }
+  }
+}
