@@ -765,6 +765,7 @@ public static class SandboxBuilder
             SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{i}",
                 huskSpots[i], 5, LootTier.Normal, 1f, null);
 
+        MoorbrutEncounter.Place();
         EncounterBuilder.PlacePairs(Vector3.zero, EncounterBuilder.FenPacks, (i, pos) =>
             SpawnZoneHusk(huskModels[i % huskModels.Length], $"Husk_{LayoutSeeder.HuskCount + i}",
                 pos, 5, LootTier.Normal, 1f, null));

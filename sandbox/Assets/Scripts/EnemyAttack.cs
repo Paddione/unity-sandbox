@@ -48,6 +48,10 @@ public sealed class EnemyAttack : MonoBehaviour
     /// <summary>Times the approach had to turn off the straight line (test seam).</summary>
     public int detours;
 
+    MoorbrutCombat brood;
+    float StrikeRange => brood ? brood.Reach : Range;
+    float RecoveryTime => brood ? brood.Recovery : Cooldown;
+
     Transform victim;
     HuskAnimator anim;
     float windupStart = -1f;
@@ -72,6 +76,7 @@ public sealed class EnemyAttack : MonoBehaviour
 
     void Awake()
     {
+        brood = GetComponent<MoorbrutCombat>();
         baseScale = transform.localScale;
         SetHome(transform.position);
         anim = GetComponent<HuskAnimator>();
@@ -94,21 +99,21 @@ public sealed class EnemyAttack : MonoBehaviour
         if (hero == null)
         {
             CancelWindup();
-            anim.SetMoving(false);
+            SetMoving(false);
             return;
         }
         if (IsStunned)
         {
             // Tank slam: hold still, cancel any windup, never strike while stunned.
             CancelWindup();
-            anim.SetMoving(false);
+            SetMoving(false);
             return;
         }
         if (KilnLayout.PlazaSafe(hero.position) || BarrensLayout.PlazaSafe(hero.position))
         {
             // Fair-fights arrival plaza: hold while the hero orients.
             CancelWindup();
-            anim.SetMoving(false);
+            SetMoving(false);
             return;
         }
         if (!homeSet) SetHome(transform.position);
@@ -117,7 +122,7 @@ public sealed class EnemyAttack : MonoBehaviour
         if (EncounterLayout.CurrentZone(hero.position) != EncounterLayout.CurrentZone(homePos))
         {
             CancelWindup();
-            anim.SetMoving(false);
+            SetMoving(false);
             return;
         }
         float dist = PlanarDistance(hero);
@@ -127,17 +132,20 @@ public sealed class EnemyAttack : MonoBehaviour
             && dist > EncounterLayout.PersonalSpace)
         {
             CancelWindup();
-            anim.SetMoving(false);
+            SetMoving(false);
             return;
         }
-        FaceHero(hero);
-        if (dist > Range && dist <= AggroRange && windupStart < 0f
-            && Time.time - lastStrike >= Cooldown)
+        if (!brood || windupStart < 0f) FaceHero(hero);
+        if (dist > StrikeRange && dist <= AggroRange && windupStart < 0f
+            && Time.time - lastStrike >= RecoveryTime)
         {
             var step = hero.position - transform.position;
             step.y = 0f;
             step.Normalize();
-            float move = Mathf.Min(ApproachSpeed * EnemyStatus.MoveFactor(gameObject) * Time.deltaTime, dist - StopDistance);
+            if (brood) step = brood.Approach(step, dist);
+            float speed = brood ? brood.Speed : ApproachSpeed;
+            float stop = brood ? StrikeRange * 0.9f : StopDistance;
+            float move = Mathf.Min(speed * EnemyStatus.MoveFactor(gameObject) * Time.deltaTime, dist - stop);
             bool walked = false;
             if (move > 0f)
             {
@@ -148,32 +156,40 @@ public sealed class EnemyAttack : MonoBehaviour
                     walked = true;
                 }
             }
-            anim.SetMoving(walked);
+            SetMoving(walked);
             return;
         }
-        anim.SetMoving(false);
+        SetMoving(false);
         if (windupStart >= 0f)
         {
-            if (dist > Range + DodgeLeeway + 1.5f)
+            if (dist > StrikeRange + DodgeLeeway + 1.5f)
             {
                 // Ran far away: cancel, short cooldown before re-engaging.
                 CancelWindup();
                 lastStrike = Time.time;
             }
-            else if (Time.time - windupStart >= Windup)
+            else if (Time.time - windupStart >= (brood ? brood.ImpactTime : Windup))
             {
                 ResolveWindup(hero, dist);
             }
             return;
         }
-        if (dist <= Range && Time.time - lastStrike >= Cooldown)
+        if (dist <= StrikeRange && Time.time - lastStrike >= RecoveryTime
+            && (!brood || brood.InArc(hero.position)))
         {
             victim = hero;
             windupStart = Time.time;
             anim.OnAttack();
-            transform.localScale = new Vector3(
+            if (brood) brood.BeginStrike();
+            else transform.localScale = new Vector3(
                 baseScale.x * 1.1f, baseScale.y * 0.85f, baseScale.z * 1.1f);
         }
+    }
+
+    void SetMoving(bool moving)
+    {
+        anim.SetMoving(moving);
+        if (brood) brood.Walk(moving);
     }
 
     void ResolveWindup(Transform hero, float dist)
@@ -181,7 +197,8 @@ public sealed class EnemyAttack : MonoBehaviour
         transform.localScale = baseScale;
         windupStart = -1f;
         lastStrike = Time.time;
-        if (hero == null || dist > Range + DodgeLeeway) return; // dodged
+        if (hero == null || dist > StrikeRange + DodgeLeeway) return; // dodged
+        if (brood && !brood.InArc(hero.position)) return;
         if (EnemyStatus.IsBlinded(gameObject)) return; // Smoke Pot: a blinded swing misses
         var hp = hero.GetComponent<PlayerHealth>();
         if (hp == null) return;
@@ -268,6 +285,7 @@ public sealed class EnemyAttack : MonoBehaviour
         if (windupStart < 0f) return;
         windupStart = -1f;
         victim = null;
+        if (brood) brood.ResetPose();
         transform.localScale = baseScale;
     }
 
