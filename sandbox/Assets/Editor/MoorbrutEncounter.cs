@@ -33,6 +33,8 @@ public static class MoorbrutEncounter
         var model = visual.GetComponent<Animation>();
         if (!model || !model.GetClip("Walk") || !model.GetClip("Strike"))
             throw new System.InvalidOperationException($"Missing walk/strike clips on {asset}");
+        model.playAutomatically = false;
+        PrefabUtility.RecordPrefabInstancePropertyModifications(model);
         var collider = host.AddComponent<CapsuleCollider>();
         collider.height = tank ? 2.25f : 0.7f;
         collider.radius = tank ? 0.95f : 0.35f;
