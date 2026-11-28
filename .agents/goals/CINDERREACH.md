@@ -523,3 +523,5 @@ Alle auf 100 % abgeschlossen, Stand oben eingearbeitet.
 | `cinderreach-accounts` | Auth-Profile, Spielernamen + Namensschilder, Konto mit Benutzer/Passwort, Cloud-Held | `02ece6d` |
 | `cinderreach-sound-audit-fix` | 35 warme SFX mit Varianten-/Material-Routing, 8 melodische 16-s-Zonenthemen, `G-DIABLO07`, Hörabnahme | `ea59d7b` |
 | `cinderreach-team-autoplay` | Kindled durch Thewes, CI-Autoplay als Team (Server + fenwalker/lanternbearer/rogue) Normal → Kindled aus Saves, `G-DIABLO06` auf Team-Verdicts | `369186f` |
+| `cinderreach-vfx-tooling` | O1+Flipbook-VFX-Pipeline (Blender 4.2.9 Meshes + 4×4-Flipbooks, Material Maker 1.8 `.ptex`, 3 URP-Basisshader unter `Assets/Art/SkillVfx/`, `docs/skill-vfx/README.md`) | `547c798` |
+| `cinderreach-class-ability-vfx` | 22 VFX-Prefabs (`SkillVfx/`, `ClassAbilityVfxBuilder.cs`, `ClassAbilityVfx.cs`, `AbilityVfxAnim.cs`), alle 18 Klassen-Skills + Varianten + Co-op-Cosmetic-Parität, Bildtafeln `docs/ability-vfx-shots/` | 2026-11-28 |
