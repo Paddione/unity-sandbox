@@ -62,16 +62,15 @@ public static class LootClick
     {
         switch (k)
         {
-            case Key.LeftAlt: case Key.RightAlt: return "Alt";
-            case Key.LeftCtrl: case Key.RightCtrl: return "Strg";
-            case Key.LeftShift: case Key.RightShift: return "Umschalt";
-            case Key.Space: return "Leertaste";
-            case Key.Tab: return "Tab";
-            case Key.Backquote: return "^";
+            case Key.LeftAlt: case Key.RightAlt: return Loc.T("key.alt");
+            case Key.LeftCtrl: case Key.RightCtrl: return Loc.T("key.ctrl");
+            case Key.LeftShift: case Key.RightShift: return Loc.T("key.shift");
+            case Key.Space: return Loc.T("key.space");
+            case Key.Tab: return Loc.T("key.tab");
         }
         string raw = k.ToString();
         if (raw.StartsWith("Digit")) return raw.Substring(5);
-        if (raw.StartsWith("Numpad")) return "Num " + raw.Substring(6);
+        if (raw.StartsWith("Numpad")) return Loc.F("key.numpad", raw.Substring(6));
         return raw;
     }
 

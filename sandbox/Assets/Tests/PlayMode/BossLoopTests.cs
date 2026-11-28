@@ -101,7 +101,10 @@ public class BossLoopTests
         Assert.AreEqual(1, SessionComplete.Shown);
         StringAssert.Contains("Erschlagen", SessionComplete.LastSummary);
         StringAssert.Contains("Gold", SessionComplete.LastSummary);
-        StringAssert.Contains("40", SessionComplete.LastSummary);
+        // Kill gold lands in the purse directly (loot-click-filter): summary shows the live total.
+        int gold = player.GetComponent<Wallet>().Gold;
+        Assert.GreaterOrEqual(gold, 40);
+        StringAssert.Contains(gold.ToString(), SessionComplete.LastSummary);
         yield return null;
     }
 }

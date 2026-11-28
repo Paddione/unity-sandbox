@@ -84,12 +84,12 @@ public class DiabloAshenFenLoopTests
         yield return null;
         Assert.IsTrue(husk == null, "Husk must die from one starter strike (3 dmg vs 3 HP).");
 
-        // Walk the hero onto the dropped loot until the trigger fires.
+        // Click the dropped loot (walk-over no longer collects, loot-click-filter).
         var drop = GameObject.FindFirstObjectByType<LootDrop>();
         Assert.IsNotNull(drop, "Kill must drop loot.");
         var looted = drop.item;
-        DiabloTestFixture.TeleportHero(player, drop.transform.position);
         int bagBefore = inventory.Count;
+        controller.OrderPickup(drop);
         float pickupWait = 0f;
         while (inventory.Count == bagBefore && pickupWait < 2f)
         {

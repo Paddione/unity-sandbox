@@ -276,8 +276,10 @@ public class DiabloMenuPlayTests
         var drop = dropGo.AddComponent<LootDrop>();
         drop.item = ItemDatabase.CreateUnique(ItemDatabase.BulwarkCarrierId);
         var labels = Track(new GameObject("Labels")).AddComponent<DiabloLootLabels>();
+        bool savedAlways = DiabloSettings.LootLabelsAlways;
         try
         {
+            DiabloSettings.LootLabelsAlways = false; // Alt-only mode (setting off)
             DiabloLootLabels.ForceShow = true;
             yield return null;
             yield return null;
@@ -287,8 +289,11 @@ public class DiabloMenuPlayTests
             Assert.AreEqual(DiabloPalette.Rarity(ItemRarity.Unique), color);
             DiabloLootLabels.ForceShow = false;
             yield return null;
-            Assert.AreEqual(0, labels.ShownCount, "labels only while Alt is held");
+            Assert.AreEqual(0, labels.ShownCount, "with the setting off, labels only while Alt is held");
+            DiabloSettings.LootLabelsAlways = true;
+            yield return null;
+            Assert.AreEqual(1, labels.ShownCount, "default: labels always shown");
         }
-        finally { DiabloLootLabels.ForceShow = false; }
+        finally { DiabloLootLabels.ForceShow = false; DiabloSettings.LootLabelsAlways = savedAlways; }
     }
 }
