@@ -150,6 +150,10 @@ die Root-Ausrichtung behält (Held: Maus, Gegner: Held). Mehr als 100° gegen di
 (Float `MoveSpeed` = −1 als Zustands-Speed auf `Run`/`Walk`, Hysterese 80°). `Moving` gilt auch bei gemessener
 Bewegung (Koop-Spiegel, Lanzer, Wirker). NPCs (`StoryNpc` mit Animator) drehen sich bei Klick oder `T` zum Helden.
 
+## Gebietsgrößen und Begegnungen
+
+Seit 2578868 messen die begehbaren Quadrate zwischen den Wandinnenkanten in Ashen Fen 70 m, in Sunken Ossuary und Cinder Kiln je 56 m und in Glass Barrens 76 m pro Seite. Lantern Holds Palisadenring hat 12 m Radius. In bisher freien Kampfabschnitten und auf den neuen Außenflächen stehen 35 zusätzliche Gegnerpaare (8/9/9/9). Ihre Aufstellung hält die Aggro-Reichweiten zu Toren, Ankünften, Wegpunkten und Händlern ein. Die Regressionen stehen in WorldEdgeTests und LayoutSeedTests.
+
 ## Spiel in einem Absatz
 
 Cinderreach ist ein isometrisches Co-op-ARPG (Unity 6000.0.85f2, URP, `sandbox/`), Arbeitstitel und
