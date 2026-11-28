@@ -1,6 +1,7 @@
 # Goal: cinderreach-inventory-redesign
 
 health_goals: [G-DIABLO01, G-DIABLO03, G-DIABLO05]
+plan_refs: [.agents/plans/cinderreach-inventory-redesign/tasks.md]
 
 Ausgangslage: [`.agents/goals/CINDERREACH.md`](../CINDERREACH.md). Design-Vorlage: Canvas
 https://claude.ai/artifact/JHgZfCWrHt6N8P1cdHwR4G, Artboard „Inventar (I)“ (`Inventory.dc.html`).
