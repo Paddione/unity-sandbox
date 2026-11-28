@@ -28,14 +28,14 @@ public static class WorldArtBuilder
             { "Bone", (Hex("#D8CCB0"), 0.3f, Color.black) },
             { "Iron", (Hex("#3A3A40"), 0.55f, Color.black) },
             { "Flame", (Hex("#FF7A1A"), 0.0f, Hex("#FF5A00") * 2.6f) },
-            { "Coal", (Hex("#5A1200"), 0.0f, Hex("#C02800") * 1.4f) },
+            { "Coal", (Hex("#5A1200"), 0.13f, Hex("#C02800") * 1.4f) },
             { "BloodCloth", (Hex("#8E1620"), 0.1f, Color.black) },
-            { "Gold", (Hex("#F2B134"), 0.6f, Color.black) },
-            { "Heather", (Hex("#55603A"), 0.05f, Color.black) },
-            { "HeatherBloom", (Hex("#8A4A7E"), 0.1f, Color.black) },
-            { "Grass", (Hex("#66733A"), 0.05f, Color.black) },
+            { "Gold", (Hex("#F2B134"), 0.56f, Color.black) },
+            { "Heather", (Hex("#55603A"), 0.23f, Color.black) },
+            { "HeatherBloom", (Hex("#8A4A7E"), 0.19f, Color.black) },
+            { "Grass", (Hex("#66733A"), 0.25f, Color.black) },
             { "Rune", (Hex("#C0180F"), 0.2f, Hex("#FF2A1A") * 2.2f) },
-            { "Blood", (Hex("#3E0507"), 0.78f, Color.black) },
+            { "Blood", (Hex("#3E0507"), 0.73f, Color.black) },
         };
 
     public static readonly string[] Props =
@@ -90,6 +90,7 @@ public static class WorldArtBuilder
         }
         m.SetColor("_BaseColor", albedo);
         m.SetFloat("_Smoothness", smooth);
+        m.SetFloat("_Metallic", name == "Gold" ? .78f : name == "Coal" ? .03f : 0f);
         m.enableInstancing = true;
         if (emission.maxColorComponent > 0f)
         {

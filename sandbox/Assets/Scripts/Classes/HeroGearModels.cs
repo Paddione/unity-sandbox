@@ -457,7 +457,48 @@ public static class HeroGearModels
 
     static readonly Dictionary<Color, Material> Materials = new Dictionary<Color, Material>();
     static Mesh cube;
-    static Mesh Cube => cube != null ? cube : cube = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+    static Mesh Cube => cube != null ? cube : cube = BeveledBlock();
+
+    // A single shared blank for grips, buckles, greaves and weapon fittings.
+    // The narrow facets catch grazing light even when the part fills only a few pixels.
+    static Mesh BeveledBlock()
+    {
+        var outline = new Vector2[]
+        {
+            new(.50f, .39f), new(.39f, .50f), new(-.39f, .50f), new(-.50f, .39f),
+            new(-.50f, -.39f), new(-.39f, -.50f), new(.39f, -.50f), new(.50f, -.39f)
+        };
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        Vector3 Point(int corner, int ring)
+        {
+            bool end = ring == 0 || ring == 3;
+            Vector2 section = outline[corner % outline.Length] * (end ? .89f : 1f);
+            float y = ring == 0 ? -.5f : ring == 1 ? -.46f : ring == 2 ? .46f : .5f;
+            return new Vector3(section.x, y, section.y);
+        }
+        for (int i = 0; i < outline.Length; i++)
+        {
+            for (int ring = 0; ring < 3; ring++)
+            {
+                int start = vertices.Count;
+                vertices.Add(Point(i, ring));
+                vertices.Add(Point(i, ring + 1));
+                vertices.Add(Point(i + 1, ring + 1));
+                vertices.Add(Point(i + 1, ring));
+                triangles.AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
+            }
+            int cap = vertices.Count;
+            vertices.AddRange(new[] { Vector3.down * .5f, Point(i, 0), Point(i + 1, 0),
+                Vector3.up * .5f, Point(i + 1, 3), Point(i, 3) });
+            for (int j = 0; j < 6; j++) triangles.Add(cap + j);
+        }
+        var mesh = new Mesh { name = "Chamfered gear fitting" };
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        return mesh;
+    }
     static readonly int ColorProperty = Shader.PropertyToID("_BaseColor");
 
     public static bool IsKnown(string id, ItemSlot slot) =>
@@ -492,6 +533,18 @@ public static class HeroGearModels
         Plate(root, "Yellow chest guard", Brass, .065f, .36f, -.33f,.13f, .33f,.13f, .27f,-.18f, 0,-.28f, -.27f,-.18f);
         var trim = classId == ClassCatalog.RogueId ? Lilac : classId == ClassCatalog.LanternbearerId ? Pearl : Iron;
         Box(root, "Guard clasp", trim, new Vector3(0,-.06f,.405f), new Vector3(.12f,.09f,.04f));
+    }
+
+    public static void LanternFrame(Transform root)
+    {
+        Box(root, "Brass foot", Brass, new Vector3(0, -.108f, 0), new Vector3(.168f, .018f, .168f));
+        Box(root, "Vented cap", Dark, new Vector3(0, .110f, 0), new Vector3(.174f, .027f, .174f));
+        foreach (float x in new[] { -.069f, .069f })
+            foreach (float z in new[] { -.069f, .069f })
+                Beam(root, "Corner stay", Brass, new Vector3(x, -.104f, z), new Vector3(x, .105f, z), .014f);
+        Beam(root, "Bail left", Iron, new Vector3(-.064f, .12f, 0), new Vector3(-.032f, .175f, 0), .012f);
+        Beam(root, "Bail top", Iron, new Vector3(-.032f, .175f, 0), new Vector3(.032f, .175f, 0), .012f);
+        Beam(root, "Bail right", Iron, new Vector3(.032f, .175f, 0), new Vector3(.064f, .12f, 0), .012f);
     }
 
     static void Grip(Transform root, float length = .22f)
@@ -553,13 +606,31 @@ public static class HeroGearModels
         }
         if (area < 0f) perimeter.Reverse();
 
+        // A perimeter bevel gives blades, armour and gems a distinct rim. Limit
+        // the inset at short edges and acute corners to keep concave outlines open.
+        var rim = new Vector3[count];
+        for (int i = 0; i < count; i++)
+        {
+            int index = perimeter[i];
+            Vector3 prev = vertices[perimeter[(i + count - 1) % count]];
+            Vector3 next = vertices[perimeter[(i + 1) % count]];
+            Vector3 incoming = vertices[index] - prev;
+            Vector3 outgoing = next - vertices[index];
+            Vector3 left = Vector3.Cross(Vector3.forward, incoming.normalized);
+            Vector3 bisector = (left + Vector3.Cross(Vector3.forward, outgoing.normalized)).normalized;
+            float inset = Mathf.Min(depth * .18f, Mathf.Min(incoming.magnitude, outgoing.magnitude) * .055f);
+            rim[index] = vertices[index];
+            vertices[index] += bisector * (inset / Mathf.Max(.5f, Vector3.Dot(left, bisector)));
+        }
         var faces = new List<Vector3>();
         for (int i = 0; i < count; i++)
         {
             int a = perimeter[i];
             int b = perimeter[(i + 1) % count];
-            faces.AddRange(new[] { vertices[a], vertices[a + count], vertices[b],
-                vertices[b], vertices[a + count], vertices[b + count] });
+            Vector3 sideA = rim[a] - Vector3.forward * (depth * .22f);
+            Vector3 sideB = rim[b] - Vector3.forward * (depth * .22f);
+            faces.AddRange(new[] { vertices[a], sideA, vertices[b], vertices[b], sideA, sideB,
+                sideA, vertices[a + count], sideB, sideB, vertices[a + count], vertices[b + count] });
         }
 
         // Clip convex ears so the notches remain open on concave silhouettes.
@@ -608,6 +679,10 @@ public static class HeroGearModels
             {
                 material = new Material(shader);
                 material.SetColor(ColorProperty, color);
+                bool metal = color == Brass || color == Iron;
+                bool stone = color == Jade || color == Lilac || color == Pearl;
+                material.SetFloat("_Metallic", metal ? .72f : 0f);
+                material.SetFloat("_Smoothness", metal ? .55f : stone ? .48f : color == Cloth ? .16f : .27f);
                 Materials[color] = material;
             }
         }

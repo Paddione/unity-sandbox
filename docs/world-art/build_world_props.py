@@ -88,9 +88,14 @@ def box(size, loc, rot=(0, 0, 0), material="Stone"):
 def rock_blob(radius, loc, rng, material="Stone", squash=0.7, moss=True, subdiv=2):
     bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=subdiv, radius=radius, location=loc)
     o = bpy.context.active_object
+    # A common bedding plane and coherent fracture faces read as a single stone.
+    tilt = rng.uniform(-0.24, 0.24)
+    phase = rng.uniform(0, math.tau)
     for v in o.data.vertices:
-        v.co *= 1.0 + rng.uniform(-0.22, 0.22)
-        v.co.z *= squash
+        x, y, z = v.co / radius
+        v.co *= 1 + .12 * math.cos(3 * x + 2 * y + phase) + rng.uniform(-.07, .07)
+        v.co.z = radius * squash * (min(.78, z) + tilt * x)
+        v.co.x += radius * .09 * z
     finish(o, material)
     if moss:
         o.data.materials.append(mat("Moss"))
@@ -108,8 +113,13 @@ def flame(loc, scale=1.0, rng=None):
         a = i * 2.1
         off = Vector((math.cos(a), math.sin(a), 0)) * 0.08 * scale
         h = (0.55 + rng.uniform(-0.1, 0.15)) * scale
-        parts.append(cyl(0.13 * scale, h, Vector(loc) + off + Vector((0, 0, h / 2)), verts=5,
-                         material="Flame", r2=0.0))
+        tongue = cyl(.12 * scale, h, Vector(loc) + off + Vector((0, 0, h / 2)),
+                     verts=7, material="Flame", r2=0.0)
+        for vertex in tongue.data.vertices:
+            if vertex.co.z > 0:
+                vertex.co.x += (.10 + .05 * i) * scale
+                vertex.co.y += math.sin(a) * .06 * scale
+        parts.append(tongue)
     return parts
 
 
@@ -174,6 +184,9 @@ def stake(i):
     parts = [cyl(0.22, h, (0, 0, h / 2), verts=7, material="Bark")]
     parts.append(cyl(0.22, 0.45, (0, 0, h + 0.225), verts=7, material="DarkWood", r2=0.02))
     parts.append(cyl(0.235, 0.12, (0, 0, h * 0.62), verts=7, material="Iron"))  # binding band
+    for side in (-1, 1):
+        parts.append(cyl(.033, .025, (side * .225, 0, h * .62),
+                         rot=(0, math.pi / 2, 0), verts=8, material="Iron"))
     o = join(parts, f"Stake_{i}")
     return spin(o, rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05), rng.uniform(0, 6.28))
 
@@ -200,6 +213,12 @@ def dead_tree(i):
         mid = Vector((0, 0, z)) + d * (length / 2)
         parts.append(cyl(0.08, length, mid, rot=d.to_track_quat("Z", "Y").to_euler(), verts=5,
                          material="Bark", r2=0.02))
+        tip = mid + d * length / 2
+        for fork in (-1, 1):
+            twig = Vector((d.x * .5 - fork * d.y * .66, d.y * .5 + fork * d.x * .66, d.z + .18)).normalized()
+            reach = length * (.48 if fork == 1 else .32)
+            parts.append(cyl(.024, reach, tip + twig * reach / 2,
+                             rot=twig.to_track_quat("Z", "Y").to_euler(), verts=5, material="Bark", r2=.004))
     for r in range(4):  # root flare
         a = r * math.pi / 2 + 0.4
         d = Vector((math.cos(a), math.sin(a), -0.35)).normalized()
@@ -216,6 +235,9 @@ def gravestone(i):
     else:
         parts = [box((0.16, 0.16, 1.2), (0, 0, 0.6)), box((0.62, 0.16, 0.16), (0, 0, 0.88))]
     parts.append(box((0.8, 0.5, 0.08), (0, 0.1, 0.04), material="Moss"))
+    # Worn moulding on the tablet and cross catches glancing light.
+    parts.insert(1, chamfer(box((.62 if i == 0 else .30, .22, .13), (0, 0, .14)), .018))
+    parts[0] = chamfer(parts[0], .022)
     o = join(parts, f"Gravestone_{i}")
     return spin(o, rng.uniform(-0.12, 0.12), rng.uniform(-0.1, 0.1), 0)
 
@@ -231,6 +253,16 @@ def bone_pile():
     bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=0.16, location=(0.1, -0.05, 0.16))
     skull = finish(bpy.context.active_object, "Bone")
     skull.scale = (1, 1.15, 0.95)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    for side in (-1, 1):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=10, ring_count=6, radius=.055,
+                                             location=(.1 + side * .062, -.192, .183))
+        socket = bpy.context.object
+        cut = skull.modifiers.new("Orbital cavity", "BOOLEAN")
+        cut.operation, cut.object = "DIFFERENCE", socket
+        bpy.context.view_layer.objects.active = skull
+        bpy.ops.object.modifier_apply(modifier=cut.name)
+        bpy.data.objects.remove(socket, do_unlink=True)
     parts.append(skull)
     parts.append(box((0.16, 0.14, 0.08), (0.1, -0.2, 0.07), material="Bone"))
     return join(parts, "BonePile")
@@ -245,6 +277,8 @@ def broken_pillar():
         if v.co.z > 0:
             v.co.z += rng.uniform(-0.55, 0.1)
     parts.append(col)
+    parts.append(chamfer(cyl(.43, .14, (0, 0, .31), verts=12, material="Stone"), .027))
+    parts.append(chamfer(cyl(.39, .085, (0, 0, .42), verts=12, material="Stone"), .019))
     return join(parts, "BrokenPillar")
 
 
@@ -256,7 +290,10 @@ def brazier():
         d = Vector((math.cos(a) * 0.35, math.sin(a) * 0.35, 1.0)).normalized()
         parts.append(cyl(0.04, 1.05, Vector((math.cos(a) * 0.17, math.sin(a) * 0.17, 0.5)),
                          rot=(-d).to_track_quat("Z", "Y").to_euler(), verts=5, material="Iron"))
-    parts.append(cyl(0.42, 0.28, (0, 0, 1.08), verts=10, material="Iron", r2=0.22))
+    parts.append(cyl(.22, .28, (0, 0, 1.08), verts=14, material="Iron", r2=.42))
+    bpy.ops.mesh.primitive_torus_add(major_radius=.41, minor_radius=.027, major_segments=20,
+                                     minor_segments=6, location=(0, 0, 1.22))
+    parts.append(finish(bpy.context.object, "Iron"))
     bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.36, depth=0.06, location=(0, 0, 1.2))
     parts.append(finish(bpy.context.active_object, "Coal"))
     parts += flame((0, 0, 1.2), 1.0, rng)
@@ -267,13 +304,15 @@ def banner():
     parts = [cyl(0.05, 3.2, (0, 0, 1.6), verts=6, material="DarkWood"),
              cyl(0.04, 1.1, (0, 0.06, 2.95), rot=(0, math.radians(90), 0), verts=6, material="DarkWood"),
              cyl(0.07, 0.12, (0, 0, 3.26), verts=6, material="Gold", r2=0.0)]
-    bpy.ops.mesh.primitive_grid_add(x_subdivisions=6, y_subdivisions=8, size=1, location=(0, 0.1, 2.25),
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=15, y_subdivisions=15, size=1, location=(0, 0.1, 2.25),
                                     rotation=(math.radians(90), 0, 0))
     cloth = finish(bpy.context.active_object, "BloodCloth")
     cloth.scale = (0.95, 1.35, 1)
     bpy.ops.object.transform_apply(location=True, scale=True, rotation=True)
     for v in cloth.data.vertices:
-        v.co.y += math.sin(v.co.x * 4.0 + v.co.z * 2.0) * 0.05
+        drop = max(0, min(1, (2.92 - v.co.z) / 1.35))
+        v.co.y += (.015 + .105 * drop) * math.sin(v.co.x * 11 + drop * 2.6)
+        v.co.x += .09 * drop * drop
         if v.co.z < 1.65:  # swallowtail cut
             v.co.z += abs(v.co.x) * 0.5
     solid = cloth.modifiers.new("Solid", "SOLIDIFY")
@@ -295,11 +334,33 @@ def tuft(name, blades, height, base_mat, tip_mat, seed):
         lean = rng.uniform(0.0, 0.45)
         d = Vector((math.cos(a) * lean, math.sin(a) * lean, 1)).normalized()
         base = Vector((math.cos(a) * r, math.sin(a) * r, 0))
-        parts.append(cyl(0.035, h, base + d * (h / 2), rot=d.to_track_quat("Z", "Y").to_euler(),
-                         verts=3, material=base_mat, r2=0.0))
+        # A folded blade bends farther toward the tip. Heather adds a tapering
+        # cluster of bells along the stem instead of a single spherical flower.
+        sideways = Vector((-math.sin(a), math.cos(a), 0))
+        wind = Vector((.42, .16, 0)) + Vector((math.cos(a), math.sin(a), 0)) * .39
+        vertices = []
+        for t, half_width in [(0, .020), (.50, .026), (.80, .016)]:
+            point = base + d * h * t + wind * h * t * t * .52
+            vertices.extend([point - sideways * half_width, point + Vector((0,0,.008)),
+                             point + sideways * half_width])
+        tip = base + d * h + wind * h * .52
+        vertices.append(tip)
+        faces = [(0,1,4,3), (1,2,5,4), (3,4,7,6), (4,5,8,7), (6,7,9), (7,8,9)]
+        mesh = bpy.data.meshes.new("Folded leaf")
+        # Close the V-section so both sides have an outward-facing surface.
+        faces.extend([(0,3,5,2), (3,6,8,5), (6,9,8), (0,2,1)])
+        pivot = base + d * h / 2
+        mesh.from_pydata([v - pivot for v in vertices], [], faces)
+        leaf = bpy.data.objects.new("Leaf", mesh)
+        leaf.location = pivot
+        bpy.context.collection.objects.link(leaf)
+        parts.append(finish(leaf, base_mat))
         if tip_mat and k % 2 == 0:
-            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.05, location=base + d * h)
-            parts.append(finish(bpy.context.active_object, tip_mat))
+            for j in range(3):
+                t = .65 + .15 * j
+                bell = base + d * h * t + wind * h * t * t * .52
+                bell += sideways * (.021 if j % 2 else -.021)
+                parts.append(cyl(.024 - .003 * j, .041, bell, verts=6, r2=.014, material=tip_mat))
     return join(parts, name)
 
 
@@ -307,7 +368,7 @@ def chamfer(o, width=0.04):
     """One-segment bevel, applied: chamfered edges catch the moon rim light."""
     bev = o.modifiers.new("Chamfer", "BEVEL")
     bev.width = width
-    bev.segments = 1
+    bev.segments = 2
     bev.limit_method = "ANGLE"
     bpy.context.view_layer.objects.active = o
     bpy.ops.object.select_all(action="DESELECT")
@@ -412,18 +473,19 @@ def blood_splat(i):
     """Flat irregular blood pool with satellite drops, 1.8 m across, 1 cm thick."""
     rng = random.Random(990 + i)
     parts = []
-    n = 18
+    n = 34
     bpy.ops.mesh.primitive_circle_add(vertices=n, radius=0.6, fill_type="NGON", location=(0, 0, 0.006))
     pool = finish(bpy.context.active_object, "Blood")
     for v in pool.data.vertices:
         if v.co.length > 0.01:
-            v.co.xy *= rng.uniform(0.7, 1.35)
+            angle = math.atan2(v.co.y, v.co.x)
+            v.co.xy *= 1 + .19 * math.sin(3 * angle + i) + .13 * math.cos(5 * angle) + rng.uniform(-.055, .055)
     pool.scale = (1.0 + 0.3 * i, 1.0, 1.0)
     parts.append(pool)
     for k in range(7 + i * 3):
         a = rng.uniform(0, 6.28)
         r = rng.uniform(0.75, 0.95 + 0.2 * i)
-        bpy.ops.mesh.primitive_circle_add(vertices=6, radius=rng.uniform(0.04, 0.11), fill_type="NGON",
+        bpy.ops.mesh.primitive_circle_add(vertices=10, radius=rng.uniform(0.04, 0.11), fill_type="NGON",
                                           location=(math.cos(a) * r, math.sin(a) * r, 0.006))
         parts.append(finish(bpy.context.active_object, "Blood"))
     o = join(parts, f"BloodSplat_{i}")

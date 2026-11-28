@@ -41,7 +41,7 @@ public static class KayKitAssets
                 material.shader = shader;
                 material.SetTexture("_BaseMap", texture);
                 material.SetColor("_BaseColor", Color.white);
-                material.SetFloat("_Smoothness", 0);
+                ApplySurface(material, folder, texture.name.Replace("_texture", ""));
                 // Several foliage models intentionally have single-sided geometry.
                 material.SetFloat("_Cull", 0);
                 material.doubleSidedGI = true;
@@ -78,6 +78,15 @@ public static class KayKitAssets
             }
         }
         Verify();
+    }
+
+    internal static void ApplySurface(Material material, string folder, string atlas)
+    {
+        var surface = AssetDatabase.LoadAssetAtPath<Texture2D>($"{folder}/{atlas}_surface.png");
+        material.SetTexture("_MetallicGlossMap", surface);
+        material.SetFloat("_Smoothness", surface != null ? 1f : 0f);
+        if (surface != null) material.EnableKeyword("_METALLICSPECGLOSSMAP");
+        else material.DisableKeyword("_METALLICSPECGLOSSMAP");
     }
 
     [MenuItem("Sandbox/KayKit/Verify Imported Assets")]

@@ -425,6 +425,30 @@ def build(name, out, preview=None):
     cavity = ao_from_height(height)
     col = shade(col, 0.8 + 0.2 * cavity * 2 - 0.2)  # bake crevice darkening
     smooth = np.broadcast_to(np.asarray(smooth, np.float32), height.shape)
+    # Relief predicts contact: raised edges polish or bleach, and low pockets
+    # trap soot, dust or moisture. Work at two periodic scales to keep the
+    # dressing legible after mipmapping at the normal isometric distance.
+    relief = ao_from_height(height, radius=size // 45) - .5
+    exposed = np.maximum(relief, 0)
+    pooled = np.maximum(-relief, 0)
+    if name in ("Stone", "CryptAshlar", "CryptFlagstone", "KilnBrick", "BarrensStone", "KilnBasalt", "Slag"):
+        dust = hexc("#ad9b81") if name != "KilnBasalt" else hexc("#807370")
+        col = mix(col, dust, exposed * .27)
+        smooth = smooth + exposed * .21 - pooled * .10
+    elif name in ("Bark", "DarkWood", "Planks", "Bone"):
+        fibre = value_noise(*grid(size), 92, rng, freq_v=8)
+        col = mix(col, hexc("#ac9679"), exposed * (.12 + .22 * fibre))
+        smooth = smooth + exposed * .20 - pooled * .06
+    elif name in ("FenMoor", "Moss", "BarrensSand"):
+        col = shade(col, 1 - .17 * pooled)
+        smooth = smooth + pooled * (.36 if name != "BarrensSand" else .10)
+    elif name == "Iron":
+        col = mix(col, hexc("#a6a299"), exposed * .38)
+        smooth = smooth + exposed * .34 - pooled * .16
+    elif name == "BloodCloth":
+        faded = fbm(*grid(size), 5, rng, octaves=4)
+        col = mix(col, hexc("#ac6052"), sstep(.40, .72, faded) * .26)
+        smooth = smooth + .08 * faded
     rgba = np.dstack([np.clip(col, 0, 1), np.clip(smooth, 0, 1)])
     os.makedirs(out, exist_ok=True)
     Image.fromarray((rgba * 255 + 0.5).astype(np.uint8), "RGBA").save(f"{out}/{name}_Albedo.png", optimize=True)

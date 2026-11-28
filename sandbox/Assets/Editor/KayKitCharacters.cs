@@ -18,9 +18,6 @@ public static class KayKitCharacters
         foreach (var pack in Packs)
         {
             var folder = Root + pack;
-            var textures = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
-                .Select(AssetDatabase.GUIDToAssetPath).Where(p => !p.EndsWith("contents.png"))
-                .Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
             foreach (var path in Directory.GetFiles(folder, "*.fbx", SearchOption.AllDirectories))
             {
                 var importer = (ModelImporter)AssetImporter.GetAtPath(path);
@@ -39,7 +36,7 @@ public static class KayKitCharacters
                     .Distinct().ToArray();
                 var key = character ? Path.GetFileNameWithoutExtension(path).Split('_')[0].ToLowerInvariant()
                     : pack == "Skeletons" ? "skeleton" : "barbarian";
-                var texture = textures.FirstOrDefault(t => t.name == key + "_texture");
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>($"{folder}/Accessories/{key}_texture.png");
                 if (texture == null) throw new InvalidOperationException($"Missing atlas for {path}");
                 var materialPath = folder + "/" + texture.name + "_URP.mat";
                 var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
@@ -50,7 +47,7 @@ public static class KayKitCharacters
                 }
                 material.SetTexture("_BaseMap", texture);
                 material.SetColor("_BaseColor", Color.white);
-                material.SetFloat("_Smoothness", 0);
+                KayKitAssets.ApplySurface(material, folder, key);
                 EditorUtility.SetDirty(material);
                 foreach (var source in sources) importer.AddRemap(source, material);
                 importer.SaveAndReimport();

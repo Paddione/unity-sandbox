@@ -113,7 +113,7 @@ public static class ZoneSurfaceBuilder
         m.SetFloat("_SmoothnessTextureChannel", 1f);
         m.EnableKeyword("_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A");
         m.SetFloat("_Smoothness", 1f);
-        m.SetFloat("_Metallic", 0f);
+        m.SetFloat("_Metallic", name == "Iron" ? .63f : 0f);
         var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(heightPath);
         m.SetTexture("_BumpMap", normal);
         m.SetFloat("_BumpScale", bump);

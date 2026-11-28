@@ -9,6 +9,10 @@ public sealed class StoryPickup : MonoBehaviour
 {
     public string itemId;
 
+#if !UNITY_SERVER
+    void Start() => StoryFindArt.Dress(this);
+#endif
+
     void OnTriggerEnter(Collider other)
     {
         if (other == null) return;

@@ -199,11 +199,11 @@ public sealed class ClassAppearance : MonoBehaviour
     /// </summary>
     static readonly Dictionary<string, Bounds> HeadBoundsByMesh = new Dictionary<string, Bounds>
     {
-        { "Knight_Head", new Bounds(new Vector3(0f, 0.51f, 0.02f), new Vector3(1.09f, 1.07f, 1.01f)) },
-        { "Ranger_Head", new Bounds(new Vector3(0f, 0.49f, 0.02f), new Vector3(1.09f, 1.08f, 1.02f)) },
-        { "Mage_Head", new Bounds(new Vector3(0f, 0.38f, 0.01f), new Vector3(1.14f, 1.08f, 1.03f)) },
-        { "Rogue_Head", new Bounds(new Vector3(0.01f, 0.37f, -0.01f), new Vector3(1.14f, 1.13f, 1.14f)) },
-        { "RogueHooded_Head", new Bounds(new Vector3(0f, 0.37f, 0.01f), new Vector3(1.04f, 1.12f, 1.10f)) },
+        { "Knight_Head", new Bounds(new Vector3(0f, 0.51f, 0.02f), new Vector3(.992f, 1.07f, .960f)) },
+        { "Ranger_Head", new Bounds(new Vector3(0f, 0.49f, 0.02f), new Vector3(.992f, 1.08f, .969f)) },
+        { "Mage_Head", new Bounds(new Vector3(0f, 0.38f, 0.01f), new Vector3(1.037f, 1.08f, .979f)) },
+        { "Rogue_Head", new Bounds(new Vector3(0.01f, 0.37f, -0.01f), new Vector3(1.037f, 1.13f, 1.083f)) },
+        { "RogueHooded_Head", new Bounds(new Vector3(0f, 0.37f, 0.01f), new Vector3(.946f, 1.12f, 1.045f)) },
     };
 
     /// <summary>Head bounds of the visible base head (head-bone space); hooded bases keep their hood.</summary>
@@ -241,12 +241,12 @@ public sealed class ClassAppearance : MonoBehaviour
             AddHairPart(root, "HairCap", PrimitiveType.Sphere, P(0f, 0.10f, -0.05f), S(1.06f, 0.86f, 1.04f), mat);
         float lockLen = longHair ? 0.78f : 0.42f;
         float lockY = longHair ? -0.30f : -0.12f;
-        AddHairPart(root, "HairLockL", PrimitiveType.Cube, P(-0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
-        AddHairPart(root, "HairLockR", PrimitiveType.Cube, P(0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
+        AddHairPart(root, "HairLockL", PrimitiveType.Sphere, P(-0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
+        AddHairPart(root, "HairLockR", PrimitiveType.Sphere, P(0.50f, lockY, 0.12f), S(0.10f, lockLen, 0.30f), mat);
         switch (profile.hairStyle)
         {
             case 1: // Lang
-                AddHairPart(root, "HairBack", PrimitiveType.Cube, P(0f, -0.30f, -0.46f), S(0.92f, 0.85f, 0.16f), mat);
+                AddHairPart(root, "HairBack", PrimitiveType.Sphere, P(0f, -0.30f, -0.46f), S(0.92f, 0.85f, 0.16f), mat);
                 break;
             case 2: // Zopf
                 AddHairPart(root, "HairTie", PrimitiveType.Sphere, P(0f, 0.02f, -0.55f), S(0.20f, 0.18f, 0.18f), mat);
@@ -254,7 +254,7 @@ public sealed class ClassAppearance : MonoBehaviour
                 break;
             case 3: // Kapuze: a shell over the back of the head plus a drape, the face stays open
                 AddHairPart(root, "HairHood", PrimitiveType.Sphere, P(0f, 0.08f, -0.16f), S(1.10f, 0.98f, 0.92f), mat);
-                AddHairPart(root, "HairDrape", PrimitiveType.Cube, P(0f, -0.40f, -0.40f), S(0.96f, 0.50f, 0.24f), mat);
+                AddHairPart(root, "HairDrape", PrimitiveType.Sphere, P(0f, -0.40f, -0.40f), S(0.96f, 0.50f, 0.24f), mat);
                 break;
             case 5: // Knoten
                 AddHairPart(root, "HairBun", PrimitiveType.Sphere, P(0f, 0.50f, -0.22f), S(0.34f, 0.30f, 0.32f), mat);
@@ -272,6 +272,8 @@ public sealed class ClassAppearance : MonoBehaviour
         part.transform.SetParent(root.transform, false);
         part.transform.localPosition = pos;
         part.transform.localScale = scale;
+        if (name == "HairLockL" || name == "HairLockR")
+            part.transform.localRotation = Quaternion.Euler(-12f, 0f, name == "HairLockL" ? -8f : 8f);
         var r = part.GetComponent<Renderer>();
         if (r != null) r.sharedMaterial = mat;
     }
@@ -280,7 +282,9 @@ public sealed class ClassAppearance : MonoBehaviour
     {
         var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
         if (shader == null) return null; // dedicated server builds ship no shaders
-        return new Material(shader) { color = HeroAppearance.HairColor(colorIndex), name = "HeroHairMaterial" };
+        var material = new Material(shader) { color = HeroAppearance.HairColor(colorIndex), name = "HeroHairMaterial" };
+        if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness", .29f);
+        return material;
     }
 
     internal void SetStarterLanternVisible(bool visible)
@@ -385,6 +389,7 @@ public sealed class ClassAppearance : MonoBehaviour
             mat.SetColor("_EmissionColor", new Color(1f, 0.7f, 0.3f) * 1.5f);
             r.sharedMaterial = mat;
         }
+        HeroGearModels.LanternFrame(go.transform);
         var light = go.AddComponent<Light>();
         light.type = LightType.Point;
         light.color = new Color(1f, 0.8f, 0.45f);
