@@ -105,6 +105,12 @@ public sealed partial class DiabloInventoryUI
         FollowCursor();
     }
 
+    internal void CellSubmit(InventoryCell cell)
+    {
+        if (cell == null || IsHolding || IsDragging) return;
+        if (cell.kind == InventoryCell.Kind.Bag && cell.index >= 0) EquipIndex(cell.index);
+    }
+
     internal void CellLeftClick(InventoryCell cell)
     {
         if (cell == null || IsDragging) return;

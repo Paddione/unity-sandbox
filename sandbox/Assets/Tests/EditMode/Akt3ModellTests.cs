@@ -204,6 +204,6 @@ public class Akt3ModellTests
     public void Save_V16_Bleibt()
     {
         // S1: kein Save-Eingriff, keine Migration — S3 verdrahtet Save/Koop.
-        Assert.AreEqual(16, SaveGame.CurrentVersion);
+        Assert.AreEqual(17, SaveGame.CurrentVersion, "Akt III braucht kein eigenes Feld; v17 kam mit bagSlots");
     }
 }

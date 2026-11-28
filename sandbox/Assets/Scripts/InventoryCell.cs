@@ -10,8 +10,11 @@ using UnityEngine.EventSystems;
 /// </summary>
 public sealed class InventoryCell : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler,
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, ISubmitHandler
 {
+    /// <summary>Keyboard/gamepad submit on a bag item equips it (mouse clicks lift it instead).</summary>
+    public void OnSubmit(BaseEventData e) { if (owner != null) owner.CellSubmit(this); }
+
     /// <summary>Doll is the 3D hero: a bag item dropped there goes to its own slot.</summary>
     public enum Kind { Bag, Equip, Doll }
 

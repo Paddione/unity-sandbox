@@ -332,7 +332,7 @@ public class Akt3FinaleTests
         DriveToH13();
         Assert.IsTrue(StoryDirector.BookDecision(true));
         SaveService.SaveNow(hero, path: savePath);
-        Assert.AreEqual(16, SaveMigrations.ReadVersion(savePath), "v16 bleibt (generische Listen)");
+        Assert.AreEqual(SaveGame.CurrentVersion, SaveMigrations.ReadVersion(savePath), "Finale braucht kein eigenes Feld (generische Listen)");
         RunProfile.Reset();
         Assert.IsTrue(SaveService.TryLoad(hero, savePath));
         Assert.AreEqual(StoryStatus.Done, S().Status("h10"));

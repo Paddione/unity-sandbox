@@ -77,10 +77,10 @@ public class SaveMigrationTests
     }
 
     [Test]
-    public void CurrentVersion_IsSixteen()
+    public void CurrentVersion_IsSeventeen()
     {
-        Assert.AreEqual(16, SaveGame.CurrentVersion);
-        Assert.AreEqual(16, new SaveGame().v);
+        Assert.AreEqual(17, SaveGame.CurrentVersion, "v17: bagSlots (cinderreach-bag-quest-upgrades)");
+        Assert.AreEqual(17, new SaveGame().v);
     }
 
     [Test]
