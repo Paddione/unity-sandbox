@@ -5,14 +5,14 @@
   "Ambient": {
    "cue": "Ambient",
    "category": "ambient",
-   "hash": "d3f8d1f164a4",
-   "prompt": "seamless warm moor breeze + subtle 55Hz air floor (DiabloAmbience bed, PlayCue no-op), dry, no reverb, close mic, dark medieval fantasy foley",
+   "hash": "2066a0fbe1fc",
+   "prompt": "seamless looping warm moor breeze with subtle low air bed, no birds, no voices, no music, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
    "duration_s": 5.5,
-   "lead_ms": 297.94,
-   "peak_dbfs": -10.33,
-   "rms_dbfs": -23.75,
+   "lead_ms": 0.0,
+   "peak_dbfs": -7.71,
+   "rms_dbfs": -24.0,
    "clipped": 0
   },
   "Arrow": {
@@ -24,8 +24,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -3.87,
-   "rms_dbfs": -15.82,
+   "peak_dbfs": -1.79,
+   "rms_dbfs": -16.05,
    "clipped": 0
   },
   "Blast": {
@@ -37,8 +37,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.09,
-   "peak_dbfs": -4.03,
-   "rms_dbfs": -15.77,
+   "peak_dbfs": -3.04,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Block": {
@@ -50,8 +50,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.81,
-   "rms_dbfs": -15.77,
+   "peak_dbfs": -2.41,
+   "rms_dbfs": -16.01,
    "clipped": 0
   },
   "BogCharge": {
@@ -63,8 +63,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.02,
-   "peak_dbfs": -5.03,
-   "rms_dbfs": -15.71,
+   "peak_dbfs": -4.33,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "BossRoar": {
@@ -76,8 +76,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.68,
-   "rms_dbfs": -14.78,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.03,
    "clipped": 0
   },
   "Cleave": {
@@ -89,8 +89,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.06,
-   "rms_dbfs": -16.35,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.3,
    "clipped": 0
   },
   "Crit": {
@@ -102,8 +102,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -6.34,
-   "rms_dbfs": -15.64,
+   "peak_dbfs": -4.06,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Death": {
@@ -115,8 +115,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -6.68,
-   "rms_dbfs": -15.67,
+   "peak_dbfs": -4.85,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Fireball": {
@@ -128,21 +128,21 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.07,
-   "rms_dbfs": -16.12,
+   "peak_dbfs": -1.01,
+   "rms_dbfs": -16.02,
    "clipped": 0
   },
   "Footstep": {
    "cue": "Footstep",
    "category": "step",
-   "hash": "34a7bc947160",
-   "prompt": "zone-ground boot step (Moor, Stone, Basalt, Sand) with 3-variant rotation, dry, no reverb, close mic, dark medieval fantasy foley",
+   "hash": "414131c1228c",
+   "prompt": "single heavy leather boot step on packed dirt ground, dry close thud, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.35,
-   "lead_ms": 2.36,
-   "peak_dbfs": -9.95,
-   "rms_dbfs": -24.38,
+   "duration_s": 0.221,
+   "lead_ms": 2.99,
+   "peak_dbfs": -2.19,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Basalt_0": {
@@ -154,8 +154,8 @@
    "sr": 44100,
    "duration_s": 0.35,
    "lead_ms": 0.0,
-   "peak_dbfs": -3.82,
-   "rms_dbfs": -20.78,
+   "peak_dbfs": -3.3,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Basalt_1": {
@@ -165,10 +165,10 @@
    "prompt": "single boot step across brittle kiln cinders and charred rock, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1321,
    "sr": 44100,
-   "duration_s": 0.213,
+   "duration_s": 0.35,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.98,
-   "rms_dbfs": -15.57,
+   "peak_dbfs": -1.19,
+   "rms_dbfs": -22.02,
    "clipped": 0
   },
   "Footstep_Basalt_2": {
@@ -179,9 +179,9 @@
    "seed": 1322,
    "sr": 44100,
    "duration_s": 0.35,
-   "lead_ms": 1.36,
-   "peak_dbfs": -4.3,
-   "rms_dbfs": -19.96,
+   "lead_ms": 3.7,
+   "peak_dbfs": -3.24,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Moor_0": {
@@ -193,8 +193,8 @@
    "sr": 44100,
    "duration_s": 0.35,
    "lead_ms": 0.0,
-   "peak_dbfs": -8.8,
-   "rms_dbfs": -22.24,
+   "peak_dbfs": -1.41,
+   "rms_dbfs": -22.01,
    "clipped": 0
   },
   "Footstep_Moor_1": {
@@ -204,10 +204,10 @@
    "prompt": "single armored boot step pressing into soft soggy moorland soil, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1301,
    "sr": 44100,
-   "duration_s": 0.344,
-   "lead_ms": 1.5,
-   "peak_dbfs": -10.56,
-   "rms_dbfs": -23.24,
+   "duration_s": 0.35,
+   "lead_ms": 2.97,
+   "peak_dbfs": -1.1,
+   "rms_dbfs": -22.21,
    "clipped": 0
   },
   "Footstep_Moor_2": {
@@ -218,9 +218,9 @@
    "seed": 1302,
    "sr": 44100,
    "duration_s": 0.35,
-   "lead_ms": 0.63,
-   "peak_dbfs": -7.48,
-   "rms_dbfs": -17.97,
+   "lead_ms": 2.99,
+   "peak_dbfs": -1.84,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Sand_0": {
@@ -231,9 +231,9 @@
    "seed": 1330,
    "sr": 44100,
    "duration_s": 0.35,
-   "lead_ms": 0.75,
-   "peak_dbfs": -9.28,
-   "rms_dbfs": -17.54,
+   "lead_ms": 0.0,
+   "peak_dbfs": -4.35,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Sand_1": {
@@ -244,9 +244,9 @@
    "seed": 1331,
    "sr": 44100,
    "duration_s": 0.35,
-   "lead_ms": 0.75,
-   "peak_dbfs": -7.83,
-   "rms_dbfs": -17.36,
+   "lead_ms": 0.02,
+   "peak_dbfs": -3.84,
+   "rms_dbfs": -22.0,
    "clipped": 0
   },
   "Footstep_Sand_2": {
@@ -256,10 +256,10 @@
    "prompt": "single leather boot step brushing dry crystalline desert dunes, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1332,
    "sr": 44100,
-   "duration_s": 0.082,
-   "lead_ms": 0.2,
-   "peak_dbfs": -14.29,
-   "rms_dbfs": -24.28,
+   "duration_s": 0.164,
+   "lead_ms": 0.0,
+   "peak_dbfs": -1.42,
+   "rms_dbfs": -22.05,
    "clipped": 0
   },
   "Footstep_Stone_0": {
@@ -269,10 +269,10 @@
    "prompt": "single leather boot sole tap on cold cathedral flagstone floor, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1310,
    "sr": 44100,
-   "duration_s": 0.12,
+   "duration_s": 0.209,
    "lead_ms": 0.0,
-   "peak_dbfs": -5.03,
-   "rms_dbfs": -19.96,
+   "peak_dbfs": -1.33,
+   "rms_dbfs": -22.03,
    "clipped": 0
   },
   "Footstep_Stone_1": {
@@ -282,10 +282,10 @@
    "prompt": "single dry heel step onto worn limestone crypt slab, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1311,
    "sr": 44100,
-   "duration_s": 0.172,
-   "lead_ms": 0.61,
-   "peak_dbfs": -13.65,
-   "rms_dbfs": -26.27,
+   "duration_s": 0.297,
+   "lead_ms": 0.0,
+   "peak_dbfs": -1.03,
+   "rms_dbfs": -22.5,
    "clipped": 0
   },
   "Footstep_Stone_2": {
@@ -295,10 +295,10 @@
    "prompt": "single solid boot step on dusty ancient stone tile, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1312,
    "sr": 44100,
-   "duration_s": 0.127,
-   "lead_ms": 0.02,
-   "peak_dbfs": -9.76,
-   "rms_dbfs": -22.0,
+   "duration_s": 0.215,
+   "lead_ms": 0.0,
+   "peak_dbfs": -1.79,
+   "rms_dbfs": -22.01,
    "clipped": 0
   },
   "Gate": {
@@ -310,8 +310,8 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.84,
-   "rms_dbfs": -16.93,
+   "peak_dbfs": -15.63,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "Gold": {
@@ -321,10 +321,10 @@
    "prompt": "muted bronze double coin clink, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.247,
-   "lead_ms": 0.02,
-   "peak_dbfs": -3.19,
-   "rms_dbfs": -18.45,
+   "duration_s": 0.33,
+   "lead_ms": 0.0,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -20.36,
    "clipped": 0
   },
   "Halo": {
@@ -336,8 +336,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.4,
-   "rms_dbfs": -16.11,
+   "peak_dbfs": -1.12,
+   "rms_dbfs": -16.32,
    "clipped": 0
   },
   "Heal": {
@@ -349,21 +349,21 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.46,
-   "rms_dbfs": -16.76,
+   "peak_dbfs": -15.39,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "Hit": {
    "cue": "Hit",
    "category": "combat",
-   "hash": "a6980c1e55cc",
-   "prompt": "material-aware impact (FleshBone, ArmorMetal, StoneAsh, Glass, GlassShield), dry, no reverb, close mic, dark medieval fantasy foley",
+   "hash": "e82ac97a3b10",
+   "prompt": "deep heavy melee impact thud with dry bone crunch and short dark steel ring, single hit, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.0,
-   "rms_dbfs": -19.92,
+   "peak_dbfs": -2.72,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Hit_ArmorMetal_0": {
@@ -373,10 +373,10 @@
    "prompt": "sword blade biting into dark iron plate armor, tight steel ring, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1260,
    "sr": 44100,
-   "duration_s": 0.217,
-   "lead_ms": 1.0,
-   "peak_dbfs": -3.34,
-   "rms_dbfs": -11.33,
+   "duration_s": 0.316,
+   "lead_ms": 2.27,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.49,
    "clipped": 0
   },
   "Hit_ArmorMetal_1": {
@@ -386,10 +386,10 @@
    "prompt": "heavy steel strike deflecting off knight pauldrons, mid iron clang, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1261,
    "sr": 44100,
-   "duration_s": 0.239,
-   "lead_ms": 0.86,
-   "peak_dbfs": -2.49,
-   "rms_dbfs": -12.73,
+   "duration_s": 0.32,
+   "lead_ms": 2.4,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.62,
    "clipped": 0
   },
   "Hit_ArmorMetal_2": {
@@ -399,10 +399,10 @@
    "prompt": "brutal iron mace blow against steel breastplate, low resonant metallic thud, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1262,
    "sr": 44100,
-   "duration_s": 0.265,
-   "lead_ms": 1.22,
-   "peak_dbfs": -1.72,
-   "rms_dbfs": -12.37,
+   "duration_s": 0.386,
+   "lead_ms": 2.65,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.6,
    "clipped": 0
   },
   "Hit_FleshBone_0": {
@@ -413,9 +413,9 @@
    "seed": 1250,
    "sr": 44100,
    "duration_s": 0.55,
-   "lead_ms": 0.73,
-   "peak_dbfs": -1.24,
-   "rms_dbfs": -13.09,
+   "lead_ms": 2.68,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -17.16,
    "clipped": 0
   },
   "Hit_FleshBone_1": {
@@ -425,10 +425,10 @@
    "prompt": "melee cleave impact onto skeleton ribcage, dull thump and bone snap, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1251,
    "sr": 44100,
-   "duration_s": 0.258,
+   "duration_s": 0.338,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.6,
-   "rms_dbfs": -14.51,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.64,
    "clipped": 0
   },
   "Hit_FleshBone_2": {
@@ -438,10 +438,10 @@
    "prompt": "heavy blunt strike onto corpse flesh and snapping knuckle bone, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1252,
    "sr": 44100,
-   "duration_s": 0.143,
+   "duration_s": 0.224,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.33,
-   "rms_dbfs": -11.56,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -17.64,
    "clipped": 0
   },
   "Hit_GlassShield_0": {
@@ -451,10 +451,10 @@
    "prompt": "glancing steel deflecting off thick crystal shield ward, resonant chime and knock, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1290,
    "sr": 44100,
-   "duration_s": 0.227,
+   "duration_s": 0.311,
    "lead_ms": 0.0,
-   "peak_dbfs": -5.89,
-   "rms_dbfs": -14.31,
+   "peak_dbfs": -1.03,
+   "rms_dbfs": -16.03,
    "clipped": 0
   },
   "Hit_GlassShield_1": {
@@ -464,10 +464,10 @@
    "prompt": "blocked strike against hardened glass barrier, dull knock with harmonic glass ring, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1291,
    "sr": 44100,
-   "duration_s": 0.125,
+   "duration_s": 0.286,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.2,
-   "rms_dbfs": -8.34,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.87,
    "clipped": 0
   },
   "Hit_GlassShield_2": {
@@ -477,10 +477,10 @@
    "prompt": "ricochet off magical prism buckler, hard deflect thud and short bell ping, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1292,
    "sr": 44100,
-   "duration_s": 0.173,
+   "duration_s": 0.396,
    "lead_ms": 0.0,
-   "peak_dbfs": -3.86,
-   "rms_dbfs": -9.06,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.56,
    "clipped": 0
   },
   "Hit_Glass_0": {
@@ -490,10 +490,10 @@
    "prompt": "sharp strike shattering cursed crystal glass shard, crisp brittle crunch, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1280,
    "sr": 44100,
-   "duration_s": 0.241,
+   "duration_s": 0.324,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.59,
-   "rms_dbfs": -9.6,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.79,
    "clipped": 0
   },
   "Hit_Glass_1": {
@@ -503,10 +503,10 @@
    "prompt": "melee hit fracturing thick obsidian glass spire, crystalline crack, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1281,
    "sr": 44100,
-   "duration_s": 0.106,
+   "duration_s": 0.187,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.19,
-   "rms_dbfs": -13.3,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -18.64,
    "clipped": 0
   },
   "Hit_Glass_2": {
@@ -516,10 +516,10 @@
    "prompt": "heavy blow smashing fused glass shell with sharp glassy scatter, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1282,
    "sr": 44100,
-   "duration_s": 0.369,
+   "duration_s": 0.451,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.18,
-   "rms_dbfs": -8.16,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -17.3,
    "clipped": 0
   },
   "Hit_StoneAsh_0": {
@@ -529,10 +529,10 @@
    "prompt": "heavy weapon strike on cracked volcanic basalt and dry cinder ash, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1270,
    "sr": 44100,
-   "duration_s": 0.204,
+   "duration_s": 0.292,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.23,
-   "rms_dbfs": -11.29,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.58,
    "clipped": 0
   },
   "Hit_StoneAsh_1": {
@@ -542,10 +542,10 @@
    "prompt": "stone crust impact with crumbling kiln slag gravel burst, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1271,
    "sr": 44100,
-   "duration_s": 0.536,
+   "duration_s": 0.55,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.48,
-   "rms_dbfs": -13.74,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.56,
    "clipped": 0
   },
   "Hit_StoneAsh_2": {
@@ -555,10 +555,10 @@
    "prompt": "iron blade chopping into brittle charcoal rock and soot, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1272,
    "sr": 44100,
-   "duration_s": 0.484,
-   "lead_ms": 0.5,
-   "peak_dbfs": -2.74,
-   "rms_dbfs": -9.7,
+   "duration_s": 0.55,
+   "lead_ms": 2.36,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.8,
    "clipped": 0
   },
   "Hurt": {
@@ -570,8 +570,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.1,
-   "rms_dbfs": -16.13,
+   "peak_dbfs": -1.02,
+   "rms_dbfs": -16.02,
    "clipped": 0
   },
   "HuskGrowl": {
@@ -583,8 +583,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.05,
-   "peak_dbfs": -8.16,
-   "rms_dbfs": -15.6,
+   "peak_dbfs": -7.73,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "IronVow": {
@@ -596,8 +596,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -7.73,
-   "rms_dbfs": -15.58,
+   "peak_dbfs": -7.31,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Lantern": {
@@ -609,8 +609,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -3.97,
-   "rms_dbfs": -15.76,
+   "peak_dbfs": -3.55,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "LevelUp": {
@@ -622,8 +622,8 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.79,
-   "rms_dbfs": -16.83,
+   "peak_dbfs": -15.76,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "Loot": {
@@ -633,10 +633,10 @@
    "prompt": "warm leather pickup rustle + soft D4-A4 pluck, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.245,
-   "lead_ms": 0.7,
-   "peak_dbfs": -5.66,
-   "rms_dbfs": -13.62,
+   "duration_s": 0.381,
+   "lead_ms": 2.86,
+   "peak_dbfs": -1.13,
+   "rms_dbfs": -20.14,
    "clipped": 0
   },
   "MireGround": {
@@ -648,8 +648,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.0,
-   "rms_dbfs": -15.93,
+   "peak_dbfs": -1.44,
+   "rms_dbfs": -16.14,
    "clipped": 0
   },
   "MireHook": {
@@ -661,8 +661,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.32,
-   "peak_dbfs": -6.26,
-   "rms_dbfs": -15.68,
+   "peak_dbfs": -4.6,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "PlayerDeath": {
@@ -674,8 +674,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.05,
-   "rms_dbfs": -16.44,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.22,
    "clipped": 0
   },
   "PowderKeg": {
@@ -687,8 +687,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.82,
-   "rms_dbfs": -15.72,
+   "peak_dbfs": -4.39,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Quest": {
@@ -700,8 +700,8 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.75,
-   "rms_dbfs": -16.93,
+   "peak_dbfs": -15.54,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "RareDrop": {
@@ -713,8 +713,8 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.0,
-   "peak_dbfs": -15.45,
-   "rms_dbfs": -16.76,
+   "peak_dbfs": -15.37,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "ShadowRoll": {
@@ -726,8 +726,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.45,
-   "rms_dbfs": -16.16,
+   "peak_dbfs": -4.45,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Shrine": {
@@ -739,8 +739,8 @@
    "sr": 44100,
    "duration_s": 1.8,
    "lead_ms": 0.02,
-   "peak_dbfs": -15.27,
-   "rms_dbfs": -16.77,
+   "peak_dbfs": -15.19,
+   "rms_dbfs": -17.0,
    "clipped": 0
   },
   "SmokePot": {
@@ -752,21 +752,21 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -6.65,
-   "rms_dbfs": -15.62,
+   "peak_dbfs": -5.19,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Swing": {
    "cue": "Swing",
    "category": "combat",
-   "hash": "873150b52b56",
-   "prompt": "warm airy melee swing, band-passed brush + low body (3-variant rotation), dry, no reverb, close mic, dark medieval fantasy foley",
+   "hash": "8f2efeba0ee3",
+   "prompt": "single warm airy melee sword swing whoosh, quick iron blade arc through air, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
    "duration_s": 0.65,
-   "lead_ms": 0.0,
-   "peak_dbfs": -9.33,
-   "rms_dbfs": -15.7,
+   "lead_ms": 0.02,
+   "peak_dbfs": -8.87,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Swing_0": {
@@ -776,10 +776,10 @@
    "prompt": "light crisp weapon swing air whoosh, quick iron blade arc, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1244,
    "sr": 44100,
-   "duration_s": 0.198,
-   "lead_ms": 0.68,
-   "peak_dbfs": -3.34,
-   "rms_dbfs": -11.68,
+   "duration_s": 0.322,
+   "lead_ms": 2.06,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.46,
    "clipped": 0
   },
   "Swing_1": {
@@ -789,10 +789,10 @@
    "prompt": "medium weight sword slash whoosh, balanced air cut, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1245,
    "sr": 44100,
-   "duration_s": 0.248,
-   "lead_ms": 1.02,
-   "peak_dbfs": -3.95,
-   "rms_dbfs": -12.45,
+   "duration_s": 0.373,
+   "lead_ms": 2.22,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.3,
    "clipped": 0
   },
   "Swing_2": {
@@ -802,10 +802,10 @@
    "prompt": "heavy warhammer or greatsword overhead swing air rush, low chesty whoosh, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1246,
    "sr": 44100,
-   "duration_s": 0.366,
-   "lead_ms": 0.61,
-   "peak_dbfs": -2.87,
-   "rms_dbfs": -10.94,
+   "duration_s": 0.499,
+   "lead_ms": 2.95,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.42,
    "clipped": 0
   },
   "SwordHit1": {
@@ -815,10 +815,10 @@
    "prompt": "sword impact variant 1, crisp dark steel, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 1.5,
+   "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -3.65,
-   "rms_dbfs": -16.16,
+   "peak_dbfs": -3.15,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "SwordHit2": {
@@ -828,10 +828,10 @@
    "prompt": "sword impact variant 2, mid steel, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 1.5,
+   "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -9.62,
-   "rms_dbfs": -18.54,
+   "peak_dbfs": -4.58,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "SwordHit3": {
@@ -841,10 +841,10 @@
    "prompt": "sword impact variant 3, heavy cleave steel, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 1.5,
+   "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.38,
-   "rms_dbfs": -15.75,
+   "peak_dbfs": -1.99,
+   "rms_dbfs": -16.04,
    "clipped": 0
   },
   "Twang": {
@@ -856,8 +856,8 @@
    "sr": 44100,
    "duration_s": 0.65,
    "lead_ms": 0.0,
-   "peak_dbfs": -2.6,
-   "rms_dbfs": -15.89,
+   "peak_dbfs": -1.24,
+   "rms_dbfs": -16.07,
    "clipped": 0
   },
   "UIClick": {
@@ -867,10 +867,10 @@
    "prompt": "muted wood/leather UI tap routed through EffectiveUI, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.162,
+   "duration_s": 0.25,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.16,
-   "rms_dbfs": -18.2,
+   "peak_dbfs": -1.47,
+   "rms_dbfs": -20.03,
    "clipped": 0
   },
   "Veil": {
@@ -882,8 +882,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -1.06,
-   "rms_dbfs": -16.36,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.25,
    "clipped": 0
   },
   "VendorBuy": {
@@ -893,10 +893,10 @@
    "prompt": "vendor buy warm rising fifth pluck, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.116,
+   "duration_s": 0.201,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.14,
-   "rms_dbfs": -18.17,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -20.27,
    "clipped": 0
   },
   "VendorSell": {
@@ -906,10 +906,10 @@
    "prompt": "vendor sell warm falling fourth pluck, dry, no reverb, close mic, dark medieval fantasy foley",
    "seed": 1234,
    "sr": 44100,
-   "duration_s": 0.214,
+   "duration_s": 0.295,
    "lead_ms": 0.07,
-   "peak_dbfs": -1.44,
-   "rms_dbfs": -16.76,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -21.38,
    "clipped": 0
   },
   "VenomVial": {
@@ -920,9 +920,9 @@
    "seed": 1234,
    "sr": 44100,
    "duration_s": 0.65,
-   "lead_ms": 0.05,
-   "peak_dbfs": -6.89,
-   "rms_dbfs": -15.6,
+   "lead_ms": 0.11,
+   "peak_dbfs": -5.06,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "WardenTaunt": {
@@ -934,8 +934,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -11.49,
-   "rms_dbfs": -19.06,
+   "peak_dbfs": -7.09,
+   "rms_dbfs": -16.0,
    "clipped": 0
   },
   "Whoosh": {
@@ -947,8 +947,8 @@
    "sr": 44100,
    "duration_s": 1.5,
    "lead_ms": 0.0,
-   "peak_dbfs": -4.33,
-   "rms_dbfs": -14.88,
+   "peak_dbfs": -1.0,
+   "rms_dbfs": -16.34,
    "clipped": 0
   }
  }

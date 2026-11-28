@@ -37,7 +37,7 @@ DEFAULT_TOKEN_FILE = Path.home() / ".config" / "remote-workspace" / "studio-mcp.
 STYLE_LINE = "dry, no reverb, close mic, dark medieval fantasy foley"
 
 PEAK_CEILING_DBFS = -1.0
-PEAK_CEILING_AMP = 10.0 ** (-1.05 / 20.0)  # ~0.8861, strictly <= -1.0 dBFS
+PEAK_CEILING_AMP = 10.0 ** (-1.0 / 20.0)  # ~=0.8913, hard cap checked by gate
 
 CATEGORY_TARGET_RMS_DB = {
     "ui": -20.0,
@@ -136,6 +136,17 @@ SFX_VARIANTS: list[dict] = [
 ]
 
 
+# Concrete Studio prompts for base cues whose manifest text is engine/meta
+# (material lists, rotation notes, runtime references) rather than a sound.
+# Without this the model renders quiet mush (e.g. Hit peak -15 dBFS).
+STUDIO_PROMPT_OVERRIDES: dict[str, str] = {
+    "Hit": "deep heavy melee impact thud with dry bone crunch and short dark steel ring, single hit",
+    "Swing": "single warm airy melee sword swing whoosh, quick iron blade arc through air",
+    "Footstep": "single heavy leather boot step on packed dirt ground, dry close thud",
+    "Ambient": "seamless looping warm moor breeze with subtle low air bed, no birds, no voices, no music",
+}
+
+
 def cue_category(cue: str) -> str:
     if cue in UI_CUES:
         return "ui"
@@ -164,7 +175,17 @@ def default_max_duration_s(key: str, category: str) -> float | None:
 
 def build_sfx_prompt(entry: dict) -> str:
     """Combine manifest cue description with consistent Cinderreach acoustic style line."""
-    base = entry.get("prompt", entry.get("cue", entry.get("key", ""))).strip()
+    key = entry.get("key", entry.get("cue", ""))
+    if key in STUDIO_PROMPT_OVERRIDES:
+        base = STUDIO_PROMPT_OVERRIDES[key]
+    else:
+        base = entry.get("prompt", entry.get("cue", entry.get("key", ""))).strip()
+        # Strip engine/meta parentheticals that confuse the generative model
+        # (e.g. "(DiabloAmbience bed, PlayCue no-op)", "(3-variant rotation)").
+        if "(" in base and ")" in base:
+            import re as _re
+
+            base = _re.sub(r"\s*\([^)]*(?:bed|no-op|rotation|routing|variant)[^)]*\)", "", base).strip()
     return f"{base}, {STYLE_LINE}" if base else STYLE_LINE
 
 
@@ -310,7 +331,29 @@ def _apply_cosine_fades(data: list[float], sr: int, fade_in_ms: float, fade_out_
         data[idx] *= 0.5 * (1.0 - math.cos(math.pi * i / fout))
 
 
-def _soft_limit(data: list[float], gain: float, ceiling: float) -> list[float]:
+def _remove_dc(data: list[float]) -> list[float]:
+    """Subtract block mean (post-trim) so local asymmetric transients keep no DC push."""
+    if not data:
+        return data
+    mean = sum(data) / len(data)
+    if mean == 0.0:
+        return data
+    return [x - mean for x in data]
+
+
+def _full_rms(data: list[float]) -> float:
+    if not data:
+        return 0.0
+    return math.sqrt(sum(x * x for x in data) / len(data))
+
+
+def _soft_limit_single(data: list[float], gain: float, ceiling: float) -> list[float]:
+    """Single-pass gain + tanh soft-knee only above threshold (no iterative re-limiting).
+
+    The old 3-iteration loop re-limited already limited peaks and diverged:
+    short transients ended ~8 dB hot (Hit_Glass_*), beds ended ~4 dB quiet
+    (Hit base). One pass keeps crest intact and hits the RMS target.
+    """
     thresh = ceiling * 0.78
     headroom = ceiling - thresh
     out = [0.0] * len(data)
@@ -341,16 +384,34 @@ def master_sfx(
     loop: bool = False,
     max_duration_s: float | None = None,
 ) -> tuple[list[float], dict]:
-    """Deterministically trim, fade/crossfade, loudness-normalize and peak-cap SFX."""
+    """Deterministically trim, fade/crossfade, loudness-normalize and peak-cap SFX.
+
+    Fixes vs. the first generation pass (Nov 2026, all 73 clips hit audible
+    defects): DC is removed *after* trimming (pre-trim mean kept Block at
+    +0.0035 and Hit_GlassShield_1 at -0.0126 DC); loops trim silence before
+    the equal-power crossfade (Ambient started with 298 ms silence and faded
+    to -78 dB tail instead of looping); trim thresholds are capped absolute
+    so quiet beds keep their tail (FULL 0.65/1.5/1.8 s hard cuts) and short
+    transients keep their decay (Footstep_Sand_2 was cut to 82 ms); fades are
+    5 ms in / 45 ms out (80 ms when capped) so sub-bass (Blast/BossRoar) does
+    not click on a 10 ms chop; loudness is a single gain pass on full-signal
+    RMS (the iterative active-RMS loop left Glass/Swing ~8 dB hot and Hit
+    ~4 dB quiet).
+    """
     if sr <= 0:
         raise ValueError(f"invalid sample rate {sr}")
     if not samples:
         raise ValueError("empty audio buffer")
 
-    mean = sum(samples) / len(samples)
-    data = [float(x) - mean for x in samples]
+    # Coarse DC removal first (protects threshold detectors), fine removal
+    # again after trim (local segment mean differs from whole-buffer mean).
+    data = _remove_dc([float(x) for x in samples])
 
+    capped = False
     if loop:
+        # Trim leading/trailing silence BEFORE the loop seam, then crossfade.
+        data, _s, _e, _capped = _trim_oneshot(data, sr, None)
+        data = _remove_dc(data)
         if max_duration_s is not None and max_duration_s > 0.0:
             limit = max(8, int(round(max_duration_s * sr)))
             data = data[:limit]
@@ -364,44 +425,27 @@ def master_sfx(
                 + math.sin(0.5 * math.pi * (i / xfade)) * head[i]
                 for i in range(xfade)
             ]
-            data = blended + mid
+            # mid + blended keeps chronological order (blended seam at loop end).
+            data = mid + blended
+        data = _remove_dc(data)
     else:
-        raw_peak = max((abs(x) for x in data), default=0.0)
-        start_thresh = max(0.01, raw_peak * 0.025) if raw_peak > 0.01 else 0.005
-        end_thresh = max(0.0056, raw_peak * 0.012) if raw_peak > 0.0056 else 0.003
-
-        first_active = next((i for i, x in enumerate(data) if abs(x) > start_thresh), 0)
-        pre_samples = int(round(0.002 * sr))
-        start = max(0, first_active - pre_samples)
-
-        last_active = next(
-            (i for i in range(len(data) - 1, start - 1, -1) if abs(data[i]) > end_thresh),
-            len(data) - 1,
-        )
-        tail_pad = int(round(0.040 * sr))
-        end = min(len(data), last_active + 1 + tail_pad)
-        if max_duration_s is not None and max_duration_s > 0.0:
-            end = min(end, start + max(1, int(round(max_duration_s * sr))))
-        data = data[start:max(start + 1, end)]
-        _apply_cosine_fades(data, sr, fade_in_ms=2.0 if start > 0 else 0.0, fade_out_ms=10.0)
+        data, start, _end, capped = _trim_oneshot(data, sr, max_duration_s)
+        data = _remove_dc(data)
+        if capped:
+            _apply_cosine_fades(data, sr, fade_in_ms=5.0 if start > 0 else 0.0, fade_out_ms=80.0)
+        else:
+            _apply_cosine_fades(data, sr, fade_in_ms=5.0 if start > 0 else 0.0, fade_out_ms=45.0)
 
     target_db = CATEGORY_TARGET_RMS_DB.get(category, CATEGORY_TARGET_RMS_DB["combat"])
     target_rms = 10.0 ** (target_db / 20.0)
-    rms = _active_rms(data, floor_amp=0.01)
-    if rms < 1e-6:
-        rms = _active_rms(data, floor_amp=0.0)
+    rms = _full_rms(data)
 
     gain = target_rms / rms if rms > 1e-9 else 1.0
-    for _ in range(3):
-        candidate = _soft_limit(data, gain, PEAK_CEILING_AMP)
-        cur_rms = _active_rms(candidate, floor_amp=0.01)
-        if cur_rms <= 1e-9 or abs(cur_rms - target_rms) / target_rms < 0.05:
-            data = candidate
-            break
-        gain *= target_rms / cur_rms
-        data = candidate
-    else:
-        data = _soft_limit(data, gain, PEAK_CEILING_AMP)
+    # Clamp absurd gains from near-silent inputs (model silence) instead of
+    # boosting noise floor into a loud hiss: max +24 dB.
+    gain = min(gain, 15.85)
+    data = _soft_limit_single(data, gain, PEAK_CEILING_AMP)
+    data = _remove_dc(data)
 
     peak = max((abs(x) for x in data), default=0.0)
     if peak > PEAK_CEILING_AMP:
@@ -409,15 +453,8 @@ def master_sfx(
         data = [x * scale for x in data]
         peak = PEAK_CEILING_AMP
 
-    if not loop:
-        first_loud = next((i for i, x in enumerate(data) if abs(x) > 0.01), 0)
-        if first_loud > int(round(0.003 * sr)):
-            cut = max(0, first_loud - int(round(0.0015 * sr)))
-            data = data[cut:]
-            _apply_cosine_fades(data, sr, fade_in_ms=1.0, fade_out_ms=0.0)
-
     clipped = sum(1 for x in data if abs(x) >= 0.9999)
-    final_rms = _active_rms(data, floor_amp=0.01)
+    final_rms = _full_rms(data)
     first_loud = next((i for i, x in enumerate(data) if abs(x) > 0.01), 0)
     metrics = {
         "sr": sr,
@@ -428,6 +465,41 @@ def master_sfx(
         "clipped": clipped,
     }
     return data, metrics
+
+
+def _trim_oneshot(
+    data: list[float], sr: int, max_duration_s: float | None
+) -> tuple[list[float], int, int, bool]:
+    """Trim leading/trailing silence, keep 120 ms natural decay.
+
+    Thresholds are capped absolute (not purely peak-relative) so loud blasts
+    do not keep their noise floor as 'active' (old code pinned every base cue
+    to FULL 0.65/1.5/1.8 s) and quiet steps do not lose their decay tail
+    (Footstep_Sand_2 was cut to 82 ms). Returns (trimmed, start, end, capped).
+    """
+    raw_peak = max((abs(x) for x in data), default=0.0)
+    if raw_peak <= 1e-9:
+        return data, 0, len(data), False
+    start_thresh = min(0.01, max(0.003, raw_peak * 0.02))
+    end_thresh = min(0.006, max(0.002, raw_peak * 0.01))
+
+    first_active = next((i for i, x in enumerate(data) if abs(x) > start_thresh), 0)
+    pre_samples = int(round(0.003 * sr))
+    start = max(0, first_active - pre_samples)
+
+    last_active = next(
+        (i for i in range(len(data) - 1, start - 1, -1) if abs(data[i]) > end_thresh),
+        len(data) - 1,
+    )
+    tail_pad = int(round(0.120 * sr))
+    end = min(len(data), last_active + 1 + tail_pad)
+    capped = False
+    if max_duration_s is not None and max_duration_s > 0.0:
+        cap_end = start + max(1, int(round(max_duration_s * sr)))
+        if end > cap_end:
+            end = cap_end
+            capped = True
+    return data[start:max(start + 1, end)], start, end, capped
 
 
 def _read_token(token_file: Path) -> str:

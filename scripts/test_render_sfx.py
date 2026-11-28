@@ -25,8 +25,10 @@ def test_trim_removes_leading_and_trailing_silence_under_5ms():
     raw = _sine_burst(sr, lead_s=0.20, body_s=0.25, tail_s=0.30, amp=0.5)
     out, metrics = sfx.master_sfx(raw, sr, category="combat")
     assert metrics["lead_ms"] < 5.0
-    assert 0.24 < metrics["duration_s"] < 0.32
-    assert abs(out[-1]) < 1e-4
+    # 0.25 s body + 3 ms pre + 120 ms natural decay tail (fades preserve reverb,
+    # no 10 ms hard chop that clicked on sub-bass Blast/BossRoar).
+    assert 0.24 < metrics["duration_s"] < 0.42
+    assert abs(out[-1]) < 1e-3
 
 
 def test_master_clamps_peak_below_minus_1_dbfs_no_clipping():
